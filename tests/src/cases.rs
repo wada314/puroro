@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod builder;
-mod bumpalo;
-mod either;
-mod empty;
-mod merged;
-mod official_samples;
-mod oneof;
-mod proto2_defaults;
-mod proto3_defaults;
-mod self_recursive;
-mod simple_get_set;
-mod simple_misc_traits;
-mod simple_ser_tests;
+//mod builder;
+//mod bumpalo;
+//mod either;
+//mod empty;
+//mod merged;
+//mod official_samples;
+//mod oneof;
+//mod proto2_defaults;
+//mod proto3_defaults;
+//mod self_recursive;
+//mod simple_get_set;
+//mod simple_misc_traits;
+//mod simple_ser_tests;
 mod template;
-mod variants_packed;
+//mod variants_packed;

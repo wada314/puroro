@@ -22,7 +22,7 @@ use ::std::convert::TryFrom;
 use ::std::io::Write;
 
 /// A common trait for protobuf message implementation in Rust.
-pub trait Message<M> {
+pub trait Message_<M> {
     /// Deserialize the message from input bytes.
     /// This method does not clear the `&mut self` before deserializing.
     /// i.e. This method "merges" the input into `&mut self`.
@@ -65,53 +65,6 @@ pub trait Message<M> {
         <Self as SerMessageToIoWrite>::ser(&self, out)
     }
 }
-impl<M> Message<M> for () where M: MessageRepresentativeImpl {}
-impl<M, T, U> Message<M> for crate::Either<T, U>
-where
-    T: Message<M>,
-    U: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-impl<M, T, U> Message<M> for (T, U)
-where
-    T: Message<M>,
-    U: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-impl<M, T> Message<M> for Option<T>
-where
-    T: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-impl<M, T> Message<M> for Box<T>
-where
-    T: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-impl<'bump, M, T> Message<M> for NoAllocBumpBox<T>
-where
-    T: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-impl<'a, M, T> Message<M> for &'a T
-where
-    T: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-impl<'a, M, T> Message<M> for &'a mut T
-where
-    T: Message<M>,
-    M: MessageRepresentativeImpl,
-{
-}
-
-pub trait MessageRepresentativeImpl {}
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
