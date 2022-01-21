@@ -21,6 +21,7 @@ use crate::Message;
 impl<
     'a,
     MP,
+    InnerType,
     InnerImplTag,
     InnerFieldsType,
     InnerSharedType,
@@ -30,7 +31,7 @@ impl<
     GetOptFieldMethodImpl<
         'a,
         (),
-        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
+        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>, InnerType>,
         tags::OptionImpl,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::LabelTag,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::TypeTag,
@@ -40,16 +41,20 @@ impl<
         MP,
         tags::OptionImpl,
         OptionFields,
-        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
+        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>, InnerType>,
     >
 where
     Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
         GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    InnerType: AsRef<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
 {
     type GetterType = Option<FinalInnerGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
-        self.shared.option.as_ref().and_then(|msg| msg.get_opt())
+        self.shared
+            .option
+            .as_ref()
+            .and_then(|msg| msg.as_ref().get_opt())
     }
 }

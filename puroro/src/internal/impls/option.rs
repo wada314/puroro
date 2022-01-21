@@ -13,7 +13,9 @@
 // limitations under the License.
 
 pub mod getter_opt;
+
 use crate::internal::{FieldsContainer, HasField};
+use ::std::marker::PhantomData;
 
 pub struct OptionFields;
 impl FieldsContainer for OptionFields {}
@@ -28,11 +30,23 @@ impl<const NUMBER: i32> HasField<NUMBER> for OptionFields {
 }
 
 #[derive(Default, Clone, Debug)]
-pub struct OptionShared<T> {
+pub struct OptionShared<MessageType, T> {
     option: Option<T>,
+    _phantom: PhantomData<MessageType>,
 }
-impl<T> From<Option<T>> for OptionShared<T> {
+impl<T> From<Option<T>> for OptionShared<T, T> {
     fn from(v: Option<T>) -> Self {
-        Self { option: v }
+        Self {
+            option: v,
+            _phantom: PhantomData,
+        }
+    }
+}
+impl<'a, T> From<Option<&'a T>> for OptionShared<T, &'a T> {
+    fn from(v: Option<&'a T>) -> Self {
+        Self {
+            option: v,
+            _phantom: PhantomData,
+        }
     }
 }
