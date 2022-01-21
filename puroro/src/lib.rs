@@ -197,4 +197,5 @@ fn test() {
     let partner = p.partner();
     let _: Option<u32> = partner.age_opt();
     let _: Option<&Person> = partner.partner_opt();
+    let _: u32 = partner.age();
 }

@@ -29,10 +29,19 @@ pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::simple::{SimpleFields, SimpleShared};
 
 use crate::tags;
+use crate::Message;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::view::BitViewSized;
+
+fn fake_message_impl<NewImplTag, MP, OldImplTag, Fields, Shared>(
+    message: &Message<MP, OldImplTag, Fields, Shared>,
+) -> &Message<MP, NewImplTag, Fields, Shared> {
+    // This is safe because Message type's inner representation
+    // does not depend on ImplTag.
+    unsafe { std::mem::transmute(message) }
+}
 
 pub trait Bitfield {
     fn get(&self, index: usize) -> bool;
