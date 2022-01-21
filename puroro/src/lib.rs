@@ -157,4 +157,7 @@ fn test() {
     let _: u32 = p.age();
     let _: &str = p.name();
     //let _: &Person = p.partner();
+    let _: &Vec<u32> = p.scores();
+    let _: &Vec<String> = p.nicknames();
+    let _: &Vec<Person> = p.children();
 }

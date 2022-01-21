@@ -79,3 +79,23 @@ where
         )
     }
 }
+
+impl<'a, MP, FieldsType, SharedType, TypeTag, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        tags::SimpleImpl,
+        tags::Repeated,
+        TypeTag,
+        NUMBER,
+    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    <FieldsType as HasField<NUMBER>>::Type: 'a,
+{
+    type GetterType = &'a <FieldsType as HasField<NUMBER>>::Type;
+    fn get(&'a self) -> Self::GetterType {
+        <FieldsType as HasField<NUMBER>>::get(&self.fields)
+    }
+}
