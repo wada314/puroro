@@ -134,6 +134,21 @@ macro_rules! impl_scalar_getters {
         }
     };
 }
+#[macro_export]
+macro_rules! impl_repeated_getters {
+    ($mp:ty, $number:expr, $get:ident) => {
+        impl<ImplTag, FieldsType, SharedType> Message<$mp, ImplTag, FieldsType, SharedType>
+        where
+            Self: crate::internal::methods::GetFieldMethod<$number>,
+        {
+            pub fn $get(
+                &self,
+            ) -> <Self as crate::internal::methods::GetFieldMethod<$number>>::GetterType<'_> {
+                <Self as crate::internal::methods::GetFieldMethod<$number>>::get(self)
+            }
+        }
+    };
+}
 
 pub struct FieldAndSharedRef<'a, Field, Shared> {
     field: &'a Field,
