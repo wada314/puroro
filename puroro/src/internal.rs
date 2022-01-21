@@ -87,7 +87,7 @@ impl<T> IsDefault for NoAllocBumpVec<T> {
 
 pub trait MessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize;
-    type Fields<const NUMBER: usize>;
+    type Fields<const NUMBER: i32>;
 }
 pub trait FieldProperties {
     type MessageProperties: self::MessageProperties;

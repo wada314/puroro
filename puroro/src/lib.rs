@@ -38,14 +38,14 @@ pub use ::either::Either;
 
 use ::std::marker::PhantomData;
 
-pub struct Message<MP, Fields, Shared> {
+pub struct Message<MP, ImplTag, Fields, Shared> {
     pub fields: Fields,
     pub shared: Shared,
-    _phantom: PhantomData<MP>,
+    _phantom: PhantomData<(MP, ImplTag)>,
 }
 
 // メモ
-use internal::methods::{GetFieldMethod, GetOptFieldMethod};
+use internal::methods::{GetFieldMethod2, GetOptFieldMethod};
 use internal::{FieldAndSharedRef, FieldProperties, MessageProperties};
 use internal::{SimpleFields, SimpleShared};
 
@@ -56,7 +56,8 @@ use internal::{SimpleFields, SimpleShared};
 //     repeated Person children = 3;
 // }
 //
-type Person = Message<PersonMessageProperties, SimpleFields, SimpleShared<1>>;
+type Person =
+    Message<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
 
 struct PersonFieldsContainer {
     name: String,

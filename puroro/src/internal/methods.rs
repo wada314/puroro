@@ -12,25 +12,69 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::FieldProperties;
+use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::Message;
 
-pub trait GetFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type GetterTypeImpl;
-    fn get_impl(&self) -> Self::GetterTypeImpl;
-}
-pub trait GetFieldMethod<'a, FP, ImplTag> {
+pub trait GetFieldMethodImpl<FieldType, SharedType, ImplTag, LabelTag, TypeTag, const NUMBER: i32> {
     type GetterType;
     fn get(&self) -> Self::GetterType;
 }
-impl<'a, FP, ImplTag, T> GetFieldMethod<'a, FP, ImplTag> for T
+pub trait GetFieldMethod<const NUMBER: i32> {
+    type GetterType;
+    fn get(&self) -> Self::GetterType;
+}
+impl<MP, ImplTag, Fields, Shared, const NUMBER: i32> GetFieldMethod<NUMBER>
+    for Message<MP, ImplTag, Fields, Shared>
+where
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
+    Fields: HasField<NUMBER>,
+    Self: GetFieldMethodImpl<
+        <Fields as HasField<NUMBER>>::Type,
+        Shared,
+        ImplTag,
+        <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
+        <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
+        NUMBER,
+    >,
+{
+    type GetterType = <Self as GetFieldMethodImpl<
+        <Fields as HasField<NUMBER>>::Type,
+        Shared,
+        ImplTag,
+        <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
+        <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
+        NUMBER,
+    >>::GetterType;
+    fn get(&self) -> Self::GetterType {
+        <Self as GetFieldMethodImpl<
+            <Fields as HasField<NUMBER>>::Type,
+            Shared,
+            ImplTag,
+            <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
+            <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
+            NUMBER,
+        >>::get(&self)
+    }
+}
+
+pub trait GetFieldMethodImpl2<'a, FP, ImplTag, LabelTag, TypeTag> {
+    type GetterTypeImpl;
+    fn get_impl(&self) -> Self::GetterTypeImpl;
+}
+pub trait GetFieldMethod2<'a, FP, ImplTag> {
+    type GetterType;
+    fn get(&self) -> Self::GetterType;
+}
+impl<'a, FP, ImplTag, T> GetFieldMethod2<'a, FP, ImplTag> for T
 where
     FP: FieldProperties,
-    T: GetFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
+    T: GetFieldMethodImpl2<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
 {
     type GetterType =
-        <Self as GetFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
+        <Self as GetFieldMethodImpl2<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
     fn get(&self) -> Self::GetterType {
-        <Self as GetFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_impl(self)
+        <Self as GetFieldMethodImpl2<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_impl(self)
     }
 }
 

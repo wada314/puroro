@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::{GetFieldMethodImpl, GetOptFieldMethod};
+use crate::internal::methods::{GetFieldMethodImpl2, GetOptFieldMethod};
 use crate::internal::FieldProperties;
 use crate::internal::{FieldAndSharedRef, SharedObjects};
 use crate::tags;
@@ -21,7 +21,7 @@ use crate::tags;
 // assuming that getter_opt method is implemented, and the `FieldPropetry::DEFAULT_VALUE`
 // type is the same as the getter's return type.
 impl<'a, _1, _2, FP, FieldType, Shared, GetterType>
-    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::NonLdType<_2>>
+    GetFieldMethodImpl2<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::NonLdType<_2>>
     for FieldAndSharedRef<'a, FieldType, Shared>
 where
     FP: FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::NonLdType<_2>>,
@@ -46,7 +46,7 @@ where
 type Borrowed<_2> = <tags::StringOrBytesType<_2> as tags::StringOrBytesTypeTag>::BorrowedType;
 
 impl<'a, 'b: 'a, _1, _2, FP, FieldType, Shared>
-    GetFieldMethodImpl<
+    GetFieldMethodImpl2<
         'a,
         FP,
         tags::SimpleImpl,
@@ -73,7 +73,7 @@ where
 // [optional|required|(unlabeled)] message field
 // assuming that getter_opt method is implemented.
 impl<'a, _1, FP, MP, FieldType, Shared>
-    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::Message<MP>>
+    GetFieldMethodImpl2<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::Message<MP>>
     for FieldAndSharedRef<'a, FieldType, Shared>
 where
     FP: FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<MP>>,
@@ -88,7 +88,7 @@ where
 
 // repeated field
 impl<'a, FP, ScalarType, Shared, TypeTag>
-    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, TypeTag>
+    GetFieldMethodImpl2<'a, FP, tags::SimpleImpl, tags::Repeated, TypeTag>
     for FieldAndSharedRef<'a, Vec<ScalarType>, Shared>
 where
     FP: FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
