@@ -18,10 +18,10 @@ use crate::tags;
 use crate::Message;
 
 // repeated field
-impl<'a, MP, FieldsType, SharedType, TypeTag, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, TypeTag, ItemType, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
-        <FieldsType as HasField<NUMBER>>::Type,
+        Vec<ItemType>,
         SharedType,
         tags::SimpleImpl,
         tags::Repeated,
@@ -29,10 +29,10 @@ impl<'a, MP, FieldsType, SharedType, TypeTag, const NUMBER: i32>
         NUMBER,
     > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER>,
-    <FieldsType as HasField<NUMBER>>::Type: 'a,
+    FieldsType: HasField<NUMBER, Type = Vec<ItemType>>,
+    ItemType: 'a,
 {
-    type GetterType = &'a <FieldsType as HasField<NUMBER>>::Type;
+    type GetterType = &'a [ItemType];
     fn get(&'a self) -> Self::GetterType {
         <FieldsType as HasField<NUMBER>>::get(&self.fields)
     }
