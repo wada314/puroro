@@ -127,8 +127,6 @@ where
 
 //################ Blanket impls ################
 
-type BorrowedType<_1> = <tags::StringOrBytesType<_1> as tags::StringOrBytesTypeTag>::BorrowedType;
-
 // (optional|required|[unlabeled]) non-ld field
 impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: i32>
     GetFieldMethodImpl<
@@ -143,8 +141,7 @@ impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: 
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::NonLdType<_2>>,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::NonLdType<_2>>,
     tags::NonLdType<_2>: tags::FieldTypeTag,
     <tags::NonLdType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<GetterType>,
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
@@ -172,12 +169,10 @@ impl<'a, MP, ImplTag, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<
-        LabelTag = tags::NonRepeatedLabel<_1>,
-        TypeTag = tags::StringOrBytesType<_2>,
-    >,
-    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<TypeTag = tags::StringOrBytesType<_2>>,
     tags::StringOrBytesType<_2>: tags::FieldTypeTag<DefaultValueType = &'static BorrowedType>,
+    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
     BorrowedType: 'a + 'static + ?Sized,
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a BorrowedType>>,
 {
