@@ -19,7 +19,7 @@ use crate::tags;
 use crate::Message;
 
 // (optional|required) numeric field
-impl<'a, MP, NumType, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
         'a,
         <FieldsType as HasField<NUMBER>>::Type,

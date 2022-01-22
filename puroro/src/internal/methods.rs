@@ -159,7 +159,7 @@ where
 }
 
 // (optional|required|[unlabeled]) (string|bytes) field
-impl<'a, MP, ImplTag, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+impl<'a, MP, ImplTag, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
         <FieldsType as HasField<NUMBER>>::Type,
@@ -176,12 +176,12 @@ where
         LabelTag = tags::NonRepeatedLabel<_1>,
         TypeTag = tags::StringOrBytesType<_2>,
     >,
-    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
-    tags::StringOrBytesType<_2>: tags::FieldTypeTag<DefaultValueType = &'static BorrowedType<_2>>,
-    BorrowedType<_2>: 'a + 'static,
-    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a BorrowedType<_2>>>,
+    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
+    tags::StringOrBytesType<_2>: tags::FieldTypeTag<DefaultValueType = &'static BorrowedType>,
+    BorrowedType: 'a + 'static + ?Sized,
+    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a BorrowedType>>,
 {
-    type GetterType = &'a BorrowedType<_2>;
+    type GetterType = &'a BorrowedType;
     fn get(&'a self) -> Self::GetterType {
         let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
         value_opt.unwrap_or(
