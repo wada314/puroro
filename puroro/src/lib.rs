@@ -139,49 +139,25 @@ impl MessageProperties for PersonMessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
     type Fields<const NUMBER: i32> = PersonFieldProperties<NUMBER>;
 }
+impl_field_properties!(PersonFieldProperties<1>, Optional, String, "", 0);
+impl_field_properties!(PersonFieldProperties<2>, Optional, UInt32, 0, 0);
+impl_field_properties!(
+    PersonFieldProperties<3>,
+    Repeated,
+    Message<PersonMessageProperties>,
+    (),
+    0
+);
+impl_field_properties!(
+    PersonFieldProperties<4>,
+    Optional,
+    Message<PersonMessageProperties>,
+    (),
+    0
+);
+impl_field_properties!(PersonFieldProperties<5>, Repeated, String, "", 0);
+impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
-impl FieldProperties for PersonFieldProperties<1> {
-    type MessageProperties = PersonMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = tags::Optional;
-    type TypeTag = tags::String;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = "";
-}
-impl FieldProperties for PersonFieldProperties<2> {
-    type MessageProperties = PersonMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 1;
-    type LabelTag = tags::Optional;
-    type TypeTag = tags::UInt32;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = 0;
-}
-impl FieldProperties for PersonFieldProperties<3> {
-    type MessageProperties = PersonMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = tags::Repeated;
-    type TypeTag = tags::Message<PersonMessageProperties>;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
-}
-impl FieldProperties for PersonFieldProperties<4> {
-    type MessageProperties = PersonMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = tags::Optional;
-    type TypeTag = tags::Message<PersonMessageProperties>;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
-}
-impl FieldProperties for PersonFieldProperties<6> {
-    type MessageProperties = PersonMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = tags::Repeated;
-    type TypeTag = tags::String;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = "";
-}
-impl FieldProperties for PersonFieldProperties<5> {
-    type MessageProperties = PersonMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = tags::Repeated;
-    type TypeTag = tags::UInt32;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = 0;
-}
 
 fn test() {
     let p = Person::default();

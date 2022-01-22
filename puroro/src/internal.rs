@@ -99,11 +99,10 @@ pub trait MessageProperties {
     type Fields<const NUMBER: i32>;
 }
 pub trait FieldProperties {
-    type MessageProperties: self::MessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
 }
 
 pub trait FieldsContainer {}
@@ -165,6 +164,18 @@ macro_rules! impl_repeated_getters {
             ) -> <Self as $crate::internal::methods::GetFieldMethod<'_, $number>>::GetterType {
                 <Self as $crate::internal::methods::GetFieldMethod<$number>>::get(self)
             }
+        }
+    };
+}
+#[macro_export]
+macro_rules! impl_field_properties {
+    ($fp:ty, $ltag_id:ident, $ttag_id:ident $(<$ttag_param:ty>)?, $default:expr, $opt_idx:expr) => {
+        impl $crate::internal::FieldProperties for $fp {
+            type LabelTag = $crate::tags::$ltag_id;
+            type TypeTag = $crate::tags::$ttag_id$(<$ttag_param>)?;
+            const DEFAULT_VALUE: <Self::TypeTag as $crate::tags::FieldTypeTag>::DefaultValueType =
+                $default;
+            const OPTIONAL_FIELD_BITFIELD_INDEX: usize = $opt_idx;
         }
     };
 }
