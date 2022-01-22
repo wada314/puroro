@@ -18,10 +18,8 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::Message;
 
-type NumType<_1> = <tags::NonLdType<_1> as tags::NumericalTypeTag>::NativeType;
-
 // (optional|required) numeric field
-impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+impl<'a, MP, NumType, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
         'a,
         <FieldsType as HasField<NUMBER>>::Type,
@@ -33,13 +31,13 @@ impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
-    tags::NonLdType<_2>: tags::NumericalTypeTag,
-    <FieldsType as HasField<NUMBER>>::Type: Clone + Into<NumType<_2>>,
+    tags::NonLdType<_2>: tags::NumericalTypeTag<NativeType = NumType>,
+    <FieldsType as HasField<NUMBER>>::Type: Clone + Into<NumType>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<NumType<_2>>;
+    type GetterType = Option<NumType>;
     fn get_opt(&'a self) -> Self::GetterType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
