@@ -15,7 +15,7 @@
 use super::{OptionFields, OptionShared};
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
-use crate::Message;
+use crate::MessageImpl;
 use crate::{tags, AsMessageRef};
 
 // non-repeated field
@@ -40,9 +40,9 @@ impl<
         tags::NonRepeatedLabel<_1>,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
-    > for Message<MP, tags::OptionImpl, OptionFields, OptionShared<MessageRef>>
+    > for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<MessageRef>>
 where
-    Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
+    MessageImpl<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
         'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,

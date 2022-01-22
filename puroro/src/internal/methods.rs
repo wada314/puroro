@@ -15,7 +15,7 @@
 use crate::internal::impls::option::{OptionFields, OptionShared};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
-use crate::Message;
+use crate::MessageImpl;
 
 pub trait GetFieldMethodImpl<
     'a,
@@ -35,7 +35,7 @@ pub trait GetFieldMethod<'a, const NUMBER: i32> {
     fn get(&'a self) -> Self::GetterType;
 }
 impl<'a, MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetFieldMethod<'a, NUMBER>
-    for Message<MP, ImplTag, FieldsType, SharedType>
+    for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -89,7 +89,7 @@ pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
     fn get_opt(&'a self) -> Self::GetterType;
 }
 impl<'a, MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetOptFieldMethod<'a, NUMBER>
-    for Message<MP, ImplTag, FieldsType, SharedType>
+    for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -137,7 +137,7 @@ impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: 
         tags::NonRepeatedLabel<_1>,
         tags::NonLdType<_2>,
         NUMBER,
-    > for Message<MP, ImplTag, FieldsType, SharedType>
+    > for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
@@ -165,7 +165,7 @@ impl<'a, MP, ImplTag, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER
         tags::NonRepeatedLabel<_1>,
         tags::StringOrBytesType<_2>,
         NUMBER,
-    > for Message<MP, ImplTag, FieldsType, SharedType>
+    > for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
@@ -196,7 +196,7 @@ impl<'a, MP, ImplTag, FieldMP, FieldMessageType, FieldsType, SharedType, _1, con
         tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
         NUMBER,
-    > for Message<MP, ImplTag, FieldsType, SharedType>
+    > for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
@@ -206,7 +206,7 @@ where
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
 {
     type GetterType =
-        Message<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>;
+        MessageImpl<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>;
     fn get(&'a self) -> Self::GetterType {
         let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
         Into::into(value_opt)

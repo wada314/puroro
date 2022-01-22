@@ -17,7 +17,7 @@ pub mod getter_opt;
 
 use crate::internal::{FieldsContainer, HasField};
 use crate::tags;
-use crate::Message;
+use crate::MessageImpl;
 
 #[derive(Default, Clone)]
 pub struct OptionFields;
@@ -41,9 +41,9 @@ impl<T> From<Option<T>> for OptionShared<T> {
         Self { option: v }
     }
 }
-impl<MP, T> From<Option<T>> for Message<MP, tags::OptionImpl, OptionFields, OptionShared<T>> {
+impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<T>> {
     fn from(val: Option<T>) -> Self {
-        Message {
+        MessageImpl {
             fields: Default::default(),
             shared: Into::into(val),
             _phantom: Default::default(),

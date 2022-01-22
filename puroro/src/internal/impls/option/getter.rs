@@ -15,7 +15,7 @@
 use super::{OptionFields, OptionShared};
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
-use crate::Message;
+use crate::MessageImpl;
 use crate::{tags, AsMessageRef};
 
 // repeated field
@@ -38,9 +38,9 @@ impl<
         tags::Repeated,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
-    > for Message<MP, tags::OptionImpl, OptionFields, OptionShared<MessageRef>>
+    > for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<MessageRef>>
 where
-    Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
+    MessageImpl<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
         'a + GetFieldMethod<'a, NUMBER, GetterType = GetterType>,
     GetterType: Default,
     MP: MessageProperties,

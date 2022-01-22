@@ -16,7 +16,7 @@ use crate::internal::methods::GetOptFieldMethodImpl;
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
-use crate::Message;
+use crate::MessageImpl;
 
 // (optional|required) numeric field
 impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
@@ -28,7 +28,7 @@ impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
         tags::NeedOptionalBitLabel<_1>,
         tags::NonLdType<_2>,
         NUMBER,
-    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
     tags::NonLdType<_2>: tags::NumericalTypeTag<NativeType = NumType>,
@@ -59,7 +59,7 @@ impl<'a, MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
         tags::NeedOptionalBitLabel<_1>,
         tags::StringOrBytesType<_2>,
         NUMBER,
-    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
     <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
@@ -101,7 +101,7 @@ impl<
         tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
         NUMBER,
-    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER, Type = Option<Box<FieldMessageType>>>,
     FieldMessageType: 'static,

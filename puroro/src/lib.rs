@@ -39,12 +39,12 @@ use internal::impls::option::{OptionFields, OptionShared};
 
 use ::std::marker::PhantomData;
 
-pub struct Message<MP, ImplTag, Fields, Shared> {
+pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
     pub fields: Fields,
     pub shared: Shared,
     _phantom: PhantomData<(MP, ImplTag)>,
 }
-impl<MP, ImplTag, Fields, Shared> Default for Message<MP, ImplTag, Fields, Shared>
+impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>
 where
     Fields: Default,
     Shared: Default,
@@ -64,27 +64,27 @@ trait AsMessageRef {
     type SharedType;
     fn as_message_ref(
         &self,
-    ) -> &Message<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>;
+    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>;
 }
-impl<MP, ImplTag, Fields, Shared> AsMessageRef for Message<MP, ImplTag, Fields, Shared> {
+impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fields, Shared> {
     type MessageProperties = MP;
     type ImplTag = ImplTag;
     type FieldsType = Fields;
     type SharedType = Shared;
     fn as_message_ref(
         &self,
-    ) -> &Message<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
+    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
         self
     }
 }
-impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef for &'a Message<MP, ImplTag, Fields, Shared> {
+impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef for &'a MessageImpl<MP, ImplTag, Fields, Shared> {
     type MessageProperties = MP;
     type ImplTag = ImplTag;
     type FieldsType = Fields;
     type SharedType = Shared;
     fn as_message_ref(
         &self,
-    ) -> &Message<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
+    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
         *self
     }
 }
@@ -105,9 +105,9 @@ use internal::{FieldProperties, MessageProperties};
 // }
 //
 type Person =
-    Message<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
+    MessageImpl<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
 type PersonOptional<T> =
-    Message<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
+    MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
 impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);

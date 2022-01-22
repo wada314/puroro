@@ -29,15 +29,15 @@ pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::simple::{SimpleFields, SimpleShared};
 
 use crate::tags;
-use crate::Message;
+use crate::MessageImpl;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::view::BitViewSized;
 
 fn fake_message_impl<NewImplTag, MP, OldImplTag, Fields, Shared>(
-    message: &Message<MP, OldImplTag, Fields, Shared>,
-) -> &Message<MP, NewImplTag, Fields, Shared> {
+    message: &MessageImpl<MP, OldImplTag, Fields, Shared>,
+) -> &MessageImpl<MP, NewImplTag, Fields, Shared> {
     // This is safe because Message type's inner representation
     // does not depend on ImplTag.
     unsafe { std::mem::transmute(message) }
@@ -110,7 +110,8 @@ macro_rules! impl_has_field {
 #[macro_export]
 macro_rules! impl_scalar_getters {
     ($mp:ty, $number:expr, $get:ident, $get_opt:ident) => {
-        impl<ImplTag, FieldsType, SharedType> Message<$mp, ImplTag, FieldsType, SharedType>
+        impl<ImplTag, FieldsType, SharedType>
+            $crate::MessageImpl<$mp, ImplTag, FieldsType, SharedType>
         where
             for<'a> Self: $crate::internal::methods::GetOptFieldMethod<'a, $number>,
         {
@@ -121,7 +122,8 @@ macro_rules! impl_scalar_getters {
                 <Self as $crate::internal::methods::GetOptFieldMethod<$number>>::get_opt(self)
             }
         }
-        impl<ImplTag, FieldsType, SharedType> Message<$mp, ImplTag, FieldsType, SharedType>
+        impl<ImplTag, FieldsType, SharedType>
+            $crate::MessageImpl<$mp, ImplTag, FieldsType, SharedType>
         where
             for<'a> Self: $crate::internal::methods::GetFieldMethod<'a, $number>,
         {
@@ -136,7 +138,8 @@ macro_rules! impl_scalar_getters {
 #[macro_export]
 macro_rules! impl_repeated_getters {
     ($mp:ty, $number:expr, $get:ident) => {
-        impl<ImplTag, FieldsType, SharedType> Message<$mp, ImplTag, FieldsType, SharedType>
+        impl<ImplTag, FieldsType, SharedType>
+            $crate::MessageImpl<$mp, ImplTag, FieldsType, SharedType>
         where
             for<'a> Self: $crate::internal::methods::GetFieldMethod<'a, $number>,
         {

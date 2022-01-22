@@ -15,7 +15,7 @@
 use crate::internal::methods::GetFieldMethodImpl;
 use crate::internal::HasField;
 use crate::tags;
-use crate::Message;
+use crate::MessageImpl;
 
 // repeated field
 impl<'a, MP, FieldsType, SharedType, TypeTag, ItemType, const NUMBER: i32>
@@ -27,7 +27,7 @@ impl<'a, MP, FieldsType, SharedType, TypeTag, ItemType, const NUMBER: i32>
         tags::Repeated,
         TypeTag,
         NUMBER,
-    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER, Type = Vec<ItemType>>,
     ItemType: 'a,
