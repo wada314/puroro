@@ -75,25 +75,6 @@ impl<Base: Bitfield, const INDEX: usize> Bitfield for FlipBitOn<Base, INDEX> {
     }
 }
 
-pub trait IsDefault {
-    fn is_default(&self) -> bool;
-}
-impl<T: Default + PartialEq> IsDefault for T {
-    fn is_default(&self) -> bool {
-        *self == Default::default()
-    }
-}
-impl IsDefault for NoAllocBumpString {
-    fn is_default(&self) -> bool {
-        self.is_empty()
-    }
-}
-impl<T> IsDefault for NoAllocBumpVec<T> {
-    fn is_default(&self) -> bool {
-        self.is_empty()
-    }
-}
-
 pub trait MessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize;
     type Fields<const NUMBER: i32>;
@@ -178,25 +159,6 @@ macro_rules! impl_field_properties {
             const OPTIONAL_FIELD_BITFIELD_INDEX: usize = $opt_idx;
         }
     };
-}
-
-pub struct FieldAndSharedRef<'a, Field, Shared> {
-    field: &'a Field,
-    shared: &'a Shared,
-}
-impl<'a, Field, Shared> FieldAndSharedRef<'a, Field, Shared> {
-    pub fn new(field: &'a Field, shared: &'a Shared) -> Self {
-        Self { field, shared }
-    }
-}
-pub struct FieldAndSharedMut<'a, Field, Shared> {
-    field: &'a mut Field,
-    shared: &'a mut Shared,
-}
-impl<'a, Field, Shared> FieldAndSharedMut<'a, Field, Shared> {
-    pub fn new(field: &'a mut Field, shared: &'a mut Shared) -> Self {
-        Self { field, shared }
-    }
 }
 
 pub trait SharedBitfield {
