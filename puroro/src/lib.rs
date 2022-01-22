@@ -73,24 +73,27 @@ impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fiel
     type SharedType = Shared;
     fn as_message_ref(
         &self,
-    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
+    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>
+    {
         self
     }
 }
-impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef for &'a MessageImpl<MP, ImplTag, Fields, Shared> {
+impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef
+    for &'a MessageImpl<MP, ImplTag, Fields, Shared>
+{
     type MessageProperties = MP;
     type ImplTag = ImplTag;
     type FieldsType = Fields;
     type SharedType = Shared;
     fn as_message_ref(
         &self,
-    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
+    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>
+    {
         *self
     }
 }
 
 // メモ
-use internal::methods::GetOptFieldMethod;
 use internal::SimpleShared;
 use internal::{FieldProperties, MessageProperties};
 
@@ -108,6 +111,22 @@ type Person =
     MessageImpl<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
 type PersonOptional<T> =
     MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
+use internal::methods::{GetFieldMethod, GetOptFieldMethod};
+trait PersonTrait:
+    for<'a> GetFieldMethod<'a, 1>
+    + for<'a> GetOptFieldMethod<'a, 1>
+    + for<'a> GetFieldMethod<'a, 2>
+    + for<'a> GetOptFieldMethod<'a, 2>
+    + for<'a> GetFieldMethod<'a, 3>
+    + for<'a> GetFieldMethod<'a, 4>
+    + for<'a> GetOptFieldMethod<'a, 4>
+    + for<'a> GetFieldMethod<'a, 5>
+    + for<'a> GetFieldMethod<'a, 6>
+{
+    fn name_opt(&self) -> <Self as GetOptFieldMethod<1>>::GetterType {
+        <Self as GetOptFieldMethod<1>>::get_opt(self)
+    }
+}
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
 impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);

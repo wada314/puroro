@@ -35,14 +35,6 @@ use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::view::BitViewSized;
 
-fn fake_message_impl<NewImplTag, MP, OldImplTag, Fields, Shared>(
-    message: &MessageImpl<MP, OldImplTag, Fields, Shared>,
-) -> &MessageImpl<MP, NewImplTag, Fields, Shared> {
-    // This is safe because Message type's inner representation
-    // does not depend on ImplTag.
-    unsafe { std::mem::transmute(message) }
-}
-
 pub trait Bitfield {
     fn get(&self, index: usize) -> bool;
     fn set(&mut self, index: usize, val: bool);
