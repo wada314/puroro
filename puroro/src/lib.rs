@@ -134,12 +134,7 @@ where
     define_getter!(fn scores(6));
 }
 
-impl<ImplTag, FieldsType, SharedType> PersonStruct<ImplTag, FieldsType, SharedType>
-where
-    for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>,
-{
-    define_getter!(pub fn name(1));
-}
+impl_scalar_getters2!(PersonStruct, 1, name, name_opt);
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
 impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);
