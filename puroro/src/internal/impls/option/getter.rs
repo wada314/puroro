@@ -13,14 +13,13 @@
 // limitations under the License.
 
 use super::{OptionFields, OptionShared};
-use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
 use crate::Message;
 use crate::{tags, AsMessageRef};
 
-// non-repeated field
-// If the inner `Option` is `Some` then delegate to the inner type.
-// If it's `None`, then just return `None`.
+// repeated field
+// Assuming the internal type's getter type is `&[T]` or whatever `Default` type
 impl<
     'a,
     MP,
@@ -28,22 +27,22 @@ impl<
     InnerImplTag,
     InnerFieldsType,
     InnerSharedType,
-    FinalInnerGetterType,
-    _1,
+    GetterType,
     const NUMBER: i32,
 >
-    GetOptFieldMethodImpl<
+    GetFieldMethodImpl<
         'a,
         (),
         OptionShared<MessageRef>,
         tags::OptionImpl,
-        tags::NonRepeatedLabel<_1>,
+        tags::Repeated,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
     > for Message<MP, tags::OptionImpl, OptionFields, OptionShared<MessageRef>>
 where
     Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
-        'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
+        'a + GetFieldMethod<'a, NUMBER, GetterType = GetterType>,
+    GetterType: Default,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     MessageRef: AsMessageRef<
@@ -53,11 +52,12 @@ where
         SharedType = InnerSharedType,
     >,
 {
-    type GetterType = Option<FinalInnerGetterType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type GetterType = GetterType;
+    fn get(&'a self) -> Self::GetterType {
         self.shared
             .option
             .as_ref()
-            .and_then(|msg| msg.as_message_ref().get_opt())
+            .map(|msg| msg.as_message_ref().get())
+            .unwrap_or_default()
     }
 }
