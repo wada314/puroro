@@ -19,7 +19,6 @@ use crate::tags;
 use crate::Message;
 
 type NumType<_1> = <tags::NonLdType<_1> as tags::NumericalTypeTag>::NativeType;
-type BorrowedType<_1> = <tags::StringOrBytesType<_1> as tags::StringOrBytesTypeTag>::BorrowedType;
 
 // (optional|required) numeric field
 impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
@@ -53,7 +52,7 @@ where
 }
 
 // (optional|required) (string|bytes) field
-impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
         'a,
         <FieldsType as HasField<NUMBER>>::Type,
@@ -65,14 +64,14 @@ impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
-    <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType<_2>>,
-    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
-    BorrowedType<_2>: 'a,
+    <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
+    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
+    BorrowedType: 'a + ?Sized,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<&'a BorrowedType<_2>>;
+    type GetterType = Option<&'a BorrowedType>;
     fn get_opt(&'a self) -> Self::GetterType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -98,7 +97,7 @@ impl<
 >
     GetOptFieldMethodImpl<
         'a,
-        <FieldsType as HasField<NUMBER>>::Type,
+        Option<Box<FieldMessageType>>,
         SharedType,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
