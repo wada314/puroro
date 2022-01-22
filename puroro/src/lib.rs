@@ -95,6 +95,21 @@ type Person =
 type PersonOptional<T> =
     MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
+
+struct PersonStruct<
+    ImplTag = tags::SimpleImpl,
+    FieldsType = PersonFieldsContainer,
+    SharedType = SimpleShared<1>,
+>(MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>);
+impl<ImplTag, FieldsType, SharedType> AsMessageRef
+    for PersonStruct<ImplTag, FieldsType, SharedType>
+{
+    type MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        &self.0
+    }
+}
+
 trait PersonTrait
 where
     Self: AsMessageRef,
@@ -117,6 +132,13 @@ where
     define_getter!(fn partner(4));
     define_getter!(fn nicknames(5));
     define_getter!(fn scores(6));
+}
+
+impl<ImplTag, FieldsType, SharedType> PersonStruct<ImplTag, FieldsType, SharedType>
+where
+    for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>,
+{
+    define_getter!(pub fn name(1));
 }
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
