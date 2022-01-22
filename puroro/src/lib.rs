@@ -58,37 +58,20 @@ where
     }
 }
 trait AsMessageRef {
-    type MessageProperties;
-    type ImplTag;
-    type FieldsType;
-    type SharedType;
-    fn as_message_ref(
-        &self,
-    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>;
+    type MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType;
 }
 impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fields, Shared> {
-    type MessageProperties = MP;
-    type ImplTag = ImplTag;
-    type FieldsType = Fields;
-    type SharedType = Shared;
-    fn as_message_ref(
-        &self,
-    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>
-    {
+    type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
+    fn as_message_ref(&self) -> &Self::MessageType {
         self
     }
 }
 impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef
     for &'a MessageImpl<MP, ImplTag, Fields, Shared>
 {
-    type MessageProperties = MP;
-    type ImplTag = ImplTag;
-    type FieldsType = Fields;
-    type SharedType = Shared;
-    fn as_message_ref(
-        &self,
-    ) -> &MessageImpl<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>
-    {
+    type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
+    fn as_message_ref(&self) -> &Self::MessageType {
         *self
     }
 }
@@ -112,20 +95,28 @@ type Person =
 type PersonOptional<T> =
     MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
-trait PersonTrait:
-    for<'a> GetFieldMethod<'a, 1>
-    + for<'a> GetOptFieldMethod<'a, 1>
-    + for<'a> GetFieldMethod<'a, 2>
-    + for<'a> GetOptFieldMethod<'a, 2>
-    + for<'a> GetFieldMethod<'a, 3>
-    + for<'a> GetFieldMethod<'a, 4>
-    + for<'a> GetOptFieldMethod<'a, 4>
-    + for<'a> GetFieldMethod<'a, 5>
-    + for<'a> GetFieldMethod<'a, 6>
+trait PersonTrait
+where
+    Self: AsMessageRef,
+    for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
+        + GetOptFieldMethod<'a, 1>
+        + GetFieldMethod<'a, 2>
+        + GetOptFieldMethod<'a, 2>
+        + GetFieldMethod<'a, 3>
+        + GetFieldMethod<'a, 4>
+        + GetOptFieldMethod<'a, 4>
+        + GetFieldMethod<'a, 5>
+        + GetFieldMethod<'a, 6>,
 {
-    fn name_opt(&self) -> <Self as GetOptFieldMethod<1>>::GetterType {
-        <Self as GetOptFieldMethod<1>>::get_opt(self)
-    }
+    define_opt_getter!(fn name_opt(1));
+    define_getter!(fn name(1));
+    define_opt_getter!(fn age_opt(2));
+    define_getter!(fn age(2));
+    define_getter!(fn children(3));
+    define_opt_getter!(fn partner_opt(4));
+    define_getter!(fn partner(4));
+    define_getter!(fn nicknames(5));
+    define_getter!(fn scores(6));
 }
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);

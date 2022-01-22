@@ -144,6 +144,26 @@ macro_rules! impl_repeated_getters {
     };
 }
 #[macro_export]
+macro_rules! define_getter {
+    ($pub:vis fn $id:ident ( $num:expr )) => {
+        $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType {
+            <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
+                self.as_message_ref(),
+            )
+        }
+    };
+}
+#[macro_export]
+macro_rules! define_opt_getter {
+    ($pub:vis fn $id:ident ( $num:expr )) => {
+        $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::GetterType {
+            <<Self as AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::get_opt(
+                self.as_message_ref(),
+            )
+        }
+    };
+}
+#[macro_export]
 macro_rules! impl_field_properties {
     ($fp:ty, $ltag_id:ident, $ttag_id:ident $(<$ttag_param:ty>)?, $default:expr, $opt_idx:expr) => {
         impl $crate::internal::FieldProperties for $fp {

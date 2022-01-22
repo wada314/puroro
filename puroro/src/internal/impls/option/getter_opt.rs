@@ -46,12 +46,8 @@ where
         'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    MessageRef: AsMessageRef<
-        MessageProperties = MP,
-        ImplTag = InnerImplTag,
-        FieldsType = InnerFieldsType,
-        SharedType = InnerSharedType,
-    >,
+    MessageRef:
+        AsMessageRef<MessageType = MessageImpl<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
 {
     type GetterType = Option<FinalInnerGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
