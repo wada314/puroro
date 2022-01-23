@@ -93,8 +93,6 @@ use std::ops::Deref;
 //
 type Person =
     MessageImpl<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
-type PersonOption<T> =
-    MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
 
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 
@@ -126,7 +124,10 @@ where
     }
 }
 
-/*type PersonOption<T> = PersonStruct<tags::OptionImpl, OptionFields, OptionShared<T>>;
+/*type PersonOption<T> =
+    MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
+*/
+type PersonOption<T> = PersonStruct<tags::OptionImpl, OptionFields, OptionShared<T>>;
 impl<T> From<MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>>
     for PersonOption<T>
 {
@@ -140,7 +141,7 @@ impl<T> From<Option<T>> for PersonOption<T> {
     fn from(inner: Option<T>) -> Self {
         PersonStruct(Into::<MessageImpl<_, _, _, _>>::into(inner))
     }
-}*/
+}
 
 trait PersonTrait
 where
@@ -235,11 +236,11 @@ fn test() {
     let _: &[String] = p.nicknames();
     let _: &[Person] = p.children();
 
-    let partner: PersonOption<&Person> = p.partner();
+    let partner: PersonOption<&Person> = p.partner().into();
     let _: Option<u32> = partner.age_opt();
     let _: Option<&Person> = partner.partner_opt();
     let _: u32 = partner.age();
-    let _: PersonOption<&Person> = partner.partner();
+    let _: PersonOption<&Person> = partner.partner().into();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
     let _: &[Person] = partner.children();
