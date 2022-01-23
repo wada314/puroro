@@ -204,22 +204,11 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<FieldMP>>,
-    Option<&'a FieldMessageType>: Into<
-        MP::OptionWrappedType<
-            MessageImpl<
-                FieldMP,
-                tags::OptionImpl,
-                OptionFields,
-                OptionShared<&'a FieldMessageType>,
-            >,
-        >,
-    >,
     FieldMessageType: 'a,
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
 {
-    type GetterType = MP::OptionWrappedType<
-        MessageImpl<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>,
-    >;
+    type GetterType =
+        MessageImpl<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>;
     fn get(&'a self) -> Self::GetterType {
         let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
         Into::into(value_opt)

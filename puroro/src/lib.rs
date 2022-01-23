@@ -200,7 +200,6 @@ struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
     type Fields<const NUMBER: i32> = PersonFieldProperties<NUMBER>;
-    type OptionWrappedType<T> = PersonOption<T>;
 }
 impl_field_properties!(PersonFieldProperties<1>, Optional, String, "", 0);
 impl_field_properties!(PersonFieldProperties<2>, Optional, UInt32, 0, 0);
