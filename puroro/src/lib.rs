@@ -79,6 +79,7 @@ impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef
 // メモ
 use internal::SimpleShared;
 use internal::{FieldProperties, MessageProperties};
+use std::ops::Deref;
 
 // assume a proto like this:
 // message Person {
@@ -106,6 +107,12 @@ impl<ImplTag, FieldsType, SharedType> AsMessageRef
 {
     type MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
     fn as_message_ref(&self) -> &Self::MessageType {
+        &self.0
+    }
+}
+impl<ImplTag, FieldsType, SharedType> Deref for PersonStruct<ImplTag, FieldsType, SharedType> {
+    type Target = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
+    fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
@@ -137,6 +144,9 @@ where
 impl_scalar_getters2!(PersonStruct, 1, name, name_opt);
 impl_scalar_getters2!(PersonStruct, 2, age, age_opt);
 impl_scalar_getters2!(PersonStruct, 4, partner, partner_opt);
+impl_repeated_getters2!(PersonStruct, 3, children);
+impl_repeated_getters2!(PersonStruct, 5, nicknames);
+impl_repeated_getters2!(PersonStruct, 6, scores);
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
 impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);

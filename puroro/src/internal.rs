@@ -181,6 +181,17 @@ macro_rules! impl_scalar_getters2 {
     };
 }
 #[macro_export]
+macro_rules! impl_repeated_getters2 {
+    ($struct:ident, $num:expr, $get:ident) => {
+        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
+        where
+            for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
+        {
+            define_getter!(pub fn $get($num));
+        }
+    };
+}
+#[macro_export]
 macro_rules! impl_field_properties {
     ($fp:ty, $ltag_id:ident, $ttag_id:ident $(<$ttag_param:ty>)?, $default:expr, $opt_idx:expr) => {
         impl $crate::internal::FieldProperties for $fp {
