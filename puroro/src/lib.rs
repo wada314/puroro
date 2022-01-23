@@ -135,6 +135,8 @@ where
 }
 
 impl_scalar_getters2!(PersonStruct, 1, name, name_opt);
+impl_scalar_getters2!(PersonStruct, 2, age, age_opt);
+impl_scalar_getters2!(PersonStruct, 4, partner, partner_opt);
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
 impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);
