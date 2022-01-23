@@ -175,13 +175,6 @@ impl_repeated_getters2!(PersonStruct, 3, children);
 impl_repeated_getters2!(PersonStruct, 5, nicknames);
 impl_repeated_getters2!(PersonStruct, 6, scores);
 
-impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
-impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);
-impl_scalar_getters!(PersonMessageProperties, 4, partner, partner_opt);
-impl_repeated_getters!(PersonMessageProperties, 3, children);
-impl_repeated_getters!(PersonMessageProperties, 6, scores);
-impl_repeated_getters!(PersonMessageProperties, 5, nicknames);
-
 #[derive(Default)]
 struct PersonFieldsContainer {
     name: String,

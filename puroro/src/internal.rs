@@ -100,50 +100,6 @@ macro_rules! impl_has_field {
     };
 }
 #[macro_export]
-macro_rules! impl_scalar_getters {
-    ($mp:ty, $number:expr, $get:ident, $get_opt:ident) => {
-        impl<ImplTag, FieldsType, SharedType>
-            $crate::MessageImpl<$mp, ImplTag, FieldsType, SharedType>
-        where
-            for<'a> Self: $crate::internal::methods::GetOptFieldMethod<'a, $number>,
-        {
-            pub fn $get_opt(
-                &self,
-            ) -> <Self as $crate::internal::methods::GetOptFieldMethod<'_, $number>>::GetterType
-            {
-                <Self as $crate::internal::methods::GetOptFieldMethod<$number>>::get_opt(self)
-            }
-        }
-        impl<ImplTag, FieldsType, SharedType>
-            $crate::MessageImpl<$mp, ImplTag, FieldsType, SharedType>
-        where
-            for<'a> Self: $crate::internal::methods::GetFieldMethod<'a, $number>,
-        {
-            pub fn $get(
-                &self,
-            ) -> <Self as $crate::internal::methods::GetFieldMethod<'_, $number>>::GetterType {
-                <Self as $crate::internal::methods::GetFieldMethod<$number>>::get(self)
-            }
-        }
-    };
-}
-#[macro_export]
-macro_rules! impl_repeated_getters {
-    ($mp:ty, $number:expr, $get:ident) => {
-        impl<ImplTag, FieldsType, SharedType>
-            $crate::MessageImpl<$mp, ImplTag, FieldsType, SharedType>
-        where
-            for<'a> Self: $crate::internal::methods::GetFieldMethod<'a, $number>,
-        {
-            pub fn $get(
-                &self,
-            ) -> <Self as $crate::internal::methods::GetFieldMethod<'_, $number>>::GetterType {
-                <Self as $crate::internal::methods::GetFieldMethod<$number>>::get(self)
-            }
-        }
-    };
-}
-#[macro_export]
 macro_rules! define_getter {
     ($pub:vis fn $id:ident ( $num:expr )) => {
         $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType {
