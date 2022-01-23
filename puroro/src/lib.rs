@@ -237,11 +237,11 @@ fn test() {
     let _: &[String] = p.nicknames();
     let _: &[PersonStruct] = p.children();
 
-    let partner: PersonOption<&PersonStruct> = p.partner().into();
+    let partner: PersonOption<&PersonStruct> = p.partner();
     let _: Option<u32> = partner.age_opt();
     let _: Option<&PersonStruct> = partner.partner_opt();
     let _: u32 = partner.age();
-    let _: PersonOption<&PersonStruct> = partner.partner().into();
+    let _: PersonOption<&PersonStruct> = partner.partner();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
     let _: &[PersonStruct] = partner.children();
