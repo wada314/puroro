@@ -93,6 +93,8 @@ use std::ops::Deref;
 //
 type Person =
     MessageImpl<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
+type PersonOption<T> =
+    MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
 
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 
@@ -124,7 +126,7 @@ where
     }
 }
 
-type PersonOption<T> = PersonStruct<tags::OptionImpl, OptionFields, OptionShared<T>>;
+/*type PersonOption<T> = PersonStruct<tags::OptionImpl, OptionFields, OptionShared<T>>;
 impl<T> From<MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>>
     for PersonOption<T>
 {
@@ -138,7 +140,7 @@ impl<T> From<Option<T>> for PersonOption<T> {
     fn from(inner: Option<T>) -> Self {
         PersonStruct(Into::<MessageImpl<_, _, _, _>>::into(inner))
     }
-}
+}*/
 
 trait PersonTrait
 where
@@ -182,8 +184,8 @@ impl_repeated_getters!(PersonMessageProperties, 5, nicknames);
 struct PersonFieldsContainer {
     name: String,
     age: u32,
-    children: Vec<PersonStruct>,
-    partner: Option<Box<PersonStruct>>,
+    children: Vec<Person>,
+    partner: Option<Box<Person>>,
     nicknames: Vec<String>,
     scores: Vec<u32>,
 }
@@ -191,8 +193,8 @@ impl crate::internal::FieldsContainer for PersonFieldsContainer {}
 
 impl_has_field!(PersonFieldsContainer, 1, String, name);
 impl_has_field!(PersonFieldsContainer, 2, u32, age);
-impl_has_field!(PersonFieldsContainer, 3, Vec<PersonStruct>, children);
-impl_has_field!(PersonFieldsContainer, 4, Option<Box<PersonStruct>>, partner);
+impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
+impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
 impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
 impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
@@ -222,23 +224,23 @@ impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
-    let p = PersonStruct::default();
+    let p = Person::default();
 
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
-    let _: Option<&PersonStruct> = p.partner_opt();
+    let _: Option<&Person> = p.partner_opt();
     let _: u32 = p.age();
     let _: &str = p.name();
     let _: &[u32] = p.scores();
     let _: &[String] = p.nicknames();
-    let _: &[PersonStruct] = p.children();
+    let _: &[Person] = p.children();
 
-    let partner: PersonOption<&PersonStruct> = p.partner();
+    let partner: PersonOption<&Person> = p.partner();
     let _: Option<u32> = partner.age_opt();
-    let _: Option<&PersonStruct> = partner.partner_opt();
+    let _: Option<&Person> = partner.partner_opt();
     let _: u32 = partner.age();
-    let _: PersonOption<&PersonStruct> = partner.partner();
+    let _: PersonOption<&Person> = partner.partner();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
-    let _: &[PersonStruct] = partner.children();
+    let _: &[Person] = partner.children();
 }
