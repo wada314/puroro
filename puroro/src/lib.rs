@@ -67,12 +67,13 @@ impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fiel
         self
     }
 }
-impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef
-    for &'a MessageImpl<MP, ImplTag, Fields, Shared>
+impl<'a, T> AsMessageRef for &'a T
+where
+    T: AsMessageRef,
 {
-    type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
+    type MessageType = T::MessageType;
     fn as_message_ref(&self) -> &Self::MessageType {
-        *self
+        <T as AsMessageRef>::as_message_ref(*self)
     }
 }
 
@@ -185,8 +186,8 @@ impl_repeated_getters!(PersonMessageProperties, 5, nicknames);
 struct PersonFieldsContainer {
     name: String,
     age: u32,
-    children: Vec<Person>,
-    partner: Option<Box<Person>>,
+    children: Vec<PersonStruct>,
+    partner: Option<Box<PersonStruct>>,
     nicknames: Vec<String>,
     scores: Vec<u32>,
 }
@@ -194,8 +195,8 @@ impl crate::internal::FieldsContainer for PersonFieldsContainer {}
 
 impl_has_field!(PersonFieldsContainer, 1, String, name);
 impl_has_field!(PersonFieldsContainer, 2, u32, age);
-impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
-impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
+impl_has_field!(PersonFieldsContainer, 3, Vec<PersonStruct>, children);
+impl_has_field!(PersonFieldsContainer, 4, Option<Box<PersonStruct>>, partner);
 impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
 impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
@@ -229,19 +230,19 @@ fn test() {
 
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
-    let _: Option<&Person> = p.partner_opt();
+    let _: Option<&PersonStruct> = p.partner_opt();
     let _: u32 = p.age();
     let _: &str = p.name();
     let _: &[u32] = p.scores();
     let _: &[String] = p.nicknames();
-    let _: &[Person] = p.children();
+    let _: &[PersonStruct] = p.children();
 
-    let partner: PersonOption<&Person> = p.partner().into();
+    let partner: PersonOption<&PersonStruct> = p.partner().into();
     let _: Option<u32> = partner.age_opt();
-    let _: Option<&Person> = partner.partner_opt();
+    let _: Option<&PersonStruct> = partner.partner_opt();
     let _: u32 = partner.age();
-    let _: PersonOption<&Person> = partner.partner().into();
+    let _: PersonOption<&PersonStruct> = partner.partner().into();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
-    let _: &[Person] = partner.children();
+    let _: &[PersonStruct] = partner.children();
 }
