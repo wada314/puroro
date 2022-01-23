@@ -128,6 +128,7 @@ where
 //################ Blanket impls ################
 
 // (optional|required|[unlabeled]) non-ld field
+// Call get_opt method, and returns a default value if it's `None`.
 impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
@@ -156,6 +157,7 @@ where
 }
 
 // (optional|required|[unlabeled]) (string|bytes) field
+// Call get_opt method, and returns a default value if it's `None`.
 impl<'a, MP, ImplTag, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
@@ -186,7 +188,7 @@ where
 }
 
 // (optional|required|[unlabeled]) message field
-// returns a `OptionalImpl`-nized message
+// returns a `OptionImpl`-nized message
 impl<'a, MP, ImplTag, FieldMP, FieldMessageType, FieldsType, SharedType, _1, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
@@ -202,11 +204,22 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<FieldMP>>,
+    Option<&'a FieldMessageType>: Into<
+        MP::OptionWrappedType<
+            MessageImpl<
+                FieldMP,
+                tags::OptionImpl,
+                OptionFields,
+                OptionShared<&'a FieldMessageType>,
+            >,
+        >,
+    >,
     FieldMessageType: 'a,
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
 {
-    type GetterType =
-        MessageImpl<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>;
+    type GetterType = MP::OptionWrappedType<
+        MessageImpl<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>,
+    >;
     fn get(&'a self) -> Self::GetterType {
         let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
         Into::into(value_opt)

@@ -70,6 +70,7 @@ impl<Base: Bitfield, const INDEX: usize> Bitfield for FlipBitOn<Base, INDEX> {
 pub trait MessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize;
     type Fields<const NUMBER: i32>;
+    type OptionWrappedType<T>;
 }
 pub trait FieldProperties {
     type LabelTag: tags::FieldLabelTag;

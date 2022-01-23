@@ -93,8 +93,7 @@ use std::ops::Deref;
 //
 type Person =
     MessageImpl<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
-type PersonOptional<T> =
-    MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
+
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 
 struct PersonStruct<
@@ -114,6 +113,30 @@ impl<ImplTag, FieldsType, SharedType> Deref for PersonStruct<ImplTag, FieldsType
     type Target = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+impl<ImplTag, FieldsType, SharedType> Default for PersonStruct<ImplTag, FieldsType, SharedType>
+where
+    MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>: Default,
+{
+    fn default() -> Self {
+        Self(Default::default())
+    }
+}
+
+type PersonOption<T> = PersonStruct<tags::OptionImpl, OptionFields, OptionShared<T>>;
+impl<T> From<MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>>
+    for PersonOption<T>
+{
+    fn from(
+        m: MessageImpl<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>,
+    ) -> Self {
+        PersonStruct(m)
+    }
+}
+impl<T> From<Option<T>> for PersonOption<T> {
+    fn from(inner: Option<T>) -> Self {
+        PersonStruct(Into::<MessageImpl<_, _, _, _>>::into(inner))
     }
 }
 
@@ -159,8 +182,8 @@ impl_repeated_getters!(PersonMessageProperties, 5, nicknames);
 struct PersonFieldsContainer {
     name: String,
     age: u32,
-    children: Vec<Person>,
-    partner: Option<Box<Person>>,
+    children: Vec<PersonStruct>,
+    partner: Option<Box<PersonStruct>>,
     nicknames: Vec<String>,
     scores: Vec<u32>,
 }
@@ -168,8 +191,8 @@ impl crate::internal::FieldsContainer for PersonFieldsContainer {}
 
 impl_has_field!(PersonFieldsContainer, 1, String, name);
 impl_has_field!(PersonFieldsContainer, 2, u32, age);
-impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
-impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
+impl_has_field!(PersonFieldsContainer, 3, Vec<PersonStruct>, children);
+impl_has_field!(PersonFieldsContainer, 4, Option<Box<PersonStruct>>, partner);
 impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
 impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
@@ -177,6 +200,7 @@ struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
     type Fields<const NUMBER: i32> = PersonFieldProperties<NUMBER>;
+    type OptionWrappedType<T> = PersonOption<T>;
 }
 impl_field_properties!(PersonFieldProperties<1>, Optional, String, "", 0);
 impl_field_properties!(PersonFieldProperties<2>, Optional, UInt32, 0, 0);
@@ -199,23 +223,23 @@ impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
-    let p = Person::default();
+    let p = PersonStruct::default();
 
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
-    let _: Option<&Person> = p.partner_opt();
+    let _: Option<&PersonStruct> = p.partner_opt();
     let _: u32 = p.age();
     let _: &str = p.name();
     let _: &[u32] = p.scores();
     let _: &[String] = p.nicknames();
-    let _: &[Person] = p.children();
+    let _: &[PersonStruct] = p.children();
 
-    let partner: PersonOptional<&Person> = p.partner();
+    let partner: PersonOption<&PersonStruct> = p.partner();
     let _: Option<u32> = partner.age_opt();
-    let _: Option<&Person> = partner.partner_opt();
+    let _: Option<&PersonStruct> = partner.partner_opt();
     let _: u32 = partner.age();
-    let _: PersonOptional<&Person> = partner.partner();
+    let _: PersonOption<&PersonStruct> = partner.partner();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
-    let _: &[Person] = partner.children();
+    let _: &[PersonStruct] = partner.children();
 }
