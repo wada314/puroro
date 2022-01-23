@@ -102,6 +102,7 @@ struct PersonStruct<
     FieldsType = PersonFieldsContainer,
     SharedType = SimpleShared<1>,
 >(MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>);
+type PersonType = PersonStruct;
 impl<ImplTag, FieldsType, SharedType> AsMessageRef
     for PersonStruct<ImplTag, FieldsType, SharedType>
 {
@@ -219,9 +220,9 @@ impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
-    let p = PersonStruct::default();
+    let p = PersonType::default();
 
-    let _: Option<u32> = p.age_opt(); /*
+    let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
     let _: Option<&PersonStruct> = p.partner_opt();
     let _: u32 = p.age();
@@ -237,5 +238,5 @@ fn test() {
     let _: PersonOption<&PersonStruct> = partner.partner();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
-    let _: &[PersonStruct] = partner.children();*/
+    let _: &[PersonStruct] = partner.children();
 }
