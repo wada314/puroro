@@ -99,6 +99,17 @@ macro_rules! impl_has_field {
         }
     };
 }
+
+#[macro_export]
+macro_rules! define_getter2 {
+    ($pub:vis fn $id:ident<$num:literal>(&self) -> $ret:ty) => {
+        $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType {
+            <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
+                self.as_message_ref(),
+            )
+        }
+    };
+}
 #[macro_export]
 macro_rules! define_getter {
     ($pub:vis fn $id:ident ( $num:expr )) => {
@@ -116,6 +127,28 @@ macro_rules! define_opt_getter {
             <<Self as AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::get_opt(
                 self.as_message_ref(),
             )
+        }
+    };
+}
+#[macro_export]
+macro_rules! impl_get_opt {
+    ($struct:ident, $num:expr, $get:ident, $get_opt:ident) => {
+        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
+        where
+            for<'a> <Self as AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
+        {
+            define_opt_getter!(pub fn $get_opt($num));
+        }
+    };
+}
+#[macro_export]
+macro_rules! impl_get {
+    ($struct:ident, $num:expr, $get:ident, $get_opt:ident) => {
+        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
+        where
+            for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
+        {
+            define_getter!(pub fn $get($num));
         }
     };
 }
