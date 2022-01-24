@@ -19,6 +19,7 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 
+// (optional|required) numeric field
 impl<MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl2<
         <FieldsType as HasField<NUMBER>>::Type,
@@ -51,6 +52,7 @@ where
     }
 }
 
+// (optional|required) (string|bytes) field
 impl<MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl2<
         <FieldsType as HasField<NUMBER>>::Type,
@@ -81,6 +83,41 @@ where
         } else {
             None
         }
+    }
+}
+
+// (optional|required|[unlabeled]) message field
+// Typically the field type is `Option<Box<M>>`.
+impl<
+    MP,
+    FieldsType,
+    SharedType,
+    FieldMP,
+    FieldMessageType, // `M`
+    _1,
+    const NUMBER: i32,
+>
+    GetOptFieldMethodImpl2<
+        Option<Box<FieldMessageType>>,
+        SharedType,
+        tags::SimpleImpl,
+        tags::NonRepeatedLabel<_1>,
+        tags::Message<FieldMP>,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = Option<Box<FieldMessageType>>>,
+    FieldMessageType: 'static,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+{
+    type GetterType<'a>
+    where
+        Self: 'a,
+    = Option<&'a FieldMessageType>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
+        let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+        field.as_deref()
     }
 }
 
