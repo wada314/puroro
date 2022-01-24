@@ -36,7 +36,10 @@ where
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType<'a> = Option<NumType>;
+    type GetterType<'a>
+    where
+        Self: 'a,
+    = Option<NumType>;
     fn get_opt(&self) -> Self::GetterType<'_> {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -61,12 +64,15 @@ where
     FieldsType: HasField<NUMBER>,
     <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
     tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
-    BorrowedType: ?Sized,
+    BorrowedType: 'static + ?Sized,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType<'a> = Option<&'a BorrowedType>;
+    type GetterType<'a>
+    where
+        Self: 'a,
+    = Option<&'a BorrowedType>;
     fn get_opt(&self) -> Self::GetterType<'_> {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
