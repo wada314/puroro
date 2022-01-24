@@ -57,7 +57,13 @@ where
         }
     }
 }
-trait AsMessageRef {
+
+pub trait WrappedMessage: Sized {
+    type OptionWrappedMessageType;
+    fn into_option_wrapped(wrapped: Option<Self>) -> Self::OptionWrappedMessageType;
+}
+
+pub trait AsMessageRef {
     type MessageType;
     fn as_message_ref(&self) -> &Self::MessageType;
 }
@@ -92,9 +98,6 @@ use std::ops::Deref;
 //     repeated Person children = 3;
 // }
 //
-type Person =
-    MessageImpl<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
-
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 
 struct PersonStruct<
@@ -102,13 +105,25 @@ struct PersonStruct<
     FieldsType = PersonFieldsContainer,
     SharedType = SimpleShared<1>,
 >(MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>);
-type PersonType = PersonStruct;
+type Person = PersonStruct;
 impl<ImplTag, FieldsType, SharedType> AsMessageRef
     for PersonStruct<ImplTag, FieldsType, SharedType>
 {
     type MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
     fn as_message_ref(&self) -> &Self::MessageType {
         &self.0
+    }
+}
+impl<ImplTag, FieldsType, SharedType> WrappedMessage
+    for PersonStruct<ImplTag, FieldsType, SharedType>
+{
+    type OptionWrappedMessageType = PersonStruct<
+        tags::OptionImpl,
+        OptionFields,
+        OptionShared<PersonStruct<ImplTag, FieldsType, SharedType>>,
+    >;
+    fn into_option_wrapped(wrapped: Option<Self>) -> Self::OptionWrappedMessageType {
+        wrapped.into()
     }
 }
 impl<ImplTag, FieldsType, SharedType> Deref for PersonStruct<ImplTag, FieldsType, SharedType> {
@@ -220,7 +235,7 @@ impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
-    let p = PersonType::default();
+    let p = Person::default();
 
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
