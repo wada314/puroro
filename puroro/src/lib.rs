@@ -58,15 +58,18 @@ where
     }
 }
 
-pub trait WrappedMessage: Sized {
-    type OptionWrappedMessageType;
-    fn into_option_wrapped(wrapped: Option<Self>) -> Self::OptionWrappedMessageType;
-}
-
 pub trait AsMessageRef {
     type MessageType;
     fn as_message_ref(&self) -> &Self::MessageType;
 }
+pub trait AsMessageDeref {
+    type DerefType<'a>: Deref<Target = Self::MessageType>
+    where
+        Self: 'a;
+    type MessageType;
+    fn as_message_deref(&self) -> Self::DerefType<'_>;
+}
+
 impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fields, Shared> {
     type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
     fn as_message_ref(&self) -> &Self::MessageType {
@@ -80,6 +83,29 @@ where
     type MessageType = T::MessageType;
     fn as_message_ref(&self) -> &Self::MessageType {
         <T as AsMessageRef>::as_message_ref(*self)
+    }
+}
+impl<MP, ImplTag, Fields, Shared> AsMessageDeref for MessageImpl<MP, ImplTag, Fields, Shared> {
+    type DerefType<'a>
+    where
+        Self: 'a,
+    = &'a MessageImpl<MP, ImplTag, Fields, Shared>;
+    type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
+    fn as_message_deref(&self) -> Self::DerefType<'_> {
+        self
+    }
+}
+impl<'a, T> AsMessageDeref for &'a T
+where
+    T: AsMessageDeref,
+{
+    type DerefType<'b>
+    where
+        Self: 'b,
+    = T::DerefType<'b>;
+    type MessageType = T::MessageType;
+    fn as_message_deref(&self) -> Self::DerefType<'_> {
+        <T as AsMessageDeref>::as_message_deref(self)
     }
 }
 
@@ -112,18 +138,6 @@ impl<ImplTag, FieldsType, SharedType> AsMessageRef
     type MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
     fn as_message_ref(&self) -> &Self::MessageType {
         &self.0
-    }
-}
-impl<ImplTag, FieldsType, SharedType> WrappedMessage
-    for PersonStruct<ImplTag, FieldsType, SharedType>
-{
-    type OptionWrappedMessageType = PersonStruct<
-        tags::OptionImpl,
-        OptionFields,
-        OptionShared<PersonStruct<ImplTag, FieldsType, SharedType>>,
-    >;
-    fn into_option_wrapped(wrapped: Option<Self>) -> Self::OptionWrappedMessageType {
-        wrapped.into()
     }
 }
 impl<ImplTag, FieldsType, SharedType> Deref for PersonStruct<ImplTag, FieldsType, SharedType> {
@@ -236,7 +250,7 @@ struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
     let p = Person::default();
-
+    /*
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
     let _: Option<&PersonStruct> = p.partner_opt();
@@ -253,5 +267,5 @@ fn test() {
     let _: PersonOption<&PersonStruct> = partner.partner();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
-    let _: &[PersonStruct] = partner.children();
+    let _: &[PersonStruct] = partner.children();*/
 }
