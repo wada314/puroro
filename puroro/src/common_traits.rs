@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::bumpalo::Bump;
-use crate::internal::NoAllocBumpBox;
-use crate::Result;
 use ::std::convert::TryFrom;
-use ::std::io::Write;
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
