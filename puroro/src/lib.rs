@@ -35,7 +35,6 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
-use internal::impls::option::{OptionFields, OptionShared};
 
 use ::std::marker::PhantomData;
 
@@ -124,7 +123,10 @@ use std::ops::Deref;
 //     repeated Person children = 3;
 // }
 //
+use internal::impls::option::{OptionFields, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
+use internal::methods2::{GetOptFieldMethod2, GetOptFieldMethodImpl2};
+use internal::HasField;
 
 struct PersonStruct<
     ImplTag = tags::SimpleImpl,
@@ -204,6 +206,15 @@ impl_scalar_getters2!(PersonStruct, 4, partner, partner_opt);
 impl_repeated_getters2!(PersonStruct, 3, children);
 impl_repeated_getters2!(PersonStruct, 5, nicknames);
 impl_repeated_getters2!(PersonStruct, 6, scores);
+
+impl PersonStruct<tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>
+where
+    <Self as Deref>::Target: GetOptFieldMethod2<1>,
+{
+    pub fn name_opt2(&self) -> <<Self as Deref>::Target as GetOptFieldMethod2<1>>::GetterType<'_> {
+        <<Self as Deref>::Target as GetOptFieldMethod2<1>>::get_opt(self.deref())
+    }
+}
 
 #[derive(Default)]
 struct PersonFieldsContainer {

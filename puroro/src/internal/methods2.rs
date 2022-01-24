@@ -39,18 +39,41 @@ pub trait GetOptFieldMethodImpl2<
     fn get_opt(&self) -> Self::GetterType<'_>;
 }
 
-impl<MP, ImplTag, LabelTag, TypeTag, Fields, Shared, const NUMBER: i32> GetOptFieldMethod2<NUMBER>
-    for MessageImpl<MP, ImplTag, Fields, Shared>
+impl<MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
+    GetOptFieldMethod2<NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetOptFieldMethodImpl2<ImplTag, LabelTag, TypeTag, Fields, Shared, NUMBER>,
+    Self: GetOptFieldMethodImpl2<
+        ImplTag,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<1>>::Type,
+        SharedType,
+        NUMBER,
+    >,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    FieldsType: HasField<1>,
 {
     type GetterType<'a>
     where
-        Self: 'a = <Self as GetOptFieldMethodImpl2<ImplTag, LabelTag, TypeTag, Fields, Shared, NUMBER>>::GetterType<'a>;
+        Self: 'a,
+    = <Self as GetOptFieldMethodImpl2<
+        ImplTag,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<1>>::Type,
+        SharedType,
+        NUMBER,
+    >>::GetterType<'a>;
     fn get_opt(&self) -> Self::GetterType<'_> {
-        <Self as GetOptFieldMethodImpl2<ImplTag, LabelTag, TypeTag, Fields, Shared, NUMBER>>::get_opt(self)
+        <Self as GetOptFieldMethodImpl2<
+            ImplTag,
+            LabelTag,
+            TypeTag,
+            <FieldsType as HasField<1>>::Type,
+            SharedType,
+            NUMBER,
+        >>::get_opt(self)
     }
 }

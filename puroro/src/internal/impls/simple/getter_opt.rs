@@ -22,11 +22,11 @@ use crate::MessageImpl;
 // (optional|required) numeric field
 impl<MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl2<
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
         tags::NonLdType<_2>,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
@@ -55,11 +55,11 @@ where
 // (optional|required) (string|bytes) field
 impl<MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl2<
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
         tags::StringOrBytesType<_2>,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
@@ -98,11 +98,11 @@ impl<
     const NUMBER: i32,
 >
     GetOptFieldMethodImpl2<
-        Option<Box<FieldMessageType>>,
-        SharedType,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
+        Option<Box<FieldMessageType>>,
+        SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
