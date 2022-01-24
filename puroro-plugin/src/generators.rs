@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![allow(unused)] // Temporary...
 use crate::utils::{
     convert_octal_escape_to_rust_style_escape, get_keyword_safe_ident, to_camel_case, upgrade,
 };
