@@ -63,3 +63,31 @@ This is not possible in 1-B interface.
     - Ditto for `enum` fields and `oneof` fields.
     - More optimization might be possible. For example, in C++ protobuf implementation, the scalar string fields are implemented as an union of heap-allocated string type and plain char array (If I remember correctly).
 - The interface can do complex process instead of directly accessing the fields. We don't need much complex process for protobuf language actually, but at least there's one example which is a default value in proto2. If we use a simple `Option<u32>` public field interface for `option uint32 age = 1 [default = 20];` proto field, The only place we can set the default value is when the field is initialized. On the other hand, if we use the 1-B option, we can set the default value when the field is cleared by `clear_age(&mut self)` method, or can define a getter method that always returns `u32` instead of `Option<u32>` using the default value in case if the field is not set.
+
+### Conclusion
+
+I think we should prefer 1-B interface for future extensibility.
+
+# Issue: Getter's return type: by ref `&u32` or by value `u32`
+
+We should split the discussion into 2 categories: Large types and small types.
+Large types are the all `repeated` types and `string`, `bytes`, and `message` fields. Small types are all other fields like `int32`, `float` or `enum`.
+
+Apparently, the large types should be returned by ref.
+
+For the small types, I think we should return by value. The copy cost is ignorable for the small types, and the by-ref value can be easily convertible to by-value but vise versa is not true.
+
+# Issue: Getter's return type: bare `T` vs. `Option<T>`
+
+Should the getter's return type be wrapped by `Option`?
+
+```rust
+impl Person {
+    pub fn age(&self) -> u32 { /* ... */ }
+    pub fn age(&self) -> Option<u32> { /* ... */ }
+}
+```
+
+In protobuf, all field types' default values are well-defined. So unwrapping the `Option` should not be the problem... ideally.
+
+
