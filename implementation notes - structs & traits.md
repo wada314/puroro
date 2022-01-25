@@ -88,6 +88,47 @@ impl Person {
 }
 ```
 
-In protobuf, all field types' default values are well-defined. So unwrapping the `Option` should not be the problem... ideally.
+In protobuf spec, all field types' default values are well-defined. So unwrapping the `Option` should not be the problem in terms protobuf's spec. However in rust's implementation, if we introduce a custom allocator then the message struct won't be `Default` anymore. So at least for the scalar message getters, the return type should be `Option` wrapped type.
 
+Probably implementing the both methods is the fair idea?
 
+# Issue: Getter methods impl type: `impl struct` vs. `impl trait for struct`
+
+Should our getter methods be implemented as a method of the message struct itself:
+
+```rust
+struct Person { /* ... */ }
+impl Person {
+    pub fn age(&self) -> u32 { /* ... */ }
+}
+```
+
+or as trait methods:
+
+```rust
+struct Person { /* ... */ }
+trait PersonTrait {
+    fn age(&self) -> u32;
+}
+impl PersonTrait for Person {
+    fn age(&self) -> u32 { /* ... */ }
+}
+```
+
+Of course implementing the both at the same time is possible, and it won't conflict or be considered as ambiguous by complier because the `struct` method is always prioritized to the `trait` methods.
+
+If we implement only the `trait` methods, the user needs to `use` the both struct and trait for each message use. So if we gonna use `trait` methods, then we would be better to implement `struct` methods too, even if it's just delegating to the `trait` methods.
+
+And we want `trait`s anyway. If we have `trait`s, we can even treat `Option<Person>` or `(Person, Person)` types as message and it's very useful:
+
+```rust
+impl PersonTrait for Option<T>
+where T: PersonTrait
+{
+    fn age(&self) -> u32 {
+        self.map(|msg| <T as PersonTrait>::age(msg)).unwrap_or_default()
+    }
+}
+```
+
+Conclusion: implement the both `struct` methods and `trait` methods.
