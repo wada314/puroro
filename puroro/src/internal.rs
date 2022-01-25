@@ -103,14 +103,26 @@ macro_rules! impl_has_field {
 
 #[macro_export]
 macro_rules! define_getter2 {
-    ($pub:vis fn $id:ident<$num:literal>(&self) -> $ret:ty) => {
-        $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType {
-            <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
-                self.as_message_ref(),
+    ($pub:vis fn $id:ident<$num:literal>(&self)) => {
+        $pub fn $id(&self) -> <<Self as AsMessageDeref>::MessageType<'_> as GetFieldMethod2<$num>>::GetterType<'_> {
+            <<Self as AsMessageDeref>::MessageType<'_> as GetFieldMethod2<$num>>::get(
+                self.as_message_deref().deref(),
             )
         }
     };
 }
+
+#[macro_export]
+macro_rules! define_opt_getter2 {
+    ($pub:vis fn $id:ident<$num:literal>(&self)) => {
+        $pub fn $id(&self) -> <<Self as AsMessageDeref>::MessageType<'_> as GetOptFieldMethod2<$num>>::GetterType<'_> {
+            <<Self as AsMessageDeref>::MessageType<'_> as GetOptFieldMethod2<$num>>::get_opt(
+                self.as_message_deref().deref(),
+            )
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! define_getter {
     ($pub:vis fn $id:ident ( $num:expr )) => {
