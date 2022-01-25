@@ -178,15 +178,15 @@ where
         + GetFieldMethod2<5>
         + GetFieldMethod2<6>,
 {
-    define_opt_getter2!(fn name_opt<1>(&self));
-    define_getter2!(fn name<1>(&self));
-    define_opt_getter2!(fn age_opt<2>(&self));
-    define_getter2!(fn age<2>(&self));
-    define_getter2!(fn children<3>(&self));
-    define_opt_getter2!(fn partner_opt<4>(&self));
-    define_getter2!(fn partner<4>(&self));
-    define_getter2!(fn nicknames<5>(&self));
-    define_getter2!(fn scores<6>(&self));
+    // define_opt_getter2!(fn name_opt<1>(&self));
+    // define_getter2!(fn name<1>(&self));
+    // define_opt_getter2!(fn age_opt<2>(&self));
+    // define_getter2!(fn age<2>(&self));
+    // define_getter2!(fn children<3>(&self));
+    // define_opt_getter2!(fn partner_opt<4>(&self));
+    // define_getter2!(fn partner<4>(&self));
+    // define_getter2!(fn nicknames<5>(&self));
+    // define_getter2!(fn scores<6>(&self));
 }
 
 // impl_scalar_getters2!(PersonStruct, 1, name, name_opt);
