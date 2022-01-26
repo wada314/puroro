@@ -119,7 +119,7 @@ Of course implementing the both at the same time is possible, and it won't confl
 
 If we implement only the `trait` methods, the user needs to `use` the both struct and trait for each message use. So if we gonna use `trait` methods, then we would be better to implement `struct` methods too, even if it's just delegating to the `trait` methods.
 
-And we want `trait`s anyway. If we have `trait`s, we can even treat `Option<Person>` or `(Person, Person)` types as message and it's very useful:
+And we want `trait`s anyway. If we have `trait`s, we can even treat `Option<Person>` or `(Person, Person)` (for merged message) types as message and it's very useful:
 
 ```rust
 impl PersonTrait for Option<T>
@@ -132,3 +132,64 @@ where T: PersonTrait
 ```
 
 Conclusion: implement the both `struct` methods and `trait` methods.
+
+# Random notes
+
+## `trait` implementation for `Option<T>` and `(T, U)`
+
+The inner type `T` (and `U`) for these types should accept the both owned and reference types. Probably smart pointers too. So the trait impl should target not `Option<T> where T: PersonTrait` but something like this:
+
+```rust
+// Not compilable
+impl<T, U> PersonTrait for Option<T>
+where
+    T: AsRef<U>
+    U: PersonTrait
+{
+    // ...
+}
+```
+
+However this is not a valid rust code. `U` must be able to unified but it's not. Using `Deref` can solve this problem because the `Deref`'s target type is not a generic parameter (i.e. multiple impl of `AsRef<T>` is possible) but an associated type (i.e. only one impl can exist at once). The problem of `Deref` is that it is not implemented for the raw type `T`. So we need a custom trait that combines `AsRef` and `Deref`:
+
+```rust
+trait AsMessageRef {
+    type MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType;
+}
+impl AsMessageRef for Person {
+    type MessageType = Person;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        self
+    }
+}
+impl<'a, T> AsMessageRef for &'a AsMessageRef 
+where T: AsMessageRef
+{
+    type MessageType = <T as AsMessageRef>::MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        *self
+    }
+}
+```
+
+Then impl the `PersonTrait` for `Option` like this:
+
+```rust
+impl<T> PersonTrait for Option<T>
+where 
+    T: AsMessageRef,
+    <T as AsMessageRef>::MessageType: PersonTrait,
+{
+    fn age(&self) -> u32 {
+        match self {
+            Some(&msg) => msg.as_message_ref().age(),
+            None => Default::default(),
+        }
+    }
+}
+```
+
+Now we can call `age()` method for both `Option<Person>` and `Option<&Person>` types.
+
+
