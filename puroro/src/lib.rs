@@ -271,8 +271,8 @@ fn test() {
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
     let _: Option<&Person> = p.partner_opt();
-    // let _: u32 = p.age();
-    // let _: &str = p.name();
+    let _: u32 = p.age();
+    let _: &str = p.name();
     // let _: &[u32] = p.scores();
     // let _: &[String] = p.nicknames();
     // let _: &[PersonStruct] = p.children();
@@ -280,8 +280,8 @@ fn test() {
     let partner: Person<_> = p.partner();
     let _: Option<u32> = partner.age_opt();
     let _: Option<&Person> = partner.partner_opt();
-    // let _: u32 = partner.age();
-    // let _: PersonOption<&PersonStruct> = partner.partner();
+    let _: u32 = partner.age();
+    let _: Person<_> = partner.partner();
     // let _: &[u32] = partner.scores();
     // let _: &[String] = partner.nicknames();
     // let _: &[PersonStruct] = partner.children();

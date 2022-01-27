@@ -12,8 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::HasField;
+use crate::internal::methods::GetFieldMethodImpl;
+use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 
 // repeated field
+impl<'a, MP, FieldsType, SharedType, ItemType, TypeTag, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        tags::SimpleImpl,
+        tags::Repeated,
+        TypeTag,
+        Vec<ItemType>,
+        SharedType,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = Vec<ItemType>>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
+    ItemType: 'a,
+{
+    type GetterType = &'a [ItemType];
+    fn get(&'a self) -> Self::GetterType {
+        <FieldsType as HasField<NUMBER>>::get(&self.fields).as_slice()
+    }
+}
