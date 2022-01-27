@@ -220,24 +220,27 @@ impl_field_properties!(PersonFieldProperties<5>, Repeated, String, "", 0);
 impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
+impl_scalar_getters!(Person, 1, name, name_opt);
+impl_scalar_getters!(Person, 2, age, age_opt);
+
 fn test() {
     let p: Person = Person::default();
-    /*
-    let _: Option<u32> = p.age_opt();
-    let _: Option<&str> = p.name_opt();
-    let _: Option<&PersonStruct> = p.partner_opt();
-    let _: u32 = p.age();
-    let _: &str = p.name();
-    let _: &[u32] = p.scores();
-    let _: &[String] = p.nicknames();
-    let _: &[PersonStruct] = p.children();
 
-    let partner: PersonOption<&PersonStruct> = p.partner();
-    let _: Option<u32> = partner.age_opt();
-    let _: Option<&PersonStruct> = partner.partner_opt();
-    let _: u32 = partner.age();
-    let _: PersonOption<&PersonStruct> = partner.partner();
-    let _: &[u32] = partner.scores();
-    let _: &[String] = partner.nicknames();
-    let _: &[PersonStruct] = partner.children();*/
+    // let _: Option<u32> = p.age_opt();
+    let _: Option<&str> = p.name_opt();
+    // let _: Option<&PersonStruct> = p.partner_opt();
+    // let _: u32 = p.age();
+    // let _: &str = p.name();
+    // let _: &[u32] = p.scores();
+    // let _: &[String] = p.nicknames();
+    // let _: &[PersonStruct] = p.children();
+
+    // let partner: PersonOption<&PersonStruct> = p.partner();
+    // let _: Option<u32> = partner.age_opt();
+    // let _: Option<&PersonStruct> = partner.partner_opt();
+    // let _: u32 = partner.age();
+    // let _: PersonOption<&PersonStruct> = partner.partner();
+    // let _: &[u32] = partner.scores();
+    // let _: &[String] = partner.nicknames();
+    // let _: &[PersonStruct] = partner.children();
 }

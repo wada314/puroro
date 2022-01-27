@@ -107,49 +107,55 @@ macro_rules! impl_has_field {
 }
 
 #[macro_export]
-macro_rules! define_getter2 {
+macro_rules! define_getter {
     ($pub:vis fn $id:ident<$num:literal>(&self)) => {
-        $pub fn $id(&self) -> <<Self as AsMessageDeref>::MessageType<'_> as GetFieldMethod2<$num>>::GetterType<'_> {
-            <<Self as AsMessageDeref>::MessageType<'_> as GetFieldMethod2<$num>>::get(
-                self.as_message_deref().deref(),
+        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType<'_> {
+            <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
+                self.as_message_ref(),
             )
         }
     };
 }
 
 #[macro_export]
-macro_rules! define_opt_getter2 {
+macro_rules! define_opt_getter {
     ($pub:vis fn $id:ident<$num:literal>(&self)) => {
-        $pub fn $id(&self) -> <<Self as AsMessageDeref>::MessageType<'_> as GetOptFieldMethod2<$num>>::GetterType<'_> {
-            <<Self as AsMessageDeref>::MessageType<'_> as GetOptFieldMethod2<$num>>::get_opt(
-                self.as_message_deref().deref(),
+        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::GetterType<'_> {
+            <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::get_opt(
+                self.as_message_ref(),
             )
         }
     };
 }
 #[macro_export]
-macro_rules! impl_scalar_getters2 {
-    ($struct:ident, $num:expr, $get:ident, $get_opt:ident) => {
+macro_rules! impl_scalar_getters {
+    ($struct:ident, $num:literal, $get:ident, $get_opt:ident) => {
         impl<Impl> $struct<Impl>
         where
-            for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
+            Self: $crate::AsMessageRef,
+            <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<$num>,
+            Impl: $crate::internal::ImplProperties,
         {
             define_getter!(pub fn $get<$num>(&self));
         }
         impl<Impl> $struct<Impl>
         where
-            for<'a> <Self as AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
+            Self: $crate::AsMessageRef,
+            <Self as $crate::AsMessageRef>::MessageType: GetOptFieldMethod<$num>,
+            Impl: $crate::internal::ImplProperties,
         {
             define_opt_getter!(pub fn $get_opt<$num>(&self));
         }
     };
 }
 #[macro_export]
-macro_rules! impl_repeated_getters2 {
-    ($struct:ident, $num:expr, $get:ident) => {
+macro_rules! impl_repeated_getters {
+    ($struct:ident, $num:literal, $get:ident) => {
         impl<Impl> $struct<Impl>
         where
-            for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
+            Self: $crate::AsMessageRef,
+            <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<$num>,
+            Impl: $crate::internal::ImplProperties,
         {
             define_getter!(pub fn $get<$num>(&self));
         }
