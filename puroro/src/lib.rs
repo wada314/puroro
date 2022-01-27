@@ -101,7 +101,7 @@ use std::ops::Deref;
 //     repeated Person children = 3;
 // }
 //
-use internal::impls::option::{OptionFields, MessageInOptionTrait, OptionShared};
+use internal::impls::option::{MessageInOptionTrait, OptionFields, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::HasField;
 
@@ -277,7 +277,7 @@ fn test() {
     // let _: &[String] = p.nicknames();
     // let _: &[PersonStruct] = p.children();
 
-     let partner: Person<_> = p.partner();
+    let partner: Person<_> = p.partner();
     // let _: Option<u32> = partner.age_opt();
     // let _: Option<&PersonStruct> = partner.partner_opt();
     // let _: u32 = partner.age();
