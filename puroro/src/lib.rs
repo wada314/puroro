@@ -39,9 +39,18 @@ pub use ::either::Either;
 use ::std::marker::PhantomData;
 
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
-    pub fields: Fields,
-    pub shared: Shared,
+    fields: Fields,
+    shared: Shared,
     _phantom: PhantomData<(MP, ImplTag)>,
+}
+impl<MP, ImplTag, Fields, Shared> MessageImpl<MP, ImplTag, Fields, Shared> {
+    pub fn new(fields: Fields, shared: Shared) -> Self {
+        Self {
+            fields,
+            shared,
+            _phantom: PhantomData,
+        }
+    }
 }
 impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>
 where
@@ -117,6 +126,14 @@ struct Person<Impl = PersonSimpleImplProperties>(
 )
 where
     Impl: ImplProperties;
+impl<Impl> Person<Impl>
+where
+    Impl: ImplProperties,
+{
+    pub fn new(fields: Impl::FieldsType, shared: Impl::SharedType) -> Self {
+        Self(MessageImpl::new(fields, shared))
+    }
+}
 
 impl<Impl> AsMessageRef for Person<Impl>
 where
@@ -153,7 +170,7 @@ where
     T: AsMessageRef,
 {
     fn from(opt: Option<T>) -> Self {
-        todo!()
+        Person::new(OptionFields::default(), opt.into())
     }
 }
 
