@@ -31,7 +31,6 @@ pub struct Person {
     /* ... */
 }
 impl Person {
-    // There are still lots of the space for the return types of the methods
     pub fn age(&self) -> &Option<u32> { /* ... */ }
     pub fn partner(&self) -> &Option<Box<Person>> { /* ... */ }
     pub fn full_names(&self) -> &[String] { /* ... */ }
