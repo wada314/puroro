@@ -136,15 +136,17 @@ macro_rules! impl_bump_has_field {
 }
 
 #[macro_export]
-macro_rules! impl_has_field2 {
-    (struct $container:ident $(<$lt:lifetime>)? {
+macro_rules! define_fields_container {
+    ($(#[$attr:meta])* struct $container:ident $(<$lt:lifetime>)? {
         $($name:ident: $ty:ty = $number:literal,)*
     }) => {
+        $(#[$attr])*
         pub struct $container $(<$lt>)? {
             $($name: $ty,)*
+            $(_phantom: ::std::marker::PhantomData<&$lt ()>,)?
         }
         impl $(<$lt>)? $crate::internal::FieldsContainer for self::$container $(<$lt>)? {}
-        impl_has_field2!(@impls $container, $($lt)?, $($name : $ty = $number,)*);
+        define_fields_container!(@impls $container, $($lt)?, $($name : $ty = $number,)*);
     };
     (@impls $container:ident, $($lt:lifetime)?, $name:ident: $ty:ty = $number:literal, $($rest:tt)*) => {
         impl$(<$lt>)? $crate::internal::HasField<$number> for self::$container $(<$lt>)? {
@@ -156,7 +158,7 @@ macro_rules! impl_has_field2 {
                 &mut self.$name
             }
         }
-        impl_has_field2!(@impls $container, $($lt)?, $($rest)*);
+        define_fields_container!(@impls $container, $($lt)?, $($rest)*);
     };
     (@impls $container:ident, $($lt:lifetime)?, ) => {};
 }

@@ -233,48 +233,22 @@ where
 {
 }
 
-#[derive(Default)]
-struct PersonFieldsContainer {
-    name: String,
-    age: u32,
-    children: Vec<Person>,
-    partner: Option<Box<Person>>,
-    nicknames: Vec<String>,
-    scores: Vec<u32>,
+define_fields_container! {
+    #[derive(Default)]
+    struct PersonFieldsContainer {
+        name: String = 1,
+        age: u32 = 2,
+        children: Vec<Person> = 3,
+        partner: Option<Box<Person>> = 4,
+        nicknames: Vec<String> = 5,
+        scores: Vec<u32> = 6,
+    }
 }
-impl crate::internal::FieldsContainer for PersonFieldsContainer {}
-
-impl_has_field!(PersonFieldsContainer, 1, String, name);
-impl_has_field!(PersonFieldsContainer, 2, u32, age);
-impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
-impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
-impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
-impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
 use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use crate::internal::{NoAllocBumpBox, NoAllocBumpString, NoAllocBumpVec};
-// struct PersonBumpFieldsContainer<'bump> {
-//     name: NoAllocBumpString,
-//     age: u32,
-//     children: NoAllocBumpVec<PersonBump<'bump>>,
-//     partner: Option<NoAllocBumpBox<PersonBump<'bump>>>,
-//     nicknames: NoAllocBumpVec<BString<'bump>>,
-//     scores: NoAllocBumpVec<u32>,
-// }
-// impl<'bump> crate::internal::FieldsContainer for PersonBumpFieldsContainer<'bump> {}
-// #[rustfmt::skip]
-// impl_bump_has_field!(PersonBumpFieldsContainer<'bump>, 1, NoAllocBumpString, name);
-// #[rustfmt::skip]
-// impl_bump_has_field!(PersonBumpFieldsContainer<'bump>, 2, u32, age);
-// #[rustfmt::skip]
-// impl_bump_has_field!(PersonBumpFieldsContainer<'bump>, 3, NoAllocBumpVec<PersonBump<'bump>>, children);
-// #[rustfmt::skip]
-// impl_bump_has_field!(PersonBumpFieldsContainer<'bump>, 4, Option<NoAllocBumpBox<PersonBump<'bump>>>, partner);
-// #[rustfmt::skip]
-// impl_bump_has_field!(PersonBumpFieldsContainer<'bump>, 5, NoAllocBumpVec<BString<'bump>>, nicknames);
-// #[rustfmt::skip]
-// impl_bump_has_field!(PersonBumpFieldsContainer<'bump>, 6, NoAllocBumpVec<u32>, scores);
-impl_has_field2! {
+
+define_fields_container! {
     struct PersonBumpFieldsContainer<'bump> {
         name: NoAllocBumpString = 1,
         age: u32 = 2,
