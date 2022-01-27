@@ -38,14 +38,14 @@ where
         ImplTag,
         LabelTag,
         TypeTag,
-        <FieldsType as HasField<1>>::Type,
+        <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
     >,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<1>,
+    FieldsType: HasField<NUMBER>,
 {
     type GetterType<'a>
     where
@@ -54,7 +54,7 @@ where
         ImplTag,
         LabelTag,
         TypeTag,
-        <FieldsType as HasField<1>>::Type,
+        <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
     >>::GetterType<'a>;
@@ -63,7 +63,7 @@ where
             ImplTag,
             LabelTag,
             TypeTag,
-            <FieldsType as HasField<1>>::Type,
+            <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
             NUMBER,
         >>::get(self)
@@ -98,14 +98,14 @@ where
         ImplTag,
         LabelTag,
         TypeTag,
-        <FieldsType as HasField<1>>::Type,
+        <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
     >,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<1>,
+    FieldsType: HasField<NUMBER>,
 {
     type GetterType<'a>
     where
@@ -114,7 +114,7 @@ where
         ImplTag,
         LabelTag,
         TypeTag,
-        <FieldsType as HasField<1>>::Type,
+        <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
     >>::GetterType<'a>;
@@ -123,7 +123,7 @@ where
             ImplTag,
             LabelTag,
             TypeTag,
-            <FieldsType as HasField<1>>::Type,
+            <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
             NUMBER,
         >>::get_opt(self)
