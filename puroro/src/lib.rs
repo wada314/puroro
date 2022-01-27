@@ -269,12 +269,15 @@ impl_field_properties!(PersonFieldProperties<5>, Repeated, String, "", 0);
 impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 pub struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
-impl_scalar_getters!(Person, 1, name, name_opt);
-impl_scalar_getters!(Person, 2, age, age_opt);
-impl_repeated_getters!(Person, 3, children);
-impl_scalar_getters!(Person, 4, partner, partner_opt);
-impl_repeated_getters!(Person, 5, nicknames);
-impl_repeated_getters!(Person, 6, scores);
+impl_getter!(Person, 1, name);
+impl_getter!(Person, 2, age);
+impl_getter!(Person, 3, children);
+impl_getter!(Person, 4, partner);
+impl_getter!(Person, 5, nicknames);
+impl_getter!(Person, 6, scores);
+impl_opt_getter!(Person, 1, name_opt);
+impl_opt_getter!(Person, 2, age_opt);
+impl_opt_getter!(Person, 4, partner_opt);
 
 fn test() {
     let person: Person = Person::default();

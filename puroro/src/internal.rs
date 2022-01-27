@@ -141,29 +141,9 @@ macro_rules! define_opt_getter {
         }
     };
 }
+
 #[macro_export]
-macro_rules! impl_scalar_getters {
-    ($struct:ident, $num:literal, $get:ident, $get_opt:ident) => {
-        impl<Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageRef,
-            for <'a> <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_getter!(pub fn $get<$num>(&self));
-        }
-        impl<Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageRef,
-            for<'a> <Self as $crate::AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_opt_getter!(pub fn $get_opt<$num>(&self));
-        }
-    };
-}
-#[macro_export]
-macro_rules! impl_repeated_getters {
+macro_rules! impl_getter {
     ($struct:ident, $num:literal, $get:ident) => {
         impl<Impl> $struct<Impl>
         where
@@ -172,6 +152,19 @@ macro_rules! impl_repeated_getters {
             Impl: $crate::internal::ImplProperties,
         {
             define_getter!(pub fn $get<$num>(&self));
+        }
+    };
+}
+#[macro_export]
+macro_rules! impl_opt_getter {
+    ($struct:ident, $num:literal, $get:ident) => {
+        impl<Impl> $struct<Impl>
+        where
+            Self: $crate::AsMessageRef,
+            for<'a> <Self as $crate::AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
+            Impl: $crate::internal::ImplProperties,
+        {
+            define_opt_getter!(pub fn $get<$num>(&self));
         }
     };
 }
