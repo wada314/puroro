@@ -16,6 +16,7 @@
 
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
+use crate::internal::{SharedAllocator, SharedBitfield};
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
@@ -24,6 +25,28 @@ use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::slice;
 use ::std::str::Utf8Error;
+
+pub struct BumpShared<'bump, const BITFIELD_U32_LEN: usize> {
+    bitfield: crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
+    bump: &'bump Bump,
+}
+
+impl<'bump, const BITFIELD_U32_LEN: usize> SharedBitfield for BumpShared<'bump, BITFIELD_U32_LEN> {
+    type BitfieldType =
+        crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>;
+    fn bitfield(&self) -> &Self::BitfieldType {
+        &self.bitfield
+    }
+    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType {
+        &mut self.bitfield
+    }
+}
+impl<'bump, const BITFIELD_U32_LEN: usize> SharedAllocator for BumpShared<'bump, BITFIELD_U32_LEN> {
+    type AllocatorType = Bump;
+    fn alloc(&self) -> &Self::AllocatorType {
+        &self.bump
+    }
+}
 
 /// A box for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
