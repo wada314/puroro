@@ -136,6 +136,32 @@ macro_rules! impl_bump_has_field {
 }
 
 #[macro_export]
+macro_rules! impl_has_field2 {
+    (struct $container:ident $(<$lt:lifetime>)? {
+        $($name:ident: $ty:ty = $number:literal,)*
+    }) => {
+        pub struct $container $(<$lt>)? {
+            $($name: $ty,)*
+        }
+        impl $(<$lt>)? $crate::internal::FieldsContainer for self::$container $(<$lt>)? {}
+        impl_has_field2!(@impls $container, $($lt)?, $($name : $ty = $number,)*);
+    };
+    (@impls $container:ident, $($lt:lifetime)?, $name:ident: $ty:ty = $number:literal, $($rest:tt)*) => {
+        impl$(<$lt>)? $crate::internal::HasField<$number> for self::$container $(<$lt>)? {
+            type Type = $ty;
+            fn get(&self) -> &Self::Type {
+                &self.$name
+            }
+            fn get_mut(&mut self) -> &mut Self::Type {
+                &mut self.$name
+            }
+        }
+        impl_has_field2!(@impls $container, $($lt)?, $($rest)*);
+    };
+    (@impls $container:ident, $($lt:lifetime)?, ) => {};
+}
+
+#[macro_export]
 macro_rules! define_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
         $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$($lt, )* $num>>::GetterType {
