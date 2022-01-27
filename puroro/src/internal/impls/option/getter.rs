@@ -13,9 +13,41 @@
 // limitations under the License.
 
 use super::{OptionFields, OptionShared};
-use crate::internal::{FieldProperties, MessageProperties};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
+use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageRef};
 
 // repeated field
 // Assuming the internal type's getter type is `&[T]` or whatever `Default` type
+impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        tags::OptionImpl,
+        tags::Repeated,
+        TypeTag,
+        <OptionFields as HasField<NUMBER>>::Type,
+        OptionShared<InnerMessageRef>,
+        NUMBER,
+    > for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<InnerMessageRef>>
+where
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
+    InnerMessageRef: AsMessageRef<MessageType = InnerMessage>,
+    InnerMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = InnerGetterType>,
+    InnerGetterType: Default,
+{
+    type GetterType = InnerGetterType;
+    fn get(&'a self) -> Self::GetterType {
+        self.shared
+            .option
+            .as_ref()
+            .map(|msg| {
+                <InnerMessage as GetFieldMethod<NUMBER>>::get(
+                    <InnerMessageRef as AsMessageRef>::as_message_ref(&msg),
+                )
+            })
+            .unwrap_or_default()
+    }
+}

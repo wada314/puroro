@@ -33,12 +33,12 @@ impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, _1, const 
     > for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<InnerMessageRef>>
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = TypeTag>,
     InnerMessageRef: AsMessageRef<MessageType = InnerMessage>,
-    InnerMessage: 'a,
-    InnerMessage: GetOptFieldMethod<'a, NUMBER, GetterType = Option<InnerGetterType>>,
+    InnerMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<InnerGetterType>>,
 {
-    type GetterType = <InnerMessage as GetOptFieldMethod<'a, NUMBER>>::GetterType;
+    type GetterType = Option<InnerGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
         self.shared.option.as_ref().and_then(|msg| {
             <InnerMessage as GetOptFieldMethod<NUMBER>>::get_opt(
