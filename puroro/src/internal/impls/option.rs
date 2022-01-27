@@ -16,8 +16,8 @@ pub mod getter;
 pub mod getter_opt;
 
 use crate::internal::{FieldsContainer, HasField};
-use crate::tags;
 use crate::MessageImpl;
+use crate::{tags, AsMessageRef};
 
 #[derive(Default, Clone)]
 pub struct OptionFields;
@@ -49,4 +49,9 @@ impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, OptionFields, 
             _phantom: Default::default(),
         }
     }
+}
+
+pub trait OptionMessageTrait<MP> {
+    type WrappedOptionMessage;
+    fn into_message(self) -> Self::WrappedOptionMessage;
 }

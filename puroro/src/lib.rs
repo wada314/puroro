@@ -101,27 +101,28 @@ use std::ops::Deref;
 //     repeated Person children = 3;
 // }
 //
-use internal::impls::option::{OptionFields, OptionShared};
+use internal::impls::option::{OptionFields, OptionMessageTrait, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::HasField;
 
-struct PersonSimpleImplProperties<FieldsType = PersonFieldsContainer, SharedType = SimpleShared<1>>(
-    PhantomData<(FieldsType, SharedType)>,
-);
+pub struct PersonSimpleImplProperties<
+    FieldsType = PersonFieldsContainer,
+    SharedType = SimpleShared<1>,
+>(PhantomData<(FieldsType, SharedType)>);
 impl<FieldsType, SharedType> ImplProperties for PersonSimpleImplProperties<FieldsType, SharedType> {
     type ImplTag = tags::SimpleImpl;
     type FieldsType = FieldsType;
     type SharedType = SharedType;
 }
 
-struct OptionImplProperties<T>(PhantomData<T>);
+pub struct OptionImplProperties<T>(PhantomData<T>);
 impl<T> ImplProperties for OptionImplProperties<T> {
     type ImplTag = tags::OptionImpl;
     type FieldsType = OptionFields;
     type SharedType = OptionShared<T>;
 }
 
-struct Person<Impl = PersonSimpleImplProperties>(
+pub struct Person<Impl = PersonSimpleImplProperties>(
     MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>,
 )
 where
@@ -174,6 +175,16 @@ where
     }
 }
 
+impl<T, MP, ImplTag, FieldsType, SharedType> OptionMessageTrait<MP> for Option<T>
+where
+    T: AsMessageRef<MessageType = MessageImpl<MP, ImplTag, FieldsType, SharedType>>,
+{
+    type WrappedOptionMessage = Person<OptionImplProperties<T>>;
+    fn into_message(self) -> Self::WrappedOptionMessage {
+        Person::new(OptionFields::default(), self.into())
+    }
+}
+
 // trait PersonTrait
 // where
 //     Self: AsMessageDeref,
@@ -223,7 +234,7 @@ impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
 impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
 impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
-struct PersonMessageProperties;
+pub struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
     type Fields<const NUMBER: i32> = PersonFieldProperties<NUMBER>;
@@ -246,7 +257,7 @@ impl_field_properties!(
 );
 impl_field_properties!(PersonFieldProperties<5>, Repeated, String, "", 0);
 impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
-struct PersonFieldProperties<const FIELD_NUMBER: i32>;
+pub struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 impl_scalar_getters!(Person, 1, name, name_opt);
 impl_scalar_getters!(Person, 2, age, age_opt);
