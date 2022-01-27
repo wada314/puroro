@@ -263,7 +263,10 @@ pub struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 impl_scalar_getters!(Person, 1, name, name_opt);
 impl_scalar_getters!(Person, 2, age, age_opt);
+impl_repeated_getters!(Person, 3, children);
 impl_scalar_getters!(Person, 4, partner, partner_opt);
+impl_repeated_getters!(Person, 5, nicknames);
+impl_repeated_getters!(Person, 6, scores);
 
 fn test() {
     let p: Person = Person::default();
@@ -273,9 +276,9 @@ fn test() {
     let _: Option<&Person> = p.partner_opt();
     let _: u32 = p.age();
     let _: &str = p.name();
-    // let _: &[u32] = p.scores();
-    // let _: &[String] = p.nicknames();
-    // let _: &[PersonStruct] = p.children();
+    let _: &[u32] = p.scores();
+    let _: &[String] = p.nicknames();
+    let _: &[Person] = p.children();
 
     let partner: Person<_> = p.partner();
     let _: Option<u32> = partner.age_opt();
