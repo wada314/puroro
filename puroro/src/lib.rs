@@ -175,9 +175,11 @@ where
     }
 }
 
-impl<T, MP, ImplTag, FieldsType, SharedType> OptionMessageTrait<MP> for Option<T>
+impl<T, ImplTag, FieldsType, SharedType> OptionMessageTrait<PersonMessageProperties> for Option<T>
 where
-    T: AsMessageRef<MessageType = MessageImpl<MP, ImplTag, FieldsType, SharedType>>,
+    T: AsMessageRef<
+        MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>,
+    >,
 {
     type WrappedOptionMessage = Person<OptionImplProperties<T>>;
     fn into_message(self) -> Self::WrappedOptionMessage {
