@@ -109,7 +109,7 @@ macro_rules! impl_has_field {
 #[macro_export]
 macro_rules! define_getter {
     ($pub:vis fn $id:ident<$num:literal>(&self)) => {
-        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType<'_> {
+        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<'_, $num>>::GetterType {
             <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
                 self.as_message_ref(),
             )
@@ -120,7 +120,7 @@ macro_rules! define_getter {
 #[macro_export]
 macro_rules! define_opt_getter {
     ($pub:vis fn $id:ident<$num:literal>(&self)) => {
-        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::GetterType<'_> {
+        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<'_, $num>>::GetterType {
             <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::get_opt(
                 self.as_message_ref(),
             )
@@ -133,7 +133,7 @@ macro_rules! impl_scalar_getters {
         impl<Impl> $struct<Impl>
         where
             Self: $crate::AsMessageRef,
-            <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<$num>,
+            for <'a> <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
             define_getter!(pub fn $get<$num>(&self));
@@ -141,7 +141,7 @@ macro_rules! impl_scalar_getters {
         impl<Impl> $struct<Impl>
         where
             Self: $crate::AsMessageRef,
-            <Self as $crate::AsMessageRef>::MessageType: GetOptFieldMethod<$num>,
+            for<'a> <Self as $crate::AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
             define_opt_getter!(pub fn $get_opt<$num>(&self));
@@ -154,7 +154,7 @@ macro_rules! impl_repeated_getters {
         impl<Impl> $struct<Impl>
         where
             Self: $crate::AsMessageRef,
-            <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<$num>,
+            for <'a> <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
             define_getter!(pub fn $get<$num>(&self));

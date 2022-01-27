@@ -19,8 +19,9 @@ use crate::tags;
 use crate::MessageImpl;
 
 // (optional|required) numeric field
-impl<MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
+        'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
         tags::NonLdType<_2>,
@@ -36,11 +37,8 @@ where
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType<'a>
-    where
-        Self: 'a,
-    = Option<NumType>;
-    fn get_opt(&self) -> Self::GetterType<'_> {
+    type GetterType = Option<NumType>;
+    fn get_opt(&'a self) -> Self::GetterType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
@@ -52,8 +50,9 @@ where
 }
 
 // (optional|required) (string|bytes) field
-impl<MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
+        'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
         tags::StringOrBytesType<_2>,
@@ -65,16 +64,13 @@ where
     FieldsType: HasField<NUMBER>,
     <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
     tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
-    BorrowedType: 'static + ?Sized,
+    BorrowedType: 'a + ?Sized,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType<'a>
-    where
-        Self: 'a,
-    = Option<&'a BorrowedType>;
-    fn get_opt(&self) -> Self::GetterType<'_> {
+    type GetterType = Option<&'a BorrowedType>;
+    fn get_opt(&'a self) -> Self::GetterType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
@@ -88,6 +84,7 @@ where
 // (optional|required|[unlabeled]) message field
 // Typically the field type is `Option<Box<M>>`.
 impl<
+    'a,
     MP,
     FieldsType,
     SharedType,
@@ -97,6 +94,7 @@ impl<
     const NUMBER: i32,
 >
     GetOptFieldMethodImpl<
+        'a,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
@@ -106,15 +104,12 @@ impl<
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER, Type = Option<Box<FieldMessageType>>>,
-    FieldMessageType: 'static,
+    FieldMessageType: 'a,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
 {
-    type GetterType<'a>
-    where
-        Self: 'a,
-    = Option<&'a FieldMessageType>;
-    fn get_opt(&self) -> Self::GetterType<'_> {
+    type GetterType = Option<&'a FieldMessageType>;
+    fn get_opt(&'a self) -> Self::GetterType {
         let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
         field.as_deref()
     }

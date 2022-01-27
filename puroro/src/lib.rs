@@ -278,8 +278,8 @@ fn test() {
     // let _: &[PersonStruct] = p.children();
 
     let partner: Person<_> = p.partner();
-    // let _: Option<u32> = partner.age_opt();
-    // let _: Option<&PersonStruct> = partner.partner_opt();
+    let _: Option<u32> = partner.age_opt();
+    let _: Option<&Person> = partner.partner_opt();
     // let _: u32 = partner.age();
     // let _: PersonOption<&PersonStruct> = partner.partner();
     // let _: &[u32] = partner.scores();
