@@ -96,17 +96,20 @@ use internal::impls::option::{OptionFields, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::HasField;
 
-struct PersonSimpleImplProperties<
-    ImplTag = tags::SimpleImpl,
-    FieldsType = PersonFieldsContainer,
-    SharedType = SimpleShared<1>,
->(PhantomData<(ImplTag, FieldsType, SharedType)>);
-impl<ImplTag, FieldsType, SharedType> ImplProperties
-    for PersonSimpleImplProperties<ImplTag, FieldsType, SharedType>
-{
-    type ImplTag = ImplTag;
+struct PersonSimpleImplProperties<FieldsType = PersonFieldsContainer, SharedType = SimpleShared<1>>(
+    PhantomData<(FieldsType, SharedType)>,
+);
+impl<FieldsType, SharedType> ImplProperties for PersonSimpleImplProperties<FieldsType, SharedType> {
+    type ImplTag = tags::SimpleImpl;
     type FieldsType = FieldsType;
     type SharedType = SharedType;
+}
+
+struct OptionImplProperties<T>(PhantomData<T>);
+impl<T> ImplProperties for OptionImplProperties<T> {
+    type ImplTag = tags::OptionImpl;
+    type FieldsType = OptionFields;
+    type SharedType = OptionShared<T>;
 }
 
 struct Person<Impl = PersonSimpleImplProperties>(
@@ -143,6 +146,14 @@ where
 {
     fn default() -> Self {
         Self(Default::default())
+    }
+}
+impl<T> From<Option<T>> for Person<OptionImplProperties<T>>
+where
+    T: AsMessageRef,
+{
+    fn from(opt: Option<T>) -> Self {
+        todo!()
     }
 }
 
