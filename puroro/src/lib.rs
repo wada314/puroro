@@ -61,16 +61,6 @@ pub trait AsMessageRef {
     type MessageType;
     fn as_message_ref(&self) -> &Self::MessageType;
 }
-pub trait AsMessageDeref {
-    type DerefType<'a>: 'a + Deref<Target = Self::MessageType<'a>>
-    where
-        Self: 'a;
-    type MessageType<'a>
-    where
-        Self: 'a;
-    fn as_message_deref(&self) -> Self::DerefType<'_>;
-}
-
 impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fields, Shared> {
     type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
     fn as_message_ref(&self) -> &Self::MessageType {
@@ -86,39 +76,10 @@ where
         <T as AsMessageRef>::as_message_ref(*self)
     }
 }
-impl<MP, ImplTag, Fields, Shared> AsMessageDeref for MessageImpl<MP, ImplTag, Fields, Shared> {
-    type DerefType<'a>
-    where
-        Self: 'a,
-    = &'a MessageImpl<MP, ImplTag, Fields, Shared>;
-    type MessageType<'a>
-    where
-        Self: 'a,
-    = MessageImpl<MP, ImplTag, Fields, Shared>;
-    fn as_message_deref(&self) -> Self::DerefType<'_> {
-        self
-    }
-}
-impl<'a, T> AsMessageDeref for &'a T
-where
-    T: AsMessageDeref,
-{
-    type DerefType<'b>
-    where
-        Self: 'b,
-    = T::DerefType<'b>;
-    type MessageType<'b>
-    where
-        Self: 'b,
-    = T::MessageType<'b>;
-    fn as_message_deref(&self) -> Self::DerefType<'_> {
-        <T as AsMessageDeref>::as_message_deref(self)
-    }
-}
 
 // メモ
-use internal::SimpleShared;
 use internal::{FieldProperties, MessageProperties};
+use internal::{ImplProperties, SimpleShared};
 use std::ops::Deref;
 
 // assume a proto like this:
@@ -133,61 +94,89 @@ use std::ops::Deref;
 //
 use internal::impls::option::{OptionFields, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
-use internal::methods2::{GetFieldMethod2, GetOptFieldMethod2};
 use internal::HasField;
 
-struct PersonStruct<
+struct PersonSimpleImplProperties<
     ImplTag = tags::SimpleImpl,
     FieldsType = PersonFieldsContainer,
     SharedType = SimpleShared<1>,
->(MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>);
-type Person = PersonStruct;
-impl<ImplTag, FieldsType, SharedType> AsMessageRef
-    for PersonStruct<ImplTag, FieldsType, SharedType>
+>(PhantomData<(ImplTag, FieldsType, SharedType)>);
+impl<ImplTag, FieldsType, SharedType> ImplProperties
+    for PersonSimpleImplProperties<ImplTag, FieldsType, SharedType>
 {
-    type MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
+    type ImplTag = ImplTag;
+    type FieldsType = FieldsType;
+    type SharedType = SharedType;
+}
+
+struct Person<IP = PersonSimpleImplProperties>(
+    MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>,
+)
+where
+    IP: ImplProperties;
+
+impl<IP> Person<IP>
+where
+    IP: ImplProperties,
+    Self: Default,
+{
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+impl<IP> AsMessageRef for Person<IP>
+where
+    IP: ImplProperties,
+{
+    type MessageType =
+        MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>;
     fn as_message_ref(&self) -> &Self::MessageType {
         &self.0
     }
 }
-impl<ImplTag, FieldsType, SharedType> Deref for PersonStruct<ImplTag, FieldsType, SharedType> {
-    type Target = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>;
+impl<IP> Deref for Person<IP>
+where
+    IP: ImplProperties,
+{
+    type Target = MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-impl<ImplTag, FieldsType, SharedType> Default for PersonStruct<ImplTag, FieldsType, SharedType>
+impl<IP> Default for Person<IP>
 where
-    MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>: Default,
+    IP: ImplProperties,
+    MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>: Default,
 {
     fn default() -> Self {
         Self(Default::default())
     }
 }
 
-trait PersonTrait
-where
-    Self: AsMessageDeref,
-    for<'a> <Self as AsMessageDeref>::MessageType<'a>: GetFieldMethod2<1>
-        + GetOptFieldMethod2<1>
-        + GetFieldMethod2<2>
-        + GetOptFieldMethod2<2>
-        + GetFieldMethod2<3>
-        + GetFieldMethod2<4>
-        + GetOptFieldMethod2<4>
-        + GetFieldMethod2<5>
-        + GetFieldMethod2<6>,
-{
-    // define_opt_getter2!(fn name_opt<1>(&self));
-    // define_getter2!(fn name<1>(&self));
-    // define_opt_getter2!(fn age_opt<2>(&self));
-    // define_getter2!(fn age<2>(&self));
-    // define_getter2!(fn children<3>(&self));
-    // define_opt_getter2!(fn partner_opt<4>(&self));
-    // define_getter2!(fn partner<4>(&self));
-    // define_getter2!(fn nicknames<5>(&self));
-    // define_getter2!(fn scores<6>(&self));
-}
+// trait PersonTrait
+// where
+//     Self: AsMessageDeref,
+//     for<'a> <Self as AsMessageDeref>::MessageType<'a>: GetFieldMethod2<1>
+//         + GetOptFieldMethod2<1>
+//         + GetFieldMethod2<2>
+//         + GetOptFieldMethod2<2>
+//         + GetFieldMethod2<3>
+//         + GetFieldMethod2<4>
+//         + GetOptFieldMethod2<4>
+//         + GetFieldMethod2<5>
+//         + GetFieldMethod2<6>,
+// {
+//     // define_opt_getter2!(fn name_opt<1>(&self));
+//     // define_getter2!(fn name<1>(&self));
+//     // define_opt_getter2!(fn age_opt<2>(&self));
+//     // define_getter2!(fn age<2>(&self));
+//     // define_getter2!(fn children<3>(&self));
+//     // define_opt_getter2!(fn partner_opt<4>(&self));
+//     // define_getter2!(fn partner<4>(&self));
+//     // define_getter2!(fn nicknames<5>(&self));
+//     // define_getter2!(fn scores<6>(&self));
+// }
 
 // impl_scalar_getters2!(PersonStruct, 1, name, name_opt);
 // impl_scalar_getters2!(PersonStruct, 2, age, age_opt);
@@ -196,21 +185,12 @@ where
 // impl_repeated_getters2!(PersonStruct, 5, nicknames);
 // impl_repeated_getters2!(PersonStruct, 6, scores);
 
-impl PersonStruct<tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>
-where
-    <Self as Deref>::Target: GetOptFieldMethod2<1>,
-{
-    pub fn name_opt2(&self) -> <<Self as Deref>::Target as GetOptFieldMethod2<1>>::GetterType<'_> {
-        <<Self as Deref>::Target as GetOptFieldMethod2<1>>::get_opt(self.deref())
-    }
-}
-
 #[derive(Default)]
 struct PersonFieldsContainer {
     name: String,
     age: u32,
-    children: Vec<PersonStruct>,
-    partner: Option<Box<PersonStruct>>,
+    children: Vec<Person>,
+    partner: Option<Box<Person>>,
     nicknames: Vec<String>,
     scores: Vec<u32>,
 }
@@ -218,8 +198,8 @@ impl crate::internal::FieldsContainer for PersonFieldsContainer {}
 
 impl_has_field!(PersonFieldsContainer, 1, String, name);
 impl_has_field!(PersonFieldsContainer, 2, u32, age);
-impl_has_field!(PersonFieldsContainer, 3, Vec<PersonStruct>, children);
-impl_has_field!(PersonFieldsContainer, 4, Option<Box<PersonStruct>>, partner);
+impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
+impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
 impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
 impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
@@ -249,7 +229,7 @@ impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
-    let p = Person::default();
+    let p = Person::new();
     /*
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();

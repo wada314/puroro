@@ -79,6 +79,12 @@ pub trait FieldProperties {
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
 }
 
+pub trait ImplProperties {
+    type ImplTag;
+    type FieldsType;
+    type SharedType;
+}
+
 pub trait FieldsContainer {}
 
 pub trait HasField<const NUMBER: i32>: FieldsContainer {
@@ -119,49 +125,6 @@ macro_rules! define_opt_getter2 {
             <<Self as AsMessageDeref>::MessageType<'_> as GetOptFieldMethod2<$num>>::get_opt(
                 self.as_message_deref().deref(),
             )
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! define_getter {
-    ($pub:vis fn $id:ident ( $num:expr )) => {
-        $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::GetterType {
-            <<Self as AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
-                self.as_message_ref(),
-            )
-        }
-    };
-}
-#[macro_export]
-macro_rules! define_opt_getter {
-    ($pub:vis fn $id:ident ( $num:expr )) => {
-        $pub fn $id(&self) -> <<Self as AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::GetterType {
-            <<Self as AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::get_opt(
-                self.as_message_ref(),
-            )
-        }
-    };
-}
-#[macro_export]
-macro_rules! impl_get_opt {
-    ($struct:ident, $num:expr, $get:ident, $get_opt:ident) => {
-        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
-        where
-            for<'a> <Self as AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
-        {
-            define_opt_getter!(pub fn $get_opt($num));
-        }
-    };
-}
-#[macro_export]
-macro_rules! impl_get {
-    ($struct:ident, $num:expr, $get:ident, $get_opt:ident) => {
-        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
-        where
-            for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
-        {
-            define_getter!(pub fn $get($num));
         }
     };
 }
