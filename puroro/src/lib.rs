@@ -101,9 +101,9 @@ use std::ops::Deref;
 //     repeated Person children = 3;
 // }
 //
-use internal::impls::option::{MessageInOptionTrait, OptionFields, OptionShared};
+use internal::impls::option::{MessageInOptionTrait, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
-use internal::HasField;
+use internal::{EmptyFields, HasField};
 
 pub struct PersonSimpleImplProperties<
     FieldsType = PersonFieldsContainer,
@@ -118,7 +118,7 @@ impl<FieldsType, SharedType> ImplProperties for PersonSimpleImplProperties<Field
 pub struct OptionImplProperties<T>(PhantomData<T>);
 impl<T> ImplProperties for OptionImplProperties<T> {
     type ImplTag = tags::OptionImpl;
-    type FieldsType = OptionFields;
+    type FieldsType = EmptyFields;
     type SharedType = OptionShared<T>;
 }
 
@@ -171,7 +171,7 @@ where
     T: AsMessageRef,
 {
     fn from(opt: Option<T>) -> Self {
-        Person::new(OptionFields::default(), opt.into())
+        Person::new(EmptyFields::default(), opt.into())
     }
 }
 
@@ -183,14 +183,14 @@ where
 {
     type WrappedOptionMessage = Person<OptionImplProperties<T>>;
     fn into_message(self) -> Self::WrappedOptionMessage {
-        Person::new(OptionFields::default(), self.into())
+        Person::new(EmptyFields::default(), self.into())
     }
 }
 
-trait PersonTrait
+trait PersonTrait<'a>
 where
     Self: AsMessageRef,
-    for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
+    <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
         + GetOptFieldMethod<'a, 1>
         + GetFieldMethod<'a, 2>
         + GetOptFieldMethod<'a, 2>
@@ -200,15 +200,15 @@ where
         + GetFieldMethod<'a, 5>
         + GetFieldMethod<'a, 6>,
 {
-    define_opt_getter!(fn name_opt<1>(&self));
-    define_getter!(fn name<1>(&self));
-    define_opt_getter!(fn age_opt<2>(&self));
-    define_getter!(fn age<2>(&self));
-    define_getter!(fn children<3>(&self));
-    define_opt_getter!(fn partner_opt<4>(&self));
-    define_getter!(fn partner<4>(&self));
-    define_getter!(fn nicknames<5>(&self));
-    define_getter!(fn scores<6>(&self));
+    define_opt_getter!(fn name_opt<1>(&'a self));
+    define_getter!(fn name<1>(&'a self));
+    define_opt_getter!(fn age_opt<2>(&'a self));
+    define_getter!(fn age<2>(&'a self));
+    define_getter!(fn children<3>(&'a self));
+    define_opt_getter!(fn partner_opt<4>(&'a self));
+    define_getter!(fn partner<4>(&'a self));
+    define_getter!(fn nicknames<5>(&'a self));
+    define_getter!(fn scores<6>(&'a self));
 }
 
 #[derive(Default)]

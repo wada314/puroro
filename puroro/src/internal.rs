@@ -91,6 +91,20 @@ pub trait HasField<const NUMBER: i32>: FieldsContainer {
     fn get(&self) -> &Self::Type;
     fn get_mut(&mut self) -> &mut Self::Type;
 }
+
+#[derive(Default, Clone)]
+pub struct EmptyFields;
+impl FieldsContainer for EmptyFields {}
+impl<const NUMBER: i32> HasField<NUMBER> for EmptyFields {
+    type Type = ();
+    fn get(&self) -> &Self::Type {
+        &()
+    }
+    fn get_mut(&mut self) -> &mut Self::Type {
+        unreachable!()
+    }
+}
+
 #[macro_export]
 macro_rules! impl_has_field {
     ($container:ty, $number:expr, $ty:ty, $name:ident) => {
@@ -108,8 +122,8 @@ macro_rules! impl_has_field {
 
 #[macro_export]
 macro_rules! define_getter {
-    ($pub:vis fn $id:ident<$num:literal>(&self)) => {
-        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<'_, $num>>::GetterType {
+    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
+        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$($lt, )* $num>>::GetterType {
             <<Self as $crate::AsMessageRef>::MessageType as GetFieldMethod<$num>>::get(
                 self.as_message_ref(),
             )
@@ -119,8 +133,8 @@ macro_rules! define_getter {
 
 #[macro_export]
 macro_rules! define_opt_getter {
-    ($pub:vis fn $id:ident<$num:literal>(&self)) => {
-        $pub fn $id(&self) -> <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<'_, $num>>::GetterType {
+    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
+        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<$($lt, )* $num>>::GetterType {
             <<Self as $crate::AsMessageRef>::MessageType as GetOptFieldMethod<$num>>::get_opt(
                 self.as_message_ref(),
             )

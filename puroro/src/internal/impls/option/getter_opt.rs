@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{OptionFields, OptionShared};
+use super::OptionShared;
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
-use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageRef};
 
@@ -27,10 +27,10 @@ impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, _1, const 
         tags::OptionImpl,
         tags::NonRepeatedLabel<_1>,
         TypeTag,
-        <OptionFields as HasField<NUMBER>>::Type,
+        <EmptyFields as HasField<NUMBER>>::Type,
         OptionShared<InnerMessageRef>,
         NUMBER,
-    > for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<InnerMessageRef>>
+    > for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
 where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:

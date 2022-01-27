@@ -15,22 +15,9 @@
 pub mod getter;
 pub mod getter_opt;
 
-use crate::internal::{FieldsContainer, HasField};
+use crate::internal::{EmptyFields, FieldsContainer, HasField};
+use crate::tags;
 use crate::MessageImpl;
-use crate::{tags, AsMessageRef};
-
-#[derive(Default, Clone)]
-pub struct OptionFields;
-impl FieldsContainer for OptionFields {}
-impl<const NUMBER: i32> HasField<NUMBER> for OptionFields {
-    type Type = ();
-    fn get(&self) -> &Self::Type {
-        &()
-    }
-    fn get_mut(&mut self) -> &mut Self::Type {
-        unreachable!()
-    }
-}
 
 #[derive(Default, Clone, Debug)]
 pub struct OptionShared<T> {
@@ -41,7 +28,7 @@ impl<T> From<Option<T>> for OptionShared<T> {
         Self { option: v }
     }
 }
-impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, OptionFields, OptionShared<T>> {
+impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<T>> {
     fn from(val: Option<T>) -> Self {
         MessageImpl {
             fields: Default::default(),
