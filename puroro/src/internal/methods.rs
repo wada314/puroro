@@ -17,6 +17,8 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 
+use super::impls::option::MessageInOptionTrait;
+
 pub trait GetFieldMethod<const NUMBER: i32> {
     type GetterType<'a>
     where
@@ -216,12 +218,15 @@ where
     FieldMessageType: 'static,
     Self: 'static,
     for<'a> Self: GetOptFieldMethod<NUMBER, GetterType<'a> = Option<&'a FieldMessageType>>,
+    for<'a> Option<&'a FieldMessageType>: MessageInOptionTrait<FieldMP>,
 {
     type GetterType<'a>
     where
         Self: 'a,
-    = <Self as GetOptFieldMethod<NUMBER>>::GetterType<'a>;
+    = <Option<&'a FieldMessageType> as MessageInOptionTrait<FieldMP>>::WrappedOptionMessage;
     fn get(&self) -> Self::GetterType<'_> {
-        <Self as GetOptFieldMethod<NUMBER>>::get_opt(self)
+        <Option<&FieldMessageType> as MessageInOptionTrait<FieldMP>>::into_message(
+            <Self as GetOptFieldMethod<NUMBER>>::get_opt(self),
+        )
     }
 }
