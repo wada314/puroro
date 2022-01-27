@@ -222,7 +222,6 @@ where
         Self: 'a,
     = <Self as GetOptFieldMethod<NUMBER>>::GetterType<'a>;
     fn get(&self) -> Self::GetterType<'_> {
-        let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
-        Into::into(value_opt)
+        <Self as GetOptFieldMethod<NUMBER>>::get_opt(self)
     }
 }

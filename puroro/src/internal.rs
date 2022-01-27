@@ -130,28 +130,28 @@ macro_rules! define_opt_getter2 {
 #[macro_export]
 macro_rules! impl_scalar_getters2 {
     ($struct:ident, $num:expr, $get:ident, $get_opt:ident) => {
-        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
+        impl<Impl> $struct<Impl>
         where
             for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
         {
-            define_getter!(pub fn $get($num));
+            define_getter!(pub fn $get<$num>(&self));
         }
-        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
+        impl<Impl> $struct<Impl>
         where
             for<'a> <Self as AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
         {
-            define_opt_getter!(pub fn $get_opt($num));
+            define_opt_getter!(pub fn $get_opt<$num>(&self));
         }
     };
 }
 #[macro_export]
 macro_rules! impl_repeated_getters2 {
     ($struct:ident, $num:expr, $get:ident) => {
-        impl<ImplTag, FieldsType, SharedType> $struct<ImplTag, FieldsType, SharedType>
+        impl<Impl> $struct<Impl>
         where
             for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
         {
-            define_getter!(pub fn $get($num));
+            define_getter!(pub fn $get<$num>(&self));
         }
     };
 }
