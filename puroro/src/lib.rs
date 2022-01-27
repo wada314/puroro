@@ -187,36 +187,29 @@ where
     }
 }
 
-// trait PersonTrait
-// where
-//     Self: AsMessageDeref,
-//     for<'a> <Self as AsMessageDeref>::MessageType<'a>: GetFieldMethod2<1>
-//         + GetOptFieldMethod2<1>
-//         + GetFieldMethod2<2>
-//         + GetOptFieldMethod2<2>
-//         + GetFieldMethod2<3>
-//         + GetFieldMethod2<4>
-//         + GetOptFieldMethod2<4>
-//         + GetFieldMethod2<5>
-//         + GetFieldMethod2<6>,
-// {
-//     // define_opt_getter2!(fn name_opt<1>(&self));
-//     // define_getter2!(fn name<1>(&self));
-//     // define_opt_getter2!(fn age_opt<2>(&self));
-//     // define_getter2!(fn age<2>(&self));
-//     // define_getter2!(fn children<3>(&self));
-//     // define_opt_getter2!(fn partner_opt<4>(&self));
-//     // define_getter2!(fn partner<4>(&self));
-//     // define_getter2!(fn nicknames<5>(&self));
-//     // define_getter2!(fn scores<6>(&self));
-// }
-
-// impl_scalar_getters2!(PersonStruct, 1, name, name_opt);
-// impl_scalar_getters2!(PersonStruct, 2, age, age_opt);
-// impl_scalar_getters2!(PersonStruct, 4, partner, partner_opt);
-// impl_repeated_getters2!(PersonStruct, 3, children);
-// impl_repeated_getters2!(PersonStruct, 5, nicknames);
-// impl_repeated_getters2!(PersonStruct, 6, scores);
+trait PersonTrait
+where
+    Self: AsMessageRef,
+    for<'a> <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
+        + GetOptFieldMethod<'a, 1>
+        + GetFieldMethod<'a, 2>
+        + GetOptFieldMethod<'a, 2>
+        + GetFieldMethod<'a, 3>
+        + GetFieldMethod<'a, 4>
+        + GetOptFieldMethod<'a, 4>
+        + GetFieldMethod<'a, 5>
+        + GetFieldMethod<'a, 6>,
+{
+    define_opt_getter!(fn name_opt<1>(&self));
+    define_getter!(fn name<1>(&self));
+    define_opt_getter!(fn age_opt<2>(&self));
+    define_getter!(fn age<2>(&self));
+    define_getter!(fn children<3>(&self));
+    define_opt_getter!(fn partner_opt<4>(&self));
+    define_getter!(fn partner<4>(&self));
+    define_getter!(fn nicknames<5>(&self));
+    define_getter!(fn scores<6>(&self));
+}
 
 #[derive(Default)]
 struct PersonFieldsContainer {
