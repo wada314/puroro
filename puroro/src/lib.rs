@@ -109,35 +109,37 @@ impl<ImplTag, FieldsType, SharedType> ImplProperties
     type SharedType = SharedType;
 }
 
-struct Person<IP = PersonSimpleImplProperties>(
-    MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>,
+struct Person<Impl = PersonSimpleImplProperties>(
+    MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>,
 )
 where
-    IP: ImplProperties;
+    Impl: ImplProperties;
 
-impl<IP> AsMessageRef for Person<IP>
+impl<Impl> AsMessageRef for Person<Impl>
 where
-    IP: ImplProperties,
+    Impl: ImplProperties,
 {
     type MessageType =
-        MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>;
+        MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
     fn as_message_ref(&self) -> &Self::MessageType {
         &self.0
     }
 }
-impl<IP> Deref for Person<IP>
+impl<Impl> Deref for Person<Impl>
 where
-    IP: ImplProperties,
+    Impl: ImplProperties,
 {
-    type Target = MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>;
+    type Target =
+        MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-impl<IP> Default for Person<IP>
+impl<Impl> Default for Person<Impl>
 where
-    IP: ImplProperties,
-    MessageImpl<PersonMessageProperties, IP::ImplTag, IP::FieldsType, IP::SharedType>: Default,
+    Impl: ImplProperties,
+    MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>:
+        Default,
 {
     fn default() -> Self {
         Self(Default::default())
