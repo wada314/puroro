@@ -12,28 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetFieldMethodImpl;
 use crate::internal::HasField;
 use crate::tags;
 use crate::MessageImpl;
 
 // repeated field
-impl<'a, MP, FieldsType, SharedType, TypeTag, ItemType, const NUMBER: i32>
-    GetFieldMethodImpl<
-        'a,
-        Vec<ItemType>,
-        SharedType,
-        tags::SimpleImpl,
-        tags::Repeated,
-        TypeTag,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
-where
-    FieldsType: HasField<NUMBER, Type = Vec<ItemType>>,
-    ItemType: 'a,
-{
-    type GetterType = &'a [ItemType];
-    fn get(&'a self) -> Self::GetterType {
-        <FieldsType as HasField<NUMBER>>::get(&self.fields)
-    }
-}

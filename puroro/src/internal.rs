@@ -16,7 +16,6 @@ pub mod bool;
 pub mod fixed_bits;
 pub mod impls;
 pub mod methods;
-pub mod methods2;
 pub mod types;
 pub mod utils;
 pub mod variant;
