@@ -115,16 +115,6 @@ struct Person<IP = PersonSimpleImplProperties>(
 where
     IP: ImplProperties;
 
-impl<IP> Person<IP>
-where
-    IP: ImplProperties,
-    Self: Default,
-{
-    pub fn new() -> Self {
-        Default::default()
-    }
-}
-
 impl<IP> AsMessageRef for Person<IP>
 where
     IP: ImplProperties,
@@ -229,7 +219,7 @@ impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 fn test() {
-    let p = Person::new();
+    let p: Person = Person::default();
     /*
     let _: Option<u32> = p.age_opt();
     let _: Option<&str> = p.name_opt();
