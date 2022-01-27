@@ -211,6 +211,21 @@ where
     define_getter!(fn scores<6>(&'a self));
 }
 
+impl<'a, T> PersonTrait<'a> for T
+where
+    T: AsMessageRef,
+    <T as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
+        + GetOptFieldMethod<'a, 1>
+        + GetFieldMethod<'a, 2>
+        + GetOptFieldMethod<'a, 2>
+        + GetFieldMethod<'a, 3>
+        + GetFieldMethod<'a, 4>
+        + GetOptFieldMethod<'a, 4>
+        + GetFieldMethod<'a, 5>
+        + GetFieldMethod<'a, 6>,
+{
+}
+
 #[derive(Default)]
 struct PersonFieldsContainer {
     name: String,
@@ -281,4 +296,6 @@ fn test() {
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();
     let _: &[Person] = partner.children();
+
+    let _: u32 = <Person<_> as PersonTrait>::age(&person);
 }
