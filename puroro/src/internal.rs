@@ -88,8 +88,7 @@ pub trait FieldsContainer {}
 
 pub trait HasField<const NUMBER: i32>: FieldsContainer {
     type Type;
-    fn get(&self) -> &Self::Type;
-    fn get_mut(&mut self) -> &mut Self::Type;
+    fn get(&self) -> &Self::Type
 }
 
 #[derive(Default, Clone)]
@@ -100,39 +99,6 @@ impl<const NUMBER: i32> HasField<NUMBER> for EmptyFields {
     fn get(&self) -> &Self::Type {
         &()
     }
-    fn get_mut(&mut self) -> &mut Self::Type {
-        unreachable!()
-    }
-}
-
-#[macro_export]
-macro_rules! impl_has_field {
-    ($container:ty, $number:expr, $ty:ty, $name:ident) => {
-        impl crate::internal::HasField<$number> for $container {
-            type Type = $ty;
-            fn get(&self) -> &Self::Type {
-                &self.$name
-            }
-            fn get_mut(&mut self) -> &mut Self::Type {
-                &mut self.$name
-            }
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_bump_has_field {
-    ($container:ty, $number:expr, $ty:ty, $name:ident) => {
-        impl<'bump> crate::internal::HasField<$number> for $container {
-            type Type = $ty;
-            fn get(&self) -> &Self::Type {
-                &self.$name
-            }
-            fn get_mut(&mut self) -> &mut Self::Type {
-                &mut self.$name
-            }
-        }
-    };
 }
 
 #[macro_export]
@@ -153,9 +119,6 @@ macro_rules! define_fields_container {
             type Type = $ty;
             fn get(&self) -> &Self::Type {
                 &self.$name
-            }
-            fn get_mut(&mut self) -> &mut Self::Type {
-                &mut self.$name
             }
         }
         define_fields_container!(@impls $container, $($lt)?, $($rest)*);

@@ -264,6 +264,8 @@ impl MessageProperties for PersonMessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
     type Fields<const NUMBER: i32> = PersonFieldProperties<NUMBER>;
 }
+
+pub struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 impl_field_properties!(PersonFieldProperties<1>, Optional, String, "", 0);
 impl_field_properties!(PersonFieldProperties<2>, Optional, UInt32, 0, 0);
 impl_field_properties!(
@@ -282,7 +284,6 @@ impl_field_properties!(
 );
 impl_field_properties!(PersonFieldProperties<5>, Repeated, String, "", 0);
 impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
-pub struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 
 impl_getter!(Person, pub fn name<1>(&self));
 impl_getter!(Person, pub fn age<2>(&self));
