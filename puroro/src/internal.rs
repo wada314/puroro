@@ -144,27 +144,27 @@ macro_rules! define_opt_getter {
 
 #[macro_export]
 macro_rules! impl_getter {
-    ($struct:ident, $num:literal, $get:ident) => {
+    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&$($lt:lifetime)? self)) => {
         impl<Impl> $struct<Impl>
         where
             Self: $crate::AsMessageRef,
             for <'a> <Self as $crate::AsMessageRef>::MessageType: GetFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
-            define_getter!(pub fn $get<$num>(&self));
+            define_getter!($pub fn $get<$num>(&$($lt)*self));
         }
     };
 }
 #[macro_export]
 macro_rules! impl_opt_getter {
-    ($struct:ident, $num:literal, $get:ident) => {
+    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&$($lt:lifetime)? self)) => {
         impl<Impl> $struct<Impl>
         where
             Self: $crate::AsMessageRef,
             for<'a> <Self as $crate::AsMessageRef>::MessageType: GetOptFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
-            define_opt_getter!(pub fn $get<$num>(&self));
+            define_opt_getter!($pub fn $get<$num>(&$($lt)*self));
         }
     };
 }
