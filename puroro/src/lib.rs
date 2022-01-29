@@ -303,14 +303,16 @@ fn test() {
     let _: Option<&Person> = person.partner_opt();
     let _: u32 = person.age();
     let _: &str = person.name();
+    let partner: Person<_> = person.partner();
     let _: &[u32] = person.scores();
     let _: &[String] = person.nicknames();
     let _: &[Person] = person.children();
 
-    let partner: Person<_> = person.partner();
     let _: Option<u32> = partner.age_opt();
+    let _: Option<&str> = partner.name_opt();
     let _: Option<&Person> = partner.partner_opt();
     let _: u32 = partner.age();
+    let _: &str = partner.name();
     let _: Person<_> = partner.partner();
     let _: &[u32] = partner.scores();
     let _: &[String] = partner.nicknames();

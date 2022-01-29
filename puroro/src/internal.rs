@@ -88,7 +88,7 @@ pub trait FieldsContainer {}
 
 pub trait HasField<const NUMBER: i32>: FieldsContainer {
     type Type;
-    fn get(&self) -> &Self::Type
+    fn get(&self) -> &Self::Type;
 }
 
 #[derive(Default, Clone)]
