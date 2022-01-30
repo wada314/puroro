@@ -38,6 +38,10 @@ pub use ::either::Either;
 
 use ::std::marker::PhantomData;
 
+pub trait DefaultIn<Alloc> {
+    fn default_in(alloc: Alloc) -> Self;
+}
+
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
     fields: Fields,
     shared: Shared,
@@ -61,6 +65,20 @@ where
         Self {
             fields: Default::default(),
             shared: Default::default(),
+            _phantom: Default::default(),
+        }
+    }
+}
+impl<MP, ImplTag, Fields, Shared, Alloc> DefaultIn<Alloc>
+    for MessageImpl<MP, ImplTag, Fields, Shared>
+where
+    Fields: Default,
+    Shared: DefaultIn<Alloc>,
+{
+    fn default_in(alloc: Alloc) -> Self {
+        Self {
+            fields: Default::default(),
+            shared: DefaultIn::default_in(alloc),
             _phantom: Default::default(),
         }
     }
@@ -138,10 +156,11 @@ impl<Impl> Person<Impl>
 where
     Impl: ImplProperties,
 {
-    pub fn new(fields: Impl::FieldsType, shared: Impl::SharedType) -> Self {
+    pub fn from_raw_parts(fields: Impl::FieldsType, shared: Impl::SharedType) -> Self {
         Self(MessageImpl::new(fields, shared))
     }
 }
+impl<'bump> PersonBump<'bump> {}
 
 impl<Impl> AsMessageRef for Person<Impl>
 where
@@ -178,7 +197,7 @@ where
     T: AsMessageRef,
 {
     fn from(opt: Option<T>) -> Self {
-        Person::new(EmptyFields::default(), opt.into())
+        Person::from_raw_parts(EmptyFields::default(), opt.into())
     }
 }
 
@@ -190,7 +209,7 @@ where
 {
     type WrappedOptionMessage = Person<OptionImplProperties<T>>;
     fn into_message(self) -> Self::WrappedOptionMessage {
-        Person::new(EmptyFields::default(), self.into())
+        Person::from_raw_parts(EmptyFields::default(), self.into())
     }
 }
 

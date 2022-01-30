@@ -17,6 +17,7 @@
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
 use crate::internal::{SharedAllocator, SharedBitfield};
+use crate::DefaultIn;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
@@ -45,6 +46,16 @@ impl<'bump, const BITFIELD_U32_LEN: usize> SharedAllocator for BumpShared<'bump,
     type AllocatorType = Bump;
     fn alloc(&self) -> &Self::AllocatorType {
         &self.bump
+    }
+}
+impl<'bump, const BITFIELD_U32_LEN: usize> DefaultIn<&'bump Bump>
+    for BumpShared<'bump, BITFIELD_U32_LEN>
+{
+    fn default_in(alloc: &'bump Bump) -> Self {
+        Self {
+            bitfield: Default::default(),
+            bump: alloc,
+        }
     }
 }
 
