@@ -91,6 +91,16 @@ pub trait HasField<const NUMBER: i32>: FieldsContainer {
     fn get(&self) -> &Self::Type;
 }
 
+pub trait SharedBitfield {
+    type BitfieldType: Bitfield;
+    fn bitfield(&self) -> &Self::BitfieldType;
+    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
+}
+pub trait SharedAllocator {
+    type AllocatorType;
+    fn alloc(&self) -> &Self::AllocatorType;
+}
+
 #[derive(Default, Clone)]
 pub struct EmptyFields;
 impl FieldsContainer for EmptyFields {}
@@ -185,14 +195,4 @@ macro_rules! impl_field_properties {
             const OPTIONAL_FIELD_BITFIELD_INDEX: usize = $opt_idx;
         }
     };
-}
-
-pub trait SharedBitfield {
-    type BitfieldType: Bitfield;
-    fn bitfield(&self) -> &Self::BitfieldType;
-    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
-}
-pub trait SharedAllocator {
-    type AllocatorType;
-    fn alloc(&self) -> &Self::AllocatorType;
 }
