@@ -17,6 +17,8 @@
 mod getter;
 mod getter_mut;
 mod getter_opt;
+use crate::DefaultIn;
+
 use super::super::SharedBitfield;
 
 pub struct SimpleFields;
@@ -34,6 +36,11 @@ impl<const BITFIELD_U32_LEN: usize> SharedBitfield for SimpleShared<BITFIELD_U32
     }
     fn bitfield_mut(&mut self) -> &mut Self::BitfieldType {
         &mut self.bitfield
+    }
+}
+impl<const BITFIELD_U32_LEN: usize> DefaultIn<()> for SimpleShared<BITFIELD_U32_LEN> {
+    fn default_in(_: ()) -> Self {
+        Default::default()
     }
 }
 
