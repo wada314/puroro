@@ -373,4 +373,13 @@ fn test() {
 
     let bump = bumpalo::Bump::new();
     let bperson = PersonBump::new_in(&bump);
+    let _: Option<u32> = bperson.age_opt();
+    let _: Option<&str> = bperson.name_opt();
+    //let _: Option<&PersonBump> = bperson.partner_opt();
+    let _: u32 = bperson.age();
+    let _: &str = bperson.name();
+    //let bpartner: Person<_> = bperson.partner();
+    //let _: &[u32] = bperson.scores();
+    //let _: &[String] = bperson.nicknames();
+    //let _: &[Person] = bperson.children();
 }
