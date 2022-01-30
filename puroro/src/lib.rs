@@ -38,8 +38,9 @@ pub use ::either::Either;
 
 use ::std::marker::PhantomData;
 
-pub trait DefaultIn<Alloc> {
-    fn default_in(alloc: Alloc) -> Self;
+pub trait DefaultIn {
+    type AllocatorType;
+    fn default_in(alloc: Self::AllocatorType) -> Self;
 }
 
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
@@ -69,13 +70,13 @@ where
         }
     }
 }
-impl<MP, ImplTag, Fields, Shared, Alloc> DefaultIn<Alloc>
-    for MessageImpl<MP, ImplTag, Fields, Shared>
+impl<MP, ImplTag, Fields, Shared> DefaultIn for MessageImpl<MP, ImplTag, Fields, Shared>
 where
     Fields: Default,
-    Shared: DefaultIn<Alloc>,
+    Shared: DefaultIn,
 {
-    fn default_in(alloc: Alloc) -> Self {
+    type AllocatorType = <Shared as DefaultIn>::AllocatorType;
+    fn default_in(alloc: Self::AllocatorType) -> Self {
         Self {
             fields: Default::default(),
             shared: DefaultIn::default_in(alloc),
@@ -161,6 +162,15 @@ where
         Default::default()
     }
 }
+impl<Impl> Person<Impl>
+where
+    Self: DefaultIn,
+    Impl: ImplProperties,
+{
+    pub fn new_in(alloc: <Self as DefaultIn>::AllocatorType) -> Self {
+        DefaultIn::default_in(alloc)
+    }
+}
 
 impl<Impl> Person<Impl>
 where
@@ -171,13 +181,13 @@ where
     }
 }
 
-impl<Impl, Alloc> DefaultIn<Alloc> for Person<Impl>
+impl<Impl, Alloc> DefaultIn for Person<Impl>
 where
     Impl: ImplProperties,
-    <Impl as ImplProperties>::SharedType: SharedAllocator<AllocatorType = Alloc>,
     MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>:
-        DefaultIn<Alloc>,
+        DefaultIn<AllocatorType = Alloc>,
 {
+    type AllocatorType = Alloc;
     fn default_in(alloc: Alloc) -> Self {
         Self(MessageImpl::default_in(alloc))
     }

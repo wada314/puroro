@@ -48,9 +48,8 @@ impl<'bump, const BITFIELD_U32_LEN: usize> SharedAllocator for BumpShared<'bump,
         &self.bump
     }
 }
-impl<'bump, const BITFIELD_U32_LEN: usize> DefaultIn<&'bump Bump>
-    for BumpShared<'bump, BITFIELD_U32_LEN>
-{
+impl<'bump, const BITFIELD_U32_LEN: usize> DefaultIn for BumpShared<'bump, BITFIELD_U32_LEN> {
+    type AllocatorType = &'bump Bump;
     fn default_in(alloc: &'bump Bump) -> Self {
         Self {
             bitfield: Default::default(),

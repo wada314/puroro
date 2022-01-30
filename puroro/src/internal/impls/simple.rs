@@ -38,7 +38,8 @@ impl<const BITFIELD_U32_LEN: usize> SharedBitfield for SimpleShared<BITFIELD_U32
         &mut self.bitfield
     }
 }
-impl<const BITFIELD_U32_LEN: usize> DefaultIn<()> for SimpleShared<BITFIELD_U32_LEN> {
+impl<const BITFIELD_U32_LEN: usize> DefaultIn for SimpleShared<BITFIELD_U32_LEN> {
+    type AllocatorType = ();
     fn default_in(_: ()) -> Self {
         Default::default()
     }
