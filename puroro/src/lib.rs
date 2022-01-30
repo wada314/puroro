@@ -154,12 +154,23 @@ pub type PersonBump<'bump> = Person<PersonBumpImplProperties<'bump>>;
 
 impl<Impl> Person<Impl>
 where
+    Self: Default,
+    Impl: ImplProperties,
+{
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+impl<Impl> Person<Impl>
+where
     Impl: ImplProperties,
 {
     pub fn from_raw_parts(fields: Impl::FieldsType, shared: Impl::SharedType) -> Self {
         Self(MessageImpl::new(fields, shared))
     }
 }
+
 impl<Impl, Alloc> DefaultIn<Alloc> for Person<Impl>
 where
     Impl: ImplProperties,
