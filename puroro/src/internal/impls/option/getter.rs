@@ -16,7 +16,7 @@ use super::OptionShared;
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
-use crate::{tags, AsMessageRef};
+use crate::{tags, AsMessageImplRef};
 
 // repeated field
 // Assuming the internal type's getter type is `&[T]` or whatever `Default` type
@@ -34,7 +34,7 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-    InnerMessageRef: AsMessageRef<MessageType = InnerMessage>,
+    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
     InnerMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = InnerGetterType>,
     InnerGetterType: Default,
 {
@@ -45,7 +45,7 @@ where
             .as_ref()
             .map(|msg| {
                 <InnerMessage as GetFieldMethod<NUMBER>>::get(
-                    <InnerMessageRef as AsMessageRef>::as_message_ref(&msg),
+                    <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                 )
             })
             .unwrap_or_default()

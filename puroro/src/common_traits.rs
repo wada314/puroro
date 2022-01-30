@@ -25,6 +25,29 @@ pub trait DefaultIn {
     fn default_in(alloc: Self::AllocatorType) -> Self;
 }
 
+pub trait AsMessageImplRef {
+    type MessageImplType;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType;
+}
+impl<'a, T> AsMessageImplRef for &'a T
+where
+    T: AsMessageImplRef,
+{
+    type MessageImplType = T::MessageImplType;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        <T as AsMessageImplRef>::as_message_impl_ref(*self)
+    }
+}
+impl<T> AsMessageImplRef for Box<T>
+where
+    T: AsMessageImplRef,
+{
+    type MessageImplType = T::MessageImplType;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        <T as AsMessageImplRef>::as_message_impl_ref(&self)
+    }
+}
+
 pub trait AsMessageRef {
     type MessageType;
     fn as_message_ref(&self) -> &Self::MessageType;
@@ -36,5 +59,14 @@ where
     type MessageType = T::MessageType;
     fn as_message_ref(&self) -> &Self::MessageType {
         <T as AsMessageRef>::as_message_ref(*self)
+    }
+}
+impl<T> AsMessageRef for Box<T>
+where
+    T: AsMessageRef,
+{
+    type MessageType = T::MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        <T as AsMessageRef>::as_message_ref(&self)
     }
 }

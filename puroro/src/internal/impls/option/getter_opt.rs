@@ -16,7 +16,7 @@ use super::OptionShared;
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
-use crate::{tags, AsMessageRef};
+use crate::{tags, AsMessageImplRef};
 
 // non-repeated field
 // If the inner `Option` is `Some` then delegate to the inner type.
@@ -35,14 +35,14 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = TypeTag>,
-    InnerMessageRef: AsMessageRef<MessageType = InnerMessage>,
+    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
     InnerMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<InnerGetterType>>,
 {
     type GetterType = Option<InnerGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
         self.shared.option.as_ref().and_then(|msg| {
             <InnerMessage as GetOptFieldMethod<NUMBER>>::get_opt(
-                <InnerMessageRef as AsMessageRef>::as_message_ref(&msg),
+                <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
             )
         })
     }

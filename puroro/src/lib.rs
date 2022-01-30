@@ -128,16 +128,26 @@ where
     }
 }
 
+impl<Impl> AsMessageImplRef for Person<Impl>
+where
+    Impl: ImplProperties,
+{
+    type MessageImplType =
+        MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        &self.0
+    }
+}
 impl<Impl> AsMessageRef for Person<Impl>
 where
     Impl: ImplProperties,
 {
-    type MessageType =
-        MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
+    type MessageType = Person<Impl>;
     fn as_message_ref(&self) -> &Self::MessageType {
-        &self.0
+        self
     }
 }
+
 impl<Impl> Deref for Person<Impl>
 where
     Impl: ImplProperties,
@@ -160,7 +170,7 @@ where
 }
 impl<T> From<Option<T>> for Person<OptionImplProperties<T>>
 where
-    T: AsMessageRef,
+    T: AsMessageImplRef,
 {
     fn from(opt: Option<T>) -> Self {
         Person::from_raw_parts(EmptyFields::default(), opt.into())
@@ -169,8 +179,8 @@ where
 
 impl<T, ImplTag, FieldsType, SharedType> MessageInOptionTrait<PersonMessageProperties> for Option<T>
 where
-    T: AsMessageRef<
-        MessageType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>,
+    T: AsMessageImplRef<
+        MessageImplType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>,
     >,
 {
     type WrappedOptionMessage = Person<OptionImplProperties<T>>;
@@ -181,8 +191,8 @@ where
 
 trait PersonTrait<'a>
 where
-    Self: AsMessageRef,
-    <Self as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
+    Self: AsMessageImplRef,
+    <Self as AsMessageImplRef>::MessageImplType: GetFieldMethod<'a, 1>
         + GetOptFieldMethod<'a, 1>
         + GetFieldMethod<'a, 2>
         + GetOptFieldMethod<'a, 2>
@@ -205,8 +215,8 @@ where
 
 impl<'a, T> PersonTrait<'a> for T
 where
-    T: AsMessageRef,
-    <T as AsMessageRef>::MessageType: GetFieldMethod<'a, 1>
+    T: AsMessageImplRef,
+    <T as AsMessageImplRef>::MessageImplType: GetFieldMethod<'a, 1>
         + GetOptFieldMethod<'a, 1>
         + GetFieldMethod<'a, 2>
         + GetOptFieldMethod<'a, 2>

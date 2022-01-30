@@ -16,6 +16,7 @@ use crate::internal::methods::GetOptFieldMethodImpl;
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
+use crate::AsMessageRef;
 use crate::MessageImpl;
 
 // (optional|required) numeric field
@@ -89,6 +90,7 @@ impl<
     FieldsType,
     SharedType,
     FieldMP,
+    FieldMessageAsRefType,
     FieldMessageType, // `M`
     _1,
     const NUMBER: i32,
@@ -98,12 +100,13 @@ impl<
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
-        Option<Box<FieldMessageType>>,
+        Option<FieldMessageAsRefType>,
         SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = Option<Box<FieldMessageType>>>,
+    FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>>,
+    FieldMessageAsRefType: 'a + AsMessageRef<MessageType = FieldMessageType>,
     FieldMessageType: 'a,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
@@ -111,6 +114,6 @@ where
     type GetterType = Option<&'a FieldMessageType>;
     fn get_opt(&'a self) -> Self::GetterType {
         let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
-        field.as_deref()
+        field.as_ref().map(|ref_msg| ref_msg.as_message_ref())
     }
 }

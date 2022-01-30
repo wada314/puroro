@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{AsMessageRef, DefaultIn};
+use crate::{AsMessageImplRef, DefaultIn};
 use ::std::marker::PhantomData;
 
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
@@ -56,9 +56,9 @@ where
         }
     }
 }
-impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fields, Shared> {
-    type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
-    fn as_message_ref(&self) -> &Self::MessageType {
+impl<MP, ImplTag, Fields, Shared> AsMessageImplRef for MessageImpl<MP, ImplTag, Fields, Shared> {
+    type MessageImplType = MessageImpl<MP, ImplTag, Fields, Shared>;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
         self
     }
 }
