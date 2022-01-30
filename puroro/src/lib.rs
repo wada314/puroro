@@ -105,7 +105,7 @@ where
 }
 
 // メモ
-use internal::{FieldProperties, MessageProperties};
+use internal::{FieldProperties, MessageProperties, SharedAllocator};
 use internal::{ImplProperties, SimpleShared};
 use std::ops::Deref;
 
@@ -160,7 +160,17 @@ where
         Self(MessageImpl::new(fields, shared))
     }
 }
-impl<'bump> PersonBump<'bump> {}
+impl<Impl, Alloc> DefaultIn<Alloc> for Person<Impl>
+where
+    Impl: ImplProperties,
+    <Impl as ImplProperties>::SharedType: SharedAllocator<AllocatorType = Alloc>,
+    MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>:
+        DefaultIn<Alloc>,
+{
+    fn default_in(alloc: Alloc) -> Self {
+        Self(MessageImpl::default_in(alloc))
+    }
+}
 
 impl<Impl> AsMessageRef for Person<Impl>
 where
