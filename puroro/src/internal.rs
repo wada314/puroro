@@ -29,7 +29,6 @@ pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::simple::{SimpleFields, SimpleShared};
 
 use crate::tags;
-use crate::MessageImpl;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
