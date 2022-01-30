@@ -15,7 +15,7 @@
 pub mod getter;
 pub mod getter_opt;
 
-use crate::internal::{EmptyFields, FieldsContainer, HasField};
+use crate::internal::EmptyFields;
 use crate::tags;
 use crate::MessageImpl;
 
@@ -30,11 +30,7 @@ impl<T> From<Option<T>> for OptionShared<T> {
 }
 impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<T>> {
     fn from(val: Option<T>) -> Self {
-        MessageImpl {
-            fields: Default::default(),
-            shared: Into::into(val),
-            _phantom: Default::default(),
-        }
+        MessageImpl::from_raw_parts(Default::default(), Into::into(val))
     }
 }
 

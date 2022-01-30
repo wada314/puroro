@@ -22,11 +22,13 @@
 mod common_traits;
 mod error;
 pub mod internal;
+pub mod message;
 pub mod repeated_field;
 pub mod tags;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
+pub use self::message::MessageImpl;
 pub use self::repeated_field::{AsRefRepeatedField, CloneThenIntoRepeatedField, RepeatedField};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
@@ -38,77 +40,7 @@ pub use ::either::Either;
 
 use ::std::marker::PhantomData;
 
-pub trait DefaultIn {
-    type AllocatorType;
-    fn default_in(alloc: Self::AllocatorType) -> Self;
-}
-
-pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
-    fields: Fields,
-    shared: Shared,
-    _phantom: PhantomData<(MP, ImplTag)>,
-}
-impl<MP, ImplTag, Fields, Shared> MessageImpl<MP, ImplTag, Fields, Shared> {
-    pub fn new(fields: Fields, shared: Shared) -> Self {
-        Self {
-            fields,
-            shared,
-            _phantom: PhantomData,
-        }
-    }
-}
-impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>
-where
-    Fields: Default,
-    Shared: Default,
-{
-    fn default() -> Self {
-        Self {
-            fields: Default::default(),
-            shared: Default::default(),
-            _phantom: Default::default(),
-        }
-    }
-}
-impl<MP, ImplTag, Fields, Shared> DefaultIn for MessageImpl<MP, ImplTag, Fields, Shared>
-where
-    Fields: Default,
-    Shared: DefaultIn,
-{
-    type AllocatorType = <Shared as DefaultIn>::AllocatorType;
-    fn default_in(alloc: Self::AllocatorType) -> Self {
-        Self {
-            fields: Default::default(),
-            shared: DefaultIn::default_in(alloc),
-            _phantom: Default::default(),
-        }
-    }
-}
-
-pub trait AsMessageRef {
-    type MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType;
-}
-impl<MP, ImplTag, Fields, Shared> AsMessageRef for MessageImpl<MP, ImplTag, Fields, Shared> {
-    type MessageType = MessageImpl<MP, ImplTag, Fields, Shared>;
-    fn as_message_ref(&self) -> &Self::MessageType {
-        self
-    }
-}
-impl<'a, T> AsMessageRef for &'a T
-where
-    T: AsMessageRef,
-{
-    type MessageType = T::MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(*self)
-    }
-}
-
 // メモ
-use internal::{FieldProperties, MessageProperties, SharedAllocator};
-use internal::{ImplProperties, SimpleShared};
-use std::ops::Deref;
 
 // assume a proto like this:
 // message Person {
@@ -122,7 +54,10 @@ use std::ops::Deref;
 //
 use internal::impls::option::{MessageInOptionTrait, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
-use internal::{EmptyFields, HasField};
+use internal::EmptyFields;
+use internal::MessageProperties;
+use internal::{ImplProperties, SimpleShared};
+use std::ops::Deref;
 
 pub struct PersonSimpleImplProperties<
     FieldsType = PersonFieldsContainer,
@@ -177,7 +112,7 @@ where
     Impl: ImplProperties,
 {
     pub fn from_raw_parts(fields: Impl::FieldsType, shared: Impl::SharedType) -> Self {
-        Self(MessageImpl::new(fields, shared))
+        Self(MessageImpl::from_raw_parts(fields, shared))
     }
 }
 

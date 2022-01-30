@@ -20,15 +20,21 @@ pub trait Enum2:
 }
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
-/// `new_in()` initialize function.
-pub trait NewIn<AllocatorType> {
-    fn new_in(alloc: AllocatorType) -> Self;
+pub trait DefaultIn {
+    type AllocatorType;
+    fn default_in(alloc: Self::AllocatorType) -> Self;
 }
-impl<'a, T> NewIn<&'a ()> for Box<T>
+
+pub trait AsMessageRef {
+    type MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType;
+}
+impl<'a, T> AsMessageRef for &'a T
 where
-    T: NewIn<&'a ()>,
+    T: AsMessageRef,
 {
-    fn new_in(_: &()) -> Self {
-        Box::new(T::new_in(&()))
+    type MessageType = T::MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        <T as AsMessageRef>::as_message_ref(*self)
     }
 }
