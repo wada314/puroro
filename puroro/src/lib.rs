@@ -299,6 +299,7 @@ use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use crate::internal::{NoAllocBumpBox, NoAllocBumpString, NoAllocBumpVec};
 
 define_fields_container! {
+    #[derive(Default)]
     struct PersonBumpFieldsContainer<'bump> {
         name: NoAllocBumpString = 1,
         age: u32 = 2,
@@ -346,7 +347,7 @@ impl_opt_getter!(Person, pub fn age_opt<2>(&self));
 impl_opt_getter!(Person, pub fn partner_opt<4>(&self));
 
 fn test() {
-    let person: Person = Person::default();
+    let person: Person = Person::new();
 
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();
@@ -369,4 +370,7 @@ fn test() {
     let _: &[Person] = partner.children();
 
     let _: u32 = <Person<_> as PersonTrait>::age(&person);
+
+    let bump = bumpalo::Bump::new();
+    let bperson = PersonBump::new_in(&bump);
 }
