@@ -320,7 +320,7 @@ fn test() {
     let bperson = PersonBump::new_in(&bump);
     let _: Option<u32> = bperson.age_opt();
     let _: Option<&str> = bperson.name_opt();
-    //let _: Option<&PersonBump> = bperson.partner_opt();
+    let _: Option<&PersonBump> = bperson.partner_opt();
     let _: u32 = bperson.age();
     let _: &str = bperson.name();
     //let bpartner: Person<_> = bperson.partner();

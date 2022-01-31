@@ -47,6 +47,15 @@ where
         <T as AsMessageImplRef>::as_message_impl_ref(&self)
     }
 }
+impl<T> AsMessageImplRef for crate::internal::NoAllocBumpBox<T>
+where
+    T: AsMessageImplRef,
+{
+    type MessageImplType = T::MessageImplType;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        <T as AsMessageImplRef>::as_message_impl_ref(&self)
+    }
+}
 
 pub trait AsMessageRef {
     type MessageType;
@@ -62,6 +71,15 @@ where
     }
 }
 impl<T> AsMessageRef for Box<T>
+where
+    T: AsMessageRef,
+{
+    type MessageType = T::MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        <T as AsMessageRef>::as_message_ref(&self)
+    }
+}
+impl<T> AsMessageRef for crate::internal::NoAllocBumpBox<T>
 where
     T: AsMessageRef,
 {
