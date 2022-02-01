@@ -327,15 +327,7 @@ fn test() {
 
     *person.age_mut() = 20;
     *person.name_mut() = "卑弥呼".to_string();
-    // person.partner_mut();
-    <MessageImpl<_, _, _, _> as internal::methods::GetMutFieldMethodImpl<
-        tags::SimpleImpl,
-        tags::Optional,
-        tags::Message<PersonMessageProperties>,
-        Option<Box<Person>>,
-        _,
-        4,
-    >>::get_mut(person.deref_mut());
+    person.partner_mut();
 
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();
