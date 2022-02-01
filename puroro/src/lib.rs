@@ -319,6 +319,7 @@ fn test() {
 
     *person.age_mut() = 20;
     *person.name_mut() = "卑弥呼".to_string();
+    person.partner_mut();
 
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();

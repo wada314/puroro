@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::bumpalo::Bump;
+use crate::internal::NoAllocBumpBox;
 use ::std::convert::TryFrom;
 
 pub trait Enum2:
@@ -23,6 +25,24 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 pub trait DefaultIn {
     type AllocatorType;
     fn default_in(alloc: Self::AllocatorType) -> Self;
+}
+impl<T> DefaultIn for Box<T>
+where
+    T: DefaultIn,
+{
+    type AllocatorType = T::AllocatorType;
+    fn default_in(alloc: Self::AllocatorType) -> Self {
+        Box::new(T::default_in(alloc))
+    }
+}
+impl<'a, T> DefaultIn for NoAllocBumpBox<T>
+where
+    T: DefaultIn<AllocatorType = &'a Bump>,
+{
+    type AllocatorType = &'a Bump;
+    fn default_in(bump: Self::AllocatorType) -> Self {
+        NoAllocBumpBox::new_in(T::default_in(bump), bump)
+    }
 }
 
 pub trait AsMessageImplRef {

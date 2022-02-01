@@ -13,10 +13,10 @@
 // limitations under the License.
 
 use crate::internal::methods::GetMutFieldMethodImpl;
-use crate::internal::{Bitfield, SharedBitfield};
+use crate::internal::{Bitfield, SharedAllocator, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties};
-use crate::tags;
-use crate::MessageImpl;
+use crate::{tags, AsMessageMut, AsMessageRef};
+use crate::{DefaultIn, MessageImpl};
 
 // (optional|required) non-message field
 impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, _3, const NUMBER: i32>
@@ -51,5 +51,48 @@ where
                 ));
         }
         <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
+    }
+}
+
+// non-repeated message field
+impl<
+    'a,
+    MP,
+    FieldsType,
+    SharedType,
+    FieldMP,
+    FieldMessageAsRefType, // typically `Box<M>`
+    FieldMessageType,      // `M`
+    Alloc,
+    _1,
+    const NUMBER: i32,
+>
+    GetMutFieldMethodImpl<
+        'a,
+        tags::SimpleImpl,
+        tags::NonRepeatedLabel<_1>,
+        tags::Message<FieldMP>,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>> + HasMutField<NUMBER>,
+    FieldMessageAsRefType: 'a
+        + DefaultIn<AllocatorType = Alloc>
+        + AsMessageRef<MessageType = FieldMessageType>
+        + AsMessageMut,
+    FieldMessageType: 'a,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    SharedType: SharedAllocator<AllocatorType = Alloc>,
+    Alloc: Clone,
+{
+    type GetterType = &'a mut FieldMessageType;
+    fn get_mut(&'a mut self) -> Self::GetterType {
+        let field_opt = <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields);
+        field_opt
+            .get_or_insert_with(|| DefaultIn::default_in(self.shared.alloc().clone()))
+            .as_message_mut()
     }
 }
