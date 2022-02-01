@@ -29,103 +29,63 @@ pub trait AsMessageImplRef {
     type MessageImplType;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType;
 }
-impl<'a, T> AsMessageImplRef for &'a T
-where
-    T: AsMessageImplRef,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(self)
-    }
+macro_rules! impl_as_message_impl_ref {
+    (impl<$($lt:lifetime, )* T> $ty:ty) => {
+        impl<$($lt, )* T> AsMessageImplRef for $ty
+        where
+            T: AsMessageImplRef,
+        {
+            type MessageImplType = T::MessageImplType;
+            fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+                <T as AsMessageImplRef>::as_message_impl_ref(self)
+            }
+        }
+    };
 }
-impl<'a, T> AsMessageImplRef for &'a mut T
-where
-    T: AsMessageImplRef,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(self)
-    }
-}
-impl<T> AsMessageImplRef for Box<T>
-where
-    T: AsMessageImplRef,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(self)
-    }
-}
-impl<T> AsMessageImplRef for crate::internal::NoAllocBumpBox<T>
-where
-    T: AsMessageImplRef,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(self)
-    }
-}
+impl_as_message_impl_ref!(impl<'a, T> &'a T);
+impl_as_message_impl_ref!(impl<'a, T> &'a mut T);
+impl_as_message_impl_ref!(impl<T> Box<T>);
+impl_as_message_impl_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
 pub trait AsMessageImplMut {
     type MessageImplType;
     fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType;
 }
-impl<'a, T> AsMessageImplMut for &'a mut T
-where
-    T: AsMessageImplMut,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
-        <T as AsMessageImplMut>::as_message_impl_mut(*self)
-    }
+macro_rules! impl_as_message_impl_mut {
+    (impl<$($lt:lifetime, )* T> $ty:ty) => {
+        impl<$($lt, )* T> AsMessageImplMut for $ty
+        where
+            T: AsMessageImplMut,
+        {
+            type MessageImplType = T::MessageImplType;
+            fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
+                <T as AsMessageImplMut>::as_message_impl_mut(self)
+            }
+        }
+    };
 }
-impl<T> AsMessageImplMut for Box<T>
-where
-    T: AsMessageImplMut,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
-        <T as AsMessageImplMut>::as_message_impl_mut(self)
-    }
-}
-impl<T> AsMessageImplMut for crate::internal::NoAllocBumpBox<T>
-where
-    T: AsMessageImplMut,
-{
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
-        <T as AsMessageImplMut>::as_message_impl_mut(self)
-    }
-}
+impl_as_message_impl_mut!(impl<'a, T> &'a mut T);
+impl_as_message_impl_mut!(impl<T> Box<T>);
+impl_as_message_impl_mut!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
 pub trait AsMessageRef {
     type MessageType;
     fn as_message_ref(&self) -> &Self::MessageType;
 }
-impl<'a, T> AsMessageRef for &'a T
-where
-    T: AsMessageRef,
-{
-    type MessageType = T::MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(self)
-    }
+macro_rules! impl_as_message_ref {
+    (impl<$($lt:lifetime, )* T> $ty:ty) => {
+        impl<$($lt, )* T> AsMessageRef for $ty
+        where
+            T: AsMessageRef,
+        {
+            type MessageType = T::MessageType;
+            fn as_message_ref(&self) -> &Self::MessageType {
+                <T as AsMessageRef>::as_message_ref(self)
+            }
+        }
+    };
 }
-impl<T> AsMessageRef for Box<T>
-where
-    T: AsMessageRef,
-{
-    type MessageType = T::MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(self)
-    }
-}
-impl<T> AsMessageRef for crate::internal::NoAllocBumpBox<T>
-where
-    T: AsMessageRef,
-{
-    type MessageType = T::MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(self)
-    }
-}
+impl_as_message_ref!(impl<'a, T> &'a T);
+impl_as_message_ref!(impl<'a, T> &'a mut T);
+impl_as_message_ref!(impl<T> Box<T>);
+impl_as_message_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
