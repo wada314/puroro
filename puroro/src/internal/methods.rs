@@ -75,6 +75,7 @@ where
         >>::get(self)
     }
 }
+
 pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
     type GetterType;
     fn get_opt(&'a self) -> Self::GetterType;
@@ -129,6 +130,64 @@ where
             SharedType,
             NUMBER,
         >>::get_opt(self)
+    }
+}
+
+pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
+    type GetterType;
+    fn get_mut(&'a mut self) -> Self::GetterType;
+}
+
+pub trait GetMutFieldMethodImpl<
+    'a,
+    ImplTag,
+    LabelTag,
+    TypeTag,
+    FieldType,
+    SharedType,
+    const NUMBER: i32,
+>
+{
+    type GetterType;
+    fn get_mut(&'a mut self) -> Self::GetterType;
+}
+
+impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
+    GetMutFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+where
+    Self: GetMutFieldMethodImpl<
+        'a,
+        ImplTag,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        NUMBER,
+    >,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    FieldsType: HasField<NUMBER>,
+{
+    type GetterType = <Self as GetMutFieldMethodImpl<
+        'a,
+        ImplTag,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        NUMBER,
+    >>::GetterType;
+    fn get_mut(&'a mut self) -> Self::GetterType {
+        <Self as GetMutFieldMethodImpl<
+            'a,
+            ImplTag,
+            LabelTag,
+            TypeTag,
+            <FieldsType as HasField<NUMBER>>::Type,
+            SharedType,
+            NUMBER,
+        >>::get_mut(self)
     }
 }
 

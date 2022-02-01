@@ -158,6 +158,17 @@ macro_rules! define_opt_getter {
 }
 
 #[macro_export]
+macro_rules! define_mut_getter {
+    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? mut self)) => {
+        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplMut>::MessageImplType as GetMutFieldMethod<$($lt, )* $num>>::GetterType {
+            <<Self as $crate::AsMessageImplMut>::MessageImplType as GetMutFieldMethod<$num>>::get_mut(
+                self.as_message_impl_mut(),
+            )
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! impl_getter {
     ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
         impl<'a, Impl> $struct<Impl>
