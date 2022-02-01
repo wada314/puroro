@@ -142,8 +142,6 @@ impl<Impl> AsMessageImplMut for Person<Impl>
 where
     Impl: ImplProperties,
 {
-    type MessageImplType =
-        MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
     fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
         &mut self.0
     }
@@ -161,7 +159,6 @@ impl<Impl> AsMessageMut for Person<Impl>
 where
     Impl: ImplProperties,
 {
-    type MessageType = Person<Impl>;
     fn as_message_mut(&mut self) -> &mut Self::MessageType {
         self
     }
@@ -259,7 +256,7 @@ define_fields_container! {
     }
 }
 
-use crate::bumpalo::collections::{String as BString, Vec as BVec};
+use crate::bumpalo::collections::String as BString;
 use crate::internal::{NoAllocBumpBox, NoAllocBumpString, NoAllocBumpVec};
 
 define_fields_container! {
@@ -316,6 +313,7 @@ impl_mut_getter!(Person, pub fn partner_mut<4>(&mut self));
 impl_mut_getter!(Person, pub fn nicknames_mut<5>(&mut self));
 impl_mut_getter!(Person, pub fn scores_mut<6>(&mut self));
 
+#[allow(unused)]
 fn test() {
     let mut person: Person = Person::new();
 

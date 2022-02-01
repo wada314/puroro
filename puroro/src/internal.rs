@@ -168,8 +168,8 @@ macro_rules! define_opt_getter {
 #[macro_export]
 macro_rules! define_mut_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? mut self)) => {
-        $pub fn $id(&$($lt)* mut self) -> <<Self as $crate::AsMessageImplMut>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$($lt, )* $num>>::GetterType {
-            <<Self as $crate::AsMessageImplMut>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::get_mut(
+        $pub fn $id(&$($lt)* mut self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$($lt, )* $num>>::GetterType {
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::get_mut(
                 self.as_message_impl_mut(),
             )
         }
@@ -208,7 +208,7 @@ macro_rules! impl_mut_getter {
         impl<'a, Impl> $struct<Impl>
         where
             Self: $crate::AsMessageImplMut,
-            <Self as $crate::AsMessageImplMut>::MessageImplType: $crate::internal::methods::GetMutFieldMethod<'a, $num>,
+            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::GetMutFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
             define_mut_getter!($pub fn $get<$num>(&'a mut self));

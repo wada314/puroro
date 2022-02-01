@@ -47,9 +47,8 @@ impl_as_message_impl_ref!(impl<'a, T> &'a mut T);
 impl_as_message_impl_ref!(impl<T> Box<T>);
 impl_as_message_impl_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
-pub trait AsMessageImplMut {
-    type MessageImplType;
-    fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType;
+pub trait AsMessageImplMut: AsMessageImplRef {
+    fn as_message_impl_mut(&mut self) -> &mut <Self as AsMessageImplRef>::MessageImplType;
 }
 macro_rules! impl_as_message_impl_mut {
     (impl<$($lt:lifetime, )* T> $ty:ty) => {
@@ -57,7 +56,6 @@ macro_rules! impl_as_message_impl_mut {
         where
             T: AsMessageImplMut,
         {
-            type MessageImplType = T::MessageImplType;
             fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
                 <T as AsMessageImplMut>::as_message_impl_mut(self)
             }
@@ -90,9 +88,8 @@ impl_as_message_ref!(impl<'a, T> &'a mut T);
 impl_as_message_ref!(impl<T> Box<T>);
 impl_as_message_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
-pub trait AsMessageMut {
-    type MessageType;
-    fn as_message_mut(&mut self) -> &mut Self::MessageType;
+pub trait AsMessageMut: AsMessageRef {
+    fn as_message_mut(&mut self) -> &mut <Self as AsMessageRef>::MessageType;
 }
 macro_rules! impl_as_message_mut {
     (impl<$($lt:lifetime, )* T> $ty:ty) => {
@@ -100,7 +97,6 @@ macro_rules! impl_as_message_mut {
         where
             T: AsMessageMut,
         {
-            type MessageType = T::MessageType;
             fn as_message_mut(&mut self) -> &mut Self::MessageType {
                 <T as AsMessageMut>::as_message_mut(self)
             }

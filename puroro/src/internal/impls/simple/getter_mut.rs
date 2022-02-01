@@ -16,7 +16,6 @@ use crate::internal::methods::GetMutFieldMethodImpl;
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties};
 use crate::tags;
-use crate::AsMessageMut;
 use crate::MessageImpl;
 
 // (optional|required) numeric field
