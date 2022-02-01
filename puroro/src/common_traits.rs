@@ -35,7 +35,7 @@ where
 {
     type MessageImplType = T::MessageImplType;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(*self)
+        <T as AsMessageImplRef>::as_message_impl_ref(self)
     }
 }
 impl<'a, T> AsMessageImplRef for &'a mut T
@@ -44,7 +44,7 @@ where
 {
     type MessageImplType = T::MessageImplType;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(*self)
+        <T as AsMessageImplRef>::as_message_impl_ref(self)
     }
 }
 impl<T> AsMessageImplRef for Box<T>
@@ -53,7 +53,7 @@ where
 {
     type MessageImplType = T::MessageImplType;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(&self)
+        <T as AsMessageImplRef>::as_message_impl_ref(self)
     }
 }
 impl<T> AsMessageImplRef for crate::internal::NoAllocBumpBox<T>
@@ -62,7 +62,7 @@ where
 {
     type MessageImplType = T::MessageImplType;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        <T as AsMessageImplRef>::as_message_impl_ref(&self)
+        <T as AsMessageImplRef>::as_message_impl_ref(self)
     }
 }
 
@@ -108,7 +108,7 @@ where
 {
     type MessageType = T::MessageType;
     fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(*self)
+        <T as AsMessageRef>::as_message_ref(self)
     }
 }
 impl<T> AsMessageRef for Box<T>
@@ -117,7 +117,7 @@ where
 {
     type MessageType = T::MessageType;
     fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(&self)
+        <T as AsMessageRef>::as_message_ref(self)
     }
 }
 impl<T> AsMessageRef for crate::internal::NoAllocBumpBox<T>
@@ -126,6 +126,6 @@ where
 {
     type MessageType = T::MessageType;
     fn as_message_ref(&self) -> &Self::MessageType {
-        <T as AsMessageRef>::as_message_ref(&self)
+        <T as AsMessageRef>::as_message_ref(self)
     }
 }
