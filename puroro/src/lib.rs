@@ -138,12 +138,31 @@ where
         &self.0
     }
 }
+impl<Impl> AsMessageImplMut for Person<Impl>
+where
+    Impl: ImplProperties,
+{
+    type MessageImplType =
+        MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
+    fn as_message_impl_mut(&mut self) -> &mut Self::MessageImplType {
+        &mut self.0
+    }
+}
 impl<Impl> AsMessageRef for Person<Impl>
 where
     Impl: ImplProperties,
 {
     type MessageType = Person<Impl>;
     fn as_message_ref(&self) -> &Self::MessageType {
+        self
+    }
+}
+impl<Impl> AsMessageMut for Person<Impl>
+where
+    Impl: ImplProperties,
+{
+    type MessageType = Person<Impl>;
+    fn as_message_mut(&mut self) -> &mut Self::MessageType {
         self
     }
 }
@@ -290,9 +309,17 @@ impl_getter!(Person, pub fn scores<6>(&self));
 impl_opt_getter!(Person, pub fn name_opt<1>(&self));
 impl_opt_getter!(Person, pub fn age_opt<2>(&self));
 impl_opt_getter!(Person, pub fn partner_opt<4>(&self));
+impl_mut_getter!(Person, pub fn name_mut<1>(&mut self));
+impl_mut_getter!(Person, pub fn age_mut<2>(&mut self));
+impl_mut_getter!(Person, pub fn children_mut<3>(&mut self));
+impl_mut_getter!(Person, pub fn partner_mut<4>(&mut self));
+impl_mut_getter!(Person, pub fn nicknames_mut<5>(&mut self));
+impl_mut_getter!(Person, pub fn scores_mut<6>(&mut self));
 
 fn test() {
-    let person: Person = Person::new();
+    let mut person: Person = Person::new();
+
+    *person.age_mut() = 20;
 
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();
