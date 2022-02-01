@@ -202,15 +202,15 @@ where
         + GetFieldMethod<'a, 5>
         + GetFieldMethod<'a, 6>,
 {
-    define_opt_getter!(fn name_opt<1>(&'a self));
-    define_getter!(fn name<1>(&'a self));
-    define_opt_getter!(fn age_opt<2>(&'a self));
-    define_getter!(fn age<2>(&'a self));
-    define_getter!(fn children<3>(&'a self));
-    define_opt_getter!(fn partner_opt<4>(&'a self));
-    define_getter!(fn partner<4>(&'a self));
-    define_getter!(fn nicknames<5>(&'a self));
-    define_getter!(fn scores<6>(&'a self));
+    // define_opt_getter!(fn name_opt<1>(&'a self));
+    // define_getter!(fn name<1>(&'a self));
+    // define_opt_getter!(fn age_opt<2>(&'a self));
+    // define_getter!(fn age<2>(&'a self));
+    // define_getter!(fn children<3>(&'a self));
+    // define_opt_getter!(fn partner_opt<4>(&'a self));
+    // define_getter!(fn partner<4>(&'a self));
+    // define_getter!(fn nicknames<5>(&'a self));
+    // define_getter!(fn scores<6>(&'a self));
 }
 
 impl<'a, T> PersonTrait<'a> for T
@@ -314,7 +314,7 @@ fn test() {
     let _: &[String] = partner.nicknames();
     let _: &[Person] = partner.children();
 
-    let _: u32 = <Person<_> as PersonTrait>::age(&person);
+    // let _: u32 = <Person<_> as PersonTrait>::age(&person);
 
     let bump = bumpalo::Bump::new();
     let bperson = PersonBump::new_in(&bump);

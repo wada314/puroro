@@ -159,27 +159,27 @@ macro_rules! define_opt_getter {
 
 #[macro_export]
 macro_rules! impl_getter {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        impl<Impl> $struct<Impl>
+    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
+        impl<'a, Impl> $struct<Impl>
         where
             Self: $crate::AsMessageImplRef,
-            for <'a> <Self as $crate::AsMessageImplRef>::MessageImplType: GetFieldMethod<'a, $num>,
+            <Self as $crate::AsMessageImplRef>::MessageImplType: GetFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
-            define_getter!($pub fn $get<$num>(&$($lt)*self));
+            define_getter!($pub fn $get<$num>(&'a self));
         }
     };
 }
 #[macro_export]
 macro_rules! impl_opt_getter {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        impl<Impl> $struct<Impl>
+    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
+        impl<'a, Impl> $struct<Impl>
         where
             Self: $crate::AsMessageImplRef,
-            for<'a> <Self as $crate::AsMessageImplRef>::MessageImplType: GetOptFieldMethod<'a, $num>,
+            <Self as $crate::AsMessageImplRef>::MessageImplType: GetOptFieldMethod<'a, $num>,
             Impl: $crate::internal::ImplProperties,
         {
-            define_opt_getter!($pub fn $get<$num>(&$($lt)*self));
+            define_opt_getter!($pub fn $get<$num>(&'a self));
         }
     };
 }

@@ -90,8 +90,8 @@ impl<
     FieldsType,
     SharedType,
     FieldMP,
-    FieldMessageAsRefType,
-    FieldMessageType, // `M`
+    FieldMessageAsRefType, // typically `Box<M>`
+    FieldMessageType,      // `M`
     _1,
     const NUMBER: i32,
 >
