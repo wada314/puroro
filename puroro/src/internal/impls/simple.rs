@@ -17,6 +17,7 @@
 mod getter;
 mod getter_mut;
 mod getter_opt;
+use crate::internal::SharedAllocator;
 use crate::DefaultIn;
 
 use super::super::SharedBitfield;
@@ -38,6 +39,14 @@ impl<const BITFIELD_U32_LEN: usize> SharedBitfield for SimpleShared<BITFIELD_U32
         &mut self.bitfield
     }
 }
+
+impl<const BITFIELD_U32_LEN: usize> SharedAllocator for SimpleShared<BITFIELD_U32_LEN> {
+    type AllocatorType = ();
+    fn alloc(&self) -> &Self::AllocatorType {
+        &()
+    }
+}
+
 impl<const BITFIELD_U32_LEN: usize> DefaultIn for SimpleShared<BITFIELD_U32_LEN> {
     type AllocatorType = ();
     fn default_in(_: ()) -> Self {

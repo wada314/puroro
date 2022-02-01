@@ -72,7 +72,7 @@ impl<
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
-        <FieldsType as HasField<NUMBER>>::Type,
+        Option<FieldMessageAsRefType>,
         SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>

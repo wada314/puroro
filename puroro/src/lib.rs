@@ -52,12 +52,12 @@ use ::std::marker::PhantomData;
 //     repeated Person children = 3;
 // }
 //
+use ::std::ops::{Deref, DerefMut};
 use internal::impls::option::{MessageInOptionTrait, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::EmptyFields;
 use internal::MessageProperties;
 use internal::{ImplProperties, SimpleShared};
-use std::ops::Deref;
 
 pub struct PersonSimpleImplProperties<
     FieldsType = PersonFieldsContainer,
@@ -172,6 +172,14 @@ where
         MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>;
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+impl<Impl> DerefMut for Person<Impl>
+where
+    Impl: ImplProperties,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 impl<Impl> Default for Person<Impl>
@@ -319,7 +327,15 @@ fn test() {
 
     *person.age_mut() = 20;
     *person.name_mut() = "卑弥呼".to_string();
-    person.partner_mut();
+    // person.partner_mut();
+    <MessageImpl<_, _, _, _> as internal::methods::GetMutFieldMethodImpl<
+        tags::SimpleImpl,
+        tags::Optional,
+        tags::Message<PersonMessageProperties>,
+        Option<Box<Person>>,
+        _,
+        4,
+    >>::get_mut(person.deref_mut());
 
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();
