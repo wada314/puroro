@@ -18,13 +18,13 @@ use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties}
 use crate::tags;
 use crate::MessageImpl;
 
-// (optional|required) numeric field
-impl<'a, MP, FieldsType, SharedType, NumType, FieldType, _1, _2, const NUMBER: i32>
+// (optional|required) non-message field
+impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, _3, const NUMBER: i32>
     GetMutFieldMethodImpl<
         'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
-        tags::NonLdType<_2>,
+        tags::NonMessageType<_2, _3>,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
@@ -32,9 +32,10 @@ impl<'a, MP, FieldsType, SharedType, NumType, FieldType, _1, _2, const NUMBER: i
 where
     FieldsType: HasMutField<NUMBER, Type = FieldType>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::NonLdType<_2>>,
-    tags::NonLdType<_2>: tags::FieldTypeTag + tags::NumericalTypeTag<NativeType = NumType>,
-    <tags::NonLdType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<FieldType>,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<TypeTag = tags::NonMessageType<_2, _3>>,
+    tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
+    <tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<FieldType>,
     FieldType: 'a,
     SharedType: SharedBitfield,
 {

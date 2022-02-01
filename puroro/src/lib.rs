@@ -318,6 +318,7 @@ fn test() {
     let mut person: Person = Person::new();
 
     *person.age_mut() = 20;
+    *person.name_mut() = "卑弥呼".to_string();
 
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();
