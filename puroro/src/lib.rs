@@ -352,7 +352,12 @@ fn test() {
     // let _: u32 = <Person<_> as PersonTrait>::age(&person);
 
     let bump = bumpalo::Bump::new();
-    let bperson = PersonBump::new_in(&bump);
+    let mut bperson = PersonBump::new_in(&bump);
+
+    *bperson.age_mut() = 20;
+    // *bperson.name_mut().extend("卑弥呼");
+    // bperson.partner_mut();
+
     let _: Option<u32> = bperson.age_opt();
     let _: Option<&str> = bperson.name_opt();
     let _: Option<&PersonBump> = bperson.partner_opt();
