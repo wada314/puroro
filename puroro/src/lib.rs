@@ -37,6 +37,7 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
+use internal::impls::bumpalo::BumpShared;
 
 use ::std::marker::PhantomData;
 
@@ -356,7 +357,7 @@ fn test() {
 
     *bperson.age_mut() = 20;
     // *bperson.name_mut().extend("卑弥呼");
-    // bperson.partner_mut();
+    bperson.partner_mut();
 
     let _: Option<u32> = bperson.age_opt();
     let _: Option<&str> = bperson.name_opt();

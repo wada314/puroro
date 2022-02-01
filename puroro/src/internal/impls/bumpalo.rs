@@ -43,7 +43,7 @@ impl<'bump, const BITFIELD_U32_LEN: usize> SharedBitfield for BumpShared<'bump, 
     }
 }
 impl<'bump, const BITFIELD_U32_LEN: usize> SharedAllocator for BumpShared<'bump, BITFIELD_U32_LEN> {
-    type AllocatorType = Bump;
+    type AllocatorType = &'bump Bump;
     fn alloc(&self) -> &Self::AllocatorType {
         &self.bump
     }
