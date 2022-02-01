@@ -89,3 +89,24 @@ impl_as_message_ref!(impl<'a, T> &'a T);
 impl_as_message_ref!(impl<'a, T> &'a mut T);
 impl_as_message_ref!(impl<T> Box<T>);
 impl_as_message_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
+
+pub trait AsMessageMut {
+    type MessageType;
+    fn as_message_mut(&mut self) -> &mut Self::MessageType;
+}
+macro_rules! impl_as_message_mut {
+    (impl<$($lt:lifetime, )* T> $ty:ty) => {
+        impl<$($lt, )* T> AsMessageMut for $ty
+        where
+            T: AsMessageMut,
+        {
+            type MessageType = T::MessageType;
+            fn as_message_mut(&mut self) -> &mut Self::MessageType {
+                <T as AsMessageMut>::as_message_mut(self)
+            }
+        }
+    };
+}
+impl_as_message_mut!(impl<'a, T> &'a mut T);
+impl_as_message_mut!(impl<T> Box<T>);
+impl_as_message_mut!(impl<T> crate::internal::NoAllocBumpBox<T>);
