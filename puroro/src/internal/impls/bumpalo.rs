@@ -100,23 +100,12 @@ impl<T> Drop for NoAllocBox<T> {
     }
 }
 
-pub trait AddBump {
-    type AddToRef<'bump, 'this>
+pub trait ComposeAlloc {
+    type AllocatorType;
+    type Composed<'this>
     where
-        Self: 'bump + 'this;
-    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this>;
-    type AddToMutRef<'bump, 'this>
-    where
-        Self: 'bump + 'this;
-    fn add_bump_mut<'bump, 'this>(
-        &'this mut self,
-        bump: &'bump Bump,
-    ) -> Self::AddToMutRef<'bump, 'this>;
-}
-
-pub trait RemoveBump {
-    type Removed;
-    fn remove_bump(self) -> Self::Removed;
+        Self: 'this;
+    fn compose_alloc(&mut self, alloc: Self::AllocatorType) -> Self::Composed<'_>;
 }
 
 /// A vec for proto message internal usage.
@@ -192,37 +181,15 @@ impl<T> NoAllocVec<T> {
             ref_vec: self,
         }
     }
-
-    pub unsafe fn as_add_bump_vec_view_in<'bump>(
-        &mut self,
-        bump: &'bump Bump,
-    ) -> AddBumpVecView<'bump, '_, T> {
-        AddBumpVecView::new(self.as_mut_vec_in(bump), bump)
-    }
 }
-impl<T> AddBump for NoAllocVec<T> {
-    type AddToRef<'bump, 'this>
+impl<'bump, T> ComposeAlloc for NoAllocVec<T> {
+    type AllocatorType = &'bump Bump;
+    type Composed<'this>
     where
-        Self: 'bump + 'this,
-    = ManuallyDrop<Vec<'bump, T>>;
-    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
-        unsafe { self.as_vec_in(bump) }
-    }
-    type AddToMutRef<'bump, 'this>
-    where
-        Self: 'bump + 'this,
+        Self: 'this,
     = RefMutVec<'bump, 'this, T>;
-    fn add_bump_mut<'bump, 'this>(
-        &'this mut self,
-        bump: &'bump Bump,
-    ) -> Self::AddToMutRef<'bump, 'this> {
-        unsafe { self.as_mut_vec_in(bump) }
-    }
-}
-impl<'bump, T> RemoveBump for Vec<'bump, T> {
-    type Removed = NoAllocVec<T>;
-    fn remove_bump(self) -> Self::Removed {
-        NoAllocVec::from_vec(self)
+    fn compose_alloc(&mut self, alloc: Self::AllocatorType) -> Self::Composed<'_> {
+        unsafe { self.as_mut_vec_in(alloc) }
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -368,29 +335,14 @@ impl NoAllocString {
         }
     }
 }
-impl AddBump for NoAllocString {
-    type AddToRef<'bump, 'this>
+impl<'bump> ComposeAlloc for NoAllocString {
+    type AllocatorType = &'bump Bump;
+    type Composed<'this>
     where
-        Self: 'bump + 'this,
-    = ManuallyDrop<String<'bump>>;
-    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
-        unsafe { self.as_string_in(bump) }
-    }
-    type AddToMutRef<'bump, 'this>
-    where
-        Self: 'bump + 'this,
+        Self: 'this,
     = RefMutString<'bump, 'this>;
-    fn add_bump_mut<'bump, 'this>(
-        &'this mut self,
-        bump: &'bump Bump,
-    ) -> Self::AddToMutRef<'bump, 'this> {
-        unsafe { self.as_mut_string_in(bump) }
-    }
-}
-impl<'bump> RemoveBump for String<'bump> {
-    type Removed = NoAllocString;
-    fn remove_bump(self) -> Self::Removed {
-        NoAllocString::from_utf8_unchecked(NoAllocVec::from_vec(self.into_bytes()))
+    fn compose_alloc(&mut self, alloc: Self::AllocatorType) -> Self::Composed<'_> {
+        unsafe { self.as_mut_string_in(alloc) }
     }
 }
 
@@ -440,46 +392,5 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
             let vec = ManuallyDrop::take(&mut self.temp_string).into_bytes();
             self.ref_string.vec = NoAllocVec::from_vec(vec);
         }
-    }
-}
-
-pub struct AddBumpVecView<'bump, 'vec, T> {
-    vec: RefMutVec<'bump, 'vec, T>,
-    bump: &'bump Bump,
-}
-impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
-    unsafe fn new(vec: RefMutVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
-        Self { vec, bump }
-    }
-
-    pub fn push<U>(&mut self, val: U)
-    where
-        U: RemoveBump<Removed = T>,
-    {
-        self.vec.push(<U as RemoveBump>::remove_bump(val));
-    }
-}
-impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
-where
-    T: AddBump,
-{
-    pub fn get(&self, index: usize) -> Option<<T as AddBump>::AddToRef<'bump, '_>> {
-        self.vec
-            .get(index)
-            .map(|v| <T as AddBump>::add_bump(v, self.bump))
-    }
-    pub fn get_mut(&mut self, index: usize) -> Option<<T as AddBump>::AddToMutRef<'bump, '_>> {
-        self.vec
-            .get_mut(index)
-            .map(|v| <T as AddBump>::add_bump_mut(v, self.bump))
-    }
-}
-impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
-where
-    T: AddBump + Default,
-{
-    pub fn push_default(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
-        self.vec.push(Default::default());
-        <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
     }
 }

@@ -18,13 +18,13 @@ use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties}
 use crate::{tags, AsMessageMut, AsMessageRef};
 use crate::{DefaultIn, MessageImpl};
 
-// (optional|required) non-message field
-impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, _3, const NUMBER: i32>
+// (optional|required) non-ld field
+impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, const NUMBER: i32>
     GetMutFieldMethodImpl<
         'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
-        tags::NonMessageType<_2, _3>,
+        tags::NonLdType<_2>,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
@@ -32,10 +32,9 @@ impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, _3, const NUMBER: i32>
 where
     FieldsType: HasMutField<NUMBER, Type = FieldType>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<TypeTag = tags::NonMessageType<_2, _3>>,
-    tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
-    <tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<FieldType>,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::NonLdType<_2>>,
+    tags::NonLdType<_2>: tags::FieldTypeTag,
+    <tags::NonLdType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<FieldType>,
     FieldType: 'a,
     SharedType: SharedBitfield,
 {
@@ -49,6 +48,39 @@ where
                 Into::into(Clone::clone(
                     &<<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
                 ));
+        }
+        <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
+    }
+}
+
+// (optional|required) ld field
+impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, const NUMBER: i32>
+    GetMutFieldMethodImpl<
+        'a,
+        tags::SimpleImpl,
+        tags::NeedOptionalBitLabel<_1>,
+        tags::StringOrBytesType<_2>,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasMutField<NUMBER, Type = FieldType>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<TypeTag = tags::StringOrBytesType<_2>>,
+    tags::StringOrBytesType<_2>: tags::FieldTypeTag,
+    <tags::StringOrBytesType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<FieldType>,
+    FieldType: 'a,
+    SharedType: SharedBitfield,
+{
+    type GetterType = &'a mut FieldType;
+    fn get_mut(&'a mut self) -> Self::GetterType {
+        let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
+        if !self.shared.bitfield().get(opt_bit_index) {
+            self.shared.bitfield_mut().set(opt_bit_index, true);
+            // initailize the field by default value
+            todo!()
         }
         <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
     }
