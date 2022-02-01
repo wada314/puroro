@@ -16,27 +16,29 @@ use crate::internal::methods::GetFieldMethodImpl;
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
+use ::std::ops::Deref;
 
 // repeated field
-impl<'a, MP, FieldsType, SharedType, ItemType, TypeTag, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, TypeTag, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
         tags::SimpleImpl,
         tags::Repeated,
         TypeTag,
-        Vec<ItemType>,
+        CollectionType,
         SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = Vec<ItemType>>,
+    FieldsType: HasField<NUMBER, Type = CollectionType>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
+    CollectionType: 'a + Deref<Target = [ItemType]>,
     ItemType: 'a,
 {
     type GetterType = &'a [ItemType];
     fn get(&'a self) -> Self::GetterType {
-        <FieldsType as HasField<NUMBER>>::get(&self.fields).as_slice()
+        <FieldsType as HasField<NUMBER>>::get(&self.fields).deref()
     }
 }
