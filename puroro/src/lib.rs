@@ -327,4 +327,14 @@ fn test() {
     let _: &[u32] = bperson.scores();
     let _: &[BString] = bperson.nicknames();
     let _: &[PersonBump] = bperson.children();
+
+    let _: Option<u32> = bpartner.age_opt();
+    let _: Option<&str> = bpartner.name_opt();
+    let _: Option<&PersonBump> = bpartner.partner_opt();
+    let _: u32 = bpartner.age();
+    let _: &str = bpartner.name();
+    let _: Person<_> = bpartner.partner();
+    let _: &[u32] = bpartner.scores();
+    let _: &[BString] = bpartner.nicknames();
+    let _: &[PersonBump] = bpartner.children();
 }
