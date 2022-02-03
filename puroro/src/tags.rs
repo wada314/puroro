@@ -62,15 +62,15 @@ mod value {
     pub type Message<M> = (True, PhantomData<M>);
 }
 
-type EmptyLd = (False, (False, False));
+type EmptyLd = (False, (False, (False, False)));
 pub type Variant<V> = (EmptyLd, (True, PhantomData<V>));
-pub type LengthDelimited<V> = (V, False);
+pub type LengthDelimited<V> = ((True, V), False);
 pub type Bits32<V> = (EmptyLd, (False, (True, PhantomData<V>)));
 pub type Bits64<V> = (EmptyLd, (False, (False, PhantomData<V>)));
 
 pub type NonLdType<_1> = (EmptyLd, _1);
-pub type NonMessageType<_1, _2> = ((False, _1), _2);
-pub type StringOrBytesType<_1> = ((False, _1), False);
+pub type NonMessageType<_1, _2> = ((True, (False, _1)), _2);
+pub type StringOrBytesType<_1> = ((True, (False, _1)), False);
 
 pub type Int32 = Variant<value::Int32>;
 pub type SInt32 = Variant<value::SInt32>;
