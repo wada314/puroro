@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::impls::bumpalo::ComposeAlloc;
 use crate::internal::methods::GetMutFieldMethodImpl;
 use crate::internal::{Bitfield, SharedAllocator, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties};
@@ -66,21 +65,17 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<TypeTag = tags::StringOrBytesType<_2>>,
-    FieldType: 'a + ComposeAlloc<AllocatorType = Alloc>,
-    for<'alloc> <FieldType as ComposeAlloc>::Composed<'alloc, 'a>: Deref + DerefMut,
-    for<'alloc> <<FieldType as ComposeAlloc>::Composed<'alloc, 'a> as Deref>::Target: Default,
-    SharedType: SharedBitfield + SharedAllocator<AllocatorType = &'a Alloc>,
-    Alloc: 'a,
+    FieldType: 'a + DefaultIn<AllocatorType = Alloc>,
+    SharedType: SharedBitfield + SharedAllocator<AllocatorType = Alloc>,
 {
     type GetterType = &'a mut FieldType;
     fn get_mut(&'a mut self) -> Self::GetterType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
-            let raw_mut_field = <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields);
-            let ref_mut =
-                <FieldType as ComposeAlloc>::compose_alloc(raw_mut_field, *self.shared.alloc());
             // initailize the field by `Default` value
+            *<FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields) =
+                DefaultIn::default_in(self.shared.alloc());
         }
         <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
     }

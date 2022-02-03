@@ -44,13 +44,13 @@ where
 }
 impl<MP, ImplTag, Fields, Shared> DefaultIn for MessageImpl<MP, ImplTag, Fields, Shared>
 where
-    Fields: Default,
-    Shared: DefaultIn,
+    Fields: DefaultIn,
+    Shared: DefaultIn<AllocatorType = <Fields as DefaultIn>::AllocatorType>,
 {
     type AllocatorType = <Shared as DefaultIn>::AllocatorType;
     fn default_in(alloc: Self::AllocatorType) -> Self {
         Self {
-            fields: Default::default(),
+            fields: Default::default_in(alloc),
             shared: DefaultIn::default_in(alloc),
             _phantom: Default::default(),
         }

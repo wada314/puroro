@@ -100,43 +100,6 @@ impl<T> Drop for NoAllocBox<T> {
     }
 }
 
-pub trait ComposeAlloc {
-    type AllocatorType;
-    type Composed<'alloc, 'this>
-    where
-        Self: 'this + 'alloc;
-    fn compose_alloc<'alloc>(
-        &mut self,
-        alloc: &'alloc Self::AllocatorType,
-    ) -> Self::Composed<'alloc, '_>;
-}
-impl<T> ComposeAlloc for ::std::vec::Vec<T> {
-    type AllocatorType = ();
-    type Composed<'alloc, 'this>
-    where
-        Self: 'this + 'alloc,
-    = &'this mut ::std::vec::Vec<T>;
-    fn compose_alloc<'alloc>(
-        &mut self,
-        _: &'alloc Self::AllocatorType,
-    ) -> Self::Composed<'alloc, '_> {
-        self
-    }
-}
-impl ComposeAlloc for ::std::string::String {
-    type AllocatorType = ();
-    type Composed<'alloc, 'this>
-    where
-        Self: 'this + 'alloc,
-    = &'this mut ::std::string::String;
-    fn compose_alloc<'alloc>(
-        &mut self,
-        _: &'alloc Self::AllocatorType,
-    ) -> Self::Composed<'alloc, '_> {
-        self
-    }
-}
-
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
 ///
@@ -209,19 +172,6 @@ impl<T> NoAllocVec<T> {
             temp_vec: self.as_vec_in(bump),
             ref_vec: self,
         }
-    }
-}
-impl<T> ComposeAlloc for NoAllocVec<T> {
-    type AllocatorType = Bump;
-    type Composed<'bump, 'this>
-    where
-        Self: 'this,
-    = RefMutVec<'bump, 'this, T>;
-    fn compose_alloc<'bump>(
-        &mut self,
-        alloc: &'bump Self::AllocatorType,
-    ) -> Self::Composed<'bump, '_> {
-        unsafe { self.as_mut_vec_in(alloc) }
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -365,19 +315,6 @@ impl NoAllocString {
             temp_string: self.as_string_in(bump),
             ref_string: self,
         }
-    }
-}
-impl ComposeAlloc for NoAllocString {
-    type AllocatorType = Bump;
-    type Composed<'bump, 'this>
-    where
-        Self: 'this + 'bump,
-    = RefMutString<'bump, 'this>;
-    fn compose_alloc<'bump>(
-        &mut self,
-        alloc: &'bump Self::AllocatorType,
-    ) -> Self::Composed<'bump, '_> {
-        unsafe { self.as_mut_string_in(alloc) }
     }
 }
 

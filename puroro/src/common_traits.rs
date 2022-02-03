@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::bumpalo::boxed::Box as BBox;
+use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use crate::bumpalo::Bump;
 use crate::internal::NoAllocBumpBox;
 use ::std::convert::TryFrom;
@@ -42,6 +44,27 @@ where
     type AllocatorType = &'a Bump;
     fn default_in(bump: Self::AllocatorType) -> Self {
         NoAllocBumpBox::new_in(T::default_in(bump), bump)
+    }
+}
+impl<'bump, T> DefaultIn for BVec<'bump, T> {
+    type AllocatorType = &'bump Bump;
+    fn default_in(alloc: Self::AllocatorType) -> Self {
+        BVec::new_in(alloc)
+    }
+}
+impl<'bump> DefaultIn for BString<'bump> {
+    type AllocatorType = &'bump Bump;
+    fn default_in(alloc: Self::AllocatorType) -> Self {
+        BString::new_in(alloc)
+    }
+}
+impl<'bump, T> DefaultIn for BBox<'bump, T>
+where
+    T: DefaultIn<AllocatorType = &'bump Bump>,
+{
+    type AllocatorType = &'bump Bump;
+    fn default_in(alloc: Self::AllocatorType) -> Self {
+        BBox::new_in(DefaultIn::default_in(alloc), alloc)
     }
 }
 

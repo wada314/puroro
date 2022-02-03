@@ -53,6 +53,8 @@ use ::std::marker::PhantomData;
 //     repeated Person children = 3;
 // }
 //
+use crate::bumpalo::boxed::Box as BBox;
+use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use ::std::ops::{Deref, DerefMut};
 use internal::impls::option::{MessageInOptionTrait, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
@@ -264,19 +266,35 @@ define_fields_container! {
         scores: Vec<u32> = 6,
     }
 }
-
-use crate::bumpalo::collections::String as BString;
-use crate::internal::{NoAllocBumpBox, NoAllocBumpString, NoAllocBumpVec};
+impl DefaultIn for PersonFieldsContainer {
+    type AllocatorType = ();
+    fn default_in(alloc: Self::AllocatorType) -> Self {
+        Default::default()
+    }
+}
 
 define_fields_container! {
-    #[derive(Default)]
     struct PersonBumpFieldsContainer<'bump> {
         name: NoAllocBumpString = 1,
         age: u32 = 2,
-        children: NoAllocBumpVec<PersonBump<'bump>> = 3,
-        partner: Option<NoAllocBumpBox<PersonBump<'bump>>> = 4,
-        nicknames: NoAllocBumpVec<BString<'bump>> = 5,
-        scores: NoAllocBumpVec<u32> = 6,
+        children: BVec<'bump, PersonBump<'bump>> = 3,
+        partner: Option<BBox<'bump, PersonBump<'bump>>> = 4,
+        nicknames: BVec<'bump, BString<'bump>> = 5,
+        scores: BVec<'bump, u32> = 6,
+    }
+}
+impl<'bump> DefaultIn for PersonBumpFieldsContainer<'bump> {
+    type AllocatorType = &'bump crate::bumpalo::Bump;
+    fn default_in(alloc: Self::AllocatorType) -> Self {
+        Self {
+            name: DefaultIn::default_in(alloc),
+            age: Default::default(),
+            children: DefaultIn::default_in(alloc),
+            partner: Default::default(),
+            nicknames: DefaultIn::default_in(alloc),
+            scores: DefaultIn::default_in(alloc),
+            _phantom: Default::default(),
+        }
     }
 }
 
