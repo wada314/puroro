@@ -107,6 +107,26 @@ pub trait ComposeAlloc {
         Self: 'this;
     fn compose_alloc(&mut self, alloc: Self::AllocatorType) -> Self::Composed<'_>;
 }
+impl<T> ComposeAlloc for ::std::vec::Vec<T> {
+    type AllocatorType = ();
+    type Composed<'this>
+    where
+        Self: 'this,
+    = &'this mut ::std::vec::Vec<T>;
+    fn compose_alloc(&mut self, _: Self::AllocatorType) -> Self::Composed<'_> {
+        self
+    }
+}
+impl ComposeAlloc for ::std::string::String {
+    type AllocatorType = ();
+    type Composed<'this>
+    where
+        Self: 'this,
+    = &'this mut ::std::string::String;
+    fn compose_alloc(&mut self, _: Self::AllocatorType) -> Self::Composed<'_> {
+        self
+    }
+}
 
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
@@ -182,14 +202,14 @@ impl<T> NoAllocVec<T> {
         }
     }
 }
-impl<'bump, T> ComposeAlloc for NoAllocVec<T> {
-    type AllocatorType = &'bump Bump;
+impl<T> ComposeAlloc for NoAllocVec<T> {
+    type AllocatorType = *const Bump;
     type Composed<'this>
     where
         Self: 'this,
-    = RefMutVec<'bump, 'this, T>;
+    = RefMutVec<'this, 'this, T>;
     fn compose_alloc(&mut self, alloc: Self::AllocatorType) -> Self::Composed<'_> {
-        unsafe { self.as_mut_vec_in(alloc) }
+        unsafe { self.as_mut_vec_in(&*alloc) }
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -335,14 +355,14 @@ impl NoAllocString {
         }
     }
 }
-impl<'bump> ComposeAlloc for NoAllocString {
-    type AllocatorType = &'bump Bump;
+impl ComposeAlloc for NoAllocString {
+    type AllocatorType = *const Bump;
     type Composed<'this>
     where
         Self: 'this,
-    = RefMutString<'bump, 'this>;
+    = RefMutString<'this, 'this>;
     fn compose_alloc(&mut self, alloc: Self::AllocatorType) -> Self::Composed<'_> {
-        unsafe { self.as_mut_string_in(alloc) }
+        unsafe { self.as_mut_string_in(&*alloc) }
     }
 }
 
