@@ -374,7 +374,7 @@ fn test() {
     let mut bperson = PersonBump::new_in(&bump);
 
     *bperson.age_mut() = 20;
-    // *bperson.name_mut().extend("卑弥呼");
+    bperson.name_mut().push_str("卑弥呼");
     bperson.partner_mut();
 
     let _: Option<u32> = bperson.age_opt();
