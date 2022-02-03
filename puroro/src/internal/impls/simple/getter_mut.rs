@@ -67,6 +67,7 @@ where
         FieldProperties<TypeTag = tags::StringOrBytesType<_2>>,
     FieldType: 'a + DefaultIn<AllocatorType = Alloc>,
     SharedType: SharedBitfield + SharedAllocator<AllocatorType = Alloc>,
+    Alloc: Clone,
 {
     type GetterType = &'a mut FieldType;
     fn get_mut(&'a mut self) -> Self::GetterType {
@@ -75,7 +76,7 @@ where
             self.shared.bitfield_mut().set(opt_bit_index, true);
             // initailize the field by `Default` value
             *<FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields) =
-                DefaultIn::default_in(self.shared.alloc());
+                DefaultIn::default_in(self.shared.alloc().clone());
         }
         <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
     }

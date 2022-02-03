@@ -275,7 +275,7 @@ impl DefaultIn for PersonFieldsContainer {
 
 define_fields_container! {
     struct PersonBumpFieldsContainer<'bump> {
-        name: NoAllocBumpString = 1,
+        name: BString<'bump> = 1,
         age: u32 = 2,
         children: BVec<'bump, PersonBump<'bump>> = 3,
         partner: Option<BBox<'bump, PersonBump<'bump>>> = 4,

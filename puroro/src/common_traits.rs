@@ -37,6 +37,18 @@ where
         Box::new(T::default_in(alloc))
     }
 }
+impl<T> DefaultIn for Vec<T> {
+    type AllocatorType = ();
+    fn default_in(_: Self::AllocatorType) -> Self {
+        Vec::new()
+    }
+}
+impl DefaultIn for String {
+    type AllocatorType = ();
+    fn default_in(_: Self::AllocatorType) -> Self {
+        String::new()
+    }
+}
 impl<'a, T> DefaultIn for NoAllocBumpBox<T>
 where
     T: DefaultIn<AllocatorType = &'a Bump>,
@@ -88,6 +100,7 @@ macro_rules! impl_as_message_impl_ref {
 impl_as_message_impl_ref!(impl<'a, T> &'a T);
 impl_as_message_impl_ref!(impl<'a, T> &'a mut T);
 impl_as_message_impl_ref!(impl<T> Box<T>);
+impl_as_message_impl_ref!(impl<'bump, T> BBox<'bump, T>);
 impl_as_message_impl_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
 pub trait AsMessageImplMut: AsMessageImplRef {
@@ -107,6 +120,7 @@ macro_rules! impl_as_message_impl_mut {
 }
 impl_as_message_impl_mut!(impl<'a, T> &'a mut T);
 impl_as_message_impl_mut!(impl<T> Box<T>);
+impl_as_message_impl_mut!(impl<'bump, T> BBox<'bump, T>);
 impl_as_message_impl_mut!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
 pub trait AsMessageRef {
@@ -129,6 +143,7 @@ macro_rules! impl_as_message_ref {
 impl_as_message_ref!(impl<'a, T> &'a T);
 impl_as_message_ref!(impl<'a, T> &'a mut T);
 impl_as_message_ref!(impl<T> Box<T>);
+impl_as_message_ref!(impl<'bump, T> BBox<'bump, T>);
 impl_as_message_ref!(impl<T> crate::internal::NoAllocBumpBox<T>);
 
 pub trait AsMessageMut: AsMessageRef {
@@ -148,4 +163,5 @@ macro_rules! impl_as_message_mut {
 }
 impl_as_message_mut!(impl<'a, T> &'a mut T);
 impl_as_message_mut!(impl<T> Box<T>);
+impl_as_message_mut!(impl<'bump, T> BBox<'bump, T>);
 impl_as_message_mut!(impl<T> crate::internal::NoAllocBumpBox<T>);

@@ -42,16 +42,17 @@ where
         }
     }
 }
-impl<MP, ImplTag, Fields, Shared> DefaultIn for MessageImpl<MP, ImplTag, Fields, Shared>
+impl<MP, ImplTag, Fields, Shared, Alloc> DefaultIn for MessageImpl<MP, ImplTag, Fields, Shared>
 where
-    Fields: DefaultIn,
-    Shared: DefaultIn<AllocatorType = <Fields as DefaultIn>::AllocatorType>,
+    Fields: DefaultIn<AllocatorType = Alloc>,
+    Shared: DefaultIn<AllocatorType = Alloc>,
+    Alloc: Clone,
 {
     type AllocatorType = <Shared as DefaultIn>::AllocatorType;
     fn default_in(alloc: Self::AllocatorType) -> Self {
         Self {
-            fields: Default::default_in(alloc),
-            shared: DefaultIn::default_in(alloc),
+            fields: DefaultIn::default_in(Clone::clone(&alloc)),
+            shared: DefaultIn::default_in(Clone::clone(&alloc)),
             _phantom: Default::default(),
         }
     }
