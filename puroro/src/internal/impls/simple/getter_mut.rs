@@ -51,7 +51,7 @@ where
 }
 
 // (optional|required) string|bytes field
-impl<'a, MP, FieldsType, SharedType, FieldType, FieldMutType, Alloc, _1, _2, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, FieldType, Alloc, _1, _2, const NUMBER: i32>
     GetMutFieldMethodImpl<
         'a,
         tags::SimpleImpl,
@@ -66,10 +66,11 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<TypeTag = tags::StringOrBytesType<_2>>,
-    FieldType: 'a + ComposeAlloc<AllocatorType = Alloc, Composed<'a> = FieldMutType>,
-    FieldMutType: Deref + DerefMut,
-    <FieldMutType as Deref>::Target: Default,
-    SharedType: SharedBitfield + SharedAllocator<AllocatorType = Alloc>,
+    FieldType: 'a + ComposeAlloc<AllocatorType = Alloc>,
+    for<'alloc> <FieldType as ComposeAlloc>::Composed<'alloc, 'a>: Deref + DerefMut,
+    for<'alloc> <<FieldType as ComposeAlloc>::Composed<'alloc, 'a> as Deref>::Target: Default,
+    SharedType: SharedBitfield + SharedAllocator<AllocatorType = &'a Alloc>,
+    Alloc: 'a,
 {
     type GetterType = &'a mut FieldType;
     fn get_mut(&'a mut self) -> Self::GetterType {
@@ -78,7 +79,7 @@ where
             self.shared.bitfield_mut().set(opt_bit_index, true);
             let raw_mut_field = <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields);
             let ref_mut =
-                <FieldType as ComposeAlloc>::compose_alloc(raw_mut_field, self.shared.alloc());
+                <FieldType as ComposeAlloc>::compose_alloc(raw_mut_field, *self.shared.alloc());
             // initailize the field by `Default` value
         }
         <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
