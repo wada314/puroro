@@ -18,10 +18,24 @@ use crate::MessageImpl;
 
 use super::impls::option::IntoOptionMessage;
 
+//################ Methods interfaces ################
+
 pub trait GetFieldMethod<'a, const NUMBER: i32> {
     type GetterType;
     fn get(&'a self) -> Self::GetterType;
 }
+
+pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
+    type GetterType;
+    fn get_opt(&'a self) -> Self::GetterType;
+}
+
+pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
+    type GetterType;
+    fn get_mut(&'a mut self) -> Self::GetterType;
+}
+
+//################ Methods Impl traits, for specialization ################
 
 pub trait GetFieldMethodImpl<
     'a,
@@ -76,11 +90,6 @@ where
     }
 }
 
-pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
-    type GetterType;
-    fn get_opt(&'a self) -> Self::GetterType;
-}
-
 pub trait GetOptFieldMethodImpl<
     'a,
     ImplTag,
@@ -131,11 +140,6 @@ where
             NUMBER,
         >>::get_opt(self)
     }
-}
-
-pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
-    type GetterType;
-    fn get_mut(&'a mut self) -> Self::GetterType;
 }
 
 pub trait GetMutFieldMethodImpl<
@@ -191,7 +195,7 @@ where
     }
 }
 
-//################ Blanket impls ################
+//################ Blanket impls for get() methods ################
 
 // (optional|required|[unlabeled]) non-ld field
 // Call get_opt method, and returns a default value if it's `None`.
@@ -273,11 +277,12 @@ where
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
     Option<&'a FieldMessageType>: IntoOptionMessage<FieldMP>,
 {
-    type GetterType =
-        <Option<&'a FieldMessageType> as IntoOptionMessage<FieldMP>>::OptionMessage;
+    type GetterType = <Option<&'a FieldMessageType> as IntoOptionMessage<FieldMP>>::OptionMessage;
     fn get(&'a self) -> Self::GetterType {
         <Option<&FieldMessageType> as IntoOptionMessage<FieldMP>>::into_message(
             <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(self),
         )
     }
 }
+
+//################ Blanket impls for has() methods ################
