@@ -436,8 +436,8 @@ fn test() {
     let eperson: Person<_> = Either::<&Person, &Person>::Left(&person).into();
 
     let _: Option<u32> = eperson.age_opt();
-    let _: Option<&str> = eperson.name_opt().as_ref().map(|e| AsRef::<str>::as_ref(e));
-    // let _: Option<&Person> = eperson.partner_opt();
+    let _: Option<&str> = eperson.name_opt();
+    let _: Option<Either<&Person, &Person>> = eperson.partner_opt();
     // let _: u32 = eperson.age();
     // let _: &str = eperson.name();
     // let partner: Person<_> = eperson.partner();

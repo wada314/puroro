@@ -76,3 +76,60 @@ where
         )
     }
 }
+
+// non-repeated message field
+impl<
+    'a,
+    MP,
+    InnerMP,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    LeftGetterType,
+    RightGetterType,
+    _1,
+    const NUMBER: i32,
+>
+    GetOptFieldMethodImpl<
+        'a,
+        tags::EitherImpl,
+        tags::NonRepeatedLabel<_1>,
+        tags::Message<InnerMP>,
+        <EmptyFields as HasField<NUMBER>>::Type,
+        EitherShared<LeftMessageRef, RightMessageRef>,
+        NUMBER,
+    >
+    for MessageImpl<
+        MP,
+        tags::EitherImpl,
+        EmptyFields,
+        EitherShared<LeftMessageRef, RightMessageRef>,
+    >
+where
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<InnerMP>>,
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<LeftGetterType>>,
+    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<RightGetterType>>,
+{
+    type GetterType = Option<Either<LeftGetterType, RightGetterType>>;
+    fn get_opt(&'a self) -> Self::GetterType {
+        self.shared.either.as_ref().either(
+            |msg| {
+                <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                    <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                )
+                .map(|l| Either::Left(l))
+            },
+            |msg| {
+                <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                    <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                )
+                .map(|r| Either::Right(r))
+            },
+        )
+    }
+}
