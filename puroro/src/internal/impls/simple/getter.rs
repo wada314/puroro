@@ -16,29 +16,37 @@ use crate::internal::methods::GetFieldMethodImpl;
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
+use ::itertools::structs::MapInto;
+use ::itertools::Itertools;
+use ::std::iter::Cloned;
 use ::std::ops::Deref;
+use ::std::slice;
 
-// repeated field
-// impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, TypeTag, const NUMBER: i32>
-//     GetFieldMethodImpl<
-//         'a,
-//         tags::SimpleImpl,
-//         tags::Repeated,
-//         TypeTag,
-//         CollectionType,
-//         SharedType,
-//         NUMBER,
-//     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
-// where
-//     FieldsType: HasField<NUMBER, Type = CollectionType>,
-//     MP: MessageProperties,
-//     <MP as MessageProperties>::Fields<NUMBER>:
-//         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-//     CollectionType: 'a + Deref<Target = [ItemType]>,
-//     ItemType: 'a,
-// {
-//     type GetterType = &'a [ItemType];
-//     fn get(&'a self) -> Self::GetterType {
-//         <FieldsType as HasField<NUMBER>>::get(&self.fields).deref()
-//     }
-// }
+// repeated non-ld field
+// `Clone` and then `Into` the iter value
+impl<'a, MP, FieldsType, SharedType, FieldType, ItemType, NumType, _1, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        tags::SimpleImpl,
+        tags::Repeated,
+        tags::NonLdType<_1>,
+        FieldType,
+        SharedType,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = FieldType>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::NonLdType<_1>>,
+    tags::NonLdType<_1>: tags::NumericalTypeTag<NativeType = NumType>,
+    FieldType: IntoIterator<Item = ItemType>,
+    <FieldType as IntoIterator>::IntoIter: Iterator<Item = ItemType>,
+    ItemType: 'a + Clone + Into<NumType>,
+{
+    type GetterType = MapInto<Cloned<slice::Iter<'a, ItemType>>, NumType>;
+    fn get(&'a self) -> Self::GetterType {
+        let slice = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+        slice.into_iter().cloned().map_into::<NumType>()
+    }
+}

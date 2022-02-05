@@ -15,6 +15,7 @@ thiserror = "1.0.24"
 either = "1.6.1"
 bumpalo = { version = "3.8.0", optional = true, features = ["collections", "boxed"] }
 bitvec = "0.22.3"
+itertools = "0.10.3"
 
 [dev-dependencies]
 puroro-doc-samples = { path = "../puroro-doc-samples" }
