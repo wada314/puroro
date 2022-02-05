@@ -219,6 +219,24 @@ where
         Person::from_raw_parts(EmptyFields::default(), opt.into())
     }
 }
+impl<T, U> From<(T, U)> for Person<MergedImplProperties<T, U>>
+where
+    T: AsMessageImplRef,
+    U: AsMessageImplRef,
+{
+    fn from(tuple: (T, U)) -> Self {
+        Person::from_raw_parts(EmptyFields::default(), tuple.into())
+    }
+}
+impl<T, U> From<Either<T, U>> for Person<EitherImplProperties<T, U>>
+where
+    T: AsMessageImplRef,
+    U: AsMessageImplRef,
+{
+    fn from(either: Either<T, U>) -> Self {
+        Person::from_raw_parts(EmptyFields::default(), either.into())
+    }
+}
 
 impl<T, ImplTag, FieldsType, SharedType> MessageInOptionTrait<PersonMessageProperties> for Option<T>
 where
