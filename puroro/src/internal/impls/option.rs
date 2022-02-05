@@ -16,8 +16,10 @@ pub mod getter;
 pub mod getter_opt;
 
 use crate::internal::EmptyFields;
+use crate::internal::ImplProperties;
 use crate::tags;
 use crate::MessageImpl;
+use ::std::marker::PhantomData;
 
 #[derive(Default, Clone, Debug)]
 pub struct OptionShared<T> {
@@ -37,4 +39,11 @@ impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, EmptyFields, O
 pub trait IntoOptionMessage<MP> {
     type OptionMessage;
     fn into_message(self) -> Self::OptionMessage;
+}
+
+pub struct OptionImplProperties<T>(PhantomData<T>);
+impl<T> ImplProperties for OptionImplProperties<T> {
+    type ImplTag = tags::OptionImpl;
+    type FieldsType = EmptyFields;
+    type SharedType = OptionShared<T>;
 }

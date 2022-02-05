@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::EmptyFields;
+use crate::internal::{EmptyFields, ImplProperties};
 use crate::{tags, Either, MessageImpl, RepeatedField};
 use ::std::iter::Chain;
+use ::std::marker::PhantomData;
 use ::std::ops::Deref;
 
 pub struct MergedShared<T, U> {
@@ -30,6 +31,18 @@ impl<MP, T, U> From<(T, U)> for MessageImpl<MP, tags::MergedImpl, EmptyFields, M
     fn from(val: (T, U)) -> Self {
         MessageImpl::from_raw_parts(Default::default(), Into::into(val))
     }
+}
+
+pub trait IntoMergedMessage<MP> {
+    type MergedMessage;
+    fn into_message(self) -> Self::MergedMessage;
+}
+
+pub struct MergedImplProperties<T, U>(PhantomData<(T, U)>);
+impl<T, U> ImplProperties for MergedImplProperties<T, U> {
+    type ImplTag = tags::MergedImpl;
+    type FieldsType = EmptyFields;
+    type SharedType = MergedShared<T, U>;
 }
 
 pub struct MergedRepeatedField<T, U>(T, U);

@@ -55,9 +55,9 @@ use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
 use internal::impls::bumpalo::BumpShared;
-use internal::impls::either::{EitherShared, IntoEitherMessage};
-use internal::impls::merged::MergedShared;
-use internal::impls::option::{IntoOptionMessage, OptionShared};
+use internal::impls::either::{EitherImplProperties, IntoEitherMessage};
+use internal::impls::merged::MergedImplProperties;
+use internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::EmptyFields;
 use internal::MessageProperties;
@@ -76,27 +76,6 @@ impl<FieldsType, SharedType> ImplProperties for PersonSimpleImplProperties<Field
     type ImplTag = tags::SimpleImpl;
     type FieldsType = FieldsType;
     type SharedType = SharedType;
-}
-
-pub struct OptionImplProperties<T>(PhantomData<T>);
-impl<T> ImplProperties for OptionImplProperties<T> {
-    type ImplTag = tags::OptionImpl;
-    type FieldsType = EmptyFields;
-    type SharedType = OptionShared<T>;
-}
-
-pub struct MergedImplProperties<T, U>(PhantomData<(T, U)>);
-impl<T, U> ImplProperties for MergedImplProperties<T, U> {
-    type ImplTag = tags::MergedImpl;
-    type FieldsType = EmptyFields;
-    type SharedType = MergedShared<T, U>;
-}
-
-pub struct EitherImplProperties<T, U>(PhantomData<(T, U)>);
-impl<T, U> ImplProperties for EitherImplProperties<T, U> {
-    type ImplTag = tags::EitherImpl;
-    type FieldsType = EmptyFields;
-    type SharedType = EitherShared<T, U>;
 }
 
 pub struct Person<Impl = PersonSimpleImplProperties>(

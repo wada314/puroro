@@ -14,8 +14,9 @@
 
 pub mod getter_opt;
 
-use crate::internal::EmptyFields;
+use crate::internal::{EmptyFields, ImplProperties};
 use crate::{tags, Either, MessageImpl, RepeatedField};
+use ::std::marker::PhantomData;
 use ::std::ops::Deref;
 
 pub struct EitherShared<T, U> {
@@ -44,6 +45,13 @@ impl<T, U> EitherRepeatedField<T, U> {
     pub fn new(from: Either<T, U>) -> Self {
         Self(from)
     }
+}
+
+pub struct EitherImplProperties<T, U>(PhantomData<(T, U)>);
+impl<T, U> ImplProperties for EitherImplProperties<T, U> {
+    type ImplTag = tags::EitherImpl;
+    type FieldsType = EmptyFields;
+    type SharedType = EitherShared<T, U>;
 }
 
 impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedField<T, U>
