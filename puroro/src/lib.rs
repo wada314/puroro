@@ -425,9 +425,9 @@ fn test() {
     let _: Option<u32> = eperson.age_opt();
     let _: Option<&str> = eperson.name_opt();
     let _: Option<Person<_>> = eperson.partner_opt();
-    // let _: u32 = eperson.age();
-    // let _: &str = eperson.name();
-    // let epartner: Person<_> = eperson.partner();
+    let _: u32 = eperson.age();
+    let _: &str = eperson.name();
+    let epartner: Person<_> = eperson.partner();
     // let _: &[u32] = eperson.scores();
     // let _: &[String] = eperson.nicknames();
     // let _: &[Person] = eperson.children();
@@ -438,9 +438,9 @@ fn test() {
     let _: Option<u32> = mperson.age_opt();
     let _: Option<&str> = mperson.name_opt();
     let _: Option<Person<_>> = mperson.partner_opt();
-    // let _: u32 = mperson.age();
-    // let _: &str = mperson.name();
-    // let mpartner: Person<_> = mperson.partner();
+    let _: u32 = mperson.age();
+    let _: &str = mperson.name();
+    let mpartner: Person<_> = mperson.partner();
     // let _: &[u32] = mperson.scores();
     // let _: &[String] = mperson.nicknames();
     // let _: &[Person] = mperson.children();

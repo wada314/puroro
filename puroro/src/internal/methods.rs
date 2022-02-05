@@ -262,7 +262,7 @@ where
 }
 
 // (optional|required|[unlabeled]) message field
-impl<'a, MP, ImplTag, FieldMP, FieldMessageType, FieldsType, SharedType, _1, const NUMBER: i32>
+impl<'a, MP, ImplTag, FieldMP, GetterType, FieldsType, SharedType, _1, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
         ImplTag,
@@ -277,15 +277,13 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<FieldMP>>,
-    FieldMessageType: 'a,
-    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
-    Option<&'a FieldMessageType>: IntoOptionMessage<FieldMP>,
+    Self: GetOptFieldMethod<'a, NUMBER, GetterType = GetterType>,
+    GetterType: IntoOptionMessage<FieldMP>,
 {
-    type GetterType = <Option<&'a FieldMessageType> as IntoOptionMessage<FieldMP>>::OptionMessage;
+    type GetterType = <GetterType as IntoOptionMessage<FieldMP>>::OptionMessage;
     fn get(&'a self) -> Self::GetterType {
-        <Option<&FieldMessageType> as IntoOptionMessage<FieldMP>>::into_message(
-            <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(self),
-        )
+        let msg_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(self);
+        <GetterType as IntoOptionMessage<FieldMP>>::into_message(msg_opt)
     }
 }
 
