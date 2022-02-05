@@ -424,4 +424,17 @@ fn test() {
     // let _: &[u32] = eperson.scores();
     // let _: &[String] = eperson.nicknames();
     // let _: &[Person] = eperson.children();
+
+    // ################ merged ################
+    let mperson: Person<_> = (&person, &bperson).into();
+    
+    let _: Option<u32> = mperson.age_opt();
+    let _: Option<&str> = mperson.name_opt();
+    // let _: Option<&Person> = mperson.partner_opt();
+    // let _: u32 = mperson.age();
+    // let _: &str = mperson.name();
+    // let partner: Person<_> = mperson.partner();
+    // let _: &[u32] = mperson.scores();
+    // let _: &[String] = mperson.nicknames();
+    // let _: &[Person] = mperson.children();
 }
