@@ -38,6 +38,8 @@ pub use ::bitvec;
 pub use ::bumpalo;
 pub use ::either::Either;
 use internal::impls::bumpalo::BumpShared;
+use internal::impls::either::EitherShared;
+use internal::impls::merged::MergedShared;
 
 use ::std::marker::PhantomData;
 
@@ -82,6 +84,20 @@ impl<T> ImplProperties for OptionImplProperties<T> {
     type ImplTag = tags::OptionImpl;
     type FieldsType = EmptyFields;
     type SharedType = OptionShared<T>;
+}
+
+pub struct MergedImplProperties<T, U>(PhantomData<(T, U)>);
+impl<T, U> ImplProperties for MergedImplProperties<T, U> {
+    type ImplTag = tags::MergedImpl;
+    type FieldsType = EmptyFields;
+    type SharedType = MergedShared<T, U>;
+}
+
+pub struct EitherImplProperties<T, U>(PhantomData<(T, U)>);
+impl<T, U> ImplProperties for EitherImplProperties<T, U> {
+    type ImplTag = tags::EitherImpl;
+    type FieldsType = EmptyFields;
+    type SharedType = EitherShared<T, U>;
 }
 
 pub struct Person<Impl = PersonSimpleImplProperties>(

@@ -12,9 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Either, RepeatedField};
+use crate::internal::EmptyFields;
+use crate::{tags, Either, MessageImpl, RepeatedField};
 use ::std::iter::Chain;
 use ::std::ops::Deref;
+
+pub struct MergedShared<T, U> {
+    first: T,
+    last: U,
+}
+impl<T, U> From<(T, U)> for MergedShared<T, U> {
+    fn from((first, last): (T, U)) -> Self {
+        Self { first, last }
+    }
+}
+impl<MP, T, U> From<(T, U)> for MessageImpl<MP, tags::MergedImpl, EmptyFields, MergedShared<T, U>> {
+    fn from(val: (T, U)) -> Self {
+        MessageImpl::from_raw_parts(Default::default(), Into::into(val))
+    }
+}
 
 pub struct MergedRepeatedField<T, U>(T, U);
 impl<T, U> MergedRepeatedField<T, U> {

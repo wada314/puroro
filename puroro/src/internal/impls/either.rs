@@ -12,8 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Either, RepeatedField};
+use crate::internal::EmptyFields;
+use crate::{tags, Either, MessageImpl, RepeatedField};
 use ::std::ops::Deref;
+
+pub struct EitherShared<T, U> {
+    either: Either<T, U>,
+}
+impl<T, U> From<Either<T, U>> for EitherShared<T, U> {
+    fn from(either: Either<T, U>) -> Self {
+        Self { either }
+    }
+}
+impl<MP, T, U> From<Either<T, U>>
+    for MessageImpl<MP, tags::EitherImpl, EmptyFields, EitherShared<T, U>>
+{
+    fn from(val: Either<T, U>) -> Self {
+        MessageImpl::from_raw_parts(Default::default(), Into::into(val))
+    }
+}
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
 impl<T, U> EitherRepeatedField<T, U> {
