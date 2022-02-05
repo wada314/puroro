@@ -19,26 +19,26 @@ use crate::MessageImpl;
 use ::std::ops::Deref;
 
 // repeated field
-impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, TypeTag, const NUMBER: i32>
-    GetFieldMethodImpl<
-        'a,
-        tags::SimpleImpl,
-        tags::Repeated,
-        TypeTag,
-        CollectionType,
-        SharedType,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
-where
-    FieldsType: HasField<NUMBER, Type = CollectionType>,
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-    CollectionType: 'a + Deref<Target = [ItemType]>,
-    ItemType: 'a,
-{
-    type GetterType = &'a [ItemType];
-    fn get(&'a self) -> Self::GetterType {
-        <FieldsType as HasField<NUMBER>>::get(&self.fields).deref()
-    }
-}
+// impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, TypeTag, const NUMBER: i32>
+//     GetFieldMethodImpl<
+//         'a,
+//         tags::SimpleImpl,
+//         tags::Repeated,
+//         TypeTag,
+//         CollectionType,
+//         SharedType,
+//         NUMBER,
+//     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+// where
+//     FieldsType: HasField<NUMBER, Type = CollectionType>,
+//     MP: MessageProperties,
+//     <MP as MessageProperties>::Fields<NUMBER>:
+//         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
+//     CollectionType: 'a + Deref<Target = [ItemType]>,
+//     ItemType: 'a,
+// {
+//     type GetterType = &'a [ItemType];
+//     fn get(&'a self) -> Self::GetterType {
+//         <FieldsType as HasField<NUMBER>>::get(&self.fields).deref()
+//     }
+// }

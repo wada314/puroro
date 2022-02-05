@@ -354,6 +354,9 @@ impl_getter!(Person, pub fn scores<6>(&self));
 impl_opt_getter!(Person, pub fn name_opt<1>(&self));
 impl_opt_getter!(Person, pub fn age_opt<2>(&self));
 impl_opt_getter!(Person, pub fn partner_opt<4>(&self));
+impl_slice_getter!(Person, pub fn children_slice<3>(&self));
+impl_slice_getter!(Person, pub fn nicknames_slice<5>(&self));
+impl_slice_getter!(Person, pub fn scores_slice<6>(&self));
 impl_mut_getter!(Person, pub fn name_mut<1>(&mut self));
 impl_mut_getter!(Person, pub fn age_mut<2>(&mut self));
 impl_mut_getter!(Person, pub fn children_mut<3>(&mut self));
@@ -375,9 +378,9 @@ fn test() {
     let _: u32 = person.age();
     let _: &str = person.name();
     let partner: Person<_> = person.partner();
-    let _: &[u32] = person.scores();
-    let _: &[String] = person.nicknames();
-    let _: &[Person] = person.children();
+    let _: &[u32] = person.scores_slice();
+    let _: &[String] = person.nicknames_slice();
+    let _: &[Person] = person.children_slice();
 
     let _: Option<u32> = partner.age_opt();
     let _: Option<&str> = partner.name_opt();
@@ -385,9 +388,9 @@ fn test() {
     let _: u32 = partner.age();
     let _: &str = partner.name();
     let _: Person<_> = partner.partner();
-    let _: &[u32] = partner.scores();
-    let _: &[String] = partner.nicknames();
-    let _: &[Person] = partner.children();
+    let _: &[u32] = partner.scores_slice();
+    let _: &[String] = partner.nicknames_slice();
+    let _: &[Person] = partner.children_slice();
 
     // let _: u32 = <Person<_> as PersonTrait>::age(&person);
 
@@ -405,9 +408,9 @@ fn test() {
     let _: u32 = bperson.age();
     let _: &str = bperson.name();
     let bpartner: Person<_> = bperson.partner();
-    let _: &[u32] = bperson.scores();
-    let _: &[BString] = bperson.nicknames();
-    let _: &[PersonBump] = bperson.children();
+    let _: &[u32] = bperson.scores_slice();
+    let _: &[BString] = bperson.nicknames_slice();
+    let _: &[PersonBump] = bperson.children_slice();
 
     let _: Option<u32> = bpartner.age_opt();
     let _: Option<&str> = bpartner.name_opt();
@@ -415,9 +418,9 @@ fn test() {
     let _: u32 = bpartner.age();
     let _: &str = bpartner.name();
     let _: Person<_> = bpartner.partner();
-    let _: &[u32] = bpartner.scores();
-    let _: &[BString] = bpartner.nicknames();
-    let _: &[PersonBump] = bpartner.children();
+    let _: &[u32] = bpartner.scores_slice();
+    let _: &[BString] = bpartner.nicknames_slice();
+    let _: &[PersonBump] = bpartner.children_slice();
 
     // ################ either ################
     let eperson: Person<_> = Either::<&Person, &Person>::Left(&person).into();
@@ -428,9 +431,9 @@ fn test() {
     let _: u32 = eperson.age();
     let _: &str = eperson.name();
     let epartner: Person<_> = eperson.partner();
-    // let _: &[u32] = eperson.scores();
-    // let _: &[String] = eperson.nicknames();
-    // let _: &[Person] = eperson.children();
+    // let _: &[u32] = eperson.scores_slice();
+    // let _: &[String] = eperson.nicknames_slice();
+    // let _: &[Person] = eperson.children_slice();
 
     // ################ merged ################
     let mperson: Person<_> = (&person, &bperson).into();
@@ -441,7 +444,7 @@ fn test() {
     let _: u32 = mperson.age();
     let _: &str = mperson.name();
     let mpartner: Person<_> = mperson.partner();
-    // let _: &[u32] = mperson.scores();
-    // let _: &[String] = mperson.nicknames();
-    // let _: &[Person] = mperson.children();
+    // let _: &[u32] = mperson.scores_slice();
+    // let _: &[String] = mperson.nicknames_slice();
+    // let _: &[Person] = mperson.children_slice();
 }

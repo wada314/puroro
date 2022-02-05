@@ -17,6 +17,7 @@
 mod getter;
 mod getter_mut;
 mod getter_opt;
+mod getter_slice;
 use crate::internal::SharedAllocator;
 use crate::DefaultIn;
 

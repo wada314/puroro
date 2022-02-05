@@ -30,6 +30,11 @@ pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
     fn get_opt(&'a self) -> Self::GetterType;
 }
 
+pub trait GetSliceFieldMethod<'a, const NUMBER: i32> {
+    type GetterType;
+    fn get_slice(&'a self) -> Self::GetterType;
+}
+
 pub trait HasFieldMethod<'a, const NUMBER: i32> {
     fn has(&'a self) -> bool;
 }
@@ -143,6 +148,59 @@ where
             SharedType,
             NUMBER,
         >>::get_opt(self)
+    }
+}
+
+pub trait GetSliceFieldMethodImpl<
+    'a,
+    ImplTag,
+    LabelTag,
+    TypeTag,
+    FieldType,
+    SharedType,
+    const NUMBER: i32,
+>
+{
+    type GetterType;
+    fn get_slice(&'a self) -> Self::GetterType;
+}
+
+impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
+    GetSliceFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+where
+    Self: GetSliceFieldMethodImpl<
+        'a,
+        ImplTag,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        NUMBER,
+    >,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    FieldsType: HasField<NUMBER>,
+{
+    type GetterType = <Self as GetSliceFieldMethodImpl<
+        'a,
+        ImplTag,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        NUMBER,
+    >>::GetterType;
+    fn get_slice(&'a self) -> Self::GetterType {
+        <Self as GetSliceFieldMethodImpl<
+            'a,
+            ImplTag,
+            LabelTag,
+            TypeTag,
+            <FieldsType as HasField<NUMBER>>::Type,
+            SharedType,
+            NUMBER,
+        >>::get_slice(self)
     }
 }
 

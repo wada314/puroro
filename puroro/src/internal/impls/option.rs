@@ -14,6 +14,7 @@
 
 pub mod getter;
 pub mod getter_opt;
+pub mod getter_slice;
 
 use crate::internal::EmptyFields;
 use crate::internal::ImplProperties;
