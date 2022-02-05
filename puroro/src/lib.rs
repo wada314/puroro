@@ -56,7 +56,7 @@ use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
 use internal::impls::bumpalo::BumpShared;
 use internal::impls::either::{EitherImplProperties, IntoEitherMessage};
-use internal::impls::merged::MergedImplProperties;
+use internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::EmptyFields;
@@ -427,7 +427,7 @@ fn test() {
     let _: Option<Person<_>> = eperson.partner_opt();
     // let _: u32 = eperson.age();
     // let _: &str = eperson.name();
-    // let partner: Person<_> = eperson.partner();
+    // let epartner: Person<_> = eperson.partner();
     // let _: &[u32] = eperson.scores();
     // let _: &[String] = eperson.nicknames();
     // let _: &[Person] = eperson.children();
@@ -437,10 +437,10 @@ fn test() {
 
     let _: Option<u32> = mperson.age_opt();
     let _: Option<&str> = mperson.name_opt();
-    // let _: Option<&Person> = mperson.partner_opt();
+    let _: Option<Person<_>> = mperson.partner_opt();
     // let _: u32 = mperson.age();
     // let _: &str = mperson.name();
-    // let partner: Person<_> = mperson.partner();
+    // let mpartner: Person<_> = mperson.partner();
     // let _: &[u32] = mperson.scores();
     // let _: &[String] = mperson.nicknames();
     // let _: &[Person] = mperson.children();

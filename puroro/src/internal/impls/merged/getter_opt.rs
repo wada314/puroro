@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::{IntoMergedMessage, MergedShared};
-use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod, GetOptFieldMethodImpl};
+use crate::internal::methods::{
+    GetFieldMethod, GetOptFieldMethod, GetOptFieldMethodImpl, HasFieldMethod,
+};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::{AsMessageImplRef, MessageImpl};
@@ -110,20 +112,28 @@ where
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<InnerMP>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = LeftGetterType>,
-    RightMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = RightGetterType>,
-    (LeftGetterType, RightGetterType): IntoMergedMessage<MergedMessage = FinalGetterType>,
+    LeftMessage:
+        'a + GetFieldMethod<'a, NUMBER, GetterType = LeftGetterType> + HasFieldMethod<'a, NUMBER>,
+    RightMessage:
+        'a + GetFieldMethod<'a, NUMBER, GetterType = RightGetterType> + HasFieldMethod<'a, NUMBER>,
+    (LeftGetterType, RightGetterType): IntoMergedMessage<InnerMP, MergedMessage = FinalGetterType>,
 {
     type GetterType = Option<FinalGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
         let (left, right) = (&self.shared.left, &self.shared.right);
-        let right_opt = <RightMessage as GetFieldMethod<NUMBER>>::get(
-            <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&right),
-        );
-        let left_opt = <LeftMessage as GetFieldMethod<NUMBER>>::get(
-            <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&left),
-        );
-        // Maybe need to return None if the both fields are None?
-        Some(IntoMergedMessage::into_message((left_opt, right_opt)))
+        let left_message_impl_ref =
+            <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&left);
+        let right_message_impl_ref =
+            <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&right);
+
+        let has_left = <LeftMessage as HasFieldMethod<NUMBER>>::has(left_message_impl_ref);
+        let has_right = <RightMessage as HasFieldMethod<NUMBER>>::has(right_message_impl_ref);
+        if has_left || has_right {
+            let left_field = <LeftMessage as GetFieldMethod<NUMBER>>::get(left_message_impl_ref);
+            let right_field = <RightMessage as GetFieldMethod<NUMBER>>::get(right_message_impl_ref);
+            Some(IntoMergedMessage::into_message((left_field, right_field)))
+        } else {
+            None
+        }
     }
 }

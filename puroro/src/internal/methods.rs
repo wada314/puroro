@@ -30,6 +30,10 @@ pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
     fn get_opt(&'a self) -> Self::GetterType;
 }
 
+pub trait HasFieldMethod<'a, const NUMBER: i32> {
+    fn has(&'a self) -> bool;
+}
+
 pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
     type GetterType;
     fn get_mut(&'a mut self) -> Self::GetterType;
@@ -286,3 +290,13 @@ where
 }
 
 //################ Blanket impls for has() methods ################
+
+impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, const NUMBER: i32>
+    HasFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+where
+    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
+{
+    fn has(&'a self) -> bool {
+        <Self as GetOptFieldMethod<NUMBER>>::get_opt(self).is_some()
+    }
+}
