@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use super::{EitherShared, IntoEitherMessage};
-use crate::internal::impls::option::IntoOptionMessage;
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::tags;

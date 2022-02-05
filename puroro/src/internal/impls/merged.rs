@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod getter_opt;
+
 use crate::internal::{EmptyFields, ImplProperties};
 use crate::{tags, Either, MessageImpl, RepeatedField};
 use ::std::iter::Chain;
@@ -19,12 +21,12 @@ use ::std::marker::PhantomData;
 use ::std::ops::Deref;
 
 pub struct MergedShared<T, U> {
-    first: T,
-    last: U,
+    left: T,
+    right: U,
 }
 impl<T, U> From<(T, U)> for MergedShared<T, U> {
-    fn from((first, last): (T, U)) -> Self {
-        Self { first, last }
+    fn from((left, right): (T, U)) -> Self {
+        Self { left, right }
     }
 }
 impl<MP, T, U> From<(T, U)> for MessageImpl<MP, tags::MergedImpl, EmptyFields, MergedShared<T, U>> {
