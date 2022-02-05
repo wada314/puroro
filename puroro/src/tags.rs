@@ -57,20 +57,19 @@ mod value {
     pub struct SFixed64;
     pub struct Fixed32;
     pub struct Fixed64;
-    pub type Bytes = (False, (True, False));
-    pub type String = (False, (False, True));
-    pub type Message<M> = (True, PhantomData<M>);
+    pub type Bytes = (False, &'static [u8]);
+    pub type String = (False, &'static str);
+    pub type Message<M> = (True, M);
 }
 
-type EmptyLd = (False, (False, (False, False)));
-pub type Variant<V> = (EmptyLd, (True, PhantomData<V>));
-pub type LengthDelimited<V> = ((True, V), False);
-pub type Bits32<V> = (EmptyLd, (False, (True, PhantomData<V>)));
-pub type Bits64<V> = (EmptyLd, (False, (False, PhantomData<V>)));
+pub type Variant<V> = (False, (False, ()), V);
+pub type LengthDelimited<V> = (True, V, ());
+pub type Bits32<V> = (False, (False, ()), V);
+pub type Bits64<V> = (False, (False, ()), V);
 
-pub type NonLdType<_1> = (EmptyLd, _1);
-pub type NonMessageType<_1, _2> = ((True, (False, _1)), _2);
-pub type StringOrBytesType<_1> = ((True, (False, _1)), False);
+pub type NonLdType<_1> = (False, (False, ()), _1);
+pub type NonMessageType<_1, _2, _3> = (_1, (False, _2), _3);
+pub type StringOrBytesType<_1> = (True, (False, _1), ());
 
 pub type Int32 = Variant<value::Int32>;
 pub type SInt32 = Variant<value::SInt32>;

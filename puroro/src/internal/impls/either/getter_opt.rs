@@ -31,13 +31,14 @@ impl<
     _1,
     _2,
     _3,
+    _4,
     const NUMBER: i32,
 >
     GetOptFieldMethodImpl<
         'a,
         tags::EitherImpl,
         tags::NonRepeatedLabel<_1>,
-        tags::NonMessageType<_2, _3>,
+        tags::NonMessageType<_2, _3, _4>,
         <EmptyFields as HasField<NUMBER>>::Type,
         EitherShared<LeftMessageRef, RightMessageRef>,
         NUMBER,
@@ -52,7 +53,7 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<
         LabelTag = tags::NonRepeatedLabel<_1>,
-        TypeTag = tags::NonMessageType<_2, _3>,
+        TypeTag = tags::NonMessageType<_2, _3, _4>,
     >,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
