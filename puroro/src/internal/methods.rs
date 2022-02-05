@@ -16,7 +16,7 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 
-use super::impls::option::MessageInOptionTrait;
+use super::impls::option::IntoOptionMessage;
 
 pub trait GetFieldMethod<'a, const NUMBER: i32> {
     type GetterType;
@@ -271,12 +271,12 @@ where
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<FieldMP>>,
     FieldMessageType: 'a,
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
-    Option<&'a FieldMessageType>: MessageInOptionTrait<FieldMP>,
+    Option<&'a FieldMessageType>: IntoOptionMessage<FieldMP>,
 {
     type GetterType =
-        <Option<&'a FieldMessageType> as MessageInOptionTrait<FieldMP>>::WrappedOptionMessage;
+        <Option<&'a FieldMessageType> as IntoOptionMessage<FieldMP>>::OptionMessage;
     fn get(&'a self) -> Self::GetterType {
-        <Option<&FieldMessageType> as MessageInOptionTrait<FieldMP>>::into_message(
+        <Option<&FieldMessageType> as IntoOptionMessage<FieldMP>>::into_message(
             <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(self),
         )
     }

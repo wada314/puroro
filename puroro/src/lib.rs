@@ -55,9 +55,9 @@ use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
 use internal::impls::bumpalo::BumpShared;
-use internal::impls::either::{EitherShared, MessagesInEitherTrait};
+use internal::impls::either::{EitherShared, IntoEitherMessage};
 use internal::impls::merged::MergedShared;
-use internal::impls::option::{MessageInOptionTrait, OptionShared};
+use internal::impls::option::{IntoOptionMessage, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::EmptyFields;
 use internal::MessageProperties;
@@ -237,21 +237,16 @@ where
     }
 }
 
-impl<T, ImplTag, FieldsType, SharedType> MessageInOptionTrait<PersonMessageProperties> for Option<T>
-where
-    T: AsMessageImplRef<
-        MessageImplType = MessageImpl<PersonMessageProperties, ImplTag, FieldsType, SharedType>,
-    >,
-{
-    type WrappedOptionMessage = Person<OptionImplProperties<T>>;
-    fn into_message(self) -> Self::WrappedOptionMessage {
+impl<T> IntoOptionMessage<PersonMessageProperties> for Option<T> {
+    type OptionMessage = Person<OptionImplProperties<T>>;
+    fn into_message(self) -> Self::OptionMessage {
         Person::from_raw_parts(EmptyFields::default(), self.into())
     }
 }
-//, LeftImplTag, RightImplTag, LeftFieldsType, RightFieldsType, LeftSharedType, RightSharedType
-impl<T, U> MessagesInEitherTrait<PersonMessageProperties> for Either<T, U> {
-    type WrappedEitherMessage = Person<EitherImplProperties<T, U>>;
-    fn into_message(self) -> Self::WrappedEitherMessage {
+
+impl<T, U> IntoEitherMessage<PersonMessageProperties> for Either<T, U> {
+    type EitherMessage = Person<EitherImplProperties<T, U>>;
+    fn into_message(self) -> Self::EitherMessage {
         Person::from_raw_parts(EmptyFields::default(), self.into())
     }
 }
@@ -443,7 +438,7 @@ fn test() {
 
     let _: Option<u32> = eperson.age_opt();
     let _: Option<&str> = eperson.name_opt();
-    let _: Option<Either<&Person, &Person>> = eperson.partner_opt();
+    let _: Option<Person<_>> = eperson.partner_opt();
     // let _: u32 = eperson.age();
     // let _: &str = eperson.name();
     // let partner: Person<_> = eperson.partner();

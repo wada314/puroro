@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::EitherShared;
+use super::{EitherShared, IntoEitherMessage};
+use crate::internal::impls::option::IntoOptionMessage;
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::tags;
@@ -88,6 +89,7 @@ impl<
     RightMessage,
     LeftGetterType,
     RightGetterType,
+    FinalGetterType,
     _1,
     const NUMBER: i32,
 >
@@ -114,22 +116,28 @@ where
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<LeftGetterType>>,
     RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<RightGetterType>>,
+    Either<LeftGetterType, RightGetterType>:
+        IntoEitherMessage<InnerMP, EitherMessage = FinalGetterType>,
 {
-    type GetterType = Option<Either<LeftGetterType, RightGetterType>>;
+    type GetterType = Option<FinalGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
-        self.shared.either.as_ref().either(
-            |msg| {
-                <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
-                    <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-                .map(|l| Either::Left(l))
-            },
-            |msg| {
-                <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
-                    <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-                .map(|r| Either::Right(r))
-            },
-        )
+        self.shared
+            .either
+            .as_ref()
+            .either(
+                |msg| {
+                    <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                        <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                    )
+                    .map(|l| Either::Left(l))
+                },
+                |msg| {
+                    <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                        <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                    )
+                    .map(|r| Either::Right(r))
+                },
+            ) // Option<Either<LeftGetterType, RightGetterType>
+            .map(|e| e.into_message())
     }
 }

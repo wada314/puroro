@@ -34,7 +34,7 @@ impl<MP, T> From<Option<T>> for MessageImpl<MP, tags::OptionImpl, EmptyFields, O
     }
 }
 
-pub trait MessageInOptionTrait<MP> {
-    type WrappedOptionMessage;
-    fn into_message(self) -> Self::WrappedOptionMessage;
+pub trait IntoOptionMessage<MP> {
+    type OptionMessage;
+    fn into_message(self) -> Self::OptionMessage;
 }

@@ -34,9 +34,9 @@ impl<MP, T, U> From<Either<T, U>>
     }
 }
 
-pub trait MessagesInEitherTrait<MP> {
-    type WrappedEitherMessage;
-    fn into_message(self) -> Self::WrappedEitherMessage;
+pub trait IntoEitherMessage<MP> {
+    type EitherMessage;
+    fn into_message(self) -> Self::EitherMessage;
 }
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
