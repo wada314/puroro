@@ -230,6 +230,13 @@ impl<T, U> IntoEitherMessage<PersonMessageProperties> for Either<T, U> {
     }
 }
 
+impl<T, U> IntoMergedMessage<PersonMessageProperties> for (T, U) {
+    type MergedMessage = Person<MergedImplProperties<T, U>>;
+    fn into_message(self) -> Self::MergedMessage {
+        Person::from_raw_parts(EmptyFields::default(), self.into())
+    }
+}
+
 trait PersonTrait<'a>
 where
     Self: AsMessageImplRef,
@@ -427,7 +434,7 @@ fn test() {
 
     // ################ merged ################
     let mperson: Person<_> = (&person, &bperson).into();
-    
+
     let _: Option<u32> = mperson.age_opt();
     let _: Option<&str> = mperson.name_opt();
     // let _: Option<&Person> = mperson.partner_opt();
