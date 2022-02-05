@@ -404,6 +404,7 @@ fn test() {
 
     // let _: u32 = <Person<_> as PersonTrait>::age(&person);
 
+    // ################ bumpalo ################
     let bump = bumpalo::Bump::new();
     let mut bperson = PersonBump::new_in(&bump);
 
@@ -430,4 +431,17 @@ fn test() {
     let _: &[u32] = bpartner.scores();
     let _: &[BString] = bpartner.nicknames();
     let _: &[PersonBump] = bpartner.children();
+
+    // ################ either ################
+    let eperson: Person<_> = Either::<&Person, &Person>::Left(&person).into();
+
+    let _: Option<u32> = eperson.age_opt();
+    let _: Option<&str> = eperson.name_opt().as_ref().map(|e| AsRef::<str>::as_ref(e));
+    // let _: Option<&Person> = eperson.partner_opt();
+    // let _: u32 = eperson.age();
+    // let _: &str = eperson.name();
+    // let partner: Person<_> = eperson.partner();
+    // let _: &[u32] = eperson.scores();
+    // let _: &[String] = eperson.nicknames();
+    // let _: &[Person] = eperson.children();
 }

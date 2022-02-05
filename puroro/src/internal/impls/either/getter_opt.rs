@@ -34,7 +34,7 @@ impl<
 >
     GetOptFieldMethodImpl<
         'a,
-        tags::OptionImpl,
+        tags::EitherImpl,
         tags::NonRepeatedLabel<_1>,
         tags::NonLdType<_2>,
         <EmptyFields as HasField<NUMBER>>::Type,
@@ -43,7 +43,7 @@ impl<
     >
     for MessageImpl<
         MP,
-        tags::OptionImpl,
+        tags::EitherImpl,
         EmptyFields,
         EitherShared<LeftMessageRef, RightMessageRef>,
     >
@@ -91,7 +91,7 @@ impl<
 >
     GetOptFieldMethodImpl<
         'a,
-        tags::OptionImpl,
+        tags::EitherImpl,
         tags::NonRepeatedLabel<_1>,
         tags::StringOrBytesType<_2>,
         <EmptyFields as HasField<NUMBER>>::Type,
@@ -100,7 +100,7 @@ impl<
     >
     for MessageImpl<
         MP,
-        tags::OptionImpl,
+        tags::EitherImpl,
         EmptyFields,
         EitherShared<LeftMessageRef, RightMessageRef>,
     >
