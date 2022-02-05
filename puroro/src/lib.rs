@@ -37,11 +37,6 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
-use internal::impls::bumpalo::BumpShared;
-use internal::impls::either::EitherShared;
-use internal::impls::merged::MergedShared;
-
-use ::std::marker::PhantomData;
 
 // メモ
 
@@ -57,7 +52,11 @@ use ::std::marker::PhantomData;
 //
 use crate::bumpalo::boxed::Box as BBox;
 use crate::bumpalo::collections::{String as BString, Vec as BVec};
+use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
+use internal::impls::bumpalo::BumpShared;
+use internal::impls::either::{EitherShared, MessagesInEitherTrait};
+use internal::impls::merged::MergedShared;
 use internal::impls::option::{MessageInOptionTrait, OptionShared};
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use internal::EmptyFields;
@@ -246,6 +245,13 @@ where
 {
     type WrappedOptionMessage = Person<OptionImplProperties<T>>;
     fn into_message(self) -> Self::WrappedOptionMessage {
+        Person::from_raw_parts(EmptyFields::default(), self.into())
+    }
+}
+//, LeftImplTag, RightImplTag, LeftFieldsType, RightFieldsType, LeftSharedType, RightSharedType
+impl<T, U> MessagesInEitherTrait<PersonMessageProperties> for Either<T, U> {
+    type WrappedEitherMessage = Person<EitherImplProperties<T, U>>;
+    fn into_message(self) -> Self::WrappedEitherMessage {
         Person::from_raw_parts(EmptyFields::default(), self.into())
     }
 }
