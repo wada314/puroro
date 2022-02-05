@@ -17,3 +17,59 @@ use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
+
+// non-repeated non-ld field
+// Assuming that the both message types returns the same type.
+impl<
+    'a,
+    MP,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    NumType,
+    _1,
+    _2,
+    const NUMBER: i32,
+>
+    GetOptFieldMethodImpl<
+        'a,
+        tags::OptionImpl,
+        tags::NonRepeatedLabel<_1>,
+        tags::NonLdType<_2>,
+        <EmptyFields as HasField<NUMBER>>::Type,
+        EitherShared<LeftMessageRef, RightMessageRef>,
+        NUMBER,
+    >
+    for MessageImpl<
+        MP,
+        tags::OptionImpl,
+        EmptyFields,
+        EitherShared<LeftMessageRef, RightMessageRef>,
+    >
+where
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::NonLdType<_2>>,
+    tags::NonLdType<_2>: tags::NumericalTypeTag<NativeType = NumType>,
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<NumType>>,
+    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<NumType>>,
+{
+    type GetterType = Option<NumType>;
+    fn get_opt(&'a self) -> Self::GetterType {
+        self.shared.either.as_ref().either(
+            |msg| {
+                <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                    <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                )
+            },
+            |msg| {
+                <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                    <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                )
+            },
+        )
+    }
+}
