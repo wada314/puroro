@@ -24,7 +24,18 @@ use ::std::slice;
 
 // repeated non-ld field
 // `Clone` and then `Into` the iter value
-impl<'a, MP, FieldsType, SharedType, FieldType, ItemType, NumType, _1, const NUMBER: i32>
+impl<
+    'a,
+    MP,
+    FieldsType,
+    SharedType,
+    FieldType,
+    InnerIterType,
+    ItemType,
+    NumType,
+    _1,
+    const NUMBER: i32,
+>
     GetFieldMethodImpl<
         'a,
         tags::SimpleImpl,
@@ -40,11 +51,12 @@ where
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::NonLdType<_1>>,
     tags::NonLdType<_1>: tags::NumericalTypeTag<NativeType = NumType>,
-    FieldType: IntoIterator<Item = ItemType>,
-    <FieldType as IntoIterator>::IntoIter: Iterator<Item = ItemType>,
+    FieldType: 'a,
+    &'a FieldType: IntoIterator<Item = &'a ItemType, IntoIter = InnerIterType>,
+    InnerIterType: Iterator<Item = &'a ItemType>,
     ItemType: 'a + Clone + Into<NumType>,
 {
-    type GetterType = MapInto<Cloned<slice::Iter<'a, ItemType>>, NumType>;
+    type GetterType = MapInto<Cloned<InnerIterType>, NumType>;
     fn get(&'a self) -> Self::GetterType {
         let slice = <FieldsType as HasField<NUMBER>>::get(&self.fields);
         slice.into_iter().cloned().map_into::<NumType>()
