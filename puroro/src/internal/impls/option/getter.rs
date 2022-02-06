@@ -21,7 +21,7 @@ use ::std::iter;
 use ::std::option;
 
 // repeated field
-// Wrap the internal message's iterator by `std::option::IntoIter`, and the flatten it.
+// Wrap the internal message's iterator by `std::option::IntoIter`, and then flatten it.
 impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
