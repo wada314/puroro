@@ -442,7 +442,7 @@ fn test() {
     let _: &[PersonBump] = bpartner.children_slice();
 
     // ################ either ################
-    let eperson: Person<_> = Either::<&Person, &Person>::Left(&person).into();
+    let eperson: Person<_> = Either::<&Person<_>, &Person>::Left(&partner).into();
 
     let _: Option<u32> = eperson.age_opt();
     let _: Option<&str> = eperson.name_opt();
@@ -450,9 +450,9 @@ fn test() {
     let _: u32 = eperson.age();
     let _: &str = eperson.name();
     let epartner: Person<_> = eperson.partner();
-    // let _: &[u32] = eperson.scores_slice();
-    // let _: &[String] = eperson.nicknames_slice();
-    // let _: &[Person] = eperson.children_slice();
+    let _: &[u32] = eperson.scores_slice();
+    let _: &[String] = eperson.nicknames_slice();
+    let _: &[Person] = eperson.children_slice();
 
     // ################ merged ################
     let mperson: Person<_> = (&person, &bperson).into();
