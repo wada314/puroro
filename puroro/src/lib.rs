@@ -54,7 +54,6 @@ use crate::bumpalo::boxed::Box as BBox;
 use crate::bumpalo::collections::{String as BString, Vec as BVec};
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
-use internal::impls::bumpalo::BumpShared;
 use internal::impls::either::{EitherImplProperties, IntoEitherMessage};
 use internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use internal::impls::option::{IntoOptionMessage, OptionImplProperties};
@@ -289,7 +288,7 @@ define_fields_container! {
 }
 impl DefaultIn for PersonFieldsContainer {
     type AllocatorType = ();
-    fn default_in(alloc: Self::AllocatorType) -> Self {
+    fn default_in(_: Self::AllocatorType) -> Self {
         Default::default()
     }
 }

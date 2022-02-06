@@ -17,7 +17,6 @@ use crate::internal::{Bitfield, SharedAllocator, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties};
 use crate::{tags, AsMessageMut, AsMessageRef};
 use crate::{DefaultIn, MessageImpl};
-use ::std::ops::{Deref, DerefMut};
 
 // (optional|required) non-message field
 impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, const NUMBER: i32>

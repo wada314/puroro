@@ -17,9 +17,8 @@ pub mod getter_opt;
 pub mod getter_slice;
 
 use crate::internal::{EmptyFields, ImplProperties};
-use crate::{tags, Either, MessageImpl, RepeatedField};
+use crate::{tags, Either, MessageImpl};
 use ::std::marker::PhantomData;
-use ::std::ops::Deref;
 
 pub struct EitherShared<T, U> {
     either: Either<T, U>,

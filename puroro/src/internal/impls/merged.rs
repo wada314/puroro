@@ -15,10 +15,8 @@
 pub mod getter_opt;
 
 use crate::internal::{EmptyFields, ImplProperties};
-use crate::{tags, Either, MessageImpl};
-use ::std::iter::Chain;
+use crate::{tags, MessageImpl};
 use ::std::marker::PhantomData;
-use ::std::ops::Deref;
 
 pub struct MergedShared<T, U> {
     left: T,
