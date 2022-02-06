@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::EitherShared;
+use super::{EitherRepeatedField, EitherShared};
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
 // repeated string | bytes field
-// Assuming the internal type's getter type is `&[T]` or whatever `IntoIter<Item: AsRef<str>>` type
+// Assuming the internal type's getter types are `IntoIterator`
 impl<
     'a,
     MP,
@@ -55,11 +55,21 @@ where
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = LeftGetterType>,
     RightMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = RightGetterType>,
-    LeftGetterType: Default,
-    RightGetterType: Default,
+    LeftGetterType: IntoIterator,
+    RightGetterType: IntoIterator,
 {
-    type GetterType = LeftGetterType;
+    type GetterType = EitherRepeatedField<LeftGetterType, RightGetterType>;
     fn get(&'a self) -> Self::GetterType {
-        todo!()
+        EitherRepeatedField(
+            self.shared
+                .either
+                .as_ref()
+                .map_left(|left| {
+                    <LeftMessage as GetFieldMethod<NUMBER>>::get(left.as_message_impl_ref())
+                })
+                .map_right(|right| {
+                    <RightMessage as GetFieldMethod<NUMBER>>::get(right.as_message_impl_ref())
+                }),
+        )
     }
 }

@@ -452,6 +452,9 @@ fn test() {
     let _: &[u32] = eperson.scores_slice();
     let _: &[String] = eperson.nicknames_slice();
     let _: &[Person] = eperson.children_slice();
+    for x in partner.nicknames() {
+        let _: &str = AsRef::<str>::as_ref(x);
+    }
 
     // ################ merged ################
     let mperson: Person<_> = (&person, &bperson).into();
