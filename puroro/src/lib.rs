@@ -381,6 +381,15 @@ fn test() {
     let _: &[u32] = person.scores_slice();
     let _: &[String] = person.nicknames_slice();
     let _: &[Person] = person.children_slice();
+    for x in person.scores() {
+        let _: u32 = x;
+    }
+    for x in person.nicknames() {
+        let _: &String = x;
+    }
+    // for x in person.children() {
+    //     let _: &Person = x;
+    // }
 
     let _: Option<u32> = partner.age_opt();
     let _: Option<&str> = partner.name_opt();

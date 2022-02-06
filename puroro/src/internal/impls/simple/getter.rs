@@ -19,8 +19,6 @@ use crate::MessageImpl;
 use ::itertools::structs::MapInto;
 use ::itertools::Itertools;
 use ::std::iter::Cloned;
-use ::std::ops::Deref;
-use ::std::slice;
 
 // repeated non-ld field
 // `Clone` and then `Into` the iter value
@@ -60,5 +58,32 @@ where
     fn get(&'a self) -> Self::GetterType {
         let slice = <FieldsType as HasField<NUMBER>>::get(&self.fields);
         slice.into_iter().cloned().map_into::<NumType>()
+    }
+}
+
+// repeated string|bytes field
+// Just return the `into_iter()` value as-is
+impl<'a, MP, FieldsType, SharedType, FieldType, InnerIterType, _1, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        tags::SimpleImpl,
+        tags::Repeated,
+        tags::StringOrBytesType<_1>,
+        FieldType,
+        SharedType,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = FieldType>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::StringOrBytesType<_1>>,
+    FieldType: 'a,
+    &'a FieldType: IntoIterator<IntoIter = InnerIterType>,
+{
+    type GetterType = InnerIterType;
+    fn get(&'a self) -> Self::GetterType {
+        let slice = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+        slice.into_iter()
     }
 }
