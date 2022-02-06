@@ -61,14 +61,14 @@ where
     }
 }
 
-// repeated string|bytes field
+// repeated ld field
 // Just return the `into_iter()` value as-is
-impl<'a, MP, FieldsType, SharedType, FieldType, InnerIterType, _1, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, LdType, FieldType, InnerIterType, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
         tags::SimpleImpl,
         tags::Repeated,
-        tags::StringOrBytesType<_1>,
+        tags::LengthDelimited<LdType>,
         FieldType,
         SharedType,
         NUMBER,
@@ -77,7 +77,7 @@ where
     FieldsType: HasField<NUMBER, Type = FieldType>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::StringOrBytesType<_1>>,
+        FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::LengthDelimited<LdType>>,
     FieldType: 'a,
     &'a FieldType: IntoIterator<IntoIter = InnerIterType>,
 {

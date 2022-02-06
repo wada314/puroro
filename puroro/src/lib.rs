@@ -387,9 +387,9 @@ fn test() {
     for x in person.nicknames() {
         let _: &String = x;
     }
-    // for x in person.children() {
-    //     let _: &Person = x;
-    // }
+    for x in person.children() {
+        let _: &Person = x;
+    }
 
     let _: Option<u32> = partner.age_opt();
     let _: Option<&str> = partner.name_opt();
