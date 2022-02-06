@@ -391,6 +391,7 @@ fn test() {
         let _: &Person = x;
     }
 
+    // ################ option ################
     let _: Option<u32> = partner.age_opt();
     let _: Option<&str> = partner.name_opt();
     let _: Option<&Person> = partner.partner_opt();
@@ -400,6 +401,15 @@ fn test() {
     let _: &[u32] = partner.scores_slice();
     let _: &[String] = partner.nicknames_slice();
     let _: &[Person] = partner.children_slice();
+    for x in partner.scores() {
+        let _: u32 = x;
+    }
+    for x in partner.nicknames() {
+        let _: &String = x;
+    }
+    for x in partner.children() {
+        let _: &Person = x;
+    }
 
     // let _: u32 = <Person<_> as PersonTrait>::age(&person);
 

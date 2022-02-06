@@ -17,37 +17,40 @@ use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
+use ::std::iter;
+use ::std::option;
 
 // repeated field
-// Assuming the internal type's getter type is `&[T]` or whatever `Default` type
-// impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, const NUMBER: i32>
-//     GetFieldMethodImpl<
-//         'a,
-//         tags::OptionImpl,
-//         tags::Repeated,
-//         TypeTag,
-//         <EmptyFields as HasField<NUMBER>>::Type,
-//         OptionShared<InnerMessageRef>,
-//         NUMBER,
-//     > for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
-// where
-//     MP: MessageProperties,
-//     <MP as MessageProperties>::Fields<NUMBER>:
-//         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-//     InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
-//     InnerMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = InnerGetterType>,
-//     InnerGetterType: Default,
-// {
-//     type GetterType = InnerGetterType;
-//     fn get(&'a self) -> Self::GetterType {
-//         self.shared
-//             .option
-//             .as_ref()
-//             .map(|msg| {
-//                 <InnerMessage as GetFieldMethod<NUMBER>>::get(
-//                     <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-//                 )
-//             })
-//             .unwrap_or_default()
-//     }
-// }
+// Wrap the internal message's iterator by `std::option::IntoIter`, and the flatten it.
+impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        tags::OptionImpl,
+        tags::Repeated,
+        TypeTag,
+        <EmptyFields as HasField<NUMBER>>::Type,
+        OptionShared<InnerMessageRef>,
+        NUMBER,
+    > for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
+where
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
+    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
+    InnerMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = InnerGetterType>,
+    InnerGetterType: Iterator,
+{
+    type GetterType = iter::Flatten<option::IntoIter<InnerGetterType>>;
+    fn get(&'a self) -> Self::GetterType {
+        self.shared
+            .option
+            .as_ref()
+            .map(|msg| {
+                <InnerMessage as GetFieldMethod<NUMBER>>::get(
+                    <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+                )
+            })
+            .into_iter()
+            .flatten()
+    }
+}
