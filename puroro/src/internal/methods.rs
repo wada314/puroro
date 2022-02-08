@@ -46,7 +46,12 @@ pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
 
 //################ Methods Impl traits, for specialization ################
 
-pub trait GetFieldMethodImpl<
+pub trait GetFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
+}
+
+pub trait GetFieldMethodImplImpl<
     'a,
     ImplTag,
     LabelTag,
@@ -63,7 +68,7 @@ pub trait GetFieldMethodImpl<
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
     GetFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetFieldMethodImpl<
+    Self: GetFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -77,7 +82,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type GetterType = <Self as GetFieldMethodImpl<
+    type GetterType = <Self as GetFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -87,7 +92,7 @@ where
         NUMBER,
     >>::GetterType;
     fn get(&'a self) -> Self::GetterType {
-        <Self as GetFieldMethodImpl<
+        <Self as GetFieldMethodImplImpl<
             'a,
             ImplTag,
             LabelTag,
@@ -262,7 +267,7 @@ where
 // (optional|required|[unlabeled]) non-ld field
 // Call get_opt method, and returns a default value if it's `None`.
 impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: i32>
-    GetFieldMethodImpl<
+    GetFieldMethodImplImpl<
         'a,
         ImplTag,
         tags::NonRepeatedLabel<_1>,
@@ -291,7 +296,7 @@ where
 // (optional|required|[unlabeled]) (string|bytes) field
 // Call get_opt method, and returns a default value if it's `None`.
 impl<'a, MP, ImplTag, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
-    GetFieldMethodImpl<
+    GetFieldMethodImplImpl<
         'a,
         ImplTag,
         tags::NonRepeatedLabel<_1>,
@@ -321,7 +326,7 @@ where
 
 // (optional|required|[unlabeled]) message field
 impl<'a, MP, ImplTag, FieldMP, GetterType, FieldsType, SharedType, _1, const NUMBER: i32>
-    GetFieldMethodImpl<
+    GetFieldMethodImplImpl<
         'a,
         ImplTag,
         tags::NonRepeatedLabel<_1>,

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::{EitherRepeatedField, EitherShared};
-use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImplImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
@@ -32,7 +32,7 @@ impl<
     RightGetterType,
     const NUMBER: i32,
 >
-    GetFieldMethodImpl<
+    GetFieldMethodImplImpl<
         'a,
         tags::EitherImpl,
         tags::Repeated,

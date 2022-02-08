@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetFieldMethodImpl;
+use crate::internal::methods::GetFieldMethodImplImpl;
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
@@ -34,7 +34,7 @@ impl<
     _1,
     const NUMBER: i32,
 >
-    GetFieldMethodImpl<
+    GetFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::Repeated,
@@ -64,7 +64,7 @@ where
 // repeated ld field
 // Just return the `into_iter()` value as-is
 impl<'a, MP, FieldsType, SharedType, LdType, FieldType, InnerIterType, const NUMBER: i32>
-    GetFieldMethodImpl<
+    GetFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::Repeated,
