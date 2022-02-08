@@ -13,10 +13,36 @@
 // limitations under the License.
 
 use super::OptionShared;
-use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImplImpl};
+use crate::internal::methods::{
+    GetOptFieldMethod, GetOptFieldMethodImpl, GetOptFieldMethodImplImpl,
+};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
+
+// non-repeated field
+// If the inner `Option` is `Some` then delegate to the inner type.
+// If it's `None`, then just return `None`.
+impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
+    GetOptFieldMethodImpl<'a, tags::OptionImpl, NUMBER>
+    for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
+where
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
+    InnerMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<InnerReturnType>>,
+{
+    type ReturnType = Option<InnerReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        self.shared.option.as_ref().and_then(|msg| {
+            <InnerMessage as GetOptFieldMethod<NUMBER>>::invoke(
+                <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
+            )
+        })
+    }
+}
+
+// ##########################################################
 
 // non-repeated field
 // If the inner `Option` is `Some` then delegate to the inner type.
