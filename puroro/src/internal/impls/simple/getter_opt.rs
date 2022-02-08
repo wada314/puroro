@@ -84,6 +84,76 @@ where
     }
 }
 
+// (optional|required) (string|bytes) field
+impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, BorrowedType, const NUMBER: i32>
+    MethodImpl<
+        'a,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        True,
+        False,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    TypeTag: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
+    <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
+    SharedType: SharedBitfield,
+    BorrowedType: 'a + ?Sized,
+{
+    type ReturnType = Option<&'a BorrowedType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
+        if self.shared.bitfield().get(opt_bit_index) {
+            let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+            Some(field.as_ref())
+        } else {
+            None
+        }
+    }
+}
+
+// (optional|required|[unlabeled]) message field
+// Typically the field type is `Option<Box<M>>`.
+impl<
+    'a,
+    MP,
+    LabelTag,
+    TypeTag,
+    FieldsType,
+    SharedType,
+    FieldMessageAsRefType, // typically `Box<M>`
+    FieldMessageType,      // `M`
+    const NUMBER: i32,
+>
+    MethodImpl<
+        'a,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        True,
+        True,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>>,
+    FieldMessageAsRefType: 'a + AsMessageRef<MessageType = FieldMessageType>,
+    FieldMessageType: 'a,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+{
+    type ReturnType = Option<&'a FieldMessageType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+        field.as_ref().map(|ref_msg| ref_msg.as_message_ref())
+    }
+}
+
 /// ###########################################################
 
 // (optional|required) numeric field
