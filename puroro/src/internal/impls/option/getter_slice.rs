@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::OptionShared;
-use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImpl};
+use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImplImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
@@ -21,7 +21,7 @@ use crate::{tags, AsMessageImplRef};
 // repeated field
 // Assuming the internal type's getter type is `&[T]` type
 impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
-    GetSliceFieldMethodImpl<
+    GetSliceFieldMethodImplImpl<
         'a,
         tags::OptionImpl,
         tags::Repeated,

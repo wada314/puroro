@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::OptionShared;
-use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
+use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImplImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
@@ -22,7 +22,7 @@ use crate::{tags, AsMessageImplRef};
 // If the inner `Option` is `Some` then delegate to the inner type.
 // If it's `None`, then just return `None`.
 impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, _1, const NUMBER: i32>
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::OptionImpl,
         tags::NonRepeatedLabel<_1>,

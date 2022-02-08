@@ -14,7 +14,7 @@
 
 use super::{IntoMergedMessage, MergedShared};
 use crate::internal::methods::{
-    GetFieldMethod, GetOptFieldMethod, GetOptFieldMethodImpl, HasFieldMethod,
+    GetFieldMethod, GetOptFieldMethod, GetOptFieldMethodImplImpl, HasFieldMethod,
 };
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::tags;
@@ -36,7 +36,7 @@ impl<
     _4,
     const NUMBER: i32,
 >
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::MergedImpl,
         tags::NonRepeatedLabel<_1>,
@@ -91,7 +91,7 @@ impl<
     _1,
     const NUMBER: i32,
 >
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::MergedImpl,
         tags::NonRepeatedLabel<_1>,

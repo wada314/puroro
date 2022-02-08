@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::EitherShared;
-use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImpl};
+use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImplImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
@@ -31,7 +31,7 @@ impl<
     SliceType,
     const NUMBER: i32,
 >
-    GetSliceFieldMethodImpl<
+    GetSliceFieldMethodImplImpl<
         'a,
         tags::EitherImpl,
         tags::Repeated,

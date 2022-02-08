@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::{EitherShared, IntoEitherMessage};
-use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
+use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImplImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::{AsMessageImplRef, Either, MessageImpl};
@@ -34,7 +34,7 @@ impl<
     _4,
     const NUMBER: i32,
 >
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::EitherImpl,
         tags::NonRepeatedLabel<_1>,
@@ -92,7 +92,7 @@ impl<
     _1,
     const NUMBER: i32,
 >
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::EitherImpl,
         tags::NonRepeatedLabel<_1>,

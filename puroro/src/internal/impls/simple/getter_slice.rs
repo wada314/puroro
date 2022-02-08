@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetSliceFieldMethodImpl;
+use crate::internal::methods::GetSliceFieldMethodImplImpl;
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
@@ -20,7 +20,7 @@ use ::std::ops::Deref;
 
 // repeated field
 impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, TypeTag, const NUMBER: i32>
-    GetSliceFieldMethodImpl<
+    GetSliceFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::Repeated,

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetOptFieldMethodImpl;
+use crate::internal::methods::GetOptFieldMethodImplImpl;
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
@@ -21,7 +21,7 @@ use crate::MessageImpl;
 
 // (optional|required) numeric field
 impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
@@ -52,7 +52,7 @@ where
 
 // (optional|required) (string|bytes) field
 impl<'a, MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
@@ -95,7 +95,7 @@ impl<
     _1,
     const NUMBER: i32,
 >
-    GetOptFieldMethodImpl<
+    GetOptFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,

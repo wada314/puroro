@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetMutFieldMethodImpl;
+use crate::internal::methods::GetMutFieldMethodImplImpl;
 use crate::internal::{Bitfield, SharedAllocator, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties};
 use crate::{tags, AsMessageMut, AsMessageRef};
@@ -20,7 +20,7 @@ use crate::{DefaultIn, MessageImpl};
 
 // (optional|required) non-message field
 impl<'a, MP, FieldsType, SharedType, FieldType, _1, _2, const NUMBER: i32>
-    GetMutFieldMethodImpl<
+    GetMutFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
@@ -50,7 +50,7 @@ where
 
 // (optional|required) string|bytes field
 impl<'a, MP, FieldsType, SharedType, FieldType, Alloc, _1, _2, const NUMBER: i32>
-    GetMutFieldMethodImpl<
+    GetMutFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
@@ -94,7 +94,7 @@ impl<
     _1,
     const NUMBER: i32,
 >
-    GetMutFieldMethodImpl<
+    GetMutFieldMethodImplImpl<
         'a,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,

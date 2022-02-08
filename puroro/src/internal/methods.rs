@@ -51,6 +51,20 @@ pub trait GetFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
+pub trait GetOptFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
+}
+pub trait GetSliceFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
+}
+
+pub trait GetMutFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a mut self) -> Self::ReturnType;
+}
+
 pub trait GetFieldMethodImplImpl<
     'a,
     ImplTag,
@@ -104,7 +118,7 @@ where
     }
 }
 
-pub trait GetOptFieldMethodImpl<
+pub trait GetOptFieldMethodImplImpl<
     'a,
     ImplTag,
     LabelTag,
@@ -121,7 +135,7 @@ pub trait GetOptFieldMethodImpl<
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
     GetOptFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetOptFieldMethodImpl<
+    Self: GetOptFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -135,7 +149,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type ReturnType = <Self as GetOptFieldMethodImpl<
+    type ReturnType = <Self as GetOptFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -145,7 +159,7 @@ where
         NUMBER,
     >>::ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
-        <Self as GetOptFieldMethodImpl<
+        <Self as GetOptFieldMethodImplImpl<
             ImplTag,
             LabelTag,
             TypeTag,
@@ -156,7 +170,7 @@ where
     }
 }
 
-pub trait GetSliceFieldMethodImpl<
+pub trait GetSliceFieldMethodImplImpl<
     'a,
     ImplTag,
     LabelTag,
@@ -173,7 +187,7 @@ pub trait GetSliceFieldMethodImpl<
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
     GetSliceFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetSliceFieldMethodImpl<
+    Self: GetSliceFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -187,7 +201,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type ReturnType = <Self as GetSliceFieldMethodImpl<
+    type ReturnType = <Self as GetSliceFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -197,7 +211,7 @@ where
         NUMBER,
     >>::ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
-        <Self as GetSliceFieldMethodImpl<
+        <Self as GetSliceFieldMethodImplImpl<
             'a,
             ImplTag,
             LabelTag,
@@ -209,7 +223,7 @@ where
     }
 }
 
-pub trait GetMutFieldMethodImpl<
+pub trait GetMutFieldMethodImplImpl<
     'a,
     ImplTag,
     LabelTag,
@@ -226,7 +240,7 @@ pub trait GetMutFieldMethodImpl<
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
     GetMutFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetMutFieldMethodImpl<
+    Self: GetMutFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -240,7 +254,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type ReturnType = <Self as GetMutFieldMethodImpl<
+    type ReturnType = <Self as GetMutFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -250,7 +264,7 @@ where
         NUMBER,
     >>::ReturnType;
     fn invoke(&'a mut self) -> Self::ReturnType {
-        <Self as GetMutFieldMethodImpl<
+        <Self as GetMutFieldMethodImplImpl<
             'a,
             ImplTag,
             LabelTag,
