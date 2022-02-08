@@ -12,12 +12,79 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetOptFieldMethodImplImpl;
+use crate::internal::bool::{False, True};
+use crate::internal::methods::{GetOptFieldMethodImpl, GetOptFieldMethodImplImpl};
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::AsMessageRef;
 use crate::MessageImpl;
+
+trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, IsMessage, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
+}
+
+impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+    GetOptFieldMethodImpl<'a, tags::SimpleImpl, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    Self: MethodImpl<
+        'a,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        <TypeTag as tags::FieldTypeTag>::IsLd,
+        <TypeTag as tags::FieldTypeTag>::IsMessage,
+        NUMBER,
+        ReturnType = ReturnType,
+    >,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    FieldsType: HasField<NUMBER>,
+    TypeTag: tags::FieldTypeTag,
+{
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        MethodImpl::invoke(self)
+    }
+}
+
+// (optional|required) numeric field
+impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, NumType, const NUMBER: i32>
+    MethodImpl<
+        'a,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        False,
+        False,
+        NUMBER,
+    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    TypeTag: tags::NumericalTypeTag<NativeType = NumType>,
+    <FieldsType as HasField<NUMBER>>::Type: Clone + Into<NumType>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
+    SharedType: SharedBitfield,
+{
+    type ReturnType = Option<NumType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let opt_bit_index = <MP::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
+        if self.shared.bitfield().get(opt_bit_index) {
+            let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+            Some(field.clone().into())
+        } else {
+            None
+        }
+    }
+}
+
+/// ###########################################################
 
 // (optional|required) numeric field
 impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>

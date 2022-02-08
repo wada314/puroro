@@ -20,6 +20,8 @@ use crate::internal::bool::{False, True};
 /// `wire_tag<value::value_tag>`.
 pub trait FieldTypeTag {
     type DefaultValueType;
+    type IsLd;
+    type IsMessage;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -105,57 +107,93 @@ pub type NeedOptionalBitLabel<_1> = (False, (False, (True, _1)));
 
 impl FieldTypeTag for Int32 {
     type DefaultValueType = i32;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for Int64 {
     type DefaultValueType = i64;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for UInt32 {
     type DefaultValueType = u32;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for UInt64 {
     type DefaultValueType = u64;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for SInt32 {
     type DefaultValueType = i32;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for SInt64 {
     type DefaultValueType = i64;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for Bool {
     type DefaultValueType = bool;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for Bytes {
     type DefaultValueType = &'static [u8];
+    type IsLd = True;
+    type IsMessage = False;
 }
 impl FieldTypeTag for String {
     type DefaultValueType = &'static str;
+    type IsLd = True;
+    type IsMessage = False;
 }
 impl<E> FieldTypeTag for Enum2<E> {
     type DefaultValueType = E;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl<E> FieldTypeTag for Enum3<E> {
     type DefaultValueType = E;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl<M> FieldTypeTag for Message<M> {
     type DefaultValueType = (); // Never be instanciated
+    type IsLd = True;
+    type IsMessage = True;
 }
 impl FieldTypeTag for Float {
     type DefaultValueType = f32;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for Double {
     type DefaultValueType = f64;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for Fixed32 {
     type DefaultValueType = u32;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for Fixed64 {
     type DefaultValueType = u64;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for SFixed32 {
     type DefaultValueType = i32;
+    type IsLd = False;
+    type IsMessage = False;
 }
 impl FieldTypeTag for SFixed64 {
     type DefaultValueType = i64;
+    type IsLd = False;
+    type IsMessage = False;
 }
 
 impl NumericalTypeTag for Int32 {
