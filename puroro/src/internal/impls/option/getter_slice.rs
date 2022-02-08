@@ -20,7 +20,7 @@ use crate::{tags, AsMessageImplRef};
 
 // repeated field
 // Assuming the internal type's getter type is `&[T]` type
-impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, const NUMBER: i32>
+impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
     GetSliceFieldMethodImpl<
         'a,
         tags::OptionImpl,
@@ -35,16 +35,16 @@ where
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
     InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
-    InnerMessage: 'a + GetSliceFieldMethod<'a, NUMBER, GetterType = InnerGetterType>,
-    InnerGetterType: Default,
+    InnerMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
+    InnerReturnType: Default,
 {
-    type GetterType = InnerGetterType;
-    fn get_slice(&'a self) -> Self::GetterType {
+    type ReturnType = InnerReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
         self.shared
             .option
             .as_ref()
             .map(|msg| {
-                <InnerMessage as GetSliceFieldMethod<NUMBER>>::get_slice(
+                <InnerMessage as GetSliceFieldMethod<NUMBER>>::invoke(
                     <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                 )
             })

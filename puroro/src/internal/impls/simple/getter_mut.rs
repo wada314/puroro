@@ -36,8 +36,8 @@ where
     FieldType: 'a + Default,
     SharedType: SharedBitfield,
 {
-    type GetterType = &'a mut FieldType;
-    fn get_mut(&'a mut self) -> Self::GetterType {
+    type ReturnType = &'a mut FieldType;
+    fn invoke(&'a mut self) -> Self::ReturnType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
@@ -68,8 +68,8 @@ where
     SharedType: SharedBitfield + SharedAllocator<AllocatorType = Alloc>,
     Alloc: Clone,
 {
-    type GetterType = &'a mut FieldType;
-    fn get_mut(&'a mut self) -> Self::GetterType {
+    type ReturnType = &'a mut FieldType;
+    fn invoke(&'a mut self) -> Self::ReturnType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
@@ -115,8 +115,8 @@ where
     SharedType: SharedAllocator<AllocatorType = Alloc>,
     Alloc: Clone,
 {
-    type GetterType = &'a mut FieldMessageType;
-    fn get_mut(&'a mut self) -> Self::GetterType {
+    type ReturnType = &'a mut FieldMessageType;
+    fn invoke(&'a mut self) -> Self::ReturnType {
         let field_opt = <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields);
         field_opt
             .get_or_insert_with(|| DefaultIn::default_in(self.shared.alloc().clone()))

@@ -21,18 +21,18 @@ use super::impls::option::IntoOptionMessage;
 //################ Methods interfaces ################
 
 pub trait GetFieldMethod<'a, const NUMBER: i32> {
-    type GetterType;
-    fn get(&'a self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
-    type GetterType;
-    fn get_opt(&'a self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetSliceFieldMethod<'a, const NUMBER: i32> {
-    type GetterType;
-    fn get_slice(&'a self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
 }
 
 pub trait HasFieldMethod<'a, const NUMBER: i32> {
@@ -40,8 +40,8 @@ pub trait HasFieldMethod<'a, const NUMBER: i32> {
 }
 
 pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
-    type GetterType;
-    fn get_mut(&'a mut self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a mut self) -> Self::ReturnType;
 }
 
 //################ Methods Impl traits, for specialization ################
@@ -61,8 +61,8 @@ pub trait GetFieldMethodImplImpl<
     const NUMBER: i32,
 >
 {
-    type GetterType;
-    fn get(&'a self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
 }
 
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
@@ -82,7 +82,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type GetterType = <Self as GetFieldMethodImplImpl<
+    type ReturnType = <Self as GetFieldMethodImplImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -90,8 +90,8 @@ where
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
-    >>::GetterType;
-    fn get(&'a self) -> Self::GetterType {
+    >>::ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
         <Self as GetFieldMethodImplImpl<
             'a,
             ImplTag,
@@ -100,7 +100,7 @@ where
             <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
             NUMBER,
-        >>::get(self)
+        >>::invoke(self)
     }
 }
 
@@ -114,8 +114,8 @@ pub trait GetOptFieldMethodImpl<
     const NUMBER: i32,
 >
 {
-    type GetterType;
-    fn get_opt(&'a self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
 }
 
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
@@ -135,7 +135,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type GetterType = <Self as GetOptFieldMethodImpl<
+    type ReturnType = <Self as GetOptFieldMethodImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -143,8 +143,8 @@ where
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
-    >>::GetterType;
-    fn get_opt(&'a self) -> Self::GetterType {
+    >>::ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
         <Self as GetOptFieldMethodImpl<
             ImplTag,
             LabelTag,
@@ -152,7 +152,7 @@ where
             <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
             NUMBER,
-        >>::get_opt(self)
+        >>::invoke(self)
     }
 }
 
@@ -166,8 +166,8 @@ pub trait GetSliceFieldMethodImpl<
     const NUMBER: i32,
 >
 {
-    type GetterType;
-    fn get_slice(&'a self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
 }
 
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
@@ -187,7 +187,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type GetterType = <Self as GetSliceFieldMethodImpl<
+    type ReturnType = <Self as GetSliceFieldMethodImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -195,8 +195,8 @@ where
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
-    >>::GetterType;
-    fn get_slice(&'a self) -> Self::GetterType {
+    >>::ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
         <Self as GetSliceFieldMethodImpl<
             'a,
             ImplTag,
@@ -205,7 +205,7 @@ where
             <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
             NUMBER,
-        >>::get_slice(self)
+        >>::invoke(self)
     }
 }
 
@@ -219,8 +219,8 @@ pub trait GetMutFieldMethodImpl<
     const NUMBER: i32,
 >
 {
-    type GetterType;
-    fn get_mut(&'a mut self) -> Self::GetterType;
+    type ReturnType;
+    fn invoke(&'a mut self) -> Self::ReturnType;
 }
 
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
@@ -240,7 +240,7 @@ where
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
 {
-    type GetterType = <Self as GetMutFieldMethodImpl<
+    type ReturnType = <Self as GetMutFieldMethodImpl<
         'a,
         ImplTag,
         LabelTag,
@@ -248,8 +248,8 @@ where
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         NUMBER,
-    >>::GetterType;
-    fn get_mut(&'a mut self) -> Self::GetterType {
+    >>::ReturnType;
+    fn invoke(&'a mut self) -> Self::ReturnType {
         <Self as GetMutFieldMethodImpl<
             'a,
             ImplTag,
@@ -258,15 +258,15 @@ where
             <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
             NUMBER,
-        >>::get_mut(self)
+        >>::invoke(self)
     }
 }
 
 //################ Blanket impls for get() methods ################
 
 // (optional|required|[unlabeled]) non-ld field
-// Call get_opt method, and returns a default value if it's `None`.
-impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: i32>
+// Call invoke method, and returns a default value if it's `None`.
+impl<'a, MP, ImplTag, FieldsType, SharedType, ReturnType, _1, _2, const NUMBER: i32>
     GetFieldMethodImplImpl<
         'a,
         ImplTag,
@@ -281,20 +281,20 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::NonLdType<_2>>,
     tags::NonLdType<_2>: tags::FieldTypeTag,
-    <tags::NonLdType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<GetterType>,
-    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
+    <tags::NonLdType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<ReturnType>,
+    Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
 {
-    type GetterType = GetterType;
-    fn get(&'a self) -> Self::GetterType {
-        let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(&self);
-        value_opt.unwrap_or(Into::<GetterType>::into(Clone::clone(
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::invoke(&self);
+        value_opt.unwrap_or(Into::<ReturnType>::into(Clone::clone(
             &<<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
         )))
     }
 }
 
 // (optional|required|[unlabeled]) (string|bytes) field
-// Call get_opt method, and returns a default value if it's `None`.
+// Call invoke method, and returns a default value if it's `None`.
 impl<'a, MP, ImplTag, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
     GetFieldMethodImplImpl<
         'a,
@@ -313,11 +313,11 @@ where
     tags::StringOrBytesType<_2>: tags::FieldTypeTag<DefaultValueType = &'static BorrowedType>,
     tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
     BorrowedType: 'static + ?Sized,
-    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a BorrowedType>>,
+    Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<&'a BorrowedType>>,
 {
-    type GetterType = &'a BorrowedType;
-    fn get(&'a self) -> Self::GetterType {
-        let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(self);
+    type ReturnType = &'a BorrowedType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::invoke(self);
         value_opt.unwrap_or(
             <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
         )
@@ -325,7 +325,7 @@ where
 }
 
 // (optional|required|[unlabeled]) message field
-impl<'a, MP, ImplTag, FieldMP, GetterType, FieldsType, SharedType, _1, const NUMBER: i32>
+impl<'a, MP, ImplTag, FieldMP, ReturnType, FieldsType, SharedType, _1, const NUMBER: i32>
     GetFieldMethodImplImpl<
         'a,
         ImplTag,
@@ -340,24 +340,24 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<FieldMP>>,
-    Self: GetOptFieldMethod<'a, NUMBER, GetterType = GetterType>,
-    GetterType: IntoOptionMessage<FieldMP>,
+    Self: GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
+    ReturnType: IntoOptionMessage<FieldMP>,
 {
-    type GetterType = <GetterType as IntoOptionMessage<FieldMP>>::OptionMessage;
-    fn get(&'a self) -> Self::GetterType {
-        let msg_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::get_opt(self);
-        <GetterType as IntoOptionMessage<FieldMP>>::into_message(msg_opt)
+    type ReturnType = <ReturnType as IntoOptionMessage<FieldMP>>::OptionMessage;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let msg_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::invoke(self);
+        <ReturnType as IntoOptionMessage<FieldMP>>::into_message(msg_opt)
     }
 }
 
 //################ Blanket impls for has() methods ################
 
-impl<'a, MP, ImplTag, FieldsType, SharedType, GetterType, const NUMBER: i32>
+impl<'a, MP, ImplTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
     HasFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
+    Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
 {
     fn has(&'a self) -> bool {
-        <Self as GetOptFieldMethod<NUMBER>>::get_opt(self).is_some()
+        <Self as GetOptFieldMethod<NUMBER>>::invoke(self).is_some()
     }
 }

@@ -52,19 +52,15 @@ where
         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetSliceFieldMethod<'a, NUMBER, GetterType = SliceType>,
-    RightMessage: 'a + GetSliceFieldMethod<'a, NUMBER, GetterType = SliceType>,
+    LeftMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = SliceType>,
+    RightMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = SliceType>,
 {
-    type GetterType = SliceType;
-    fn get_slice(&'a self) -> Self::GetterType {
+    type ReturnType = SliceType;
+    fn invoke(&'a self) -> Self::ReturnType {
         self.shared.either.as_ref().either(
-            |left| {
-                <LeftMessage as GetSliceFieldMethod<NUMBER>>::get_slice(left.as_message_impl_ref())
-            },
+            |left| <LeftMessage as GetSliceFieldMethod<NUMBER>>::invoke(left.as_message_impl_ref()),
             |right| {
-                <RightMessage as GetSliceFieldMethod<NUMBER>>::get_slice(
-                    right.as_message_impl_ref(),
-                )
+                <RightMessage as GetSliceFieldMethod<NUMBER>>::invoke(right.as_message_impl_ref())
             },
         )
     }

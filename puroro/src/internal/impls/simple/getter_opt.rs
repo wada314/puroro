@@ -38,8 +38,8 @@ where
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<NumType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = Option<NumType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
@@ -70,8 +70,8 @@ where
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<&'a BorrowedType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = Option<&'a BorrowedType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
@@ -111,8 +111,8 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
 {
-    type GetterType = Option<&'a FieldMessageType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = Option<&'a FieldMessageType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
         field.as_ref().map(|ref_msg| ref_msg.as_message_ref())
     }

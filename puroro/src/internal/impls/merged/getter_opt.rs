@@ -29,7 +29,7 @@ impl<
     RightMessageRef,
     LeftMessage,
     RightMessage,
-    GetterType,
+    ReturnType,
     _1,
     _2,
     _3,
@@ -59,17 +59,17 @@ where
     >,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
-    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
+    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
+    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
 {
-    type GetterType = Option<GetterType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = Option<ReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         let (left, right) = (&self.shared.left, &self.shared.right);
-        let right_opt = <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+        let right_opt = <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
             <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&right),
         );
         right_opt.or_else(|| {
-            <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+            <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
                 <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&left),
             )
         })
@@ -85,9 +85,9 @@ impl<
     RightMessageRef,
     LeftMessage,
     RightMessage,
-    LeftGetterType,
-    RightGetterType,
-    FinalGetterType,
+    LeftReturnType,
+    RightReturnType,
+    FinalReturnType,
     _1,
     const NUMBER: i32,
 >
@@ -113,13 +113,13 @@ where
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage:
-        'a + GetFieldMethod<'a, NUMBER, GetterType = LeftGetterType> + HasFieldMethod<'a, NUMBER>,
+        'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType> + HasFieldMethod<'a, NUMBER>,
     RightMessage:
-        'a + GetFieldMethod<'a, NUMBER, GetterType = RightGetterType> + HasFieldMethod<'a, NUMBER>,
-    (LeftGetterType, RightGetterType): IntoMergedMessage<InnerMP, MergedMessage = FinalGetterType>,
+        'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType> + HasFieldMethod<'a, NUMBER>,
+    (LeftReturnType, RightReturnType): IntoMergedMessage<InnerMP, MergedMessage = FinalReturnType>,
 {
-    type GetterType = Option<FinalGetterType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = Option<FinalReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         let (left, right) = (&self.shared.left, &self.shared.right);
         let left_message_impl_ref =
             <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&left);
@@ -129,8 +129,9 @@ where
         let has_left = <LeftMessage as HasFieldMethod<NUMBER>>::has(left_message_impl_ref);
         let has_right = <RightMessage as HasFieldMethod<NUMBER>>::has(right_message_impl_ref);
         if has_left || has_right {
-            let left_field = <LeftMessage as GetFieldMethod<NUMBER>>::get(left_message_impl_ref);
-            let right_field = <RightMessage as GetFieldMethod<NUMBER>>::get(right_message_impl_ref);
+            let left_field = <LeftMessage as GetFieldMethod<NUMBER>>::invoke(left_message_impl_ref);
+            let right_field =
+                <RightMessage as GetFieldMethod<NUMBER>>::invoke(right_message_impl_ref);
             Some(IntoMergedMessage::into_message((left_field, right_field)))
         } else {
             None

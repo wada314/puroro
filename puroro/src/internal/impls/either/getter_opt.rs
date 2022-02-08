@@ -27,7 +27,7 @@ impl<
     RightMessageRef,
     LeftMessage,
     RightMessage,
-    GetterType,
+    ReturnType,
     _1,
     _2,
     _3,
@@ -57,19 +57,19 @@ where
     >,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = GetterType>,
-    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = GetterType>,
+    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
+    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
 {
-    type GetterType = GetterType;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
         self.shared.either.as_ref().either(
             |msg| {
-                <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
                     <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                 )
             },
             |msg| {
-                <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
                     <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                 )
             },
@@ -86,9 +86,9 @@ impl<
     RightMessageRef,
     LeftMessage,
     RightMessage,
-    LeftGetterType,
-    RightGetterType,
-    FinalGetterType,
+    LeftReturnType,
+    RightReturnType,
+    FinalReturnType,
     _1,
     const NUMBER: i32,
 >
@@ -113,30 +113,30 @@ where
         FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<InnerMP>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<LeftGetterType>>,
-    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<RightGetterType>>,
-    Either<LeftGetterType, RightGetterType>:
-        IntoEitherMessage<InnerMP, EitherMessage = FinalGetterType>,
+    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<LeftReturnType>>,
+    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<RightReturnType>>,
+    Either<LeftReturnType, RightReturnType>:
+        IntoEitherMessage<InnerMP, EitherMessage = FinalReturnType>,
 {
-    type GetterType = Option<FinalGetterType>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type ReturnType = Option<FinalReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         self.shared
             .either
             .as_ref()
             .either(
                 |msg| {
-                    <LeftMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                    <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
                         <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                     )
                     .map(|l| Either::Left(l))
                 },
                 |msg| {
-                    <RightMessage as GetOptFieldMethod<NUMBER>>::get_opt(
+                    <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
                         <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                     )
                     .map(|r| Either::Right(r))
                 },
-            ) // Option<Either<LeftGetterType, RightGetterType>
+            ) // Option<Either<LeftReturnType, RightReturnType>
             .map(|e| e.into_message())
     }
 }

@@ -37,8 +37,8 @@ where
     CollectionType: 'a + Deref<Target = [ItemType]>,
     ItemType: 'a,
 {
-    type GetterType = &'a [ItemType];
-    fn get_slice(&'a self) -> Self::GetterType {
+    type ReturnType = &'a [ItemType];
+    fn invoke(&'a self) -> Self::ReturnType {
         <FieldsType as HasField<NUMBER>>::get(&self.fields).deref()
     }
 }

@@ -54,8 +54,8 @@ where
     InnerIterType: Iterator<Item = &'a ItemType>,
     ItemType: 'a + Clone + Into<NumType>,
 {
-    type GetterType = MapInto<Cloned<InnerIterType>, NumType>;
-    fn get(&'a self) -> Self::GetterType {
+    type ReturnType = MapInto<Cloned<InnerIterType>, NumType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         let slice = <FieldsType as HasField<NUMBER>>::get(&self.fields);
         slice.into_iter().cloned().map_into::<NumType>()
     }
@@ -81,8 +81,8 @@ where
     FieldType: 'a,
     &'a FieldType: IntoIterator<IntoIter = InnerIterType>,
 {
-    type GetterType = InnerIterType;
-    fn get(&'a self) -> Self::GetterType {
+    type ReturnType = InnerIterType;
+    fn invoke(&'a self) -> Self::ReturnType {
         let slice = <FieldsType as HasField<NUMBER>>::get(&self.fields);
         slice.into_iter()
     }

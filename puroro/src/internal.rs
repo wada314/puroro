@@ -145,8 +145,8 @@ macro_rules! define_fields_container {
 #[macro_export]
 macro_rules! define_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$($lt, )* $num>>::GetterType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$num>>::get(
+        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$($lt, )* $num>>::ReturnType {
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$num>>::invoke(
                 self.as_message_impl_ref(),
             )
         }
@@ -156,8 +156,8 @@ macro_rules! define_getter {
 #[macro_export]
 macro_rules! define_opt_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$($lt, )* $num>>::GetterType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$num>>::get_opt(
+        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$($lt, )* $num>>::ReturnType {
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$num>>::invoke(
                 self.as_message_impl_ref(),
             )
         }
@@ -167,8 +167,8 @@ macro_rules! define_opt_getter {
 #[macro_export]
 macro_rules! define_slice_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$($lt, )* $num>>::GetterType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$num>>::get_slice(
+        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$($lt, )* $num>>::ReturnType {
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$num>>::invoke(
                 self.as_message_impl_ref(),
             )
         }
@@ -178,8 +178,8 @@ macro_rules! define_slice_getter {
 #[macro_export]
 macro_rules! define_mut_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? mut self)) => {
-        $pub fn $id(&$($lt)* mut self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$($lt, )* $num>>::GetterType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::get_mut(
+        $pub fn $id(&$($lt)* mut self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$($lt, )* $num>>::ReturnType {
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::invoke(
                 self.as_message_impl_mut(),
             )
         }

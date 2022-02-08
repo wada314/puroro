@@ -28,8 +28,8 @@ impl<
     RightMessageRef,
     LeftMessage,
     RightMessage,
-    LeftGetterType,
-    RightGetterType,
+    LeftReturnType,
+    RightReturnType,
     const NUMBER: i32,
 >
     GetFieldMethodImplImpl<
@@ -53,22 +53,22 @@ where
         FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::StringOrBytesType<_1>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = LeftGetterType>,
-    RightMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = RightGetterType>,
-    LeftGetterType: IntoIterator,
-    RightGetterType: IntoIterator,
+    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
+    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
+    LeftReturnType: IntoIterator,
+    RightReturnType: IntoIterator,
 {
-    type GetterType = EitherRepeatedField<LeftGetterType, RightGetterType>;
-    fn get(&'a self) -> Self::GetterType {
+    type ReturnType = EitherRepeatedField<LeftReturnType, RightReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
         EitherRepeatedField(
             self.shared
                 .either
                 .as_ref()
                 .map_left(|left| {
-                    <LeftMessage as GetFieldMethod<NUMBER>>::get(left.as_message_impl_ref())
+                    <LeftMessage as GetFieldMethod<NUMBER>>::invoke(left.as_message_impl_ref())
                 })
                 .map_right(|right| {
-                    <RightMessage as GetFieldMethod<NUMBER>>::get(right.as_message_impl_ref())
+                    <RightMessage as GetFieldMethod<NUMBER>>::invoke(right.as_message_impl_ref())
                 }),
         )
     }

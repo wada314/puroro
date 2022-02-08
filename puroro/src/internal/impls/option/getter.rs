@@ -22,7 +22,7 @@ use ::std::option;
 
 // repeated field
 // Wrap the internal message's iterator by `std::option::IntoIter`, and then flatten it.
-impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerGetterType, const NUMBER: i32>
+impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
     GetFieldMethodImplImpl<
         'a,
         tags::OptionImpl,
@@ -37,16 +37,16 @@ where
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
     InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
-    InnerMessage: 'a + GetFieldMethod<'a, NUMBER, GetterType = InnerGetterType>,
-    InnerGetterType: Iterator,
+    InnerMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
+    InnerReturnType: Iterator,
 {
-    type GetterType = iter::Flatten<option::IntoIter<InnerGetterType>>;
-    fn get(&'a self) -> Self::GetterType {
+    type ReturnType = iter::Flatten<option::IntoIter<InnerReturnType>>;
+    fn invoke(&'a self) -> Self::ReturnType {
         self.shared
             .option
             .as_ref()
             .map(|msg| {
-                <InnerMessage as GetFieldMethod<NUMBER>>::get(
+                <InnerMessage as GetFieldMethod<NUMBER>>::invoke(
                     <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
                 )
             })
