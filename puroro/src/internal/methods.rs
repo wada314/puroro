@@ -119,20 +119,6 @@ where
     }
 }
 
-pub trait GetOptFieldMethodImplImpl<
-    'a,
-    ImplTag,
-    LabelTag,
-    TypeTag,
-    FieldType,
-    SharedType,
-    const NUMBER: i32,
->
-{
-    type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
-}
-
 impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
     GetOptFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where

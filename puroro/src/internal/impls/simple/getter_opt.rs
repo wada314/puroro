@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::bool::{False, True};
-use crate::internal::methods::{GetOptFieldMethodImpl, GetOptFieldMethodImplImpl};
+use crate::internal::methods::GetOptFieldMethodImpl;
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
@@ -138,107 +138,6 @@ impl<
         SharedType,
         True,
         True,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
-where
-    FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>>,
-    FieldMessageAsRefType: 'a + AsMessageRef<MessageType = FieldMessageType>,
-    FieldMessageType: 'a,
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-{
-    type ReturnType = Option<&'a FieldMessageType>;
-    fn invoke(&'a self) -> Self::ReturnType {
-        let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
-        field.as_ref().map(|ref_msg| ref_msg.as_message_ref())
-    }
-}
-
-/// ###########################################################
-
-// (optional|required) numeric field
-impl<'a, MP, FieldsType, SharedType, NumType, _1, _2, const NUMBER: i32>
-    GetOptFieldMethodImplImpl<
-        'a,
-        tags::SimpleImpl,
-        tags::NeedOptionalBitLabel<_1>,
-        tags::NonLdType<_2>,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
-where
-    FieldsType: HasField<NUMBER>,
-    tags::NonLdType<_2>: tags::NumericalTypeTag<NativeType = NumType>,
-    <FieldsType as HasField<NUMBER>>::Type: Clone + Into<NumType>,
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    SharedType: SharedBitfield,
-{
-    type ReturnType = Option<NumType>;
-    fn invoke(&'a self) -> Self::ReturnType {
-        let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
-        if self.shared.bitfield().get(opt_bit_index) {
-            let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
-            Some(field.clone().into())
-        } else {
-            None
-        }
-    }
-}
-
-// (optional|required) (string|bytes) field
-impl<'a, MP, FieldsType, SharedType, BorrowedType, _1, _2, const NUMBER: i32>
-    GetOptFieldMethodImplImpl<
-        'a,
-        tags::SimpleImpl,
-        tags::NeedOptionalBitLabel<_1>,
-        tags::StringOrBytesType<_2>,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
-where
-    FieldsType: HasField<NUMBER>,
-    <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
-    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
-    BorrowedType: 'a + ?Sized,
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    SharedType: SharedBitfield,
-{
-    type ReturnType = Option<&'a BorrowedType>;
-    fn invoke(&'a self) -> Self::ReturnType {
-        let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
-        if self.shared.bitfield().get(opt_bit_index) {
-            let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
-            Some(field.as_ref())
-        } else {
-            None
-        }
-    }
-}
-
-// (optional|required|[unlabeled]) message field
-// Typically the field type is `Option<Box<M>>`.
-impl<
-    'a,
-    MP,
-    FieldsType,
-    SharedType,
-    FieldMP,
-    FieldMessageAsRefType, // typically `Box<M>`
-    FieldMessageType,      // `M`
-    _1,
-    const NUMBER: i32,
->
-    GetOptFieldMethodImplImpl<
-        'a,
-        tags::SimpleImpl,
-        tags::NonRepeatedLabel<_1>,
-        tags::Message<FieldMP>,
-        Option<FieldMessageAsRefType>,
-        SharedType,
         NUMBER,
     > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where

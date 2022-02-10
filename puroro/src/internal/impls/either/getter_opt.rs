@@ -14,9 +14,7 @@
 
 use super::{EitherShared, IntoEitherMessage};
 use crate::internal::bool::{False, True};
-use crate::internal::methods::{
-    GetOptFieldMethod, GetOptFieldMethodImpl, GetOptFieldMethodImplImpl,
-};
+use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::{AsMessageImplRef, Either, MessageImpl};
@@ -142,132 +140,6 @@ where
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = LabelTag, TypeTag = tags::Message<InnerMP>>,
-    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
-    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<LeftReturnType>>,
-    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<RightReturnType>>,
-    Either<LeftReturnType, RightReturnType>:
-        IntoEitherMessage<InnerMP, EitherMessage = FinalReturnType>,
-{
-    type ReturnType = Option<FinalReturnType>;
-    fn invoke(&'a self) -> Self::ReturnType {
-        self.shared
-            .either
-            .as_ref()
-            .either(
-                |msg| {
-                    <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                        <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                    )
-                    .map(|l| Either::Left(l))
-                },
-                |msg| {
-                    <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                        <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                    )
-                    .map(|r| Either::Right(r))
-                },
-            ) // Option<Either<LeftReturnType, RightReturnType>
-            .map(|e| e.into_message())
-    }
-}
-
-// #########################################################
-
-// non-repeated non-message field
-// Assuming that the both message types returns the same type.
-impl<
-    'a,
-    MP,
-    LeftMessageRef,
-    RightMessageRef,
-    LeftMessage,
-    RightMessage,
-    ReturnType,
-    _1,
-    _2,
-    _3,
-    _4,
-    const NUMBER: i32,
->
-    GetOptFieldMethodImplImpl<
-        'a,
-        tags::EitherImpl,
-        tags::NonRepeatedLabel<_1>,
-        tags::NonMessageType<_2, _3, _4>,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-        NUMBER,
-    >
-    for MessageImpl<
-        MP,
-        tags::EitherImpl,
-        EmptyFields,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-    >
-where
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<
-        LabelTag = tags::NonRepeatedLabel<_1>,
-        TypeTag = tags::NonMessageType<_2, _3, _4>,
-    >,
-    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
-    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
-    RightMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
-{
-    type ReturnType = ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
-        self.shared.either.as_ref().either(
-            |msg| {
-                <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                    <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-            },
-            |msg| {
-                <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                    <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-            },
-        )
-    }
-}
-
-// non-repeated message field
-// Return `Either` of the both return types
-impl<
-    'a,
-    MP,
-    InnerMP,
-    LeftMessageRef,
-    RightMessageRef,
-    LeftMessage,
-    RightMessage,
-    LeftReturnType,
-    RightReturnType,
-    FinalReturnType,
-    _1,
-    const NUMBER: i32,
->
-    GetOptFieldMethodImplImpl<
-        'a,
-        tags::EitherImpl,
-        tags::NonRepeatedLabel<_1>,
-        tags::Message<InnerMP>,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-        NUMBER,
-    >
-    for MessageImpl<
-        MP,
-        tags::EitherImpl,
-        EmptyFields,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-    >
-where
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<InnerMP>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<LeftReturnType>>,
