@@ -32,10 +32,9 @@ where
 {
     type ReturnType = Option<InnerReturnType>;
     fn invoke(&'a self) -> Self::ReturnType {
-        self.shared.option.as_ref().and_then(|msg| {
-            <InnerMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-            )
-        })
+        self.shared
+            .option
+            .as_ref()
+            .and_then(|msg| GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
     }
 }
