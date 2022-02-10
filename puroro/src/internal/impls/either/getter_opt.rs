@@ -91,16 +91,8 @@ where
     type ReturnType = ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
         self.shared.either.as_ref().either(
-            |msg| {
-                <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                    <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-            },
-            |msg| {
-                <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                    <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-            },
+            |msg| GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()),
+            |msg| GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()),
         )
     }
 }
@@ -154,18 +146,14 @@ where
             .as_ref()
             .either(
                 |msg| {
-                    <LeftMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                        <LeftMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                    )
-                    .map(|l| Either::Left(l))
+                    GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref())
+                        .map(|l| Either::Left(l))
                 },
                 |msg| {
-                    <RightMessage as GetOptFieldMethod<NUMBER>>::invoke(
-                        <RightMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                    )
-                    .map(|r| Either::Right(r))
+                    GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref())
+                        .map(|r| Either::Right(r))
                 },
-            ) // Option<Either<LeftReturnType, RightReturnType>
+            ) // Option<Either<LeftReturnType, RightReturnType>>
             .map(|e| e.into_message())
     }
 }
