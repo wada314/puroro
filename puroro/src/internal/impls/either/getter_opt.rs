@@ -21,7 +21,7 @@ use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties}
 use crate::tags;
 use crate::{AsMessageImplRef, Either, MessageImpl};
 
-trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, const NUMBER: i32> {
+trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
@@ -36,7 +36,7 @@ where
         TypeTag,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
-        <TypeTag as tags::FieldTypeTag>::IsLd,
+        <TypeTag as tags::FieldTypeTag>::IsMessage,
         NUMBER,
         ReturnType = ReturnType,
     >,
@@ -52,7 +52,7 @@ where
     }
 }
 
-// non-repeated non-ld field
+// non-repeated non-message field
 // Assuming that the both message types returns the same type.
 impl<
     'a,
@@ -107,7 +107,7 @@ where
     }
 }
 
-// non-repeated ld field
+// non-repeated message field
 // Return `Either` of the both return types
 impl<
     'a,
