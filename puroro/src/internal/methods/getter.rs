@@ -12,18 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! Blanket impls for scalar `get()` methods.
+//! It just redirects to `get_opt()` method and unwrap or return a default value.
+
+use crate::internal::bool::{False, True};
 use crate::internal::impls::option::IntoOptionMessage;
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImplImpl, GetOptFieldMethod};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
-trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, const NUMBER: i32> {
+trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
-//################ Blanket impls for get() methods ################
+// (optional|required|[unlabeled]) non-ld field
+// Call `get_opt()` method, and returns a default value if it's `None`.
+impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+    MethodImpl<
+        'a,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        False,
+        False,
+        NUMBER,
+    > for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag,
+    TypeTag::DefaultValueType: Clone + Into<ReturnType>,
+    Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
+{
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::invoke(&self);
+        value_opt.unwrap_or(Into::<ReturnType>::into(Clone::clone(
+            &<<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
+        )))
+    }
+}
+
+/////////////////////////////////////////////////
 
 // (optional|required|[unlabeled]) non-ld field
 // Call invoke method, and returns a default value if it's `None`.
