@@ -46,7 +46,7 @@ pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
 
 //################ Methods Impl traits, for specialization ################
 
-pub trait GetFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
+pub trait GetFieldMethodImpl<'a, ImplTag, IsRepeated, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
@@ -119,14 +119,10 @@ where
     }
 }
 
-impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
-    GetOptFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+impl<'a, MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetOptFieldMethod<'a, NUMBER>
+    for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
     Self: GetOptFieldMethodImpl<'a, ImplTag, NUMBER>,
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
 {
     type ReturnType = <Self as GetOptFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {

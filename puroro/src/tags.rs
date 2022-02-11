@@ -38,6 +38,7 @@ pub trait StringOrBytesTypeTag {
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {
     const DO_DEFAULT_CHECK: bool;
+    type IsRepeated;
 }
 
 mod value {
@@ -250,18 +251,23 @@ impl StringOrBytesTypeTag for Bytes {
 
 impl FieldLabelTag for Repeated {
     const DO_DEFAULT_CHECK: bool = false;
+    type IsRepeated = True;
 }
 impl FieldLabelTag for Optional {
     const DO_DEFAULT_CHECK: bool = false;
+    type IsRepeated = False;
 }
 impl FieldLabelTag for Unlabeled {
     const DO_DEFAULT_CHECK: bool = true;
+    type IsRepeated = False;
 }
 impl FieldLabelTag for Required {
     const DO_DEFAULT_CHECK: bool = false;
+    type IsRepeated = False;
 }
 impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
+    type IsRepeated = False;
 }
 
 pub struct SimpleImpl;

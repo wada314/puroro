@@ -12,13 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetFieldMethodImplImpl;
+use crate::internal::bool::{False, True};
+use crate::internal::methods::{GetFieldMethodImpl, GetFieldMethodImplImpl};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 use ::itertools::structs::MapInto;
 use ::itertools::Itertools;
 use ::std::iter::Cloned;
+
+trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
+}
+
+impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+    GetFieldMethodImpl<'a, tags::SimpleImpl, False, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    Self: MethodImpl<
+        'a,
+        LabelTag,
+        TypeTag,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        <TypeTag as tags::FieldTypeTag>::IsLd,
+        NUMBER,
+        ReturnType = ReturnType,
+    >,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    FieldsType: HasField<NUMBER>,
+    TypeTag: tags::FieldTypeTag,
+{
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        MethodImpl::invoke(self)
+    }
+}
 
 // repeated non-ld field
 // `Clone` and then `Into` the iter value
