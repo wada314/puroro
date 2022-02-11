@@ -22,20 +22,18 @@ use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties}
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
-trait MethodImpl<'a, FieldType, SharedType, IsLd, IsMessage, const NUMBER: i32> {
+trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
 // (optional|required|[unlabeled]) non-ld field
 // Call `get_opt()` method, and returns a default value if it's `None`.
-impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
-    MethodImpl<'a, <FieldsType as HasField<NUMBER>>::Type, SharedType, False, False, NUMBER>
-    for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+impl<'a, MP, ImplTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+    MethodImpl<'a, False, False, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
     TypeTag::DefaultValueType: Clone + Into<ReturnType>,
     Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
@@ -44,20 +42,18 @@ where
     fn invoke(&'a self) -> Self::ReturnType {
         let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::invoke(&self);
         value_opt.unwrap_or(Into::<ReturnType>::into(Clone::clone(
-            &<<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
+            &MP::Fields::<NUMBER>::DEFAULT_VALUE,
         )))
     }
 }
 
 // (optional|required|[unlabeled]) (string|bytes) field
 // Call invoke method, and returns a default value if it's `None`.
-impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, BorrowedType, const NUMBER: i32>
-    MethodImpl<'a, <FieldsType as HasField<NUMBER>>::Type, SharedType, True, False, NUMBER>
-    for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+impl<'a, MP, ImplTag, TypeTag, FieldsType, SharedType, BorrowedType, const NUMBER: i32>
+    MethodImpl<'a, True, False, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag<DefaultValueType = &'static BorrowedType>,
     TypeTag: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
     BorrowedType: 'static + ?Sized,
@@ -66,9 +62,7 @@ where
     type ReturnType = &'a BorrowedType;
     fn invoke(&'a self) -> Self::ReturnType {
         let value_opt = GetOptFieldMethod::<NUMBER>::invoke(self);
-        value_opt.unwrap_or(
-            <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
-        )
+        value_opt.unwrap_or(MP::Fields::<NUMBER>::DEFAULT_VALUE)
     }
 }
 
