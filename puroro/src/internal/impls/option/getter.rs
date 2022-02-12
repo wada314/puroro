@@ -14,8 +14,8 @@
 
 use super::OptionShared;
 use crate::internal::bool::True;
-use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl, GetFieldMethodImplImpl};
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
+use crate::internal::{EmptyFields, FieldProperties, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 use ::std::iter;
@@ -39,43 +39,6 @@ where
             .option
             .as_ref()
             .map(|msg| GetFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
-            .into_iter()
-            .flatten()
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////
-
-// repeated field
-// Wrap the internal message's iterator by `std::option::IntoIter`, and then flatten it.
-impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
-    GetFieldMethodImplImpl<
-        'a,
-        tags::OptionImpl,
-        tags::Repeated,
-        TypeTag,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        OptionShared<InnerMessageRef>,
-        NUMBER,
-    > for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
-where
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
-    InnerMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
-    InnerReturnType: Iterator,
-{
-    type ReturnType = iter::Flatten<option::IntoIter<InnerReturnType>>;
-    fn invoke(&'a self) -> Self::ReturnType {
-        self.shared
-            .option
-            .as_ref()
-            .map(|msg| {
-                <InnerMessage as GetFieldMethod<NUMBER>>::invoke(
-                    <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-            })
             .into_iter()
             .flatten()
     }

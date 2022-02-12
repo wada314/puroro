@@ -18,8 +18,6 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 
-use super::impls::option::IntoOptionMessage;
-
 //################ Methods interfaces ################
 
 pub trait GetFieldMethod<'a, const NUMBER: i32> {
@@ -68,20 +66,6 @@ pub trait GetMutFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
     fn invoke(&'a mut self) -> Self::ReturnType;
 }
 
-pub trait GetFieldMethodImplImpl<
-    'a,
-    ImplTag,
-    LabelTag,
-    TypeTag,
-    FieldType,
-    SharedType,
-    const NUMBER: i32,
->
-{
-    type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
-}
-
 impl<'a, MP, ImplTag, LabelTag, FieldsType, SharedType, const NUMBER: i32>
     GetFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
@@ -104,7 +88,7 @@ where
 {
     type ReturnType = <Self as GetOptFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
-        <Self as GetOptFieldMethodImpl<ImplTag, NUMBER>>::invoke(self)
+        GetOptFieldMethodImpl::invoke(self)
     }
 }
 

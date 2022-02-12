@@ -14,8 +14,8 @@
 
 use super::{EitherRepeatedField, EitherShared};
 use crate::internal::bool::{False, True};
-use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl, GetFieldMethodImplImpl};
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
+use crate::internal::{EmptyFields, FieldProperties, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
@@ -74,64 +74,6 @@ where
                 .as_ref()
                 .map_left(|left| GetFieldMethod::<NUMBER>::invoke(left.as_message_impl_ref()))
                 .map_right(|right| GetFieldMethod::<NUMBER>::invoke(right.as_message_impl_ref())),
-        )
-    }
-}
-
-////////////////////////////////////////////////////////
-
-// repeated string | bytes field
-// Assuming the internal type's getter types are `IntoIterator`
-impl<
-    'a,
-    MP,
-    _1,
-    LeftMessageRef,
-    RightMessageRef,
-    LeftMessage,
-    RightMessage,
-    LeftReturnType,
-    RightReturnType,
-    const NUMBER: i32,
->
-    GetFieldMethodImplImpl<
-        'a,
-        tags::EitherImpl,
-        tags::Repeated,
-        tags::StringOrBytesType<_1>,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-        NUMBER,
-    >
-    for MessageImpl<
-        MP,
-        tags::EitherImpl,
-        EmptyFields,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-    >
-where
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::StringOrBytesType<_1>>,
-    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
-    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
-    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
-    LeftReturnType: IntoIterator,
-    RightReturnType: IntoIterator,
-{
-    type ReturnType = EitherRepeatedField<LeftReturnType, RightReturnType>;
-    fn invoke(&'a self) -> Self::ReturnType {
-        EitherRepeatedField(
-            self.shared
-                .either
-                .as_ref()
-                .map_left(|left| {
-                    <LeftMessage as GetFieldMethod<NUMBER>>::invoke(left.as_message_impl_ref())
-                })
-                .map_right(|right| {
-                    <RightMessage as GetFieldMethod<NUMBER>>::invoke(right.as_message_impl_ref())
-                }),
         )
     }
 }
