@@ -45,22 +45,3 @@ impl<T, U> ImplProperties for MergedImplProperties<T, U> {
     type FieldsType = EmptyFields;
     type SharedType = MergedShared<T, U>;
 }
-
-pub struct MergedRepeatedField<T, U>(T, U);
-impl<T, U> MergedRepeatedField<T, U> {
-    pub fn new(t: T, u: U) -> Self {
-        Self(t, u)
-    }
-}
-
-// impl<T, U> IntoIterator for MergedRepeatedField<T, U>
-// where
-//     T: IntoIterator,
-//     U: IntoIterator,
-// {
-//     type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
-//     type IntoIter = Chain<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
-//     fn into_iter(self) -> Self::IntoIter {
-//         todo!()
-//     }
-// }

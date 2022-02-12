@@ -17,7 +17,7 @@ use crate::internal::bool::{False, True};
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
 use crate::MessageImpl;
-use crate::{tags, AsMessageImplRef};
+use crate::{tags, AsMessageImplRef, Either};
 use ::std::iter;
 
 trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
@@ -99,38 +99,46 @@ where
 // And then returns an `IntoIterator<Item = Either<T::Item, U::Item>>`.
 // The both item types no need to be the same.
 // `Either` of 2 `AsRef<str>` types is `AsRef<str>` by itself too.
-// impl<
-//     'a,
-//     MP,
-//     FieldsType,
-//     LeftMessageRef,
-//     RightMessageRef,
-//     LeftMessage,
-//     RightMessage,
-//     LeftReturnType,
-//     RightReturnType,
-//     const NUMBER: i32,
-// > MethodImpl<'a, True, False, NUMBER>
-//     for MessageImpl<MP, tags::MergedImpl, FieldsType, EitherShared<LeftMessageRef, RightMessageRef>>
-// where
-//     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
-//     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-//     LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
-//     RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
-//     LeftReturnType: IntoIterator,
-//     RightReturnType: IntoIterator,
-// {
-//     type ReturnType = EitherIter<LeftReturnType::IntoIter, RightReturnType::IntoIter>;
-//     fn invoke(&'a self) -> Self::ReturnType {
-//         EitherIter(
-//             self.shared
-//                 .either
-//                 .as_ref()
-//                 .map_left(|left| left.as_message_impl_ref().invoke_get().into_iter())
-//                 .map_right(|right| right.as_message_impl_ref().invoke_get().into_iter()),
-//         )
-//     }
-// }
+impl<
+    'a,
+    MP,
+    FieldsType,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    LeftReturnType,
+    RightReturnType,
+    const NUMBER: i32,
+> MethodImpl<'a, True, False, NUMBER>
+    for MessageImpl<MP, tags::MergedImpl, FieldsType, MergedShared<LeftMessageRef, RightMessageRef>>
+where
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
+    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
+    LeftReturnType: IntoIterator,
+    RightReturnType: IntoIterator,
+{
+    type ReturnType = impl IntoIterator<Item = Either<LeftReturnType::Item, RightReturnType::Item>>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let left_iter = self
+            .shared
+            .left
+            .as_message_impl_ref()
+            .invoke_get()
+            .into_iter()
+            .map(|item| Either::Left(item));
+        let right_iter = self
+            .shared
+            .right
+            .as_message_impl_ref()
+            .invoke_get()
+            .into_iter()
+            .map(|item| Either::Right(item));
+        left_iter.chain(right_iter)
+    }
+}
 
 // repeated message field
 // Assuming the internal type's getter types `T` and `U` are:
