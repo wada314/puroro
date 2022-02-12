@@ -249,15 +249,15 @@ where
         + GetFieldMethod<'a, 5>
         + GetFieldMethod<'a, 6>,
 {
-    // define_opt_getter!(fn name_opt<1>(&'a self));
-    // define_getter!(fn name<1>(&'a self));
-    // define_opt_getter!(fn age_opt<2>(&'a self));
-    // define_getter!(fn age<2>(&'a self));
-    // define_getter!(fn children<3>(&'a self));
-    // define_opt_getter!(fn partner_opt<4>(&'a self));
-    // define_getter!(fn partner<4>(&'a self));
-    // define_getter!(fn nicknames<5>(&'a self));
-    // define_getter!(fn scores<6>(&'a self));
+    // define_get_opt!(fn name_opt<1>(&'a self));
+    // define_get!(fn name<1>(&'a self));
+    // define_get_opt!(fn age_opt<2>(&'a self));
+    // define_get!(fn age<2>(&'a self));
+    // define_get!(fn children<3>(&'a self));
+    // define_get_opt!(fn partner_opt<4>(&'a self));
+    // define_get!(fn partner<4>(&'a self));
+    // define_get!(fn nicknames<5>(&'a self));
+    // define_get!(fn scores<6>(&'a self));
 }
 
 impl<'a, T> PersonTrait<'a> for T
@@ -344,24 +344,24 @@ impl_field_properties!(
 impl_field_properties!(PersonFieldProperties<5>, Repeated, String, "", 0);
 impl_field_properties!(PersonFieldProperties<6>, Repeated, UInt32, 0, 0);
 
-impl_getter!(Person, pub fn name<1>(&self));
-impl_getter!(Person, pub fn age<2>(&self));
-impl_getter!(Person, pub fn children<3>(&self));
-impl_getter!(Person, pub fn partner<4>(&self));
-impl_getter!(Person, pub fn nicknames<5>(&self));
-impl_getter!(Person, pub fn scores<6>(&self));
-impl_opt_getter!(Person, pub fn name_opt<1>(&self));
-impl_opt_getter!(Person, pub fn age_opt<2>(&self));
-impl_opt_getter!(Person, pub fn partner_opt<4>(&self));
-impl_slice_getter!(Person, pub fn children_slice<3>(&self));
-impl_slice_getter!(Person, pub fn nicknames_slice<5>(&self));
-impl_slice_getter!(Person, pub fn scores_slice<6>(&self));
-impl_mut_getter!(Person, pub fn name_mut<1>(&mut self));
-impl_mut_getter!(Person, pub fn age_mut<2>(&mut self));
-impl_mut_getter!(Person, pub fn children_mut<3>(&mut self));
-impl_mut_getter!(Person, pub fn partner_mut<4>(&mut self));
-impl_mut_getter!(Person, pub fn nicknames_mut<5>(&mut self));
-impl_mut_getter!(Person, pub fn scores_mut<6>(&mut self));
+impl_get!(Person, pub fn name<1>(&self));
+impl_get!(Person, pub fn age<2>(&self));
+impl_get!(Person, pub fn children<3>(&self));
+impl_get!(Person, pub fn partner<4>(&self));
+impl_get!(Person, pub fn nicknames<5>(&self));
+impl_get!(Person, pub fn scores<6>(&self));
+impl_get_opt!(Person, pub fn name_opt<1>(&self));
+impl_get_opt!(Person, pub fn age_opt<2>(&self));
+impl_get_opt!(Person, pub fn partner_opt<4>(&self));
+impl_get_slice!(Person, pub fn children_slice<3>(&self));
+impl_get_slice!(Person, pub fn nicknames_slice<5>(&self));
+impl_get_slice!(Person, pub fn scores_slice<6>(&self));
+impl_get_mut!(Person, pub fn name_mut<1>(&mut self));
+impl_get_mut!(Person, pub fn age_mut<2>(&mut self));
+impl_get_mut!(Person, pub fn children_mut<3>(&mut self));
+impl_get_mut!(Person, pub fn partner_mut<4>(&mut self));
+impl_get_mut!(Person, pub fn nicknames_mut<5>(&mut self));
+impl_get_mut!(Person, pub fn scores_mut<6>(&mut self));
 
 #[allow(unused)]
 fn test() {
