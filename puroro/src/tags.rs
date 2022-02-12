@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::internal::bool::{False, True};
+use ::std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
@@ -42,7 +43,6 @@ pub trait FieldLabelTag {
 }
 
 mod value {
-    use super::{False, True};
     use ::std::marker::PhantomData;
     pub struct Int32;
     pub struct UInt32;
@@ -59,19 +59,15 @@ mod value {
     pub struct SFixed64;
     pub struct Fixed32;
     pub struct Fixed64;
-    pub type Bytes = (False, &'static [u8]);
-    pub type String = (False, &'static str);
-    pub type Message<M> = (True, M);
+    pub struct Bytes;
+    pub struct String;
+    pub struct Message<M>(PhantomData<M>);
 }
 
-pub type Variant<V> = (False, (False, ()), V);
-pub type LengthDelimited<V> = (True, V, ());
-pub type Bits32<V> = (False, (False, ()), V);
-pub type Bits64<V> = (False, (False, ()), V);
-
-pub type NonLdType<_1> = (False, (False, ()), _1);
-pub type NonMessageType<_1, _2, _3> = (_1, (False, _2), _3);
-pub type StringOrBytesType<_1> = (True, (False, _1), ());
+pub struct Variant<V>(PhantomData<V>);
+pub struct LengthDelimited<V>(PhantomData<V>);
+pub struct Bits32<V>(PhantomData<V>);
+pub struct Bits64<V>(PhantomData<V>);
 
 pub type Int32 = Variant<value::Int32>;
 pub type SInt32 = Variant<value::SInt32>;
@@ -93,18 +89,15 @@ pub type Enum3<E> = Variant<value::Enum3<E>>;
 pub type Message<M> = LengthDelimited<value::Message<M>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
-pub type Repeated = (True, False);
+pub struct Repeated;
 /// Proto2 optional field || Proto3 explicitly optional marked field.
-pub type Optional = (False, (False, (True, True)));
+pub struct Optional;
 /// Only available in proto2.
-pub type Required = (False, (False, (True, False)));
+pub struct Required;
 /// Proto3 unlabeled field.
-pub type Unlabeled = (False, (True, False));
+pub struct Unlabeled;
 /// An item of oneof.
-pub type OneofField = (False, (False, (False, False)));
-
-pub type NonRepeatedLabel<_1> = (False, _1);
-pub type NeedOptionalBitLabel<_1> = (False, (False, (True, _1)));
+pub struct OneofField;
 
 impl FieldTypeTag for Int32 {
     type DefaultValueType = i32;
