@@ -82,42 +82,18 @@ pub trait GetFieldMethodImplImpl<
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
-impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
+impl<'a, MP, ImplTag, LabelTag, FieldsType, SharedType, const NUMBER: i32>
     GetFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetFieldMethodImplImpl<
-        'a,
-        ImplTag,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        NUMBER,
-    >,
+    Self: GetFieldMethodImpl<'a, ImplTag, LabelTag::IsRepeated, NUMBER>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
+    MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag>,
+    LabelTag: tags::FieldLabelTag,
 {
-    type ReturnType = <Self as GetFieldMethodImplImpl<
-        'a,
-        ImplTag,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        NUMBER,
-    >>::ReturnType;
+    type ReturnType =
+        <Self as GetFieldMethodImpl<'a, ImplTag, LabelTag::IsRepeated, NUMBER>>::ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
-        <Self as GetFieldMethodImplImpl<
-            'a,
-            ImplTag,
-            LabelTag,
-            TypeTag,
-            <FieldsType as HasField<NUMBER>>::Type,
-            SharedType,
-            NUMBER,
-        >>::invoke(self)
+        GetFieldMethodImpl::invoke(self)
     }
 }
 
