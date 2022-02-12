@@ -35,7 +35,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke_get_mut_impl(&'a mut self) -> Self::ReturnType {
-        MethodImpl::invoke(self)
+        self.invoke()
     }
 }
 
@@ -56,9 +56,9 @@ where
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
             // initailize the field by `Default` value
-            *HasMutField::<NUMBER>::get_field_mut(&mut self.fields) = Default::default();
+            *self.fields.get_field_mut() = FieldType::default();
         }
-        HasMutField::<NUMBER>::get_field_mut(&mut self.fields)
+        self.fields.get_field_mut()
     }
 }
 
@@ -79,11 +79,10 @@ where
         let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
-            // initailize the field by `Default` value
-            *<FieldsType as HasMutField<NUMBER>>::get_field_mut(&mut self.fields) =
-                DefaultIn::default_in(self.shared.alloc().clone());
+            // initailize the field by `DefaultIn` value
+            *self.fields.get_field_mut() = FieldType::default_in(self.shared.alloc().clone());
         }
-        <FieldsType as HasMutField<NUMBER>>::get_field_mut(&mut self.fields)
+        self.fields.get_field_mut()
     }
 }
 
@@ -93,28 +92,28 @@ impl<
     MP,
     FieldsType,
     SharedType,
-    FieldMessageAsRefType, // typically `Box<M>`
-    FieldMessageType,      // `M`
+    MaybeBoxedFieldMessageType, // typically `Box<M>`
+    FieldMessageType,           // `M`
     Alloc,
     const NUMBER: i32,
 > MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>> + HasMutField<NUMBER>,
-    FieldMessageAsRefType: 'a
+    FieldsType: HasField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>> + HasMutField<NUMBER>,
+    MaybeBoxedFieldMessageType: 'a
         + DefaultIn<AllocatorType = Alloc>
         + AsMessageRef<MessageType = FieldMessageType>
         + AsMessageMut,
     FieldMessageType: 'a,
-    MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties,
     SharedType: SharedAllocator<AllocatorType = Alloc>,
     Alloc: Clone,
 {
     type ReturnType = &'a mut FieldMessageType;
     fn invoke(&'a mut self) -> Self::ReturnType {
-        let field_opt = HasMutField::<NUMBER>::get_field_mut(&mut self.fields);
+        let field_opt = self.fields.get_field_mut();
         field_opt
-            .get_or_insert_with(|| FieldMessageAsRefType::default_in(self.shared.alloc().clone()))
+            .get_or_insert_with(|| {
+                MaybeBoxedFieldMessageType::default_in(self.shared.alloc().clone())
+            })
             .as_message_mut()
     }
 }
