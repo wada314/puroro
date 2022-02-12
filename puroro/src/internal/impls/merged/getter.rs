@@ -17,7 +17,7 @@ use crate::internal::bool::{False, True};
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
 use crate::MessageImpl;
-use crate::{tags, AsMessageImplRef, Either};
+use crate::{tags, AsMessageImplRef};
 use ::std::iter;
 
 trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
@@ -72,7 +72,19 @@ where
 {
     type ReturnType = iter::Chain<LeftReturnType::IntoIter, RightReturnType::IntoIter>;
     fn invoke(&'a self) -> Self::ReturnType {
-        todo!()
+        let left_iter = self
+            .shared
+            .left
+            .as_message_impl_ref()
+            .invoke_get()
+            .into_iter();
+        let right_iter = self
+            .shared
+            .right
+            .as_message_impl_ref()
+            .invoke_get()
+            .into_iter();
+        left_iter.chain(right_iter)
     }
 }
 
