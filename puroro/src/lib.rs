@@ -452,13 +452,13 @@ fn test() {
     let _: &[u32] = eperson.scores_slice();
     let _: &[String] = eperson.nicknames_slice();
     let _: &[Person] = eperson.children_slice();
-    for x in partner.scores() {
+    for x in eperson.scores() {
         let _: u32 = x;
     }
-    for x in partner.nicknames() {
+    for x in eperson.nicknames() {
         let _: &String = x;
     }
-    // for x in partner.children() {
+    // for x in eperson.children() {
     //     let _: &Person = x;
     // }
 
