@@ -480,13 +480,13 @@ fn test() {
     let _: u32 = mperson.age();
     let _: &str = mperson.name();
     let mpartner: Person<_> = mperson.partner();
-    // for x in mperson.scores() {
-    //     let _: u32 = x;
-    // }
-    // for x in mperson.nicknames() {
-    //     let _: &str = AsRef::<str>::as_ref(&x);
-    // }
-    // for x in mperson.children() {
-    //     let _: &Person<_> = x.as_message_ref();
-    // }
+    for x in mperson.scores() {
+        let _: u32 = x;
+    }
+    for x in mperson.nicknames() {
+        let _: &str = AsRef::<str>::as_ref(&x);
+    }
+    for x in mperson.children() {
+        let _: &Person<_> = x.as_message_ref();
+    }
 }

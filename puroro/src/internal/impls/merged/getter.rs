@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{IntoMergedMessage, MergedShared};
+use super::MergedShared;
 use crate::internal::bool::{False, True};
+use crate::internal::impls::either::IntoEitherMessage;
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
 use crate::MessageImpl;
@@ -147,46 +148,55 @@ where
 // U: IntoIterator,
 // Either<T::Item, U::Item>: IntoEitherMessage<MP>,
 // ```
-// And then returns an `IntoIterator<Item = Either<T::Item, U::Item>::EitherMessage>`.
+// And then returns an `IntoIterator<Item = <T::Item, U::Item>::EitherMessage>`.
 // The both item types no need to be the same.
-// impl<
-//     'a,
-//     MP,
-//     InnerMP,
-//     FieldsType,
-//     LeftMessageRef,
-//     RightMessageRef,
-//     LeftMessage,
-//     RightMessage,
-//     LeftReturnType,
-//     RightReturnType,
-//     LeftItemType,
-//     RightItemType,
-//     const NUMBER: i32,
-// > MethodImpl<'a, True, True, NUMBER>
-//     for MessageImpl<MP, tags::MergedImpl, FieldsType, EitherShared<LeftMessageRef, RightMessageRef>>
-// where
-//     MP: MessageProperties,
-//     MP::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
-//     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
-//     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-//     LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
-//     RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
-//     LeftReturnType: IntoIterator<Item = LeftItemType>,
-//     RightReturnType: IntoIterator<Item = RightItemType>,
-//     Either<LeftItemType, RightItemType>: IntoEitherMessage<InnerMP>,
-// {
-//     type ReturnType = impl IntoIterator<
-//         Item = <Either<LeftItemType, RightItemType> as IntoEitherMessage<InnerMP>>::EitherMessage,
-//     >;
-//     fn invoke(&'a self) -> Self::ReturnType {
-//         EitherIter(
-//             self.shared
-//                 .either
-//                 .as_ref()
-//                 .map_left(|left| left.as_message_impl_ref().invoke_get().into_iter())
-//                 .map_right(|right| right.as_message_impl_ref().invoke_get().into_iter()),
-//         )
-//         .map(|either| either.into_message())
-//     }
-// }
+impl<
+    'a,
+    MP,
+    InnerMP,
+    FieldsType,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    LeftReturnType,
+    RightReturnType,
+    LeftItemType,
+    RightItemType,
+    const NUMBER: i32,
+> MethodImpl<'a, True, True, NUMBER>
+    for MessageImpl<MP, tags::MergedImpl, FieldsType, MergedShared<LeftMessageRef, RightMessageRef>>
+where
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
+    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
+    LeftReturnType: IntoIterator<Item = LeftItemType>,
+    RightReturnType: IntoIterator<Item = RightItemType>,
+    Either<LeftItemType, RightItemType>: IntoEitherMessage<InnerMP>,
+{
+    type ReturnType = impl IntoIterator<
+        Item = <Either<LeftItemType, RightItemType> as IntoEitherMessage<InnerMP>>::EitherMessage,
+    >;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let left_iter = self
+            .shared
+            .left
+            .as_message_impl_ref()
+            .invoke_get()
+            .into_iter()
+            .map(|item| Either::Left(item));
+        let right_iter = self
+            .shared
+            .right
+            .as_message_impl_ref()
+            .invoke_get()
+            .into_iter()
+            .map(|item| Either::Right(item));
+        left_iter
+            .chain(right_iter)
+            .map(|either| either.into_message())
+    }
+}
