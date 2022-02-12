@@ -20,30 +20,18 @@ use crate::tags;
 use crate::AsMessageRef;
 use crate::MessageImpl;
 
-trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, IsMessage, const NUMBER: i32> {
+trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
     GetOptFieldMethodImpl<'a, tags::SimpleImpl, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    Self: MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        <TypeTag as tags::FieldTypeTag>::IsLd,
-        <TypeTag as tags::FieldTypeTag>::IsMessage,
-        NUMBER,
-        ReturnType = ReturnType,
-    >,
+    Self: MethodImpl<'a, TypeTag::IsLd, TypeTag::IsMessage, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
 {
     type ReturnType = ReturnType;
@@ -53,28 +41,20 @@ where
 }
 
 // (optional|required) numeric field
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, NumType, const NUMBER: i32>
-    MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        False,
-        False,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, NumType, const NUMBER: i32>
+    MethodImpl<'a, False, False, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER>,
-    TypeTag: tags::NumericalTypeTag<NativeType = NumType>,
-    <FieldsType as HasField<NUMBER>>::Type: Clone + Into<NumType>,
+    FieldsType: HasField<NUMBER, Type = FieldType>,
+    FieldType: Clone + Into<NumType>,
     MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    TypeTag: tags::NumericalTypeTag<NativeType = NumType>,
     SharedType: SharedBitfield,
 {
     type ReturnType = Option<NumType>;
     fn invoke(&'a self) -> Self::ReturnType {
-        let opt_bit_index = <MP::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
+        let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = HasField::<NUMBER>::get(&self.fields);
             Some(field.clone().into())
@@ -85,29 +65,21 @@ where
 }
 
 // (optional|required) (string|bytes) field
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, BorrowedType, const NUMBER: i32>
-    MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        True,
-        False,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, BorrowedType, const NUMBER: i32>
+    MethodImpl<'a, True, False, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER>,
-    TypeTag: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
-    <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType>,
+    FieldsType: HasField<NUMBER, Type = FieldType>,
+    FieldType: 'a + AsRef<BorrowedType>,
     MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    TypeTag: tags::StringOrBytesTypeTag<BorrowedType = BorrowedType>,
     SharedType: SharedBitfield,
     BorrowedType: 'a + ?Sized,
 {
     type ReturnType = Option<&'a BorrowedType>;
     fn invoke(&'a self) -> Self::ReturnType {
-        let opt_bit_index = <MP::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
+        let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = HasField::<NUMBER>::get(&self.fields);
             Some(field.as_ref())
@@ -122,30 +94,18 @@ where
 impl<
     'a,
     MP,
-    LabelTag,
-    TypeTag,
     FieldsType,
     SharedType,
     FieldMessageAsRefType, // typically `Box<M>`
     FieldMessageType,      // `M`
     const NUMBER: i32,
->
-    MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        True,
-        True,
-        NUMBER,
-    > for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+> MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>>,
     FieldMessageAsRefType: 'a + AsMessageRef<MessageType = FieldMessageType>,
     FieldMessageType: 'a,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    MP::Fields<NUMBER>: FieldProperties,
 {
     type ReturnType = Option<&'a FieldMessageType>;
     fn invoke(&'a self) -> Self::ReturnType {
