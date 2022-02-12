@@ -21,7 +21,7 @@ use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties}
 use crate::tags;
 use crate::{AsMessageImplRef, MessageImpl};
 
-trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsMessage, const NUMBER: i32> {
+trait MethodImpl<'a, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
@@ -30,16 +30,8 @@ impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER
     GetOptFieldMethodImpl<'a, tags::MergedImpl, NUMBER>
     for MessageImpl<MP, tags::MergedImpl, FieldsType, SharedType>
 where
-    Self: MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        <TypeTag as tags::FieldTypeTag>::IsMessage,
-        NUMBER,
-        ReturnType = ReturnType,
-    >,
+    Self:
+        MethodImpl<'a, <TypeTag as tags::FieldTypeTag>::IsMessage, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>:
         FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
@@ -65,16 +57,7 @@ impl<
     RightMessage,
     ReturnType,
     const NUMBER: i32,
->
-    MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        MergedShared<LeftMessageRef, RightMessageRef>,
-        False,
-        NUMBER,
-    >
+> MethodImpl<'a, False, NUMBER>
     for MessageImpl<
         MP,
         tags::MergedImpl,
@@ -94,7 +77,8 @@ where
     fn invoke(&'a self) -> Self::ReturnType {
         let (left, right) = (&self.shared.left, &self.shared.right);
         let right_opt = GetOptFieldMethod::<NUMBER>::invoke_get_opt(right.as_message_impl_ref());
-        right_opt.or_else(|| GetOptFieldMethod::<NUMBER>::invoke_get_opt(left.as_message_impl_ref()))
+        right_opt
+            .or_else(|| GetOptFieldMethod::<NUMBER>::invoke_get_opt(left.as_message_impl_ref()))
     }
 }
 
@@ -112,16 +96,7 @@ impl<
     RightReturnType,
     FinalReturnType,
     const NUMBER: i32,
->
-    MethodImpl<
-        'a,
-        LabelTag,
-        tags::Message<InnerMP>,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        MergedShared<LeftMessageRef, RightMessageRef>,
-        True,
-        NUMBER,
-    >
+> MethodImpl<'a, True, NUMBER>
     for MessageImpl<
         MP,
         tags::MergedImpl,
