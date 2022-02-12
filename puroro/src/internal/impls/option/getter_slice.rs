@@ -14,17 +14,15 @@
 
 use super::OptionShared;
 use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImpl};
-use crate::internal::{EmptyFields, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
 // repeated field
 // Assuming the internal type's getter type is `&[T]` type
-impl<'a, MP, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
+impl<'a, MP, FieldsType, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
     GetSliceFieldMethodImpl<'a, tags::OptionImpl, NUMBER>
-    for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
+    for MessageImpl<MP, tags::OptionImpl, FieldsType, OptionShared<InnerMessageRef>>
 where
-    MP: MessageProperties,
     InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
     InnerMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
     InnerReturnType: Default,
@@ -34,7 +32,7 @@ where
         self.shared
             .option
             .as_ref()
-            .map(|msg| GetSliceFieldMethod::<NUMBER>::invoke_get_slice(msg.as_message_impl_ref()))
+            .map(|msg| msg.as_message_impl_ref().invoke_get_slice())
             .unwrap_or_default()
     }
 }

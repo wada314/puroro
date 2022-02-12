@@ -17,7 +17,9 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    #[allow(unused_imports)]
     use super::_puroro_internal::*;
+    #[allow(unused_imports)]
     use super::_puroro_traits::*;
 }
 pub mod _puroro_internal {
@@ -127,7 +129,9 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
+            #[allow(unused_imports)]
             use super::_puroro_internal::*;
+            #[allow(unused_imports)]
             use super::_puroro_traits::*;
         }
         pub mod _puroro_internal {

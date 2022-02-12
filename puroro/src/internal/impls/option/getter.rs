@@ -15,7 +15,6 @@
 use super::OptionShared;
 use crate::internal::bool::True;
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
-use crate::internal::{EmptyFields, FieldProperties, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 use ::std::iter;
@@ -23,12 +22,10 @@ use ::std::option;
 
 // repeated field
 // Wrap the internal message's iterator by `std::option::IntoIter`, and then flatten it.
-impl<'a, MP, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
+impl<'a, MP, FieldsType, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
     GetFieldMethodImpl<'a, tags::OptionImpl, True, NUMBER>
-    for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
+    for MessageImpl<MP, tags::OptionImpl, FieldsType, OptionShared<InnerMessageRef>>
 where
-    MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties,
     InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
     InnerMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
     InnerReturnType: Iterator,
@@ -38,7 +35,7 @@ where
         self.shared
             .option
             .as_ref()
-            .map(|msg| GetFieldMethod::<NUMBER>::invoke_get(msg.as_message_impl_ref()))
+            .map(|msg| msg.as_message_impl_ref().invoke_get())
             .into_iter()
             .flatten()
     }
