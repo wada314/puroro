@@ -13,12 +13,16 @@
 // limitations under the License.
 
 use super::OptionShared;
-use crate::internal::methods::{GetFieldMethod, GetFieldMethodImplImpl};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImplImpl, GetFieldMethodImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 use ::std::iter;
 use ::std::option;
+use crate::internal::bool::{False, True};
+
+
+////////////////////////////////////////////////////////////////////////////
 
 // repeated field
 // Wrap the internal message's iterator by `std::option::IntoIter`, and then flatten it.

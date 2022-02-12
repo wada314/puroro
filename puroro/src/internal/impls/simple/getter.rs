@@ -27,7 +27,7 @@ trait MethodImpl<'a, IsLd, const NUMBER: i32> {
 }
 
 impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
-    GetFieldMethodImpl<'a, tags::SimpleImpl, False, NUMBER>
+    GetFieldMethodImpl<'a, tags::SimpleImpl, True, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     Self: MethodImpl<'a, <TypeTag as tags::FieldTypeTag>::IsLd, NUMBER, ReturnType = ReturnType>,

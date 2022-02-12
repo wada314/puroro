@@ -17,7 +17,7 @@
 
 use crate::internal::bool::{False, True};
 use crate::internal::impls::option::IntoOptionMessage;
-use crate::internal::methods::{GetFieldMethodImplImpl, GetOptFieldMethod};
+use crate::internal::methods::{GetFieldMethodImpl, GetFieldMethodImplImpl, GetOptFieldMethod};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
@@ -25,6 +25,21 @@ use crate::MessageImpl;
 trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
+}
+
+impl<'a, MP, ImplTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+    GetFieldMethodImpl<'a, ImplTag, False, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    Self: MethodImpl<'a, TypeTag::IsLd, TypeTag::IsMessage, NUMBER, ReturnType = ReturnType>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag,
+{
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        MethodImpl::invoke(self)
+    }
 }
 
 // (optional|required|[unlabeled]) non-ld field
