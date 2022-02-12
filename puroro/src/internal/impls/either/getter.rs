@@ -13,10 +13,72 @@
 // limitations under the License.
 
 use super::{EitherRepeatedField, EitherShared};
-use crate::internal::methods::{GetFieldMethod, GetFieldMethodImplImpl};
+use crate::internal::bool::{False, True};
+use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl, GetFieldMethodImplImpl};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
+
+trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
+    type ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType;
+}
+
+impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+    GetFieldMethodImpl<'a, tags::EitherImpl, True, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    Self: MethodImpl<'a, TypeTag::IsLd, TypeTag::IsMessage, NUMBER, ReturnType = ReturnType>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag,
+{
+    type ReturnType = ReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        MethodImpl::invoke(self)
+    }
+}
+
+// repeated string | bytes field
+// Assuming the internal type's getter types are `IntoIterator`
+impl<
+    'a,
+    MP,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    LeftReturnType,
+    RightReturnType,
+    const NUMBER: i32,
+> MethodImpl<'a, True, False, NUMBER>
+    for MessageImpl<
+        MP,
+        tags::EitherImpl,
+        EmptyFields,
+        EitherShared<LeftMessageRef, RightMessageRef>,
+    >
+where
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
+    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
+    LeftReturnType: IntoIterator,
+    RightReturnType: IntoIterator,
+{
+    type ReturnType = EitherRepeatedField<LeftReturnType, RightReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        EitherRepeatedField(
+            self.shared
+                .either
+                .as_ref()
+                .map_left(|left| GetFieldMethod::<NUMBER>::invoke(left.as_message_impl_ref()))
+                .map_right(|right| GetFieldMethod::<NUMBER>::invoke(right.as_message_impl_ref())),
+        )
+    }
+}
+
+////////////////////////////////////////////////////////
 
 // repeated string | bytes field
 // Assuming the internal type's getter types are `IntoIterator`
