@@ -40,7 +40,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
-        let value_opt = <Self as GetOptFieldMethod<'a, NUMBER>>::invoke(&self);
+        let value_opt = GetOptFieldMethod::<NUMBER>::invoke(self);
         value_opt.unwrap_or(Into::<ReturnType>::into(Clone::clone(
             &MP::Fields::<NUMBER>::DEFAULT_VALUE,
         )))
