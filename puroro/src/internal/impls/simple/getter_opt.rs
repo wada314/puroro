@@ -36,7 +36,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke_get_opt_impl(&'a self) -> Self::ReturnType {
-        MethodImpl::invoke(self)
+        self.invoke()
     }
 }
 
@@ -56,7 +56,7 @@ where
     fn invoke(&'a self) -> Self::ReturnType {
         let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
-            let field = HasField::<NUMBER>::get_field(&self.fields);
+            let field = self.fields.get_field();
             Some(field.clone().into())
         } else {
             None
@@ -81,7 +81,7 @@ where
     fn invoke(&'a self) -> Self::ReturnType {
         let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
-            let field = HasField::<NUMBER>::get_field(&self.fields);
+            let field = self.fields.get_field();
             Some(field.as_ref())
         } else {
             None
@@ -96,20 +96,20 @@ impl<
     MP,
     FieldsType,
     SharedType,
-    FieldMessageAsRefType, // typically `Box<M>`
-    FieldMessageType,      // `M`
+    MaybeBoxedFieldMessageType, // typically `Box<M>`
+    FieldMessageType,           // `M`
     const NUMBER: i32,
 > MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = Option<FieldMessageAsRefType>>,
-    FieldMessageAsRefType: 'a + AsMessageRef<MessageType = FieldMessageType>,
+    FieldsType: HasField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>>,
+    MaybeBoxedFieldMessageType: 'a + AsMessageRef<MessageType = FieldMessageType>,
     FieldMessageType: 'a,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
 {
     type ReturnType = Option<&'a FieldMessageType>;
     fn invoke(&'a self) -> Self::ReturnType {
-        let field = HasField::<NUMBER>::get_field(&self.fields);
+        let field = self.fields.get_field();
         field.as_ref().map(|ref_msg| ref_msg.as_message_ref())
     }
 }

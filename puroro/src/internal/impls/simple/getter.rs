@@ -38,7 +38,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke_get_impl(&'a self) -> Self::ReturnType {
-        MethodImpl::invoke(self)
+        self.invoke()
     }
 }
 
@@ -68,7 +68,7 @@ where
 {
     type ReturnType = MapInto<Cloned<InnerIterType>, NumType>;
     fn invoke(&'a self) -> Self::ReturnType {
-        let slice = HasField::<NUMBER>::get_field(&self.fields);
+        let slice = self.fields.get_field();
         slice.into_iter().cloned().map_into::<NumType>()
     }
 }
@@ -86,7 +86,7 @@ where
 {
     type ReturnType = InnerIterType;
     fn invoke(&'a self) -> Self::ReturnType {
-        let slice = HasField::<NUMBER>::get_field(&self.fields);
+        let slice = self.fields.get_field();
         slice.into_iter()
     }
 }
