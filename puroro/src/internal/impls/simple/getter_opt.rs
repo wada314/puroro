@@ -15,7 +15,7 @@
 use crate::internal::bool::{False, True};
 use crate::internal::methods::GetOptFieldMethodImpl;
 use crate::internal::{Bitfield, SharedBitfield};
-use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::internal::{FieldProperties, GetField, MessageProperties};
 use crate::tags;
 use crate::AsMessageRef;
 use crate::MessageImpl;
@@ -45,7 +45,7 @@ impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, NumType, const NUMBER: 
     MethodImpl<'a, False, False, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = FieldType>,
+    FieldsType: GetField<NUMBER, Type = FieldType>,
     FieldType: Clone + Into<NumType>,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
@@ -69,7 +69,7 @@ impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, BorrowedType, const NUM
     MethodImpl<'a, True, False, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = FieldType>,
+    FieldsType: GetField<NUMBER, Type = FieldType>,
     FieldType: 'a + AsRef<BorrowedType>,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
@@ -101,7 +101,7 @@ impl<
     const NUMBER: i32,
 > MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>>,
+    FieldsType: GetField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>>,
     MaybeBoxedFieldMessageType: 'a + AsMessageRef<MessageType = FieldMessageType>,
     FieldMessageType: 'a,
     MP: MessageProperties,

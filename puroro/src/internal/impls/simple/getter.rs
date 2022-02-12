@@ -14,7 +14,7 @@
 
 use crate::internal::bool::{False, True};
 use crate::internal::methods::GetFieldMethodImpl;
-use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::internal::{FieldProperties, GetField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 use ::itertools::structs::MapInto;
@@ -33,7 +33,7 @@ where
     Self: MethodImpl<'a, <TypeTag as tags::FieldTypeTag>::IsLd, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
+    FieldsType: GetField<NUMBER>,
     TypeTag: tags::FieldTypeTag,
 {
     type ReturnType = ReturnType;
@@ -57,7 +57,7 @@ impl<
     const NUMBER: i32,
 > MethodImpl<'a, False, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = FieldType>,
+    FieldsType: GetField<NUMBER, Type = FieldType>,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     TypeTag: tags::NumericalTypeTag<NativeType = NumType>,
@@ -78,7 +78,7 @@ where
 impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, InnerIterType, const NUMBER: i32>
     MethodImpl<'a, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = FieldType>,
+    FieldsType: GetField<NUMBER, Type = FieldType>,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     FieldType: 'a,

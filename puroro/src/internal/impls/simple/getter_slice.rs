@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::methods::GetSliceFieldMethodImpl;
-use crate::internal::HasField;
+use crate::internal::GetField;
 use crate::tags;
 use crate::MessageImpl;
 use ::std::ops::Deref;
@@ -23,7 +23,7 @@ impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, const NUMBER: i32
     GetSliceFieldMethodImpl<'a, tags::SimpleImpl, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = CollectionType>,
+    FieldsType: GetField<NUMBER, Type = CollectionType>,
     CollectionType: 'a + Deref<Target = [ItemType]>,
     ItemType: 'a,
 {

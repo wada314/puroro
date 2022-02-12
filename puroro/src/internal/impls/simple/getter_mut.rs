@@ -15,7 +15,7 @@
 use crate::internal::bool::{False, True};
 use crate::internal::methods::GetMutFieldMethodImpl;
 use crate::internal::{Bitfield, SharedAllocator, SharedBitfield};
-use crate::internal::{FieldProperties, HasField, HasMutField, MessageProperties};
+use crate::internal::{FieldProperties, GetField, GetFieldMut, MessageProperties};
 use crate::{tags, AsMessageMut, AsMessageRef};
 use crate::{DefaultIn, MessageImpl};
 
@@ -44,7 +44,7 @@ impl<'a, MP, FieldsType, SharedType, FieldType, const NUMBER: i32>
     MethodImpl<'a, False, False, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasMutField<NUMBER, Type = FieldType>,
+    FieldsType: GetFieldMut<NUMBER, Type = FieldType>,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
     FieldType: 'a + Default,
@@ -67,7 +67,7 @@ impl<'a, MP, FieldsType, SharedType, FieldType, Alloc, const NUMBER: i32>
     MethodImpl<'a, True, False, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasMutField<NUMBER, Type = FieldType>,
+    FieldsType: GetFieldMut<NUMBER, Type = FieldType>,
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
     FieldType: 'a + DefaultIn<AllocatorType = Alloc>,
@@ -98,7 +98,7 @@ impl<
     const NUMBER: i32,
 > MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FieldsType: HasField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>> + HasMutField<NUMBER>,
+    FieldsType: GetField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>> + GetFieldMut<NUMBER>,
     MaybeBoxedFieldMessageType: 'a
         + DefaultIn<AllocatorType = Alloc>
         + AsMessageRef<MessageType = FieldMessageType>
