@@ -35,7 +35,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke_get_impl(&'a self) -> Self::ReturnType {
-        MethodImpl::invoke(self)
+        self.invoke()
     }
 }
 
@@ -72,8 +72,8 @@ where
             self.shared
                 .either
                 .as_ref()
-                .map_left(|left| GetFieldMethod::<NUMBER>::invoke_get(left.as_message_impl_ref()))
-                .map_right(|right| GetFieldMethod::<NUMBER>::invoke_get(right.as_message_impl_ref())),
+                .map_left(|left| left.as_message_impl_ref().invoke_get())
+                .map_right(|right| right.as_message_impl_ref().invoke_get()),
         )
     }
 }
