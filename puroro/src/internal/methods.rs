@@ -14,7 +14,7 @@
 
 mod getter;
 
-use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::internal::{FieldProperties, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 
@@ -105,56 +105,14 @@ where
     }
 }
 
-pub trait GetMutFieldMethodImplImpl<
-    'a,
-    ImplTag,
-    LabelTag,
-    TypeTag,
-    FieldType,
-    SharedType,
-    const NUMBER: i32,
->
-{
-    type ReturnType;
-    fn invoke(&'a mut self) -> Self::ReturnType;
-}
-
-impl<'a, MP, ImplTag, LabelTag, TypeTag, FieldsType, SharedType, const NUMBER: i32>
-    GetMutFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+impl<'a, MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetMutFieldMethod<'a, NUMBER>
+    for MessageImpl<MP, ImplTag, FieldsType, SharedType>
 where
-    Self: GetMutFieldMethodImplImpl<
-        'a,
-        ImplTag,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        NUMBER,
-    >,
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
+    Self: GetMutFieldMethodImpl<'a, ImplTag, NUMBER>,
 {
-    type ReturnType = <Self as GetMutFieldMethodImplImpl<
-        'a,
-        ImplTag,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        NUMBER,
-    >>::ReturnType;
+    type ReturnType = <Self as GetMutFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
     fn invoke(&'a mut self) -> Self::ReturnType {
-        <Self as GetMutFieldMethodImplImpl<
-            'a,
-            ImplTag,
-            LabelTag,
-            TypeTag,
-            <FieldsType as HasField<NUMBER>>::Type,
-            SharedType,
-            NUMBER,
-        >>::invoke(self)
+        GetMutFieldMethodImpl::invoke(self)
     }
 }
 
