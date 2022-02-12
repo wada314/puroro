@@ -30,7 +30,7 @@ where
     InnerReturnType: Default,
 {
     type ReturnType = InnerReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_slice_impl(&'a self) -> Self::ReturnType {
         self.shared
             .option
             .as_ref()

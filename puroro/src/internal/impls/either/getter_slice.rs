@@ -38,7 +38,7 @@ where
     RightMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = SliceType>,
 {
     type ReturnType = SliceType;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_slice_impl(&'a self) -> Self::ReturnType {
         self.shared.either.as_ref().either(
             |left| GetSliceFieldMethod::<NUMBER>::invoke_get_slice(left.as_message_impl_ref()),
             |right| GetSliceFieldMethod::<NUMBER>::invoke_get_slice(right.as_message_impl_ref()),

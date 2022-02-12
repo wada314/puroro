@@ -35,7 +35,7 @@ where
     TypeTag: tags::FieldTypeTag,
 {
     type ReturnType = ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_opt_impl(&'a self) -> Self::ReturnType {
         MethodImpl::invoke(self)
     }
 }

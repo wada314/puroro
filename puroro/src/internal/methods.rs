@@ -48,22 +48,22 @@ pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
 
 pub trait GetFieldMethodImpl<'a, ImplTag, IsRepeated, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
+    fn invoke_get_impl(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetOptFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
+    fn invoke_get_opt_impl(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetSliceFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
+    fn invoke_get_slice_impl(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetMutFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a mut self) -> Self::ReturnType;
+    fn invoke_get_mut_impl(&'a mut self) -> Self::ReturnType;
 }
 
 //################ Delegating to methods Impl traits ################
@@ -79,7 +79,7 @@ where
     type ReturnType =
         <Self as GetFieldMethodImpl<'a, ImplTag, LabelTag::IsRepeated, NUMBER>>::ReturnType;
     fn invoke_get(&'a self) -> Self::ReturnType {
-        GetFieldMethodImpl::invoke(self)
+        self.invoke_get_impl()
     }
 }
 
@@ -90,7 +90,7 @@ where
 {
     type ReturnType = <Self as GetOptFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
     fn invoke_get_opt(&'a self) -> Self::ReturnType {
-        GetOptFieldMethodImpl::invoke(self)
+        self.invoke_get_opt_impl()
     }
 }
 
@@ -101,7 +101,7 @@ where
 {
     type ReturnType = <Self as GetSliceFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
     fn invoke_get_slice(&'a self) -> Self::ReturnType {
-        GetSliceFieldMethodImpl::invoke(self)
+        self.invoke_get_slice_impl()
     }
 }
 
@@ -112,7 +112,7 @@ where
 {
     type ReturnType = <Self as GetMutFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
     fn invoke_get_mut(&'a mut self) -> Self::ReturnType {
-        GetMutFieldMethodImpl::invoke(self)
+        self.invoke_get_mut_impl()
     }
 }
 

@@ -34,7 +34,7 @@ where
     InnerReturnType: Iterator,
 {
     type ReturnType = iter::Flatten<option::IntoIter<InnerReturnType>>;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_impl(&'a self) -> Self::ReturnType {
         self.shared
             .option
             .as_ref()

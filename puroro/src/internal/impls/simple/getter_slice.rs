@@ -28,7 +28,7 @@ where
     ItemType: 'a,
 {
     type ReturnType = &'a [ItemType];
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_slice_impl(&'a self) -> Self::ReturnType {
         self.fields.get_field().deref()
     }
 }
