@@ -456,7 +456,7 @@ fn test() {
         let _: u32 = x;
     }
     for x in eperson.nicknames() {
-        let _: &String = x;
+        let _: &str = AsRef::<str>::as_ref(&x);
     }
     // for x in eperson.children() {
     //     let _: &Person = x;
