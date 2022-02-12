@@ -458,9 +458,9 @@ fn test() {
     for x in eperson.nicknames() {
         let _: &str = AsRef::<str>::as_ref(&x);
     }
-    // for x in eperson.children() {
-    //     let _: &Person = x;
-    // }
+    for x in eperson.children() {
+        let _: Person<_> = x;
+    }
 
     // ################ merged ################
     let mperson: Person<_> = (&person, &bperson).into();

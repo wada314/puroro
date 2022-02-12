@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{EitherRepeatedField, EitherShared};
+use super::{EitherIter, EitherShared, IntoEitherMessage};
 use crate::internal::bool::{False, True};
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
 use crate::internal::{FieldProperties, MessageProperties};
@@ -45,8 +45,8 @@ where
 // T: IntoIterator,
 // U: IntoIterator<Item = <T as IntoIterator>::Item>,
 // ```
-// And then returns an `Either<T, U>`.
 // The both `Item` types must to be the same.
+// And then returns an `Either<T, U>`.
 // As long as the requirements above are met, `Either<T, U>` become an
 // `IntoIterator<Item = T::Item>`.
 impl<
@@ -110,14 +110,65 @@ where
     LeftReturnType: IntoIterator,
     RightReturnType: IntoIterator,
 {
-    type ReturnType = EitherRepeatedField<LeftReturnType, RightReturnType>;
+    type ReturnType = EitherIter<LeftReturnType::IntoIter, RightReturnType::IntoIter>;
     fn invoke(&'a self) -> Self::ReturnType {
-        EitherRepeatedField(
+        EitherIter(
             self.shared
                 .either
                 .as_ref()
-                .map_left(|left| left.as_message_impl_ref().invoke_get())
-                .map_right(|right| right.as_message_impl_ref().invoke_get()),
+                .map_left(|left| left.as_message_impl_ref().invoke_get().into_iter())
+                .map_right(|right| right.as_message_impl_ref().invoke_get().into_iter()),
         )
+    }
+}
+
+// repeated message field
+// Assuming the internal type's getter types `T` and `U` are:
+// ```
+// T: IntoIterator,
+// U: IntoIterator,
+// Either<T::Item, U::Item>: IntoEitherMessage<MP>,
+// ```
+// And then returns an `IntoIterator<Item = Either<T::Item, U::Item>::EitherMessage>`.
+// The both item types no need to be the same.
+impl<
+    'a,
+    MP,
+    InnerMP,
+    FieldsType,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    LeftReturnType,
+    RightReturnType,
+    LeftItemType,
+    RightItemType,
+    const NUMBER: i32,
+> MethodImpl<'a, True, True, NUMBER>
+    for MessageImpl<MP, tags::EitherImpl, FieldsType, EitherShared<LeftMessageRef, RightMessageRef>>
+where
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
+    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
+    LeftReturnType: IntoIterator<Item = LeftItemType>,
+    RightReturnType: IntoIterator<Item = RightItemType>,
+    Either<LeftItemType, RightItemType>: IntoEitherMessage<InnerMP>,
+{
+    type ReturnType = impl IntoIterator<
+        Item = <Either<LeftItemType, RightItemType> as IntoEitherMessage<InnerMP>>::EitherMessage,
+    >;
+    fn invoke(&'a self) -> Self::ReturnType {
+        EitherIter(
+            self.shared
+                .either
+                .as_ref()
+                .map_left(|left| left.as_message_impl_ref().invoke_get().into_iter())
+                .map_right(|right| right.as_message_impl_ref().invoke_get().into_iter()),
+        )
+        .map(|either| either.into_message())
     }
 }

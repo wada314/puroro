@@ -48,24 +48,8 @@ impl<T, U> ImplProperties for EitherImplProperties<T, U> {
     type SharedType = EitherShared<T, U>;
 }
 
-pub struct EitherRepeatedField<T, U>(pub(crate) Either<T, U>);
-
-impl<T, U> IntoIterator for EitherRepeatedField<T, U>
-where
-    T: IntoIterator,
-    U: IntoIterator,
-{
-    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
-    type IntoIter = EitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
-    fn into_iter(self) -> Self::IntoIter {
-        EitherIter(
-            self.0
-                .map_left(|t| t.into_iter())
-                .map_right(|u| u.into_iter()),
-        )
-    }
-}
-
+/// An iterator for `Either<T: Iterator, U: Iterator>` which iterates over
+/// `Either<T::Item, U::Item>`.
 pub struct EitherIter<T, U>(Either<T, U>);
 
 impl<T, U> Iterator for EitherIter<T, U>
