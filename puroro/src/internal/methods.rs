@@ -36,7 +36,7 @@ pub trait GetSliceFieldMethod<'a, const NUMBER: i32> {
 }
 
 pub trait HasFieldMethod<'a, const NUMBER: i32> {
-    fn has(&'a self) -> bool;
+    fn invoke(&'a self) -> bool;
 }
 
 pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
@@ -65,6 +65,8 @@ pub trait GetMutFieldMethodImpl<'a, ImplTag, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a mut self) -> Self::ReturnType;
 }
+
+//################ Delegating to methods Impl traits ################
 
 impl<'a, MP, ImplTag, LabelTag, FieldsType, SharedType, const NUMBER: i32>
     GetFieldMethod<'a, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
@@ -205,7 +207,7 @@ impl<'a, MP, ImplTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
 where
     Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
 {
-    fn has(&'a self) -> bool {
-        <Self as GetOptFieldMethod<NUMBER>>::invoke(self).is_some()
+    fn invoke(&'a self) -> bool {
+        GetOptFieldMethod::invoke(self).is_some()
     }
 }

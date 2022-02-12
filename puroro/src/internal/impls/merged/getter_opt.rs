@@ -146,8 +146,8 @@ where
         let left_message_impl_ref = left.as_message_impl_ref();
         let right_message_impl_ref = right.as_message_impl_ref();
 
-        let has_left = HasFieldMethod::<NUMBER>::has(left_message_impl_ref);
-        let has_right = HasFieldMethod::<NUMBER>::has(right_message_impl_ref);
+        let has_left = HasFieldMethod::<NUMBER>::invoke(left_message_impl_ref);
+        let has_right = HasFieldMethod::<NUMBER>::invoke(right_message_impl_ref);
         if has_left || has_right {
             let left_field = GetFieldMethod::<NUMBER>::invoke(left_message_impl_ref);
             let right_field = GetFieldMethod::<NUMBER>::invoke(right_message_impl_ref);
