@@ -17,10 +17,10 @@
 
 use crate::internal::bool::{False, True};
 use crate::internal::impls::option::IntoOptionMessage;
-use crate::internal::methods::{GetFieldMethod, GetFieldMethodImplImpl, GetOptFieldMethod};
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::methods::{GetFieldMethodImplImpl, GetOptFieldMethod};
+use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::tags;
 use crate::MessageImpl;
-use crate::{tags, AsMessageImplRef};
 
 trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
     type ReturnType;
