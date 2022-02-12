@@ -13,10 +13,8 @@
 // limitations under the License.
 
 use super::OptionShared;
-use crate::internal::methods::{
-    GetSliceFieldMethod, GetSliceFieldMethodImpl, GetSliceFieldMethodImplImpl,
-};
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImpl};
+use crate::internal::{EmptyFields, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
@@ -37,40 +35,6 @@ where
             .option
             .as_ref()
             .map(|msg| GetSliceFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
-            .unwrap_or_default()
-    }
-}
-
-// repeated field
-// Assuming the internal type's getter type is `&[T]` type
-impl<'a, MP, TypeTag, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
-    GetSliceFieldMethodImplImpl<
-        'a,
-        tags::OptionImpl,
-        tags::Repeated,
-        TypeTag,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        OptionShared<InnerMessageRef>,
-        NUMBER,
-    > for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
-where
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
-    InnerMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
-    InnerReturnType: Default,
-{
-    type ReturnType = InnerReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
-        self.shared
-            .option
-            .as_ref()
-            .map(|msg| {
-                <InnerMessage as GetSliceFieldMethod<NUMBER>>::invoke(
-                    <InnerMessageRef as AsMessageImplRef>::as_message_impl_ref(&msg),
-                )
-            })
             .unwrap_or_default()
     }
 }

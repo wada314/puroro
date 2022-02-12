@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use super::EitherShared;
-use crate::internal::methods::{
-    GetSliceFieldMethod, GetSliceFieldMethodImpl, GetSliceFieldMethodImplImpl,
-};
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImpl};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
 
@@ -45,57 +42,6 @@ where
         self.shared.either.as_ref().either(
             |left| GetSliceFieldMethod::<NUMBER>::invoke(left.as_message_impl_ref()),
             |right| GetSliceFieldMethod::<NUMBER>::invoke(right.as_message_impl_ref()),
-        )
-    }
-}
-
-/////////////////////////////////////////////
-////
-////
-// repeated field
-// Assuming the both internal type's getter types are same `&[T]` type
-impl<
-    'a,
-    MP,
-    TypeTag,
-    LeftMessageRef,
-    RightMessageRef,
-    LeftMessage,
-    RightMessage,
-    SliceType,
-    const NUMBER: i32,
->
-    GetSliceFieldMethodImplImpl<
-        'a,
-        tags::EitherImpl,
-        tags::Repeated,
-        TypeTag,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-        NUMBER,
-    >
-    for MessageImpl<
-        MP,
-        tags::EitherImpl,
-        EmptyFields,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-    >
-where
-    MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
-    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
-    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
-    LeftMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = SliceType>,
-    RightMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = SliceType>,
-{
-    type ReturnType = SliceType;
-    fn invoke(&'a self) -> Self::ReturnType {
-        self.shared.either.as_ref().either(
-            |left| <LeftMessage as GetSliceFieldMethod<NUMBER>>::invoke(left.as_message_impl_ref()),
-            |right| {
-                <RightMessage as GetSliceFieldMethod<NUMBER>>::invoke(right.as_message_impl_ref())
-            },
         )
     }
 }
