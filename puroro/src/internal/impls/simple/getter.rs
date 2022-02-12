@@ -21,28 +21,18 @@ use ::itertools::structs::MapInto;
 use ::itertools::Itertools;
 use ::std::iter::Cloned;
 
-trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsLd, const NUMBER: i32> {
+trait MethodImpl<'a, IsLd, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
     GetFieldMethodImpl<'a, tags::SimpleImpl, False, NUMBER>
     for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    Self: MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        <TypeTag as tags::FieldTypeTag>::IsLd,
-        NUMBER,
-        ReturnType = ReturnType,
-    >,
+    Self: MethodImpl<'a, <TypeTag as tags::FieldTypeTag>::IsLd, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     FieldsType: HasField<NUMBER>,
     TypeTag: tags::FieldTypeTag,
 {
@@ -51,6 +41,57 @@ where
         MethodImpl::invoke(self)
     }
 }
+
+// repeated non-ld field
+// `Clone` and then `Into` the iter value
+impl<
+    'a,
+    MP,
+    TypeTag,
+    FieldsType,
+    SharedType,
+    FieldType,
+    InnerIterType,
+    ItemType,
+    NumType,
+    const NUMBER: i32,
+> MethodImpl<'a, False, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = FieldType>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    TypeTag: tags::NumericalTypeTag<NativeType = NumType>,
+    FieldType: 'a,
+    &'a FieldType: IntoIterator<Item = &'a ItemType, IntoIter = InnerIterType>,
+    InnerIterType: Iterator<Item = &'a ItemType>,
+    ItemType: 'a + Clone + Into<NumType>,
+{
+    type ReturnType = MapInto<Cloned<InnerIterType>, NumType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let slice = HasField::<NUMBER>::get(&self.fields);
+        slice.into_iter().cloned().map_into::<NumType>()
+    }
+}
+
+// repeated ld field
+// Just return the `into_iter()` value as-is
+impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, InnerIterType, const NUMBER: i32>
+    MethodImpl<'a, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = FieldType>,
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
+    FieldType: 'a,
+    &'a FieldType: IntoIterator<IntoIter = InnerIterType>,
+{
+    type ReturnType = InnerIterType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let slice = HasField::<NUMBER>::get(&self.fields);
+        slice.into_iter()
+    }
+}
+
+////////////////////////////////////////////////////////////////
 
 // repeated non-ld field
 // `Clone` and then `Into` the iter value
