@@ -15,9 +15,9 @@
 use super::{EitherRepeatedField, EitherShared};
 use crate::internal::bool::{False, True};
 use crate::internal::methods::{GetFieldMethod, GetFieldMethodImpl};
-use crate::internal::{EmptyFields, FieldProperties, MessageProperties};
+use crate::internal::{FieldProperties, MessageProperties};
 use crate::MessageImpl;
-use crate::{tags, AsMessageImplRef};
+use crate::{tags, AsMessageImplRef, Either};
 
 trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
     type ReturnType;
@@ -39,11 +39,60 @@ where
     }
 }
 
-// repeated string | bytes field
-// Assuming the internal type's getter types are `IntoIterator`
+// repeated non-ld field
+// (Implicitly ) assuming the internal type's getter types `T` and `U` are:
+// ```
+// T: IntoIterator,
+// U: IntoIterator<Item = <T as IntoIterator>::Item>,
+// ```
+// And then returns an `Either<T, U>`.
+// The both `Item` types must to be the same.
+// As long as the requirements above are met, `Either<T, U>` become an
+// `IntoIterator<Item = T::Item>`.
 impl<
     'a,
     MP,
+    FieldsType,
+    LeftMessageRef,
+    RightMessageRef,
+    LeftMessage,
+    RightMessage,
+    LeftReturnType,
+    RightReturnType,
+    const NUMBER: i32,
+> MethodImpl<'a, False, False, NUMBER>
+    for MessageImpl<MP, tags::EitherImpl, FieldsType, EitherShared<LeftMessageRef, RightMessageRef>>
+where
+    LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
+    RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
+    LeftMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = LeftReturnType>,
+    RightMessage: 'a + GetFieldMethod<'a, NUMBER, ReturnType = RightReturnType>,
+{
+    type ReturnType = Either<LeftReturnType, RightReturnType>;
+    fn invoke(&'a self) -> Self::ReturnType {
+        self.shared
+            .either
+            .as_ref()
+            .map_left(|left| left.as_message_impl_ref().invoke_get())
+            .map_right(|right| right.as_message_impl_ref().invoke_get())
+    }
+}
+
+// repeated string | bytes field
+// Assuming the internal type's getter types `T` and `U` are:
+// ```
+// T: IntoIterator,
+// <T as IntoIterator>::Item: AsRef<str>, // or [u8]
+// U: IntoIterator,
+// <U as IntoIterator>::Item: AsRef<str>, // or [u8]
+// ```
+// And then returns an `IntoIterator<Item = Either<T::Item, U::Item>>`.
+// The both item types no need to be the same.
+// `Either` of 2 `AsRef<str>` types is `AsRef<str>` by itself too.
+impl<
+    'a,
+    MP,
+    FieldsType,
     LeftMessageRef,
     RightMessageRef,
     LeftMessage,
@@ -52,12 +101,7 @@ impl<
     RightReturnType,
     const NUMBER: i32,
 > MethodImpl<'a, True, False, NUMBER>
-    for MessageImpl<
-        MP,
-        tags::EitherImpl,
-        EmptyFields,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-    >
+    for MessageImpl<MP, tags::EitherImpl, FieldsType, EitherShared<LeftMessageRef, RightMessageRef>>
 where
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
