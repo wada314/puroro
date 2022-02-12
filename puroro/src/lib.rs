@@ -480,7 +480,4 @@ fn test() {
     let _: u32 = mperson.age();
     let _: &str = mperson.name();
     let mpartner: Person<_> = mperson.partner();
-    // let _: &[u32] = mperson.scores_slice();
-    // let _: &[String] = mperson.nicknames_slice();
-    // let _: &[Person] = mperson.children_slice();
 }
