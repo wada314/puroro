@@ -362,6 +362,9 @@ impl_get_mut!(Person, pub fn children_mut<3>(&mut self));
 impl_get_mut!(Person, pub fn partner_mut<4>(&mut self));
 impl_get_mut!(Person, pub fn nicknames_mut<5>(&mut self));
 impl_get_mut!(Person, pub fn scores_mut<6>(&mut self));
+impl_has!(Person, pub fn has_name<1>(&self));
+impl_has!(Person, pub fn has_age<2>(&self));
+impl_has!(Person, pub fn has_partner<4>(&self));
 
 #[allow(unused)]
 fn test() {
@@ -374,6 +377,9 @@ fn test() {
     let _: Option<u32> = person.age_opt();
     let _: Option<&str> = person.name_opt();
     let _: Option<&Person> = person.partner_opt();
+    let _: bool = person.has_age();
+    let _: bool = person.has_name();
+    let _: bool = person.has_partner();
     let _: u32 = person.age();
     let _: &str = person.name();
     let partner: Person<_> = person.partner();
@@ -394,6 +400,9 @@ fn test() {
     let _: Option<u32> = partner.age_opt();
     let _: Option<&str> = partner.name_opt();
     let _: Option<&Person> = partner.partner_opt();
+    let _: bool = partner.has_age();
+    let _: bool = partner.has_name();
+    let _: bool = partner.has_partner();
     let _: u32 = partner.age();
     let _: &str = partner.name();
     let _: Person<_> = partner.partner();
@@ -423,6 +432,9 @@ fn test() {
     let _: Option<u32> = bperson.age_opt();
     let _: Option<&str> = bperson.name_opt();
     let _: Option<&PersonBump> = bperson.partner_opt();
+    let _: bool = bperson.has_age();
+    let _: bool = bperson.has_name();
+    let _: bool = bperson.has_partner();
     let _: u32 = bperson.age();
     let _: &str = bperson.name();
     let bpartner: Person<_> = bperson.partner();
@@ -455,6 +467,9 @@ fn test() {
     let _: Option<u32> = eperson.age_opt();
     let _: Option<&str> = eperson.name_opt();
     let _: Option<Person<_>> = eperson.partner_opt();
+    let _: bool = eperson.has_age();
+    let _: bool = eperson.has_name();
+    let _: bool = eperson.has_partner();
     let _: u32 = eperson.age();
     let _: &str = eperson.name();
     let epartner: Person<_> = eperson.partner();
@@ -477,6 +492,9 @@ fn test() {
     let _: Option<u32> = mperson.age_opt();
     let _: Option<&str> = mperson.name_opt();
     let _: Option<Person<_>> = mperson.partner_opt();
+    let _: bool = mperson.has_age();
+    let _: bool = mperson.has_name();
+    let _: bool = mperson.has_partner();
     let _: u32 = mperson.age();
     let _: &str = mperson.name();
     let mpartner: Person<_> = mperson.partner();

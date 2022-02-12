@@ -187,6 +187,17 @@ macro_rules! define_get_mut {
 }
 
 #[macro_export]
+macro_rules! define_has {
+    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
+        $pub fn $id(&$($lt)* self) -> bool {
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::HasFieldMethod<$num>>::invoke_has(
+                self.as_message_impl_ref(),
+            )
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! impl_get {
     ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
         impl<'a, Impl> $struct<Impl>
@@ -238,6 +249,20 @@ macro_rules! impl_get_mut {
             Impl: $crate::internal::ImplProperties,
         {
             define_get_mut!($pub fn $get<$num>(&'a mut self));
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_has {
+    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
+        impl<'a, Impl> $struct<Impl>
+        where
+            Self: $crate::AsMessageImplRef,
+            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::HasFieldMethod<'a, $num>,
+            Impl: $crate::internal::ImplProperties,
+        {
+            define_has!($pub fn $get<$num>(&'a self));
         }
     };
 }
