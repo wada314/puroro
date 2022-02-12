@@ -56,7 +56,7 @@ where
     fn invoke(&'a self) -> Self::ReturnType {
         let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
-            let field = HasField::<NUMBER>::get(&self.fields);
+            let field = HasField::<NUMBER>::get_field(&self.fields);
             Some(field.clone().into())
         } else {
             None
@@ -81,7 +81,7 @@ where
     fn invoke(&'a self) -> Self::ReturnType {
         let opt_bit_index = MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
-            let field = HasField::<NUMBER>::get(&self.fields);
+            let field = HasField::<NUMBER>::get_field(&self.fields);
             Some(field.as_ref())
         } else {
             None
@@ -109,7 +109,7 @@ where
 {
     type ReturnType = Option<&'a FieldMessageType>;
     fn invoke(&'a self) -> Self::ReturnType {
-        let field = HasField::<NUMBER>::get(&self.fields);
+        let field = HasField::<NUMBER>::get_field(&self.fields);
         field.as_ref().map(|ref_msg| ref_msg.as_message_ref())
     }
 }

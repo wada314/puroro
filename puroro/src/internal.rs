@@ -86,10 +86,10 @@ pub trait FieldsContainer {}
 
 pub trait HasField<const NUMBER: i32>: FieldsContainer {
     type Type;
-    fn get(&self) -> &Self::Type;
+    fn get_field(&self) -> &Self::Type;
 }
 pub trait HasMutField<const NUMBER: i32>: HasField<NUMBER> {
-    fn get_mut(&mut self) -> &mut <Self as HasField<NUMBER>>::Type;
+    fn get_field_mut(&mut self) -> &mut <Self as HasField<NUMBER>>::Type;
 }
 
 pub trait SharedBitfield {
@@ -107,7 +107,7 @@ pub struct EmptyFields;
 impl FieldsContainer for EmptyFields {}
 impl<const NUMBER: i32> HasField<NUMBER> for EmptyFields {
     type Type = ();
-    fn get(&self) -> &Self::Type {
+    fn get_field(&self) -> &Self::Type {
         &()
     }
 }
@@ -128,12 +128,12 @@ macro_rules! define_fields_container {
     (@impls $container:ident, $($lt:lifetime)?, $name:ident: $ty:ty = $number:literal, $($rest:tt)*) => {
         impl$(<$lt>)? $crate::internal::HasField<$number> for self::$container $(<$lt>)? {
             type Type = $ty;
-            fn get(&self) -> &Self::Type {
+            fn get_field(&self) -> &Self::Type {
                 &self.$name
             }
         }
         impl$(<$lt>)? $crate::internal::HasMutField<$number> for self::$container $(<$lt>)? {
-            fn get_mut(&mut self) -> &mut <Self as $crate::internal::HasField<$number>>::Type {
+            fn get_field_mut(&mut self) -> &mut <Self as $crate::internal::HasField<$number>>::Type {
                 &mut self.$name
             }
         }

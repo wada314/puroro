@@ -55,7 +55,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
-        let value_opt = GetOptFieldMethod::<NUMBER>::invoke(self);
+        let value_opt = GetOptFieldMethod::<NUMBER>::invoke_get_opt(self);
         value_opt.unwrap_or(Into::<ReturnType>::into(Clone::clone(
             &MP::Fields::<NUMBER>::DEFAULT_VALUE,
         )))
@@ -76,7 +76,7 @@ where
 {
     type ReturnType = &'a BorrowedType;
     fn invoke(&'a self) -> Self::ReturnType {
-        let value_opt = GetOptFieldMethod::<NUMBER>::invoke(self);
+        let value_opt = GetOptFieldMethod::<NUMBER>::invoke_get_opt(self);
         value_opt.unwrap_or(MP::Fields::<NUMBER>::DEFAULT_VALUE)
     }
 }
@@ -92,7 +92,7 @@ where
 {
     type ReturnType = ReturnType::OptionMessage;
     fn invoke(&'a self) -> Self::ReturnType {
-        let msg_opt = GetOptFieldMethod::<NUMBER>::invoke(self);
+        let msg_opt = GetOptFieldMethod::<NUMBER>::invoke_get_opt(self);
         IntoOptionMessage::into_message(msg_opt)
     }
 }

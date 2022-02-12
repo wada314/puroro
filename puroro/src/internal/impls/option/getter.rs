@@ -38,7 +38,7 @@ where
         self.shared
             .option
             .as_ref()
-            .map(|msg| GetFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
+            .map(|msg| GetFieldMethod::<NUMBER>::invoke_get(msg.as_message_impl_ref()))
             .into_iter()
             .flatten()
     }

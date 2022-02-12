@@ -22,26 +22,26 @@ use crate::MessageImpl;
 
 pub trait GetFieldMethod<'a, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
+    fn invoke_get(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
+    fn invoke_get_opt(&'a self) -> Self::ReturnType;
 }
 
 pub trait GetSliceFieldMethod<'a, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType;
+    fn invoke_get_slice(&'a self) -> Self::ReturnType;
 }
 
 pub trait HasFieldMethod<'a, const NUMBER: i32> {
-    fn invoke(&'a self) -> bool;
+    fn invoke_has(&'a self) -> bool;
 }
 
 pub trait GetMutFieldMethod<'a, const NUMBER: i32> {
     type ReturnType;
-    fn invoke(&'a mut self) -> Self::ReturnType;
+    fn invoke_get_mut(&'a mut self) -> Self::ReturnType;
 }
 
 //################ Methods Impl traits, for specialization ################
@@ -78,7 +78,7 @@ where
 {
     type ReturnType =
         <Self as GetFieldMethodImpl<'a, ImplTag, LabelTag::IsRepeated, NUMBER>>::ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get(&'a self) -> Self::ReturnType {
         GetFieldMethodImpl::invoke(self)
     }
 }
@@ -89,7 +89,7 @@ where
     Self: GetOptFieldMethodImpl<'a, ImplTag, NUMBER>,
 {
     type ReturnType = <Self as GetOptFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_opt(&'a self) -> Self::ReturnType {
         GetOptFieldMethodImpl::invoke(self)
     }
 }
@@ -100,7 +100,7 @@ where
     Self: GetSliceFieldMethodImpl<'a, ImplTag, NUMBER>,
 {
     type ReturnType = <Self as GetSliceFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
-    fn invoke(&'a self) -> Self::ReturnType {
+    fn invoke_get_slice(&'a self) -> Self::ReturnType {
         GetSliceFieldMethodImpl::invoke(self)
     }
 }
@@ -111,7 +111,7 @@ where
     Self: GetMutFieldMethodImpl<'a, ImplTag, NUMBER>,
 {
     type ReturnType = <Self as GetMutFieldMethodImpl<'a, ImplTag, NUMBER>>::ReturnType;
-    fn invoke(&'a mut self) -> Self::ReturnType {
+    fn invoke_get_mut(&'a mut self) -> Self::ReturnType {
         GetMutFieldMethodImpl::invoke(self)
     }
 }
@@ -123,7 +123,7 @@ impl<'a, MP, ImplTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
 where
     Self: GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
 {
-    fn invoke(&'a self) -> bool {
-        GetOptFieldMethod::invoke(self).is_some()
+    fn invoke_has(&'a self) -> bool {
+        GetOptFieldMethod::invoke_get_opt(self).is_some()
     }
 }

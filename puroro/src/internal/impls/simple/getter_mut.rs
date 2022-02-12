@@ -56,9 +56,9 @@ where
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
             // initailize the field by `Default` value
-            *HasMutField::<NUMBER>::get_mut(&mut self.fields) = Default::default();
+            *HasMutField::<NUMBER>::get_field_mut(&mut self.fields) = Default::default();
         }
-        HasMutField::<NUMBER>::get_mut(&mut self.fields)
+        HasMutField::<NUMBER>::get_field_mut(&mut self.fields)
     }
 }
 
@@ -80,10 +80,10 @@ where
         if !self.shared.bitfield().get(opt_bit_index) {
             self.shared.bitfield_mut().set(opt_bit_index, true);
             // initailize the field by `Default` value
-            *<FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields) =
+            *<FieldsType as HasMutField<NUMBER>>::get_field_mut(&mut self.fields) =
                 DefaultIn::default_in(self.shared.alloc().clone());
         }
-        <FieldsType as HasMutField<NUMBER>>::get_mut(&mut self.fields)
+        <FieldsType as HasMutField<NUMBER>>::get_field_mut(&mut self.fields)
     }
 }
 
@@ -112,7 +112,7 @@ where
 {
     type ReturnType = &'a mut FieldMessageType;
     fn invoke(&'a mut self) -> Self::ReturnType {
-        let field_opt = HasMutField::<NUMBER>::get_mut(&mut self.fields);
+        let field_opt = HasMutField::<NUMBER>::get_field_mut(&mut self.fields);
         field_opt
             .get_or_insert_with(|| FieldMessageAsRefType::default_in(self.shared.alloc().clone()))
             .as_message_mut()

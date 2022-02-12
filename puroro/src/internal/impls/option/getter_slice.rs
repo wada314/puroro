@@ -34,7 +34,7 @@ where
         self.shared
             .option
             .as_ref()
-            .map(|msg| GetSliceFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
+            .map(|msg| GetSliceFieldMethod::<NUMBER>::invoke_get_slice(msg.as_message_impl_ref()))
             .unwrap_or_default()
     }
 }

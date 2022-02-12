@@ -93,8 +93,8 @@ where
     type ReturnType = Option<ReturnType>;
     fn invoke(&'a self) -> Self::ReturnType {
         let (left, right) = (&self.shared.left, &self.shared.right);
-        let right_opt = GetOptFieldMethod::<NUMBER>::invoke(right.as_message_impl_ref());
-        right_opt.or_else(|| GetOptFieldMethod::<NUMBER>::invoke(left.as_message_impl_ref()))
+        let right_opt = GetOptFieldMethod::<NUMBER>::invoke_get_opt(right.as_message_impl_ref());
+        right_opt.or_else(|| GetOptFieldMethod::<NUMBER>::invoke_get_opt(left.as_message_impl_ref()))
     }
 }
 
@@ -146,11 +146,11 @@ where
         let left_message_impl_ref = left.as_message_impl_ref();
         let right_message_impl_ref = right.as_message_impl_ref();
 
-        let has_left = HasFieldMethod::<NUMBER>::invoke(left_message_impl_ref);
-        let has_right = HasFieldMethod::<NUMBER>::invoke(right_message_impl_ref);
+        let has_left = HasFieldMethod::<NUMBER>::invoke_has(left_message_impl_ref);
+        let has_right = HasFieldMethod::<NUMBER>::invoke_has(right_message_impl_ref);
         if has_left || has_right {
-            let left_field = GetFieldMethod::<NUMBER>::invoke(left_message_impl_ref);
-            let right_field = GetFieldMethod::<NUMBER>::invoke(right_message_impl_ref);
+            let left_field = GetFieldMethod::<NUMBER>::invoke_get(left_message_impl_ref);
+            let right_field = GetFieldMethod::<NUMBER>::invoke_get(right_message_impl_ref);
             Some(IntoMergedMessage::into_message((left_field, right_field)))
         } else {
             None

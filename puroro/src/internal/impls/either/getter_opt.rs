@@ -91,8 +91,8 @@ where
     type ReturnType = ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
         self.shared.either.as_ref().either(
-            |msg| GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()),
-            |msg| GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()),
+            |msg| GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref()),
+            |msg| GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref()),
         )
     }
 }
@@ -146,11 +146,11 @@ where
             .as_ref()
             .either(
                 |msg| {
-                    GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref())
+                    GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref())
                         .map(|l| Either::Left(l))
                 },
                 |msg| {
-                    GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref())
+                    GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref())
                         .map(|r| Either::Right(r))
                 },
             ) // Option<Either<LeftReturnType, RightReturnType>>

@@ -29,6 +29,6 @@ where
 {
     type ReturnType = &'a [ItemType];
     fn invoke(&'a self) -> Self::ReturnType {
-        self.fields.get().deref()
+        self.fields.get_field().deref()
     }
 }

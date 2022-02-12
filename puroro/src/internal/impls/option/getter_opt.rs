@@ -35,6 +35,6 @@ where
         self.shared
             .option
             .as_ref()
-            .and_then(|msg| GetOptFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
+            .and_then(|msg| GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref()))
     }
 }
