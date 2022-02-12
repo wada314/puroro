@@ -19,29 +19,18 @@ use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties}
 use crate::tags;
 use crate::{AsMessageImplRef, Either, MessageImpl};
 
-trait MethodImpl<'a, LabelTag, TypeTag, FieldType, SharedType, IsMessage, const NUMBER: i32> {
+trait MethodImpl<'a, IsMessage, const NUMBER: i32> {
     type ReturnType;
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
     GetOptFieldMethodImpl<'a, tags::EitherImpl, NUMBER>
     for MessageImpl<MP, tags::EitherImpl, FieldsType, SharedType>
 where
-    Self: MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        <TypeTag as tags::FieldTypeTag>::IsMessage,
-        NUMBER,
-        ReturnType = ReturnType,
-    >,
+    Self: MethodImpl<'a, TypeTag::IsMessage, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
 {
     type ReturnType = ReturnType;
@@ -54,8 +43,6 @@ where
 // Assuming that the both message types returns the same type.
 impl<
     'a,
-    LabelTag,
-    TypeTag,
     MP,
     LeftMessageRef,
     RightMessageRef,
@@ -63,16 +50,7 @@ impl<
     RightMessage,
     ReturnType,
     const NUMBER: i32,
->
-    MethodImpl<
-        'a,
-        LabelTag,
-        TypeTag,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-        False,
-        NUMBER,
-    >
+> MethodImpl<'a, False, NUMBER>
     for MessageImpl<
         MP,
         tags::EitherImpl,
@@ -81,8 +59,7 @@ impl<
     >
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
@@ -101,7 +78,6 @@ where
 // Return `Either` of the both return types
 impl<
     'a,
-    LabelTag,
     MP,
     InnerMP,
     LeftMessageRef,
@@ -112,16 +88,7 @@ impl<
     RightReturnType,
     FinalReturnType,
     const NUMBER: i32,
->
-    MethodImpl<
-        'a,
-        LabelTag,
-        tags::Message<InnerMP>,
-        <EmptyFields as HasField<NUMBER>>::Type,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-        True,
-        NUMBER,
-    >
+> MethodImpl<'a, True, NUMBER>
     for MessageImpl<
         MP,
         tags::EitherImpl,
@@ -130,8 +97,7 @@ impl<
     >
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = tags::Message<InnerMP>>,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<LeftReturnType>>,

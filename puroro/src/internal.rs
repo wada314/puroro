@@ -146,7 +146,7 @@ macro_rules! define_fields_container {
 macro_rules! define_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
         $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$num>>::invoke(
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$num>>::invoke_get(
                 self.as_message_impl_ref(),
             )
         }
@@ -157,7 +157,7 @@ macro_rules! define_getter {
 macro_rules! define_opt_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
         $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$num>>::invoke(
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$num>>::invoke_get_opt(
                 self.as_message_impl_ref(),
             )
         }
@@ -168,7 +168,7 @@ macro_rules! define_opt_getter {
 macro_rules! define_slice_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
         $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$num>>::invoke(
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$num>>::invoke_get_slice(
                 self.as_message_impl_ref(),
             )
         }
@@ -179,7 +179,7 @@ macro_rules! define_slice_getter {
 macro_rules! define_mut_getter {
     ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? mut self)) => {
         $pub fn $id(&$($lt)* mut self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::invoke(
+            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::invoke_get_mut(
                 self.as_message_impl_mut(),
             )
         }
