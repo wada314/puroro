@@ -66,6 +66,22 @@ where
     }
 }
 
+// (optional|required|[unlabeled]) message field
+impl<'a, MP, ImplTag, FieldMP, ReturnType, FieldsType, SharedType, const NUMBER: i32>
+    MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, ImplTag, FieldsType, SharedType>
+where
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<FieldMP>>,
+    Self: GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
+    ReturnType: IntoOptionMessage<FieldMP>,
+{
+    type ReturnType = ReturnType::OptionMessage;
+    fn invoke(&'a self) -> Self::ReturnType {
+        let msg_opt = GetOptFieldMethod::<NUMBER>::invoke(self);
+        IntoOptionMessage::into_message(msg_opt)
+    }
+}
+
 /////////////////////////////////////////////////
 
 // (optional|required|[unlabeled]) non-ld field
