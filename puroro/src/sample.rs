@@ -338,6 +338,10 @@ impl_has!(Person, pub fn has_name<1>(&self));
 impl_has!(Person, pub fn has_age<2>(&self));
 impl_has!(Person, pub fn has_partner<4>(&self));
 
+pub trait DeserFromBytes {
+    fn deser_from_bytes<Iter>(&mut self, bytes: Iter) -> Result<()>;
+}
+
 #[allow(unused)]
 fn test() {
     let mut person: Person = Person::new();
