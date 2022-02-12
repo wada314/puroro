@@ -17,7 +17,7 @@ use crate::internal::bool::{False, True};
 use crate::internal::methods::{
     GetFieldMethod, GetOptFieldMethod, GetOptFieldMethodImpl, HasFieldMethod,
 };
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::{FieldProperties, MessageProperties};
 use crate::tags;
 use crate::{AsMessageImplRef, MessageImpl};
 
@@ -26,21 +26,18 @@ trait MethodImpl<'a, IsMessage, const NUMBER: i32> {
     fn invoke(&'a self) -> Self::ReturnType;
 }
 
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
+impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
     GetOptFieldMethodImpl<'a, tags::MergedImpl, NUMBER>
     for MessageImpl<MP, tags::MergedImpl, FieldsType, SharedType>
 where
-    Self:
-        MethodImpl<'a, <TypeTag as tags::FieldTypeTag>::IsMessage, NUMBER, ReturnType = ReturnType>,
+    Self: MethodImpl<'a, TypeTag::IsMessage, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
-    FieldsType: HasField<NUMBER>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
 {
     type ReturnType = ReturnType;
     fn invoke_get_opt_impl(&'a self) -> Self::ReturnType {
-        MethodImpl::invoke(self)
+        self.invoke()
     }
 }
 
@@ -48,9 +45,8 @@ where
 // Assuming that the both message types returns the same type.
 impl<
     'a,
-    LabelTag,
-    TypeTag,
     MP,
+    FieldsType,
     LeftMessageRef,
     RightMessageRef,
     LeftMessage,
@@ -58,16 +54,10 @@ impl<
     ReturnType,
     const NUMBER: i32,
 > MethodImpl<'a, False, NUMBER>
-    for MessageImpl<
-        MP,
-        tags::MergedImpl,
-        EmptyFields,
-        MergedShared<LeftMessageRef, RightMessageRef>,
-    >
+    for MessageImpl<MP, tags::MergedImpl, FieldsType, MergedShared<LeftMessageRef, RightMessageRef>>
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    MP::Fields<NUMBER>: FieldProperties,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<ReturnType>>,
@@ -76,18 +66,17 @@ where
     type ReturnType = Option<ReturnType>;
     fn invoke(&'a self) -> Self::ReturnType {
         let (left, right) = (&self.shared.left, &self.shared.right);
-        let right_opt = GetOptFieldMethod::<NUMBER>::invoke_get_opt(right.as_message_impl_ref());
-        right_opt
-            .or_else(|| GetOptFieldMethod::<NUMBER>::invoke_get_opt(left.as_message_impl_ref()))
+        let right_opt = right.as_message_impl_ref().invoke_get_opt();
+        right_opt.or_else(|| left.as_message_impl_ref().invoke_get_opt())
     }
 }
 
 // non-repeated message field
 impl<
     'a,
-    LabelTag,
     MP,
     InnerMP,
+    FieldsType,
     LeftMessageRef,
     RightMessageRef,
     LeftMessage,
@@ -97,16 +86,10 @@ impl<
     FinalReturnType,
     const NUMBER: i32,
 > MethodImpl<'a, True, NUMBER>
-    for MessageImpl<
-        MP,
-        tags::MergedImpl,
-        EmptyFields,
-        MergedShared<LeftMessageRef, RightMessageRef>,
-    >
+    for MessageImpl<MP, tags::MergedImpl, FieldsType, MergedShared<LeftMessageRef, RightMessageRef>>
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>:
-        FieldProperties<LabelTag = LabelTag, TypeTag = tags::Message<InnerMP>>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage:
@@ -121,12 +104,12 @@ where
         let left_message_impl_ref = left.as_message_impl_ref();
         let right_message_impl_ref = right.as_message_impl_ref();
 
-        let has_left = HasFieldMethod::<NUMBER>::invoke_has(left_message_impl_ref);
-        let has_right = HasFieldMethod::<NUMBER>::invoke_has(right_message_impl_ref);
+        let has_left = left_message_impl_ref.invoke_has();
+        let has_right = right_message_impl_ref.invoke_has();
         if has_left || has_right {
-            let left_field = GetFieldMethod::<NUMBER>::invoke_get(left_message_impl_ref);
-            let right_field = GetFieldMethod::<NUMBER>::invoke_get(right_message_impl_ref);
-            Some(IntoMergedMessage::into_message((left_field, right_field)))
+            let left_field = left_message_impl_ref.invoke_get();
+            let right_field = right_message_impl_ref.invoke_get();
+            Some((left_field, right_field).into_message())
         } else {
             None
         }
