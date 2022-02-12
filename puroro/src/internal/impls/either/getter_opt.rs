@@ -15,7 +15,7 @@
 use super::{EitherShared, IntoEitherMessage};
 use crate::internal::bool::{False, True};
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
-use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
+use crate::internal::{EmptyFields, FieldProperties, MessageProperties};
 use crate::tags;
 use crate::{AsMessageImplRef, Either, MessageImpl};
 
@@ -35,7 +35,7 @@ where
 {
     type ReturnType = ReturnType;
     fn invoke_get_opt_impl(&'a self) -> Self::ReturnType {
-        MethodImpl::invoke(self)
+        self.invoke()
     }
 }
 
@@ -59,7 +59,7 @@ impl<
     >
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    MP::Fields<NUMBER>: FieldProperties,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = ReturnType>,
@@ -68,8 +68,8 @@ where
     type ReturnType = ReturnType;
     fn invoke(&'a self) -> Self::ReturnType {
         self.shared.either.as_ref().either(
-            |msg| GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref()),
-            |msg| GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref()),
+            |msg| msg.as_message_impl_ref().invoke_get_opt(),
+            |msg| msg.as_message_impl_ref().invoke_get_opt(),
         )
     }
 }
@@ -80,6 +80,7 @@ impl<
     'a,
     MP,
     InnerMP,
+    FieldsType,
     LeftMessageRef,
     RightMessageRef,
     LeftMessage,
@@ -89,15 +90,10 @@ impl<
     FinalReturnType,
     const NUMBER: i32,
 > MethodImpl<'a, True, NUMBER>
-    for MessageImpl<
-        MP,
-        tags::EitherImpl,
-        EmptyFields,
-        EitherShared<LeftMessageRef, RightMessageRef>,
-    >
+    for MessageImpl<MP, tags::EitherImpl, FieldsType, EitherShared<LeftMessageRef, RightMessageRef>>
 where
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
+    MP::Fields<NUMBER>: FieldProperties<TypeTag = tags::Message<InnerMP>>,
     LeftMessageRef: AsMessageImplRef<MessageImplType = LeftMessage>,
     RightMessageRef: AsMessageImplRef<MessageImplType = RightMessage>,
     LeftMessage: 'a + GetOptFieldMethod<'a, NUMBER, ReturnType = Option<LeftReturnType>>,
@@ -112,11 +108,13 @@ where
             .as_ref()
             .either(
                 |msg| {
-                    GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref())
+                    msg.as_message_impl_ref()
+                        .invoke_get_opt()
                         .map(|l| Either::Left(l))
                 },
                 |msg| {
-                    GetOptFieldMethod::<NUMBER>::invoke_get_opt(msg.as_message_impl_ref())
+                    msg.as_message_impl_ref()
+                        .invoke_get_opt()
                         .map(|r| Either::Right(r))
                 },
             ) // Option<Either<LeftReturnType, RightReturnType>>
