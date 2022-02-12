@@ -12,11 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetSliceFieldMethodImplImpl;
+use crate::internal::methods::{GetSliceFieldMethodImpl, GetSliceFieldMethodImplImpl};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::MessageImpl;
 use ::std::ops::Deref;
+
+// repeated field
+impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, const NUMBER: i32>
+    GetSliceFieldMethodImpl<'a, tags::SimpleImpl, NUMBER>
+    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = CollectionType>,
+    CollectionType: 'a + Deref<Target = [ItemType]>,
+    ItemType: 'a,
+{
+    type ReturnType = &'a [ItemType];
+    fn invoke(&'a self) -> Self::ReturnType {
+        self.fields.get().deref()
+    }
+}
+
+////////////////////////////////////////////////////////////
 
 // repeated field
 impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, TypeTag, const NUMBER: i32>

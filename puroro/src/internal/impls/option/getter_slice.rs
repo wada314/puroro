@@ -13,10 +13,33 @@
 // limitations under the License.
 
 use super::OptionShared;
-use crate::internal::methods::{GetSliceFieldMethod, GetSliceFieldMethodImplImpl};
+use crate::internal::methods::{
+    GetSliceFieldMethod, GetSliceFieldMethodImpl, GetSliceFieldMethodImplImpl,
+};
 use crate::internal::{EmptyFields, FieldProperties, HasField, MessageProperties};
 use crate::MessageImpl;
 use crate::{tags, AsMessageImplRef};
+
+// repeated field
+// Assuming the internal type's getter type is `&[T]` type
+impl<'a, MP, InnerMessageRef, InnerMessage, InnerReturnType, const NUMBER: i32>
+    GetSliceFieldMethodImpl<'a, tags::OptionImpl, NUMBER>
+    for MessageImpl<MP, tags::OptionImpl, EmptyFields, OptionShared<InnerMessageRef>>
+where
+    MP: MessageProperties,
+    InnerMessageRef: AsMessageImplRef<MessageImplType = InnerMessage>,
+    InnerMessage: 'a + GetSliceFieldMethod<'a, NUMBER, ReturnType = InnerReturnType>,
+    InnerReturnType: Default,
+{
+    type ReturnType = InnerReturnType;
+    fn invoke(&'a self) -> Self::ReturnType {
+        self.shared
+            .option
+            .as_ref()
+            .map(|msg| GetSliceFieldMethod::<NUMBER>::invoke(msg.as_message_impl_ref()))
+            .unwrap_or_default()
+    }
+}
 
 // repeated field
 // Assuming the internal type's getter type is `&[T]` type
