@@ -439,6 +439,15 @@ fn test() {
     let _: &[u32] = bpartner.scores_slice();
     let _: &[BString] = bpartner.nicknames_slice();
     let _: &[PersonBump] = bpartner.children_slice();
+    for x in bperson.scores() {
+        let _: u32 = x;
+    }
+    for x in bperson.nicknames() {
+        let _: &str = AsRef::<str>::as_ref(&x);
+    }
+    for x in bperson.children() {
+        let _: &Person<_> = x.as_message_ref();
+    }
 
     // ################ either ################
     let eperson: Person<_> = Either::<&Person<_>, &Person>::Left(&partner).into();
@@ -459,7 +468,7 @@ fn test() {
         let _: &str = AsRef::<str>::as_ref(&x);
     }
     for x in eperson.children() {
-        let _: Person<_> = x;
+        let _: &Person<_> = x.as_message_ref();
     }
 
     // ################ merged ################
