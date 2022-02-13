@@ -35,12 +35,21 @@ impl<MP, ImplTag, Fields, Shared> MessageImpl<MP, ImplTag, Fields, Shared> {
     }
 }
 
-impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared> {
+impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared>
+where
+    MP: MessageProperties,
+{
     pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter) -> Result<()>
     where
+        Self: MatchFieldNumber<DeserSimpleImpl<MP, Fields, Shared, Iter>>,
         Iter: Iterator<Item = io::Result<u8>>,
     {
-        todo!()
+        let mut deser = DeserSimpleImpl {
+            bytes,
+            _phantom: PhantomData,
+        };
+        self.match_field_number_mut(1, &mut deser)?;
+        Ok(())
     }
 }
 
@@ -59,7 +68,7 @@ pub trait FieldHandler {
         <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
 }
 
-struct DeserSimpleImpl<MP, FieldsType, SharedType, Iter> {
+pub struct DeserSimpleImpl<MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
