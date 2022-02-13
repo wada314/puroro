@@ -31,8 +31,32 @@ use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{EmptyFields, ImplProperties, MessageProperties, SimpleShared};
 use crate::*;
+use ::std::io;
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
+
+pub trait DeserFromBytes {
+    fn deser_from_bytes<Iter: Iterator<Item = io::Result<u8>>>(
+        &mut self,
+        bytes: Iter,
+    ) -> Result<()>;
+}
+
+impl<Impl> DeserFromBytes for Person<Impl>
+where
+    Impl: ImplProperties<ImplTag = tags::SimpleImpl>,
+{
+    fn deser_from_bytes<Iter: Iterator<Item = io::Result<u8>>>(
+        &mut self,
+        bytes: Iter,
+    ) -> Result<()> {
+        todo!()
+    }
+}
+
+
+
+////////////////////////////////////////////////
 
 pub struct PersonSimpleImplProperties<
     FieldsType = PersonFieldsContainer,
@@ -337,10 +361,6 @@ impl_get_mut!(Person, pub fn scores_mut<6>(&mut self));
 impl_has!(Person, pub fn has_name<1>(&self));
 impl_has!(Person, pub fn has_age<2>(&self));
 impl_has!(Person, pub fn has_partner<4>(&self));
-
-pub trait DeserFromBytes {
-    fn deser_from_bytes<Iter>(&mut self, bytes: Iter) -> Result<()>;
-}
 
 #[allow(unused)]
 fn test() {
