@@ -20,6 +20,7 @@
 #![doc(test(attr(feature(generic_associated_types))))]
 
 mod common_traits;
+mod deser;
 mod error;
 pub mod internal;
 pub mod message;
@@ -38,4 +39,3 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
-

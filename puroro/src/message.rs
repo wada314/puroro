@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tags;
-use crate::{AsMessageImplRef, DefaultIn, Result};
-use ::std::io;
+use crate::{AsMessageImplRef, DefaultIn};
 use ::std::marker::PhantomData;
-
-use crate::internal::{FieldProperties, GetField, GetFieldMut, MessageProperties};
 
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
     pub(crate) fields: Fields,
@@ -33,71 +29,6 @@ impl<MP, ImplTag, Fields, Shared> MessageImpl<MP, ImplTag, Fields, Shared> {
             _phantom: PhantomData,
         }
     }
-}
-
-impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared>
-where
-    MP: MessageProperties,
-{
-    pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter) -> Result<()>
-    where
-        Self: MatchFieldNumber<DeserSimpleImpl<MP, Fields, Shared, Iter>>,
-        Iter: Iterator<Item = io::Result<u8>>,
-    {
-        let mut deser = DeserSimpleImpl {
-            bytes,
-            _phantom: PhantomData,
-        };
-        self.match_field_number_mut(1, &mut deser)?;
-        Ok(())
-    }
-}
-
-pub trait FieldHandler {
-    type MP;
-    type FieldsType;
-    type SharedType;
-    fn handle_mut<const NUMBER: i32>(
-        &mut self,
-        field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
-        shared: &mut Self::SharedType,
-    ) -> Result<()>
-    where
-        Self::FieldsType: GetFieldMut<NUMBER>,
-        Self::MP: MessageProperties,
-        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
-}
-
-pub struct DeserSimpleImpl<MP, FieldsType, SharedType, Iter> {
-    bytes: Iter,
-    _phantom: PhantomData<(MP, FieldsType, SharedType)>,
-}
-
-impl<MP, FieldsType, SharedType, Iter> FieldHandler
-    for DeserSimpleImpl<MP, FieldsType, SharedType, Iter>
-where
-    MP: MessageProperties,
-{
-    type MP = MP;
-    type FieldsType = FieldsType;
-    type SharedType = SharedType;
-
-    fn handle_mut<const NUMBER: i32>(
-        &mut self,
-        field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
-        shared: &mut Self::SharedType,
-    ) -> Result<()>
-    where
-        Self::FieldsType: GetFieldMut<NUMBER>,
-        Self::MP: MessageProperties,
-        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    {
-        todo!()
-    }
-}
-
-pub trait MatchFieldNumber<FH: FieldHandler> {
-    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()>;
 }
 
 impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>

@@ -30,7 +30,7 @@ use crate::internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{
-    EmptyFields, FieldProperties, ImplProperties, MessageProperties, SimpleShared,
+    EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber, MessageProperties, SimpleShared,
 };
 use crate::*;
 use ::std::marker::PhantomData;
@@ -42,7 +42,7 @@ use crate::message::*;
 impl<FieldsType, SharedType, FH> MatchFieldNumber<FH>
     for MessageImpl<PersonMessageProperties, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FH: FieldHandler<
+    FH: FieldHandlerMut<
         FieldsType = FieldsType,
         SharedType = SharedType,
         MP = PersonMessageProperties,

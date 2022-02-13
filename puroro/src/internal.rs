@@ -28,6 +28,7 @@ pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::simple::{SimpleFields, SimpleShared};
 
 use crate::tags;
+use crate::Result;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
@@ -110,6 +111,25 @@ impl<const NUMBER: i32> GetField<NUMBER> for EmptyFields {
     fn get_field(&self) -> &Self::Type {
         &()
     }
+}
+
+pub trait FieldHandlerMut {
+    type MP;
+    type FieldsType;
+    type SharedType;
+    fn handle_mut<const NUMBER: i32>(
+        &mut self,
+        field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
+        shared: &mut Self::SharedType,
+    ) -> Result<()>
+    where
+        Self::FieldsType: GetFieldMut<NUMBER>,
+        Self::MP: MessageProperties,
+        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
+}
+
+pub trait MatchFieldNumber<FH: FieldHandlerMut> {
+    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()>;
 }
 
 #[macro_export]
