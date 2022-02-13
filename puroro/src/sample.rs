@@ -34,12 +34,46 @@ use crate::*;
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
 
-impl<Impl> crate::message::DeserFieldHandler for Person<Impl>
+use crate::internal::GetFieldMut;
+use crate::message::*;
+
+impl<FieldsType, SharedType, FH> MatchFieldNumber<FH>
+    for MessageImpl<PersonMessageProperties, tags::SimpleImpl, FieldsType, SharedType>
 where
-    Impl: ImplProperties,
+    FH: FieldHandler<FieldsType = FieldsType, SharedType = SharedType>,
+    FieldsType: GetFieldMut<1>,
+    FieldsType: GetFieldMut<2>,
+    FieldsType: GetFieldMut<3>,
+    FieldsType: GetFieldMut<4>,
+    FieldsType: GetFieldMut<5>,
+    FieldsType: GetFieldMut<6>,
 {
-    fn handle(number: i32) -> Result<()> {
+    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()> {
         match number {
+            1 => handler.handle_mut::<1>(
+                &mut GetFieldMut::<1>::get_field_mut(&mut self.fields),
+                &mut self.shared,
+            ),
+            2 => handler.handle_mut::<2>(
+                &mut GetFieldMut::<2>::get_field_mut(&mut self.fields),
+                &mut self.shared,
+            ),
+            3 => handler.handle_mut::<3>(
+                &mut GetFieldMut::<3>::get_field_mut(&mut self.fields),
+                &mut self.shared,
+            ),
+            4 => handler.handle_mut::<4>(
+                &mut GetFieldMut::<4>::get_field_mut(&mut self.fields),
+                &mut self.shared,
+            ),
+            5 => handler.handle_mut::<5>(
+                &mut GetFieldMut::<5>::get_field_mut(&mut self.fields),
+                &mut self.shared,
+            ),
+            6 => handler.handle_mut::<6>(
+                &mut GetFieldMut::<6>::get_field_mut(&mut self.fields),
+                &mut self.shared,
+            ),
             _ => Err(ErrorKind::UnknownFieldNumber)?,
         }
     }

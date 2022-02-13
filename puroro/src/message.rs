@@ -17,6 +17,8 @@ use crate::{AsMessageImplRef, DefaultIn, Result};
 use ::std::io;
 use ::std::marker::PhantomData;
 
+use crate::internal::{GetField, GetFieldMut};
+
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
     pub(crate) fields: Fields,
     pub(crate) shared: Shared,
@@ -42,8 +44,29 @@ impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared> {
     }
 }
 
-pub trait DeserFieldHandler {
-    fn handle(number: i32) -> Result<()>;
+pub trait FieldHandler {
+    type FieldsType;
+    type SharedType;
+    fn handle_mut<const NUMBER: i32>(
+        &mut self,
+        field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
+        shared: &mut Self::SharedType,
+    ) -> Result<()>
+    where
+        Self::FieldsType: GetFieldMut<NUMBER>;
+}
+
+struct DeserSimpleImpl<MP, Iter> {
+    bytes: Iter,
+    _phantom: PhantomData<MP>,
+}
+
+pub trait MatchFieldNumber<FH: FieldHandler> {
+    fn match_field_number_mut(
+        &mut self,
+        number: i32,
+        handler: &mut FH,
+    ) -> Result<()>;
 }
 
 impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>
