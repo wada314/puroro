@@ -17,7 +17,7 @@ use crate::{AsMessageImplRef, DefaultIn, Result};
 use ::std::io;
 use ::std::marker::PhantomData;
 
-use crate::internal::{GetField, GetFieldMut};
+use crate::internal::{FieldProperties, GetField, GetFieldMut, MessageProperties};
 
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
     pub(crate) fields: Fields,
@@ -45,6 +45,7 @@ impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared> {
 }
 
 pub trait FieldHandler {
+    type MP;
     type FieldsType;
     type SharedType;
     fn handle_mut<const NUMBER: i32>(
@@ -53,20 +54,41 @@ pub trait FieldHandler {
         shared: &mut Self::SharedType,
     ) -> Result<()>
     where
-        Self::FieldsType: GetFieldMut<NUMBER>;
+        Self::FieldsType: GetFieldMut<NUMBER>,
+        Self::MP: MessageProperties,
+        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
 }
 
-struct DeserSimpleImpl<MP, Iter> {
+struct DeserSimpleImpl<MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
-    _phantom: PhantomData<MP>,
+    _phantom: PhantomData<(MP, FieldsType, SharedType)>,
+}
+
+impl<MP, FieldsType, SharedType, Iter> FieldHandler
+    for DeserSimpleImpl<MP, FieldsType, SharedType, Iter>
+where
+    MP: MessageProperties,
+{
+    type MP = MP;
+    type FieldsType = FieldsType;
+    type SharedType = SharedType;
+
+    fn handle_mut<const NUMBER: i32>(
+        &mut self,
+        field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
+        shared: &mut Self::SharedType,
+    ) -> Result<()>
+    where
+        Self::FieldsType: GetFieldMut<NUMBER>,
+        Self::MP: MessageProperties,
+        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    {
+        todo!()
+    }
 }
 
 pub trait MatchFieldNumber<FH: FieldHandler> {
-    fn match_field_number_mut(
-        &mut self,
-        number: i32,
-        handler: &mut FH,
-    ) -> Result<()>;
+    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()>;
 }
 
 impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>
