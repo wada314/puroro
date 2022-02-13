@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{AsMessageImplRef, DefaultIn};
+use crate::tags;
+use crate::{AsMessageImplRef, DefaultIn, Result};
+use ::std::io;
 use ::std::marker::PhantomData;
 
 pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
@@ -20,6 +22,7 @@ pub struct MessageImpl<MP, ImplTag, Fields, Shared> {
     pub(crate) shared: Shared,
     _phantom: PhantomData<(MP, ImplTag)>,
 }
+
 impl<MP, ImplTag, Fields, Shared> MessageImpl<MP, ImplTag, Fields, Shared> {
     pub fn from_raw_parts(fields: Fields, shared: Shared) -> Self {
         Self {
@@ -29,6 +32,20 @@ impl<MP, ImplTag, Fields, Shared> MessageImpl<MP, ImplTag, Fields, Shared> {
         }
     }
 }
+
+impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared> {
+    pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter) -> Result<()>
+    where
+        Iter: Iterator<Item = io::Result<u8>>,
+    {
+        todo!()
+    }
+}
+
+pub trait DeserFieldHandler {
+    fn handle(number: i32) -> Result<()>;
+}
+
 impl<MP, ImplTag, Fields, Shared> Default for MessageImpl<MP, ImplTag, Fields, Shared>
 where
     Fields: Default,
@@ -42,6 +59,7 @@ where
         }
     }
 }
+
 impl<MP, ImplTag, Fields, Shared, Alloc> DefaultIn for MessageImpl<MP, ImplTag, Fields, Shared>
 where
     Fields: DefaultIn<AllocatorType = Alloc>,
@@ -57,6 +75,7 @@ where
         }
     }
 }
+
 impl<MP, ImplTag, Fields, Shared> AsMessageImplRef for MessageImpl<MP, ImplTag, Fields, Shared> {
     type MessageImplType = MessageImpl<MP, ImplTag, Fields, Shared>;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {

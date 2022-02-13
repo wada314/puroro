@@ -31,30 +31,19 @@ use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{EmptyFields, ImplProperties, MessageProperties, SimpleShared};
 use crate::*;
-use ::std::io;
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
 
-pub trait DeserFromBytes {
-    fn deser_from_bytes<Iter: Iterator<Item = io::Result<u8>>>(
-        &mut self,
-        bytes: Iter,
-    ) -> Result<()>;
-}
-
-impl<Impl> DeserFromBytes for Person<Impl>
+impl<Impl> crate::message::DeserFieldHandler for Person<Impl>
 where
-    Impl: ImplProperties<ImplTag = tags::SimpleImpl>,
+    Impl: ImplProperties,
 {
-    fn deser_from_bytes<Iter: Iterator<Item = io::Result<u8>>>(
-        &mut self,
-        bytes: Iter,
-    ) -> Result<()> {
-        todo!()
+    fn handle(number: i32) -> Result<()> {
+        match number {
+            _ => Err(ErrorKind::UnknownFieldNumber)?,
+        }
     }
 }
-
-
 
 ////////////////////////////////////////////////
 
