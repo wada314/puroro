@@ -55,34 +55,23 @@ where
     FieldsType: GetFieldMut<6>,
 {
     fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()> {
+        macro_rules! call {
+            ($number:literal) => {
+                handler.handle_mut::<$number>(
+                    &mut GetFieldMut::<$number>::get_field_mut(&mut self.fields),
+                    &mut self.shared,
+                )
+            };
+        }
         match number {
-            1 => self.call_handler_mut::<_, 1>(handler),
-            2 => self.call_handler_mut::<_, 2>(handler),
-            3 => self.call_handler_mut::<_, 3>(handler),
-            4 => self.call_handler_mut::<_, 4>(handler),
-            5 => self.call_handler_mut::<_, 5>(handler),
-            6 => self.call_handler_mut::<_, 6>(handler),
+            1 => call!(1),
+            2 => call!(2),
+            3 => call!(3),
+            4 => call!(4),
+            5 => call!(5),
+            6 => call!(6),
             _ => Err(ErrorKind::UnknownFieldNumber)?,
         }
-    }
-}
-impl<FieldsType, SharedType>
-    MessageImpl<PersonMessageProperties, tags::SimpleImpl, FieldsType, SharedType>
-{
-    fn call_handler_mut<FH, const NUMBER: i32>(&mut self, handler: &mut FH) -> Result<()>
-    where
-        FieldsType: GetFieldMut<NUMBER>,
-        FH: FieldHandler<
-            FieldsType = FieldsType,
-            SharedType = SharedType,
-            MP = PersonMessageProperties,
-        >,
-        <PersonMessageProperties as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    {
-        handler.handle_mut::<NUMBER>(
-            &mut GetFieldMut::<NUMBER>::get_field_mut(&mut self.fields),
-            &mut self.shared,
-        )
     }
 }
 
