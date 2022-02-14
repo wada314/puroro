@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::types::WireType;
+use crate::internal::variant::Variant;
 use crate::internal::{
     FieldHandlerMut, FieldProperties, GetField, GetFieldMut, MatchFieldNumber, MessageProperties,
 };
 use crate::tags;
-use crate::{MessageImpl, Result};
-use ::std::io;
+use crate::{ErrorKind, MessageImpl, Result};
+use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
 pub struct DeserSimpleImpl<MP, FieldsType, SharedType, Iter> {
@@ -52,17 +54,35 @@ impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared>
 where
     MP: MessageProperties,
 {
-    pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter) -> Result<()>
+    pub fn deser_from_bytes<Iter>(&mut self, mut bytes: Iter) -> Result<()>
     where
         Self: MatchFieldNumber<DeserSimpleImpl<MP, Fields, Shared, Iter>>,
-        Iter: Iterator<Item = io::Result<u8>>,
+        Iter: Iterator<Item = IoResult<u8>>,
     {
-        let mut deser = DeserSimpleImpl {
-            bytes,
-            _phantom: PhantomData,
-        };
-        self.match_field_number_mut(1, &mut deser)?;
+        while let Ok(Some((wire_type, number))) = try_get_wire_type_and_field_number(&mut bytes) {
+            let mut deser = DeserSimpleImpl {
+                bytes,
+                _phantom: PhantomData,
+            };
+            self.match_field_number_mut(number, &mut deser)?;
+        }
         todo!();
         Ok(())
     }
+}
+
+fn try_get_wire_type_and_field_number<I>(iter: &mut I) -> Result<Option<(WireType, i32)>>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    let mut peekable = iter.peekable();
+    if let None = peekable.peek() {
+        // Found EOF at first byte. Successfull failure.
+        return Ok(None);
+    }
+    let key = Variant::decode_bytes(&mut peekable)?.to_u32()?;
+    Ok(Some((
+        WireType::try_from((key & 0x07) as i32)?,
+        <i32 as TryFrom<u32>>::try_from(key >> 3).map_err(|_| ErrorKind::InvalidFieldNumber)?,
+    )))
 }
