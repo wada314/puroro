@@ -22,13 +22,13 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
-pub struct DeserSimpleImpl<MP, FieldsType, SharedType, Iter> {
-    bytes: Iter,
+pub struct DeserSimpleImpl<'a, MP, FieldsType, SharedType, Iter> {
+    bytes: &'a mut Iter,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
-impl<MP, FieldsType, SharedType, Iter> FieldHandlerMut
-    for DeserSimpleImpl<MP, FieldsType, SharedType, Iter>
+impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerMut
+    for DeserSimpleImpl<'a, MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
 {
@@ -61,7 +61,7 @@ where
     {
         while let Ok(Some((wire_type, number))) = try_get_wire_type_and_field_number(&mut bytes) {
             let mut deser = DeserSimpleImpl {
-                bytes,
+                bytes: &mut bytes,
                 _phantom: PhantomData,
             };
             self.match_field_number_mut(number, &mut deser)?;
