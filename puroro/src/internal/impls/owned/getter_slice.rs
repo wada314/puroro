@@ -20,8 +20,8 @@ use ::std::ops::Deref;
 
 // repeated field
 impl<'a, MP, FieldsType, SharedType, CollectionType, ItemType, const NUMBER: i32>
-    GetSliceFieldMethodImpl<'a, tags::SimpleImpl, NUMBER>
-    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+    GetSliceFieldMethodImpl<'a, tags::OwnedImpl, NUMBER>
+    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetField<NUMBER, Type = CollectionType>,
     CollectionType: 'a + Deref<Target = [ItemType]>,

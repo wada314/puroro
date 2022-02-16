@@ -310,8 +310,8 @@ impl Message {
         )
     }
     pub fn rust_impl_path(&self, impl_name: &str, gp: &[&str]) -> String {
-        // "Simple" impls are separeted out to a special namespace.
-        let module = if impl_name == "Simple" {
+        // "Owned" impls are separeted out to a special namespace.
+        let module = if impl_name == "Owned" {
             "_puroro_simple_impl"
         } else {
             "_puroro_impls"
@@ -348,8 +348,8 @@ impl Message {
         format!("{}Trait", &self.rust_ident)
     }
     pub fn rust_impl_ident(&self, impl_name: &str) -> String {
-        // Simple impl uses raw name without suffix.
-        if impl_name == "Simple" {
+        // Owned impl uses raw name without suffix.
+        if impl_name == "Owned" {
             self.rust_ident.clone()
         } else {
             format!("{}{}", &self.rust_ident, impl_name)
@@ -774,7 +774,7 @@ impl Field {
             LengthDelimited(String) => "::std::string::String".into(),
             LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
             LengthDelimited(Message(m)) => {
-                let bare_msg = upgrade(&m)?.rust_impl_path("Simple", &[]);
+                let bare_msg = upgrade(&m)?.rust_impl_path("Owned", &[]);
                 if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
                     bare_msg.into()
                 } else {
@@ -792,7 +792,7 @@ impl Field {
             LengthDelimited(String) => format!("&{} str", lt).into(),
             LengthDelimited(Bytes) => format!("&{} [u8]", lt).into(),
             LengthDelimited(Message(m)) => {
-                let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
+                let msg_type = upgrade(&m)?.rust_impl_path("Owned", &[]);
                 format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
             Trivial(field_type) => field_type.rust_type_name()?,
@@ -816,7 +816,7 @@ impl Field {
                 )
             }
             LengthDelimited(Message(m)) => {
-                let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
+                let msg_type = upgrade(&m)?.rust_impl_path("Owned", &[]);
                 format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
             }
             Trivial(field_type) => {
@@ -833,7 +833,7 @@ impl Field {
             let scalar_type = match self.field_type()?.categories()? {
                 LengthDelimited(String) => "::std::string::String".into(),
                 LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
-                LengthDelimited(Message(m)) => upgrade(&m)?.rust_impl_path("Simple", &[]).into(),
+                LengthDelimited(Message(m)) => upgrade(&m)?.rust_impl_path("Owned", &[]).into(),
                 Trivial(field_type) => field_type.rust_type_name()?,
             };
             if self.is_repeated()? {

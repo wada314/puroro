@@ -128,7 +128,7 @@ impl Message {
             builder_ident: m.rust_impl_ident("Builder"),
             template_ident: m.rust_impl_ident("Template"),
             template_field_types_trait: m.rust_impl_ident("TemplateFieldTypes"),
-            template_simple_ident: m.rust_impl_ident("Simple2"),
+            template_simple_ident: m.rust_impl_ident("Owned2"),
             template_message_properties_ident: m.rust_message_properties_ident()?,
             template_field_properties_ident: m.rust_impl_ident("FieldProperties"),
         })
@@ -331,14 +331,14 @@ impl Field {
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_field_message_path: maybe_message
                 .as_ref()
-                .map(|m| m.rust_impl_path("Simple", &[]))
+                .map(|m| m.rust_impl_path("Owned", &[]))
                 .unwrap_or_default(),
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple", &[])
+                        msg.rust_impl_path("Owned", &[])
                     } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
+                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Owned", &[]))
                     },
                 )
             })?,
@@ -557,7 +557,7 @@ impl OneofField {
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(format!(
                     "::std::boxed::Box<{}>",
-                    msg.rust_impl_path("Simple", &[])
+                    msg.rust_impl_path("Owned", &[])
                 ))
             })?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {

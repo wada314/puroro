@@ -25,7 +25,7 @@ pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
 pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
-pub use impls::simple::{SimpleFields, SimpleShared};
+pub use impls::owned::{OwnedFields, OwnedShared};
 
 use crate::tags;
 use crate::Result;

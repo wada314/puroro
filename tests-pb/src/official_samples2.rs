@@ -34,8 +34,8 @@ pub mod _puroro_internal {
         type AType;
     }
 
-    impl Test1TemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl Test1TemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type AType = i32;
     }
     pub trait Test2TemplateFieldTypes {
@@ -43,8 +43,8 @@ pub mod _puroro_internal {
         type BType;
     }
 
-    impl Test2TemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl Test2TemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type BType = ::std::string::String;
     }
     pub trait Test3TemplateFieldTypes {
@@ -52,8 +52,8 @@ pub mod _puroro_internal {
         type CType;
     }
 
-    impl Test3TemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl Test3TemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type CType = ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
         >;
@@ -63,8 +63,8 @@ pub mod _puroro_internal {
         type DType;
     }
 
-    impl Test4TemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl Test4TemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type DType = ::std::vec::Vec<i32>;
     }
 }

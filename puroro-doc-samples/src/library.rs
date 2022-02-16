@@ -32,8 +32,8 @@ pub mod _puroro_internal {
         type NumPagesType;
     }
 
-    impl BookTemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl BookTemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type TitleType = ::std::string::String;
         type NumPagesType = u32;
     }

@@ -33,8 +33,8 @@ pub mod _puroro_internal {
         type NotAnnotatedType;
     }
 
-    impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type ExplicitlyPackedType = ::std::vec::Vec<i32>;
         type ExplicitlyNotPackedType = ::std::vec::Vec<i32>;
         type NotAnnotatedType = ::std::vec::Vec<i32>;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![doc = include_str!("simple.md")]
+#![doc = include_str!("owned.md")]
 
 mod getter;
 mod getter_mut;
@@ -23,14 +23,14 @@ use crate::DefaultIn;
 
 use super::super::SharedBitfield;
 
-pub struct SimpleFields;
+pub struct OwnedFields;
 
 #[derive(Default, Clone, Debug)]
-pub struct SimpleShared<const BITFIELD_U32_LEN: usize> {
+pub struct OwnedShared<const BITFIELD_U32_LEN: usize> {
     bitfield: crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
 }
 
-impl<const BITFIELD_U32_LEN: usize> SharedBitfield for SimpleShared<BITFIELD_U32_LEN> {
+impl<const BITFIELD_U32_LEN: usize> SharedBitfield for OwnedShared<BITFIELD_U32_LEN> {
     type BitfieldType =
         crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>;
     fn bitfield(&self) -> &Self::BitfieldType {
@@ -41,21 +41,21 @@ impl<const BITFIELD_U32_LEN: usize> SharedBitfield for SimpleShared<BITFIELD_U32
     }
 }
 
-impl<const BITFIELD_U32_LEN: usize> SharedAllocator for SimpleShared<BITFIELD_U32_LEN> {
+impl<const BITFIELD_U32_LEN: usize> SharedAllocator for OwnedShared<BITFIELD_U32_LEN> {
     type AllocatorType = ();
     fn alloc(&self) -> &Self::AllocatorType {
         &()
     }
 }
 
-impl<const BITFIELD_U32_LEN: usize> DefaultIn for SimpleShared<BITFIELD_U32_LEN> {
+impl<const BITFIELD_U32_LEN: usize> DefaultIn for OwnedShared<BITFIELD_U32_LEN> {
     type AllocatorType = ();
     fn default_in(_: ()) -> Self {
         Default::default()
     }
 }
 
-impl<const BITFIELD_U32_LEN: usize> From<&()> for SimpleShared<BITFIELD_U32_LEN> {
+impl<const BITFIELD_U32_LEN: usize> From<&()> for OwnedShared<BITFIELD_U32_LEN> {
     fn from(_: &()) -> Self {
         Default::default()
     }

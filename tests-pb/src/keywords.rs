@@ -31,8 +31,8 @@ pub mod _puroro_internal {
         type TypeType;
     }
 
-    impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type TypeType = i32;
     }
 }

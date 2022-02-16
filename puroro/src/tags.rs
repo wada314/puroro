@@ -263,7 +263,7 @@ impl FieldLabelTag for OneofField {
     type IsRepeated = False;
 }
 
-pub struct SimpleImpl;
+pub struct OwnedImpl;
 pub struct OptionImpl;
 pub struct MergedImpl;
 pub struct EitherImpl;

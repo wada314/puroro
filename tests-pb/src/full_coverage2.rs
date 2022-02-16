@@ -78,8 +78,8 @@ pub mod _puroro_internal {
         type F64RepeatedType;
     }
 
-    impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type I32RequiredType = i32;
         type I32OptionalType = i32;
         type I32RepeatedType = ::std::vec::Vec<i32>;
@@ -213,8 +213,8 @@ pub mod _puroro_nested {
                 type I64RequiredType;
             }
 
-            impl SubmsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-                type ImplTag = ::puroro::tags::SimpleImpl;
+            impl SubmsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
+                type ImplTag = ::puroro::tags::OwnedImpl;
                 type I32RequiredType = i32;
                 type I64RequiredType = i64;
             }

@@ -22,14 +22,14 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
-pub struct DeserSimpleFieldHandler<MP, FieldsType, SharedType, Iter> {
+pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
     wire_type: WireType,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
 impl<MP, FieldsType, SharedType, Iter> FieldHandlerMut
-    for DeserSimpleFieldHandler<MP, FieldsType, SharedType, Iter>
+    for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
 {
@@ -52,7 +52,7 @@ where
     }
 }
 
-impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     MP: MessageProperties,
 {
@@ -62,8 +62,8 @@ where
         Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        let mut message_stack = Vec::new();
-        while let Some(message) = message_stack.last_mut() {}
+        // let mut message_stack = Vec::new();
+        // while let Some(message) = message_stack.last_mut() {}
         Ok(())
     }
 }

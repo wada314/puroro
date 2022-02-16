@@ -25,8 +25,8 @@ trait MethodImpl<'a, IsLd, IsMessage, const NUMBER: i32> {
 }
 
 impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
-    GetMutFieldMethodImpl<'a, tags::SimpleImpl, NUMBER>
-    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+    GetMutFieldMethodImpl<'a, tags::OwnedImpl, NUMBER>
+    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     Self: MethodImpl<'a, TypeTag::IsLd, TypeTag::IsMessage, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
@@ -42,7 +42,7 @@ where
 // (optional|required) non-ld field
 impl<'a, MP, FieldsType, SharedType, FieldType, const NUMBER: i32>
     MethodImpl<'a, False, False, NUMBER>
-    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetFieldMut<NUMBER, Type = FieldType>,
     MP: MessageProperties,
@@ -64,8 +64,7 @@ where
 
 // (optional|required) string|bytes field
 impl<'a, MP, FieldsType, SharedType, FieldType, Alloc, const NUMBER: i32>
-    MethodImpl<'a, True, False, NUMBER>
-    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+    MethodImpl<'a, True, False, NUMBER> for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetFieldMut<NUMBER, Type = FieldType>,
     MP: MessageProperties,
@@ -96,7 +95,7 @@ impl<
     FieldMessageType,           // `M`
     Alloc,
     const NUMBER: i32,
-> MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+> MethodImpl<'a, True, True, NUMBER> for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetField<NUMBER, Type = Option<MaybeBoxedFieldMessageType>> + GetFieldMut<NUMBER>,
     MaybeBoxedFieldMessageType: 'a

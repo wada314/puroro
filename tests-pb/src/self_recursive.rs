@@ -31,8 +31,8 @@ pub mod _puroro_internal {
         type RecursiveUnlabeledType;
     }
 
-    impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type RecursiveUnlabeledType = ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
         >;

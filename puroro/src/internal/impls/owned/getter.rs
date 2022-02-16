@@ -27,8 +27,8 @@ trait MethodImpl<'a, IsLd, const NUMBER: i32> {
 }
 
 impl<'a, MP, TypeTag, FieldsType, SharedType, ReturnType, const NUMBER: i32>
-    GetFieldMethodImpl<'a, tags::SimpleImpl, True, NUMBER>
-    for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+    GetFieldMethodImpl<'a, tags::OwnedImpl, True, NUMBER>
+    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     Self: MethodImpl<'a, <TypeTag as tags::FieldTypeTag>::IsLd, NUMBER, ReturnType = ReturnType>,
     MP: MessageProperties,
@@ -55,7 +55,7 @@ impl<
     ItemType,
     NumType,
     const NUMBER: i32,
-> MethodImpl<'a, False, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+> MethodImpl<'a, False, NUMBER> for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetField<NUMBER, Type = FieldType>,
     MP: MessageProperties,
@@ -76,7 +76,7 @@ where
 // repeated ld field
 // Just return the `into_iter()` value as-is
 impl<'a, MP, TypeTag, FieldsType, SharedType, FieldType, InnerIterType, const NUMBER: i32>
-    MethodImpl<'a, True, NUMBER> for MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
+    MethodImpl<'a, True, NUMBER> for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetField<NUMBER, Type = FieldType>,
     MP: MessageProperties,

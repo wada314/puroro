@@ -92,8 +92,8 @@ pub mod _puroro_internal {
         type EnumFourtyTwoType;
     }
 
-    impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-        type ImplTag = ::puroro::tags::SimpleImpl;
+    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
+        type ImplTag = ::puroro::tags::OwnedImpl;
         type I32DefaultType = i32;
         type I320Type = i32;
         type I3242Type = i32;

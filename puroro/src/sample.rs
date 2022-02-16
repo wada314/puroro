@@ -30,7 +30,7 @@ use crate::internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{
-    EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber, MessageProperties, SimpleShared,
+    EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber, MessageProperties, OwnedShared,
 };
 use crate::*;
 use ::std::marker::PhantomData;
@@ -40,7 +40,7 @@ use crate::internal::GetFieldMut;
 use crate::message::*;
 
 impl<FieldsType, SharedType> MatchFieldNumber
-    for MessageImpl<PersonMessageProperties, tags::SimpleImpl, FieldsType, SharedType>
+    for MessageImpl<PersonMessageProperties, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetFieldMut<1>,
     FieldsType: GetFieldMut<2>,
@@ -86,22 +86,22 @@ where
 
 ////////////////////////////////////////////////
 
-pub struct PersonSimpleImplProperties<
+pub struct PersonOwnedImplProperties<
     FieldsType = PersonFieldsContainer,
-    SharedType = SimpleShared<1>,
+    SharedType = OwnedShared<1>,
 >(PhantomData<(FieldsType, SharedType)>);
-pub type PersonBumpImplProperties<'bump> = PersonSimpleImplProperties<
+pub type PersonBumpImplProperties<'bump> = PersonOwnedImplProperties<
     PersonBumpFieldsContainer<'bump>,
     internal::impls::bumpalo::BumpShared<'bump, 1>,
 >;
 
-impl<FieldsType, SharedType> ImplProperties for PersonSimpleImplProperties<FieldsType, SharedType> {
-    type ImplTag = tags::SimpleImpl;
+impl<FieldsType, SharedType> ImplProperties for PersonOwnedImplProperties<FieldsType, SharedType> {
+    type ImplTag = tags::OwnedImpl;
     type FieldsType = FieldsType;
     type SharedType = SharedType;
 }
 
-pub struct Person<Impl = PersonSimpleImplProperties>(
+pub struct Person<Impl = PersonOwnedImplProperties>(
     MessageImpl<PersonMessageProperties, Impl::ImplTag, Impl::FieldsType, Impl::SharedType>,
 )
 where
