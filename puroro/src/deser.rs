@@ -22,9 +22,21 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
+pub struct DeserOptions {
+    pub recursion_limit: Option<usize>,
+}
+impl Default for DeserOptions {
+    fn default() -> Self {
+        Self {
+            recursion_limit: Some(30),
+        }
+    }
+}
+
 pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
     wire_type: WireType,
+    recursion_level: usize,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
@@ -56,14 +68,33 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
 where
     MP: MessageProperties,
 {
-    // Implementation note: DO NOT CALL THIS METHOD RECURSIVELY!
-    pub fn deser_from_bytes<Iter>(&mut self, mut bytes: Iter) -> Result<()>
+    pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter, options: &DeserOptions) -> Result<()>
     where
         Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        // let mut message_stack = Vec::new();
-        // while let Some(message) = message_stack.last_mut() {}
+        self.deser_from_bytes_impl(bytes, options, 0)
+    }
+
+    pub fn deser_from_bytes_impl<Iter>(
+        &mut self,
+        mut bytes: Iter,
+        options: &DeserOptions,
+        recursion_level: usize,
+    ) -> Result<()>
+    where
+        Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
+        Iter: Iterator<Item = IoResult<u8>>,
+    {
+        while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {
+            let mut handler = DeserOwnedFieldHandler {
+                bytes: bytes.by_ref(),
+                wire_type,
+                recursion_level,
+                _phantom: PhantomData,
+            };
+            self.match_field_number_mut(number, &mut handler)?;
+        }
         Ok(())
     }
 }
