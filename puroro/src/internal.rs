@@ -128,8 +128,17 @@ pub trait FieldHandlerMut {
         <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
 }
 
-pub trait MatchFieldNumber<FH: FieldHandlerMut> {
-    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()>;
+pub trait MatchFieldNumber {
+    type MP;
+    type FieldsType;
+    type SharedType;
+    fn match_field_number_mut<FH>(&mut self, number: i32, handler: &mut FH) -> Result<()>
+    where
+        FH: FieldHandlerMut<
+            MP = Self::MP,
+            FieldsType = Self::FieldsType,
+            SharedType = Self::SharedType,
+        >;
 }
 
 #[macro_export]

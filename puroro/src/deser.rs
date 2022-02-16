@@ -51,13 +51,13 @@ where
     }
 }
 
-impl<MP, Fields, Shared> MessageImpl<MP, tags::SimpleImpl, Fields, Shared>
+impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     MP: MessageProperties,
 {
     pub fn deser_from_bytes<Iter>(&mut self, mut bytes: Iter) -> Result<()>
     where
-        Self: MatchFieldNumber<DeserSimpleFieldHandler<MP, Fields, Shared, Iter>>,
+        Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         loop {

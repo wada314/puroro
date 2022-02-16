@@ -39,14 +39,9 @@ use ::std::ops::{Deref, DerefMut};
 use crate::internal::GetFieldMut;
 use crate::message::*;
 
-impl<FieldsType, SharedType, FH> MatchFieldNumber<FH>
+impl<FieldsType, SharedType> MatchFieldNumber
     for MessageImpl<PersonMessageProperties, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FH: FieldHandlerMut<
-        FieldsType = FieldsType,
-        SharedType = SharedType,
-        MP = PersonMessageProperties,
-    >,
     FieldsType: GetFieldMut<1>,
     FieldsType: GetFieldMut<2>,
     FieldsType: GetFieldMut<3>,
@@ -54,7 +49,21 @@ where
     FieldsType: GetFieldMut<5>,
     FieldsType: GetFieldMut<6>,
 {
-    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<()> {
+    type MP = PersonMessageProperties;
+    type FieldsType = FieldsType;
+    type SharedType = SharedType;
+    fn match_field_number_mut<FH: FieldHandlerMut>(
+        &mut self,
+        number: i32,
+        handler: &mut FH,
+    ) -> Result<()>
+    where
+        FH: FieldHandlerMut<
+            MP = Self::MP,
+            FieldsType = Self::FieldsType,
+            SharedType = Self::SharedType,
+        >,
+    {
         macro_rules! call {
             ($number:literal) => {
                 handler.handle_mut::<$number>(
