@@ -22,11 +22,6 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
-pub enum DeserTasks {
-    READ_WIRE_TYPE_AND_FIELD_NUMBER,
-    READ_FIELD_BODY(WireType, i32),
-}
-
 pub struct DeserSimpleFieldHandler<MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
     wire_type: WireType,
@@ -41,7 +36,7 @@ where
     type MP = MP;
     type FieldsType = FieldsType;
     type SharedType = SharedType;
-    type ReturnType = Option<DeserTasks>;
+    type ReturnType = Option<()>;
 
     fn handle_mut<const NUMBER: i32>(
         &mut self,
@@ -67,36 +62,8 @@ where
         Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        let mut tasks = vec![DeserTasks::READ_WIRE_TYPE_AND_FIELD_NUMBER];
-        while let Some(task) = tasks.pop() {
-            match task {
-                DeserTasks::READ_WIRE_TYPE_AND_FIELD_NUMBER => {
-                    match try_get_wire_type_and_field_number(bytes.by_ref()) {
-                        Ok(Some((wire_type, number))) => {
-                            // reserve read next field header
-                            tasks.push(DeserTasks::READ_WIRE_TYPE_AND_FIELD_NUMBER);
-                            tasks.push(DeserTasks::READ_FIELD_BODY(wire_type, number));
-                        }
-                        Ok(None) => {
-                            // end of input iterator, correct exit
-                        }
-                        Err(e) => Err(e)?,
-                    }
-                }
-                DeserTasks::READ_FIELD_BODY(wire_type, number) => {
-                    let mut deser_handler = DeserSimpleFieldHandler {
-                        bytes: bytes.by_ref(),
-                        wire_type,
-                        _phantom: PhantomData,
-                    };
-                    if let Some(new_task) =
-                        self.match_field_number_mut(number, &mut deser_handler)?
-                    {
-                        tasks.push(new_task);
-                    }
-                }
-            }
-        }
+        let mut message_stack = Vec::new();
+        while let Some(message) = message_stack.last_mut() {}
         Ok(())
     }
 }
