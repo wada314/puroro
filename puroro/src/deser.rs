@@ -22,7 +22,7 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
-enum DeserTasks {
+pub enum DeserTasks {
     READ_WIRE_TYPE_AND_FIELD_NUMBER,
     READ_FIELD_BODY(WireType, i32),
 }
@@ -47,7 +47,7 @@ where
         &mut self,
         field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
         shared: &mut Self::SharedType,
-    ) -> Result<()>
+    ) -> Result<Self::ReturnType>
     where
         Self::FieldsType: GetFieldMut<NUMBER>,
         Self::MP: MessageProperties,
