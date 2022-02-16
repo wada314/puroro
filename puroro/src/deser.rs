@@ -22,13 +22,14 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
-pub struct DeserSimpleImpl<'a, MP, FieldsType, SharedType, Iter> {
-    bytes: &'a mut Iter,
+pub struct DeserSimpleFieldHandler<MP, FieldsType, SharedType, Iter> {
+    bytes: Iter,
+    wire_type: WireType,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
-impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerMut
-    for DeserSimpleImpl<'a, MP, FieldsType, SharedType, Iter>
+impl<MP, FieldsType, SharedType, Iter> FieldHandlerMut
+    for DeserSimpleFieldHandler<MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
 {
@@ -56,22 +57,30 @@ where
 {
     pub fn deser_from_bytes<Iter>(&mut self, mut bytes: Iter) -> Result<()>
     where
-        Self: MatchFieldNumber<DeserSimpleImpl<MP, Fields, Shared, Iter>>,
+        Self: MatchFieldNumber<DeserSimpleFieldHandler<MP, Fields, Shared, Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        while let Ok(Some((wire_type, number))) = try_get_wire_type_and_field_number(&mut bytes) {
-            let mut deser = DeserSimpleImpl {
-                bytes: &mut bytes,
-                _phantom: PhantomData,
-            };
-            self.match_field_number_mut(number, &mut deser)?;
+        loop {
+            match try_get_wire_type_and_field_number(bytes.by_ref()) {
+                Ok(Some((wire_type, number))) => {
+                    let mut deser = DeserSimpleFieldHandler {
+                        bytes: bytes.by_ref(),
+                        wire_type,
+                        _phantom: PhantomData,
+                    };
+                    self.match_field_number_mut(number, &mut deser)?;
+                }
+                Ok(None) => {
+                    // end of input iterator, correct exit
+                }
+                Err(e) => Err(e)?,
+            }
         }
-        todo!();
         Ok(())
     }
 }
 
-fn try_get_wire_type_and_field_number<I>(iter: &mut I) -> Result<Option<(WireType, i32)>>
+fn try_get_wire_type_and_field_number<I>(mut iter: I) -> Result<Option<(WireType, i32)>>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
