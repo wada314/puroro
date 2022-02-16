@@ -61,6 +61,7 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::SimpleImpl, FieldsType, S
 where
     MP: MessageProperties,
 {
+    // Implementation note: DO NOT CALL THIS METHOD RECURSIVELY!
     pub fn deser_from_bytes<Iter>(&mut self, mut bytes: Iter) -> Result<()>
     where
         Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
