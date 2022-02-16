@@ -72,6 +72,8 @@ where
                 DeserTasks::READ_WIRE_TYPE_AND_FIELD_NUMBER => {
                     match try_get_wire_type_and_field_number(bytes.by_ref()) {
                         Ok(Some((wire_type, number))) => {
+                            // reserve read next field header
+                            tasks.push(DeserTasks::READ_WIRE_TYPE_AND_FIELD_NUMBER);
                             tasks.push(DeserTasks::READ_FIELD_BODY(wire_type, number));
                         }
                         Ok(None) => {
