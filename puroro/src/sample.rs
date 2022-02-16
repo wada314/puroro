@@ -56,7 +56,7 @@ where
         &mut self,
         number: i32,
         handler: &mut FH,
-    ) -> Result<()>
+    ) -> Result<FH::ReturnType>
     where
         FH: FieldHandlerMut<
             MP = Self::MP,

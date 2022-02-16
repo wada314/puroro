@@ -117,11 +117,12 @@ pub trait FieldHandlerMut {
     type MP;
     type FieldsType;
     type SharedType;
+    type ReturnType;
     fn handle_mut<const NUMBER: i32>(
         &mut self,
         field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
         shared: &mut Self::SharedType,
-    ) -> Result<()>
+    ) -> Result<Self::ReturnType>
     where
         Self::FieldsType: GetFieldMut<NUMBER>,
         Self::MP: MessageProperties,
@@ -132,7 +133,11 @@ pub trait MatchFieldNumber {
     type MP;
     type FieldsType;
     type SharedType;
-    fn match_field_number_mut<FH>(&mut self, number: i32, handler: &mut FH) -> Result<()>
+    fn match_field_number_mut<FH>(
+        &mut self,
+        number: i32,
+        handler: &mut FH,
+    ) -> Result<FH::ReturnType>
     where
         FH: FieldHandlerMut<
             MP = Self::MP,
