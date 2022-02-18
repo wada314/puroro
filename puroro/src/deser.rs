@@ -108,22 +108,36 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
 where
     MP: MessageProperties,
 {
-    pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter, options: &DeserOptions) -> Result<()>
+    pub fn deser_from_bytes<'a, Iter>(
+        &'a mut self,
+        bytes: Iter,
+        options: &DeserOptions,
+    ) -> Result<()>
     where
-        Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
+        Self: MatchFieldNumber<
+            DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>,
+            MP = MP,
+            FieldsType = FieldsType,
+            SharedType = SharedType,
+        >,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         self.deser_from_bytes_impl(bytes, options, 0)
     }
 
-    pub fn deser_from_bytes_impl<Iter>(
-        &mut self,
+    pub fn deser_from_bytes_impl<'a, Iter>(
+        &'a mut self,
         mut bytes: Iter,
         options: &DeserOptions,
         recursion_level: usize,
     ) -> Result<()>
     where
-        Self: MatchFieldNumber<MP = MP, FieldsType = FieldsType, SharedType = SharedType>,
+        Self: MatchFieldNumber<
+            DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>,
+            MP = MP,
+            FieldsType = FieldsType,
+            SharedType = SharedType,
+        >,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {
