@@ -41,6 +41,10 @@ pub struct DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter> {
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
+trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType> {
+    fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()>;
+}
+
 impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerMut
     for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
 where
@@ -101,7 +105,7 @@ where
     }
 }
 
-fn try_get_wire_type_and_field_number<I>(mut iter: I) -> Result<Option<(WireType, i32)>>
+fn try_get_wire_type_and_field_number<I>(iter: I) -> Result<Option<(WireType, i32)>>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
@@ -113,6 +117,8 @@ where
     let key = Variant::decode_bytes(&mut peekable)?.to_u32()?;
     Ok(Some((
         WireType::try_from((key & 0x07) as i32)?,
-        <i32 as TryFrom<u32>>::try_from(key >> 3).map_err(|_| ErrorKind::InvalidFieldNumber)?,
+        (key >> 3)
+            .try_into()
+            .map_err(|_| ErrorKind::InvalidFieldNumber)?,
     )))
 }
