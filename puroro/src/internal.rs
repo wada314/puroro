@@ -126,8 +126,11 @@ pub trait FieldHandlerMut {
     where
         Self::FieldsType: GetFieldMut<NUMBER>,
         Self::MP: MessageProperties,
-        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
+        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+        Self: CanHandleThisNumber<NUMBER>;
 }
+
+pub trait CanHandleThisNumber<const NUMBER: i32> {}
 
 pub trait MatchFieldNumber {
     type MP;

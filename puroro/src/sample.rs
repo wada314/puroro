@@ -30,7 +30,8 @@ use crate::internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{
-    EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber, MessageProperties, OwnedShared,
+    CanHandleThisNumber, EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber,
+    MessageProperties, OwnedShared,
 };
 use crate::*;
 use ::std::marker::PhantomData;
@@ -74,11 +75,11 @@ where
         }
         match number {
             1 => call!(1),
-            2 => call!(2),
-            3 => call!(3),
-            4 => call!(4),
-            5 => call!(5),
-            6 => call!(6),
+            // 2 => call!(2),
+            // 3 => call!(3),
+            // 4 => call!(4),
+            // 5 => call!(5),
+            // 6 => call!(6),
             _ => Err(ErrorKind::UnknownFieldNumber)?,
         }
     }

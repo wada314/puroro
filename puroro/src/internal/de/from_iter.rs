@@ -171,11 +171,11 @@ fn test_scoped_iter() {
     assert_eq!("g", s4.by_ref().collect::<String>());
 }
 
-/// Converts `Result<u8, std::io::IoError>` into `Result<Variant, ErrorKind>`.
-pub struct Variants<I: Iterator<Item = IoResult<u8>>> {
+/// Converts `Iterator<Item=IoResult<u8>>` into `Result<Variant, ErrorKind>`.
+pub struct Variants<I> {
     iter: I,
 }
-impl<I: Iterator<Item = IoResult<u8>>> Variants<I> {
+impl<I> Variants<I> {
     pub fn new(iter: I) -> Self {
         Self { iter }
     }

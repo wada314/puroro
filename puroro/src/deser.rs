@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::bool::{False, True};
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::{
-    FieldHandlerMut, FieldProperties, GetField, GetFieldMut, MatchFieldNumber, MessageProperties,
+    CanHandleThisNumber, FieldHandlerMut, FieldProperties, GetField, GetFieldMut, MatchFieldNumber,
+    MessageProperties,
 };
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
@@ -41,7 +43,7 @@ pub struct DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter> {
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
-trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType> {
+trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType, IsRepeated, IsMessage> {
     fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()>;
 }
 
@@ -64,8 +66,41 @@ where
         Self::FieldsType: GetFieldMut<NUMBER>,
         Self::MP: MessageProperties,
         <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+        Self: CanHandleThisNumber<NUMBER>,
     {
         todo!()
+    }
+}
+
+impl<'a, MP, FieldsType, SharedType, Iter, const NUMBER: i32> CanHandleThisNumber<NUMBER>
+    for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
+where
+    MP: MessageProperties,
+{
+}
+
+impl<'a, MP, LabelTag, LdTypeTag, FieldsType, FieldType, SharedType, Iter>
+    DeserOwnedFieldImpl<
+        LabelTag,
+        tags::LengthDelimited<LdTypeTag>,
+        FieldType,
+        SharedType,
+        False, /* IsRepeated */
+        False, /* IsMessage */
+    > for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
+where
+    MP: MessageProperties,
+    Iter: Iterator<Item = IoResult<u8>>,
+{
+    fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()> {
+        if let WireType::LengthDelimited = self.wire_type {
+            let length: usize = Variant::decode_bytes(&mut self.bytes)?
+                .to_u32()?
+                .try_into()?;
+            todo!()
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
     }
 }
 
