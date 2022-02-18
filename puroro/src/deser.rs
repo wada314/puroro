@@ -33,15 +33,16 @@ impl Default for DeserOptions {
     }
 }
 
-pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
+pub struct DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
     wire_type: WireType,
     recursion_level: usize,
+    options: &'a DeserOptions,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
-impl<MP, FieldsType, SharedType, Iter> FieldHandlerMut
-    for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
+impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerMut
+    for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
 {
@@ -91,6 +92,7 @@ where
                 bytes: bytes.by_ref(),
                 wire_type,
                 recursion_level,
+                options,
                 _phantom: PhantomData,
             };
             self.match_field_number_mut(number, &mut handler)?;
