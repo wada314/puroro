@@ -122,8 +122,9 @@ where
         options: &DeserOptions,
     ) -> Result<()>
     where
-        Self: MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>>,
-        Iter: Iterator<Item = IoResult<u8>>,
+        Self:
+            MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, &'a mut Iter>>,
+        Iter: 'a + Iterator<Item = IoResult<u8>>,
     {
         self.deser_from_bytes_impl(bytes, options, 0)
     }
@@ -135,8 +136,9 @@ where
         recursion_level: usize,
     ) -> Result<()>
     where
-        Self: MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>>,
-        Iter: Iterator<Item = IoResult<u8>>,
+        Self:
+            MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, &'a mut Iter>>,
+        Iter: 'a + Iterator<Item = IoResult<u8>>,
     {
         while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {
             let mut handler = DeserOwnedFieldHandler {
