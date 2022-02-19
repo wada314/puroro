@@ -113,12 +113,15 @@ impl<const NUMBER: i32> GetField<NUMBER> for EmptyFields {
     }
 }
 
-pub trait FieldHandlerMut {
+pub trait FieldHandlerBase {
+    type ReturnType;
+}
+
+pub trait FieldHandlerMut<const NUMBER: i32>: FieldHandlerBase {
     type MP;
     type FieldsType;
     type SharedType;
-    type ReturnType;
-    fn handle_mut<const NUMBER: i32>(
+    fn handle_mut(
         &mut self,
         field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
         shared: &mut Self::SharedType,
@@ -126,23 +129,13 @@ pub trait FieldHandlerMut {
     where
         Self::FieldsType: GetFieldMut<NUMBER>,
         Self::MP: MessageProperties,
-        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-        Self: CanHandleThisNumber<NUMBER>;
+        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
 }
 
 pub trait CanHandleThisNumber<const NUMBER: i32> {}
 
-pub trait MatchFieldNumber<FH> {
-    type MP;
-    type FieldsType;
-    type SharedType;
-    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType>
-    where
-        FH: FieldHandlerMut<
-            MP = Self::MP,
-            FieldsType = Self::FieldsType,
-            SharedType = Self::SharedType,
-        >;
+pub trait MatchFieldNumber<FH: FieldHandlerBase> {
+    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType>;
 }
 
 #[macro_export]

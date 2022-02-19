@@ -16,8 +16,8 @@ use crate::internal::bool::{False, True};
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::{
-    CanHandleThisNumber, FieldHandlerMut, FieldProperties, GetField, GetFieldMut, MatchFieldNumber,
-    MessageProperties,
+    CanHandleThisNumber, FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut,
+    MatchFieldNumber, MessageProperties,
 };
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
@@ -47,17 +47,33 @@ trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType, IsRepeated, 
     fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()>;
 }
 
-impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerMut
+impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerBase
     for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
+{
+    type ReturnType = ();
+}
+
+impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
+    FieldHandlerMut<NUMBER> for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
+    FieldsType: GetFieldMut<NUMBER>,
+    LabelTag: tags::FieldLabelTag,
+    TypeTag: tags::FieldTypeTag,
+    Self: DeserOwnedFieldImpl<
+        LabelTag,
+        TypeTag,
+        FieldsType::Type,
+        SharedType,
+        LabelTag::IsRepeated,
+        TypeTag::IsMessage,
+    >,
 {
     type MP = MP;
     type FieldsType = FieldsType;
     type SharedType = SharedType;
-    type ReturnType = Option<()>;
-
-    fn handle_mut<const NUMBER: i32>(
+    fn handle_mut(
         &mut self,
         field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
         shared: &mut Self::SharedType,
@@ -66,17 +82,9 @@ where
         Self::FieldsType: GetFieldMut<NUMBER>,
         Self::MP: MessageProperties,
         <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-        Self: CanHandleThisNumber<NUMBER>,
     {
-        todo!()
+        Ok(self.deser_field(field, shared)?)
     }
-}
-
-impl<'a, MP, FieldsType, SharedType, Iter, const NUMBER: i32> CanHandleThisNumber<NUMBER>
-    for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
-where
-    MP: MessageProperties,
-{
 }
 
 impl<'a, MP, LabelTag, LdTypeTag, FieldsType, FieldType, SharedType, Iter>
@@ -114,12 +122,7 @@ where
         options: &DeserOptions,
     ) -> Result<()>
     where
-        Self: MatchFieldNumber<
-            DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>,
-            MP = MP,
-            FieldsType = FieldsType,
-            SharedType = SharedType,
-        >,
+        Self: MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         self.deser_from_bytes_impl(bytes, options, 0)
@@ -132,12 +135,7 @@ where
         recursion_level: usize,
     ) -> Result<()>
     where
-        Self: MatchFieldNumber<
-            DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>,
-            MP = MP,
-            FieldsType = FieldsType,
-            SharedType = SharedType,
-        >,
+        Self: MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {

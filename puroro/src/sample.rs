@@ -30,8 +30,7 @@ use crate::internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{
-    CanHandleThisNumber, EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber,
-    MessageProperties, OwnedShared,
+    EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber, MessageProperties, OwnedShared,
 };
 use crate::*;
 use ::std::marker::PhantomData;
@@ -44,27 +43,19 @@ impl<FieldsType, SharedType, FH> MatchFieldNumber<FH>
     for MessageImpl<PersonMessageProperties, tags::OwnedImpl, FieldsType, SharedType>
 where
     FieldsType: GetFieldMut<1>,
-    FieldsType: GetFieldMut<2>,
-    FieldsType: GetFieldMut<3>,
-    FieldsType: GetFieldMut<4>,
-    FieldsType: GetFieldMut<5>,
-    FieldsType: GetFieldMut<6>,
+    // FieldsType: GetFieldMut<2>,
+    // FieldsType: GetFieldMut<3>,
+    // FieldsType: GetFieldMut<4>,
+    // FieldsType: GetFieldMut<5>,
+    // FieldsType: GetFieldMut<6>,
+    FH: FieldHandlerMut<1>,
+    // FH: FieldHandlerMut<2>,
+    // FH: FieldHandlerMut<3>,
+    // FH: FieldHandlerMut<4>,
+    // FH: FieldHandlerMut<5>,
+    // FH: FieldHandlerMut<6>,
 {
-    type MP = PersonMessageProperties;
-    type FieldsType = FieldsType;
-    type SharedType = SharedType;
-    fn match_field_number_mut(
-        &mut self,
-        number: i32,
-        handler: &mut FH,
-    ) -> Result<FH::ReturnType>
-    where
-        FH: FieldHandlerMut<
-            MP = Self::MP,
-            FieldsType = Self::FieldsType,
-            SharedType = Self::SharedType,
-        >,
-    {
+    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType> {
         macro_rules! call {
             ($number:literal) => {
                 handler.handle_mut::<$number>(
