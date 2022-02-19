@@ -142,10 +142,15 @@ where
                 options,
                 _phantom: PhantomData::<(MP, FieldsType, SharedType)>,
             };
-            self.match_field_number_mut(number, &mut handler)?;
+            // self.match_field_number_mut(number, &mut handler)?;
+            hoge(self, number, &mut handler);
         }
         Ok(())
     }
+}
+
+fn hoge<'a, 'b, A: 'a, B: 'b, C>(_: &'a mut A, _: C, _: &'b mut B) {
+    todo!()
 }
 
 fn try_get_wire_type_and_field_number<I>(iter: I) -> Result<Option<(WireType, i32)>>
