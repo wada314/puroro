@@ -149,7 +149,7 @@ where
     }
 }
 
-fn hoge<'a, 'b, A: 'a, B: 'b, C>(_: &'a mut A, _: C, _: &'b mut B) {
+fn hoge<A, B, C>(_: &mut A, _: C, _: &mut B) {
     todo!()
 }
 
