@@ -16,8 +16,8 @@ use crate::internal::bool::{False, True};
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::{
-    CanHandleThisNumber, FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut,
-    MatchFieldNumber, MessageProperties,
+    FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut, MatchFieldNumber,
+    MessageProperties,
 };
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};

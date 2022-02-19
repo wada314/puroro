@@ -58,7 +58,8 @@ where
     fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType> {
         macro_rules! call {
             ($number:literal) => {
-                handler.handle_mut::<$number>(
+                <FH as FieldHandlerMut<$number>>::handle_mut(
+                    handler,
                     &mut GetFieldMut::<$number>::get_field_mut(&mut self.fields),
                     &mut self.shared,
                 )

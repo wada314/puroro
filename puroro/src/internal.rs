@@ -132,8 +132,6 @@ pub trait FieldHandlerMut<const NUMBER: i32>: FieldHandlerBase {
         <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties;
 }
 
-pub trait CanHandleThisNumber<const NUMBER: i32> {}
-
 pub trait MatchFieldNumber<FH: FieldHandlerBase> {
     fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType>;
 }
