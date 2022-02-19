@@ -30,14 +30,13 @@ use crate::internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{
-    EmptyFields, FieldHandlerMut, ImplProperties, MatchFieldNumber, MessageProperties, OwnedShared,
+    EmptyFields, FieldHandlerMut, GetField, GetFieldMut, ImplProperties, MatchFieldNumber,
+    MessageProperties, OwnedShared,
 };
+use crate::message::*;
 use crate::*;
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, DerefMut};
-
-use crate::internal::GetFieldMut;
-use crate::message::*;
 
 impl<FieldsType, SharedType, FH> MatchFieldNumber<FH>
     for MessageImpl<PersonMessageProperties, tags::OwnedImpl, FieldsType, SharedType>
@@ -48,7 +47,7 @@ where
     // FieldsType: GetFieldMut<4>,
     // FieldsType: GetFieldMut<5>,
     // FieldsType: GetFieldMut<6>,
-    FH: FieldHandlerMut<1>,
+    FH: FieldHandlerMut<1, FieldType = <FieldsType as GetField<1>>::Type, SharedType = SharedType>,
     // FH: FieldHandlerMut<2>,
     // FH: FieldHandlerMut<3>,
     // FH: FieldHandlerMut<4>,
@@ -60,7 +59,7 @@ where
             ($number:literal) => {
                 <FH as FieldHandlerMut<$number>>::handle_mut(
                     handler,
-                    &mut GetFieldMut::<$number>::get_field_mut(&mut self.fields),
+                    GetFieldMut::<$number>::get_field_mut(&mut self.fields),
                     &mut self.shared,
                 )
             };

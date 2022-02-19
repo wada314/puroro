@@ -70,19 +70,13 @@ where
         TypeTag::IsMessage,
     >,
 {
-    type MP = MP;
-    type FieldsType = FieldsType;
+    type FieldType = <FieldsType as GetField<NUMBER>>::Type;
     type SharedType = SharedType;
     fn handle_mut(
         &mut self,
-        field: &mut <Self::FieldsType as GetField<NUMBER>>::Type,
+        field: &mut Self::FieldType,
         shared: &mut Self::SharedType,
-    ) -> Result<Self::ReturnType>
-    where
-        Self::FieldsType: GetFieldMut<NUMBER>,
-        Self::MP: MessageProperties,
-        <Self::MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    {
+    ) -> Result<Self::ReturnType> {
         Ok(self.deser_field(field, shared)?)
     }
 }
@@ -119,7 +113,7 @@ where
     pub fn deser_from_bytes<'a, Iter>(
         &'a mut self,
         bytes: Iter,
-        options: &DeserOptions,
+        options: &'a DeserOptions,
     ) -> Result<()>
     where
         Self:
@@ -132,7 +126,7 @@ where
     pub fn deser_from_bytes_impl<'a, Iter>(
         &'a mut self,
         mut bytes: Iter,
-        options: &DeserOptions,
+        options: &'a DeserOptions,
         recursion_level: usize,
     ) -> Result<()>
     where
