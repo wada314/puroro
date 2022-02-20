@@ -78,6 +78,11 @@ where
         field: &mut Self::FieldType,
         shared: &mut Self::SharedType,
     ) -> Result<Self::ReturnType> {
+        if let Some(recursion_limit) = self.options.recursion_limit {
+            if self.recursion_level >= recursion_limit {
+                Err(ErrorKind::DeserRecursionOverflow())?
+            }
+        }
         Ok(self.deser_field(field, shared)?)
     }
 }

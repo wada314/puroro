@@ -66,6 +66,8 @@ pub enum ErrorKind {
     InvalidUtf8Bumpalo(),
     #[error("Group is not supported.")]
     GroupNotSupported,
+    #[error("Overflowed the recursion limit when deserializing the message.")]
+    DeserRecursionOverflow(),
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }
