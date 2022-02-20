@@ -46,16 +46,7 @@ pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
-trait DeserOwnedFieldImpl<
-    LabelTag,
-    TypeTag,
-    FieldType,
-    SharedType,
-    IsRepeated,
-    IsMessage,
-    const NUMBER: i32,
->
-{
+trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType, IsRepeated, const NUMBER: i32> {
     fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()>;
 }
 
@@ -79,7 +70,6 @@ where
         FieldsType::Type,
         SharedType,
         LabelTag::IsRepeated,
-        TypeTag::IsMessage,
         NUMBER,
     >,
 {
@@ -107,7 +97,6 @@ impl<'a, MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
         String,
         SharedType,
         False, /* IsRepeated */
-        False, /* IsMessage */
         NUMBER,
     > for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 where
@@ -115,16 +104,24 @@ where
     MP::Fields<NUMBER>: FieldProperties,
     Iter: Iterator<Item = IoResult<u8>>,
     SharedType: SharedBitfield,
+    LabelTag: tags::FieldLabelTag,
 {
     fn deser_field(&mut self, field: &mut String, shared: &mut SharedType) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
+            let length: usize = Variant::decode_bytes(&mut self.bytes)?
+                .to_u32()?
+                .try_into()?;
+
+            if LabelTag::DO_DEFAULT_CHECK && length == 0 {
+                // If the field is proto3 unlabaled type, then do not touch
+                // the field value.
+                return Ok(());
+            }
+
             shared
                 .bitfield_mut()
                 .set(MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX, true);
             field.clear();
-            let length: usize = Variant::decode_bytes(&mut self.bytes)?
-                .to_u32()?
-                .try_into()?;
             if field.capacity() < length {
                 field.reserve(length - field.capacity());
             }
