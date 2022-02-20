@@ -16,8 +16,8 @@ use crate::internal::bool::{False, True};
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::{
-    FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut, MatchFieldNumber,
-    MessageProperties,
+    Bitfield, FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut,
+    MatchFieldNumber, MessageProperties, SharedBitfield,
 };
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
@@ -46,7 +46,16 @@ pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
-trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType, IsRepeated, IsMessage> {
+trait DeserOwnedFieldImpl<
+    LabelTag,
+    TypeTag,
+    FieldType,
+    SharedType,
+    IsRepeated,
+    IsMessage,
+    const NUMBER: i32,
+>
+{
     fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()>;
 }
 
@@ -71,6 +80,7 @@ where
         SharedType,
         LabelTag::IsRepeated,
         TypeTag::IsMessage,
+        NUMBER,
     >,
 {
     type FieldType = <FieldsType as GetField<NUMBER>>::Type;
@@ -90,7 +100,7 @@ where
 }
 
 // `string` proto field where the rust's field type is `std::string::String`.
-impl<'a, MP, LabelTag, FieldsType, SharedType, Iter>
+impl<'a, MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
     DeserOwnedFieldImpl<
         LabelTag,
         tags::String,
@@ -98,13 +108,20 @@ impl<'a, MP, LabelTag, FieldsType, SharedType, Iter>
         SharedType,
         False, /* IsRepeated */
         False, /* IsMessage */
+        NUMBER,
     > for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
     Iter: Iterator<Item = IoResult<u8>>,
+    SharedType: SharedBitfield,
 {
     fn deser_field(&mut self, field: &mut String, shared: &mut SharedType) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
+            shared
+                .bitfield_mut()
+                .set(MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX, true);
+            field.clear();
             let length: usize = Variant::decode_bytes(&mut self.bytes)?
                 .to_u32()?
                 .try_into()?;
