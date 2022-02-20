@@ -76,6 +76,50 @@ where
     }
 }
 
+// numerical non-repeated fields
+impl<'a, MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, const NUMBER: i32>
+    DeserOwnedFieldImpl<
+        LabelTag,
+        tags::Variant<VariantTypeTag>,
+        FieldType,
+        SharedType,
+        False, /* IsRepeated */
+        NUMBER,
+    > for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
+where
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
+    Iter: Iterator<Item = IoResult<u8>>,
+    tags::Variant<VariantTypeTag>:
+        tags::NumericalTypeTag<NativeType = FieldType> + crate::internal::variant::VariantTypeTag,
+    SharedType: SharedBitfield,
+    LabelTag: tags::FieldLabelTag,
+{
+    fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()> {
+        match self.wire_type {
+            WireType::Variant => {
+                let variant = Variant::decode_bytes(&mut self.bytes)?;
+
+                if LabelTag::DO_DEFAULT_CHECK && variant.is_zero() {
+                    // If the field is proto3 unlabaled type, then do not touch
+                    // the field value.
+                    return Ok(());
+                }
+
+                shared
+                    .bitfield_mut()
+                    .set(MP::Fields::<NUMBER>::OPTIONAL_FIELD_BITFIELD_INDEX, true);
+                *field = variant.to_native::<tags::Variant<VariantTypeTag>>()?;
+                Ok(())
+            }
+            WireType::LengthDelimited => {
+                todo!()
+            }
+            _ => Err(ErrorKind::UnexpectedWireType)?,
+        }
+    }
+}
+
 // `string` proto field where the rust's field type is `std::string::String`.
 impl<'a, MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
     DeserOwnedFieldImpl<
