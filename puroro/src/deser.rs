@@ -142,7 +142,7 @@ where
                 options,
                 _phantom: PhantomData::<(MP, FieldsType, SharedType)>,
             };
-            // self.match_field_number_mut(number, &mut handler)?;
+            self.match_field_number_mut(number, &mut handler)?;
         }
         Ok(())
     }
