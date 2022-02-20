@@ -160,7 +160,7 @@ where
         self.deser_from_bytes_impl(bytes, options, 0)
     }
 
-    pub fn deser_from_bytes_impl<'a, Iter>(
+    fn deser_from_bytes_impl<'a, Iter>(
         &'a mut self,
         mut bytes: Iter,
         options: DeserOptions,
