@@ -18,10 +18,10 @@ use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::{
     Bitfield, FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut,
-    MatchFieldNumber, MessageProperties, SharedBitfield,
+    MessageProperties, SharedBitfield,
 };
 use crate::tags;
-use crate::{ErrorKind, MessageImpl, Result};
+use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 

@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::bool::{False, True};
-use crate::internal::impls::owned::deser::{DeserOwnedFieldHandler};
+use crate::internal::impls::owned::deser::DeserOwnedFieldHandler;
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
-use crate::internal::{
-    Bitfield, FieldHandlerBase, FieldHandlerMut, FieldProperties, GetField, GetFieldMut,
-    MatchFieldNumber, MessageProperties, SharedBitfield,
-};
+use crate::internal::{MatchFieldNumber, MessageProperties};
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
