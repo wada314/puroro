@@ -383,6 +383,7 @@ impl_has!(Person, pub fn has_age<2>(&self));
 impl_has!(Person, pub fn has_partner<4>(&self));
 
 #[allow(unused)]
+#[test]
 fn test() {
     let mut person: Person = Person::new();
 
@@ -523,4 +524,13 @@ fn test() {
     for x in mperson.children() {
         let _: &Person<_> = x.as_message_ref();
     }
+}
+
+#[allow(unused)]
+#[test]
+fn test_deser() {
+    use ::std::io::Read;
+    let mut person: Person = Person::new();
+    let input = vec![(1 << 3) | 2, 0];
+    person.deser_from_bytes(input.bytes(), Default::default());
 }
