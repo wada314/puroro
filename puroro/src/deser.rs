@@ -125,18 +125,18 @@ where
             let length: usize = Variant::decode_bytes(&mut self.bytes)?
                 .to_u32()?
                 .try_into()?;
+            if field.capacity() < length {
+                field.reserve(length - field.capacity());
+            }
+            let mut inner_vec = ::std::mem::take(field).into_bytes();
+            for byte in self.bytes.by_ref().take(length) {
+                inner_vec.push(byte?);
+            }
             if self.options.do_utf8_check {
-                let input_vec = self
-                    .bytes
-                    .by_ref()
-                    .take(length)
-                    .collect::<IoResult<Vec<_>>>()?;
-                let input_string = String::from_utf8(input_vec).map_err(|e| ErrorKind::from(e))?;
-                field.push_str(&input_string);
+                *field = String::from_utf8(inner_vec).map_err(|e| Into::<ErrorKind>::into(e))?;
             } else {
-                let inner_vec = unsafe { field.as_mut_vec() };
-                for byte in self.bytes.by_ref().take(length) {
-                    inner_vec.push(byte?);
+                unsafe {
+                    *field = String::from_utf8_unchecked(inner_vec);
                 }
             }
             Ok(())
