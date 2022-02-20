@@ -24,6 +24,7 @@ use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
+#[derive(Clone)]
 pub struct DeserOptions {
     pub recursion_limit: Option<usize>,
 }
@@ -35,11 +36,11 @@ impl Default for DeserOptions {
     }
 }
 
-pub struct DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter> {
+pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
     bytes: Iter,
     wire_type: WireType,
     recursion_level: usize,
-    options: &'a DeserOptions,
+    options: DeserOptions,
     _phantom: PhantomData<(MP, FieldsType, SharedType)>,
 }
 
@@ -47,14 +48,14 @@ trait DeserOwnedFieldImpl<LabelTag, TypeTag, FieldType, SharedType, IsRepeated, 
     fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()>;
 }
 
-impl<'a, MP, FieldsType, SharedType, Iter> FieldHandlerBase
-    for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
+impl<MP, FieldsType, SharedType, Iter> FieldHandlerBase
+    for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 {
     type ReturnType = ();
 }
 
 impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
-    FieldHandlerMut<NUMBER> for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
+    FieldHandlerMut<NUMBER> for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
@@ -89,7 +90,7 @@ impl<'a, MP, LabelTag, LdTypeTag, FieldsType, FieldType, SharedType, Iter>
         SharedType,
         False, /* IsRepeated */
         False, /* IsMessage */
-    > for DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, Iter>
+    > for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
     Iter: Iterator<Item = IoResult<u8>>,
@@ -110,28 +111,28 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
 where
     MP: MessageProperties,
 {
-    pub fn deser_from_bytes<'a, 'c, Iter>(
+    pub fn deser_from_bytes<'a, Iter>(
         &'a mut self,
         bytes: Iter,
-        options: &'c DeserOptions,
+        options: DeserOptions,
     ) -> Result<()>
     where
         for<'b> Self:
-            MatchFieldNumber<DeserOwnedFieldHandler<'c, MP, FieldsType, SharedType, &'b mut Iter>>,
+            MatchFieldNumber<DeserOwnedFieldHandler<MP, FieldsType, SharedType, &'b mut Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         self.deser_from_bytes_impl(bytes, options, 0)
     }
 
-    pub fn deser_from_bytes_impl<'a, 'c, Iter>(
+    pub fn deser_from_bytes_impl<'a, Iter>(
         &'a mut self,
         mut bytes: Iter,
-        options: &'c DeserOptions,
+        options: DeserOptions,
         recursion_level: usize,
     ) -> Result<()>
     where
         for<'b> Self:
-            MatchFieldNumber<DeserOwnedFieldHandler<'c, MP, FieldsType, SharedType, &'b mut Iter>>,
+            MatchFieldNumber<DeserOwnedFieldHandler<MP, FieldsType, SharedType, &'b mut Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {
@@ -139,7 +140,7 @@ where
                 bytes: bytes.by_ref(),
                 wire_type,
                 recursion_level,
-                options,
+                options: options.clone(),
                 _phantom: PhantomData::<(MP, FieldsType, SharedType)>,
             };
             self.match_field_number_mut(number, &mut handler)?;
