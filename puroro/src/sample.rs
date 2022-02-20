@@ -531,6 +531,9 @@ fn test() {
 fn test_deser() {
     use ::std::io::Read;
     let mut person: Person = Person::new();
-    let input = vec![(1 << 3) | 2, 0];
+    let mut input = vec![(1 << 3) | 2, 5];
+    input.extend_from_slice(b"hello");
     person.deser_from_bytes(input.bytes(), Default::default());
+
+    assert_eq!(person.name(), "hello");
 }
