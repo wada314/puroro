@@ -110,29 +110,29 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
 where
     MP: MessageProperties,
 {
-    pub fn deser_from_bytes<'a, Iter>(
+    pub fn deser_from_bytes<'a, 'c, Iter>(
         &'a mut self,
         bytes: Iter,
-        options: &'a DeserOptions,
+        options: &'c DeserOptions,
     ) -> Result<()>
     where
-        Self:
-            MatchFieldNumber<DeserOwnedFieldHandler<'a, MP, FieldsType, SharedType, &'a mut Iter>>,
-        Iter: 'a + Iterator<Item = IoResult<u8>>,
+        for<'b> Self:
+            MatchFieldNumber<DeserOwnedFieldHandler<'c, MP, FieldsType, SharedType, &'b mut Iter>>,
+        Iter: Iterator<Item = IoResult<u8>>,
     {
         self.deser_from_bytes_impl(bytes, options, 0)
     }
 
-    pub fn deser_from_bytes_impl<'a, 'b, 'c, Iter>(
+    pub fn deser_from_bytes_impl<'a, 'c, Iter>(
         &'a mut self,
         mut bytes: Iter,
         options: &'c DeserOptions,
         recursion_level: usize,
     ) -> Result<()>
     where
-        Self:
+        for<'b> Self:
             MatchFieldNumber<DeserOwnedFieldHandler<'c, MP, FieldsType, SharedType, &'b mut Iter>>,
-        Iter: 'b + Iterator<Item = IoResult<u8>>,
+        Iter: Iterator<Item = IoResult<u8>>,
     {
         while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {
             let mut handler = DeserOwnedFieldHandler {
@@ -143,14 +143,9 @@ where
                 _phantom: PhantomData::<(MP, FieldsType, SharedType)>,
             };
             // self.match_field_number_mut(number, &mut handler)?;
-            hoge(self, number, &mut handler);
         }
         Ok(())
     }
-}
-
-fn hoge<A, B, C>(_: &mut A, _: C, _: &mut B) {
-    todo!()
 }
 
 fn try_get_wire_type_and_field_number<I>(iter: I) -> Result<Option<(WireType, i32)>>
