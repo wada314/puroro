@@ -27,11 +27,13 @@ use ::std::marker::PhantomData;
 #[derive(Clone)]
 pub struct DeserOptions {
     pub recursion_limit: Option<usize>,
+    pub do_utf8_check: bool,
 }
 impl Default for DeserOptions {
     fn default() -> Self {
         Self {
             recursion_limit: Some(30),
+            do_utf8_check: true,
         }
     }
 }
@@ -87,11 +89,12 @@ where
     }
 }
 
-impl<'a, MP, LabelTag, LdTypeTag, FieldsType, FieldType, SharedType, Iter>
+// `string` proto field where the rust's field type is `std::string::String`.
+impl<'a, MP, LabelTag, FieldsType, SharedType, Iter>
     DeserOwnedFieldImpl<
         LabelTag,
-        tags::LengthDelimited<LdTypeTag>,
-        FieldType,
+        tags::String,
+        String,
         SharedType,
         False, /* IsRepeated */
         False, /* IsMessage */
@@ -100,12 +103,26 @@ where
     MP: MessageProperties,
     Iter: Iterator<Item = IoResult<u8>>,
 {
-    fn deser_field(&mut self, field: &mut FieldType, shared: &mut SharedType) -> Result<()> {
+    fn deser_field(&mut self, field: &mut String, shared: &mut SharedType) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
             let length: usize = Variant::decode_bytes(&mut self.bytes)?
                 .to_u32()?
                 .try_into()?;
-            todo!()
+            if self.options.do_utf8_check {
+                let input_vec = self
+                    .bytes
+                    .by_ref()
+                    .take(length)
+                    .collect::<IoResult<Vec<_>>>()?;
+                let input_string = String::from_utf8(input_vec).map_err(|e| ErrorKind::from(e))?;
+                field.push_str(&input_string);
+            } else {
+                let inner_vec = unsafe { field.as_mut_vec() };
+                for byte in self.bytes.by_ref().take(length) {
+                    inner_vec.push(byte?);
+                }
+            }
+            Ok(())
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
