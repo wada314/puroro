@@ -24,26 +24,25 @@ use crate::tags;
 use crate::MessageImpl;
 use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
-use ::std::marker::PhantomData;
 
-pub struct DeserOwnedFieldHandler<MessageImplType, Iter> {
+pub struct DeserOwnedFieldHandler<Iter> {
     pub(crate) bytes: Iter,
     pub(crate) wire_type: WireType,
     pub(crate) recursion_level: usize,
     pub(crate) options: DeserOptions,
-    pub(crate) _phantom: PhantomData<MessageImplType>,
 }
 
 trait DeserOwnedFieldImpl<LabelTag, TypeTag, MessageImplType, IsRepeated, const NUMBER: i32> {
     fn deser_field(&mut self, message: &mut MessageImplType) -> Result<()>;
 }
 
-impl<MessageImplType, Iter> FieldHandlerBase for DeserOwnedFieldHandler<MessageImplType, Iter> {
+impl<Iter> FieldHandlerBase for DeserOwnedFieldHandler<Iter> {
     type ReturnType = ();
 }
 
-impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32> FieldHandlerMut<NUMBER>
-    for DeserOwnedFieldHandler<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, Iter>
+impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
+    FieldHandlerMut<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, NUMBER>
+    for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
@@ -57,8 +56,10 @@ where
         NUMBER,
     >,
 {
-    type MessageType = MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>;
-    fn handle_mut(&mut self, message: &mut Self::MessageType) -> Result<Self::ReturnType> {
+    fn handle_mut(
+        &mut self,
+        message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
+    ) -> Result<Self::ReturnType> {
         if let Some(recursion_limit) = self.options.recursion_limit {
             if self.recursion_level >= recursion_limit {
                 Err(ErrorKind::DeserRecursionOverflow())?
@@ -76,7 +77,7 @@ impl<MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, cons
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, Iter>
+    > for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -120,7 +121,7 @@ impl<MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, Iter>
+    > for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,

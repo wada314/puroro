@@ -117,9 +117,8 @@ pub trait FieldHandlerBase {
     type ReturnType;
 }
 
-pub trait FieldHandlerMut<const NUMBER: i32>: FieldHandlerBase {
-    type MessageType;
-    fn handle_mut(&mut self, message: &mut Self::MessageType) -> Result<Self::ReturnType>;
+pub trait FieldHandlerMut<MessageImplType, const NUMBER: i32>: FieldHandlerBase {
+    fn handle_mut(&mut self, message: &mut MessageImplType) -> Result<Self::ReturnType>;
 }
 
 pub trait MatchFieldNumber<FH: FieldHandlerBase> {

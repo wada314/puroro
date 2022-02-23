@@ -47,7 +47,7 @@ where
     // FieldsType: GetFieldMut<4>,
     // FieldsType: GetFieldMut<5>,
     // FieldsType: GetFieldMut<6>,
-    FH: FieldHandlerMut<1, MessageType = Self>,
+    FH: FieldHandlerMut<Self, 1>,
     // FH: FieldHandlerMut<2>,
     // FH: FieldHandlerMut<3>,
     // FH: FieldHandlerMut<4>,
@@ -57,7 +57,7 @@ where
     fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType> {
         macro_rules! call {
             ($number:literal) => {
-                <FH as FieldHandlerMut<$number>>::handle_mut(handler, self)
+                <FH as FieldHandlerMut<Self, $number>>::handle_mut(handler, self)
             };
         }
         match number {
