@@ -44,8 +44,8 @@ impl<MP, FieldsType, SharedType, Iter> FieldHandlerBase
     type ReturnType = ();
 }
 
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
-    FieldHandlerMut<NUMBER> for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
+impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32> FieldHandlerMut<NUMBER>
+    for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
