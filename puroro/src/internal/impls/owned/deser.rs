@@ -26,26 +26,24 @@ use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
-pub struct DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter> {
+pub struct DeserOwnedFieldHandler<MessageImplType, Iter> {
     pub(crate) bytes: Iter,
     pub(crate) wire_type: WireType,
     pub(crate) recursion_level: usize,
     pub(crate) options: DeserOptions,
-    pub(crate) _phantom: PhantomData<(MP, FieldsType, SharedType)>,
+    pub(crate) _phantom: PhantomData<MessageImplType>,
 }
 
 trait DeserOwnedFieldImpl<LabelTag, TypeTag, MessageImplType, IsRepeated, const NUMBER: i32> {
     fn deser_field(&mut self, message: &mut MessageImplType) -> Result<()>;
 }
 
-impl<MP, FieldsType, SharedType, Iter> FieldHandlerBase
-    for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
-{
+impl<MessageImplType, Iter> FieldHandlerBase for DeserOwnedFieldHandler<MessageImplType, Iter> {
     type ReturnType = ();
 }
 
 impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32> FieldHandlerMut<NUMBER>
-    for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
+    for DeserOwnedFieldHandler<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
@@ -78,7 +76,7 @@ impl<MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, cons
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
+    > for DeserOwnedFieldHandler<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -122,7 +120,7 @@ impl<MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<MP, FieldsType, SharedType, Iter>
+    > for DeserOwnedFieldHandler<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
