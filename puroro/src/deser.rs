@@ -15,7 +15,7 @@
 use crate::internal::impls::owned::deser::DeserOwnedFieldHandler;
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
-use crate::internal::{MatchFieldNumber, MessageProperties};
+use crate::internal::MatchFieldNumber;
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
@@ -34,10 +34,7 @@ impl Default for DeserOptions {
     }
 }
 
-impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
-where
-    MP: MessageProperties,
-{
+impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType> {
     pub fn deser_from_bytes<'a, Iter>(
         &'a mut self,
         bytes: Iter,
