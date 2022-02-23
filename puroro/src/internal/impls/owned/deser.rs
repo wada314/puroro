@@ -16,12 +16,14 @@ use crate::deser::DeserOptions;
 use crate::internal::bool::False;
 use crate::internal::methods::GetMutFieldMethod;
 use crate::internal::types::WireType;
+use crate::internal::variant;
 use crate::internal::variant::Variant;
 use crate::internal::{
-    methods, FieldHandlerBase, FieldHandlerMut, FieldProperties, MessageProperties, SharedBitfield,
+    methods, FieldHandlerBase, FieldHandlerMut, FieldProperties, MatchFieldNumber,
+    MessageProperties, SharedBitfield,
 };
-use crate::tags;
-use crate::MessageImpl;
+use crate::{tags, AsMessageImplMut};
+use crate::{AsMessageImplRef, MessageImpl};
 use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 
@@ -83,7 +85,7 @@ where
     MP::Fields<NUMBER>: FieldProperties,
     Iter: Iterator<Item = IoResult<u8>>,
     tags::Variant<VariantTypeTag>:
-        tags::NumericalTypeTag<NativeType = FieldType> + crate::internal::variant::VariantTypeTag,
+        tags::NumericalTypeTag<NativeType = FieldType> + variant::VariantTypeTag,
     LabelTag: tags::FieldLabelTag,
     for<'a> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>:
         methods::GetMutFieldMethod<'a, NUMBER, ReturnType = &'a mut FieldType>,
@@ -162,6 +164,59 @@ where
                     *field = String::from_utf8_unchecked(inner_vec);
                 }
             }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
+// message non-repeated field
+impl<
+    MP,
+    FieldMP,
+    LabelTag,
+    FieldsType,
+    SharedType,
+    MutFieldType,
+    FieldMessageImplType,
+    Iter,
+    const NUMBER: i32,
+>
+    DeserOwnedFieldImpl<
+        LabelTag,
+        tags::Message<FieldMP>,
+        MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
+        False, /* IsRepeated */
+        NUMBER,
+    > for DeserOwnedFieldHandler<Iter>
+where
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
+    Iter: Iterator<Item = IoResult<u8>>,
+    SharedType: SharedBitfield,
+    LabelTag: tags::FieldLabelTag,
+
+    for<'a> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>:
+        methods::GetMutFieldMethod<'a, NUMBER, ReturnType = MutFieldType>,
+    MutFieldType: AsMessageImplMut + AsMessageImplRef<MessageImplType = FieldMessageImplType>,
+    for<'a> FieldMessageImplType: MatchFieldNumber<DeserOwnedFieldHandler<&'a mut Iter>>,
+{
+    fn deser_field(
+        &mut self,
+        message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
+    ) -> Result<()> {
+        if let WireType::LengthDelimited = self.wire_type {
+            let length: usize = Variant::decode_bytes(&mut self.bytes)?
+                .to_u32()?
+                .try_into()?;
+
+            let field = message.invoke_get_mut().as_message_impl_mut();
+            field.deser_from_bytes_impl(
+                self.bytes.by_ref(), // TODO: take
+                self.options.clone(),
+                self.recursion_level + 1,
+            )?;
             Ok(())
         } else {
             Err(ErrorKind::UnexpectedWireType)?
