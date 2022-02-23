@@ -118,13 +118,8 @@ pub trait FieldHandlerBase {
 }
 
 pub trait FieldHandlerMut<const NUMBER: i32>: FieldHandlerBase {
-    type FieldType;
-    type SharedType;
-    fn handle_mut(
-        &mut self,
-        field: &mut Self::FieldType,
-        shared: &mut Self::SharedType,
-    ) -> Result<Self::ReturnType>;
+    type MessageType;
+    fn handle_mut(&mut self, message: &mut Self::MessageType) -> Result<Self::ReturnType>;
 }
 
 pub trait MatchFieldNumber<FH: FieldHandlerBase> {

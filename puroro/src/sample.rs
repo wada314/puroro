@@ -30,8 +30,8 @@ use crate::internal::impls::merged::{IntoMergedMessage, MergedImplProperties};
 use crate::internal::impls::option::{IntoOptionMessage, OptionImplProperties};
 use crate::internal::methods::{GetFieldMethod, GetOptFieldMethod};
 use crate::internal::{
-    EmptyFields, FieldHandlerMut, GetField, GetFieldMut, ImplProperties, MatchFieldNumber,
-    MessageProperties, OwnedShared,
+    EmptyFields, FieldHandlerMut, GetFieldMut, ImplProperties, MatchFieldNumber, MessageProperties,
+    OwnedShared,
 };
 use crate::message::*;
 use crate::*;
@@ -47,7 +47,7 @@ where
     // FieldsType: GetFieldMut<4>,
     // FieldsType: GetFieldMut<5>,
     // FieldsType: GetFieldMut<6>,
-    FH: FieldHandlerMut<1, FieldType = <FieldsType as GetField<1>>::Type, SharedType = SharedType>,
+    FH: FieldHandlerMut<1, MessageType = Self>,
     // FH: FieldHandlerMut<2>,
     // FH: FieldHandlerMut<3>,
     // FH: FieldHandlerMut<4>,
@@ -57,11 +57,7 @@ where
     fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType> {
         macro_rules! call {
             ($number:literal) => {
-                <FH as FieldHandlerMut<$number>>::handle_mut(
-                    handler,
-                    GetFieldMut::<$number>::get_field_mut(&mut self.fields),
-                    &mut self.shared,
-                )
+                <FH as FieldHandlerMut<$number>>::handle_mut(handler, self)
             };
         }
         match number {
