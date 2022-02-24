@@ -104,6 +104,16 @@ where
     )))
 }
 
+pub trait ScopedIterator<'a>: Iterator {
+    type Scoped<'b>: ScopedIterator<'b> + Iterator<Item = Self::Item>
+    where
+        Self: 'a + 'b,
+        'a: 'b;
+    fn push_scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
+    where
+        'a: 'b;
+}
+
 pub struct ScopedIter<I> {
     iter: I,
     pos: usize,
