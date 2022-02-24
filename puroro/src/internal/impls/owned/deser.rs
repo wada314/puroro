@@ -19,8 +19,7 @@ use crate::internal::types::WireType;
 use crate::internal::variant;
 use crate::internal::variant::Variant;
 use crate::internal::{
-    methods, FieldHandlerBase, FieldHandlerMut, FieldProperties, MatchFieldNumber,
-    MessageProperties, SharedBitfield,
+    methods, FieldHandlerBase, FieldHandlerMut, FieldProperties, MessageProperties, SharedBitfield,
 };
 use crate::{tags, AsMessageImplMut};
 use crate::{AsMessageImplRef, MessageImpl};
@@ -212,14 +211,15 @@ where
                 .to_u32()?
                 .try_into()?;
 
-            let field = message.invoke_get_mut().as_message_impl_mut();
+            let mut field = message.invoke_get_mut();
+            let msg_impl = field.as_message_impl_mut();
             self.bytes.push_scope(length);
-            field.deser_from_bytes_impl(
-                self.bytes,
+            msg_impl.deser_from_bytes_impl(
+                self.bytes.by_ref(),
                 self.options.clone(),
                 self.recursion_level + 1,
             )?;
-            self.bytes.pop_scope(length);
+            self.bytes.pop_scope();
             Ok(())
         } else {
             Err(ErrorKind::UnexpectedWireType)?

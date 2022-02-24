@@ -34,7 +34,7 @@ impl Default for DeserOptions {
     }
 }
 
-pub(crate) trait DeserFromBytesImpl<Iter> {
+pub trait DeserFromBytesImpl<Iter> {
     fn deser_from_bytes_impl(
         &mut self,
         bytes: &mut ScopedIter<Iter>,
@@ -110,27 +110,20 @@ pub struct ScopedIter<I> {
     end_stack: Vec<usize>,
 }
 impl<I> ScopedIter<I> {
-    pub fn new(iter: I) -> Self {
+    pub(crate) fn new(iter: I) -> Self {
         Self {
             iter,
             pos: 0,
             end_stack: Vec::new(),
         }
     }
-    pub fn new_with_len(iter: I, len: usize) -> Self {
-        Self {
-            iter,
-            pos: 0,
-            end_stack: vec![len],
-        }
-    }
-    fn push_scope(&mut self, new_len: usize) {
+    pub(crate) fn push_scope(&mut self, new_len: usize) {
         if let Some(cur_end) = self.end_stack.last() {
             assert!(self.pos + new_len <= *cur_end);
         }
         self.end_stack.push(self.pos + new_len);
     }
-    fn pop_scope(&mut self) {
+    pub(crate) fn pop_scope(&mut self) {
         if let Some(cur_end) = self.end_stack.last() {
             assert_eq!(self.pos, *cur_end);
         }
