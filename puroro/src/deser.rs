@@ -34,6 +34,43 @@ impl Default for DeserOptions {
     }
 }
 
+pub(crate) trait DeserFromBytesImpl<Iter> {
+    fn deser_from_bytes_impl(
+        &mut self,
+        bytes: &mut ScopedIter<Iter>,
+        options: DeserOptions,
+        recursion_level: usize,
+    ) -> Result<()>;
+}
+
+impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
+    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
+where
+    Iter: Iterator<Item = IoResult<u8>>,
+    for<'a> Self: MatchFieldNumber<DeserOwnedFieldHandler<'a, Iter>>,
+{
+    fn deser_from_bytes_impl(
+        &mut self,
+        bytes: &mut ScopedIter<Iter>,
+        options: DeserOptions,
+        recursion_level: usize,
+    ) -> Result<()> {
+        let mut handler = DeserOwnedFieldHandler {
+            bytes,
+            wire_type: WireType::Variant, // a random value
+            recursion_level,
+            options: options.clone(),
+        };
+        while let Some((wire_type, number)) =
+            try_get_wire_type_and_field_number(&mut handler.bytes)?
+        {
+            handler.wire_type = wire_type;
+            self.match_field_number_mut(number, &mut handler)?;
+        }
+        Ok(())
+    }
+}
+
 impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType> {
     pub fn deser_from_bytes<'a, Iter>(
         &'a mut self,
@@ -41,32 +78,11 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
         options: DeserOptions,
     ) -> Result<()>
     where
-        for<'b> Self: MatchFieldNumber<DeserOwnedFieldHandler<&'b mut Iter>>,
+        Self: DeserFromBytesImpl<Iter>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        self.deser_from_bytes_impl(bytes, options, 0)
-    }
-
-    fn deser_from_bytes_impl<'a, Iter>(
-        &'a mut self,
-        mut bytes: Iter,
-        options: DeserOptions,
-        recursion_level: usize,
-    ) -> Result<()>
-    where
-        for<'b> Self: MatchFieldNumber<DeserOwnedFieldHandler<&'b mut Iter>>,
-        Iter: Iterator<Item = IoResult<u8>>,
-    {
-        while let Some((wire_type, number)) = try_get_wire_type_and_field_number(bytes.by_ref())? {
-            let mut handler = DeserOwnedFieldHandler {
-                bytes: bytes.by_ref(),
-                wire_type,
-                recursion_level,
-                options: options.clone(),
-            };
-            self.match_field_number_mut(number, &mut handler)?;
-        }
-        Ok(())
+        let mut scoped_iter = ScopedIter::new(bytes);
+        self.deser_from_bytes_impl(&mut scoped_iter, options, 0)
     }
 }
 
@@ -86,4 +102,89 @@ where
             .try_into()
             .map_err(|_| ErrorKind::InvalidFieldNumber)?,
     )))
+}
+
+pub struct ScopedIter<I> {
+    iter: I,
+    pos: usize,
+    end_stack: Vec<usize>,
+}
+impl<I> ScopedIter<I> {
+    pub fn new(iter: I) -> Self {
+        Self {
+            iter,
+            pos: 0,
+            end_stack: Vec::new(),
+        }
+    }
+    pub fn new_with_len(iter: I, len: usize) -> Self {
+        Self {
+            iter,
+            pos: 0,
+            end_stack: vec![len],
+        }
+    }
+    fn push_scope(&mut self, new_len: usize) {
+        if let Some(cur_end) = self.end_stack.last() {
+            assert!(self.pos + new_len <= *cur_end);
+        }
+        self.end_stack.push(self.pos + new_len);
+    }
+    fn pop_scope(&mut self) {
+        if let Some(cur_end) = self.end_stack.last() {
+            assert_eq!(self.pos, *cur_end);
+        }
+        self.end_stack.pop().unwrap();
+    }
+}
+impl<I> Iterator for ScopedIter<I>
+where
+    I: Iterator,
+{
+    type Item = <I as Iterator>::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.end_stack.last() {
+            Some(end) => {
+                if self.pos < *end {
+                    self.pos += 1;
+                    self.iter.next()
+                } else {
+                    None
+                }
+            }
+            None => {
+                self.pos += 1;
+                self.iter.next()
+            }
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let inner_size = self.iter.size_hint();
+        match self.end_stack.last() {
+            Some(end) => (inner_size.0, Some(end - self.pos)),
+            None => inner_size,
+        }
+    }
+}
+
+#[test]
+fn test_scoped_iter() {
+    let s1 = ScopedIter::new("abcdefg".chars());
+    assert_eq!("abcdefg", s1.collect::<String>());
+
+    let s2 = ScopedIter::new_with_len("abcdefg".chars(), 5);
+    assert_eq!("abcde", s2.collect::<String>());
+
+    let mut s3 = ScopedIter::new("abcdefg".chars());
+    s3.push_scope(5);
+    assert_eq!("abcde", s3.collect::<String>());
+
+    let mut s4 = ScopedIter::new("abcdefg".chars());
+    assert_eq!(Some('a'), s4.next());
+    s4.push_scope(5);
+    assert_eq!("bcdef", s4.by_ref().collect::<String>());
+    s4.pop_scope();
+    assert_eq!("g", s4.by_ref().collect::<String>());
 }
