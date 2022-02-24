@@ -113,6 +113,19 @@ pub trait ScopedIterator<'a>: Iterator {
     where
         'a: 'b;
 }
+impl<'a, I: Iterator> ScopedIterator<'a> for &'a mut ScopedIter<I> {
+    type Scoped<'b>
+    where
+        Self: 'a + 'b,
+        'a: 'b,
+    = &'b mut ScopedIter<I>;
+    fn push_scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
+    where
+        'a: 'b,
+    {
+        todo!()
+    }
+}
 
 pub struct ScopedIter<I> {
     iter: I,
