@@ -45,34 +45,10 @@ pub trait DeserFromBytesImpl {
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>;
 }
 
-trait MatchDeserOwnedField {
-    fn match_field<Iter>(
-        &mut self,
-        number: i32,
-        handler: &mut DeserOwnedFieldHandler<Iter>,
-    ) -> Result<<DeserOwnedFieldHandler<Iter> as FieldHandlerBase>::ReturnType>
-    where
-        Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>;
-}
-impl<MP, FieldsType, SharedType> MatchDeserOwnedField
-    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
-{
-    fn match_field<Iter>(
-        &mut self,
-        number: i32,
-        handler: &mut DeserOwnedFieldHandler<Iter>,
-    ) -> Result<<DeserOwnedFieldHandler<Iter> as FieldHandlerBase>::ReturnType>
-    where
-        Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
-    {
-        self.match_field_number_mut(number, handler)
-    }
-}
-
 impl<MP, FieldsType, SharedType> DeserFromBytesImpl
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
-    Self: MatchDeserOwnedField,
+    Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
 {
     fn deser_from_bytes_impl<'a, Iter>(
         &mut self,
@@ -93,7 +69,7 @@ where
             try_get_wire_type_and_field_number(&mut handler.bytes)?
         {
             handler.wire_type = wire_type;
-            self.match_field(number, &mut handler)?;
+            self.match_field_number_mut(number, &mut handler)?;
         }
         Ok(())
     }
