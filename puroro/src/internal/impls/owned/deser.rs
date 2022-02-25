@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::deser::{DeserFromBytesImpl, DeserOptions, ScopedIter};
+use crate::deser::{DeserFromBytesImpl, DeserOptions, ScopedIterator};
 use crate::internal::bool::False;
 use crate::internal::methods::GetMutFieldMethod;
 use crate::internal::types::WireType;
@@ -26,8 +26,8 @@ use crate::{AsMessageImplRef, MessageImpl};
 use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 
-pub struct DeserOwnedFieldHandler<'a, Iter> {
-    pub(crate) bytes: &'a mut ScopedIter<Iter>,
+pub struct DeserOwnedFieldHandler<I> {
+    pub(crate) bytes: I,
     pub(crate) wire_type: WireType,
     pub(crate) recursion_level: usize,
     pub(crate) options: DeserOptions,
@@ -37,13 +37,13 @@ trait DeserOwnedFieldImpl<LabelTag, TypeTag, MessageImplType, IsRepeated, const 
     fn deser_field(&mut self, message: &mut MessageImplType) -> Result<()>;
 }
 
-impl<'a, Iter> FieldHandlerBase for DeserOwnedFieldHandler<'a, Iter> {
+impl<Iter> FieldHandlerBase for DeserOwnedFieldHandler<Iter> {
     type ReturnType = ();
 }
 
-impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
+impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
     FieldHandlerMut<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, NUMBER>
-    for DeserOwnedFieldHandler<'a, Iter>
+    for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
@@ -71,14 +71,14 @@ where
 }
 
 // numerical non-repeated fields
-impl<'a, MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, const NUMBER: i32>
+impl<MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, const NUMBER: i32>
     DeserOwnedFieldImpl<
         LabelTag,
         tags::Variant<VariantTypeTag>,
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<'a, Iter>
+    > for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -115,14 +115,14 @@ where
 }
 
 // `string` proto field where the rust's field type is `std::string::String`.
-impl<'a, MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
+impl<MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
     DeserOwnedFieldImpl<
         LabelTag,
         tags::String,
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<'a, Iter>
+    > for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -172,7 +172,6 @@ where
 
 // message non-repeated field
 impl<
-    'a,
     MP,
     FieldMP,
     LabelTag,
@@ -189,11 +188,11 @@ impl<
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<'a, Iter>
+    > for DeserOwnedFieldHandler<Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
-    Iter: Iterator<Item = IoResult<u8>>,
+    for<'a> Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
     SharedType: SharedBitfield,
     LabelTag: tags::FieldLabelTag,
 
@@ -213,13 +212,11 @@ where
 
             let mut field = message.invoke_get_mut();
             let msg_impl = field.as_message_impl_mut();
-            self.bytes.push_scope(length);
             msg_impl.deser_from_bytes_impl(
-                self.bytes.by_ref(),
+                self.bytes.scope(length),
                 self.options.clone(),
                 self.recursion_level + 1,
             )?;
-            self.bytes.pop_scope();
             Ok(())
         } else {
             Err(ErrorKind::UnexpectedWireType)?
