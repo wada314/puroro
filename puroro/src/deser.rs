@@ -109,79 +109,75 @@ pub trait ScopedIterator<'a>: Iterator {
     where
         Self: 'a + 'b,
         'a: 'b;
-    fn push_scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
+    fn scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
     where
         'a: 'b;
 }
-impl<'a, I: Iterator> ScopedIterator<'a> for &'a mut ScopedIter<I> {
+impl<'a, I: Iterator> ScopedIterator<'a> for ScopedIter<'a, I> {
     type Scoped<'b>
     where
         Self: 'a + 'b,
         'a: 'b,
-    = &'b mut ScopedIter<I>;
-    fn push_scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
+    = ScopedIter<'b, I>;
+    fn scope<'b>(&'a mut self, scope_len: usize) -> Self::Scoped<'b>
     where
         'a: 'b,
     {
-        todo!()
+        <ScopedIter<'a, I>>::scope(self, scope_len)
     }
 }
 
-pub struct ScopedIter<I> {
+pub(crate) struct PosIter<I> {
     iter: I,
     pos: usize,
-    end_stack: Vec<usize>,
 }
-impl<I> ScopedIter<I> {
+impl<I> PosIter<I> {
     pub(crate) fn new(iter: I) -> Self {
-        Self {
-            iter,
-            pos: 0,
-            end_stack: Vec::new(),
-        }
+        Self { iter, pos: 0 }
     }
-    pub(crate) fn push_scope(&mut self, new_len: usize) {
-        if let Some(cur_end) = self.end_stack.last() {
-            assert!(self.pos + new_len <= *cur_end);
-        }
-        self.end_stack.push(self.pos + new_len);
-    }
-    pub(crate) fn pop_scope(&mut self) {
-        if let Some(cur_end) = self.end_stack.last() {
-            assert_eq!(self.pos, *cur_end);
-        }
-        self.end_stack.pop().unwrap();
+    pub(crate) fn pos(&self) -> usize {
+        self.pos
     }
 }
-impl<I> Iterator for ScopedIter<I>
+impl<I: Iterator> Iterator for PosIter<I> {
+    type Item = I::Item;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.pos += 1;
+        self.iter.next()
+    }
+}
+
+pub struct ScopedIter<'a, I> {
+    iter: &'a mut PosIter<I>,
+    end_pos: usize,
+}
+impl<'a, I> ScopedIter<'a, I> {
+    pub(crate) fn new(iter: &'a mut PosIter<I>, end_pos: usize) -> Self {
+        Self { iter, end_pos }
+    }
+    pub(crate) fn scope<'b>(&'a mut self, scope_len: usize) -> ScopedIter<'b, I>
+    where
+        'a: 'b,
+    {
+        let pos = self.iter.pos();
+        ScopedIter::new(self.iter, pos + scope_len)
+    }
+}
+impl<'a, I> Iterator for ScopedIter<'a, I>
 where
     I: Iterator,
 {
     type Item = <I as Iterator>::Item;
-
     fn next(&mut self) -> Option<Self::Item> {
-        match self.end_stack.last() {
-            Some(end) => {
-                if self.pos < *end {
-                    self.pos += 1;
-                    self.iter.next()
-                } else {
-                    None
-                }
-            }
-            None => {
-                self.pos += 1;
-                self.iter.next()
-            }
+        if self.iter.pos() >= self.end_pos {
+            None
+        } else {
+            self.iter.next()
         }
     }
-
     fn size_hint(&self) -> (usize, Option<usize>) {
         let inner_size = self.iter.size_hint();
-        match self.end_stack.last() {
-            Some(end) => (inner_size.0, Some(end - self.pos)),
-            None => inner_size,
-        }
+        (inner_size.0, Some(self.end_pos - self.iter.pos()))
     }
 }
 
