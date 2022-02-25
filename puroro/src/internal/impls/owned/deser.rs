@@ -199,7 +199,7 @@ where
     for<'b> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>:
         methods::GetMutFieldMethod<'b, NUMBER, ReturnType = MutFieldType>,
     MutFieldType: AsMessageImplMut + AsMessageImplRef<MessageImplType = FieldMessageImplType>,
-    FieldMessageImplType: DeserFromBytesImpl<Iter>,
+    FieldMessageImplType: DeserFromBytesImpl,
 {
     fn deser_field(
         &mut self,
