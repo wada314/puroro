@@ -34,27 +34,31 @@ impl Default for DeserOptions {
     }
 }
 
-pub trait DeserFromBytesImpl<Iter> {
-    fn deser_from_bytes_impl(
+pub trait DeserFromBytesImpl {
+    fn deser_from_bytes_impl<Iter>(
         &mut self,
         bytes: Iter,
         options: DeserOptions,
         recursion_level: usize,
-    ) -> Result<()>;
+    ) -> Result<()>
+    where
+        for<'a> Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>;
 }
 
-impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
+impl<MP, FieldsType, SharedType> DeserFromBytesImpl
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
-    for<'a> Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
     Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
 {
-    fn deser_from_bytes_impl(
+    fn deser_from_bytes_impl<Iter>(
         &mut self,
         bytes: Iter,
         options: DeserOptions,
         recursion_level: usize,
-    ) -> Result<()> {
+    ) -> Result<()>
+    where
+        for<'a> Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
+    {
         let mut handler = DeserOwnedFieldHandler {
             bytes,
             wire_type: WireType::Variant, // a random value
