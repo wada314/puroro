@@ -42,7 +42,7 @@ pub trait DeserFromBytesImpl<Iter> {
         recursion_level: usize,
     ) -> Result<()>
     where
-        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>;
+        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator;
 }
 
 impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
@@ -57,7 +57,7 @@ where
         recursion_level: usize,
     ) -> Result<()>
     where
-        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
+        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator,
     {
         let mut handler = DeserOwnedFieldHandler {
             bytes,
@@ -104,39 +104,31 @@ where
     )))
 }
 
-pub trait ScopedIterator<'a>: Iterator {
-    type Scoped<'b>: ScopedIterator<'b> + Iterator<Item = Self::Item>
+pub trait ScopedIterator: Iterator {
+    type Scoped<'a>: ScopedIterator + Iterator<Item = Self::Item>
     where
-        Self: 'a + 'b,
-        'a: 'b;
-    fn scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
-    where
-        'a: 'b;
+        Self: 'a;
+    fn scope(&mut self, new_len: usize) -> Self::Scoped<'_>;
 }
-impl<'a, I: Iterator> ScopedIterator<'a> for ScopedIter<'a, I> {
+impl<'a, I: Iterator> ScopedIterator for ScopedIter<'a, I>
+where
+    Self: 'a,
+{
     type Scoped<'b>
     where
-        Self: 'a + 'b,
-        'a: 'b,
+        Self: 'b,
     = ScopedIter<'b, I>;
-    fn scope<'b>(&'a mut self, scope_len: usize) -> Self::Scoped<'b>
-    where
-        'a: 'b,
-    {
-        <ScopedIter<'a, I>>::scope(self, scope_len)
+    fn scope(&mut self, scope_len: usize) -> Self::Scoped<'_> {
+        <ScopedIter<I>>::scope(self, scope_len)
     }
 }
-impl<'a, I: Iterator> ScopedIterator<'a> for &'a mut PosIter<I> {
+impl<'a, I: Iterator> ScopedIterator for &'a mut PosIter<I> {
     type Scoped<'b>
     where
-        Self: 'a + 'b,
-        'a: 'b,
+        Self: 'b,
     = ScopedIter<'b, I>;
-    fn scope<'b>(&'a mut self, new_len: usize) -> Self::Scoped<'b>
-    where
-        'a: 'b,
-    {
-        <ScopedIter<'a, I>>::new(self, self.pos() + new_len)
+    fn scope(&mut self, new_len: usize) -> Self::Scoped<'_> {
+        <ScopedIter<I>>::new(self, self.pos() + new_len)
     }
 }
 
@@ -168,10 +160,7 @@ impl<'a, I> ScopedIter<'a, I> {
     pub(crate) fn new(iter: &'a mut PosIter<I>, end_pos: usize) -> Self {
         Self { iter, end_pos }
     }
-    pub(crate) fn scope<'b>(&'a mut self, scope_len: usize) -> ScopedIter<'b, I>
-    where
-        'a: 'b,
-    {
+    pub(crate) fn scope(&mut self, scope_len: usize) -> ScopedIter<'_, I> {
         let pos = self.iter.pos();
         ScopedIter::new(self.iter, pos + scope_len)
     }

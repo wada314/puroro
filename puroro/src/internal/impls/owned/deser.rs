@@ -192,14 +192,14 @@ impl<
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
-    for<'a> Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
+    Iter: Iterator<Item = IoResult<u8>> + ScopedIterator,
     SharedType: SharedBitfield,
     LabelTag: tags::FieldLabelTag,
 
     for<'b> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>:
         methods::GetMutFieldMethod<'b, NUMBER, ReturnType = MutFieldType>,
     MutFieldType: AsMessageImplMut + AsMessageImplRef<MessageImplType = FieldMessageImplType>,
-    for<'b> FieldMessageImplType: DeserFromBytesImpl<<Iter as ScopedIterator<'b>>::Scoped<'b>>,
+    for<'a> FieldMessageImplType: DeserFromBytesImpl<<Iter as ScopedIterator>::Scoped<'a>>,
 {
     fn deser_field(
         &mut self,
