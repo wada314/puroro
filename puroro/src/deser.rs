@@ -78,11 +78,11 @@ where
 impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType> {
     pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter, options: DeserOptions) -> Result<()>
     where
-        for<'a> Self: DeserFromBytesImpl<&'a mut PosIter<Iter>>,
+        Self: DeserFromBytesImpl<PosIter<Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        let mut pos_iter = PosIter::new(bytes);
-        self.deser_from_bytes_impl(&mut pos_iter, options, 0)
+        let pos_iter = PosIter::new(bytes);
+        self.deser_from_bytes_impl(pos_iter, options, 0)
     }
 }
 
@@ -122,11 +122,11 @@ where
         <ScopedIter<I>>::scope(self, scope_len)
     }
 }
-impl<'a, I: Iterator> ScopedIterator for &'a mut PosIter<I> {
-    type Scoped<'b>
+impl<I: Iterator> ScopedIterator for PosIter<I> {
+    type Scoped<'a>
     where
-        Self: 'b,
-    = ScopedIter<'b, I>;
+        Self: 'a,
+    = ScopedIter<'a, I>;
     fn scope(&mut self, new_len: usize) -> Self::Scoped<'_> {
         <ScopedIter<I>>::new(self, self.pos() + new_len)
     }
@@ -189,4 +189,11 @@ fn test_scoped_iter() {
     assert_eq!("abcdefg", p1.collect::<String>());
 
     let mut p2 = PosIter::new("abcdefg".chars());
+    let s2 = p2.scope(4);
+    assert_eq!("abcd", s2.collect::<String>());
+
+    let mut p3 = PosIter::new("abcdefg".chars());
+    assert_eq!(Some('a'), p3.next());
+    let s3 = p3.scope(4);
+    assert_eq!("bcde", s3.collect::<String>());
 }
