@@ -41,14 +41,14 @@ use ::std::ops::{Deref, DerefMut};
 impl<FieldsType, SharedType, FH> MatchFieldNumber<FH>
     for MessageImpl<PersonMessageProperties, tags::OwnedImpl, FieldsType, SharedType>
 where
-    FieldsType: GetFieldMut<1>,
-    FieldsType: GetFieldMut<2>,
+    // FieldsType: GetFieldMut<1>,
+    // FieldsType: GetFieldMut<2>,
     // FieldsType: GetFieldMut<3>,
     FieldsType: GetFieldMut<4>,
     // FieldsType: GetFieldMut<5>,
     // FieldsType: GetFieldMut<6>,
-    FH: FieldHandlerMut<Self, 1>,
-    FH: FieldHandlerMut<Self, 2>,
+    // FH: FieldHandlerMut<Self, 1>,
+    // FH: FieldHandlerMut<Self, 2>,
     // FH: FieldHandlerMut<Self, 3>,
     FH: FieldHandlerMut<Self, 4>,
     // FH: FieldHandlerMut<Self, 5>,
@@ -61,8 +61,8 @@ where
             };
         }
         match number {
-            1 => call!(1),
-            2 => call!(2),
+            // 1 => call!(1),
+            // 2 => call!(2),
             // 3 => call!(3),
             4 => call!(4),
             // 5 => call!(5),
