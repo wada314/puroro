@@ -15,7 +15,7 @@
 use crate::internal::impls::owned::deser::DeserOwnedFieldHandler;
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
-use crate::internal::{FieldHandlerBase, MatchFieldNumber};
+use crate::internal::MatchFieldNumber;
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
 use ::std::io::Result as IoResult;
@@ -196,20 +196,8 @@ where
 
 #[test]
 fn test_scoped_iter() {
-    let s1 = ScopedIter::new("abcdefg".chars());
-    assert_eq!("abcdefg", s1.collect::<String>());
+    let p1 = PosIter::new("abcdefg".chars());
+    assert_eq!("abcdefg", p1.collect::<String>());
 
-    let s2 = ScopedIter::new_with_len("abcdefg".chars(), 5);
-    assert_eq!("abcde", s2.collect::<String>());
-
-    let mut s3 = ScopedIter::new("abcdefg".chars());
-    s3.push_scope(5);
-    assert_eq!("abcde", s3.collect::<String>());
-
-    let mut s4 = ScopedIter::new("abcdefg".chars());
-    assert_eq!(Some('a'), s4.next());
-    s4.push_scope(5);
-    assert_eq!("bcdef", s4.by_ref().collect::<String>());
-    s4.pop_scope();
-    assert_eq!("g", s4.by_ref().collect::<String>());
+    let mut p2 = PosIter::new("abcdefg".chars());
 }
