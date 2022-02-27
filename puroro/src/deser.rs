@@ -34,22 +34,23 @@ impl Default for DeserOptions {
     }
 }
 
-pub trait DeserFromBytesImpl {
-    fn deser_from_bytes_impl<'a, Iter>(
+pub trait DeserFromBytesImpl<Iter> {
+    fn deser_from_bytes_impl<'a>(
         &mut self,
         bytes: Iter,
         options: DeserOptions,
         recursion_level: usize,
     ) -> Result<()>
     where
-        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
-        Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>;
+        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>;
 }
 
-impl<MP, FieldsType, SharedType> DeserFromBytesImpl
+impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
+where
+    Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
 {
-    fn deser_from_bytes_impl<'a, Iter>(
+    fn deser_from_bytes_impl<'a>(
         &mut self,
         bytes: Iter,
         options: DeserOptions,
@@ -57,7 +58,6 @@ impl<MP, FieldsType, SharedType> DeserFromBytesImpl
     ) -> Result<()>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
-        Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
     {
         let mut handler = DeserOwnedFieldHandler {
             bytes,
@@ -78,7 +78,7 @@ impl<MP, FieldsType, SharedType> DeserFromBytesImpl
 impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType> {
     pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter, options: DeserOptions) -> Result<()>
     where
-        Self: DeserFromBytesImpl,
+        for<'a> Self: DeserFromBytesImpl<&'a mut PosIter<Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
         let mut pos_iter = PosIter::new(bytes);
@@ -140,7 +140,7 @@ impl<'a, I: Iterator> ScopedIterator<'a> for &'a mut PosIter<I> {
     }
 }
 
-pub(crate) struct PosIter<I> {
+pub struct PosIter<I> {
     iter: I,
     pos: usize,
 }
