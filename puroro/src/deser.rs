@@ -42,13 +42,12 @@ pub trait DeserFromBytesImpl {
         recursion_level: usize,
     ) -> Result<()>
     where
-        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>;
+        Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
+        Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>;
 }
 
 impl<MP, FieldsType, SharedType> DeserFromBytesImpl
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
-where
-    Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
 {
     fn deser_from_bytes_impl<'a, Iter>(
         &mut self,
@@ -58,6 +57,7 @@ where
     ) -> Result<()>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator<'a>,
+        Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
     {
         let mut handler = DeserOwnedFieldHandler {
             bytes,
