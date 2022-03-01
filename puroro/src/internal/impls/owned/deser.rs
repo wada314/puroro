@@ -27,7 +27,7 @@ use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 
 pub struct DeserOwnedFieldHandler<I> {
-    pub(crate) bytes: I,
+    pub(crate) bytes: Option<I>,
     pub(crate) wire_type: WireType,
     pub(crate) recursion_level: usize,
     pub(crate) options: DeserOptions,
@@ -199,7 +199,7 @@ where
     for<'b> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>:
         methods::GetMutFieldMethod<'b, NUMBER, ReturnType = MutFieldType>,
     MutFieldType: AsMessageImplMut + AsMessageImplRef<MessageImplType = FieldMessageImplType>,
-    for<'a> FieldMessageImplType: DeserFromBytesImpl<<Iter as ScopedIterator>::Scoped<'a>>,
+    FieldMessageImplType: DeserFromBytesImpl<Iter>,
 {
     fn deser_field(
         &mut self,
@@ -212,8 +212,9 @@ where
 
             let mut field = message.invoke_get_mut();
             let msg_impl = field.as_message_impl_mut();
-            msg_impl.deser_from_bytes_impl(
-                self.bytes.scope(length),
+            self.bytes.push_scope(length);
+            self.bytes = msg_impl.deser_from_bytes_impl(
+                self.bytes,
                 self.options.clone(),
                 self.recursion_level + 1,
             )?;

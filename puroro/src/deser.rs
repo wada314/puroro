@@ -35,12 +35,12 @@ impl Default for DeserOptions {
 }
 
 pub trait DeserFromBytesImpl<Iter> {
-    fn deser_from_bytes_impl<'a>(
+    fn deser_from_bytes_impl(
         &mut self,
         bytes: Iter,
         options: DeserOptions,
         recursion_level: usize,
-    ) -> Result<()>
+    ) -> Result<Iter>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator;
 }
@@ -50,12 +50,12 @@ impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
 where
     Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
 {
-    fn deser_from_bytes_impl<'a>(
+    fn deser_from_bytes_impl(
         &mut self,
         bytes: Iter,
         options: DeserOptions,
         recursion_level: usize,
-    ) -> Result<()>
+    ) -> Result<Iter>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator,
     {
@@ -71,18 +71,21 @@ where
             handler.wire_type = wire_type;
             self.match_field_number_mut(number, &mut handler)?;
         }
-        Ok(())
+        Ok(bytes)
     }
 }
 
 impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType> {
     pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter, options: DeserOptions) -> Result<()>
     where
-        Self: DeserFromBytesImpl<PosIter<Iter>>,
+        Self: DeserFromBytesImpl<ScopedIter<Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        let pos_iter = PosIter::new(bytes);
-        self.deser_from_bytes_impl(pos_iter, options, 0)
+        let scoped_iter = ScopedIter::new(bytes);
+        self.deser_from_bytes_impl(scoped_iter, options, 0)?;
+        debug_assert!(!scoped_iter.is_in_scope());
+        debug_assert!(scoped_iter.next().is_none());
+        Ok(())
     }
 }
 
@@ -105,30 +108,23 @@ where
 }
 
 pub trait ScopedIterator: Iterator {
-    type Scoped<'a>: ScopedIterator + Iterator<Item = Self::Item>
-    where
-        Self: 'a;
-    fn scope(&mut self, new_len: usize) -> Self::Scoped<'_>;
+    fn push_scope(&mut self, new_len: usize);
+    fn pop_scope(&mut self);
 }
-impl<'a, I: Iterator> ScopedIterator for ScopedIter<'a, I>
-where
-    Self: 'a,
-{
-    type Scoped<'b>
-    where
-        Self: 'b,
-    = ScopedIter<'b, I>;
-    fn scope(&mut self, scope_len: usize) -> Self::Scoped<'_> {
-        <ScopedIter<I>>::scope(self, scope_len)
+impl<I: Iterator> ScopedIterator for ScopedIter<I> {
+    fn push_scope(&mut self, new_len: usize) {
+        <ScopedIter<I>>::push_scope(self, new_len)
+    }
+    fn pop_scope(&mut self) {
+        <ScopedIter<I>>::pop_scope(self)
     }
 }
-impl<I: Iterator> ScopedIterator for PosIter<I> {
-    type Scoped<'a>
-    where
-        Self: 'a,
-    = ScopedIter<'a, I>;
-    fn scope(&mut self, new_len: usize) -> Self::Scoped<'_> {
-        <ScopedIter<I>>::new(self, self.pos() + new_len)
+impl<'a, I: Iterator> ScopedIterator for &'a mut ScopedIter<I> {
+    fn push_scope(&mut self, new_len: usize) {
+        <ScopedIter<I>>::push_scope(self, new_len)
+    }
+    fn pop_scope(&mut self) {
+        <ScopedIter<I>>::pop_scope(self)
     }
 }
 
@@ -152,34 +148,56 @@ impl<I: Iterator> Iterator for PosIter<I> {
     }
 }
 
-pub struct ScopedIter<'a, I> {
-    iter: &'a mut PosIter<I>,
-    end_pos: usize,
+pub struct ScopedIter<I> {
+    iter: PosIter<I>,
+    end_pos: Vec<usize>,
 }
-impl<'a, I> ScopedIter<'a, I> {
-    pub(crate) fn new(iter: &'a mut PosIter<I>, end_pos: usize) -> Self {
-        Self { iter, end_pos }
+impl<I> ScopedIter<I> {
+    pub(crate) fn new(iter: I) -> Self {
+        Self {
+            iter: PosIter::new(iter),
+            end_pos: Vec::new(),
+        }
     }
-    pub(crate) fn scope(&mut self, scope_len: usize) -> ScopedIter<'_, I> {
+    pub(crate) fn push_scope(&mut self, scope_len: usize) {
         let pos = self.iter.pos();
-        ScopedIter::new(self.iter, pos + scope_len)
+        self.end_pos.push(pos + scope_len);
+    }
+    pub(crate) fn pop_scope(&mut self) {
+        let last_end_pos = self.end_pos.pop().expect("Non-corresponding push/pop");
+        debug_assert_eq!(
+            self.iter.pos(),
+            last_end_pos,
+            "The iter scope pop at unexpected location"
+        );
+    }
+    pub(crate) fn is_in_scope(&self) -> bool {
+        !self.end_pos.is_empty()
     }
 }
-impl<'a, I> Iterator for ScopedIter<'a, I>
+impl<'a, I> Iterator for ScopedIter<I>
 where
     I: Iterator,
 {
     type Item = <I as Iterator>::Item;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.iter.pos() >= self.end_pos {
-            None
+        if let Some(last_pos) = self.end_pos.last() {
+            if self.iter.pos() >= *last_pos {
+                None
+            } else {
+                self.iter.next()
+            }
         } else {
             self.iter.next()
         }
     }
     fn size_hint(&self) -> (usize, Option<usize>) {
         let inner_size = self.iter.size_hint();
-        (inner_size.0, Some(self.end_pos - self.iter.pos()))
+        if let Some(last_pos) = self.end_pos.last() {
+            (inner_size.0, Some(last_pos - self.iter.pos()))
+        } else {
+            inner_size
+        }
     }
 }
 
