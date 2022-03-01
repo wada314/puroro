@@ -201,15 +201,15 @@ where
 
 #[test]
 fn test_scoped_iter() {
-    let p1 = PosIter::new("abcdefg".chars());
-    assert_eq!("abcdefg", p1.collect::<String>());
+    let s1 = ScopedIter::new("abcdefg".chars());
+    assert_eq!("abcdefg", s1.collect::<String>());
 
-    let mut p2 = PosIter::new("abcdefg".chars());
-    let s2 = p2.scope(4);
+    let mut s2 = ScopedIter::new("abcdefg".chars());
+    s2.push_scope(4);
     assert_eq!("abcd", s2.collect::<String>());
 
-    let mut p3 = PosIter::new("abcdefg".chars());
-    assert_eq!(Some('a'), p3.next());
-    let s3 = p3.scope(4);
+    let mut s3 = ScopedIter::new("abcdefg".chars());
+    assert_eq!(Some('a'), s3.next());
+    s3.push_scope(4);
     assert_eq!("bcde", s3.collect::<String>());
 }
