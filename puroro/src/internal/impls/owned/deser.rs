@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::deser::{DeserFromBytesImpl, DeserOptions, ScopedIterator};
+use crate::deser::{DeserContext, DeserFromBytesImpl, DeserOptions, ScopedIterator};
 use crate::internal::bool::False;
 use crate::internal::methods::GetMutFieldMethod;
 use crate::internal::types::WireType;
@@ -26,24 +26,23 @@ use crate::{AsMessageImplRef, MessageImpl};
 use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 
-pub struct DeserOwnedFieldHandler<I> {
-    pub(crate) bytes: I,
+pub struct DeserOwnedFieldHandler<'a, I> {
+    pub(crate) dc: &'a mut DeserContext<I>,
     pub(crate) wire_type: WireType,
     pub(crate) recursion_level: usize,
-    pub(crate) options: DeserOptions,
 }
 
 trait DeserOwnedFieldImpl<LabelTag, TypeTag, MessageImplType, IsRepeated, const NUMBER: i32> {
     fn deser_field(self, message: &mut MessageImplType) -> Result<()>;
 }
 
-impl<Iter> FieldHandlerBase for DeserOwnedFieldHandler<Iter> {
+impl<'a, Iter> FieldHandlerBase for DeserOwnedFieldHandler<'a, Iter> {
     type ReturnType = ();
 }
 
-impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
+impl<'a, MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
     FieldHandlerMut<MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>, NUMBER>
-    for DeserOwnedFieldHandler<Iter>
+    for DeserOwnedFieldHandler<'a, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties<LabelTag = LabelTag, TypeTag = TypeTag>,
@@ -61,7 +60,7 @@ where
         self,
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<Self::ReturnType> {
-        if let Some(recursion_limit) = self.options.recursion_limit {
+        if let Some(recursion_limit) = self.dc.options().recursion_limit {
             if self.recursion_level >= recursion_limit {
                 Err(ErrorKind::DeserRecursionOverflow())?
             }
@@ -71,14 +70,14 @@ where
 }
 
 // numerical non-repeated fields
-impl<MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, const NUMBER: i32>
+impl<'a, MP, LabelTag, VariantTypeTag, FieldType, FieldsType, SharedType, Iter, const NUMBER: i32>
     DeserOwnedFieldImpl<
         LabelTag,
         tags::Variant<VariantTypeTag>,
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<Iter>
+    > for DeserOwnedFieldHandler<'a, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -95,7 +94,7 @@ where
     ) -> Result<()> {
         match self.wire_type {
             WireType::Variant => {
-                let variant = Variant::decode_bytes(&mut self.bytes)?;
+                let variant = Variant::decode_bytes(&mut self.dc.bytes())?;
 
                 if LabelTag::DO_DEFAULT_CHECK && variant.is_zero() {
                     // If the field is proto3 unlabaled type, then do not touch
@@ -115,14 +114,14 @@ where
 }
 
 // `string` proto field where the rust's field type is `std::string::String`.
-impl<MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
+impl<'a, MP, LabelTag, FieldsType, SharedType, Iter, const NUMBER: i32>
     DeserOwnedFieldImpl<
         LabelTag,
         tags::String,
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<Iter>
+    > for DeserOwnedFieldHandler<'a, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -138,7 +137,7 @@ where
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
-            let length: usize = Variant::decode_bytes(&mut self.bytes)?
+            let length: usize = Variant::decode_bytes(&mut self.dc.bytes())?
                 .to_u32()?
                 .try_into()?;
 
@@ -153,10 +152,10 @@ where
                 field.reserve(length - field.capacity());
             }
             let mut inner_vec = ::std::mem::take(field).into_bytes();
-            for byte in self.bytes.by_ref().take(length) {
+            for byte in self.dc.bytes().by_ref().take(length) {
                 inner_vec.push(byte?);
             }
-            if self.options.do_utf8_check {
+            if self.dc.options().do_utf8_check {
                 *field = String::from_utf8(inner_vec).map_err(|e| Into::<ErrorKind>::into(e))?;
             } else {
                 unsafe {
@@ -172,6 +171,7 @@ where
 
 // message non-repeated field
 impl<
+    'a,
     MP,
     FieldMP,
     LabelTag,
@@ -188,7 +188,7 @@ impl<
         MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
         False, /* IsRepeated */
         NUMBER,
-    > for DeserOwnedFieldHandler<Iter>
+    > for DeserOwnedFieldHandler<'a, Iter>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
@@ -199,25 +199,22 @@ where
     for<'b> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>:
         methods::GetMutFieldMethod<'b, NUMBER, ReturnType = MutFieldType>,
     MutFieldType: AsMessageImplMut + AsMessageImplRef<MessageImplType = FieldMessageImplType>,
-    FieldMessageImplType: DeserFromBytesImpl<Iter>,
+    FieldMessageImplType: DeserFromBytesImpl<'a, Iter>,
 {
     fn deser_field(
         mut self,
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
-            let length: usize = Variant::decode_bytes(&mut self.bytes)?
+            let length: usize = Variant::decode_bytes(&mut self.dc.bytes())?
                 .to_u32()?
                 .try_into()?;
 
             let mut field = message.invoke_get_mut();
             let msg_impl = field.as_message_impl_mut();
-            self.bytes.push_scope(length);
-            self.bytes = msg_impl.deser_from_bytes_impl(
-                self.bytes,
-                self.options.clone(),
-                self.recursion_level + 1,
-            )?;
+            self.dc.bytes().push_scope(length);
+            msg_impl.deser_from_bytes_impl(self.dc, self.recursion_level + 1)?;
+            self.dc.bytes().pop_scope();
             Ok(())
         } else {
             Err(ErrorKind::UnexpectedWireType)?
