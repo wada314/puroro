@@ -118,11 +118,11 @@ pub trait FieldHandlerBase {
 }
 
 pub trait FieldHandlerMut<MessageImplType, const NUMBER: i32>: FieldHandlerBase {
-    fn handle_mut(&mut self, message: &mut MessageImplType) -> Result<Self::ReturnType>;
+    fn handle_mut(self, message: &mut MessageImplType) -> Result<Self::ReturnType>;
 }
 
 pub trait MatchFieldNumber<FH: FieldHandlerBase> {
-    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType>;
+    fn match_field_number_mut(&mut self, number: i32, handler: FH) -> Result<FH::ReturnType>;
 }
 
 #[macro_export]

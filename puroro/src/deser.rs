@@ -48,28 +48,26 @@ pub trait DeserFromBytesImpl<Iter> {
 impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
-    Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
+    for<'a> Self: MatchFieldNumber<DeserOwnedFieldHandler<&'a mut Iter>>,
 {
     fn deser_from_bytes_impl(
         &mut self,
-        bytes: Iter,
+        mut bytes: Iter,
         options: DeserOptions,
         recursion_level: usize,
     ) -> Result<Iter>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator,
     {
-        let mut handler = DeserOwnedFieldHandler {
-            bytes,
-            wire_type: WireType::Variant, // a random value
-            recursion_level,
-            options: options.clone(),
-        };
-        while let Some((wire_type, number)) =
-            try_get_wire_type_and_field_number(&mut handler.bytes)?
-        {
+        while let Some((wire_type, number)) = try_get_wire_type_and_field_number(&mut bytes)? {
+            let mut handler = DeserOwnedFieldHandler {
+                bytes: &mut bytes,
+                wire_type: WireType::Variant, // a random value
+                recursion_level,
+                options: options.clone(),
+            };
             handler.wire_type = wire_type;
-            self.match_field_number_mut(number, &mut handler)?;
+            self.match_field_number_mut(number, handler)?;
         }
         Ok(bytes)
     }
@@ -82,7 +80,7 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
         Iter: Iterator<Item = IoResult<u8>>,
     {
         let scoped_iter = ScopedIter::new(bytes);
-        self.deser_from_bytes_impl(scoped_iter, options, 0)?;
+        let mut scoped_iter = self.deser_from_bytes_impl(scoped_iter, options, 0)?;
         debug_assert!(!scoped_iter.is_in_scope());
         debug_assert!(scoped_iter.next().is_none());
         Ok(())

@@ -54,7 +54,7 @@ where
     // FH: FieldHandlerMut<Self, 5>,
     // FH: FieldHandlerMut<Self, 6>,
 {
-    fn match_field_number_mut(&mut self, number: i32, handler: &mut FH) -> Result<FH::ReturnType> {
+    fn match_field_number_mut(&mut self, number: i32, handler: FH) -> Result<FH::ReturnType> {
         macro_rules! call {
             ($number:literal) => {
                 <FH as FieldHandlerMut<Self, $number>>::handle_mut(handler, self)

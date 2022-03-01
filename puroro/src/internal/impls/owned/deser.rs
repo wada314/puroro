@@ -27,14 +27,14 @@ use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
 
 pub struct DeserOwnedFieldHandler<I> {
-    pub(crate) bytes: Option<I>,
+    pub(crate) bytes: I,
     pub(crate) wire_type: WireType,
     pub(crate) recursion_level: usize,
     pub(crate) options: DeserOptions,
 }
 
 trait DeserOwnedFieldImpl<LabelTag, TypeTag, MessageImplType, IsRepeated, const NUMBER: i32> {
-    fn deser_field(&mut self, message: &mut MessageImplType) -> Result<()>;
+    fn deser_field(self, message: &mut MessageImplType) -> Result<()>;
 }
 
 impl<Iter> FieldHandlerBase for DeserOwnedFieldHandler<Iter> {
@@ -58,7 +58,7 @@ where
     >,
 {
     fn handle_mut(
-        &mut self,
+        self,
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<Self::ReturnType> {
         if let Some(recursion_limit) = self.options.recursion_limit {
@@ -90,7 +90,7 @@ where
         methods::GetMutFieldMethod<'b, NUMBER, ReturnType = &'b mut FieldType>,
 {
     fn deser_field(
-        &mut self,
+        mut self,
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<()> {
         match self.wire_type {
@@ -134,7 +134,7 @@ where
         methods::GetMutFieldMethod<'b, NUMBER, ReturnType = &'b mut String>,
 {
     fn deser_field(
-        &mut self,
+        mut self,
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
@@ -202,7 +202,7 @@ where
     FieldMessageImplType: DeserFromBytesImpl<Iter>,
 {
     fn deser_field(
-        &mut self,
+        mut self,
         message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
     ) -> Result<()> {
         if let WireType::LengthDelimited = self.wire_type {
