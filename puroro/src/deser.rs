@@ -18,7 +18,9 @@ use crate::internal::variant::Variant;
 use crate::internal::MatchFieldNumber;
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
+use ::std::cell::RefCell;
 use ::std::io::Result as IoResult;
+use ::std::rc::Rc;
 
 #[derive(Clone)]
 pub struct DeserOptions {
@@ -34,7 +36,7 @@ impl Default for DeserOptions {
     }
 }
 
-pub(crate) struct DeserContext<I> {
+pub struct DeserContext<I> {
     bytes: I,
     options: DeserOptions,
 }
@@ -50,33 +52,35 @@ impl<I> DeserContext<I> {
     }
 }
 
-pub trait DeserFromBytesImpl<'a, Iter> {
+pub trait DeserFromBytesImpl<Iter> {
     fn deser_from_bytes_impl(
         &mut self,
-        dc: &'a mut DeserContext<Iter>,
+        dc: Rc<RefCell<DeserContext<Iter>>>,
         recursion_level: usize,
     ) -> Result<()>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator;
 }
 
-impl<'a, MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<'a, Iter>
+impl<'a, MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
-    Self: MatchFieldNumber<DeserOwnedFieldHandler<'a, Iter>>,
+    Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
     Iter: 'a,
 {
     fn deser_from_bytes_impl(
         &mut self,
-        dc: &'a mut DeserContext<Iter>,
+        dc: Rc<RefCell<DeserContext<Iter>>>,
         recursion_level: usize,
     ) -> Result<()>
     where
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator,
     {
-        while let Some((wire_type, number)) = try_get_wire_type_and_field_number(dc.bytes())? {
-            let mut handler = DeserOwnedFieldHandler {
-                dc,
+        while let Some((wire_type, number)) =
+            try_get_wire_type_and_field_number(dc.borrow_mut().bytes())?
+        {
+            let handler = DeserOwnedFieldHandler {
+                dc: Rc::clone(&dc),
                 wire_type: wire_type,
                 recursion_level,
             };
@@ -89,13 +93,16 @@ where
 impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType> {
     pub fn deser_from_bytes<Iter>(&mut self, bytes: Iter, options: DeserOptions) -> Result<()>
     where
-        for<'a> Self: DeserFromBytesImpl<'a, ScopedIter<Iter>>,
+        Self: DeserFromBytesImpl<ScopedIter<Iter>>,
         Iter: Iterator<Item = IoResult<u8>>,
     {
-        let mut dc = DeserContext::new(ScopedIter::new(bytes), options);
-        self.deser_from_bytes_impl(&mut dc, 0)?;
-        debug_assert!(!dc.bytes().is_in_scope());
-        debug_assert!(dc.bytes().next().is_none());
+        let dc = Rc::new(RefCell::new(DeserContext::new(
+            ScopedIter::new(bytes),
+            options,
+        )));
+        self.deser_from_bytes_impl(Rc::clone(&dc), 0)?;
+        debug_assert!(!dc.borrow_mut().bytes().is_in_scope());
+        debug_assert!(dc.borrow_mut().bytes().next().is_none());
         Ok(())
     }
 }
