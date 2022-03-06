@@ -16,10 +16,10 @@ use crate::internal::impls::owned::deser::DeserOwnedFieldHandler;
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::MatchFieldNumber;
-use crate::{tags, AsMessageImplMut};
+use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
 use ::std::cell::RefCell;
-use ::std::io::{BufRead, Result as IoResult};
+use ::std::io::Result as IoResult;
 use ::std::rc::Rc;
 
 #[derive(Clone)]
@@ -104,14 +104,6 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
         debug_assert!(dc.borrow_mut().bytes().next().is_none());
         Ok(())
     }
-}
-
-fn deser_from_read<Msg, R>(root: &mut Msg, read: R)
-where
-    Msg: AsMessageImplMut,
-    R: BufRead,
-{
-    todo!()
 }
 
 fn try_get_wire_type_and_field_number<I>(iter: I) -> Result<Option<(WireType, i32)>>

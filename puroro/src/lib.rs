@@ -21,6 +21,7 @@
 
 mod common_traits;
 mod deser;
+mod deser2;
 mod error;
 pub mod internal;
 pub mod message;
