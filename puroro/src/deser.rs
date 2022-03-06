@@ -62,11 +62,10 @@ pub trait DeserFromBytesImpl<Iter> {
         Iter: Iterator<Item = IoResult<u8>> + ScopedIterator;
 }
 
-impl<'a, MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
+impl<MP, FieldsType, SharedType, Iter> DeserFromBytesImpl<Iter>
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 where
     Self: MatchFieldNumber<DeserOwnedFieldHandler<Iter>>,
-    Iter: 'a,
 {
     fn deser_from_bytes_impl(
         &mut self,
