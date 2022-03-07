@@ -12,8 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::types::WireType;
+use crate::internal::variant::Variant;
+use crate::internal::MatchFieldNumber;
+use crate::tags;
+use crate::{ErrorKind, MessageImpl, Result};
+use ::std::io::BufRead;
 use ::std::io::Result as IoResult;
 
-pub trait DeserFromRead<R> {
-    fn deser_from_read(&mut self, read: &mut R) -> IoResult<()>;
+pub trait DeserFromRead {
+    fn deser_from_read<R: BufRead>(&mut self, read: &mut R) -> IoResult<()>;
+}
+
+impl<MP, FieldsType, SharedType> DeserFromRead
+    for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
+{
+    fn deser_from_read<R: BufRead>(&mut self, read: &mut R) -> IoResult<()> {
+        todo!()
+    }
 }
