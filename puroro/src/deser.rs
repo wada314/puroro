@@ -106,7 +106,7 @@ impl<MP, FieldsType, SharedType> MessageImpl<MP, tags::OwnedImpl, FieldsType, Sh
     }
 }
 
-fn try_get_wire_type_and_field_number<I>(iter: I) -> Result<Option<(WireType, i32)>>
+pub(crate) fn try_get_wire_type_and_field_number<I>(iter: I) -> Result<Option<(WireType, i32)>>
 where
     I: Iterator<Item = IoResult<u8>>,
 {

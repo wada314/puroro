@@ -12,44 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::deser::try_get_wire_type_and_field_number;
 use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::MatchFieldNumber;
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
+use ::std::io::Read;
 use ::std::io::Result as IoResult;
-use ::std::io::{BufReader, Read};
 
-pub trait DeserFromRead<R: Read> {
-    fn deser_from_read<'a, 'b>(
-        &'a mut self,
-        read: &'b mut R,
-    ) -> (DeserFromReadContext<'a, &'b mut R>, Result<()>);
+pub trait DeserFromSlice {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> Result<()>;
 }
 
-impl<R: Read, MP, FieldsType, SharedType> DeserFromRead<R>
+impl<MP, FieldsType, SharedType> DeserFromSlice
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 {
-    fn deser_from_read<'a, 'b>(
-        &'a mut self,
-        read: &'b mut R,
-    ) -> (DeserFromReadContext<'a, &'b mut R>, Result<()>) {
-        let mut context = DeserFromReadContext {
-            message_stack: vec![self],
-            read,
-        };
-        let result = context.continue_deser();
-        (context, result)
-    }
-}
-
-pub struct DeserFromReadContext<'a, R> {
-    message_stack: Vec<&'a mut dyn DeserFromRead<R>>,
-    read: R,
-}
-
-impl<'a, 'b, R: Read> DeserFromReadContext<'a, R> {
-    pub fn continue_deser(&mut self) -> Result<()> {
-        todo!()
+    fn deser_from_slice(&mut self, mut slice: &[u8]) -> Result<()> {
+        let mut stack: Vec<&mut dyn DeserFromSlice> = vec![self];
+        loop {
+            if slice.is_empty() {
+                break Ok(());
+            }
+            if let Some((wire_type, field_number)) =
+                try_get_wire_type_and_field_number(slice.bytes())?
+            {}
+        }
     }
 }
