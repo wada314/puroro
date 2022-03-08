@@ -17,17 +17,39 @@ use crate::internal::variant::Variant;
 use crate::internal::MatchFieldNumber;
 use crate::tags;
 use crate::{ErrorKind, MessageImpl, Result};
-use ::std::io::BufRead;
 use ::std::io::Result as IoResult;
+use ::std::io::{BufReader, Read};
 
-pub trait DeserFromRead {
-    fn deser_from_read<R: BufRead>(&mut self, read: &mut R) -> IoResult<()>;
+pub trait DeserFromRead<R: Read> {
+    fn deser_from_read<'a, 'b>(
+        &'a mut self,
+        read: &'b mut R,
+    ) -> (DeserFromReadContext<'a, 'b, R>, Result<()>);
 }
 
-impl<MP, FieldsType, SharedType> DeserFromRead
+impl<R: Read, MP, FieldsType, SharedType> DeserFromRead<R>
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 {
-    fn deser_from_read<R: BufRead>(&mut self, read: &mut R) -> IoResult<()> {
+    fn deser_from_read<'a, 'b>(
+        &'a mut self,
+        read: &'b mut R,
+    ) -> (DeserFromReadContext<'a, 'b, R>, Result<()>) {
+        let mut context = DeserFromReadContext {
+            message_stack: vec![self],
+            read: BufReader::new(read),
+        };
+        let result = context.continue_deser();
+        (context, result)
+    }
+}
+
+pub struct DeserFromReadContext<'a, 'b, R> {
+    message_stack: Vec<&'a mut dyn DeserFromRead<R>>,
+    read: BufReader<&'b mut R>,
+}
+
+impl<'a, 'b, R: Read> DeserFromReadContext<'a, 'b, R> {
+    pub fn continue_deser(&mut self) -> Result<()> {
         todo!()
     }
 }

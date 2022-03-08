@@ -52,8 +52,8 @@ pub enum ErrorKind {
     ZeroLengthPackedField,
     #[error("Unknown enum variant.")]
     UnknownEnumVariant(i32),
-    #[error("The bytestream iterator returned an error: {0}")]
-    IteratorError(#[from] std::io::Error),
+    #[error("The io returned an error: {0}")]
+    IoError(#[from] std::io::Error),
     #[error("The formatter returned an error: {0}")]
     FormatterError(#[from] std::fmt::Error),
     #[error("The length of given field is not valid (Mostly a negative number).")]

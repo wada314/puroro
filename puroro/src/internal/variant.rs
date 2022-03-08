@@ -252,7 +252,7 @@ mod tests {
         ));
         assert!(matches!(
             get_err(vec![Err(io_error1)]).kind,
-            ErrorKind::IteratorError(_)
+            ErrorKind::IoError(_)
         ));
     }
 
