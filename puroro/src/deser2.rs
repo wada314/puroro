@@ -24,7 +24,7 @@ pub trait DeserFromRead<R: Read> {
     fn deser_from_read<'a, 'b>(
         &'a mut self,
         read: &'b mut R,
-    ) -> (DeserFromReadContext<'a, 'b, R>, Result<()>);
+    ) -> (DeserFromReadContext<'a, &'b mut R>, Result<()>);
 }
 
 impl<R: Read, MP, FieldsType, SharedType> DeserFromRead<R>
@@ -33,22 +33,22 @@ impl<R: Read, MP, FieldsType, SharedType> DeserFromRead<R>
     fn deser_from_read<'a, 'b>(
         &'a mut self,
         read: &'b mut R,
-    ) -> (DeserFromReadContext<'a, 'b, R>, Result<()>) {
+    ) -> (DeserFromReadContext<'a, &'b mut R>, Result<()>) {
         let mut context = DeserFromReadContext {
             message_stack: vec![self],
-            read: BufReader::new(read),
+            read,
         };
         let result = context.continue_deser();
         (context, result)
     }
 }
 
-pub struct DeserFromReadContext<'a, 'b, R> {
+pub struct DeserFromReadContext<'a, R> {
     message_stack: Vec<&'a mut dyn DeserFromRead<R>>,
-    read: BufReader<&'b mut R>,
+    read: R,
 }
 
-impl<'a, 'b, R: Read> DeserFromReadContext<'a, 'b, R> {
+impl<'a, 'b, R: Read> DeserFromReadContext<'a, R> {
     pub fn continue_deser(&mut self) -> Result<()> {
         todo!()
     }
