@@ -29,7 +29,7 @@ impl<MP, FieldsType, SharedType> DeserFromSlice
     for MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>
 {
     fn deser_from_slice(&mut self, mut slice: &[u8]) -> Result<()> {
-        let mut stack: Vec<&mut dyn DeserFromSlice> = vec![self];
+        let mut message_stack: Vec<&mut dyn DeserFromSlice> = vec![self];
         loop {
             if slice.is_empty() {
                 break Ok(());
