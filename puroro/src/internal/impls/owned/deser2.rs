@@ -67,8 +67,13 @@ pub trait HandlerImpl<TypeTag, MsgImplType, IsRepeated, IsMessage, const NUMBER:
 }
 
 impl<FieldMsgType, MsgImplType, const NUMBER: i32>
-    HandlerImpl<tags::Message<FieldMsgType>, MsgImplType, False, True, NUMBER>
-    for GetMaybeLastMutMessageHandler
+    HandlerImpl<
+        tags::Message<FieldMsgType>,
+        MsgImplType,
+        False, /* =IsRepeated */
+        True,  /* =IsMessage */
+        NUMBER,
+    > for GetMaybeLastMutMessageHandler
 where
     for<'a> MsgImplType: methods::GetMutFieldMethod<'a, NUMBER, ReturnType = &'a mut FieldMsgType>,
     FieldMsgType: 'static + AsMessageImplMut,
@@ -82,8 +87,35 @@ where
     }
 }
 
+impl<FieldMsgType, MsgImplType, const NUMBER: i32>
+    HandlerImpl<
+        tags::Message<FieldMsgType>,
+        MsgImplType,
+        True, /* =IsRepeated */
+        True, /* =IsMessage */
+        NUMBER,
+    > for GetMaybeLastMutMessageHandler
+where
+    for<'a> MsgImplType:
+        methods::GetMutFieldMethod<'a, NUMBER, ReturnType = &'a mut Vec<FieldMsgType>>,
+    FieldMsgType: 'static + Default + AsMessageImplMut,
+    FieldMsgType::MessageImplType: 'static + DeserFromSlice,
+{
+    fn handle_mut_impl<'a>(
+        self,
+        message: &'a mut MsgImplType,
+    ) -> Result<Option<&'a mut dyn DeserFromSlice>> {
+        let msg_vec = message.invoke_get_mut();
+        msg_vec.push(FieldMsgType::default());
+        Ok(msg_vec
+            .last_mut()
+            .map(|msg| msg.as_message_impl_mut() as &mut dyn DeserFromSlice))
+    }
+}
+
 impl<TypeTag, MsgImplType, IsRepeated, const NUMBER: i32>
-    HandlerImpl<TypeTag, MsgImplType, IsRepeated, False, NUMBER> for GetMaybeLastMutMessageHandler
+    HandlerImpl<TypeTag, MsgImplType, IsRepeated, False /* =IsMessage */, NUMBER>
+    for GetMaybeLastMutMessageHandler
 {
     fn handle_mut_impl<'a>(
         self,

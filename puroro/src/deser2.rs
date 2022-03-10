@@ -17,7 +17,7 @@ use crate::internal::types::WireType;
 use crate::internal::variant::Variant;
 use crate::internal::MatchFieldNumber;
 use crate::tags;
-use crate::{ErrorKind, MessageImpl, Result};
+use crate::{MessageImpl, Result};
 use ::std::io::Read;
 use ::std::io::Result as IoResult;
 
