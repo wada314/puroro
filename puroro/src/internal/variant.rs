@@ -26,7 +26,7 @@ impl Variant {
     fn new(bytes: [u8; 8]) -> Self {
         Variant(bytes)
     }
-    pub fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
+    pub fn decode_bytes<I>(mut bytes: I) -> Result<Self>
     where
         I: Iterator<Item = IoResult<u8>>,
     {

@@ -29,6 +29,7 @@ use ::std::cell::RefCell;
 use ::std::io::Result as IoResult;
 use ::std::rc::Rc;
 
+#[derive(Default)]
 pub struct GetMaybeLastMutMessageHandler {}
 
 impl FieldHandlerBase for GetMaybeLastMutMessageHandler {
