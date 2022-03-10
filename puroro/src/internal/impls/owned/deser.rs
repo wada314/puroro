@@ -39,7 +39,7 @@ trait DeserOwnedFieldImpl<LabelTag, TypeTag, MessageImplType, IsRepeated, const 
 }
 
 impl<Iter> FieldHandlerBase for DeserOwnedFieldHandler<Iter> {
-    type ReturnType = ();
+    type ReturnType<'a> = ();
 }
 
 impl<MP, LabelTag, TypeTag, FieldsType, SharedType, Iter, const NUMBER: i32>
@@ -58,10 +58,10 @@ where
         NUMBER,
     >,
 {
-    fn handle_mut(
+    fn handle_mut<'a>(
         self,
-        message: &mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
-    ) -> Result<Self::ReturnType> {
+        message: &'a mut MessageImpl<MP, tags::OwnedImpl, FieldsType, SharedType>,
+    ) -> Result<Self::ReturnType<'a>> {
         if let Some(recursion_limit) = self.dc.borrow().options().recursion_limit {
             if self.recursion_level >= recursion_limit {
                 Err(ErrorKind::DeserRecursionOverflow())?

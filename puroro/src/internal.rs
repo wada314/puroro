@@ -114,15 +114,15 @@ impl<const NUMBER: i32> GetField<NUMBER> for EmptyFields {
 }
 
 pub trait FieldHandlerBase {
-    type ReturnType;
+    type ReturnType<'a>;
 }
 
 pub trait FieldHandlerMut<MessageImplType, const NUMBER: i32>: FieldHandlerBase {
-    fn handle_mut(self, message: &mut MessageImplType) -> Result<Self::ReturnType>;
+    fn handle_mut<'a>(self, message: &'a mut MessageImplType) -> Result<Self::ReturnType<'a>>;
 }
 
 pub trait MatchFieldNumber<FH: FieldHandlerBase> {
-    fn match_field_number_mut(&mut self, number: i32, handler: FH) -> Result<FH::ReturnType>;
+    fn match_field_number_mut(&mut self, number: i32, handler: FH) -> Result<FH::ReturnType<'_>>;
 }
 
 #[macro_export]

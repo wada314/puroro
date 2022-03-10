@@ -15,6 +15,7 @@
 #![doc = include_str!("owned.md")]
 
 pub(crate) mod deser;
+pub(crate) mod deser2;
 mod getter;
 mod getter_mut;
 mod getter_opt;
