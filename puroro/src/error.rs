@@ -68,6 +68,8 @@ pub enum ErrorKind {
     GroupNotSupported,
     #[error("Overflowed the recursion limit when deserializing the message.")]
     DeserRecursionOverflow(),
+    #[error("Error while deserializing a message. Assumed to be puroro's bug.")]
+    DeserInternalError(&'static str),
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }
