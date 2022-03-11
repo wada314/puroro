@@ -48,8 +48,8 @@ where
                     if slice.is_empty() {
                         continue;
                     }
-                    let msg = *msg_stack
-                        .last()
+                    let msg = msg_stack
+                        .last_mut()
                         .ok_or(ErrorKind::DeserInternalError("msg_stack is empty"))?;
                     let (wire_type, field_number) = try_get_wire_type_and_field_number(
                         slice.as_ref().bytes(),
