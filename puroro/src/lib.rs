@@ -34,3 +34,18 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
+
+//////////////////////////////////////////////////////////////
+
+pub trait GetOptField<const NUMBER: i32> {
+    type FieldType;
+    fn get_opt_field(&self) -> Option<Self::FieldType>;
+}
+pub trait GetMutField<const NUMBER: i32> {
+    type MutRefType;
+    fn get_mut_field(&self) -> Self::MutRefType;
+}
+pub trait GenericMessage {
+    fn try_get_opt_i64_field(&self, number: i32) -> Result<Option<i64>>;
+    fn try_get_opt_string_field(&self, number: i32) -> Result<Option<&str>>;
+}
