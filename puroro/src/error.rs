@@ -30,6 +30,8 @@ pub enum ErrorKind {
     InvalidBooleanValue,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
+    #[error("Unknown enum variant value: {0}.")]
+    UnknownEnumVariant(i32),
     #[error("Invalid wire type value: {0}.")]
     InvalidWireType(i32),
     #[error("The io returned an error: {0}")]
