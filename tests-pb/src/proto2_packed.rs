@@ -5,13 +5,6 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-//pub use _puroro_simple_impl::Msg;
-pub mod _puroro_simple_impl {
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
-
 pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
@@ -25,19 +18,6 @@ pub mod _puroro_impls {
 pub mod _puroro_internal {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
-    }
-    pub trait MsgTemplateFieldTypes {
-        type ImplTag;
-        type ExplicitlyPackedType;
-        type ExplicitlyNotPackedType;
-        type NotAnnotatedType;
-    }
-
-    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
-        type ImplTag = ::puroro::tags::OwnedImpl;
-        type ExplicitlyPackedType = ::std::vec::Vec<i32>;
-        type ExplicitlyNotPackedType = ::std::vec::Vec<i32>;
-        type NotAnnotatedType = ::std::vec::Vec<i32>;
     }
 }
 pub use _puroro_traits::*;

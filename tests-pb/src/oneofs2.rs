@@ -5,14 +5,6 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-//pub use _puroro_simple_impl::Msg;
-//pub use _puroro_simple_impl::Submsg;
-pub mod _puroro_simple_impl {
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
-
 pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
@@ -26,35 +18,6 @@ pub mod _puroro_impls {
 pub mod _puroro_internal {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
-    }
-    pub trait MsgTemplateFieldTypes {
-        type ImplTag;
-        type G1Int32Type;
-        type G1StringType;
-        type G2F32Type;
-        type G2StringType;
-        type G2SubmsgType;
-        type G3Int32Type;
-    }
-
-    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
-        type ImplTag = ::puroro::tags::OwnedImpl;
-        type G1Int32Type = i32;
-        type G1StringType = ::std::string::String;
-        type G2F32Type = f32;
-        type G2StringType = ::std::string::String;
-        type G2SubmsgType =
-            ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>;
-        type G3Int32Type = i32;
-    }
-    pub trait SubmsgTemplateFieldTypes {
-        type ImplTag;
-        type I32OptionalType;
-    }
-
-    impl SubmsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
-        type ImplTag = ::puroro::tags::OwnedImpl;
-        type I32OptionalType = i32;
     }
 }
 pub use _puroro_traits::*;

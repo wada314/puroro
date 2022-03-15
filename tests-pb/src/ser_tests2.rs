@@ -5,13 +5,6 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-//pub use _puroro_simple_impl::Msg;
-pub mod _puroro_simple_impl {
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
-
 pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
@@ -25,41 +18,6 @@ pub mod _puroro_impls {
 pub mod _puroro_internal {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
-    }
-    pub trait MsgTemplateFieldTypes {
-        type ImplTag;
-        type I32OptionalType;
-        type I32RepeatedType;
-        type FloatOptionalType;
-        type FloatRepeatedType;
-        type StringOptionalType;
-        type StringRepeatedType;
-        type SubmsgOptionalType;
-        type SubmsgRepeatedType;
-        type EnumOptionalType;
-        type EnumRepeatedType;
-        type VeryLargeFieldNumberType;
-    }
-
-    impl MsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
-        type ImplTag = ::puroro::tags::OwnedImpl;
-        type I32OptionalType = i32;
-        type I32RepeatedType = ::std::vec::Vec<i32>;
-        type FloatOptionalType = f32;
-        type FloatRepeatedType = ::std::vec::Vec<f32>;
-        type StringOptionalType = ::std::string::String;
-        type StringRepeatedType = ::std::vec::Vec<::std::string::String>;
-        type SubmsgOptionalType = ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            >,
-        >;
-        type SubmsgRepeatedType = ::std::vec::Vec<
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-        >;
-        type EnumOptionalType = self::_puroro_root::ser_tests2::Enum;
-        type EnumRepeatedType = ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>;
-        type VeryLargeFieldNumberType = i32;
     }
 }
 pub use _puroro_traits::*;
@@ -116,13 +74,6 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        //pub use _puroro_simple_impl::Submsg;
-        pub mod _puroro_simple_impl {
-            mod _puroro_root {
-                pub use super::super::_puroro_root::*;
-            }
-        }
-
         pub use _puroro_impls::*;
         pub mod _puroro_impls {
             mod _puroro_root {
@@ -136,15 +87,6 @@ pub mod _puroro_nested {
         pub mod _puroro_internal {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
-            }
-            pub trait SubmsgTemplateFieldTypes {
-                type ImplTag;
-                type I32OptionalType;
-            }
-
-            impl SubmsgTemplateFieldTypes for ::puroro::internal::OwnedFields {
-                type ImplTag = ::puroro::tags::OwnedImpl;
-                type I32OptionalType = i32;
             }
         }
         pub use _puroro_traits::*;
