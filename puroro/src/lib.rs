@@ -20,19 +20,13 @@
 #![doc(test(attr(feature(generic_associated_types))))]
 
 mod common_traits;
-mod deser;
-mod deser2;
 mod error;
 pub mod internal;
-pub mod message;
-pub mod repeated_field;
 mod sample;
 pub mod tags;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
-pub use self::message::MessageImpl;
-pub use self::repeated_field::{AsRefRepeatedField, CloneThenIntoRepeatedField, RepeatedField};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports

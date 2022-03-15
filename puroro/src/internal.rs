@@ -14,21 +14,10 @@
 
 pub mod bool;
 pub mod fixed_bits;
-pub mod impls;
-pub mod methods;
 pub mod types;
-pub mod utils;
 pub mod variant;
 
-pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
-pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
-pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
-pub use impls::bumpalo::RefMutString as RefMutBumpString;
-pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
-pub use impls::owned::{OwnedFields, OwnedShared};
-
 use crate::tags;
-use crate::Result;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
@@ -83,9 +72,7 @@ pub trait ImplProperties {
     type SharedType;
 }
 
-pub trait FieldsContainer {}
-
-pub trait GetField<const NUMBER: i32>: FieldsContainer {
+pub trait GetField<const NUMBER: i32> {
     type Type;
     fn get_field(&self) -> &Self::Type;
 }
@@ -101,194 +88,4 @@ pub trait SharedBitfield {
 pub trait SharedAllocator {
     type AllocatorType;
     fn alloc(&self) -> &Self::AllocatorType;
-}
-
-#[derive(Default, Clone)]
-pub struct EmptyFields;
-impl FieldsContainer for EmptyFields {}
-impl<const NUMBER: i32> GetField<NUMBER> for EmptyFields {
-    type Type = ();
-    fn get_field(&self) -> &Self::Type {
-        &()
-    }
-}
-
-pub trait FieldHandlerBase {
-    type ReturnType<'a>;
-}
-
-pub trait FieldHandlerMut<MessageImplType, const NUMBER: i32>: FieldHandlerBase {
-    fn handle_mut<'a>(self, message: &'a mut MessageImplType) -> Result<Self::ReturnType<'a>>;
-}
-
-pub trait MatchFieldNumber<FH: FieldHandlerBase> {
-    fn match_field_number_mut(&mut self, number: i32, handler: FH) -> Result<FH::ReturnType<'_>>;
-}
-
-#[macro_export]
-macro_rules! define_fields_container {
-    ($(#[$attr:meta])* struct $container:ident $(<$lt:lifetime>)? {
-        $($name:ident: $ty:ty = $number:literal,)*
-    }) => {
-        $(#[$attr])*
-        pub struct $container $(<$lt>)? {
-            $($name: $ty,)*
-            $(_phantom: ::std::marker::PhantomData<&$lt ()>,)?
-        }
-        impl $(<$lt>)? $crate::internal::FieldsContainer for self::$container $(<$lt>)? {}
-        define_fields_container!(@impls $container, $($lt)?, $($name : $ty = $number,)*);
-    };
-    (@impls $container:ident, $($lt:lifetime)?, $name:ident: $ty:ty = $number:literal, $($rest:tt)*) => {
-        impl$(<$lt>)? $crate::internal::GetField<$number> for self::$container $(<$lt>)? {
-            type Type = $ty;
-            fn get_field(&self) -> &Self::Type {
-                &self.$name
-            }
-        }
-        impl$(<$lt>)? $crate::internal::GetFieldMut<$number> for self::$container $(<$lt>)? {
-            fn get_field_mut(&mut self) -> &mut <Self as $crate::internal::GetField<$number>>::Type {
-                &mut self.$name
-            }
-        }
-        define_fields_container!(@impls $container, $($lt)?, $($rest)*);
-    };
-    (@impls $container:ident, $($lt:lifetime)?, ) => {};
-}
-
-#[macro_export]
-macro_rules! define_get {
-    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetFieldMethod<$num>>::invoke_get(
-                self.as_message_impl_ref(),
-            )
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! define_get_opt {
-    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetOptFieldMethod<$num>>::invoke_get_opt(
-                self.as_message_impl_ref(),
-            )
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! define_get_slice {
-    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)*self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetSliceFieldMethod<$num>>::invoke_get_slice(
-                self.as_message_impl_ref(),
-            )
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! define_get_mut {
-    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? mut self)) => {
-        $pub fn $id(&$($lt)* mut self) -> <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$($lt, )* $num>>::ReturnType {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::GetMutFieldMethod<$num>>::invoke_get_mut(
-                self.as_message_impl_mut(),
-            )
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! define_has {
-    ($pub:vis fn $id:ident<$num:literal>(&$($lt:lifetime)? self)) => {
-        $pub fn $id(&$($lt)* self) -> bool {
-            <<Self as $crate::AsMessageImplRef>::MessageImplType as $crate::internal::methods::HasFieldMethod<$num>>::invoke_has(
-                self.as_message_impl_ref(),
-            )
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_get {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
-        impl<'a, Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageImplRef,
-            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::GetFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_get!($pub fn $get<$num>(&'a self));
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_get_opt {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
-        impl<'a, Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageImplRef,
-            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::GetOptFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_get_opt!($pub fn $get<$num>(&'a self));
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_get_slice {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
-        impl<'a, Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageImplRef,
-            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::GetSliceFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_get_slice!($pub fn $get<$num>(&'a self));
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_get_mut {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&mut self)) => {
-        impl<'a, Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageImplMut,
-            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::GetMutFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_get_mut!($pub fn $get<$num>(&'a mut self));
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_has {
-    ($struct:ident, $pub:vis fn $get:ident<$num:literal>(&self)) => {
-        impl<'a, Impl> $struct<Impl>
-        where
-            Self: $crate::AsMessageImplRef,
-            <Self as $crate::AsMessageImplRef>::MessageImplType: $crate::internal::methods::HasFieldMethod<'a, $num>,
-            Impl: $crate::internal::ImplProperties,
-        {
-            define_has!($pub fn $get<$num>(&'a self));
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_field_properties {
-    ($fp:ty, $ltag_id:ident, $ttag_id:ident $(<$ttag_param:ty>)?, $default:expr, $opt_idx:expr) => {
-        impl $crate::internal::FieldProperties for $fp {
-            type LabelTag = $crate::tags::$ltag_id;
-            type TypeTag = $crate::tags::$ttag_id$(<$ttag_param>)?;
-            const DEFAULT_VALUE: <Self::TypeTag as $crate::tags::FieldTypeTag>::DefaultValueType =
-                $default;
-            const OPTIONAL_FIELD_BITFIELD_INDEX: usize = $opt_idx;
-        }
-    };
 }

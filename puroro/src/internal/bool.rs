@@ -16,13 +16,3 @@
 pub struct True();
 #[derive(Clone, PartialEq, Debug)]
 pub struct False();
-
-pub trait BoolType {
-    type Choose<T, F>;
-}
-impl BoolType for True {
-    type Choose<T, F> = T;
-}
-impl BoolType for False {
-    type Choose<T, F> = F;
-}

@@ -1,20 +1,4 @@
 
-{#-
- # The default simple impl, which is using a same name with messages
- # (e.g. `message MyMessage` => `struct MyMessage`)
- # must be separated out to standalone namespace to avoid name conflict.
- #}
-{%- for m in messages %}
-//pub use _puroro_simple_impl::{{ m.simple_ident }};
-{%- endfor %}
-pub mod _puroro_simple_impl {
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-    {%- for m in messages %}
-    {%- endfor %}
-}
-
 pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
