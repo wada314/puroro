@@ -37,15 +37,40 @@ pub use ::either::Either;
 
 //////////////////////////////////////////////////////////////
 
-pub trait GetOptField<const NUMBER: i32> {
-    type FieldType;
-    fn get_opt_field(&self) -> Option<Self::FieldType>;
-}
-pub trait GetMutField<const NUMBER: i32> {
-    type MutRefType;
-    fn get_mut_field(&self) -> Self::MutRefType;
-}
 pub trait GenericMessage {
-    fn try_get_opt_i64_field(&self, number: i32) -> Result<Option<i64>>;
-    fn try_get_opt_string_field(&self, number: i32) -> Result<Option<&str>>;
+    type FieldType<'a>: 'a + GenericField
+    where
+        Self: 'a;
+    fn try_get_field(&self, number: i32) -> Result<&dyn GenericField>;
+}
+
+pub trait GenericField {
+    fn try_get_u32(&self) -> Result<u32> {
+        Err(ErrorKind::IncorrectFieldGetter)?
+    }
+    fn try_get_str(&self) -> Result<&str> {
+        Err(ErrorKind::IncorrectFieldGetter)?
+    }
+    fn try_get_message(&self) -> Result<&dyn GenericMessage> {
+        Err(ErrorKind::IncorrectFieldGetter)?
+    }
+}
+
+impl GenericField for u32 {
+    fn try_get_u32(&self) -> Result<u32> {
+        Ok(*self)
+    }
+}
+
+impl<'msg> GenericField for String {
+    fn try_get_str(&self) -> Result<&str> {
+        Ok(self.as_str())
+    }
+}
+
+pub struct MessageField<M>(M);
+impl<M: AsRef<dyn GenericMessage>> GenericField for MessageField<M> {
+    fn try_get_message(&self) -> Result<&dyn GenericMessage> {
+        Ok(self.0.as_ref())
+    }
 }

@@ -36,6 +36,8 @@ pub enum ErrorKind {
     InvalidWireType(i32),
     #[error("The io returned an error: {0}")]
     IoError(#[from] std::io::Error),
+    #[error("That getter method is not valid. Wrong field number or wrong field type?")]
+    IncorrectFieldGetter,
     #[error("The formatter returned an error: {0}")]
     FormatterError(#[from] std::fmt::Error),
     #[error("Other error: {0}")]
