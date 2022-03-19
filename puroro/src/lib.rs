@@ -38,9 +38,6 @@ pub use ::either::Either;
 //////////////////////////////////////////////////////////////
 
 pub trait GenericMessage {
-    type FieldType<'a>: 'a + GenericField
-    where
-        Self: 'a;
     fn try_get_field(&self, number: i32) -> Result<&dyn GenericField>;
 }
 
