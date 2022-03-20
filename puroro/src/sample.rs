@@ -27,7 +27,6 @@
 
 use crate::internal::Bitfield;
 use crate::{ErrorKind, Result};
-use ::std::any::Any;
 use ::std::marker::PhantomData;
 
 pub trait GenericMessage {
@@ -100,7 +99,7 @@ impl<M: GenericMessage> GenericField for MessageField<M> {
 pub struct OptionProtoStructDummyField<M>(PhantomData<M>);
 impl<M> GenericField for OptionProtoStructDummyField<M> {
     fn try_get_u32(&self, shared: &dyn GenericShared, _: i32) -> Result<u32> {
-        shared.downcast_ref::<OptionProtoStructShared<M>>()
+        Err(ErrorKind::IncorrectFieldGetter)?
     }
     fn try_get_str(&self, _: &dyn GenericShared, _: i32) -> Result<&str> {
         Err(ErrorKind::IncorrectFieldGetter)?
