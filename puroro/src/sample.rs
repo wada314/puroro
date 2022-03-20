@@ -29,7 +29,47 @@ use crate::internal::Bitfield;
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
-pub struct MessageDescriptor {}
+pub struct MessageDescriptor {
+    fields: &'static [FieldDescriptor],
+}
+
+impl MessageDescriptor {
+    pub fn field(&self, number: i32) -> Result<&FieldDescriptor> {
+        Ok(self
+            .fields
+            .iter()
+            .find(|f| f.number == number)
+            .ok_or(ErrorKind::ReflectionError)?)
+    }
+}
+
+enum FieldDefaultValue {
+    None,
+    U32(u32),
+    String(&'static str),
+}
+
+pub struct FieldDescriptor {
+    number: i32,
+    default_value: FieldDefaultValue,
+}
+
+impl FieldDescriptor {
+    pub fn default_value_u32(&self) -> Result<u32> {
+        if let FieldDefaultValue::U32(v) = &self.default_value {
+            Ok(*v)
+        } else {
+            Err(ErrorKind::ReflectionError)?
+        }
+    }
+    pub fn default_value_str(&self) -> Result<&str> {
+        if let FieldDefaultValue::String(v) = &self.default_value {
+            Ok(*v)
+        } else {
+            Err(ErrorKind::ReflectionError)?
+        }
+    }
+}
 
 pub trait GenericMessage {
     fn try_get_field(&self, number: i32) -> Result<GenericFieldWrapper<'_>>;
@@ -39,6 +79,7 @@ pub struct GenericFieldWrapper<'msg> {
     field: &'msg dyn GenericField,
     shared: &'msg dyn GenericShared,
     number: i32,
+    desc: Option<&'static FieldDescriptor>,
 }
 impl<'msg> GenericFieldWrapper<'msg> {
     pub fn try_get_u32(&self) -> Result<u32> {
@@ -57,32 +98,33 @@ impl<'msg> From<&'msg u32> for GenericFieldWrapper<'msg> {
             field: val,
             shared: &(),
             number: 0,
+            desc: None,
         }
     }
 }
 
 pub trait GenericField {
     fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+        Err(ErrorKind::ReflectionError)?
     }
     fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+        Err(ErrorKind::ReflectionError)?
     }
     fn try_get_message<'a>(
         &'a self,
         _: &'a dyn GenericShared,
         _: i32,
     ) -> Result<&'a dyn GenericMessage> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+        Err(ErrorKind::ReflectionError)?
     }
 }
 
 pub trait GenericShared {
     fn try_get_bitfield(&self) -> Result<&dyn Bitfield> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+        Err(ErrorKind::ReflectionError)?
     }
     fn try_get_wrapped_option(&self) -> Result<Option<&dyn GenericMessage>> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+        Err(ErrorKind::ReflectionError)?
     }
 }
 
@@ -121,6 +163,7 @@ impl GenericMessage for DefaultProtoStruct {
             field: &DEFAULT_PROTO_STRUCT_DUMMY_FIELD,
             shared: &(),
             number,
+            desc: None,
         })
     }
 }
