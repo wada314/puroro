@@ -171,7 +171,7 @@ impl GenericField for OptionProtoStructDummyField {
             .transpose()?
             .map(|f| f.try_get_message())
             .transpose()?
-            .unwrap_or_else(|| todo!() /* need proper default value here */))
+            .unwrap_or_else(|| &DEFAULT_PROTO_STRUCT))
     }
 }
 
