@@ -107,8 +107,41 @@ impl<M: GenericMessage> GenericField for MessageField<M> {
     }
 }
 
-pub struct OptionProtoStructDummyField<M>(PhantomData<M>);
-impl<M> GenericField for OptionProtoStructDummyField<M> {
+#[derive(Default)]
+pub struct DefaultProtoStruct();
+const DEFAULT_PROTO_STRUCT: DefaultProtoStruct = DefaultProtoStruct();
+impl GenericMessage for DefaultProtoStruct {
+    fn try_get_field(&self, number: i32) -> Result<GenericFieldWrapper<'_>> {
+        Ok(GenericFieldWrapper {
+            exclusive: &DEFAULT_PROTO_STRUCT_DUMMY_FIELD,
+            shared: &(),
+            number,
+        })
+    }
+}
+
+pub struct DefaultProtoStructDummyField();
+const DEFAULT_PROTO_STRUCT_DUMMY_FIELD: DefaultProtoStructDummyField =
+    DefaultProtoStructDummyField();
+impl GenericField for DefaultProtoStructDummyField {
+    fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
+        Ok(0 /* Need default value */)
+    }
+    fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
+        Ok("" /* Need default value */)
+    }
+
+    fn try_get_message<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+    ) -> Result<&'a dyn GenericMessage> {
+        Ok(&DEFAULT_PROTO_STRUCT)
+    }
+}
+
+pub struct OptionProtoStructDummyField();
+impl GenericField for OptionProtoStructDummyField {
     fn try_get_u32<'a>(&'a self, shared: &'a dyn GenericShared, number: i32) -> Result<u32> {
         Ok(shared
             .try_get_wrapped_option()?
