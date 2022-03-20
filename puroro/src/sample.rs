@@ -35,11 +35,12 @@ pub struct MessageDescriptor {
 
 impl MessageDescriptor {
     pub fn field(&self, number: i32) -> Result<&FieldDescriptor> {
+        debug_assert!(self.fields.is_sorted_by_key(|f| f.number));
         Ok(self
             .fields
-            .iter()
-            .find(|f| f.number == number)
-            .ok_or(ErrorKind::ReflectionError)?)
+            .binary_search_by_key(&number, |f| f.number)
+            .map(|index| &self.fields[index])
+            .map_err(|_| ErrorKind::ReflectionError)?)
     }
 }
 

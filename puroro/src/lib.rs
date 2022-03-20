@@ -16,6 +16,7 @@
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
+#![feature(is_sorted)]
 // Allow using GAT in document sample code.
 #![doc(test(attr(feature(generic_associated_types))))]
 
