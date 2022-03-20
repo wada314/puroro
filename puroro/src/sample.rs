@@ -57,17 +57,15 @@ pub struct FieldDescriptor {
 
 impl FieldDescriptor {
     pub fn default_value_u32(&self) -> Result<u32> {
-        if let FieldDefaultValue::U32(v) = &self.default_value {
-            Ok(*v)
-        } else {
-            Err(ErrorKind::ReflectionError)?
+        match &self.default_value {
+            FieldDefaultValue::U32(v) => Ok(*v),
+            _ => Err(ErrorKind::ReflectionError)?,
         }
     }
     pub fn default_value_str(&self) -> Result<&str> {
-        if let FieldDefaultValue::String(v) = &self.default_value {
-            Ok(*v)
-        } else {
-            Err(ErrorKind::ReflectionError)?
+        match &self.default_value {
+            FieldDefaultValue::String(v) => Ok(*v),
+            _ => Err(ErrorKind::ReflectionError)?,
         }
     }
 }
@@ -84,13 +82,14 @@ pub struct GenericFieldWrapper<'msg> {
 }
 impl<'msg> GenericFieldWrapper<'msg> {
     pub fn try_get_u32(&self) -> Result<u32> {
-        self.field.try_get_u32(self.shared, self.number)
+        self.field.try_get_u32(self.shared, self.number, self.desc)
     }
     pub fn try_get_str(&self) -> Result<&'msg str> {
-        self.field.try_get_str(self.shared, self.number)
+        self.field.try_get_str(self.shared, self.number, self.desc)
     }
     pub fn try_get_message(&self) -> Result<&'msg dyn GenericMessage> {
-        self.field.try_get_message(self.shared, self.number)
+        self.field
+            .try_get_message(self.shared, self.number, self.desc)
     }
 }
 impl<'msg> From<&'msg u32> for GenericFieldWrapper<'msg> {
@@ -105,16 +104,27 @@ impl<'msg> From<&'msg u32> for GenericFieldWrapper<'msg> {
 }
 
 pub trait GenericField {
-    fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
+    fn try_get_u32<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+        _: Option<&FieldDescriptor>,
+    ) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
+    fn try_get_str<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+        _: Option<&FieldDescriptor>,
+    ) -> Result<&'a str> {
         Err(ErrorKind::ReflectionError)?
     }
     fn try_get_message<'a>(
         &'a self,
         _: &'a dyn GenericShared,
         _: i32,
+        _: Option<&FieldDescriptor>,
     ) -> Result<&'a dyn GenericMessage> {
         Err(ErrorKind::ReflectionError)?
     }
@@ -130,13 +140,23 @@ pub trait GenericShared {
 }
 
 impl GenericField for u32 {
-    fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
+    fn try_get_u32<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+        _: Option<&FieldDescriptor>,
+    ) -> Result<u32> {
         Ok(*self)
     }
 }
 
 impl<'msg> GenericField for String {
-    fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
+    fn try_get_str<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+        _: Option<&FieldDescriptor>,
+    ) -> Result<&'a str> {
         Ok(&self)
     }
 }
@@ -147,6 +167,7 @@ impl<M: GenericMessage> GenericField for MessageField<M> {
         &'a self,
         _: &'a dyn GenericShared,
         _: i32,
+        _: Option<&FieldDescriptor>,
     ) -> Result<&'a dyn GenericMessage> {
         Ok(self
             .0
@@ -173,10 +194,20 @@ pub struct DefaultProtoStructDummyField();
 const DEFAULT_PROTO_STRUCT_DUMMY_FIELD: DefaultProtoStructDummyField =
     DefaultProtoStructDummyField();
 impl GenericField for DefaultProtoStructDummyField {
-    fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
+    fn try_get_u32<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+        _: Option<&FieldDescriptor>,
+    ) -> Result<u32> {
         Ok(0 /* Need default value */)
     }
-    fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
+    fn try_get_str<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+        _: Option<&FieldDescriptor>,
+    ) -> Result<&'a str> {
         Ok("" /* Need default value */)
     }
 
@@ -184,6 +215,7 @@ impl GenericField for DefaultProtoStructDummyField {
         &'a self,
         _: &'a dyn GenericShared,
         _: i32,
+        _: Option<&FieldDescriptor>,
     ) -> Result<&'a dyn GenericMessage> {
         Ok(&DEFAULT_PROTO_STRUCT)
     }
@@ -191,16 +223,28 @@ impl GenericField for DefaultProtoStructDummyField {
 
 pub struct OptionProtoStructDummyField();
 impl GenericField for OptionProtoStructDummyField {
-    fn try_get_u32<'a>(&'a self, shared: &'a dyn GenericShared, number: i32) -> Result<u32> {
+    fn try_get_u32<'a>(
+        &'a self,
+        shared: &'a dyn GenericShared,
+        number: i32,
+        desc: Option<&FieldDescriptor>,
+    ) -> Result<u32> {
         Ok(shared
             .try_get_wrapped_option()?
             .map(|m| m.try_get_field(number))
             .transpose()?
             .map(|f| f.try_get_u32())
-            .transpose()?
-            .unwrap_or(0 /* need proper default value here */))
+            .unwrap_or_else(|| {
+                desc.ok_or(ErrorKind::ReflectionError.into())
+                    .and_then(|fd| fd.default_value_u32())
+            })?)
     }
-    fn try_get_str<'a>(&'a self, shared: &'a dyn GenericShared, number: i32) -> Result<&'a str> {
+    fn try_get_str<'a>(
+        &'a self,
+        shared: &'a dyn GenericShared,
+        number: i32,
+        desc: Option<&FieldDescriptor>,
+    ) -> Result<&'a str> {
         Ok(shared
             .try_get_wrapped_option()?
             .map(|m| m.try_get_field(number))
