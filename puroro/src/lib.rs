@@ -25,6 +25,8 @@ pub mod internal;
 mod sample;
 pub mod tags;
 
+use std::marker::PhantomData;
+
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
@@ -34,40 +36,3 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
-
-//////////////////////////////////////////////////////////////
-
-pub trait GenericMessage {
-    fn try_get_field(&self, number: i32) -> Result<&dyn GenericField>;
-}
-
-pub trait GenericField {
-    fn try_get_u32(&self) -> Result<u32> {
-        Err(ErrorKind::IncorrectFieldGetter)?
-    }
-    fn try_get_str(&self) -> Result<&str> {
-        Err(ErrorKind::IncorrectFieldGetter)?
-    }
-    fn try_get_message(&self) -> Result<&dyn GenericMessage> {
-        Err(ErrorKind::IncorrectFieldGetter)?
-    }
-}
-
-impl GenericField for u32 {
-    fn try_get_u32(&self) -> Result<u32> {
-        Ok(*self)
-    }
-}
-
-impl<'msg> GenericField for String {
-    fn try_get_str(&self) -> Result<&str> {
-        Ok(self.as_str())
-    }
-}
-
-pub struct MessageField<M>(M);
-impl<M: AsRef<dyn GenericMessage>> GenericField for MessageField<M> {
-    fn try_get_message(&self) -> Result<&dyn GenericMessage> {
-        Ok(self.0.as_ref())
-    }
-}
