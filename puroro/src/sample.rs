@@ -42,10 +42,10 @@ impl<'msg> GenericFieldWrapper<'msg> {
     pub fn try_get_u32(&self) -> Result<u32> {
         self.exclusive.try_get_u32(self.shared, self.number)
     }
-    pub fn try_get_str(&self) -> Result<&str> {
+    pub fn try_get_str(&self) -> Result<&'msg str> {
         self.exclusive.try_get_str(self.shared, self.number)
     }
-    pub fn try_get_message(&self) -> Result<&dyn GenericMessage> {
+    pub fn try_get_message(&self) -> Result<&'msg dyn GenericMessage> {
         self.exclusive.try_get_message(self.shared, self.number)
     }
 }
@@ -60,13 +60,17 @@ impl<'msg> From<&'msg u32> for GenericFieldWrapper<'msg> {
 }
 
 pub trait GenericField {
-    fn try_get_u32(&self, _: &dyn GenericShared, _: i32) -> Result<u32> {
+    fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
         Err(ErrorKind::IncorrectFieldGetter)?
     }
-    fn try_get_str(&self, _: &dyn GenericShared, _: i32) -> Result<&str> {
+    fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
         Err(ErrorKind::IncorrectFieldGetter)?
     }
-    fn try_get_message(&self, _: &dyn GenericShared, _: i32) -> Result<&dyn GenericMessage> {
+    fn try_get_message<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+    ) -> Result<&'a dyn GenericMessage> {
         Err(ErrorKind::IncorrectFieldGetter)?
     }
 }
@@ -75,41 +79,74 @@ pub trait GenericShared {
     fn try_get_bitfield(&self) -> Result<&dyn Bitfield> {
         Err(ErrorKind::IncorrectFieldGetter)?
     }
+    fn try_get_wrapped_option(&self) -> Result<Option<&dyn GenericMessage>> {
+        Err(ErrorKind::IncorrectFieldGetter)?
+    }
 }
 
 impl GenericField for u32 {
-    fn try_get_u32(&self, _: &dyn GenericShared, _: i32) -> Result<u32> {
+    fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<u32> {
         Ok(*self)
     }
 }
 
 impl<'msg> GenericField for String {
-    fn try_get_str(&self, _: &dyn GenericShared, _: i32) -> Result<&str> {
+    fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: i32) -> Result<&'a str> {
         Ok(&self)
     }
 }
 
 pub struct MessageField<M>(Option<Box<M>>);
 impl<M: GenericMessage> GenericField for MessageField<M> {
-    fn try_get_message(&self, _: &dyn GenericShared, _: i32) -> Result<&dyn GenericMessage> {
+    fn try_get_message<'a>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: i32,
+    ) -> Result<&'a dyn GenericMessage> {
         Ok(self.0.as_ref().expect("FIXME").as_ref())
     }
 }
 
 pub struct OptionProtoStructDummyField<M>(PhantomData<M>);
 impl<M> GenericField for OptionProtoStructDummyField<M> {
-    fn try_get_u32(&self, shared: &dyn GenericShared, _: i32) -> Result<u32> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+    fn try_get_u32<'a>(&'a self, shared: &'a dyn GenericShared, number: i32) -> Result<u32> {
+        Ok(shared
+            .try_get_wrapped_option()?
+            .map(|m| m.try_get_field(number))
+            .transpose()?
+            .map(|f| f.try_get_u32())
+            .transpose()?
+            .unwrap_or(0 /* need proper default value here */))
     }
-    fn try_get_str(&self, _: &dyn GenericShared, _: i32) -> Result<&str> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+    fn try_get_str<'a>(&'a self, shared: &'a dyn GenericShared, number: i32) -> Result<&'a str> {
+        Ok(shared
+            .try_get_wrapped_option()?
+            .map(|m| m.try_get_field(number))
+            .transpose()?
+            .map(|f| f.try_get_str())
+            .transpose()?
+            .unwrap_or("" /* need proper default value here */))
     }
-    fn try_get_message(&self, _: &dyn GenericShared, _: i32) -> Result<&dyn GenericMessage> {
-        Err(ErrorKind::IncorrectFieldGetter)?
+    fn try_get_message<'a>(
+        &'a self,
+        shared: &'a dyn GenericShared,
+        number: i32,
+    ) -> Result<&'a dyn GenericMessage> {
+        Ok(shared
+            .try_get_wrapped_option()?
+            .map(|m| m.try_get_field(number))
+            .transpose()?
+            .map(|f| f.try_get_message())
+            .transpose()?
+            .unwrap_or_else(|| todo!() /* need proper default value here */))
     }
 }
 
 impl GenericShared for () {}
 
 struct OptionProtoStructShared<M>(Option<M>);
-impl<M: 'static> GenericShared for OptionProtoStructShared<M> {}
+impl<M: GenericMessage> GenericShared for OptionProtoStructShared<M> {
+    fn try_get_wrapped_option(&self) -> Result<Option<&dyn GenericMessage>> {
+        Ok(self.0.as_ref().map(|x| x as &dyn GenericMessage))
+    }
+}
