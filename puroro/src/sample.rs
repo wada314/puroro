@@ -29,30 +29,32 @@ use crate::internal::Bitfield;
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
+pub struct MessageDescriptor {}
+
 pub trait GenericMessage {
     fn try_get_field(&self, number: i32) -> Result<GenericFieldWrapper<'_>>;
 }
 
 pub struct GenericFieldWrapper<'msg> {
-    exclusive: &'msg dyn GenericField,
+    field: &'msg dyn GenericField,
     shared: &'msg dyn GenericShared,
     number: i32,
 }
 impl<'msg> GenericFieldWrapper<'msg> {
     pub fn try_get_u32(&self) -> Result<u32> {
-        self.exclusive.try_get_u32(self.shared, self.number)
+        self.field.try_get_u32(self.shared, self.number)
     }
     pub fn try_get_str(&self) -> Result<&'msg str> {
-        self.exclusive.try_get_str(self.shared, self.number)
+        self.field.try_get_str(self.shared, self.number)
     }
     pub fn try_get_message(&self) -> Result<&'msg dyn GenericMessage> {
-        self.exclusive.try_get_message(self.shared, self.number)
+        self.field.try_get_message(self.shared, self.number)
     }
 }
 impl<'msg> From<&'msg u32> for GenericFieldWrapper<'msg> {
     fn from(val: &'msg u32) -> Self {
         Self {
-            exclusive: val,
+            field: val,
             shared: &(),
             number: 0,
         }
@@ -103,17 +105,20 @@ impl<M: GenericMessage> GenericField for MessageField<M> {
         _: &'a dyn GenericShared,
         _: i32,
     ) -> Result<&'a dyn GenericMessage> {
-        Ok(self.0.as_ref().expect("FIXME").as_ref())
+        Ok(self
+            .0
+            .as_ref()
+            .map(|m| m.as_ref() as &dyn GenericMessage)
+            .unwrap_or(&DEFAULT_PROTO_STRUCT))
     }
 }
 
-#[derive(Default)]
 pub struct DefaultProtoStruct();
 const DEFAULT_PROTO_STRUCT: DefaultProtoStruct = DefaultProtoStruct();
 impl GenericMessage for DefaultProtoStruct {
     fn try_get_field(&self, number: i32) -> Result<GenericFieldWrapper<'_>> {
         Ok(GenericFieldWrapper {
-            exclusive: &DEFAULT_PROTO_STRUCT_DUMMY_FIELD,
+            field: &DEFAULT_PROTO_STRUCT_DUMMY_FIELD,
             shared: &(),
             number,
         })
