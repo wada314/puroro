@@ -71,7 +71,7 @@ pub trait GenericField {
     }
 }
 
-pub trait GenericShared: Any {
+pub trait GenericShared {
     fn try_get_bitfield(&self) -> Result<&dyn Bitfield> {
         Err(ErrorKind::IncorrectFieldGetter)?
     }
