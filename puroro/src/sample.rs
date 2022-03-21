@@ -71,15 +71,18 @@ impl FieldDescriptor {
 }
 
 pub trait GenericMessage {
-    fn try_get_field(&self, desc: &FieldDescriptor) -> Result<GenericFieldWrapper<'_>>;
+    fn try_get_field<'msg, 'desc>(
+        &'msg self,
+        desc: &'desc FieldDescriptor,
+    ) -> Result<GenericFieldWrapper<'msg, 'desc>>;
 }
 
-pub struct GenericFieldWrapper<'msg> {
+pub struct GenericFieldWrapper<'msg, 'desc> {
     field: &'msg dyn GenericField,
     shared: &'msg dyn GenericShared,
-    desc: &'static FieldDescriptor,
+    desc: &'desc FieldDescriptor,
 }
-impl<'msg> GenericFieldWrapper<'msg> {
+impl<'msg, 'desc> GenericFieldWrapper<'msg, 'desc> {
     pub fn try_get_u32(&self) -> Result<u32> {
         self.field.try_get_u32(self.shared, self.desc)
     }
@@ -130,7 +133,7 @@ impl GenericField for u32 {
     }
 }
 
-impl<'msg> GenericField for String {
+impl<'msg, 'desc> GenericField for String {
     fn try_get_str<'a>(&'a self, _: &'a dyn GenericShared, _: &FieldDescriptor) -> Result<&'a str> {
         Ok(&self)
     }
@@ -154,7 +157,10 @@ impl<M: GenericMessage> GenericField for MessageField<M> {
 pub struct DefaultProtoStruct();
 const DEFAULT_PROTO_STRUCT: DefaultProtoStruct = DefaultProtoStruct();
 impl GenericMessage for DefaultProtoStruct {
-    fn try_get_field(&self, desc: &FieldDescriptor) -> Result<GenericFieldWrapper<'_>> {
+    fn try_get_field<'msg, 'desc>(
+        &'msg self,
+        desc: &'desc FieldDescriptor,
+    ) -> Result<GenericFieldWrapper<'msg, 'desc>> {
         Ok(GenericFieldWrapper {
             field: &DEFAULT_PROTO_STRUCT_DUMMY_FIELD,
             shared: &(),
