@@ -83,10 +83,10 @@ impl<'a> GenericFieldWrapper<'a> {
     pub fn try_get_u32(&self) -> Result<u32> {
         self.field.try_get_u32(self.shared, self.desc)
     }
-    pub fn try_get_str(&self) -> Result<&str> {
+    pub fn try_get_str(&self) -> Result<&'a str> {
         self.field.try_get_str(self.shared, self.desc)
     }
-    pub fn try_get_message(&self) -> Result<&dyn GenericMessage> {
+    pub fn try_get_message(&self) -> Result<&'a dyn GenericMessage> {
         self.field.try_get_message(self.shared, self.desc)
     }
 
@@ -134,7 +134,7 @@ impl GenericField for u32 {
     }
 }
 
-impl<'a> GenericField for String {
+impl GenericField for String {
     fn try_get_str<'a>(
         &'a self,
         _: &'a dyn GenericShared,
