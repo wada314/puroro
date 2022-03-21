@@ -103,13 +103,23 @@ pub trait GenericField {
     fn try_get_u32<'a>(&'a self, _: &'a dyn GenericShared, _: &'a FieldDescriptor) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_repeated_u32<'a>(
+    fn try_collect_repeated_u32<'a, T: FromIterator<u32>>(
         &'a self,
         _: &'a dyn GenericShared,
         _: &'a FieldDescriptor,
-    ) -> Result<()> {
-        // Is there any way that I can return an iterator without heap allocating?
-        todo!("What should I return???")
+    ) -> Result<T> {
+        Err(ErrorKind::ReflectionError)?
+    }
+    fn try_for_each_repeated_u32<'a, F, E>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: &'a FieldDescriptor,
+        _: F,
+    ) -> Result<::std::result::Result<(), E>>
+    where
+        F: FnMut(u32) -> ::std::result::Result<(), E>,
+    {
+        Err(ErrorKind::ReflectionError)?
     }
     fn try_get_str<'a>(
         &'a self,
