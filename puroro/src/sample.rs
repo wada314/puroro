@@ -62,7 +62,7 @@ impl FieldDescriptor {
             _ => Err(ErrorKind::ReflectionError)?,
         }
     }
-    pub fn default_value_str(&self) -> Result<&str> {
+    pub fn default_value_str(&self) -> Result<&'static str> {
         match &self.default_value {
             FieldDefaultValue::String(v) => Ok(*v),
             _ => Err(ErrorKind::ReflectionError)?,
@@ -250,13 +250,16 @@ impl GenericField for OptionProtoStructDummyField {
             .map(|m| m.try_get_field(number))
             .transpose()?
             .map(|f| f.try_get_str())
-            .transpose()?
-            .unwrap_or("" /* need proper default value here */))
+            .unwrap_or_else(|| {
+                desc.ok_or(ErrorKind::ReflectionError.into())
+                    .and_then(|fd| fd.default_value_str())
+            })?)
     }
     fn try_get_message<'a>(
         &'a self,
         shared: &'a dyn GenericShared,
         number: i32,
+        _: Option<&FieldDescriptor>,
     ) -> Result<&'a dyn GenericMessage> {
         Ok(shared
             .try_get_wrapped_option()?
