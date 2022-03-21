@@ -162,6 +162,28 @@ impl GenericField for String {
     }
 }
 
+impl GenericField for Vec<u32> {
+    fn try_collect_repeated_u32<'a, T: FromIterator<u32>>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: &'a FieldDescriptor,
+    ) -> Result<T> {
+        Ok(T::from_iter(self.iter().cloned()))
+    }
+
+    fn try_for_each_repeated_u32<'a, F, E>(
+        &'a self,
+        _: &'a dyn GenericShared,
+        _: &'a FieldDescriptor,
+        _: F,
+    ) -> Result<std::result::Result<(), E>>
+    where
+        F: FnMut(u32) -> std::result::Result<(), E>,
+    {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+
 pub struct MessageField<M>(Option<Box<M>>);
 impl<M: GenericMessage> GenericField for MessageField<M> {
     fn try_get_message<'a>(
