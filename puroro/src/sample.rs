@@ -74,20 +74,10 @@ pub trait GenericMessage {
     fn try_get_u32<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_collect_repeated_u32<'a, T: FromIterator<u32>>(
+    fn try_get_repeated_u32_boxed<'a>(
         &'a self,
-        desc: &'a FieldDescriptor,
-    ) -> Result<T> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_for_each_repeated_u32<'a, F, E>(
-        &'a self,
-        desc: &'a FieldDescriptor,
-        f: F,
-    ) -> Result<::std::result::Result<(), E>>
-    where
-        F: FnMut(u32) -> ::std::result::Result<(), E>,
-    {
+        _: &'a FieldDescriptor,
+    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
         Err(ErrorKind::ReflectionError)?
     }
     fn try_get_str<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
@@ -98,6 +88,7 @@ pub trait GenericMessage {
     }
 }
 
-pub struct DefaultProtoStruct();
-const DEFAULT_PROTO_STRUCT: DefaultProtoStruct = DefaultProtoStruct();
-impl GenericMessage for DefaultProtoStruct {}
+pub struct DefaultProtoStruct<'a> {
+    desc: &'a MessageDescriptor,
+}
+impl<'a> GenericMessage for DefaultProtoStruct<'a> {}
