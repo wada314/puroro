@@ -29,34 +29,6 @@ use crate::internal::Bitfield;
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
-pub trait StaticMessageDescriptor {
-    /// Only existing field implements `StaticFieldDescriptor`
-    type Fields<const NUMBER: i32>;
-}
-pub trait StaticFieldDescriptor {
-    const NUMBER: i32;
-    const DEFAULT_VALUE: FieldDefaultValue;
-}
-
-struct PersonStaticMessageDescriptor;
-struct PersonStaticFieldDescriptor<const NUMBER: i32>;
-
-impl StaticMessageDescriptor for PersonStaticMessageDescriptor {
-    type Fields<const NUMBER: i32> = PersonStaticFieldDescriptor<NUMBER>;
-}
-impl StaticFieldDescriptor for PersonStaticFieldDescriptor<1> {
-    const NUMBER: i32 = 1;
-    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::String("John Doe");
-}
-impl StaticFieldDescriptor for PersonStaticFieldDescriptor<2> {
-    const NUMBER: i32 = 2;
-    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::U32(14);
-}
-impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
-    const NUMBER: i32 = 3;
-    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::None;
-}
-
 pub struct MessageDescriptor {
     fields: &'static [FieldDescriptor],
 }
