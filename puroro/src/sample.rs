@@ -30,7 +30,8 @@ use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
 pub trait StaticMessageDescriptor {
-    type Fields<const NUMBER: i32>: StaticFieldDescriptor;
+    /// Only existing field implements `StaticFieldDescriptor`
+    type Fields<const NUMBER: i32>;
 }
 pub trait StaticFieldDescriptor {
     const NUMBER: i32;
