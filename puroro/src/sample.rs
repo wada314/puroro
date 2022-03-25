@@ -51,7 +51,7 @@ pub struct MessageDescriptor {
 }
 
 impl<'a> MessageDescriptor {
-    pub fn field(&self, number: i32) -> Result<&FieldDescriptor> {
+    pub fn field_by_number(&self, number: i32) -> Result<&FieldDescriptor> {
         debug_assert!(self.fields.is_sorted_by_key(|f| f.number));
         Ok(self
             .fields
