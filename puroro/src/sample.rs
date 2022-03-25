@@ -23,22 +23,22 @@ use ::std::ops::Deref;
 
 struct Nil;
 struct Cons<T, U>(T, U);
-struct Field<T, const NUMBER: i32>(T);
+struct Field<T, FD>(T, PhantomData<FD>);
 
-trait TryFromField<F, MD, FD>: Sized {
-    fn try_from_field(field: &F) -> Result<Self> {
+trait TryFromField<MD, FD, F>: Sized {
+    fn try_from_field(_field: &F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-trait TryFromFieldOpt<F, MD, FD>: Sized {
-    fn try_from_field_opt(field: &F) -> Result<Option<Self>> {
+trait TryFromFieldOpt<MD, FD, F>: Sized {
+    fn try_from_field_opt(_field: &F) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-impl<F, MD, FD> TryFromField<F, MD, FD> for u32
+impl<MD, FD, F> TryFromField<MD, FD, F> for u32
 where
     FD: StaticFieldDescriptor,
-    u32: TryFromFieldOpt<F, MD, FD>,
+    u32: TryFromFieldOpt<MD, FD, F>,
 {
     fn try_from_field(field: &F) -> Result<Self> {
         match Self::try_from_field_opt(field)? {
@@ -50,22 +50,33 @@ where
         }
     }
 }
-impl<MD, FD> TryFromFieldOpt<u32, MD, FD> for u32 {
+impl<MD, FD> TryFromFieldOpt<MD, FD, u32> for u32 {
     fn try_from_field_opt(field: &u32) -> Result<Option<Self>> {
         Ok(Some(*field))
     }
 }
 
-trait GetFieldByNumber {
-    fn field_by_number<T>(&self, _number: i32) -> Result<&T> {
-        Err(ErrorKind::ReflectionError)?
+trait GetFieldByNumber<MD, R> {
+    fn field_by_number(&self, _: i32) -> Result<R>;
+}
+impl<MD, FD, R, F, U> GetFieldByNumber<MD, R> for Cons<Field<F, FD>, U>
+where
+    R: TryFromField<MD, FD, F>,
+    U: GetFieldByNumber<MD, R>,
+    FD: StaticFieldDescriptor,
+{
+    fn field_by_number(&self, number: i32) -> Result<R> {
+        if FD::NUMBER == number {
+            R::try_from_field(&self.0.0)
+        } else {
+            self.1.field_by_number(number)
+        }
     }
 }
-impl<T, U, const NUMBER: i32> GetFieldByNumber for Cons<Field<T, NUMBER>, U>
-where
-    U: GetFieldByNumber,
-{
-    fn field_by_number<V>(&self, number: i32) -> Result<&V> {}
+impl<MD, R> GetFieldByNumber<MD, R> for Nil {
+    fn field_by_number(&self, _: i32) -> Result<R> {
+        Err(ErrorKind::ReflectionError)?
+    }
 }
 
 pub trait StaticMessageDescriptor {
