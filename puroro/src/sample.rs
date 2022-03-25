@@ -117,38 +117,3 @@ pub trait GenericMessage {
         Err(ErrorKind::ReflectionError)?
     }
 }
-
-#[derive(Debug)]
-pub struct DefaultProtoStruct {
-    desc: &'static MessageDescriptor,
-}
-impl GenericMessage for DefaultProtoStruct {
-    fn try_get_u32<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<u32> {
-        let expected_fd = self.desc.field(fd.number())?;
-        debug_assert_eq!(fd, expected_fd);
-        Ok(fd.default_value_u32()?)
-    }
-    fn try_get_repeated_u32_boxed<'a>(
-        &'a self,
-        fd: &'a FieldDescriptor,
-    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
-        self.desc.field(fd.number())?;
-        Ok(Box::new(::std::iter::empty()))
-    }
-
-    fn try_get_str<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a str> {
-        let expected_fd = self.desc.field(fd.number())?;
-        debug_assert_eq!(fd, expected_fd);
-        Ok(fd.default_value_str()?)
-    }
-
-    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn GenericMessage> {
-        let expected_fd = self.desc.field(fd.number())?;
-        debug_assert_eq!(fd, expected_fd);
-        let md = match fd.field_type() {
-            FieldTypeEnum::Message(md) => md,
-            _ => Err(ErrorKind::ReflectionError)?,
-        };
-        todo!()
-    }
-}
