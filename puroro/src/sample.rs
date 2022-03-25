@@ -25,9 +25,34 @@ struct Nil;
 struct Cons<T, U>(T, U);
 struct Field<T, const NUMBER: i32>(T);
 
-trait TryFromField<F, S>: Sized {
-    fn try_from_field(field: &F, shared: &S) -> Result<Self> {
+trait TryFromField<F, MD, FD>: Sized {
+    fn try_from_field(field: &F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
+    }
+}
+trait TryFromFieldOpt<F, MD, FD>: Sized {
+    fn try_from_field_opt(field: &F) -> Result<Option<Self>> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+impl<F, MD, FD> TryFromField<F, MD, FD> for u32
+where
+    FD: StaticFieldDescriptor,
+    u32: TryFromFieldOpt<F, MD, FD>,
+{
+    fn try_from_field(field: &F) -> Result<Self> {
+        match Self::try_from_field_opt(field)? {
+            Some(val) => Ok(val),
+            None => match FD::DEFAULT_VALUE {
+                FieldDefaultValue::U32(val) => Ok(val),
+                _ => Err(ErrorKind::ReflectionError)?,
+            },
+        }
+    }
+}
+impl<MD, FD> TryFromFieldOpt<u32, MD, FD> for u32 {
+    fn try_from_field_opt(field: &u32) -> Result<Option<Self>> {
+        Ok(Some(*field))
     }
 }
 
@@ -41,6 +66,15 @@ where
     U: GetFieldByNumber,
 {
     fn field_by_number<V>(&self, number: i32) -> Result<&V> {}
+}
+
+pub trait StaticMessageDescriptor {
+    /// Only existing field implements `StaticFieldDescriptor`
+    type Fields<const NUMBER: i32>;
+}
+pub trait StaticFieldDescriptor {
+    const NUMBER: i32;
+    const DEFAULT_VALUE: FieldDefaultValue;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -188,4 +222,23 @@ impl Message for Person {
             _ => Err(ErrorKind::ReflectionError)?,
         })
     }
+}
+
+struct PersonStaticMessageDescriptor;
+struct PersonStaticFieldDescriptor<const NUMBER: i32>;
+
+impl StaticMessageDescriptor for PersonStaticMessageDescriptor {
+    type Fields<const NUMBER: i32> = PersonStaticFieldDescriptor<NUMBER>;
+}
+impl StaticFieldDescriptor for PersonStaticFieldDescriptor<1> {
+    const NUMBER: i32 = 1;
+    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::String("John Doe");
+}
+impl StaticFieldDescriptor for PersonStaticFieldDescriptor<2> {
+    const NUMBER: i32 = 2;
+    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::U32(14);
+}
+impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
+    const NUMBER: i32 = 3;
+    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::None;
 }
