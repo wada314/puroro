@@ -91,7 +91,7 @@ impl FieldDescriptor {
     }
 }
 
-pub trait GenericMessage {
+pub trait Message {
     fn try_get_u32<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
@@ -104,7 +104,7 @@ pub trait GenericMessage {
     fn try_get_str<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn GenericMessage> {
+    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn Message> {
         Err(ErrorKind::ReflectionError)?
     }
 }
@@ -128,7 +128,7 @@ pub struct Person {
 
 static PERSON_DEFAULT_INSTANCE: Lazy<Person> = Lazy::new(Default::default);
 
-impl GenericMessage for Person {
+impl Message for Person {
     fn try_get_u32<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<u32> {
         Ok(match fd.number {
             2 => {
@@ -140,13 +140,6 @@ impl GenericMessage for Person {
             }
             _ => Err(ErrorKind::ReflectionError)?,
         })
-    }
-
-    fn try_get_repeated_u32_boxed<'a>(
-        &'a self,
-        _: &'a FieldDescriptor,
-    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
-        Err(ErrorKind::ReflectionError)?
     }
 
     fn try_get_str<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a str> {
@@ -162,11 +155,11 @@ impl GenericMessage for Person {
         })
     }
 
-    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn GenericMessage> {
+    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn Message> {
         Ok(match fd.number {
             4 => match &self.partner {
-                Some(boxed) => AsRef::as_ref(boxed) as &dyn GenericMessage,
-                None => Lazy::force(&PERSON_DEFAULT_INSTANCE) as &dyn GenericMessage,
+                Some(boxed) => AsRef::as_ref(boxed) as &dyn Message,
+                None => Lazy::force(&PERSON_DEFAULT_INSTANCE) as &dyn Message,
             },
             _ => Err(ErrorKind::ReflectionError)?,
         })
