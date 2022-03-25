@@ -27,6 +27,7 @@
 
 use crate::tags::FieldTypeTag;
 use crate::{ErrorKind, Result};
+use ::once_cell::sync::OnceCell;
 use ::std::marker::PhantomData;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -117,6 +118,7 @@ pub trait GenericMessage {
     }
 }
 
+#[derive(Debug)]
 pub struct DefaultProtoStruct {
     desc: &'static MessageDescriptor,
 }
@@ -143,6 +145,10 @@ impl GenericMessage for DefaultProtoStruct {
     fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn GenericMessage> {
         let expected_fd = self.desc.field(fd.number())?;
         debug_assert_eq!(fd, expected_fd);
+        let md = match fd.field_type() {
+            FieldTypeEnum::Message(md) => md,
+            _ => Err(ErrorKind::ReflectionError)?,
+        };
         todo!()
     }
 }
