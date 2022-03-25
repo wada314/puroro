@@ -16,10 +16,32 @@
 
 use crate::internal::Bitfield;
 use crate::tags::FieldTypeTag;
-use crate::{ErrorKind, Result};
+use crate::{ErrorKind, PuroroError, Result};
 use ::once_cell::sync::Lazy;
 use ::std::marker::PhantomData;
 use ::std::ops::Deref;
+
+struct Nil;
+struct Cons<T, U>(T, U);
+struct Field<T, const NUMBER: i32>(T);
+
+trait TryFromField<F, S>: Sized {
+    fn try_from_field(field: &F, shared: &S) -> Result<Self> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+
+trait GetFieldByNumber {
+    fn field_by_number<T>(&self, _number: i32) -> Result<&T> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+impl<T, U, const NUMBER: i32> GetFieldByNumber for Cons<Field<T, NUMBER>, U>
+where
+    U: GetFieldByNumber,
+{
+    fn field_by_number<V>(&self, number: i32) -> Result<&V> {}
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum FieldTypeEnum {
@@ -108,6 +130,8 @@ pub trait Message {
         Err(ErrorKind::ReflectionError)?
     }
 }
+
+pub trait MessageMut {}
 
 /// assume a proto like this as input:
 /// message Person {
