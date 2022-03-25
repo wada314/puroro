@@ -12,23 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! assume a proto like this as input:
-//! message Person {
-//!     optional string name = 1;
-//!     optional uint32 age = 2;
-//!     optional Person partner = 4;
-//!     repeated string nicknames = 5;
-//!     repeated uint32 scores = 6;
-//!     repeated Person children = 3;
-//! }
-//!
-
 //////////////////////////////////////////////////////////////
 
+use crate::internal::Bitfield;
 use crate::tags::FieldTypeTag;
 use crate::{ErrorKind, Result};
-use ::once_cell::sync::OnceCell;
+use ::once_cell::sync::Lazy;
 use ::std::marker::PhantomData;
+use ::std::ops::Deref;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum FieldTypeEnum {
@@ -115,5 +106,69 @@ pub trait GenericMessage {
     }
     fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn GenericMessage> {
         Err(ErrorKind::ReflectionError)?
+    }
+}
+
+/// assume a proto like this as input:
+/// message Person {
+///     optional string name = 1;
+///     optional uint32 age = 2;
+///     optional Person partner = 4;
+///     repeated string nicknames = 5;
+///     repeated uint32 scores = 6;
+///     repeated Person children = 3;
+/// }
+#[derive(Default)]
+pub struct Person {
+    _bitvec: ::bitvec::BitArr!(for 2),
+    name: String,
+    age: u32,
+    partner: Option<Box<Person>>,
+}
+
+static PERSON_DEFAULT_INSTANCE: Lazy<Person> = Lazy::new(Default::default);
+
+impl GenericMessage for Person {
+    fn try_get_u32<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<u32> {
+        Ok(match fd.number {
+            2 => {
+                if self._bitvec.get(0) {
+                    self.age
+                } else {
+                    fd.default_value_u32()?
+                }
+            }
+            _ => Err(ErrorKind::ReflectionError)?,
+        })
+    }
+
+    fn try_get_repeated_u32_boxed<'a>(
+        &'a self,
+        _: &'a FieldDescriptor,
+    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
+        Err(ErrorKind::ReflectionError)?
+    }
+
+    fn try_get_str<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a str> {
+        Ok(match fd.number {
+            1 => {
+                if self._bitvec.get(0) {
+                    &self.name
+                } else {
+                    &fd.default_value_str()?
+                }
+            }
+            _ => Err(ErrorKind::ReflectionError)?,
+        })
+    }
+
+    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn GenericMessage> {
+        Ok(match fd.number {
+            4 => match &self.partner {
+                Some(boxed) => AsRef::as_ref(boxed) as &dyn GenericMessage,
+                None => Lazy::force(&PERSON_DEFAULT_INSTANCE) as &dyn GenericMessage,
+            },
+            _ => Err(ErrorKind::ReflectionError)?,
+        })
     }
 }
