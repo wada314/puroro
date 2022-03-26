@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////
 
 use crate::internal::Bitfield;
-use crate::tags::FieldTypeTag;
+use crate::tags::{self, FieldTypeTag};
 use crate::{ErrorKind, PuroroError, Result};
 use ::once_cell::sync::Lazy;
 use ::std::marker::PhantomData;
@@ -123,6 +123,8 @@ pub trait StaticMessageDescriptor {
 pub trait StaticFieldDescriptor {
     const NUMBER: i32;
     const DEFAULT_VALUE: FieldDefaultValue;
+    type FieldLabelTag: tags::FieldLabelTag;
+    type FieldTypeTag: tags::FieldTypeTag;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -281,12 +283,18 @@ impl StaticMessageDescriptor for PersonStaticMessageDescriptor {
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<1> {
     const NUMBER: i32 = 1;
     const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::String("John Doe");
+    type FieldLabelTag = tags::Optional;
+    type FieldTypeTag = tags::String;
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<2> {
     const NUMBER: i32 = 2;
     const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::U32(14);
+    type FieldLabelTag = tags::Optional;
+    type FieldTypeTag = tags::UInt32;
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
     const NUMBER: i32 = 3;
     const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::None;
+    type FieldLabelTag = tags::Optional;
+    type FieldTypeTag = tags::Message<PersonStaticMessageDescriptor>;
 }
