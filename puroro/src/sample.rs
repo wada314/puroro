@@ -75,6 +75,24 @@ impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, String> for &'f str {
         Ok(Some(field))
     }
 }
+impl<'f, MD, FD, M> TryFromField<'f, MD, FD, Option<Box<M>>> for &'f M
+where
+    FD: StaticFieldDescriptor,
+    &'f M: TryFromFieldOpt<'f, MD, FD, Option<Box<M>>>,
+{
+    fn try_from_field(field: &'f Option<Box<M>>) -> Result<Self> {
+        match Self::try_from_field_opt(field)? {
+            Some(val) => Ok(val),
+            None => todo!(),
+        }
+    }
+}
+impl<'f, MD, FD, M> TryFromFieldOpt<'f, MD, FD, Option<Box<M>>> for &'f M {
+    fn try_from_field_opt(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
+        Ok(field.as_deref())
+    }
+}
+
 trait GetFieldByNumber<MD, R> {
     fn field_by_number(&self, _: i32) -> Result<R>;
 }
@@ -111,7 +129,7 @@ pub trait StaticFieldDescriptor {
 enum FieldTypeEnum {
     Int32,
     String,
-    Message(&'static MessageDescriptor),
+    M(&'static MessageDescriptor),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -177,7 +195,7 @@ impl FieldDescriptor {
     }
 }
 
-pub trait Message {
+pub trait M {
     fn try_get_u32<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
@@ -190,7 +208,7 @@ pub trait Message {
     fn try_get_str<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn Message> {
+    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn M> {
         Err(ErrorKind::ReflectionError)?
     }
 }
@@ -216,7 +234,7 @@ pub struct Person {
 
 static PERSON_DEFAULT_INSTANCE: Lazy<Person> = Lazy::new(Default::default);
 
-impl Message for Person {
+impl M for Person {
     fn try_get_u32<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<u32> {
         Ok(match fd.number {
             2 => {
@@ -243,11 +261,11 @@ impl Message for Person {
         })
     }
 
-    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn Message> {
+    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn M> {
         Ok(match fd.number {
             4 => match &self.partner {
-                Some(boxed) => AsRef::as_ref(boxed) as &dyn Message,
-                None => Lazy::force(&PERSON_DEFAULT_INSTANCE) as &dyn Message,
+                Some(boxed) => AsRef::as_ref(boxed) as &dyn M,
+                None => Lazy::force(&PERSON_DEFAULT_INSTANCE) as &dyn M,
             },
             _ => Err(ErrorKind::ReflectionError)?,
         })
