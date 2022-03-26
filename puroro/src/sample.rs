@@ -197,7 +197,7 @@ impl FieldDescriptor {
     }
 }
 
-pub trait M {
+pub trait Message {
     fn try_get_u32<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
@@ -210,7 +210,7 @@ pub trait M {
     fn try_get_str<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn M> {
+    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn Message> {
         Err(ErrorKind::ReflectionError)?
     }
 }
@@ -226,51 +226,38 @@ pub trait MessageMut {}
 ///     repeated uint32 scores = 6;
 ///     repeated Person children = 3;
 /// }
-#[derive(Default)]
-pub struct Person {
-    _bitvec: ::bitvec::BitArr!(for 2),
-    name: String,
-    age: u32,
-    partner: Option<Box<Person>>,
+struct PersonStruct<M>(M);
+type Person = PersonStruct<
+    OwnedMessageImpl<
+        PersonStaticMessageDescriptor,
+        Cons<
+            Field<u32, PersonStaticFieldDescriptor<2>>,
+            Cons<
+                Field<String, PersonStaticFieldDescriptor<1>>,
+                Cons<Field<Option<Box<Person>>, PersonStaticFieldDescriptor<4>>, Nil>,
+            >,
+        >,
+        1,
+    >,
+>;
+
+struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
+    bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
+    fields: F,
+    _phantom: PhantomData<MD>,
 }
-
-static PERSON_DEFAULT_INSTANCE: Lazy<Person> = Lazy::new(Default::default);
-
-impl M for Person {
+impl<MD, F, const BITFIELD_U32_LEN: usize> Message for OwnedMessageImpl<MD, F, BITFIELD_U32_LEN>
+where
+    F: GetFieldByNumber<MD, u32>,
+    for<'a> F: GetFieldByNumber<MD, &'a str>,
+    for<'a> F: GetFieldByNumber<MD, &'a Person>,
+{
     fn try_get_u32<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<u32> {
-        Ok(match fd.number {
-            2 => {
-                if self._bitvec.get(0) {
-                    self.age
-                } else {
-                    fd.default_value_u32()?
-                }
-            }
-            _ => Err(ErrorKind::ReflectionError)?,
-        })
+        self.fields.field_by_number(fd.number())
     }
 
     fn try_get_str<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a str> {
-        Ok(match fd.number {
-            1 => {
-                if self._bitvec.get(0) {
-                    &self.name
-                } else {
-                    &fd.default_value_str()?
-                }
-            }
-            _ => Err(ErrorKind::ReflectionError)?,
-        })
-    }
-
-    fn try_get_message<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a dyn M> {
-        Ok(match fd.number {
-            4 => match &self.partner {
-                Some(boxed) => AsRef::as_ref(boxed) as &dyn M,
-                None => Lazy::force(&PERSON_DEFAULT_INSTANCE) as &dyn M,
-            },
-            _ => Err(ErrorKind::ReflectionError)?,
-        })
+        self.fields.field_by_number(fd.number())
     }
 }
 
