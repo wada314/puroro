@@ -25,22 +25,22 @@ struct Nil;
 struct Cons<T, U>(T, U);
 struct Field<T, FD>(T, PhantomData<FD>);
 
-trait TryFromField<MD, FD, F>: Sized {
-    fn try_from_field(_field: &F) -> Result<Self> {
+trait TryFromField<'f, MD, FD, F>: Sized {
+    fn try_from_field(_field: &'f F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-trait TryFromFieldOpt<MD, FD, F>: Sized {
-    fn try_from_field_opt(_field: &F) -> Result<Option<Self>> {
+trait TryFromFieldOpt<'f, MD, FD, F>: Sized {
+    fn try_from_field_opt(_field: &'f F) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-impl<MD, FD, F> TryFromField<MD, FD, F> for u32
+impl<'f, MD, FD, F> TryFromField<'f, MD, FD, F> for u32
 where
     FD: StaticFieldDescriptor,
-    u32: TryFromFieldOpt<MD, FD, F>,
+    u32: TryFromFieldOpt<'f, MD, FD, F>,
 {
-    fn try_from_field(field: &F) -> Result<Self> {
+    fn try_from_field(field: &'f F) -> Result<Self> {
         match Self::try_from_field_opt(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
@@ -50,18 +50,37 @@ where
         }
     }
 }
-impl<MD, FD> TryFromFieldOpt<MD, FD, u32> for u32 {
+impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, u32> for u32 {
     fn try_from_field_opt(field: &u32) -> Result<Option<Self>> {
         Ok(Some(*field))
     }
 }
-
+impl<'f, MD, FD, F> TryFromField<'f, MD, FD, F> for &'f str
+where
+    FD: StaticFieldDescriptor,
+    &'f str: TryFromFieldOpt<'f, MD, FD, F>,
+{
+    fn try_from_field(field: &'f F) -> Result<Self> {
+        match Self::try_from_field_opt(field)? {
+            Some(val) => Ok(val),
+            None => match FD::DEFAULT_VALUE {
+                FieldDefaultValue::String(val) => Ok(val),
+                _ => Err(ErrorKind::ReflectionError)?,
+            },
+        }
+    }
+}
+impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, String> for &'f str {
+    fn try_from_field_opt(field: &'f String) -> Result<Option<Self>> {
+        Ok(Some(field))
+    }
+}
 trait GetFieldByNumber<MD, R> {
     fn field_by_number(&self, _: i32) -> Result<R>;
 }
 impl<MD, FD, R, F, U> GetFieldByNumber<MD, R> for Cons<Field<F, FD>, U>
 where
-    R: TryFromField<MD, FD, F>,
+    for<'a> R: TryFromField<'a, MD, FD, F>,
     U: GetFieldByNumber<MD, R>,
     FD: StaticFieldDescriptor,
 {
