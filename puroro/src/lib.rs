@@ -21,6 +21,7 @@
 #![doc(test(attr(feature(generic_associated_types))))]
 
 mod common_traits;
+pub mod desc;
 mod error;
 pub mod internal;
 mod sample;

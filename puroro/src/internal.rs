@@ -14,6 +14,7 @@
 
 pub mod bool;
 pub mod fixed_bits;
+pub mod owned;
 pub mod types;
 pub mod variant;
 
