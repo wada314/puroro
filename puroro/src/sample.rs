@@ -55,26 +55,32 @@ pub trait MessageMut {}
 ///     repeated uint32 scores = 6;
 ///     repeated Person children = 3;
 /// }
-struct PersonStruct<M>(M);
 
 struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
     bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
     fields: F,
     _phantom: PhantomData<MD>,
 }
-impl<MD, F, const BITFIELD_U32_LEN: usize> Message for OwnedMessageImpl<MD, F, BITFIELD_U32_LEN>
-where
-    F: GetFieldByNumber<MD, u32>,
-    for<'a> F: GetFieldByNumber<MD, &'a str>,
-    for<'a> F: GetFieldByNumber<MD, &'a Person>,
-{
-    fn try_get_u32<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<u32> {
-        self.fields.field_by_number(fd.number())
-    }
 
-    fn try_get_str<'a>(&'a self, fd: &'a FieldDescriptor) -> Result<&'a str> {
-        self.fields.field_by_number(fd.number())
-    }
+trait OwnedFields {
+    type FieldType<const NUMBER: i32>;
+    fn get<const NUMBER: i32>(&self) -> &<Self::FieldType<NUMBER> as OwnedFieldType>::Type
+    where
+        Self::FieldType<NUMBER>: OwnedFieldType;
+}
+trait OwnedFieldType {
+    type Type;
+}
+struct PersonOwnedFields {
+    name: String,
+    age: u32,
+}
+struct PersonOwnedFieldType<const NUMBER: i32>();
+impl OwnedFieldType for PersonOwnedFieldType<1> {
+    type Type = String;
+}
+impl OwnedFieldType for PersonOwnedFieldType<2> {
+    type Type = u32;
 }
 
 struct PersonStaticMessageDescriptor;
