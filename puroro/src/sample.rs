@@ -21,8 +21,6 @@ use ::once_cell::sync::Lazy;
 use ::std::marker::PhantomData;
 use ::std::ops::Deref;
 
-struct Nil;
-struct Cons<T, U>(T, U);
 struct Field<T, FD>(T, PhantomData<FD>);
 
 trait TryFromField<'f, MD, FD, F>: Sized {
@@ -95,25 +93,6 @@ impl<'f, MD, FD, M> TryFromFieldOpt<'f, MD, FD, Option<Box<M>>> for &'f M {
 
 trait GetFieldByNumber<MD, R> {
     fn field_by_number(&self, _: i32) -> Result<R>;
-}
-impl<MD, FD, R, F, U> GetFieldByNumber<MD, R> for Cons<Field<F, FD>, U>
-where
-    for<'a> R: TryFromField<'a, MD, FD, F>,
-    U: GetFieldByNumber<MD, R>,
-    FD: StaticFieldDescriptor,
-{
-    fn field_by_number(&self, number: i32) -> Result<R> {
-        if FD::NUMBER == number {
-            R::try_from_field(&self.0.0)
-        } else {
-            self.1.field_by_number(number)
-        }
-    }
-}
-impl<MD, R> GetFieldByNumber<MD, R> for Nil {
-    fn field_by_number(&self, _: i32) -> Result<R> {
-        Err(ErrorKind::ReflectionError)?
-    }
 }
 
 pub trait StaticMessageDescriptor {
@@ -227,19 +206,6 @@ pub trait MessageMut {}
 ///     repeated Person children = 3;
 /// }
 struct PersonStruct<M>(M);
-type Person = PersonStruct<
-    OwnedMessageImpl<
-        PersonStaticMessageDescriptor,
-        Cons<
-            Field<u32, PersonStaticFieldDescriptor<2>>,
-            Cons<
-                Field<String, PersonStaticFieldDescriptor<1>>,
-                Cons<Field<Option<Box<Person>>, PersonStaticFieldDescriptor<4>>, Nil>,
-            >,
-        >,
-        1,
-    >,
->;
 
 struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
     bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
