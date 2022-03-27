@@ -15,9 +15,6 @@
 use crate::desc::FieldDefaultValue;
 use crate::desc::StaticFieldDescriptor;
 use crate::{ErrorKind, Result};
-use ::std::marker::PhantomData;
-
-struct Field<T, FD>(T, PhantomData<FD>);
 
 trait TryFromField<'f, MD, FD, F>: Sized {
     fn try_from_field(_field: &'f F) -> Result<Self> {
@@ -29,6 +26,7 @@ trait TryFromFieldOpt<'f, MD, FD, F>: Sized {
         Err(ErrorKind::ReflectionError)?
     }
 }
+
 impl<'f, MD, FD, F> TryFromField<'f, MD, FD, F> for u32
 where
     FD: StaticFieldDescriptor,
@@ -49,6 +47,7 @@ impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, u32> for u32 {
         Ok(Some(*field))
     }
 }
+
 impl<'f, MD, FD, F> TryFromField<'f, MD, FD, F> for &'f str
 where
     FD: StaticFieldDescriptor,
@@ -69,6 +68,7 @@ impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, String> for &'f str {
         Ok(Some(field))
     }
 }
+
 impl<'f, MD, FD, M> TryFromField<'f, MD, FD, Option<Box<M>>> for &'f M
 where
     FD: StaticFieldDescriptor,

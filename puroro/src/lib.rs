@@ -27,8 +27,6 @@ pub mod internal;
 mod sample;
 pub mod tags;
 
-use std::marker::PhantomData;
-
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
