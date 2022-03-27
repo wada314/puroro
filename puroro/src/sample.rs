@@ -63,24 +63,33 @@ struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
 }
 
 trait OwnedFields {
-    type FieldType<const NUMBER: i32>;
-    fn get<const NUMBER: i32>(&self) -> &<Self::FieldType<NUMBER> as OwnedFieldType>::Type
+    fn get<const NUMBER: i32>(&self) -> &<Self as OwnedFieldGetter<NUMBER>>::Type
     where
-        Self::FieldType<NUMBER>: OwnedFieldType;
+        Self: OwnedFieldGetter<NUMBER>,
+    {
+        <Self as OwnedFieldGetter<NUMBER>>::get(&self)
+    }
 }
-trait OwnedFieldType {
+trait OwnedFieldGetter<const NUMBER: i32> {
     type Type;
+    fn get(&self) -> &Self::Type;
 }
 struct PersonOwnedFields {
     name: String,
     age: u32,
 }
-struct PersonOwnedFieldType<const NUMBER: i32>();
-impl OwnedFieldType for PersonOwnedFieldType<1> {
+impl OwnedFields for PersonOwnedFields {}
+impl OwnedFieldGetter<1> for PersonOwnedFields {
     type Type = String;
+    fn get(&self) -> &Self::Type {
+        &self.name
+    }
 }
-impl OwnedFieldType for PersonOwnedFieldType<2> {
+impl OwnedFieldGetter<2> for PersonOwnedFields {
     type Type = u32;
+    fn get(&self) -> &Self::Type {
+        &self.age
+    }
 }
 
 struct PersonStaticMessageDescriptor;
