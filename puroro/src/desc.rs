@@ -75,14 +75,14 @@ pub trait StaticFieldDescriptor {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum FieldTypeEnum {
+pub enum FieldTypeEnum {
     Int32,
     String,
     M(&'static MessageDescriptor),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum FieldLabelEnum {
+pub enum FieldLabelEnum {
     Optional,
     Required,
     Repeated,
