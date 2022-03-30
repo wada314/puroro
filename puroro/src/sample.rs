@@ -92,5 +92,6 @@ where
 #[test]
 fn test() {
     let person: Person = Person::default();
-    assert_eq!("John Doe", person.name());
+    assert_eq!("", person.name());
+    assert_eq!(0, person.age());
 }
