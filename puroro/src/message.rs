@@ -17,22 +17,33 @@ use crate::{ErrorKind, Result};
 
 pub trait Message {
     type Descriptor: StaticMessageDescriptor;
+    fn try_get_u32<'a, FD, const NUMBER: i32>(&'a self) -> Result<u32> {
+        Err(ErrorKind::ReflectionError)?
+    }
+    fn try_get_repeated_u32_boxed<'a, FD, const NUMBER: i32>(
+        &'a self,
+    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
+        Err(ErrorKind::ReflectionError)?
+    }
+    fn try_get_str<'a, FD, const NUMBER: i32>(&'a self) -> Result<&'a str> {
+        Err(ErrorKind::ReflectionError)?
+    }
 }
 
 pub trait DynMessage {
-    fn try_get_u32<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
+    fn try_get_u32_dyn<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_repeated_u32_boxed<'a>(
+    fn try_get_repeated_u32_dyn_boxed<'a>(
         &'a self,
         _: &'a FieldDescriptor,
     ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_str<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
+    fn try_get_str_dyn<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
         Err(ErrorKind::ReflectionError)?
     }
-    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn DynMessage> {
+    fn try_get_message_dyn<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn DynMessage> {
         Err(ErrorKind::ReflectionError)?
     }
 }
