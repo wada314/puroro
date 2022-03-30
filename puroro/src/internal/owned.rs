@@ -16,24 +16,24 @@ use crate::desc::FieldDefaultValue;
 use crate::desc::StaticFieldDescriptor;
 use crate::{ErrorKind, Result};
 
-trait TryFromField<'f, MD, FD, F>: Sized {
-    fn try_from_field(_field: &'f F) -> Result<Self> {
+trait TryFromRawField<'f, MD, FD, F>: Sized {
+    fn try_from_raw_field(_field: &'f F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-trait TryFromFieldOpt<'f, MD, FD, F>: Sized {
-    fn try_from_field_opt(_field: &'f F) -> Result<Option<Self>> {
+trait TryFromRawFieldOpt<'f, MD, FD, F>: Sized {
+    fn try_from_raw_field_opt(_field: &'f F) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-impl<'f, MD, FD, F> TryFromField<'f, MD, FD, F> for u32
+impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for u32
 where
     FD: StaticFieldDescriptor,
-    u32: TryFromFieldOpt<'f, MD, FD, F>,
+    u32: TryFromRawFieldOpt<'f, MD, FD, F>,
 {
-    fn try_from_field(field: &'f F) -> Result<Self> {
-        match Self::try_from_field_opt(field)? {
+    fn try_from_raw_field(field: &'f F) -> Result<Self> {
+        match Self::try_from_raw_field_opt(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
                 FieldDefaultValue::U32(val) => Ok(val),
@@ -42,19 +42,19 @@ where
         }
     }
 }
-impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, u32> for u32 {
-    fn try_from_field_opt(field: &u32) -> Result<Option<Self>> {
+impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, u32> for u32 {
+    fn try_from_raw_field_opt(field: &u32) -> Result<Option<Self>> {
         Ok(Some(*field))
     }
 }
 
-impl<'f, MD, FD, F> TryFromField<'f, MD, FD, F> for &'f str
+impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for &'f str
 where
     FD: StaticFieldDescriptor,
-    &'f str: TryFromFieldOpt<'f, MD, FD, F>,
+    &'f str: TryFromRawFieldOpt<'f, MD, FD, F>,
 {
-    fn try_from_field(field: &'f F) -> Result<Self> {
-        match Self::try_from_field_opt(field)? {
+    fn try_from_raw_field(field: &'f F) -> Result<Self> {
+        match Self::try_from_raw_field_opt(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
                 FieldDefaultValue::String(val) => Ok(val),
@@ -63,26 +63,26 @@ where
         }
     }
 }
-impl<'f, MD, FD> TryFromFieldOpt<'f, MD, FD, String> for &'f str {
-    fn try_from_field_opt(field: &'f String) -> Result<Option<Self>> {
+impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, String> for &'f str {
+    fn try_from_raw_field_opt(field: &'f String) -> Result<Option<Self>> {
         Ok(Some(field))
     }
 }
 
-impl<'f, MD, FD, M> TryFromField<'f, MD, FD, Option<Box<M>>> for &'f M
+impl<'f, MD, FD, M> TryFromRawField<'f, MD, FD, Option<Box<M>>> for &'f M
 where
     FD: StaticFieldDescriptor,
-    &'f M: TryFromFieldOpt<'f, MD, FD, Option<Box<M>>>,
+    &'f M: TryFromRawFieldOpt<'f, MD, FD, Option<Box<M>>>,
 {
-    fn try_from_field(field: &'f Option<Box<M>>) -> Result<Self> {
-        match Self::try_from_field_opt(field)? {
+    fn try_from_raw_field(field: &'f Option<Box<M>>) -> Result<Self> {
+        match Self::try_from_raw_field_opt(field)? {
             Some(val) => Ok(val),
             None => todo!(),
         }
     }
 }
-impl<'f, MD, FD, M> TryFromFieldOpt<'f, MD, FD, Option<Box<M>>> for &'f M {
-    fn try_from_field_opt(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
+impl<'f, MD, FD, M> TryFromRawFieldOpt<'f, MD, FD, Option<Box<M>>> for &'f M {
+    fn try_from_raw_field_opt(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
         Ok(field.as_deref())
     }
 }

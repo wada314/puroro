@@ -62,30 +62,30 @@ struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
     _phantom: PhantomData<MD>,
 }
 
-trait OwnedFields {
-    fn get<const NUMBER: i32>(&self) -> &<Self as OwnedFieldGetter<NUMBER>>::Type
+trait OwnedRawFields {
+    fn get<const NUMBER: i32>(&self) -> &<Self as OwnedRawFieldGetter<NUMBER>>::Type
     where
-        Self: OwnedFieldGetter<NUMBER>,
+        Self: OwnedRawFieldGetter<NUMBER>,
     {
-        <Self as OwnedFieldGetter<NUMBER>>::get(&self)
+        <Self as OwnedRawFieldGetter<NUMBER>>::get(&self)
     }
 }
-trait OwnedFieldGetter<const NUMBER: i32> {
+trait OwnedRawFieldGetter<const NUMBER: i32> {
     type Type;
     fn get(&self) -> &Self::Type;
 }
-struct PersonOwnedFields {
+struct PersonOwnedRawFields {
     name: String,
     age: u32,
 }
-impl OwnedFields for PersonOwnedFields {}
-impl OwnedFieldGetter<1> for PersonOwnedFields {
+impl OwnedRawFields for PersonOwnedRawFields {}
+impl OwnedRawFieldGetter<1> for PersonOwnedRawFields {
     type Type = String;
     fn get(&self) -> &Self::Type {
         &self.name
     }
 }
-impl OwnedFieldGetter<2> for PersonOwnedFields {
+impl OwnedRawFieldGetter<2> for PersonOwnedRawFields {
     type Type = u32;
     fn get(&self) -> &Self::Type {
         &self.age
@@ -111,7 +111,7 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<2> {
     type FieldTypeTag = tags::UInt32;
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
-    const NUMBER: i32 = 3;
+    const NUMBER: i32 = 4;
     const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::None;
     type FieldLabelTag = tags::Optional;
     type FieldTypeTag = tags::Message<PersonStaticMessageDescriptor>;
