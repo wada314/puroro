@@ -22,30 +22,6 @@ use crate::tags::{self};
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
-trait GetFieldByNumber<MD, R> {
-    fn field_by_number(&self, _: i32) -> Result<R>;
-}
-
-pub trait Message {
-    fn try_get_u32<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_repeated_u32_boxed<'a>(
-        &'a self,
-        _: &'a FieldDescriptor,
-    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_str<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_message<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn Message> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-
-pub trait MessageMut {}
-
 /// assume a proto like this as input:
 /// message Person {
 ///     optional string name = 1;
@@ -55,12 +31,6 @@ pub trait MessageMut {}
 ///     repeated uint32 scores = 6;
 ///     repeated Person children = 3;
 /// }
-
-struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
-    bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
-    fields: F,
-    _phantom: PhantomData<MD>,
-}
 
 trait OwnedRawFields {
     fn get<const NUMBER: i32>(&self) -> &<Self as OwnedRawFieldGetter<NUMBER>>::Type

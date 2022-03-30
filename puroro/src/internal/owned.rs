@@ -15,6 +15,13 @@
 use crate::desc::FieldDefaultValue;
 use crate::desc::StaticFieldDescriptor;
 use crate::{ErrorKind, Result};
+use ::std::marker::PhantomData;
+
+struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
+    bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
+    fields: F,
+    _phantom: PhantomData<MD>,
+}
 
 trait TryFromRawField<'f, MD, FD, F>: Sized {
     fn try_from_raw_field(_field: &'f F) -> Result<Self> {

@@ -24,6 +24,7 @@ mod common_traits;
 pub mod desc;
 mod error;
 pub mod internal;
+pub mod message;
 mod sample;
 pub mod tags;
 
