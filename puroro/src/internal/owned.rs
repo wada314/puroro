@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::FieldDefaultValue;
-use crate::desc::StaticFieldDescriptor;
+use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
+use crate::message::{Message, MessageFieldGetter};
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
@@ -31,6 +31,18 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<NUMBER>>::get(&self.fields);
         R::try_from_raw_field(raw_field_ref)
+    }
+}
+impl<MD, FD, FS, const NUMBER: i32, const BITFIELD_U32_LEN: usize> MessageFieldGetter<FD, NUMBER>
+    for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
+where
+    MD: StaticMessageDescriptor,
+    FD: StaticFieldDescriptor,
+    FS: OwnedRawFields + OwnedRawFieldGetter<{ NUMBER }>,
+    for<'a> u32: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
+{
+    fn try_get_u32(&self) -> Result<u32> {
+        self.try_get_field_as::<FD, u32, NUMBER>()
     }
 }
 

@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::{FieldDescriptor, StaticMessageDescriptor};
+use crate::desc::{FieldDescriptor, StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::{ErrorKind, Result};
 
 pub trait Message {
     type Descriptor: StaticMessageDescriptor;
-    fn try_get_u32<'a, FD, const NUMBER: i32>(&'a self) -> Result<u32> {
-        Err(ErrorKind::ReflectionError)?
+    fn try_get_u32<FD, const NUMBER: i32>(&self) -> Result<u32>
+    where
+        Self: MessageFieldGetter<FD, NUMBER>,
+    {
+        <Self as MessageFieldGetter<FD, NUMBER>>::try_get_u32(&self)
     }
-    fn try_get_repeated_u32_boxed<'a, FD, const NUMBER: i32>(
-        &'a self,
-    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_str<'a, FD, const NUMBER: i32>(&'a self) -> Result<&'a str> {
+}
+pub trait MessageFieldGetter<FD, const NUMBER: i32> {
+    fn try_get_u32(&self) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
 }
