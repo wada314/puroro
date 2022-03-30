@@ -17,10 +17,34 @@ use crate::desc::StaticFieldDescriptor;
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
-struct OwnedMessageImpl<MD, F, const BITFIELD_U32_LEN: usize> {
+struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
     bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
-    fields: F,
+    fields: FS,
     _phantom: PhantomData<MD>,
+}
+impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN> {
+    pub fn try_get_field_as<'a, FD, R, const NUMBER: i32>(&'a self) -> Result<R>
+    where
+        FD: StaticFieldDescriptor,
+        FS: OwnedRawFields + OwnedRawFieldGetter<{ NUMBER }>,
+        R: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
+    {
+        let raw_field_ref = <FS as OwnedRawFieldGetter<NUMBER>>::get(&self.fields);
+        R::try_from_raw_field(raw_field_ref)
+    }
+}
+
+pub trait OwnedRawFields {
+    fn get<const NUMBER: i32>(&self) -> &<Self as OwnedRawFieldGetter<NUMBER>>::Type
+    where
+        Self: OwnedRawFieldGetter<NUMBER>,
+    {
+        <Self as OwnedRawFieldGetter<NUMBER>>::get(&self)
+    }
+}
+pub trait OwnedRawFieldGetter<const NUMBER: i32> {
+    type Type;
+    fn get(&self) -> &Self::Type;
 }
 
 trait TryFromRawField<'f, MD, FD, F>: Sized {

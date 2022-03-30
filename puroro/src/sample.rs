@@ -14,13 +14,9 @@
 
 //////////////////////////////////////////////////////////////
 
-use crate::desc::{
-    FieldDefaultValue, FieldDescriptor, MessageDescriptor, StaticFieldDescriptor,
-    StaticMessageDescriptor,
-};
+use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
+use crate::internal::owned::{OwnedRawFieldGetter, OwnedRawFields};
 use crate::tags::{self};
-use crate::{ErrorKind, Result};
-use ::std::marker::PhantomData;
 
 /// assume a proto like this as input:
 /// message Person {
@@ -32,18 +28,6 @@ use ::std::marker::PhantomData;
 ///     repeated Person children = 3;
 /// }
 
-trait OwnedRawFields {
-    fn get<const NUMBER: i32>(&self) -> &<Self as OwnedRawFieldGetter<NUMBER>>::Type
-    where
-        Self: OwnedRawFieldGetter<NUMBER>,
-    {
-        <Self as OwnedRawFieldGetter<NUMBER>>::get(&self)
-    }
-}
-trait OwnedRawFieldGetter<const NUMBER: i32> {
-    type Type;
-    fn get(&self) -> &Self::Type;
-}
 struct PersonOwnedRawFields {
     name: String,
     age: u32,
