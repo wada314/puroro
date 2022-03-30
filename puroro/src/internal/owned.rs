@@ -40,11 +40,16 @@ where
     FD: StaticFieldDescriptor,
     FS: OwnedRawFields + OwnedRawFieldGetter<{ NUMBER }>,
     for<'a> u32: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
+    for<'a> &'a str: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
 {
     fn try_get_u32(&self) -> Result<u32> {
         self.try_get_field_as::<FD, u32, NUMBER>()
     }
+    fn try_get_str(&self) -> Result<&str> {
+        self.try_get_field_as::<FD, &str, NUMBER>()
+    }
 }
+impl<MD, FS, const BITFIELD_U32_LEN: usize> Message for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN> {}
 
 pub trait OwnedRawFields {
     fn get<const NUMBER: i32>(&self) -> &<Self as OwnedRawFieldGetter<NUMBER>>::Type

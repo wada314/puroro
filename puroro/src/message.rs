@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::{FieldDescriptor, StaticFieldDescriptor, StaticMessageDescriptor};
+use crate::desc::{FieldDescriptor, StaticMessageDescriptor};
 use crate::{ErrorKind, Result};
 
 pub trait Message {
-    type Descriptor: StaticMessageDescriptor;
     fn try_get_u32<FD, const NUMBER: i32>(&self) -> Result<u32>
     where
         Self: MessageFieldGetter<FD, NUMBER>,
@@ -26,6 +25,9 @@ pub trait Message {
 }
 pub trait MessageFieldGetter<FD, const NUMBER: i32> {
     fn try_get_u32(&self) -> Result<u32> {
+        Err(ErrorKind::ReflectionError)?
+    }
+    fn try_get_str(&self) -> Result<&str> {
         Err(ErrorKind::ReflectionError)?
     }
 }
