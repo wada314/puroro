@@ -17,7 +17,8 @@ use crate::message::{Message, MessageFieldGetter};
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
-struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
+#[derive(Default)]
+pub struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
     bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
     fields: FS,
     _phantom: PhantomData<MD>,
@@ -64,12 +65,12 @@ pub trait OwnedRawFieldGetter<const NUMBER: i32> {
     fn get(&self) -> &Self::Type;
 }
 
-trait TryFromRawField<'f, MD, FD, F>: Sized {
+pub trait TryFromRawField<'f, MD, FD, F>: Sized {
     fn try_from_raw_field(_field: &'f F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-trait TryFromRawFieldOpt<'f, MD, FD, F>: Sized {
+pub trait TryFromRawFieldOpt<'f, MD, FD, F>: Sized {
     fn try_from_raw_field_opt(_field: &'f F) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }

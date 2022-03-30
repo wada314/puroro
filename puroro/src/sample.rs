@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::internal::owned::{OwnedRawFieldGetter, OwnedRawFields};
+use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter, OwnedRawFields};
 use crate::message::{Message, MessageFieldGetter};
 use crate::tags::{self};
 
@@ -29,6 +29,7 @@ use crate::tags::{self};
 ///     repeated Person children = 3;
 /// }
 
+#[derive(Default)]
 struct PersonOwnedRawFields {
     name: String,
     age: u32,
@@ -47,6 +48,7 @@ impl OwnedRawFieldGetter<2> for PersonOwnedRawFields {
     }
 }
 
+#[derive(Default)]
 struct PersonStaticMessageDescriptor;
 struct PersonStaticFieldDescriptor<const NUMBER: i32>;
 
@@ -72,7 +74,8 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
     type FieldTypeTag = tags::Message<PersonStaticMessageDescriptor>;
 }
 
-pub struct Person<M>(M);
+#[derive(Default)]
+pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields, 1>>(M);
 impl<M: Message> Person<M>
 where
     M: MessageFieldGetter<PersonStaticFieldDescriptor<1>, 1>,
@@ -84,4 +87,10 @@ where
     pub fn age(&self) -> u32 {
         <M as Message>::try_get_u32::<PersonStaticFieldDescriptor<2>, 2>(&self.0).unwrap()
     }
+}
+
+#[test]
+fn test() {
+    let person: Person = Person::default();
+    assert_eq!("John Doe", person.name());
 }
