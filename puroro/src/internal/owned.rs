@@ -96,6 +96,7 @@ impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, u32> for u32 {
         Ok(Some(*field))
     }
 }
+impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, String> for u32 {}
 
 impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for &'f str
 where
@@ -117,6 +118,7 @@ impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, String> for &'f str {
         Ok(Some(field))
     }
 }
+impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, u32> for &'f str {}
 
 impl<'f, MD, FD, M> TryFromRawField<'f, MD, FD, Option<Box<M>>> for &'f M
 where
