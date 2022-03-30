@@ -16,6 +16,7 @@
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::owned::{OwnedRawFieldGetter, OwnedRawFields};
+use crate::message::{Message, MessageFieldGetter};
 use crate::tags::{self};
 
 /// assume a proto like this as input:
@@ -69,4 +70,18 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
     const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::None;
     type FieldLabelTag = tags::Optional;
     type FieldTypeTag = tags::Message<PersonStaticMessageDescriptor>;
+}
+
+pub struct Person<M>(M);
+impl<M: Message> Person<M>
+where
+    M: MessageFieldGetter<PersonStaticFieldDescriptor<1>, 1>,
+    M: MessageFieldGetter<PersonStaticFieldDescriptor<2>, 2>,
+{
+    pub fn name(&self) -> &str {
+        <M as Message>::try_get_str::<PersonStaticFieldDescriptor<1>, 1>(&self.0).unwrap()
+    }
+    pub fn age(&self) -> u32 {
+        <M as Message>::try_get_u32::<PersonStaticFieldDescriptor<2>, 2>(&self.0).unwrap()
+    }
 }
