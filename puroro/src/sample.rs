@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter, OwnedRawFields};
+use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
 use crate::message::{Message, MessageFieldGetter};
 use crate::tags::{self};
 
@@ -34,7 +34,6 @@ struct PersonOwnedRawFields {
     name: String,
     age: u32,
 }
-impl OwnedRawFields for PersonOwnedRawFields {}
 impl OwnedRawFieldGetter<1> for PersonOwnedRawFields {
     type Type = String;
     fn get(&self) -> &Self::Type {

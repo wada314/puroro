@@ -27,7 +27,7 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
     pub fn try_get_field_as<'a, FD, R, const NUMBER: i32>(&'a self) -> Result<R>
     where
         FD: StaticFieldDescriptor,
-        FS: OwnedRawFields + OwnedRawFieldGetter<{ NUMBER }>,
+        FS: OwnedRawFieldGetter<{ NUMBER }>,
         R: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<NUMBER>>::get(&self.fields);
@@ -39,7 +39,7 @@ impl<MD, FD, FS, const NUMBER: i32, const BITFIELD_U32_LEN: usize> MessageFieldG
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor,
-    FS: OwnedRawFields + OwnedRawFieldGetter<{ NUMBER }>,
+    FS: OwnedRawFieldGetter<{ NUMBER }>,
     for<'a> u32: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
     for<'a> &'a str: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<{ NUMBER }>>::Type>,
 {
@@ -52,14 +52,6 @@ where
 }
 impl<MD, FS, const BITFIELD_U32_LEN: usize> Message for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN> {}
 
-pub trait OwnedRawFields {
-    fn get<const NUMBER: i32>(&self) -> &<Self as OwnedRawFieldGetter<NUMBER>>::Type
-    where
-        Self: OwnedRawFieldGetter<NUMBER>,
-    {
-        <Self as OwnedRawFieldGetter<NUMBER>>::get(&self)
-    }
-}
 pub trait OwnedRawFieldGetter<const NUMBER: i32> {
     type Type;
     fn get(&self) -> &Self::Type;
