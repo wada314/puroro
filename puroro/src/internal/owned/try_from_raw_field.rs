@@ -29,6 +29,20 @@ pub trait TryFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
     }
 }
 
+macro_rules! impl_trait {
+    ($into:ty, $from:ty, $is_repeated:ty, $is_message:ty $(, $method:item)?) => {
+        impl<'f, MD, FD> TryFromRawFieldImpl<'f, MD, FD, $from, $is_repeated, $is_message> for $into
+        where
+            FD: StaticFieldDescriptor,
+            $into: TryOptFromRawField<'f, MD, FD, $from>,
+        {
+            $($method)?
+        }
+    };
+}
+impl_trait!(u64, String, False, False);
+impl_trait!(u64, &'f str, False, False);
+
 impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryFromRawField<'f, MD, FD, F> for T
 where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
