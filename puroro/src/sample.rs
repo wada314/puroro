@@ -17,7 +17,7 @@
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
 use crate::message::{MessageFieldGetter, MessageImpl};
-use crate::tags::{self};
+use crate::tags;
 
 /// assume a proto like this as input:
 /// message Person {
