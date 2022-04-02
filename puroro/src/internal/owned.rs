@@ -42,21 +42,17 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
     }
 }
 
-impl<'msg, MD, FD, FS, const BITFIELD_U32_LEN: usize> MessageFieldGetter<'msg, FD>
+impl<'msg, MD, FD, FS, R, const BITFIELD_U32_LEN: usize> MessageFieldGetter<'msg, FD, R>
     for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-    u32: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
-    &'msg str: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
 {
-    fn try_get_u32(&'msg self) -> Result<u32> {
-        self.try_get_field_as::<FD, u32>()
-    }
-    fn try_get_str(&'msg self) -> Result<&'msg str> {
-        self.try_get_field_as::<FD, &str>()
+    fn try_get_field(&'msg self) -> Result<R> {
+        self.try_get_field_as::<FD, R>()
     }
 }
 

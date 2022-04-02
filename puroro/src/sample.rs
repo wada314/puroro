@@ -78,8 +78,8 @@ pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwne
 impl<'msg, M> Person<M>
 where
     M: MessageImpl<'msg, PersonStaticMessageDescriptor>
-        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<1>>
-        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<2>>,
+        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<1>, &'msg str>
+        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<2>, u32>,
 {
     pub fn name(&'msg self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
