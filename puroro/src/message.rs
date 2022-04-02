@@ -15,7 +15,7 @@
 use crate::desc::FieldDescriptor;
 use crate::{ErrorKind, Result};
 
-pub trait Message {
+pub trait MessageImpl<MD> {
     fn try_get_u32<FD, const NUMBER: i32>(&self) -> Result<u32>
     where
         Self: MessageFieldGetter<FD, NUMBER>,

@@ -16,7 +16,7 @@
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
-use crate::message::{Message, MessageFieldGetter};
+use crate::message::{MessageFieldGetter, MessageImpl};
 use crate::tags::{self};
 
 /// assume a proto like this as input:
@@ -75,16 +75,25 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
 
 #[derive(Default)]
 pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields, 1>>(M);
-impl<M: Message> Person<M>
+impl<M> Person<M>
 where
-    M: MessageFieldGetter<PersonStaticFieldDescriptor<1>, 1>,
-    M: MessageFieldGetter<PersonStaticFieldDescriptor<2>, 2>,
+    M: MessageImpl<PersonStaticMessageDescriptor>
+        + MessageFieldGetter<PersonStaticFieldDescriptor<1>, 1>
+        + MessageFieldGetter<PersonStaticFieldDescriptor<2>, 2>,
 {
     pub fn name(&self) -> &str {
-        <M as Message>::try_get_str::<PersonStaticFieldDescriptor<1>, 1>(&self.0).unwrap()
+        <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
+            PersonStaticFieldDescriptor<1>,
+            1,
+        >(&self.0)
+        .unwrap()
     }
     pub fn age(&self) -> u32 {
-        <M as Message>::try_get_u32::<PersonStaticFieldDescriptor<2>, 2>(&self.0).unwrap()
+        <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
+            PersonStaticFieldDescriptor<2>,
+            2,
+        >(&self.0)
+        .unwrap()
     }
 }
 

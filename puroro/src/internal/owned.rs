@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::message::{Message, MessageFieldGetter};
+use crate::message::{MessageFieldGetter, MessageImpl};
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
@@ -50,7 +50,10 @@ where
         self.try_get_field_as::<FD, &str, NUMBER>()
     }
 }
-impl<MD, FS, const BITFIELD_U32_LEN: usize> Message for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN> {}
+impl<MD, FS, const BITFIELD_U32_LEN: usize> MessageImpl<MD>
+    for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
+{
+}
 
 pub trait OwnedRawFieldGetter<const NUMBER: i32> {
     type Type;
