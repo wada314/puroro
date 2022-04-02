@@ -29,7 +29,7 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
         <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-        R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+        R: TryFromRawFieldRef<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<FD>>::get(&self.fields);
         R::try_from_raw_field(raw_field_ref)
@@ -42,8 +42,8 @@ where
     FD: StaticFieldDescriptor,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-    u32: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
-    &'msg str: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    u32: TryFromRawFieldRef<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    &'msg str: TryFromRawFieldRef<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
 {
     fn try_get_u32(&'msg self) -> Result<u32> {
         self.try_get_field_as::<FD, u32>()
@@ -62,21 +62,21 @@ pub trait OwnedRawFieldGetter<FD> {
     fn get(&self) -> &Self::Type;
 }
 
-pub trait TryFromRawField<'f, MD, FD, F>: Sized {
+pub trait TryFromRawFieldRef<'f, MD, FD, F>: Sized {
     fn try_from_raw_field(_field: &'f F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-pub trait TryFromRawFieldOpt<'f, MD, FD, F>: Sized {
+pub trait TryOptFromRawFieldRef<'f, MD, FD, F>: Sized {
     fn try_from_raw_field_opt(_field: &'f F) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for u32
+impl<'f, MD, FD, F> TryFromRawFieldRef<'f, MD, FD, F> for u32
 where
     FD: StaticFieldDescriptor,
-    u32: TryFromRawFieldOpt<'f, MD, FD, F>,
+    u32: TryOptFromRawFieldRef<'f, MD, FD, F>,
 {
     fn try_from_raw_field(field: &'f F) -> Result<Self> {
         match Self::try_from_raw_field_opt(field)? {
@@ -88,17 +88,17 @@ where
         }
     }
 }
-impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, u32> for u32 {
+impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, u32> for u32 {
     fn try_from_raw_field_opt(field: &u32) -> Result<Option<Self>> {
         Ok(Some(*field))
     }
 }
-impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, String> for u32 {}
+impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, String> for u32 {}
 
-impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for &'f str
+impl<'f, MD, FD, F> TryFromRawFieldRef<'f, MD, FD, F> for &'f str
 where
     FD: StaticFieldDescriptor,
-    &'f str: TryFromRawFieldOpt<'f, MD, FD, F>,
+    &'f str: TryOptFromRawFieldRef<'f, MD, FD, F>,
 {
     fn try_from_raw_field(field: &'f F) -> Result<Self> {
         match Self::try_from_raw_field_opt(field)? {
@@ -110,17 +110,17 @@ where
         }
     }
 }
-impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, String> for &'f str {
+impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, String> for &'f str {
     fn try_from_raw_field_opt(field: &'f String) -> Result<Option<Self>> {
         Ok(Some(field))
     }
 }
-impl<'f, MD, FD> TryFromRawFieldOpt<'f, MD, FD, u32> for &'f str {}
+impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, u32> for &'f str {}
 
-impl<'f, MD, FD, M> TryFromRawField<'f, MD, FD, Option<Box<M>>> for &'f M
+impl<'f, MD, FD, M> TryFromRawFieldRef<'f, MD, FD, Option<Box<M>>> for &'f M
 where
     FD: StaticFieldDescriptor,
-    &'f M: TryFromRawFieldOpt<'f, MD, FD, Option<Box<M>>>,
+    &'f M: TryOptFromRawFieldRef<'f, MD, FD, Option<Box<M>>>,
 {
     fn try_from_raw_field(field: &'f Option<Box<M>>) -> Result<Self> {
         match Self::try_from_raw_field_opt(field)? {
@@ -129,7 +129,7 @@ where
         }
     }
 }
-impl<'f, MD, FD, M> TryFromRawFieldOpt<'f, MD, FD, Option<Box<M>>> for &'f M {
+impl<'f, MD, FD, M> TryOptFromRawFieldRef<'f, MD, FD, Option<Box<M>>> for &'f M {
     fn try_from_raw_field_opt(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
         Ok(field.as_deref())
     }
