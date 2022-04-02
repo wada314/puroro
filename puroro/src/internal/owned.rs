@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::internal::bool::{False, True};
+use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::message::{MessageFieldGetter, MessageImpl};
-use crate::tags::{self};
-use crate::{ErrorKind, Result};
+use crate::Result;
 use ::std::marker::PhantomData;
+
+pub mod try_from_raw_field;
+pub mod try_opt_from_raw_field;
+
+pub use try_from_raw_field::TryFromRawField;
+pub use try_opt_from_raw_field::TryOptFromRawField;
 
 #[derive(Default)]
 pub struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
@@ -37,6 +41,7 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
         R::try_from_raw_field(raw_field_ref)
     }
 }
+
 impl<'msg, MD, FD, FS, const BITFIELD_U32_LEN: usize> MessageFieldGetter<'msg, FD>
     for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
 where
@@ -54,6 +59,7 @@ where
         self.try_get_field_as::<FD, &str>()
     }
 }
+
 impl<'msg, MD, FS, const BITFIELD_U32_LEN: usize> MessageImpl<'msg, MD>
     for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
 {
@@ -62,110 +68,4 @@ impl<'msg, MD, FS, const BITFIELD_U32_LEN: usize> MessageImpl<'msg, MD>
 pub trait OwnedRawFieldGetter<FD> {
     type Type;
     fn get(&self) -> &Self::Type;
-}
-
-pub trait TryFromRawField<'f, MD, FD, F>: Sized {
-    fn try_from_raw_field(_field: &'f F) -> Result<Self> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-pub trait TryOptFromRawField<'f, MD, FD, F>: Sized {
-    fn try_opt_from_raw_field(_field: &'f F) -> Result<Option<Self>> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-
-pub trait TryFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
-    fn try_from_raw_field_impl(_field: &'f F) -> Result<Self> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-pub trait TryOptFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
-    fn try_opt_from_raw_field_impl(_field: &'f F) -> Result<Option<Self>> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryFromRawField<'f, MD, FD, F> for T
-where
-    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
-    LabelTag: tags::FieldLabelTag,
-    TypeTag: tags::FieldTypeTag,
-    T: TryFromRawFieldImpl<'f, MD, FD, F, LabelTag::IsRepeated, TypeTag::IsMessage>,
-{
-    fn try_from_raw_field(field: &'f F) -> Result<Self> {
-        Self::try_from_raw_field_impl(field)
-    }
-}
-impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryOptFromRawField<'f, MD, FD, F> for T
-where
-    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
-    LabelTag: tags::FieldLabelTag,
-    TypeTag: tags::FieldTypeTag,
-    T: TryOptFromRawFieldImpl<'f, MD, FD, F, LabelTag::IsRepeated, TypeTag::IsMessage>,
-{
-    fn try_opt_from_raw_field(field: &'f F) -> Result<Option<Self>> {
-        Self::try_opt_from_raw_field_impl(field)
-    }
-}
-
-impl<'f, MD, FD, F> TryFromRawFieldImpl<'f, MD, FD, F, False, False> for u32
-where
-    FD: StaticFieldDescriptor,
-    u32: TryOptFromRawField<'f, MD, FD, F>,
-{
-    fn try_from_raw_field_impl(field: &'f F) -> Result<Self> {
-        match Self::try_opt_from_raw_field(field)? {
-            Some(val) => Ok(val),
-            None => match FD::DEFAULT_VALUE {
-                FieldDefaultValue::U32(val) => Ok(val),
-                _ => Err(ErrorKind::ReflectionError)?,
-            },
-        }
-    }
-}
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for u32 {
-    fn try_opt_from_raw_field_impl(field: &u32) -> Result<Option<Self>> {
-        Ok(Some(*field))
-    }
-}
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for u32 {}
-
-impl<'f, MD, FD, F> TryFromRawFieldImpl<'f, MD, FD, F, False, False> for &'f str
-where
-    FD: StaticFieldDescriptor,
-    &'f str: TryOptFromRawField<'f, MD, FD, F>,
-{
-    fn try_from_raw_field_impl(field: &'f F) -> Result<Self> {
-        match Self::try_opt_from_raw_field(field)? {
-            Some(val) => Ok(val),
-            None => match FD::DEFAULT_VALUE {
-                FieldDefaultValue::String(val) => Ok(val),
-                _ => Err(ErrorKind::ReflectionError)?,
-            },
-        }
-    }
-}
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for &'f str {
-    fn try_opt_from_raw_field_impl(field: &'f String) -> Result<Option<Self>> {
-        Ok(Some(field))
-    }
-}
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for &'f str {}
-
-impl<'f, MD, FD, M> TryFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, False, True> for &'f M
-where
-    FD: StaticFieldDescriptor,
-    &'f M: TryOptFromRawField<'f, MD, FD, Option<Box<M>>>,
-{
-    fn try_from_raw_field_impl(field: &'f Option<Box<M>>) -> Result<Self> {
-        match Self::try_opt_from_raw_field(field)? {
-            Some(val) => Ok(val),
-            None => todo!(),
-        }
-    }
-}
-impl<'f, MD, FD, M> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, False, True> for &'f M {
-    fn try_opt_from_raw_field_impl(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
-        Ok(field.as_deref())
-    }
 }
