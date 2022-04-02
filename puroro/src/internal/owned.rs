@@ -24,34 +24,35 @@ pub struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
     _phantom: PhantomData<MD>,
 }
 impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN> {
-    pub fn try_get_field_as<'a, FD, R>(&'a self) -> Result<R>
+    pub fn try_get_field_as<'msg, FD, R>(&'msg self) -> Result<R>
     where
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
-        <FS as OwnedRawFieldGetter<FD>>::Type: 'a,
-        R: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+        <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
+        R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<FD>>::get(&self.fields);
         R::try_from_raw_field(raw_field_ref)
     }
 }
-impl<MD, FD, FS, const BITFIELD_U32_LEN: usize> MessageFieldGetter<FD>
+impl<'msg, MD, FD, FS, const BITFIELD_U32_LEN: usize> MessageFieldGetter<'msg, FD>
     for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor,
     FS: OwnedRawFieldGetter<FD>,
-    for<'a> u32: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
-    for<'a> &'a str: TryFromRawField<'a, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
+    u32: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    &'msg str: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
 {
-    fn try_get_u32(&self) -> Result<u32> {
+    fn try_get_u32(&'msg self) -> Result<u32> {
         self.try_get_field_as::<FD, u32>()
     }
-    fn try_get_str(&self) -> Result<&str> {
+    fn try_get_str(&'msg self) -> Result<&'msg str> {
         self.try_get_field_as::<FD, &str>()
     }
 }
-impl<MD, FS, const BITFIELD_U32_LEN: usize> MessageImpl<MD>
+impl<'msg, MD, FS, const BITFIELD_U32_LEN: usize> MessageImpl<'msg, MD>
     for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
 {
 }

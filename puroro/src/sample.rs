@@ -75,19 +75,19 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
 
 #[derive(Default)]
 pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields, 1>>(M);
-impl<M> Person<M>
+impl<'msg, M> Person<M>
 where
-    M: MessageImpl<PersonStaticMessageDescriptor>
-        + MessageFieldGetter<PersonStaticFieldDescriptor<1>>
-        + MessageFieldGetter<PersonStaticFieldDescriptor<2>>,
+    M: MessageImpl<'msg, PersonStaticMessageDescriptor>
+        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<1>>
+        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<2>>,
 {
-    pub fn name(&self) -> &str {
+    pub fn name(&'msg self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
             PersonStaticFieldDescriptor<1>,
         >(&self.0)
         .unwrap()
     }
-    pub fn age(&self) -> u32 {
+    pub fn age(&'msg self) -> u32 {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
             PersonStaticFieldDescriptor<2>,
         >(&self.0)
