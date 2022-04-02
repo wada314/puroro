@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
+use crate::internal::bool::{False, True};
 use crate::message::{MessageFieldGetter, MessageImpl};
+use crate::tags::{self};
 use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
@@ -29,7 +31,7 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
         <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-        R: TryFromRawFieldRef<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+        R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<FD>>::get(&self.fields);
         R::try_from_raw_field(raw_field_ref)
@@ -42,8 +44,8 @@ where
     FD: StaticFieldDescriptor,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-    u32: TryFromRawFieldRef<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
-    &'msg str: TryFromRawFieldRef<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    u32: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    &'msg str: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
 {
     fn try_get_u32(&'msg self) -> Result<u32> {
         self.try_get_field_as::<FD, u32>()
@@ -62,24 +64,46 @@ pub trait OwnedRawFieldGetter<FD> {
     fn get(&self) -> &Self::Type;
 }
 
-pub trait TryFromRawFieldRef<'f, MD, FD, F>: Sized {
+pub trait TryFromRawField<'f, MD, FD, F>: Sized {
     fn try_from_raw_field(_field: &'f F) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-pub trait TryOptFromRawFieldRef<'f, MD, FD, F>: Sized {
-    fn try_from_raw_field_opt(_field: &'f F) -> Result<Option<Self>> {
+pub trait TryOptFromRawField<'f, MD, FD, F>: Sized {
+    fn try_opt_from_raw_field(_field: &'f F) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-impl<'f, MD, FD, F> TryFromRawFieldRef<'f, MD, FD, F> for u32
+pub trait TryFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
+    fn try_from_raw_field_impl(_field: &'f F) -> Result<Self> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+pub trait TryOptFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
+    fn try_opt_from_raw_field_impl(_field: &'f F) -> Result<Option<Self>> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryOptFromRawField<'f, MD, FD, F> for T
+where
+    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
+    LabelTag: tags::FieldLabelTag,
+    TypeTag: tags::FieldTypeTag,
+    T: TryOptFromRawFieldImpl<'f, MD, FD, F, LabelTag::IsRepeated, TypeTag::IsMessage>,
+{
+    fn try_opt_from_raw_field(field: &'f F) -> Result<Option<Self>> {
+        Self::try_opt_from_raw_field_impl(field)
+    }
+}
+
+impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for u32
 where
     FD: StaticFieldDescriptor,
-    u32: TryOptFromRawFieldRef<'f, MD, FD, F>,
+    u32: TryOptFromRawField<'f, MD, FD, F>,
 {
     fn try_from_raw_field(field: &'f F) -> Result<Self> {
-        match Self::try_from_raw_field_opt(field)? {
+        match Self::try_opt_from_raw_field(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
                 FieldDefaultValue::U32(val) => Ok(val),
@@ -88,20 +112,20 @@ where
         }
     }
 }
-impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, u32> for u32 {
-    fn try_from_raw_field_opt(field: &u32) -> Result<Option<Self>> {
+impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for u32 {
+    fn try_opt_from_raw_field_impl(field: &u32) -> Result<Option<Self>> {
         Ok(Some(*field))
     }
 }
-impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, String> for u32 {}
+impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for u32 {}
 
-impl<'f, MD, FD, F> TryFromRawFieldRef<'f, MD, FD, F> for &'f str
+impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for &'f str
 where
     FD: StaticFieldDescriptor,
-    &'f str: TryOptFromRawFieldRef<'f, MD, FD, F>,
+    &'f str: TryOptFromRawField<'f, MD, FD, F>,
 {
     fn try_from_raw_field(field: &'f F) -> Result<Self> {
-        match Self::try_from_raw_field_opt(field)? {
+        match Self::try_opt_from_raw_field(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
                 FieldDefaultValue::String(val) => Ok(val),
@@ -110,27 +134,27 @@ where
         }
     }
 }
-impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, String> for &'f str {
-    fn try_from_raw_field_opt(field: &'f String) -> Result<Option<Self>> {
+impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for &'f str {
+    fn try_opt_from_raw_field_impl(field: &'f String) -> Result<Option<Self>> {
         Ok(Some(field))
     }
 }
-impl<'f, MD, FD> TryOptFromRawFieldRef<'f, MD, FD, u32> for &'f str {}
+impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for &'f str {}
 
-impl<'f, MD, FD, M> TryFromRawFieldRef<'f, MD, FD, Option<Box<M>>> for &'f M
+impl<'f, MD, FD, M> TryFromRawField<'f, MD, FD, Option<Box<M>>> for &'f M
 where
     FD: StaticFieldDescriptor,
-    &'f M: TryOptFromRawFieldRef<'f, MD, FD, Option<Box<M>>>,
+    &'f M: TryOptFromRawField<'f, MD, FD, Option<Box<M>>>,
 {
     fn try_from_raw_field(field: &'f Option<Box<M>>) -> Result<Self> {
-        match Self::try_from_raw_field_opt(field)? {
+        match Self::try_opt_from_raw_field(field)? {
             Some(val) => Ok(val),
             None => todo!(),
         }
     }
 }
-impl<'f, MD, FD, M> TryOptFromRawFieldRef<'f, MD, FD, Option<Box<M>>> for &'f M {
-    fn try_from_raw_field_opt(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
+impl<'f, MD, FD, M> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, False, True> for &'f M {
+    fn try_opt_from_raw_field_impl(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
         Ok(field.as_deref())
     }
 }
