@@ -20,13 +20,13 @@ pub trait MessageImpl<'msg, MD> {
     where
         Self: MessageFieldGetter<'msg, FD, u32>,
     {
-        <Self as MessageFieldGetter<FD, u32>>::try_get_field(&self)
+        self.try_get_field()
     }
     fn try_get_str<FD>(&'msg self) -> Result<&str>
     where
         Self: MessageFieldGetter<'msg, FD, &'msg str>,
     {
-        <Self as MessageFieldGetter<FD, &'msg str>>::try_get_field(&self)
+        self.try_get_field()
     }
 }
 pub trait MessageFieldGetter<'msg, FD, R> {
