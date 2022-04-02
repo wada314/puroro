@@ -41,19 +41,19 @@ where
     }
 }
 
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for u32 {
-    fn try_opt_from_raw_field_impl(field: &u32) -> Result<Option<Self>> {
-        Ok(Some(*field))
-    }
+macro_rules! impl_trait {
+    ($into:ty, $from:ty, $is_repeated:ty, $is_message:ty $(, |$field_name:ident| $expr:expr)?) => {
+        impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, $from, $is_repeated, $is_message> for $into {
+            $(fn try_opt_from_raw_field_impl($field_name: &'f $from) -> Result<Option<Self>> {
+                $expr
+            })?
+        }
+    };
 }
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for u32 {}
-
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for &'f str {
-    fn try_opt_from_raw_field_impl(field: &'f String) -> Result<Option<Self>> {
-        Ok(Some(field))
-    }
-}
-impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for &'f str {}
+impl_trait!(u32, u32, False, False, |f| Ok(Some(*f)));
+impl_trait!(u32, &'f str, False, False);
+impl_trait!(&'f str, String, False, False, |f| Ok(Some(f)));
+impl_trait!(&'f str, u32, False, False);
 
 impl<'f, MD, FD, M> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, False, True> for &'f M {
     fn try_opt_from_raw_field_impl(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
