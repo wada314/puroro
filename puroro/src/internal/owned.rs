@@ -85,6 +85,17 @@ pub trait TryOptFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
         Err(ErrorKind::ReflectionError)?
     }
 }
+impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryFromRawField<'f, MD, FD, F> for T
+where
+    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
+    LabelTag: tags::FieldLabelTag,
+    TypeTag: tags::FieldTypeTag,
+    T: TryFromRawFieldImpl<'f, MD, FD, F, LabelTag::IsRepeated, TypeTag::IsMessage>,
+{
+    fn try_from_raw_field(field: &'f F) -> Result<Self> {
+        Self::try_from_raw_field_impl(field)
+    }
+}
 impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryOptFromRawField<'f, MD, FD, F> for T
 where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
@@ -97,12 +108,12 @@ where
     }
 }
 
-impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for u32
+impl<'f, MD, FD, F> TryFromRawFieldImpl<'f, MD, FD, F, False, False> for u32
 where
     FD: StaticFieldDescriptor,
     u32: TryOptFromRawField<'f, MD, FD, F>,
 {
-    fn try_from_raw_field(field: &'f F) -> Result<Self> {
+    fn try_from_raw_field_impl(field: &'f F) -> Result<Self> {
         match Self::try_opt_from_raw_field(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
@@ -119,12 +130,12 @@ impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for u32 {
 }
 impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for u32 {}
 
-impl<'f, MD, FD, F> TryFromRawField<'f, MD, FD, F> for &'f str
+impl<'f, MD, FD, F> TryFromRawFieldImpl<'f, MD, FD, F, False, False> for &'f str
 where
     FD: StaticFieldDescriptor,
     &'f str: TryOptFromRawField<'f, MD, FD, F>,
 {
-    fn try_from_raw_field(field: &'f F) -> Result<Self> {
+    fn try_from_raw_field_impl(field: &'f F) -> Result<Self> {
         match Self::try_opt_from_raw_field(field)? {
             Some(val) => Ok(val),
             None => match FD::DEFAULT_VALUE {
@@ -141,12 +152,12 @@ impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, String, False, False> for &'
 }
 impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, u32, False, False> for &'f str {}
 
-impl<'f, MD, FD, M> TryFromRawField<'f, MD, FD, Option<Box<M>>> for &'f M
+impl<'f, MD, FD, M> TryFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, False, True> for &'f M
 where
     FD: StaticFieldDescriptor,
     &'f M: TryOptFromRawField<'f, MD, FD, Option<Box<M>>>,
 {
-    fn try_from_raw_field(field: &'f Option<Box<M>>) -> Result<Self> {
+    fn try_from_raw_field_impl(field: &'f Option<Box<M>>) -> Result<Self> {
         match Self::try_opt_from_raw_field(field)? {
             Some(val) => Ok(val),
             None => todo!(),
