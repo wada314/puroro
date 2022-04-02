@@ -16,20 +16,20 @@ use crate::desc::FieldDescriptor;
 use crate::{ErrorKind, Result};
 
 pub trait MessageImpl<MD> {
-    fn try_get_u32<FD, const NUMBER: i32>(&self) -> Result<u32>
+    fn try_get_u32<FD>(&self) -> Result<u32>
     where
-        Self: MessageFieldGetter<FD, NUMBER>,
+        Self: MessageFieldGetter<FD>,
     {
-        <Self as MessageFieldGetter<FD, NUMBER>>::try_get_u32(&self)
+        <Self as MessageFieldGetter<FD>>::try_get_u32(&self)
     }
-    fn try_get_str<FD, const NUMBER: i32>(&self) -> Result<&str>
+    fn try_get_str<FD>(&self) -> Result<&str>
     where
-        Self: MessageFieldGetter<FD, NUMBER>,
+        Self: MessageFieldGetter<FD>,
     {
-        <Self as MessageFieldGetter<FD, NUMBER>>::try_get_str(&self)
+        <Self as MessageFieldGetter<FD>>::try_get_str(&self)
     }
 }
-pub trait MessageFieldGetter<FD, const NUMBER: i32> {
+pub trait MessageFieldGetter<FD> {
     fn try_get_u32(&self) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }

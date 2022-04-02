@@ -34,13 +34,13 @@ struct PersonOwnedRawFields {
     name: String,
     age: u32,
 }
-impl OwnedRawFieldGetter<1> for PersonOwnedRawFields {
+impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<1>> for PersonOwnedRawFields {
     type Type = String;
     fn get(&self) -> &Self::Type {
         &self.name
     }
 }
-impl OwnedRawFieldGetter<2> for PersonOwnedRawFields {
+impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<2>> for PersonOwnedRawFields {
     type Type = u32;
     fn get(&self) -> &Self::Type {
         &self.age
@@ -78,20 +78,18 @@ pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwne
 impl<M> Person<M>
 where
     M: MessageImpl<PersonStaticMessageDescriptor>
-        + MessageFieldGetter<PersonStaticFieldDescriptor<1>, 1>
-        + MessageFieldGetter<PersonStaticFieldDescriptor<2>, 2>,
+        + MessageFieldGetter<PersonStaticFieldDescriptor<1>>
+        + MessageFieldGetter<PersonStaticFieldDescriptor<2>>,
 {
     pub fn name(&self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
             PersonStaticFieldDescriptor<1>,
-            1,
         >(&self.0)
         .unwrap()
     }
     pub fn age(&self) -> u32 {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
             PersonStaticFieldDescriptor<2>,
-            2,
         >(&self.0)
         .unwrap()
     }
