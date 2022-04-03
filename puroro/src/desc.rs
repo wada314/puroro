@@ -72,6 +72,7 @@ pub trait StaticMessageDescriptor {
 pub trait StaticFieldDescriptor {
     const NUMBER: i32;
     const DEFAULT_VALUE: FieldDefaultValue;
+    const OWNED_HASFIELD_BITFIELD_INDEX: Option<usize>;
     type FieldLabelTag: tags::FieldLabelTag;
     type FieldTypeTag: tags::FieldTypeTag;
 }

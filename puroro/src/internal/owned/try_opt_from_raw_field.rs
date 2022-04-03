@@ -14,6 +14,7 @@
 
 use crate::desc::StaticFieldDescriptor;
 use crate::internal::bool::{False, True};
+use crate::internal::Bitfield;
 use crate::tags;
 use crate::{ErrorKind, Result};
 
@@ -45,7 +46,11 @@ macro_rules! impl_trait {
     ($into:ty, $from:ty, $is_repeated:ty, $is_message:ty
         $(, |$field_name:ident, $bitfield_name:ident| $expr:expr)?
     ) => {
-        impl<'f, MD, FD, B> TryOptFromRawFieldImpl<'f, MD, FD, $from, B, $is_repeated, $is_message> for $into {
+        impl<'f, MD, FD, B> TryOptFromRawFieldImpl<'f, MD, FD, $from, B, $is_repeated, $is_message> for $into
+        where
+            FD: StaticFieldDescriptor,
+            B: Bitfield,
+        {
             $(fn try_opt_from_raw_field_impl(
                 $field_name: &'f $from,
                 $bitfield_name: &'f B
@@ -55,12 +60,28 @@ macro_rules! impl_trait {
         }
     };
 }
-impl_trait!(u32, u32, False, False, |f, _b| Ok(Some(*f)));
-impl_trait!(u32, &'f str, False, False);
-impl_trait!(&'f str, String, False, False, |f, _b| Ok(Some(f)));
-impl_trait!(&'f str, u32, False, False);
+impl_trait!(u32, u32, False, False, |f, b| {
+    Ok(
+        if b.get(FD::OWNED_HASFIELD_BITFIELD_INDEX.ok_or(ErrorKind::ReflectionError)?) {
+            Some(*f)
+        } else {
+            None
+        },
+    )
+});
+impl_trait!(&'f str, String, False, False, |f, b| {
+    Ok(
+        if b.get(FD::OWNED_HASFIELD_BITFIELD_INDEX.ok_or(ErrorKind::ReflectionError)?) {
+            Some(f)
+        } else {
+            None
+        },
+    )
+});
 
-impl<'f, MD, FD, M, B> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True> for &'f M {
+impl<'f, MD, FD, M, B> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True>
+    for &'f M
+{
     fn try_opt_from_raw_field_impl(field: &'f Option<Box<M>>, _: &B) -> Result<Option<Self>> {
         Ok(field.as_deref())
     }
