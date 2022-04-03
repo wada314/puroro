@@ -33,3 +33,12 @@ pub trait MessageFieldGetter<'msg, FD, R> {
         Err(ErrorKind::ReflectionError)?
     }
 }
+
+pub trait AsMessageRef {
+    type MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType;
+}
+pub trait AsMessageImplRef {
+    type MessageImplType;
+    fn as_messageimpl_ref(&self) -> &Self::MessageImplType;
+}

@@ -16,7 +16,7 @@
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
-use crate::message::{MessageFieldGetter, MessageImpl};
+use crate::message::{AsMessageImplRef, AsMessageRef, MessageFieldGetter, MessageImpl};
 use crate::tags;
 
 /// assume a proto like this as input:
@@ -96,6 +96,19 @@ where
             PersonStaticFieldDescriptor<2>,
         >(&self.0)
         .unwrap()
+    }
+}
+
+impl<M> AsMessageRef for Person<M> {
+    type MessageType = Self;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        self
+    }
+}
+impl<M> AsMessageImplRef for Person<M> {
+    type MessageImplType = M;
+    fn as_messageimpl_ref(&self) -> &Self::MessageImplType {
+        &self.0
     }
 }
 
