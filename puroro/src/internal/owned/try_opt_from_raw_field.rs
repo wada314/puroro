@@ -17,46 +17,51 @@ use crate::internal::bool::{False, True};
 use crate::tags;
 use crate::{ErrorKind, Result};
 
-pub trait TryOptFromRawField<'f, MD, FD, F>: Sized {
-    fn try_opt_from_raw_field(_field: &'f F) -> Result<Option<Self>> {
+pub trait TryOptFromRawField<'f, MD, FD, F, B>: Sized {
+    fn try_opt_from_raw_field(_field: &'f F, _bitfield: &'f B) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-pub trait TryOptFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
-    fn try_opt_from_raw_field_impl(_field: &'f F) -> Result<Option<Self>> {
+pub trait TryOptFromRawFieldImpl<'f, MD, FD, F, B, IsRepeated, IsMessage>: Sized {
+    fn try_opt_from_raw_field_impl(_field: &'f F, _bitfield: &'f B) -> Result<Option<Self>> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryOptFromRawField<'f, MD, FD, F> for T
+impl<'f, T, MD, FD, F, B, LabelTag, TypeTag> TryOptFromRawField<'f, MD, FD, F, B> for T
 where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
     LabelTag: tags::FieldLabelTag,
     TypeTag: tags::FieldTypeTag,
-    T: TryOptFromRawFieldImpl<'f, MD, FD, F, LabelTag::IsRepeated, TypeTag::IsMessage>,
+    T: TryOptFromRawFieldImpl<'f, MD, FD, F, B, LabelTag::IsRepeated, TypeTag::IsMessage>,
 {
-    fn try_opt_from_raw_field(field: &'f F) -> Result<Option<Self>> {
-        Self::try_opt_from_raw_field_impl(field)
+    fn try_opt_from_raw_field(field: &'f F, bitfield: &'f B) -> Result<Option<Self>> {
+        Self::try_opt_from_raw_field_impl(field, bitfield)
     }
 }
 
 macro_rules! impl_trait {
-    ($into:ty, $from:ty, $is_repeated:ty, $is_message:ty $(, |$field_name:ident| $expr:expr)?) => {
-        impl<'f, MD, FD> TryOptFromRawFieldImpl<'f, MD, FD, $from, $is_repeated, $is_message> for $into {
-            $(fn try_opt_from_raw_field_impl($field_name: &'f $from) -> Result<Option<Self>> {
+    ($into:ty, $from:ty, $is_repeated:ty, $is_message:ty
+        $(, |$field_name:ident, $bitfield_name:ident| $expr:expr)?
+    ) => {
+        impl<'f, MD, FD, B> TryOptFromRawFieldImpl<'f, MD, FD, $from, B, $is_repeated, $is_message> for $into {
+            $(fn try_opt_from_raw_field_impl(
+                $field_name: &'f $from,
+                $bitfield_name: &'f B
+            ) -> Result<Option<Self>> {
                 $expr
             })?
         }
     };
 }
-impl_trait!(u32, u32, False, False, |f| Ok(Some(*f)));
+impl_trait!(u32, u32, False, False, |f, _b| Ok(Some(*f)));
 impl_trait!(u32, &'f str, False, False);
-impl_trait!(&'f str, String, False, False, |f| Ok(Some(f)));
+impl_trait!(&'f str, String, False, False, |f, _b| Ok(Some(f)));
 impl_trait!(&'f str, u32, False, False);
 
-impl<'f, MD, FD, M> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, False, True> for &'f M {
-    fn try_opt_from_raw_field_impl(field: &'f Option<Box<M>>) -> Result<Option<Self>> {
+impl<'f, MD, FD, M, B> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True> for &'f M {
+    fn try_opt_from_raw_field_impl(field: &'f Option<Box<M>>, _: &B) -> Result<Option<Self>> {
         Ok(field.as_deref())
     }
 }

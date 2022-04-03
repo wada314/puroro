@@ -18,38 +18,38 @@ use crate::internal::bool::{False, True};
 use crate::tags;
 use crate::{ErrorKind, Result};
 
-pub trait TryFromRawField<'f, MD, FD, F>: Sized {
-    fn try_from_raw_field(_field: &'f F) -> Result<Self> {
+pub trait TryFromRawField<'f, MD, FD, F, B>: Sized {
+    fn try_from_raw_field(_field: &'f F, _: &'f B) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-pub trait TryFromRawFieldImpl<'f, MD, FD, F, IsRepeated, IsMessage>: Sized {
-    fn try_from_raw_field_impl(_field: &'f F) -> Result<Self> {
+pub trait TryFromRawFieldImpl<'f, MD, FD, F, B, IsRepeated, IsMessage>: Sized {
+    fn try_from_raw_field_impl(_field: &'f F, _: &'f B) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-impl<'f, T, MD, FD, F, LabelTag, TypeTag> TryFromRawField<'f, MD, FD, F> for T
+impl<'f, T, MD, FD, F, B, LabelTag, TypeTag> TryFromRawField<'f, MD, FD, F, B> for T
 where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
     LabelTag: tags::FieldLabelTag,
     TypeTag: tags::FieldTypeTag,
-    T: TryFromRawFieldImpl<'f, MD, FD, F, LabelTag::IsRepeated, TypeTag::IsMessage>,
+    T: TryFromRawFieldImpl<'f, MD, FD, F, B, LabelTag::IsRepeated, TypeTag::IsMessage>,
 {
-    fn try_from_raw_field(field: &'f F) -> Result<Self> {
-        Self::try_from_raw_field_impl(field)
+    fn try_from_raw_field(field: &'f F, bitfield: &'f B) -> Result<Self> {
+        Self::try_from_raw_field_impl(field, bitfield)
     }
 }
 
 macro_rules! impl_trait_using_opt {
     ($into:ty, $is_message:ty, $default:expr) => {
-        impl<'f, MD, FD, F> TryFromRawFieldImpl<'f, MD, FD, F, False, $is_message> for $into
+        impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, $is_message> for $into
         where
             FD: StaticFieldDescriptor,
-            $into: TryOptFromRawField<'f, MD, FD, F>,
+            $into: TryOptFromRawField<'f, MD, FD, F, B>,
         {
-            fn try_from_raw_field_impl(field: &'f F) -> Result<Self> {
-                match Self::try_opt_from_raw_field(field)? {
+            fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
+                match Self::try_opt_from_raw_field(field, bitfield)? {
                     Some(val) => Ok(val),
                     None => $default,
                 }
@@ -74,13 +74,13 @@ impl_trait_using_opt!(
     }
 );
 
-impl<'f, MD, FD, F, M> TryFromRawFieldImpl<'f, MD, FD, F, False, True> for &'f M
+impl<'f, MD, FD, F, B, M> TryFromRawFieldImpl<'f, MD, FD, F, B, False, True> for &'f M
 where
     FD: StaticFieldDescriptor,
-    &'f M: TryOptFromRawField<'f, MD, FD, F>,
+    &'f M: TryOptFromRawField<'f, MD, FD, F, B>,
 {
-    fn try_from_raw_field_impl(field: &'f F) -> Result<Self> {
-        match Self::try_opt_from_raw_field(field)? {
+    fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
+        match Self::try_opt_from_raw_field(field, bitfield)? {
             Some(val) => Ok(val),
             None => todo!(),
         }

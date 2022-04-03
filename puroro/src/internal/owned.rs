@@ -23,9 +23,12 @@ pub mod try_opt_from_raw_field;
 pub use try_from_raw_field::TryFromRawField;
 pub use try_opt_from_raw_field::TryOptFromRawField;
 
+type BitArray<const U32_LEN: usize> =
+    ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; U32_LEN]>;
+
 #[derive(Default)]
 pub struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
-    bitvec: ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
+    bitvec: BitArray<BITFIELD_U32_LEN>,
     fields: FS,
     _phantom: PhantomData<MD>,
 }
@@ -35,10 +38,16 @@ impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U3
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
         <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-        R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+        R: TryFromRawField<
+            'msg,
+            MD,
+            FD,
+            <FS as OwnedRawFieldGetter<FD>>::Type,
+            BitArray<BITFIELD_U32_LEN>,
+        >,
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<FD>>::get(&self.fields);
-        R::try_from_raw_field(raw_field_ref)
+        R::try_from_raw_field(raw_field_ref, &self.bitvec)
     }
 }
 
@@ -49,7 +58,13 @@ where
     FD: StaticFieldDescriptor,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-    R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type>,
+    R: TryFromRawField<
+        'msg,
+        MD,
+        FD,
+        <FS as OwnedRawFieldGetter<FD>>::Type,
+        BitArray<BITFIELD_U32_LEN>,
+    >,
 {
     fn try_get_field(&'msg self) -> Result<R> {
         self.try_get_field_as::<FD, R>()
