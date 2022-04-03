@@ -40,5 +40,18 @@ pub trait AsMessageRef {
 }
 pub trait AsMessageImplRef {
     type MessageImplType;
-    fn as_messageimpl_ref(&self) -> &Self::MessageImplType;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType;
+}
+
+impl<T: AsMessageRef> AsMessageRef for &T {
+    type MessageType = T::MessageType;
+    fn as_message_ref(&self) -> &Self::MessageType {
+        T::as_message_ref(self)
+    }
+}
+impl<T: AsMessageImplRef> AsMessageImplRef for &T {
+    type MessageImplType = T::MessageImplType;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        T::as_message_impl_ref(&self)
+    }
 }

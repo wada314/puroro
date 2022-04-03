@@ -107,7 +107,7 @@ impl<M> AsMessageRef for Person<M> {
 }
 impl<M> AsMessageImplRef for Person<M> {
     type MessageImplType = M;
-    fn as_messageimpl_ref(&self) -> &Self::MessageImplType {
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
         &self.0
     }
 }
