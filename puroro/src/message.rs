@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::FieldDescriptor;
 use crate::{ErrorKind, Result};
 
 pub trait MessageImpl<'msg, MD> {
@@ -34,23 +33,3 @@ pub trait MessageFieldGetter<'msg, FD, R> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-
-pub trait DynMessage {
-    fn try_get_u32_dyn<'a>(&'a self, _: &'a FieldDescriptor) -> Result<u32> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_repeated_u32_dyn_boxed<'a>(
-        &'a self,
-        _: &'a FieldDescriptor,
-    ) -> Result<Box<dyn 'a + Iterator<Item = u32>>> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_str_dyn<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a str> {
-        Err(ErrorKind::ReflectionError)?
-    }
-    fn try_get_message_dyn<'a>(&'a self, _: &'a FieldDescriptor) -> Result<&'a dyn DynMessage> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-
-pub trait MessageMut {}
