@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::Bitfield;
 use crate::tags;
 use crate::{ErrorKind, Result};
 
@@ -66,6 +67,7 @@ impl FieldDescriptor {
 pub trait StaticMessageDescriptor {
     /// Only existing field implements `StaticFieldDescriptor`
     type Fields<const NUMBER: i32>;
+    type OwnedBitfield: Bitfield;
 }
 pub trait StaticFieldDescriptor {
     const NUMBER: i32;

@@ -53,6 +53,7 @@ struct PersonStaticFieldDescriptor<const NUMBER: i32>;
 
 impl StaticMessageDescriptor for PersonStaticMessageDescriptor {
     type Fields<const NUMBER: i32> = PersonStaticFieldDescriptor<NUMBER>;
+    type OwnedBitfield = ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; 1]>;
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<1> {
     const NUMBER: i32 = 1;
@@ -74,7 +75,7 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
 }
 
 #[derive(Default)]
-pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields, 1>>(M);
+pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>>(M);
 impl<'msg, M> Person<M>
 where
     M: MessageImpl<'msg, PersonStaticMessageDescriptor>

@@ -23,56 +23,46 @@ pub mod try_opt_from_raw_field;
 pub use try_from_raw_field::TryFromRawField;
 pub use try_opt_from_raw_field::TryOptFromRawField;
 
-type BitArray<const U32_LEN: usize> =
-    ::bitvec::array::BitArray<::bitvec::order::Lsb0, [u32; U32_LEN]>;
-
 #[derive(Default)]
-pub struct OwnedMessageImpl<MD, FS, const BITFIELD_U32_LEN: usize> {
-    bitvec: BitArray<BITFIELD_U32_LEN>,
+pub struct OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+{
+    bitvec: MD::OwnedBitfield,
     fields: FS,
     _phantom: PhantomData<MD>,
 }
-impl<MD, FS, const BITFIELD_U32_LEN: usize> OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN> {
+impl<MD, FS> OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+{
     pub fn try_get_field_as<'msg, FD, R>(&'msg self) -> Result<R>
     where
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
         <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-        R: TryFromRawField<
-            'msg,
-            MD,
-            FD,
-            <FS as OwnedRawFieldGetter<FD>>::Type,
-            BitArray<BITFIELD_U32_LEN>,
-        >,
+        R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
     {
         let raw_field_ref = <FS as OwnedRawFieldGetter<FD>>::get(&self.fields);
         R::try_from_raw_field(raw_field_ref, &self.bitvec)
     }
 }
 
-impl<'msg, MD, FD, FS, R, const BITFIELD_U32_LEN: usize> MessageFieldGetter<'msg, FD, R>
-    for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
+impl<'msg, MD, FD, FS, R> MessageFieldGetter<'msg, FD, R> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-    R: TryFromRawField<
-        'msg,
-        MD,
-        FD,
-        <FS as OwnedRawFieldGetter<FD>>::Type,
-        BitArray<BITFIELD_U32_LEN>,
-    >,
+    R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
 {
     fn try_get_field(&'msg self) -> Result<R> {
         self.try_get_field_as::<FD, R>()
     }
 }
 
-impl<'msg, MD, FS, const BITFIELD_U32_LEN: usize> MessageImpl<'msg, MD>
-    for OwnedMessageImpl<MD, FS, BITFIELD_U32_LEN>
+impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
+    MD: StaticMessageDescriptor
 {
 }
 
