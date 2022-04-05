@@ -14,7 +14,7 @@
 
 use crate::internal::Bitfield;
 use crate::tags;
-use crate::{ErrorKind, Result};
+use crate::{ErrorKind, PuroroError, Result};
 
 #[derive(Debug, PartialEq)]
 pub struct MessageDescriptor {
@@ -99,5 +99,19 @@ pub enum FieldDefaultValue {
     U64(u64),
     I32(i32),
     I64(i64),
+    F32(f32),
+    F64(f64),
+    Bool(bool),
     String(&'static str),
+    Bytes(&'static [u8]),
+}
+impl TryFrom<FieldDefaultValue> for u32 {
+    type Error = PuroroError;
+    fn try_from(value: FieldDefaultValue) -> Result<Self, Self::Error> {
+        Ok(match value {
+            FieldDefaultValue::U32(v) => v,
+            FieldDefaultValue::None => Default::default(),
+            _ => Err(ErrorKind::ReflectionError)?
+        })
+    }
 }

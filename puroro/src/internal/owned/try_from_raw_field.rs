@@ -62,6 +62,7 @@ impl_trait_using_opt!(
     False,
     match FD::DEFAULT_VALUE {
         FieldDefaultValue::U32(val) => Ok(val),
+        FieldDefaultValue::None => Ok(u32::default()),
         _ => Err(ErrorKind::ReflectionError)?,
     }
 );
@@ -70,6 +71,7 @@ impl_trait_using_opt!(
     False,
     match FD::DEFAULT_VALUE {
         FieldDefaultValue::String(val) => Ok(val),
+        FieldDefaultValue::None => Ok(<&str>::default()),
         _ => Err(ErrorKind::ReflectionError)?,
     }
 );

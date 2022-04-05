@@ -17,6 +17,7 @@ pub mod fixed_bits;
 pub mod owned;
 pub mod types;
 pub mod variant;
+pub mod option;
 
 use crate::tags;
 use ::bitvec::array::BitArray;

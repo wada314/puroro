@@ -1,0 +1,55 @@
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+use crate::desc::{FieldDefaultValue, StaticFieldDescriptor};
+use crate::internal::bool::{False, True};
+use crate::message::{AsMessageImplRef, MessageFieldGetter};
+use crate::tags;
+use crate::{ErrorKind, Result};
+
+impl<'msg, FD, R, InnerM, InnerMI, LabelTag, TypeTag> MessageFieldGetter<'msg, FD, R>
+    for Option<InnerM>
+where
+    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
+    LabelTag: tags::FieldLabelTag,
+    TypeTag: tags::FieldTypeTag,
+    Self: MessageFieldGetterImpl<'msg, FD, R, LabelTag::IsRepeated, TypeTag::IsMessage>,
+{
+    fn try_get_field(&'msg self) -> Result<R> {
+        self.try_get_field_impl()
+    }
+}
+
+trait MessageFieldGetterImpl<'msg, FD, R, IsRepeated, IsMessage> {
+    fn try_get_field_impl(&'msg self) -> Result<R>;
+}
+
+impl<'msg, FD, InnerM, InnerMI> MessageFieldGetterImpl<'msg, FD, u32, False, False>
+    for Option<InnerM>
+where
+    FD: StaticFieldDescriptor,
+    InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
+    InnerMI: MessageFieldGetter<'msg, FD, R>,
+{
+    fn try_get_field_impl(&'msg self) -> Result<u32> {
+        Ok(match self {
+            Some(m) => m.as_message_impl_ref().try_get_field(),
+            None => match FD::DEFAULT_VALUE {
+                FieldDefaultValue::U32(v) => v,
+                FieldDefaultValue::None => Default::default(),
+                _ => Err(ErrorKind::ReflectionError)?,
+            },
+        })
+    }
+}
