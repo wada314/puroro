@@ -71,7 +71,7 @@ pub trait StaticMessageDescriptor {
 }
 pub trait StaticFieldDescriptor {
     const NUMBER: i32;
-    const DEFAULT_VALUE: FieldDefaultValue;
+    const DEFAULT_VALUE: Option<FieldDefaultValue>;
     const OWNED_HASFIELD_BITFIELD_INDEX: Option<usize>;
     type FieldLabelTag: tags::FieldLabelTag;
     type FieldTypeTag: tags::FieldTypeTag;
@@ -94,7 +94,6 @@ pub enum FieldLabelEnum {
 
 #[derive(Debug, PartialEq)]
 pub enum FieldDefaultValue {
-    None,
     U32(u32),
     U64(u64),
     I32(i32),
@@ -112,7 +111,6 @@ macro_rules! impl_try_from {
             fn try_from(value: FieldDefaultValue) -> ::std::result::Result<Self, Self::Error> {
                 Ok(match value {
                     FieldDefaultValue::$enum_value(v) => v,
-                    FieldDefaultValue::None => Default::default(),
                     _ => Err(ErrorKind::ReflectionError)?,
                 })
             }

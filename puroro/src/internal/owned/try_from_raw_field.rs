@@ -42,7 +42,7 @@ where
 }
 
 macro_rules! impl_trait_using_opt {
-    ($into:ty, $is_message:ty, $default:expr) => {
+    ($into:ty, $is_message:ty) => {
         impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, $is_message> for $into
         where
             FD: StaticFieldDescriptor,
@@ -51,30 +51,16 @@ macro_rules! impl_trait_using_opt {
             fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
                 match Self::try_opt_from_raw_field(field, bitfield)? {
                     Some(val) => Ok(val),
-                    None => $default,
+                    None => FD::DEFAULT_VALUE
+                        .map(|d| TryInto::try_into(d))
+                        .unwrap_or(Ok(Default::default())),
                 }
             }
         }
     };
 }
-impl_trait_using_opt!(
-    u32,
-    False,
-    match FD::DEFAULT_VALUE {
-        FieldDefaultValue::U32(val) => Ok(val),
-        FieldDefaultValue::None => Ok(u32::default()),
-        _ => Err(ErrorKind::ReflectionError)?,
-    }
-);
-impl_trait_using_opt!(
-    &'f str,
-    False,
-    match FD::DEFAULT_VALUE {
-        FieldDefaultValue::String(val) => Ok(val),
-        FieldDefaultValue::None => Ok(<&str>::default()),
-        _ => Err(ErrorKind::ReflectionError)?,
-    }
-);
+impl_trait_using_opt!(u32, False);
+impl_trait_using_opt!(&'f str, False);
 
 impl<'f, MD, FD, F, B, M> TryFromRawFieldImpl<'f, MD, FD, F, B, False, True> for &'f M
 where

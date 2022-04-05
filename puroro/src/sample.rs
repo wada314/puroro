@@ -57,21 +57,21 @@ impl StaticMessageDescriptor for PersonStaticMessageDescriptor {
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<1> {
     const NUMBER: i32 = 1;
-    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::String("John Doe");
+    const DEFAULT_VALUE: Option<FieldDefaultValue> = Some(FieldDefaultValue::String("John Doe"));
     const OWNED_HASFIELD_BITFIELD_INDEX: Option<usize> = Some(0);
     type FieldLabelTag = tags::Optional;
     type FieldTypeTag = tags::String;
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<2> {
     const NUMBER: i32 = 2;
-    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::U32(14);
+    const DEFAULT_VALUE: Option<FieldDefaultValue> = Some(FieldDefaultValue::U32(14));
     const OWNED_HASFIELD_BITFIELD_INDEX: Option<usize> = Some(1);
     type FieldLabelTag = tags::Optional;
     type FieldTypeTag = tags::UInt32;
 }
 impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
     const NUMBER: i32 = 4;
-    const DEFAULT_VALUE: FieldDefaultValue = FieldDefaultValue::None;
+    const DEFAULT_VALUE: Option<FieldDefaultValue> = None;
     const OWNED_HASFIELD_BITFIELD_INDEX: Option<usize> = None;
     type FieldLabelTag = tags::Optional;
     type FieldTypeTag = tags::Message<PersonStaticMessageDescriptor>;

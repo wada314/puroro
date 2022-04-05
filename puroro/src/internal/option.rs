@@ -18,8 +18,7 @@ use crate::message::{AsMessageImplRef, MessageFieldGetter};
 use crate::tags;
 use crate::{ErrorKind, Result};
 
-impl<'msg, FD, R, InnerM, InnerMI, LabelTag, TypeTag> MessageFieldGetter<'msg, FD, R>
-    for Option<InnerM>
+impl<'msg, FD, R, InnerM, LabelTag, TypeTag> MessageFieldGetter<'msg, FD, R> for Option<InnerM>
 where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
     LabelTag: tags::FieldLabelTag,
@@ -40,16 +39,14 @@ impl<'msg, FD, InnerM, InnerMI> MessageFieldGetterImpl<'msg, FD, u32, False, Fal
 where
     FD: StaticFieldDescriptor,
     InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
-    InnerMI: MessageFieldGetter<'msg, FD, R>,
+    InnerMI: 'msg + MessageFieldGetter<'msg, FD, u32>,
 {
     fn try_get_field_impl(&'msg self) -> Result<u32> {
         Ok(match self {
-            Some(m) => m.as_message_impl_ref().try_get_field(),
-            None => match FD::DEFAULT_VALUE {
-                FieldDefaultValue::U32(v) => v,
-                FieldDefaultValue::None => Default::default(),
-                _ => Err(ErrorKind::ReflectionError)?,
-            },
+            Some(m) => m.as_message_impl_ref().try_get_field()?,
+            None => FD::DEFAULT_VALUE
+                .map(|d| <u32 as TryFrom<_>>::try_from(d))
+                .unwrap_or(Ok(Default::default()))?,
         })
     }
 }
