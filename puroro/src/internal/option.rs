@@ -64,3 +64,18 @@ delegate_message_field_getter!(f64);
 delegate_message_field_getter!(bool);
 delegate_message_field_getter!(&'msg str);
 delegate_message_field_getter!(&'msg [u8]);
+
+impl<'msg, FD, InnerM, InnerMI, M> MessageFieldGetterImpl<'msg, FD, Option<&'msg M>, False, True>
+    for Option<InnerM>
+where
+    FD: StaticFieldDescriptor,
+    InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
+    InnerMI: 'msg + MessageFieldGetter<'msg, FD, &'msg M>,
+{
+    fn try_get_field_impl(&'msg self) -> Result<Option<&'msg M>> {
+        Ok(self
+            .as_ref()
+            .map(|inner_m| inner_m.as_message_impl_ref().try_get_field())
+            .transpose()?)
+    }
+}
