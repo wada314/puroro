@@ -14,12 +14,11 @@
 
 pub mod bool;
 pub mod fixed_bits;
+pub mod option;
 pub mod owned;
 pub mod types;
 pub mod variant;
-pub mod option;
 
-use crate::tags;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
@@ -55,39 +54,4 @@ impl<Base: Bitfield, const INDEX: usize> Bitfield for FlipBitOn<Base, INDEX> {
     fn set(&mut self, _: usize, _: bool) {
         unimplemented!()
     }
-}
-
-pub trait MessageProperties {
-    const BITFIELD_OPTIONAL_FIELD_COUNT: usize;
-    type Fields<const NUMBER: i32>;
-}
-pub trait FieldProperties {
-    type LabelTag: tags::FieldLabelTag;
-    type TypeTag: tags::FieldTypeTag;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-}
-
-pub trait ImplProperties {
-    type ImplTag;
-    type FieldsType;
-    type SharedType;
-}
-
-pub trait GetField<const NUMBER: i32> {
-    type Type;
-    fn get_field(&self) -> &Self::Type;
-}
-pub trait GetFieldMut<const NUMBER: i32>: GetField<NUMBER> {
-    fn get_field_mut(&mut self) -> &mut <Self as GetField<NUMBER>>::Type;
-}
-
-pub trait SharedBitfield {
-    type BitfieldType: Bitfield;
-    fn bitfield(&self) -> &Self::BitfieldType;
-    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
-}
-pub trait SharedAllocator {
-    type AllocatorType;
-    fn alloc(&self) -> &Self::AllocatorType;
 }

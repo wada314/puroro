@@ -27,11 +27,22 @@ pub trait MessageImpl<'msg, MD> {
     {
         self.try_get_field()
     }
+    fn try_get_msg<FD, M>(&'msg self) -> Result<M>
+    where
+        Self: MessageFieldGetter<'msg, FD, M>,
+    {
+        self.try_get_field()
+    }
+
+    type MessageImplForField<FD>;
 }
 pub trait MessageFieldGetter<'msg, FD, R> {
     fn try_get_field(&'msg self) -> Result<R> {
         Err(ErrorKind::ReflectionError)?
     }
+}
+pub trait GetMessageImplForField<FD> {
+    type Type;
 }
 
 pub trait AsMessageRef {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::message::{MessageFieldGetter, MessageImpl};
+use crate::message::{GetMessageImplForField, MessageFieldGetter, MessageImpl};
 use crate::Result;
 use ::std::marker::PhantomData;
 
@@ -61,9 +61,18 @@ where
     }
 }
 
-impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
-    MD: StaticMessageDescriptor
+impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
 {
+    type MessageImplForField<FD> = GetOwnedMessageImplForField<FD>;
+}
+
+pub struct GetOwnedMessageImplForField<FD>(PhantomData<FD>);
+impl<FD> GetMessageImplForField<FD> for GetOwnedMessageImplForField<FD> 
+where FD: StaticFieldDescriptor
+{
+    type Type = ;
 }
 
 pub trait OwnedRawFieldGetter<FD> {
