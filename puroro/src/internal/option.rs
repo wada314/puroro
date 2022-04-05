@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::{FieldDefaultValue, StaticFieldDescriptor};
+use crate::desc::StaticFieldDescriptor;
 use crate::internal::bool::{False, True};
 use crate::message::{AsMessageImplRef, MessageFieldGetter};
 use crate::tags;
-use crate::{ErrorKind, Result};
+use crate::Result;
 
 impl<'msg, FD, R, InnerM, LabelTag, TypeTag> MessageFieldGetter<'msg, FD, R> for Option<InnerM>
 where
@@ -34,19 +34,33 @@ trait MessageFieldGetterImpl<'msg, FD, R, IsRepeated, IsMessage> {
     fn try_get_field_impl(&'msg self) -> Result<R>;
 }
 
-impl<'msg, FD, InnerM, InnerMI> MessageFieldGetterImpl<'msg, FD, u32, False, False>
-    for Option<InnerM>
-where
-    FD: StaticFieldDescriptor,
-    InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
-    InnerMI: 'msg + MessageFieldGetter<'msg, FD, u32>,
-{
-    fn try_get_field_impl(&'msg self) -> Result<u32> {
-        Ok(match self {
-            Some(m) => m.as_message_impl_ref().try_get_field()?,
-            None => FD::DEFAULT_VALUE
-                .map(|d| <u32 as TryFrom<_>>::try_from(d))
-                .unwrap_or(Ok(Default::default()))?,
-        })
-    }
+macro_rules! delegate_message_field_getter {
+    ($ty:ty) => {
+        impl<'msg, FD, InnerM, InnerMI> MessageFieldGetterImpl<'msg, FD, $ty, False, False>
+            for Option<InnerM>
+        where
+            FD: StaticFieldDescriptor,
+            InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
+            InnerMI: 'msg + MessageFieldGetter<'msg, FD, $ty>,
+        {
+            fn try_get_field_impl(&'msg self) -> Result<$ty> {
+                Ok(match self {
+                    Some(m) => m.as_message_impl_ref().try_get_field()?,
+                    None => FD::DEFAULT_VALUE
+                        .map(|d| TryFrom::try_from(d))
+                        .unwrap_or(Ok(Default::default()))?,
+                })
+            }
+        }
+    };
 }
+
+delegate_message_field_getter!(u32);
+delegate_message_field_getter!(u64);
+delegate_message_field_getter!(i32);
+delegate_message_field_getter!(i64);
+delegate_message_field_getter!(f32);
+delegate_message_field_getter!(f64);
+delegate_message_field_getter!(bool);
+delegate_message_field_getter!(&'msg str);
+delegate_message_field_getter!(&'msg [u8]);
