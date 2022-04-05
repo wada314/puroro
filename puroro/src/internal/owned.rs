@@ -68,7 +68,10 @@ where
     }
 }
 
-impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> {}
+impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
+    MD: StaticMessageDescriptor
+{
+}
 
 pub trait OwnedRawFieldGetter<FD> {
     type Type;
