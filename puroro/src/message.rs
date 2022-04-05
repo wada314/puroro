@@ -17,28 +17,28 @@ use crate::{ErrorKind, Result};
 pub trait MessageImpl<'msg, MD> {
     fn try_get_u32<FD>(&'msg self) -> Result<u32>
     where
-        Self: MessageFieldGetter<'msg, FD, u32>,
+        Self: MessageScalarFieldGetter<'msg, FD, ReturnType = u32>,
     {
         self.try_get_field()
     }
     fn try_get_str<FD>(&'msg self) -> Result<&str>
     where
-        Self: MessageFieldGetter<'msg, FD, &'msg str>,
+        Self: MessageScalarFieldGetter<'msg, FD, ReturnType = &'msg str>,
     {
         self.try_get_field()
     }
     fn try_get_msg<FD, M>(&'msg self) -> Result<M>
     where
-        Self: MessageFieldGetter<'msg, FD, M>,
+        Self: MessageScalarFieldGetter<'msg, FD, ReturnType = M>,
     {
         self.try_get_field()
     }
 }
-pub trait MessageFieldGetter<'msg, FD, R> {
-    fn try_get_field(&'msg self) -> Result<R> {
+pub trait MessageScalarFieldGetter<'msg, FD> {
+    type ReturnType;
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
         Err(ErrorKind::ReflectionError)?
     }
-    type MessageImplForField;
 }
 pub trait GetMessageImplForField<FD> {
     type Type;

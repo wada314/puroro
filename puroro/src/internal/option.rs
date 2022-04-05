@@ -14,35 +14,45 @@
 
 use crate::desc::StaticFieldDescriptor;
 use crate::internal::bool::{False, True};
-use crate::message::{AsMessageImplRef, MessageFieldGetter};
+use crate::message::{AsMessageImplRef, MessageScalarFieldGetter};
 use crate::tags;
 use crate::Result;
 
-impl<'msg, FD, R, InnerM, LabelTag, TypeTag> MessageFieldGetter<'msg, FD, R> for Option<InnerM>
+impl<'msg, FD, InnerM, LabelTag, TypeTag, ReturnType> MessageScalarFieldGetter<'msg, FD>
+    for Option<InnerM>
 where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
     LabelTag: tags::FieldLabelTag,
     TypeTag: tags::FieldTypeTag,
-    Self: MessageFieldGetterImpl<'msg, FD, R, LabelTag::IsRepeated, TypeTag::IsMessage>,
+    Self: MessageFieldGetterImpl<
+        'msg,
+        FD,
+        LabelTag::IsRepeated,
+        TypeTag::IsMessage,
+        ReturnTypeImpl = ReturnType,
+    >,
 {
-    fn try_get_field(&'msg self) -> Result<R> {
+    type ReturnType = ReturnType;
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
         self.try_get_field_impl()
     }
 }
 
-trait MessageFieldGetterImpl<'msg, FD, R, IsRepeated, IsMessage> {
-    fn try_get_field_impl(&'msg self) -> Result<R>;
+trait MessageFieldGetterImpl<'msg, FD, IsRepeated, IsMessage> {
+    type ReturnTypeImpl;
+    fn try_get_field_impl(&'msg self) -> Result<Self::ReturnTypeImpl>;
 }
 
 macro_rules! delegate_message_field_getter {
     ($ty:ty) => {
-        impl<'msg, FD, InnerM, InnerMI> MessageFieldGetterImpl<'msg, FD, $ty, False, False>
+        impl<'msg, FD, InnerM, InnerMI> MessageFieldGetterImpl<'msg, FD, False, False>
             for Option<InnerM>
         where
             FD: StaticFieldDescriptor,
             InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
-            InnerMI: 'msg + MessageFieldGetter<'msg, FD, $ty>,
+            InnerMI: 'msg + MessageScalarFieldGetter<'msg, FD, ReturnType = $ty>,
         {
+            type ReturnTypeImpl = $ty;
             fn try_get_field_impl(&'msg self) -> Result<$ty> {
                 Ok(match self {
                     Some(m) => m.as_message_impl_ref().try_get_field()?,
@@ -65,13 +75,13 @@ delegate_message_field_getter!(bool);
 delegate_message_field_getter!(&'msg str);
 delegate_message_field_getter!(&'msg [u8]);
 
-impl<'msg, FD, InnerM, InnerMI, M> MessageFieldGetterImpl<'msg, FD, Option<&'msg M>, False, True>
-    for Option<InnerM>
+impl<'msg, FD, InnerM, InnerMI, M> MessageFieldGetterImpl<'msg, FD, False, True> for Option<InnerM>
 where
     FD: StaticFieldDescriptor,
     InnerM: AsMessageImplRef<MessageImplType = InnerMI>,
-    InnerMI: 'msg + MessageFieldGetter<'msg, FD, &'msg M>,
+    InnerMI: 'msg + MessageScalarFieldGetter<'msg, FD, ReturnType = &'msg M>,
 {
+    type ReturnTypeImpl = Option<&'msg M>;
     fn try_get_field_impl(&'msg self) -> Result<Option<&'msg M>> {
         Ok(self
             .as_ref()

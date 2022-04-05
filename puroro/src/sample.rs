@@ -16,7 +16,7 @@
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
-use crate::message::{AsMessageImplRef, AsMessageRef, MessageFieldGetter, MessageImpl};
+use crate::message::{AsMessageImplRef, AsMessageRef, MessageImpl, MessageScalarFieldGetter};
 use crate::tags;
 
 /// assume a proto like this as input:
@@ -89,13 +89,9 @@ pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwne
 impl<'msg, M> Person<M>
 where
     M: MessageImpl<'msg, PersonStaticMessageDescriptor>
-        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<1>, &'msg str>
-        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<2>, u32>
-        + MessageFieldGetter<
-            'msg,
-            PersonStaticFieldDescriptor<4>,
-            Person<Option<&'msg PersonOwnedRawFields /* NO */>>,
-        >,
+        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<1>, ReturnType = &'msg str>
+        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, ReturnType = u32>
+        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
 {
     pub fn name(&'msg self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
@@ -109,7 +105,10 @@ where
         >(&self.0)
         .unwrap()
     }
-    pub fn partner(&'msg self) -> Person<Option<&'msg PersonOwnedRawFields /* NO */>> {
+    pub fn partner(
+        &'msg self,
+    ) -> Person<<M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::ReturnType>
+    {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
             PersonStaticFieldDescriptor<4>,
             _,

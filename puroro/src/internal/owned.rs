@@ -14,7 +14,7 @@
 
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::bool::{False, True};
-use crate::message::{GetMessageImplForField, MessageFieldGetter, MessageImpl};
+use crate::message::{GetMessageImplForField, MessageImpl, MessageScalarFieldGetter};
 use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;
@@ -38,7 +38,7 @@ impl<MD, FS> OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
 {
-    pub fn try_get_owned_field<'msg, FD, R>(&'msg self) -> Result<R>
+    pub fn try_get_owned_scalar_field<'msg, FD, R>(&'msg self) -> Result<R>
     where
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
@@ -50,7 +50,7 @@ where
     }
 }
 
-impl<'msg, MD, FD, FS, R, TypeTag, LabelTag, IsRepeated, IsMessage> MessageFieldGetter<'msg, FD, R>
+impl<'msg, MD, FD, FS, TypeTag, LabelTag, IsRepeated, IsMessage> MessageScalarFieldGetter<'msg, FD>
     for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
@@ -59,12 +59,13 @@ where
     TypeTag: tags::FieldTypeTag<IsMessage = IsMessage>,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
-    R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
+    TypeTag::NonMessageScalarGetterType<'msg>:
+        TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
 {
-    fn try_get_field(&'msg self) -> Result<R> {
-        self.try_get_owned_field::<FD, R>()
+    type ReturnType = TypeTag::NonMessageScalarGetterType<'msg>;
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
+        self.try_get_owned_scalar_field::<FD, Self::ReturnType>()
     }
-    type MessageImplForField = <FS as OwnedRawFieldGetter<FD>>::Type;
 }
 
 impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> {}

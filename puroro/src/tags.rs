@@ -23,6 +23,7 @@ pub trait FieldTypeTag {
     type DefaultValueType;
     type IsLd;
     type IsMessage;
+    type NonMessageScalarGetterType<'a>;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -103,91 +104,109 @@ impl FieldTypeTag for Int32 {
     type DefaultValueType = i32;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = i32;
 }
 impl FieldTypeTag for Int64 {
     type DefaultValueType = i64;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = i64;
 }
 impl FieldTypeTag for UInt32 {
     type DefaultValueType = u32;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = u32;
 }
 impl FieldTypeTag for UInt64 {
     type DefaultValueType = u64;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = u64;
 }
 impl FieldTypeTag for SInt32 {
     type DefaultValueType = i32;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = i32;
 }
 impl FieldTypeTag for SInt64 {
     type DefaultValueType = i64;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = i64;
 }
 impl FieldTypeTag for Bool {
     type DefaultValueType = bool;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = bool;
 }
 impl FieldTypeTag for Bytes {
     type DefaultValueType = &'static [u8];
     type IsLd = True;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = &'a [u8];
 }
 impl FieldTypeTag for String {
     type DefaultValueType = &'static str;
     type IsLd = True;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = &'a str;
 }
 impl<E> FieldTypeTag for Enum2<E> {
     type DefaultValueType = E;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = E;
 }
 impl<E> FieldTypeTag for Enum3<E> {
     type DefaultValueType = E;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = E;
 }
 impl<M> FieldTypeTag for Message<M> {
     type DefaultValueType = (); // Never be instanciated
     type IsLd = True;
     type IsMessage = True;
+    type NonMessageScalarGetterType<'a> = (); // Never be instanciated
 }
 impl FieldTypeTag for Float {
     type DefaultValueType = f32;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = f32;
 }
 impl FieldTypeTag for Double {
     type DefaultValueType = f64;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = f64;
 }
 impl FieldTypeTag for Fixed32 {
     type DefaultValueType = u32;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = u32;
 }
 impl FieldTypeTag for Fixed64 {
     type DefaultValueType = u64;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = u64;
 }
 impl FieldTypeTag for SFixed32 {
     type DefaultValueType = i32;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = i32;
 }
 impl FieldTypeTag for SFixed64 {
     type DefaultValueType = i64;
     type IsLd = False;
     type IsMessage = False;
+    type NonMessageScalarGetterType<'a> = i64;
 }
 
 impl NumericalTypeTag for Int32 {
