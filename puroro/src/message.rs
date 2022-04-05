@@ -33,13 +33,12 @@ pub trait MessageImpl<'msg, MD> {
     {
         self.try_get_field()
     }
-
-    type MessageImplForField<FD>;
 }
 pub trait MessageFieldGetter<'msg, FD, R> {
     fn try_get_field(&'msg self) -> Result<R> {
         Err(ErrorKind::ReflectionError)?
     }
+    type MessageImplForField;
 }
 pub trait GetMessageImplForField<FD> {
     type Type;

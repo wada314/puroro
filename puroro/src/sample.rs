@@ -33,6 +33,7 @@ use crate::tags;
 struct PersonOwnedRawFields {
     name: String,
     age: u32,
+    partner: Option<Box<Person>>,
 }
 impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<1>> for PersonOwnedRawFields {
     type Type = String;
@@ -44,6 +45,12 @@ impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<2>> for PersonOwnedRawField
     type Type = u32;
     fn get(&self) -> &Self::Type {
         &self.age
+    }
+}
+impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {
+    type Type = Option<Box<Person>>;
+    fn get(&self) -> &Self::Type {
+        &self.partner
     }
 }
 
@@ -83,7 +90,12 @@ impl<'msg, M> Person<M>
 where
     M: MessageImpl<'msg, PersonStaticMessageDescriptor>
         + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<1>, &'msg str>
-        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<2>, u32>,
+        + MessageFieldGetter<'msg, PersonStaticFieldDescriptor<2>, u32>
+        + MessageFieldGetter<
+            'msg,
+            PersonStaticFieldDescriptor<4>,
+            Person<Option<&'msg PersonOwnedRawFields /* NO */>>,
+        >,
 {
     pub fn name(&'msg self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
@@ -94,6 +106,13 @@ where
     pub fn age(&'msg self) -> u32 {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
             PersonStaticFieldDescriptor<2>,
+        >(&self.0)
+        .unwrap()
+    }
+    pub fn partner(&'msg self) -> Person<Option<&'msg PersonOwnedRawFields /* NO */>> {
+        <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
+            PersonStaticFieldDescriptor<4>,
+            _,
         >(&self.0)
         .unwrap()
     }

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
+use crate::internal::bool::{False, True};
 use crate::message::{GetMessageImplForField, MessageFieldGetter, MessageImpl};
+use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;
 
@@ -48,10 +50,13 @@ where
     }
 }
 
-impl<'msg, MD, FD, FS, R> MessageFieldGetter<'msg, FD, R> for OwnedMessageImpl<MD, FS>
+impl<'msg, MD, FD, FS, R, TypeTag, LabelTag, IsRepeated, IsMessage> MessageFieldGetter<'msg, FD, R>
+    for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
-    FD: StaticFieldDescriptor,
+    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
+    LabelTag: tags::FieldLabelTag<IsRepeated = IsRepeated>,
+    TypeTag: tags::FieldTypeTag<IsMessage = IsMessage>,
     FS: OwnedRawFieldGetter<FD>,
     <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
     R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
@@ -59,21 +64,10 @@ where
     fn try_get_field(&'msg self) -> Result<R> {
         self.try_get_owned_field::<FD, R>()
     }
+    type MessageImplForField = <FS as OwnedRawFieldGetter<FD>>::Type;
 }
 
-impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS>
-where
-    MD: StaticMessageDescriptor,
-{
-    type MessageImplForField<FD> = GetOwnedMessageImplForField<FD>;
-}
-
-pub struct GetOwnedMessageImplForField<FD>(PhantomData<FD>);
-impl<FD> GetMessageImplForField<FD> for GetOwnedMessageImplForField<FD> 
-where FD: StaticFieldDescriptor
-{
-    type Type = ;
-}
+impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> {}
 
 pub trait OwnedRawFieldGetter<FD> {
     type Type;
