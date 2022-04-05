@@ -105,13 +105,27 @@ pub enum FieldDefaultValue {
     String(&'static str),
     Bytes(&'static [u8]),
 }
-impl TryFrom<FieldDefaultValue> for u32 {
-    type Error = PuroroError;
-    fn try_from(value: FieldDefaultValue) -> Result<Self, Self::Error> {
-        Ok(match value {
-            FieldDefaultValue::U32(v) => v,
-            FieldDefaultValue::None => Default::default(),
-            _ => Err(ErrorKind::ReflectionError)?
-        })
-    }
+macro_rules! impl_try_from {
+    ($ty:ty, $enum_value:ident) => {
+        impl TryFrom<FieldDefaultValue> for $ty {
+            type Error = PuroroError;
+            fn try_from(value: FieldDefaultValue) -> ::std::result::Result<Self, Self::Error> {
+                Ok(match value {
+                    FieldDefaultValue::$enum_value(v) => v,
+                    FieldDefaultValue::None => Default::default(),
+                    _ => Err(ErrorKind::ReflectionError)?,
+                })
+            }
+        }
+    };
 }
+
+impl_try_from!(u32, U32);
+impl_try_from!(u64, U64);
+impl_try_from!(i32, I32);
+impl_try_from!(i64, I64);
+impl_try_from!(f32, F32);
+impl_try_from!(f64, F64);
+impl_try_from!(bool, Bool);
+impl_try_from!(&'static str, String);
+impl_try_from!(&'static [u8], Bytes);
