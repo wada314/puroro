@@ -36,7 +36,7 @@ impl<MD, FS> OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
 {
-    pub fn try_get_field_as<'msg, FD, R>(&'msg self) -> Result<R>
+    pub fn try_get_owned_field<'msg, FD, R>(&'msg self) -> Result<R>
     where
         FD: StaticFieldDescriptor,
         FS: OwnedRawFieldGetter<FD>,
@@ -57,7 +57,7 @@ where
     R: TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
 {
     fn try_get_field(&'msg self) -> Result<R> {
-        self.try_get_field_as::<FD, R>()
+        self.try_get_owned_field::<FD, R>()
     }
 }
 
