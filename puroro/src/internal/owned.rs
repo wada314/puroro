@@ -50,8 +50,27 @@ where
     }
 }
 
-impl<'msg, MD, FD, FS, TypeTag, LabelTag, IsRepeated, IsMessage> MessageScalarFieldGetter<'msg, FD>
+impl<'msg, MD, FD, FS, LabelTag, TypeTag, IsMessage, ReturnType> MessageScalarFieldGetter<'msg, FD>
     for OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag<IsMessage = IsMessage>,
+    Self: MessageScalarFieldGetterImpl<'msg, FD, TypeTag, IsMessage, ReturnTypeImpl = ReturnType>,
+{
+    type ReturnType = ReturnType;
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
+        self.try_get_field_impl()
+    }
+}
+
+pub trait MessageScalarFieldGetterImpl<'msg, FD, TypeTag, IsMessage> {
+    type ReturnTypeImpl;
+    fn try_get_field_impl(&'msg self) -> Result<Self::ReturnTypeImpl>;
+}
+
+impl<'msg, MD, FD, FS, LabelTag, TypeTag, IsRepeated, IsMessage>
+    MessageScalarFieldGetterImpl<'msg, FD, TypeTag, False> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
@@ -62,9 +81,9 @@ where
     TypeTag::NonMessageScalarGetterType<'msg>:
         TryFromRawField<'msg, MD, FD, <FS as OwnedRawFieldGetter<FD>>::Type, MD::OwnedBitfield>,
 {
-    type ReturnType = TypeTag::NonMessageScalarGetterType<'msg>;
-    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
-        self.try_get_owned_scalar_field::<FD, Self::ReturnType>()
+    type ReturnTypeImpl = TypeTag::NonMessageScalarGetterType<'msg>;
+    fn try_get_field_impl(&'msg self) -> Result<Self::ReturnTypeImpl> {
+        self.try_get_owned_scalar_field::<FD, Self::ReturnTypeImpl>()
     }
 }
 
