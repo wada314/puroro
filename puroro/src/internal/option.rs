@@ -81,11 +81,11 @@ impl<'msg, FD, FieldMD, OptM, OptMI, FieldM> MessageFieldGetterImpl<'msg, FD, Fi
 where
     FD: StaticFieldDescriptor,
     OptM: AsMessageImplRef<MessageImplType = OptMI>,
-    OptMI: MessageScalarFieldGetter<'msg, FD, ReturnType = FieldM>,
+    OptMI: 'msg + MessageScalarFieldGetter<'msg, FD, ReturnType = FieldM>,
     FieldM: 'msg,
 {
-    type ReturnTypeImpl = Option<&'msg FieldM>;
-    fn try_get_field_impl(&'msg self) -> Result<Option<&'msg FieldM>> {
+    type ReturnTypeImpl = Option<FieldM>;
+    fn try_get_field_impl(&'msg self) -> Result<Option<FieldM>> {
         Ok(self
             .as_ref()
             .map(|inner_m| inner_m.as_message_impl_ref().try_get_field())

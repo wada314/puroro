@@ -109,11 +109,13 @@ where
         &'msg self,
     ) -> Person<<M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::ReturnType>
     {
-        <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
-            PersonStaticFieldDescriptor<4>,
-            _,
-        >(&self.0)
-        .unwrap()
+        Person(
+            <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
+                PersonStaticFieldDescriptor<4>,
+                _,
+            >(&self.0)
+            .unwrap(),
+        )
     }
 }
 
