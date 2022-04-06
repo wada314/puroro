@@ -42,6 +42,7 @@ where
     }
 }
 
+// TryOptFromRawFieldImpl for non-message types
 macro_rules! impl_trait {
     ($into:ty, $from:ty, $is_repeated:ty, $is_message:ty
         $(, |$field_name:ident, $bitfield_name:ident| $expr:expr)?
@@ -79,6 +80,7 @@ impl_trait!(&'f str, String, False, False, |f, b| {
     )
 });
 
+// TryOptFromRawFieldImpl for message type
 impl<'f, MD, FD, M, B> TryOptFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True>
     for &'f M
 {

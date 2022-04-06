@@ -87,16 +87,18 @@ where
     }
 }
 
-impl<'msg, MD, FD, FS, InnerMD, LabelTag, IsRepeated>
-    MessageScalarFieldGetterImpl<'msg, FD, tags::Message<InnerMD>, True> for OwnedMessageImpl<MD, FS>
+impl<'msg, MD, FD, FS, InnerMD, InnerM, LabelTag, IsRepeated>
+    MessageScalarFieldGetterImpl<'msg, FD, tags::Message<InnerMD>, True>
+    for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = tags::Message<InnerMD>>,
     LabelTag: tags::FieldLabelTag<IsRepeated = IsRepeated>,
-    FS: OwnedRawFieldGetter<FD>,
-    <FS as OwnedRawFieldGetter<FD>>::Type: 'msg,
+    FS: OwnedRawFieldGetter<FD, Type = Option<Box<InnerM>>>,
+    InnerM: 'msg,
+    &'msg InnerM: TryFromRawField<'msg, MD, FD, Option<Box<InnerM>>, MD::OwnedBitfield>,
 {
-    type ReturnTypeImpl = FS::Type;
+    type ReturnTypeImpl = &'msg InnerM;
     fn try_get_field_impl(&'msg self) -> Result<Self::ReturnTypeImpl> {
         self.try_get_owned_scalar_field::<FD, Self::ReturnTypeImpl>()
     }
