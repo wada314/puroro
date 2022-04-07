@@ -52,23 +52,15 @@ where
     B: Bitfield,
 {
     fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
-        let convert_val: u32 = field
+        let val: u32 = field
             .clone()
             .try_into()
             .map_err(|e| Into::<ErrorKind>::into(e))?;
         Ok(
             if let Some(has_field_bit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
-                if bitfield.get(has_field_bit_index) {
-                    Some(convert_val)
-                } else {
-                    None
-                }
+                bitfield.get(has_field_bit_index).then(|| val)
             } else {
-                if convert_val == u32::default() {
-                    None
-                } else {
-                    Some(convert_val)
-                }
+                (val != u32::default()).then(|| val)
             },
         )
     }
@@ -81,20 +73,12 @@ where
     B: Bitfield,
 {
     fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
-        let convert_val: &str = field.as_ref();
+        let s: &str = field.as_ref();
         Ok(
             if let Some(has_field_bit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
-                if bitfield.get(has_field_bit_index) {
-                    Some(convert_val)
-                } else {
-                    None
-                }
+                bitfield.get(has_field_bit_index).then(|| s)
             } else {
-                if convert_val.is_empty() {
-                    None
-                } else {
-                    Some(convert_val)
-                }
+                (!s.is_empty()).then(|| s)
             },
         )
     }
