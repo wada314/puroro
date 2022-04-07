@@ -40,6 +40,8 @@ pub enum ErrorKind {
     ReflectionError,
     #[error("The formatter returned an error: {0}")]
     FormatterError(#[from] std::fmt::Error),
+    #[error("Library error: Infallible error should not actually be instanciated")]
+    InfallibleError(#[from] std::convert::Infallible),
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }

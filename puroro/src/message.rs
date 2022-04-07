@@ -38,13 +38,11 @@ pub trait MessageImpl<'msg, MD> {
         self.try_get_field()
     }
 }
-pub trait MessageScalarFieldGetter<'msg, FD>
-where
-    FD: StaticFieldDescriptor,
-{
+pub trait MessageScalarFieldGetter<'msg, FD> {
     type ReturnType;
     fn try_get_field(&'msg self) -> Result<Self::ReturnType>
     where
+        FD: StaticFieldDescriptor,
         FieldDefaultValue: TryInto<Self::ReturnType, Error = PuroroError>,
     {
         Ok(if let Some(v) = self.try_get_opt_field()? {

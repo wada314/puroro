@@ -18,24 +18,14 @@ use crate::message::{AsMessageImplRef, MessageScalarFieldGetter};
 use crate::tags;
 use crate::Result;
 
-impl<'msg, FD, InnerM, LabelTag, TypeTag, ReturnType> MessageScalarFieldGetter<'msg, FD>
-    for Option<InnerM>
+impl<'msg, FD, InnerM, ReturnType> MessageScalarFieldGetter<'msg, FD> for Option<InnerM>
 where
-    FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
-    LabelTag: tags::FieldLabelTag,
-    TypeTag: tags::FieldTypeTag,
-    Self: MessageFieldGetterImpl<
-        'msg,
-        FD,
-        TypeTag,
-        LabelTag::IsRepeated,
-        TypeTag::IsMessage,
-        ReturnTypeImpl = ReturnType,
-    >,
+    FD: StaticFieldDescriptor,
+    InnerM: MessageScalarFieldGetter<'msg, FD, ReturnType = ReturnType>,
 {
     type ReturnType = ReturnType;
-    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
-        self.try_get_field_impl()
+    fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
+        Ok(self.map(|m| m.try_get_field()).transpose()?)
     }
 }
 
