@@ -14,7 +14,7 @@
 
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::bool::{False, True};
-use crate::message::{GetMessageImplForField, MessageImpl, MessageScalarFieldGetter};
+use crate::message::MessageImpl;
 use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;

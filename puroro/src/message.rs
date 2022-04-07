@@ -14,6 +14,9 @@
 
 use crate::{ErrorKind, Result};
 
+mod as_ref;
+pub use as_ref::{AsMessageImplRef, AsMessageRef};
+
 pub trait MessageImpl<'msg, MD> {
     fn try_get_u32<FD>(&'msg self) -> Result<u32>
     where
@@ -44,27 +47,5 @@ pub trait MessageOptionFieldGetter<'msg, FD> {
     type ReturnType;
     fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
         Err(ErrorKind::ReflectionError)?
-    }
-}
-
-pub trait AsMessageRef {
-    type MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType;
-}
-pub trait AsMessageImplRef {
-    type MessageImplType;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType;
-}
-
-impl<T: AsMessageRef> AsMessageRef for &T {
-    type MessageType = T::MessageType;
-    fn as_message_ref(&self) -> &Self::MessageType {
-        T::as_message_ref(self)
-    }
-}
-impl<T: AsMessageImplRef> AsMessageImplRef for &T {
-    type MessageImplType = T::MessageImplType;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        T::as_message_impl_ref(&self)
     }
 }
