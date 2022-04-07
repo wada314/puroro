@@ -12,39 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{ErrorKind, Result};
+use crate::desc::{FieldDefaultValue, StaticFieldDescriptor};
+use crate::{ErrorKind, PuroroError, Result};
 
 mod as_ref;
 pub use as_ref::{AsMessageImplRef, AsMessageRef};
 
 pub trait MessageImpl<'msg, MD> {
-    fn try_get_u32<FD>(&'msg self) -> Result<u32>
+    fn try_get_u32<FD: StaticFieldDescriptor>(&'msg self) -> Result<u32>
     where
         Self: MessageScalarFieldGetter<'msg, FD, ReturnType = u32>,
     {
         self.try_get_field()
     }
-    fn try_get_str<FD>(&'msg self) -> Result<&str>
+    fn try_get_str<FD: StaticFieldDescriptor>(&'msg self) -> Result<&str>
     where
         Self: MessageScalarFieldGetter<'msg, FD, ReturnType = &'msg str>,
     {
         self.try_get_field()
     }
-    fn try_get_msg<FD, M>(&'msg self) -> Result<M>
+    fn try_get_msg<FD: StaticFieldDescriptor, M>(&'msg self) -> Result<M>
     where
         Self: MessageScalarFieldGetter<'msg, FD, ReturnType = M>,
     {
         self.try_get_field()
     }
 }
-pub trait MessageScalarFieldGetter<'msg, FD> {
+pub trait MessageScalarFieldGetter<'msg, FD>
+where
+    FD: StaticFieldDescriptor,
+{
     type ReturnType;
-    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
-        Err(ErrorKind::ReflectionError)?
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType>
+    where
+        FieldDefaultValue: TryInto<Self::ReturnType, Error = PuroroError>,
+    {
+        Ok(if let Some(v) = self.try_get_opt_field()? {
+            v
+        } else {
+            FD::DEFAULT_VALUE
+                .map(|d| d.try_into())
+                .transpose()?
+                .ok_or(ErrorKind::ReflectionError)?
+        })
     }
-}
-pub trait MessageOptionFieldGetter<'msg, FD> {
-    type ReturnType;
     fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
         Err(ErrorKind::ReflectionError)?
     }

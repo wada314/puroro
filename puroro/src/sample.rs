@@ -76,7 +76,7 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<2> {
     type FieldLabelTag = tags::Optional;
     type FieldTypeTag = tags::UInt32;
 }
-impl StaticFieldDescriptor for PersonStaticFieldDescriptor<3> {
+impl StaticFieldDescriptor for PersonStaticFieldDescriptor<4> {
     const NUMBER: i32 = 4;
     const DEFAULT_VALUE: Option<FieldDefaultValue> = None;
     const OWNED_HASFIELD_BITFIELD_INDEX: Option<usize> = None;
