@@ -22,7 +22,7 @@ impl<'msg, FD, InnerM, ReturnType> MessageScalarFieldGetter<'msg, FD> for Option
 where
     FD: StaticFieldDescriptor,
     InnerM: MessageScalarFieldGetter<'msg, FD, ReturnType = ReturnType>,
-    FieldDefaultValue: TryInto<Self::ReturnType, Error = PuroroError>,
+    FieldDefaultValue: TryInto<ReturnType, Error = PuroroError>,
 {
     type ReturnType = ReturnType;
     fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
