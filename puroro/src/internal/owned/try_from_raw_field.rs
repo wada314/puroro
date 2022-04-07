@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::TryOptFromRawField;
 use crate::desc::StaticFieldDescriptor;
 use crate::internal::bool::{False, True};
 use crate::internal::Bitfield;

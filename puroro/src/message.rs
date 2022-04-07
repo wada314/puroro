@@ -40,8 +40,11 @@ pub trait MessageScalarFieldGetter<'msg, FD> {
         Err(ErrorKind::ReflectionError)?
     }
 }
-pub trait GetMessageImplForField<FD> {
-    type Type;
+pub trait MessageOptionFieldGetter<'msg, FD> {
+    type ReturnType;
+    fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
+        Err(ErrorKind::ReflectionError)?
+    }
 }
 
 pub trait AsMessageRef {
