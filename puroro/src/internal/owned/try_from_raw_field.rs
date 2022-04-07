@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::num::TryFromIntError;
+
 use super::TryOptFromRawField;
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor};
 use crate::internal::bool::{False, True};
+use crate::internal::Bitfield;
 use crate::tags;
 use crate::{ErrorKind, Result};
 
@@ -41,36 +44,58 @@ where
     }
 }
 
-macro_rules! impl_trait_using_opt {
-    ($into:ty, $is_message:ty) => {
-        impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, $is_message> for $into
-        where
-            FD: StaticFieldDescriptor,
-            $into: TryOptFromRawField<'f, MD, FD, F, B>,
-        {
-            fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
-                match Self::try_opt_from_raw_field(field, bitfield)? {
-                    Some(val) => Ok(val),
-                    None => FD::DEFAULT_VALUE
-                        .map(|d| TryInto::try_into(d))
-                        .unwrap_or(Ok(Default::default())),
-                }
-            }
-        }
-    };
-}
-impl_trait_using_opt!(u32, False);
-impl_trait_using_opt!(&'f str, False);
-
-impl<'f, MD, FD, F, B, M> TryFromRawFieldImpl<'f, MD, FD, F, B, False, True> for &'f M
+impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False> for Option<u32>
 where
     FD: StaticFieldDescriptor,
-    &'f M: TryOptFromRawField<'f, MD, FD, F, B>,
+    F: Clone + Default + PartialEq + TryInto<u32>,
+    ErrorKind: From<<F as TryInto<u32>>::Error>,
+    B: Bitfield,
 {
     fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
-        match Self::try_opt_from_raw_field(field, bitfield)? {
-            Some(val) => Ok(val),
-            None => todo!(),
-        }
+        let convert_val: u32 = field
+            .clone()
+            .try_into()
+            .map_err(|e| Into::<ErrorKind>::into(e))?;
+        Ok(
+            if let Some(has_field_bit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
+                if bitfield.get(has_field_bit_index) {
+                    Some(convert_val)
+                } else {
+                    None
+                }
+            } else {
+                if convert_val == u32::default() {
+                    None
+                } else {
+                    Some(convert_val)
+                }
+            },
+        )
+    }
+}
+
+impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False> for Option<&'f str>
+where
+    FD: StaticFieldDescriptor,
+    F: AsRef<str>,
+    B: Bitfield,
+{
+    fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
+        let convert_val: &str = field.as_ref();
+        Ok(
+            if let Some(has_field_bit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
+                if bitfield.get(has_field_bit_index) {
+                    Some(convert_val)
+                } else {
+                    None
+                }
+            } else {
+                if convert_val.is_empty() {
+                    None
+                } else {
+                    Some(convert_val)
+                }
+            },
+        )
     }
 }
