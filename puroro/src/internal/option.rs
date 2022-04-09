@@ -80,7 +80,8 @@ where
     FD: StaticFieldDescriptor,
     InnerM: MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
 {
+    type GetterReturnTypeImpl = Option<ReturnType>;
     fn try_get_field_impl(&'msg self) -> Result<Self::GetterReturnTypeImpl> {
-        todo!()
+        self.try_get_opt_field()
     }
 }
