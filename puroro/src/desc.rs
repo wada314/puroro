@@ -106,7 +106,7 @@ pub enum FieldDefaultValue {
 }
 macro_rules! impl_try_from {
     ($ty:ty, $enum_value:ident) => {
-        impl TryFrom<FieldDefaultValue> for $ty {
+        impl<'a> TryFrom<FieldDefaultValue> for $ty {
             type Error = PuroroError;
             fn try_from(value: FieldDefaultValue) -> ::std::result::Result<Self, Self::Error> {
                 Ok(match value {
@@ -125,5 +125,5 @@ impl_try_from!(i64, I64);
 impl_try_from!(f32, F32);
 impl_try_from!(f64, F64);
 impl_try_from!(bool, Bool);
-impl_try_from!(&'static str, String);
-impl_try_from!(&'static [u8], Bytes);
+impl_try_from!(&'a str, String);
+impl_try_from!(&'a [u8], Bytes);
