@@ -107,8 +107,9 @@ where
     }
     pub fn partner(
         &'msg self,
-    ) -> Person<<M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::ReturnType>
-    {
+    ) -> Person<
+        <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
+    > {
         Person(
             <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
                 PersonStaticFieldDescriptor<4>,
