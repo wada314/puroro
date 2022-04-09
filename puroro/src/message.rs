@@ -38,9 +38,19 @@ pub trait MessageImpl<'msg, MD> {
         self.try_get_field()
     }
 }
-pub trait MessageScalarFieldGetter<'msg, FD> {
+
+pub trait MessageOptFieldGetter<'msg, FD> {
     type ReturnType;
-    fn try_get_field(&'msg self) -> Result<Self::ReturnType>
+    fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>>;
+}
+
+pub trait MessageScalarFieldGetter<'msg, FD>: MessageOptFieldGetter<'msg, FD> {
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType>;
+
+    // A pseudo private default impl for `try_get_field`.
+    // Because the scalar message field getter cannot fulfill the `TryInto` bound
+    // I cannot implement this as a common default implementation.
+    fn _try_get_field(&'msg self) -> Result<Self::ReturnType>
     where
         FD: StaticFieldDescriptor,
         FieldDefaultValue: TryInto<Self::ReturnType, Error = PuroroError>,
@@ -53,8 +63,5 @@ pub trait MessageScalarFieldGetter<'msg, FD> {
                 .transpose()?
                 .ok_or(ErrorKind::ReflectionError)?
         })
-    }
-    fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
-        Err(ErrorKind::ReflectionError)?
     }
 }

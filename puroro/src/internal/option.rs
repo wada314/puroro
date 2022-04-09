@@ -14,18 +14,59 @@
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor};
 use crate::internal::bool::{False, True};
-use crate::message::{AsMessageImplRef, MessageScalarFieldGetter};
+use crate::message::{AsMessageImplRef, MessageOptFieldGetter, MessageScalarFieldGetter};
 use crate::tags;
-use crate::{PuroroError, Result};
+use crate::{ErrorKind, PuroroError, Result};
 
-impl<'msg, FD, InnerM, ReturnType> MessageScalarFieldGetter<'msg, FD> for Option<InnerM>
+impl<'msg, FD, InnerM, ReturnType> MessageOptFieldGetter<'msg, FD> for Option<InnerM>
 where
     FD: StaticFieldDescriptor,
-    InnerM: MessageScalarFieldGetter<'msg, FD, ReturnType = ReturnType>,
-    FieldDefaultValue: TryInto<ReturnType, Error = PuroroError>,
+    InnerM: MessageOptFieldGetter<'msg, FD, ReturnType = ReturnType>,
 {
     type ReturnType = ReturnType;
     fn try_get_opt_field(&'msg self) -> Result<Option<Self::ReturnType>> {
-        Ok(self.map(|m| m.try_get_field()).transpose()?)
+        // just delegate to inner mesasge type
+        Ok(self
+            .as_ref()
+            .map(|m| m.try_get_opt_field())
+            .transpose()?
+            .flatten())
+    }
+}
+
+impl<'msg, FD, InnerM, TypeTag, IsMessage> MessageScalarFieldGetter<'msg, FD> for Option<InnerM>
+where
+    FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag<IsMessage = IsMessage>,
+    Self: MessageScalarFieldGetterImpl<'msg, FD, IsMessage>,
+{
+    fn try_get_field(&'msg self) -> Result<Self::ReturnType> {
+        self.try_get_field_impl()
+    }
+}
+
+pub trait MessageScalarFieldGetterImpl<'msg, FD, IsMessage>:
+    MessageOptFieldGetter<'msg, FD>
+{
+    fn try_get_field_impl(&'msg self) -> Result<Self::ReturnType>;
+}
+
+impl<'msg, FD, InnerM, ReturnType> MessageScalarFieldGetterImpl<'msg, FD, False> for Option<InnerM>
+where
+    FD: StaticFieldDescriptor,
+    InnerM: MessageOptFieldGetter<'msg, FD, ReturnType = ReturnType>,
+    FieldDefaultValue: TryInto<ReturnType, Error = PuroroError>,
+{
+    fn try_get_field_impl(&'msg self) -> Result<Self::ReturnType> {
+        // Get non-message scalar field. Maybe use FD::DEFAULT_VALUE.
+        Ok(self
+            .as_ref()
+            .map(|m| m.try_get_opt_field())
+            .transpose()?
+            .flatten()
+            .or(FD::DEFAULT_VALUE
+                .map(|default| default.try_into())
+                .transpose()?)
+            .ok_or(ErrorKind::ReflectionError)?)
     }
 }
