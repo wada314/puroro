@@ -19,15 +19,15 @@ use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
 use crate::message::{AsMessageImplRef, AsMessageRef, MessageImpl, MessageScalarFieldGetter};
 use crate::tags;
 
-/// assume a proto like this as input:
-/// message Person {
-///     optional string name = 1;
-///     optional uint32 age = 2;
-///     optional Person partner = 4;
-///     repeated string nicknames = 5;
-///     repeated uint32 scores = 6;
-///     repeated Person children = 3;
-/// }
+// assume a proto like this as input:
+// message Person {
+//     optional string name = 1;
+//     optional uint32 age = 2;
+//     optional Person partner = 4;
+//     repeated string nicknames = 5;
+//     repeated uint32 scores = 6;
+//     repeated Person children = 3;
+// }
 
 #[derive(Default)]
 struct PersonOwnedRawFields {
