@@ -18,24 +18,34 @@ use crate::message::{AsMessageImplRef, MessageOptFieldGetter, MessageScalarField
 use crate::tags;
 use crate::{ErrorKind, PuroroError, Result};
 
-impl<'msg, FD, InnerM, ReturnType> MessageOptFieldGetter<'msg, FD> for Option<InnerM>
+pub struct OptionMessageImpl<MIR>(Option<MIR>);
+impl<MIR> From<Option<MIR>> for OptionMessageImpl<MIR> {
+    fn from(v: Option<MIR>) -> Self {
+        OptionMessageImpl(v)
+    }
+}
+
+impl<'msg, FD, MI, MIR, ReturnType> MessageOptFieldGetter<'msg, FD> for OptionMessageImpl<MIR>
 where
     FD: StaticFieldDescriptor,
-    InnerM: MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
+    MIR: AsMessageImplRef<MessageImplType = MI>,
+    MI: 'msg + MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
 {
     type OptReturnType = ReturnType;
     fn try_get_opt_field(&'msg self) -> Result<Option<Self::OptReturnType>> {
         // just delegate to inner mesasge type
         Ok(self
+            .0
             .as_ref()
-            .map(|m| m.try_get_opt_field())
+            .map(|m| m.as_message_impl_ref().try_get_opt_field())
             .transpose()?
             .flatten())
     }
 }
 
-impl<'msg, FD, InnerM, TypeTag, IsMessage, ReturnType> MessageScalarFieldGetter<'msg, FD>
-    for Option<InnerM>
+// Switch impl for message type and non-message types
+impl<'msg, FD, MIR, TypeTag, IsMessage, ReturnType> MessageScalarFieldGetter<'msg, FD>
+    for OptionMessageImpl<MIR>
 where
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag<IsMessage = IsMessage>,
@@ -54,18 +64,22 @@ pub trait MessageScalarFieldGetterImpl<'msg, FD, IsMessage>:
     fn try_get_field_impl(&'msg self) -> Result<Self::GetterReturnTypeImpl>;
 }
 
-impl<'msg, FD, InnerM, ReturnType> MessageScalarFieldGetterImpl<'msg, FD, False> for Option<InnerM>
+// Non message types. Get `Some` value or use `FD::DEFAULT_VALUE`.
+impl<'msg, FD, MI, MIR, ReturnType> MessageScalarFieldGetterImpl<'msg, FD, False>
+    for OptionMessageImpl<MIR>
 where
     FD: StaticFieldDescriptor,
-    InnerM: MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
+    MIR: AsMessageImplRef<MessageImplType = MI>,
+    MI: 'msg + MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
     FieldDefaultValue: TryInto<ReturnType, Error = PuroroError>,
 {
     type GetterReturnTypeImpl = ReturnType;
     fn try_get_field_impl(&'msg self) -> Result<Self::GetterReturnTypeImpl> {
         // Get non-message scalar field. Maybe use FD::DEFAULT_VALUE.
         Ok(self
+            .0
             .as_ref()
-            .map(|m| m.try_get_opt_field())
+            .map(|m| m.as_message_impl_ref().try_get_opt_field())
             .transpose()?
             .flatten()
             .or(FD::DEFAULT_VALUE
@@ -75,13 +89,15 @@ where
     }
 }
 
-impl<'msg, FD, InnerM, ReturnType> MessageScalarFieldGetterImpl<'msg, FD, True> for Option<InnerM>
+// Message field type. Return `OptionMessageImpl`
+impl<'msg, FD, MIR, ReturnType> MessageScalarFieldGetterImpl<'msg, FD, True>
+    for OptionMessageImpl<MIR>
 where
     FD: StaticFieldDescriptor,
-    InnerM: MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
+    Self: MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
 {
-    type GetterReturnTypeImpl = Option<ReturnType>;
+    type GetterReturnTypeImpl = OptionMessageImpl<ReturnType>;
     fn try_get_field_impl(&'msg self) -> Result<Self::GetterReturnTypeImpl> {
-        self.try_get_opt_field()
+        Ok(self.try_get_opt_field()?.into())
     }
 }
