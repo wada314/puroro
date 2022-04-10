@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::desc::StaticFieldDescriptor;
-use crate::message::{AsMessageImplRef, MessageOptFieldGetter};
+use crate::message::{AsMessageImplRef, MessageImpl, MessageOptFieldGetter};
 use crate::Result;
 
 pub struct OptionMessageImpl<MIR>(Option<MIR>);
@@ -22,6 +22,7 @@ impl<MIR> From<Option<MIR>> for OptionMessageImpl<MIR> {
         OptionMessageImpl(v)
     }
 }
+impl<'msg, MIR, MD> MessageImpl<'msg, MD> for OptionMessageImpl<MIR> {}
 impl<MIR> AsMessageImplRef for OptionMessageImpl<MIR> {
     type MessageImplType = Self;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {
