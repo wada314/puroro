@@ -15,7 +15,6 @@
 //////////////////////////////////////////////////////////////
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::internal::option::OptionMessageImpl;
 use crate::internal::owned::{OwnedMessageImpl, OwnedRawField, OwnedRawMessageField};
 use crate::message::{AsMessageImplRef, AsMessageRef, MessageImpl, MessageScalarFieldGetter};
 use crate::tags;
@@ -90,36 +89,30 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<4> {
 
 #[derive(Default)]
 pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>>(M);
-pub trait PersonTrait {
-    fn name(&self) -> &str;
-    fn age(&self) -> u32;
-    type PartnerType<'a>: PersonTrait
-    where
-        Self: 'a;
-    fn partner(&self) -> Self::PartnerType<'_>;
-}
-impl<'msg, M> PersonTrait for Person<M>
+impl<'msg, M> Person<M>
 where
-    M: AsMessageImplRef
-        + MessageImpl<'msg, PersonStaticMessageDescriptor>
+    M: MessageImpl<'msg, PersonStaticMessageDescriptor>
         + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<1>, GetterReturnType = &'msg str>
         + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, GetterReturnType = u32>
         + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
 {
-    fn name(&self) -> &str {
+    pub fn name(&'msg self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
             PersonStaticFieldDescriptor<1>,
         >(&self.0)
         .unwrap()
     }
-    fn age(&self) -> u32 {
+    pub fn age(&'msg self) -> u32 {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
             PersonStaticFieldDescriptor<2>,
         >(&self.0)
         .unwrap()
     }
-    type PartnerType<'a> = Person<OptionMessageImpl<&'a M>> where Self: 'a;
-    fn partner(&self) -> Self::PartnerType<'_> {
+    pub fn partner(
+        &'msg self,
+    ) -> Person<
+        <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
+    > {
         Person(
             <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
                 PersonStaticFieldDescriptor<4>,
