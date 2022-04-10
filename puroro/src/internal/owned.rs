@@ -59,3 +59,5 @@ trait MessageOptFieldGetterImpl<'msg, FD, IsMessage> {
     type OptReturnTypeImpl;
     fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>>;
 }
+
+impl<'msg, MD, FD, FS> MessageOptFieldGetterImpl<'msg, FD, False> for OwnedMessageImpl<MD, FS> {}
