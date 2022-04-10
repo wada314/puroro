@@ -14,14 +14,13 @@
 
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::bool::{False, True};
-use crate::message::MessageImpl;
+use crate::message::{MessageImpl, MessageOptFieldGetter, MessageScalarFieldGetter};
 use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;
 
 pub mod try_from_raw_field;
-
-pub use try_from_raw_field::TryFromRawField;
+use try_from_raw_field::TryFromRawField;
 
 #[derive(Default)]
 pub struct OwnedMessageImpl<MD, FS>
@@ -41,4 +40,22 @@ impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
 pub trait OwnedRawFieldGetter<FD> {
     type Type;
     fn get(&self) -> &Self::Type;
+}
+
+impl<'msg, MD, FD, FS, TypeTag, R> MessageOptFieldGetter<'msg, FD> for OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+    FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag,
+    Self: MessageOptFieldGetterImpl<'msg, FD, TypeTag::IsMessage, OptReturnTypeImpl = R>,
+{
+    type OptReturnType = R;
+    fn try_get_opt_field(&'msg self) -> Result<Option<Self::OptReturnType>> {
+        self.try_get_opt_field_impl()
+    }
+}
+
+trait MessageOptFieldGetterImpl<'msg, FD, IsMessage> {
+    type OptReturnTypeImpl;
+    fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>>;
 }
