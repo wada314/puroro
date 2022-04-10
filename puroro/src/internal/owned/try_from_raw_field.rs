@@ -23,7 +23,7 @@ pub trait TryFromRawField<'f, MD, FD, F, B>: Sized {
         Err(ErrorKind::ReflectionError)?
     }
 }
-pub trait TryFromRawFieldImpl<'f, MD, FD, F, B, IsRepeated, IsMessage>: Sized {
+pub trait TryFromRawFieldImpl<'f, MD, FD, F, B, IsRepeated, IsMessage, IsLd>: Sized {
     fn try_from_raw_field_impl(_field: &'f F, _: &'f B) -> Result<Self> {
         Err(ErrorKind::ReflectionError)?
     }
@@ -34,22 +34,32 @@ where
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
     LabelTag: tags::FieldLabelTag,
     TypeTag: tags::FieldTypeTag,
-    T: TryFromRawFieldImpl<'f, MD, FD, F, B, LabelTag::IsRepeated, TypeTag::IsMessage>,
+    T: TryFromRawFieldImpl<
+        'f,
+        MD,
+        FD,
+        F,
+        B,
+        LabelTag::IsRepeated,
+        TypeTag::IsMessage,
+        TypeTag::IsLd,
+    >,
 {
     fn try_from_raw_field(field: &'f F, bitfield: &'f B) -> Result<Self> {
         Self::try_from_raw_field_impl(field, bitfield)
     }
 }
 
-impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False> for Option<u32>
+impl<'f, MD, FD, F, B, T> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False, False> for Option<T>
 where
     FD: StaticFieldDescriptor,
-    F: Clone + Default + PartialEq + TryInto<u32>,
-    ErrorKind: From<<F as TryInto<u32>>::Error>,
+    F: Clone + TryInto<T>,
+    T: Default + PartialEq,
+    ErrorKind: From<<F as TryInto<T>>::Error>,
     B: Bitfield,
 {
     fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
-        let val: u32 = field
+        let val: T = field
             .clone()
             .try_into()
             .map_err(|e| Into::<ErrorKind>::into(e))?;
@@ -57,31 +67,33 @@ where
             if let Some(has_field_bit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
                 bitfield.get(has_field_bit_index).then(|| val)
             } else {
-                (val != u32::default()).then(|| val)
+                (val != T::default()).then(|| val)
             },
         )
     }
 }
 
-impl<'f, MD, FD, F, B> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False> for Option<&'f str>
+impl<'f, MD, FD, F, B, T> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False, True>
+    for Option<&'f T>
 where
     FD: StaticFieldDescriptor,
-    F: AsRef<str>,
+    F: AsRef<T>,
+    &'f T: Default + PartialEq,
     B: Bitfield,
 {
     fn try_from_raw_field_impl(field: &'f F, bitfield: &'f B) -> Result<Self> {
-        let s: &str = field.as_ref();
+        let s: &T = field.as_ref();
         Ok(
             if let Some(has_field_bit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
                 bitfield.get(has_field_bit_index).then(|| s)
             } else {
-                (!s.is_empty()).then(|| s)
+                (s != <&T>::default()).then(|| s)
             },
         )
     }
 }
 
-impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True>
+impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True, True>
     for Option<&'f M>
 {
     fn try_from_raw_field_impl(field: &'f Option<Box<M>>, _bitfield: &'f B) -> Result<Self> {
@@ -89,7 +101,7 @@ impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False,
     }
 }
 
-impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<M>, B, False, True>
+impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<M>, B, False, True, True>
     for Option<&'f M>
 {
     fn try_from_raw_field_impl(field: &'f Option<M>, _bitfield: &'f B) -> Result<Self> {
@@ -97,7 +109,7 @@ impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<M>, B, False, True
     }
 }
 
-impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, M, B, False, True> for Option<&'f M> {
+impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, M, B, False, True, True> for Option<&'f M> {
     fn try_from_raw_field_impl(field: &'f M, _bitfield: &'f B) -> Result<Self> {
         Ok(Some(field))
     }
