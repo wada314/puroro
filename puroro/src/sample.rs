@@ -92,35 +92,34 @@ pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwne
 impl<'msg, M> Person<M>
 where
     M: MessageImpl<'msg, PersonStaticMessageDescriptor>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<1>, GetterReturnType = &'msg str>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, GetterReturnType = u32>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
+        // + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<1>, GetterReturnType = &'msg str>
+        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, GetterReturnType = u32>, // + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
 {
-    pub fn name(&'msg self) -> &str {
-        <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
-            PersonStaticFieldDescriptor<1>,
-        >(&self.0)
-        .unwrap()
-    }
+    // pub fn name(&'msg self) -> &str {
+    //     <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
+    //         PersonStaticFieldDescriptor<1>,
+    //     >(&self.0)
+    //     .unwrap()
+    // }
     pub fn age(&'msg self) -> u32 {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
             PersonStaticFieldDescriptor<2>,
         >(&self.0)
         .unwrap()
     }
-    pub fn partner(
-        &'msg self,
-    ) -> Person<
-        <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
-    > {
-        Person(
-            <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
-                PersonStaticFieldDescriptor<4>,
-                _,
-            >(&self.0)
-            .unwrap(),
-        )
-    }
+    // pub fn partner(
+    //     &'msg self,
+    // ) -> Person<
+    //     <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
+    // > {
+    //     Person(
+    //         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
+    //             PersonStaticFieldDescriptor<4>,
+    //             _,
+    //         >(&self.0)
+    //         .unwrap(),
+    //     )
+    // }
 }
 
 impl<M> AsMessageRef for Person<M> {
@@ -139,6 +138,7 @@ impl<M> AsMessageImplRef for Person<M> {
 #[test]
 fn test() {
     let person: Person = Person::default();
-    assert_eq!("John Doe", person.name());
+    // assert_eq!("John Doe", person.name());
     assert_eq!(14, person.age());
+    // person.partner();
 }
