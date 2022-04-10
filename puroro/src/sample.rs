@@ -138,9 +138,9 @@ impl<M> AsMessageImplRef for Person<M> {
 #[test]
 fn test() {
     let person: Person = Person::default();
-    // <OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>
-    // as MessageScalarFieldGetter<PersonStaticFieldDescriptor<1>>>
-    // ::try_get_field(&person.0);
+    <OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>
+    as MessageScalarFieldGetter<PersonStaticFieldDescriptor<4>>>
+    ::try_get_field(&person.0);
     assert_eq!("John Doe", person.name());
     assert_eq!(14, person.age());
     // person.partner();
