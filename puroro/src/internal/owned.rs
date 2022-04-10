@@ -38,9 +38,12 @@ impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
 {
 }
 
-pub trait OwnedRawFieldGetter<FD> {
+pub trait OwnedRawField<FD> {
     type Type;
     fn get(&self) -> &Self::Type;
+}
+pub trait OwnedRawMessageField<FD>: OwnedRawField<FD> {
+    type FieldMessageImpl;
 }
 
 impl<'msg, MD, FD, FS, TypeTag, R> MessageOptFieldGetter<'msg, FD> for OwnedMessageImpl<MD, FS>
@@ -69,7 +72,7 @@ where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag<NonMessageScalarGetterType<'msg> = R>,
-    FS: OwnedRawFieldGetter<FD, Type = RawType>,
+    FS: OwnedRawField<FD, Type = RawType>,
     RawType: 'msg,
     Option<R>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
     R: Default + PartialEq,
@@ -81,4 +84,10 @@ where
             &self.bitvec,
         )
     }
+}
+
+// Message field optional getter.
+impl<'msg, MD, FD, FS, TypeTag, RawType, R> MessageOptFieldGetterImpl<'msg, FD, True>
+    for OwnedMessageImpl<MD, FS>
+{
 }

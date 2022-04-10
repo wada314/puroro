@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor, StaticMessageDescriptor};
-use crate::internal::owned::{OwnedMessageImpl, OwnedRawFieldGetter};
+use crate::internal::owned::{OwnedMessageImpl, OwnedRawField, OwnedRawMessageField};
 use crate::message::{AsMessageImplRef, AsMessageRef, MessageImpl, MessageScalarFieldGetter};
 use crate::tags;
 
@@ -35,23 +35,26 @@ struct PersonOwnedRawFields {
     age: u32,
     partner: Option<Box<Person>>,
 }
-impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<1>> for PersonOwnedRawFields {
+impl OwnedRawField<PersonStaticFieldDescriptor<1>> for PersonOwnedRawFields {
     type Type = String;
     fn get(&self) -> &Self::Type {
         &self.name
     }
 }
-impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<2>> for PersonOwnedRawFields {
+impl OwnedRawField<PersonStaticFieldDescriptor<2>> for PersonOwnedRawFields {
     type Type = u32;
     fn get(&self) -> &Self::Type {
         &self.age
     }
 }
-impl OwnedRawFieldGetter<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {
+impl OwnedRawField<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {
     type Type = Option<Box<Person>>;
     fn get(&self) -> &Self::Type {
         &self.partner
     }
+}
+impl OwnedRawMessageField<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {
+    type FieldMessageImpl = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>;
 }
 
 #[derive(Default)]
