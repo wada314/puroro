@@ -30,7 +30,7 @@ use crate::tags;
 // }
 
 #[derive(Default)]
-struct PersonOwnedRawFields {
+pub struct PersonOwnedRawFields {
     name: String,
     age: u32,
     partner: Option<Box<Person>>,
@@ -58,8 +58,8 @@ impl OwnedRawMessageField<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFiel
 }
 
 #[derive(Default)]
-struct PersonStaticMessageDescriptor;
-struct PersonStaticFieldDescriptor<const NUMBER: i32>;
+pub struct PersonStaticMessageDescriptor;
+pub struct PersonStaticFieldDescriptor<const NUMBER: i32>;
 
 impl StaticMessageDescriptor for PersonStaticMessageDescriptor {
     type Fields<const NUMBER: i32> = PersonStaticFieldDescriptor<NUMBER>;
