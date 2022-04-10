@@ -93,7 +93,8 @@ impl<'msg, M> Person<M>
 where
     M: MessageImpl<'msg, PersonStaticMessageDescriptor>
         + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<1>, GetterReturnType = &'msg str>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, GetterReturnType = u32>, // + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
+        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, GetterReturnType = u32>
+        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
 {
     pub fn name(&'msg self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
@@ -107,19 +108,19 @@ where
         >(&self.0)
         .unwrap()
     }
-    // pub fn partner(
-    //     &'msg self,
-    // ) -> Person<
-    //     <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
-    // > {
-    //     Person(
-    //         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
-    //             PersonStaticFieldDescriptor<4>,
-    //             _,
-    //         >(&self.0)
-    //         .unwrap(),
-    //     )
-    // }
+    pub fn partner(
+        &'msg self,
+    ) -> Person<
+        <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
+    > {
+        Person(
+            <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
+                PersonStaticFieldDescriptor<4>,
+                _,
+            >(&self.0)
+            .unwrap(),
+        )
+    }
 }
 
 impl<M> AsMessageRef for Person<M> {
@@ -138,10 +139,7 @@ impl<M> AsMessageImplRef for Person<M> {
 #[test]
 fn test() {
     let person: Person = Person::default();
-    <OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>
-    as MessageScalarFieldGetter<PersonStaticFieldDescriptor<4>>>
-    ::try_get_field(&person.0);
     assert_eq!("John Doe", person.name());
     assert_eq!(14, person.age());
-    // person.partner();
+    person.partner();
 }

@@ -15,6 +15,7 @@
 use crate::desc::StaticFieldDescriptor;
 use crate::internal::bool::{False, True};
 use crate::internal::Bitfield;
+use crate::message::AsMessageImplRef;
 use crate::tags;
 use crate::{ErrorKind, Result};
 
@@ -94,24 +95,22 @@ where
     }
 }
 
-impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<Box<M>>, B, False, True, True>
-    for Option<&'f M>
-{
-    fn try_from_raw_field_impl(field: &'f Option<Box<M>>, _bitfield: &'f B) -> Result<Self> {
-        Ok(field.as_deref())
-    }
-}
-
-impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, Option<M>, B, False, True, True>
-    for Option<&'f M>
+impl<'f, MD, FD, B, M, MI> TryFromRawFieldImpl<'f, MD, FD, Option<M>, B, False, True, True>
+    for Option<&'f MI>
+where
+    M: AsMessageImplRef<MessageImplType = MI>,
 {
     fn try_from_raw_field_impl(field: &'f Option<M>, _bitfield: &'f B) -> Result<Self> {
-        Ok(field.as_ref())
+        Ok(field.as_ref().map(|m| m.as_message_impl_ref()))
     }
 }
 
-impl<'f, MD, FD, B, M> TryFromRawFieldImpl<'f, MD, FD, M, B, False, True, True> for Option<&'f M> {
+impl<'f, MD, FD, B, M, MI> TryFromRawFieldImpl<'f, MD, FD, M, B, False, True, True>
+    for Option<&'f MI>
+where
+    M: AsMessageImplRef<MessageImplType = MI>,
+{
     fn try_from_raw_field_impl(field: &'f M, _bitfield: &'f B) -> Result<Self> {
-        Ok(Some(field))
+        Ok(Some(field.as_message_impl_ref()))
     }
 }
