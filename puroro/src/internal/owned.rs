@@ -62,21 +62,24 @@ trait MessageOptFieldGetterImpl<'msg, FD, IsMessage> {
 }
 
 // Non-message field getter. Getter type is determined by `FieldTypeTag::NonMessageScalarGetterType`
-impl<'msg, MD, FD, FS, TypeTag, GetterType> MessageOptFieldGetterImpl<'msg, FD, False>
+impl<'msg, MD, FD, FS, TypeTag, RawType, R> MessageOptFieldGetterImpl<'msg, FD, False>
     for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
-    TypeTag: tags::FieldTypeTag<NonMessageScalarGetterType<'msg> = GetterType>,
-    FS: OwnedRawFieldGetter<FD, Type = GetterType>,
+    TypeTag: tags::FieldTypeTag<NonMessageScalarGetterType<'msg> = R>,
+    FS: OwnedRawFieldGetter<FD, Type = RawType>,
+    RawType: 'msg,
+    Option<R>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
 {
-    type OptReturnTypeImpl = GetterType;
+    type OptReturnTypeImpl = R;
     fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>> {
         let get_inner = || {
-            <Option<GetterType> as TryFromRawField<FD>>::try_from_raw_field(
+            <Option<R> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
                 self.fields.get(),
                 &self.bitvec,
             )
         };
+        todo!()
     }
 }
