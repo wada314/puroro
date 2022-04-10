@@ -141,5 +141,6 @@ fn test() {
     let person: Person = Person::default();
     assert_eq!("John Doe", person.name());
     assert_eq!(14, person.age());
-    person.partner();
+    let partner = person.partner();
+    assert_eq!("John Doe", partner.name());
 }

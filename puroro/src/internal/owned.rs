@@ -15,7 +15,9 @@
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::bool::{False, True};
 use crate::internal::Bitfield;
-use crate::message::{MessageImpl, MessageOptFieldGetter, MessageScalarFieldGetter};
+use crate::message::{
+    AsMessageImplRef, MessageImpl, MessageOptFieldGetter, MessageScalarFieldGetter,
+};
 use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;
@@ -36,6 +38,15 @@ where
 impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
     MD: StaticMessageDescriptor
 {
+}
+impl<MD, FS> AsMessageImplRef for OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+{
+    type MessageImplType = Self;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        self
+    }
 }
 
 pub trait OwnedRawField<FD> {

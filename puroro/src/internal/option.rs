@@ -22,6 +22,12 @@ impl<MIR> From<Option<MIR>> for OptionMessageImpl<MIR> {
         OptionMessageImpl(v)
     }
 }
+impl<MIR> AsMessageImplRef for OptionMessageImpl<MIR> {
+    type MessageImplType = Self;
+    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
+        self
+    }
+}
 
 impl<'msg, FD, MI, MIR, ReturnType> MessageOptFieldGetter<'msg, FD> for OptionMessageImpl<MIR>
 where
