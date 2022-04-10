@@ -87,7 +87,20 @@ where
 }
 
 // Message field optional getter.
-impl<'msg, MD, FD, FS, TypeTag, RawType, R> MessageOptFieldGetterImpl<'msg, FD, True>
+impl<'msg, MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<'msg, FD, True>
     for OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+    FS: OwnedRawField<FD, Type = RawType> + OwnedRawMessageField<FD, FieldMessageImpl = MI>,
+    MI: 'msg,
+    RawType: 'msg,
+    Option<&'msg MI>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
 {
+    type OptReturnTypeImpl = &'msg MI;
+    fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>> {
+        <Option<Self::OptReturnTypeImpl> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
+            self.fields.get(),
+            &self.bitvec,
+        )
+    }
 }
