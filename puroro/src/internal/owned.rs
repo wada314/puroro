@@ -14,6 +14,7 @@
 
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::bool::{False, True};
+use crate::internal::Bitfield;
 use crate::message::{MessageImpl, MessageOptFieldGetter, MessageScalarFieldGetter};
 use crate::tags;
 use crate::Result;
@@ -60,4 +61,22 @@ trait MessageOptFieldGetterImpl<'msg, FD, IsMessage> {
     fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>>;
 }
 
-impl<'msg, MD, FD, FS> MessageOptFieldGetterImpl<'msg, FD, False> for OwnedMessageImpl<MD, FS> {}
+// Non-message field getter. Getter type is determined by `FieldTypeTag::NonMessageScalarGetterType`
+impl<'msg, MD, FD, FS, TypeTag, GetterType> MessageOptFieldGetterImpl<'msg, FD, False>
+    for OwnedMessageImpl<MD, FS>
+where
+    MD: StaticMessageDescriptor,
+    FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag<NonMessageScalarGetterType<'msg> = GetterType>,
+    FS: OwnedRawFieldGetter<FD, Type = GetterType>,
+{
+    type OptReturnTypeImpl = GetterType;
+    fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>> {
+        let get_inner = || {
+            <Option<GetterType> as TryFromRawField<FD>>::try_from_raw_field(
+                self.fields.get(),
+                &self.bitvec,
+            )
+        };
+    }
+}
