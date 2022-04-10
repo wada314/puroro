@@ -78,6 +78,7 @@ impl<'f, MD, FD, F, B, T> TryFromRawFieldImpl<'f, MD, FD, F, B, False, False, Tr
 where
     FD: StaticFieldDescriptor,
     F: AsRef<T>,
+    T: ?Sized,
     &'f T: Default + PartialEq,
     B: Bitfield,
 {
