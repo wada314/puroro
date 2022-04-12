@@ -57,6 +57,7 @@ pub trait OwnedRawMessageField<FD>: OwnedRawField<FD> {
     type FieldMessageImpl;
 }
 
+// branch opt field getter impl by IsMessage.
 impl<'msg, MD, FD, FS, TypeTag, R> MessageOptFieldGetter<'msg, FD> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
