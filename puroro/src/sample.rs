@@ -92,8 +92,8 @@ pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwne
 impl<'a, M> Person<M>
 where
     M: MessageImpl<PersonStaticMessageDescriptor>
-        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<1>, GetterReturnType = &'a str>
-        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<2>, GetterReturnType = u32>
+        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<1>, GetterReturnType<'a> = &'a str>
+        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<2>, GetterReturnType<'a> = u32>
         + MessageScalarFieldGetter<PersonStaticFieldDescriptor<4>>,
 {
     pub fn name(&'a self) -> &str {

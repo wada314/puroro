@@ -55,7 +55,7 @@ pub trait OwnedRawMessageField<FD>: OwnedRawField<FD> {
 }
 
 // branch opt field getter impl by IsMessage.
-impl<MD, FD, FS, TypeTag, R> MessageOptFieldGetter<FD> for OwnedMessageImpl<MD, FS>
+impl<MD, FD, FS, TypeTag> MessageOptFieldGetter<FD> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
@@ -95,13 +95,13 @@ where
 }
 
 // Message field optional getter.
-impl<MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<FD, True> for OwnedMessageImpl<MD, FS>
+impl<'msg, MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<FD, True> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FS: OwnedRawField<FD, Type = RawType> + OwnedRawMessageField<FD, FieldMessageImpl = MI>,
     Option<&'msg MI>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
 {
-    type OptReturnTypeImpl<'msg> = &'msg MI;
+    type OptReturnTypeImpl<'a> = &'a MI;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
         <Option<Self::OptReturnTypeImpl> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
             self.fields.get(),
