@@ -89,30 +89,29 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<4> {
 
 #[derive(Default)]
 pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>>(M);
-impl<'msg, M> Person<M>
+impl<'a, M> Person<M>
 where
-    M: MessageImpl<'msg, PersonStaticMessageDescriptor>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<1>, GetterReturnType = &'msg str>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<2>, GetterReturnType = u32>
-        + MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>,
+    M: MessageImpl<PersonStaticMessageDescriptor>
+        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<1>, GetterReturnType = &'a str>
+        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<2>, GetterReturnType = u32>
+        + MessageScalarFieldGetter<PersonStaticFieldDescriptor<4>>,
 {
-    pub fn name(&'msg self) -> &str {
+    pub fn name(&'a self) -> &str {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_str::<
             PersonStaticFieldDescriptor<1>,
         >(&self.0)
         .unwrap()
     }
-    pub fn age(&'msg self) -> u32 {
+    pub fn age(&'a self) -> u32 {
         <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_u32::<
             PersonStaticFieldDescriptor<2>,
         >(&self.0)
         .unwrap()
     }
     pub fn partner(
-        &'msg self,
-    ) -> Person<
-        <M as MessageScalarFieldGetter<'msg, PersonStaticFieldDescriptor<4>>>::GetterReturnType,
-    > {
+        &'a self,
+    ) -> Person<<M as MessageScalarFieldGetter<PersonStaticFieldDescriptor<4>>>::GetterReturnType<'a>>
+    {
         Person(
             <M as MessageImpl<PersonStaticMessageDescriptor>>::try_get_msg::<
                 PersonStaticFieldDescriptor<4>,

@@ -22,7 +22,7 @@ impl<MIR> From<Option<MIR>> for OptionMessageImpl<MIR> {
         OptionMessageImpl(v)
     }
 }
-impl<'msg, MIR, MD> MessageImpl<'msg, MD> for OptionMessageImpl<MIR> {}
+impl<MIR, MD> MessageImpl<MD> for OptionMessageImpl<MIR> {}
 impl<MIR> AsMessageImplRef for OptionMessageImpl<MIR> {
     type MessageImplType = Self;
     fn as_message_impl_ref(&self) -> &Self::MessageImplType {
@@ -30,14 +30,14 @@ impl<MIR> AsMessageImplRef for OptionMessageImpl<MIR> {
     }
 }
 
-impl<'msg, FD, MI, MIR, ReturnType> MessageOptFieldGetter<'msg, FD> for OptionMessageImpl<MIR>
+impl<FD, MI, MIR> MessageOptFieldGetter<FD> for OptionMessageImpl<MIR>
 where
     FD: StaticFieldDescriptor,
     MIR: AsMessageImplRef<MessageImplType = MI>,
-    MI: 'msg + MessageOptFieldGetter<'msg, FD, OptReturnType = ReturnType>,
+    MI: MessageOptFieldGetter<FD>,
 {
-    type OptReturnType = ReturnType;
-    fn try_get_opt_field(&'msg self) -> Result<Option<Self::OptReturnType>> {
+    type OptReturnType<'msg> = <MI as MessageOptFieldGetter<FD>>::OptReturnType<'msg>;
+    fn try_get_opt_field<'a>(&'a self) -> Result<Option<Self::OptReturnType<'a>>> {
         // just delegate to inner mesasge type
         Ok(self
             .0

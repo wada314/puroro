@@ -35,10 +35,7 @@ where
     _phantom: PhantomData<MD>,
 }
 
-impl<'msg, MD, FS> MessageImpl<'msg, MD> for OwnedMessageImpl<MD, FS> where
-    MD: StaticMessageDescriptor
-{
-}
+impl<MD, FS> MessageImpl<MD> for OwnedMessageImpl<MD, FS> where MD: StaticMessageDescriptor {}
 impl<MD, FS> AsMessageImplRef for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
@@ -58,40 +55,39 @@ pub trait OwnedRawMessageField<FD>: OwnedRawField<FD> {
 }
 
 // branch opt field getter impl by IsMessage.
-impl<'msg, MD, FD, FS, TypeTag, R> MessageOptFieldGetter<'msg, FD> for OwnedMessageImpl<MD, FS>
+impl<MD, FD, FS, TypeTag, R> MessageOptFieldGetter<FD> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
-    Self: MessageOptFieldGetterImpl<'msg, FD, TypeTag::IsMessage, OptReturnTypeImpl = R>,
+    Self: MessageOptFieldGetterImpl<FD, TypeTag::IsMessage>,
 {
-    type OptReturnType = R;
-    fn try_get_opt_field(&'msg self) -> Result<Option<Self::OptReturnType>> {
+    type OptReturnType<'msg> =
+        <Self as MessageOptFieldGetterImpl<FD, TypeTag::IsMessage>>::OptReturnTypeImpl<'msg>;
+    fn try_get_opt_field<'a>(&'a self) -> Result<Option<Self::OptReturnType<'a>>> {
         self.try_get_opt_field_impl()
     }
 }
 
-trait MessageOptFieldGetterImpl<'msg, FD, IsMessage> {
-    type OptReturnTypeImpl;
-    fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>>;
+trait MessageOptFieldGetterImpl<FD, IsMessage> {
+    type OptReturnTypeImpl<'msg>;
+    fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>>;
 }
 
 // Non-message field optional getter.
 // Getter type is determined by `FieldTypeTag::NonMessageScalarGetterType`
-impl<'msg, MD, FD, FS, TypeTag, RawType, R> MessageOptFieldGetterImpl<'msg, FD, False>
-    for OwnedMessageImpl<MD, FS>
+impl<MD, FD, FS, TypeTag, RawType> MessageOptFieldGetterImpl<FD, False> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
-    TypeTag: tags::FieldTypeTag<NonMessageScalarGetterType<'msg> = R>,
+    TypeTag: tags::FieldTypeTag,
     FS: OwnedRawField<FD, Type = RawType>,
-    RawType: 'msg,
-    Option<R>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
-    R: Default + PartialEq,
+    Option<TypeTag::DefaultValueType>: TryFromRawField<'static, MD, FD, RawType, MD::OwnedBitfield>,
+    TypeTag::DefaultValueType: Default + PartialEq,
 {
-    type OptReturnTypeImpl = R;
-    fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>> {
-        <Option<R> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
+    type OptReturnTypeImpl<'msg> = TypeTag::DefaultValueType;
+    fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
+        <Option<TypeTag::DefaultValueType> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
             self.fields.get(),
             &self.bitvec,
         )
@@ -99,17 +95,14 @@ where
 }
 
 // Message field optional getter.
-impl<'msg, MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<'msg, FD, True>
-    for OwnedMessageImpl<MD, FS>
+impl<MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<FD, True> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
     FS: OwnedRawField<FD, Type = RawType> + OwnedRawMessageField<FD, FieldMessageImpl = MI>,
-    MI: 'msg,
-    RawType: 'msg,
     Option<&'msg MI>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
 {
-    type OptReturnTypeImpl = &'msg MI;
-    fn try_get_opt_field_impl(&'msg self) -> Result<Option<Self::OptReturnTypeImpl>> {
+    type OptReturnTypeImpl<'msg> = &'msg MI;
+    fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
         <Option<Self::OptReturnTypeImpl> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
             self.fields.get(),
             &self.bitvec,
