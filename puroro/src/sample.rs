@@ -142,5 +142,5 @@ fn test() {
     assert_eq!("John Doe", person.name());
     assert_eq!(14, person.age());
     let partner = person.partner();
-    assert_eq!("John Doe", partner.name());
+    MessageScalarFieldGetter::<PersonStaticFieldDescriptor<4>>::try_get_field(&partner.0);
 }
