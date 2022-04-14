@@ -85,7 +85,7 @@ where
     FD: StaticFieldDescriptor,
     FieldDefaultValue: TryInto<Self::OptReturnType<'msg>, Error = PuroroError>,
 {
-    type GetterReturnTypeImpl<'a> = Self::OptReturnType<'a> where Self: 'a;
+    type GetterReturnTypeImpl<'msg2> = Self::OptReturnType<'msg2> where Self: 'msg2;
     fn try_get_field_impl<'a>(&'a self) -> Result<Self::GetterReturnTypeImpl<'a>> {
         // Get non-message scalar field. Maybe use FD::DEFAULT_VALUE.
         Ok(self

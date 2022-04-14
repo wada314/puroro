@@ -57,20 +57,23 @@ pub trait OwnedRawMessageField<FD>: OwnedRawField<FD> {
 // branch opt field getter impl by IsMessage.
 impl<MD, FD, FS, TypeTag> MessageOptFieldGetter<FD> for OwnedMessageImpl<MD, FS>
 where
+    Self: MessageOptFieldGetterImpl<FD, TypeTag::IsMessage>,
     MD: StaticMessageDescriptor,
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
-    Self: MessageOptFieldGetterImpl<FD, TypeTag::IsMessage>,
 {
     type OptReturnType<'msg> =
-        <Self as MessageOptFieldGetterImpl<FD, TypeTag::IsMessage>>::OptReturnTypeImpl<'msg>;
+        <Self as MessageOptFieldGetterImpl<FD, TypeTag::IsMessage>>::OptReturnTypeImpl<'msg>
+    where Self: 'msg;
     fn try_get_opt_field<'a>(&'a self) -> Result<Option<Self::OptReturnType<'a>>> {
         self.try_get_opt_field_impl()
     }
 }
 
 trait MessageOptFieldGetterImpl<FD, IsMessage> {
-    type OptReturnTypeImpl<'msg>;
+    type OptReturnTypeImpl<'msg>
+    where
+        Self: 'msg;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>>;
 }
 
@@ -99,9 +102,10 @@ impl<'msg, MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<FD, True> for Owne
 where
     MD: StaticMessageDescriptor,
     FS: OwnedRawField<FD, Type = RawType> + OwnedRawMessageField<FD, FieldMessageImpl = MI>,
+    MI: 'msg,
     Option<&'msg MI>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
 {
-    type OptReturnTypeImpl<'a> = &'a MI;
+    type OptReturnTypeImpl<'msg2> = &'msg2 MI where MI: 'msg2;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
         <Option<Self::OptReturnTypeImpl> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
             self.fields.get(),

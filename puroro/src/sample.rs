@@ -91,7 +91,8 @@ impl StaticFieldDescriptor for PersonStaticFieldDescriptor<4> {
 pub struct Person<M = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>>(M);
 impl<'a, M> Person<M>
 where
-    M: MessageImpl<PersonStaticMessageDescriptor>
+    M: 'a
+        + MessageImpl<PersonStaticMessageDescriptor>
         + MessageScalarFieldGetter<PersonStaticFieldDescriptor<1>, GetterReturnType<'a> = &'a str>
         + MessageScalarFieldGetter<PersonStaticFieldDescriptor<2>, GetterReturnType<'a> = u32>
         + MessageScalarFieldGetter<PersonStaticFieldDescriptor<4>>,
