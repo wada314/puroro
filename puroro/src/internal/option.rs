@@ -36,7 +36,7 @@ where
     MIR: AsMessageImplRef<MessageImplType = MI>,
     MI: MessageOptFieldGetter<FD>,
 {
-    type OptReturnType<'msg> = <MI as MessageOptFieldGetter<FD>>::OptReturnType<'msg>;
+    type OptReturnType<'msg> = MI::OptReturnType<'msg> where MI: 'msg;
     fn try_get_opt_field<'a>(&'a self) -> Result<Option<Self::OptReturnType<'a>>> {
         // just delegate to inner mesasge type
         Ok(self

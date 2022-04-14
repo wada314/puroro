@@ -43,18 +43,24 @@ pub trait MessageImpl<MD> {
 }
 
 pub trait MessageOptFieldGetter<FD> {
-    type OptReturnType<'msg>;
+    type OptReturnType<'msg>
+    where
+        Self: 'msg;
     fn try_get_opt_field<'a>(&'a self) -> Result<Option<Self::OptReturnType<'a>>>;
 }
 
 pub trait MessageScalarFieldGetter<FD>: MessageOptFieldGetter<FD> {
-    type GetterReturnType<'msg>;
+    type GetterReturnType<'msg>
+    where
+        Self: 'msg;
     fn try_get_field<'a>(&'a self) -> Result<Self::GetterReturnType<'a>>;
 }
 
 // Blanket impl for MessageScalarFieldGetter.
 pub trait MessageScalarFieldGetterImpl<FD, IsMessage>: MessageOptFieldGetter<FD> {
-    type GetterReturnTypeImpl<'msg>;
+    type GetterReturnTypeImpl<'msg>
+    where
+        Self: 'msg;
     fn try_get_field_impl<'a>(&'a self) -> Result<Self::GetterReturnTypeImpl<'a>>;
 }
 
@@ -66,20 +72,20 @@ where
     Self: MessageScalarFieldGetterImpl<FD, IsMessage>,
 {
     type GetterReturnType<'msg> =
-        <Self as MessageScalarFieldGetterImpl<FD, IsMessage>>::GetterReturnTypeImpl<'msg>;
+        <Self as MessageScalarFieldGetterImpl<FD, IsMessage>>::GetterReturnTypeImpl<'msg> where Self: 'msg;
     fn try_get_field<'a>(&'a self) -> Result<Self::GetterReturnType<'a>> {
         self.try_get_field_impl()
     }
 }
 
 // Non message types. Get `Some` value or use `FD::DEFAULT_VALUE`.
-impl<'msg, FD, T, R> MessageScalarFieldGetterImpl<FD, False> for T
+impl<'msg, FD, T> MessageScalarFieldGetterImpl<FD, False> for T
 where
+    Self: 'msg + MessageOptFieldGetter<FD>,
     FD: StaticFieldDescriptor,
-    Self: MessageOptFieldGetter<FD, OptReturnType<'msg> = R>,
-    FieldDefaultValue: TryInto<R, Error = PuroroError>,
+    FieldDefaultValue: TryInto<Self::OptReturnType<'msg>, Error = PuroroError>,
 {
-    type GetterReturnTypeImpl<'a> = <Self as MessageOptFieldGetter<FD>>::OptReturnType<'a>;
+    type GetterReturnTypeImpl<'a> = Self::OptReturnType<'a> where Self: 'a;
     fn try_get_field_impl<'a>(&'a self) -> Result<Self::GetterReturnTypeImpl<'a>> {
         // Get non-message scalar field. Maybe use FD::DEFAULT_VALUE.
         Ok(self
@@ -97,7 +103,7 @@ where
     FD: StaticFieldDescriptor,
     Self: MessageOptFieldGetter<FD>,
 {
-    type GetterReturnTypeImpl<'msg> = <Self as MessageOptFieldGetter<FD>>::OptReturnType<'msg>;
+    type GetterReturnTypeImpl<'msg> = Self::OptReturnType<'msg> where Self: 'msg;
     fn try_get_field_impl<'a>(&'a self) -> Result<Self::GetterReturnTypeImpl<'a>> {
         Ok(self.try_get_opt_field()?.into())
     }
