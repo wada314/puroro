@@ -14,7 +14,6 @@
 
 use crate::desc::{FieldDefaultValue, StaticFieldDescriptor};
 use crate::internal::bool::{False, True};
-use crate::internal::option::OptionMessageImpl;
 use crate::tags;
 use crate::{ErrorKind, PuroroError, Result};
 

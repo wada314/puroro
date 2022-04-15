@@ -15,9 +15,7 @@
 use crate::desc::{StaticFieldDescriptor, StaticMessageDescriptor};
 use crate::internal::bool::{False, True};
 use crate::internal::Bitfield;
-use crate::message::{
-    AsMessageImplRef, MessageImpl, MessageOptFieldGetter, MessageScalarFieldGetter,
-};
+use crate::message::{AsMessageImplRef, MessageImpl, MessageOptFieldGetter};
 use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;
@@ -51,7 +49,9 @@ pub trait OwnedRawField<FD> {
     fn get(&self) -> &Self::Type;
 }
 pub trait OwnedRawMessageField<FD>: OwnedRawField<FD> {
-    type FieldMessageImpl;
+    type FieldMessageImpl
+    where
+        Self::Type: AsMessageImplRef<MessageImplType = Self::FieldMessageImpl>;
 }
 
 // branch opt field getter impl by IsMessage.
@@ -88,7 +88,7 @@ where
     Option<TypeTag::DefaultValueType>: TryFromRawField<'static, MD, FD, RawType, MD::OwnedBitfield>,
     TypeTag::DefaultValueType: Default + PartialEq,
 {
-    type OptReturnTypeImpl<'msg> = TypeTag::DefaultValueType;
+    type OptReturnTypeImpl<'msg> = TypeTag::DefaultValueType where Self:'msg;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
         <Option<TypeTag::DefaultValueType> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
             self.fields.get(),
@@ -98,14 +98,15 @@ where
 }
 
 // Message field optional getter.
-impl<'msg, MD, FD, FS, MI, RawType> MessageOptFieldGetterImpl<FD, True> for OwnedMessageImpl<MD, FS>
+impl<'msg, MD, FD, FS, RawType> MessageOptFieldGetterImpl<FD, True> for OwnedMessageImpl<MD, FS>
 where
     MD: StaticMessageDescriptor,
-    FS: OwnedRawField<FD, Type = RawType> + OwnedRawMessageField<FD, FieldMessageImpl = MI>,
-    MI: 'msg,
-    Option<&'msg MI>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
+    FS: OwnedRawField<FD, Type = RawType> + OwnedRawMessageField<FD>,
+    RawType: AsMessageImplRef<MessageImplType = FS::FieldMessageImpl>,
+    FS::FieldMessageImpl: 'msg,
+    Option<&'msg FS::FieldMessageImpl>: TryFromRawField<'msg, MD, FD, RawType, MD::OwnedBitfield>,
 {
-    type OptReturnTypeImpl<'msg2> = &'msg2 MI where MI: 'msg2;
+    type OptReturnTypeImpl<'msg2> = &'msg2 <FS::Type as AsMessageImplRef>::MessageImplType where Self: 'msg2;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
         <Option<Self::OptReturnTypeImpl> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
             self.fields.get(),
