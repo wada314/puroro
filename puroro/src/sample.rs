@@ -53,9 +53,7 @@ impl OwnedRawField<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {
         &self.partner
     }
 }
-impl OwnedRawMessageField<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {
-    type FieldMessageImpl = OwnedMessageImpl<PersonStaticMessageDescriptor, PersonOwnedRawFields>;
-}
+impl OwnedRawMessageField<PersonStaticFieldDescriptor<4>> for PersonOwnedRawFields {}
 
 #[derive(Default)]
 pub struct PersonStaticMessageDescriptor;
