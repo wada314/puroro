@@ -53,16 +53,18 @@ where
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
     B: Bitfield,
-    T: Clone + TryInto<TypeTag::NonMessageScalarGetterType<'static>, Error = PuroroError>,
-    TypeTag::NonMessageScalarGetterType<'static>: Default + PartialEq,
+    for<'a> T: Clone + TryInto<TypeTag::NonMessageScalarGetterType<'a>, Error = PuroroError>,
+    for<'a> TypeTag::NonMessageScalarGetterType<'a>: Default + PartialEq,
 {
-    type TargetImpl<'a> = Option<TypeTag::DefaultValueType>;
+    type TargetImpl<'a> = Option<TypeTag::NonMessageScalarGetterType<'a>> where Self: 'a, B: 'a;
     fn try_raw_field_into_impl<'a>(&'a self, bitfields: &'a B) -> Result<Self::TargetImpl<'a>> {
         let v = self.clone().try_into()?;
-        if let Some(hasbit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
-            bitfields.get(hasbit_index).then(|| v)
-        } else {
-            (v != Default::default()).then(|| v)
-        }
+        Ok(
+            if let Some(hasbit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
+                bitfields.get(hasbit_index).then(|| v)
+            } else {
+                (v != Default::default()).then(|| v)
+            },
+        )
     }
 }
