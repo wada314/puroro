@@ -17,9 +17,9 @@ use crate::internal::bool::{False, True};
 use crate::internal::Bitfield;
 use crate::message::AsMessageImplRef;
 use crate::tags::{self, FieldLabelTag};
-use crate::{ErrorKind, Result};
+use crate::{ErrorKind, PuroroError, Result};
 
-pub trait TryRawfieldInto<MD, FD, B> {
+pub trait TryRawFieldInto<MD, FD, B> {
     type Target<'a>
     where
         Self: 'a,
@@ -35,7 +35,7 @@ pub trait TryRawFieldIntoImpl<MD, FD, B, IsRepeated, IsLd, IsMessage> {
     fn try_raw_field_into_impl<'a>(&'a self, _: &'a B) -> Result<Self::TargetImpl<'a>>;
 }
 
-impl<MD, FD, B, T, LabelTag, TypeTag> TryRawfieldInto for T
+impl<MD, FD, B, T, LabelTag, TypeTag> TryRawFieldInto for T
 where
     T: TryRawFieldIntoImpl<MD, FD, B, LabelTag::IsRepeated, TypeTag::IsLd, TypeTag::IsMessage>,
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
@@ -45,5 +45,24 @@ where
     type Target<'a> = T::TargetImpl<'a>;
     fn try_raw_field_into<'a>(&'a self, bitfields: &'a B) -> Result<Self::Target<'a>> {
         self.try_raw_field_into_impl(bitfields)
+    }
+}
+
+impl<MD, FD, B, T, TypeTag> TryRawFieldIntoImpl<MD, FD, B, False, False, False> for T
+where
+    FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
+    TypeTag: tags::FieldTypeTag,
+    B: Bitfield,
+    T: Clone + TryInto<TypeTag::NonMessageScalarGetterType<'static>, Result = PuroroError>,
+    TypeTag::NonMessageScalarGetterType<'static>: Default + PartialEq,
+{
+    type TargetImpl<'a> = Option<TypeTag::DefaultValueType>;
+    fn try_raw_field_into_impl<'a>(&'a self, bitfields: &'a B) -> Result<Self::TargetImpl<'a>> {
+        let v = self.clone().try_into()?;
+        if let Some(hasbit_index) = FD::OWNED_HASFIELD_BITFIELD_INDEX {
+            bitfields.get(hasbit_index).then(|| v)
+        } else {
+            (v != Default::default()).then(|| v)
+        }
     }
 }

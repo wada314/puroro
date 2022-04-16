@@ -21,7 +21,7 @@ use crate::Result;
 use ::std::marker::PhantomData;
 
 pub mod try_from_raw_field;
-use try_from_raw_field::TryFromRawField;
+use try_from_raw_field::TryRawFieldInto;
 
 #[derive(Default)]
 pub struct OwnedMessageImpl<MD, FS>
@@ -83,15 +83,11 @@ where
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
     FS: OwnedRawField<FD, Type = RawType>,
-    Option<TypeTag::DefaultValueType>: TryFromRawField<MD, FD, RawType, MD::OwnedBitfield>,
-    TypeTag::DefaultValueType: Default + PartialEq,
+    RawType: TryRawFieldInto<MD, FD, MD::OwnedBitfield>,
 {
-    type OptReturnTypeImpl<'msg> = TypeTag::DefaultValueType where Self:'msg;
+    type OptReturnTypeImpl<'msg> = RawType::Target<'msg> where Self:'msg;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
-        <Option<TypeTag::DefaultValueType> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
-            self.fields.get(),
-            &self.bitvec,
-        )
+        self.fields.get().try_raw_field_into(&self.bitvec)
     }
 }
 
@@ -102,13 +98,10 @@ where
     FD: 'static,
     FS: OwnedRawField<FD> + OwnedRawMessageField<FD>,
     FS::MessageImplType: 'msg,
-    Option<&'msg FS::MessageImplType>: TryFromRawField<MD, FD, FS::Type, MD::OwnedBitfield>,
+    FS::Type: TryRawFieldInto<MD, FD, MD::OwnedBitfield>,
 {
     type OptReturnTypeImpl<'msg2> = &'msg2 FS::MessageImplType where Self: 'msg2;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
-        <Option<Self::OptReturnTypeImpl<'a>> as TryFromRawField<_, _, _, _>>::try_from_raw_field(
-            self.fields.get(),
-            &self.bitvec,
-        )
+        self.fields.get().try_raw_field_into(&self.bitvec)
     }
 }
