@@ -35,14 +35,14 @@ pub trait TryRawFieldIntoImpl<MD, FD, B, IsRepeated, IsLd, IsMessage> {
     fn try_raw_field_into_impl<'a>(&'a self, _: &'a B) -> Result<Self::TargetImpl<'a>>;
 }
 
-impl<MD, FD, B, T, LabelTag, TypeTag> TryRawFieldInto for T
+impl<MD, FD, B, T, LabelTag, TypeTag> TryRawFieldInto<MD, FD, B> for T
 where
     T: TryRawFieldIntoImpl<MD, FD, B, LabelTag::IsRepeated, TypeTag::IsLd, TypeTag::IsMessage>,
     FD: StaticFieldDescriptor<FieldLabelTag = LabelTag, FieldTypeTag = TypeTag>,
     LabelTag: tags::FieldLabelTag,
     TypeTag: tags::FieldTypeTag,
 {
-    type Target<'a> = T::TargetImpl<'a>;
+    type Target<'a> = T::TargetImpl<'a> where Self: 'a, B: 'a;
     fn try_raw_field_into<'a>(&'a self, bitfields: &'a B) -> Result<Self::Target<'a>> {
         self.try_raw_field_into_impl(bitfields)
     }
@@ -53,7 +53,7 @@ where
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
     B: Bitfield,
-    T: Clone + TryInto<TypeTag::NonMessageScalarGetterType<'static>, Result = PuroroError>,
+    T: Clone + TryInto<TypeTag::NonMessageScalarGetterType<'static>, Error = PuroroError>,
     TypeTag::NonMessageScalarGetterType<'static>: Default + PartialEq,
 {
     type TargetImpl<'a> = Option<TypeTag::DefaultValueType>;
