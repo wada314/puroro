@@ -83,7 +83,7 @@ where
     FD: StaticFieldDescriptor<FieldTypeTag = TypeTag>,
     TypeTag: tags::FieldTypeTag,
     FS: OwnedRawField<FD, Type = RawType>,
-    Option<TypeTag::DefaultValueType>: TryFromRawField<'static, MD, FD, RawType, MD::OwnedBitfield>,
+    Option<TypeTag::DefaultValueType>: TryFromRawField<MD, FD, RawType, MD::OwnedBitfield>,
     TypeTag::DefaultValueType: Default + PartialEq,
 {
     type OptReturnTypeImpl<'msg> = TypeTag::DefaultValueType where Self:'msg;
@@ -102,7 +102,7 @@ where
     FD: 'static,
     FS: OwnedRawField<FD> + OwnedRawMessageField<FD>,
     FS::MessageImplType: 'msg,
-    Option<&'msg FS::MessageImplType>: TryFromRawField<'msg, MD, FD, FS::Type, MD::OwnedBitfield>,
+    Option<&'msg FS::MessageImplType>: TryFromRawField<MD, FD, FS::Type, MD::OwnedBitfield>,
 {
     type OptReturnTypeImpl<'msg2> = &'msg2 FS::MessageImplType where Self: 'msg2;
     fn try_get_opt_field_impl<'a>(&'a self) -> Result<Option<Self::OptReturnTypeImpl<'a>>> {
