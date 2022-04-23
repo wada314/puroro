@@ -20,8 +20,8 @@ use crate::tags;
 use crate::Result;
 use ::std::marker::PhantomData;
 
-pub mod try_from_raw_field;
-use try_from_raw_field::TryRawFieldInto;
+pub mod try_raw_field_into;
+use try_raw_field_into::TryRawFieldInto;
 
 #[derive(Default)]
 pub struct OwnedMessageImpl<MD, FS>
