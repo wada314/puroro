@@ -11,39 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-use crate::desc::StaticFieldDescriptor;
-use crate::message::{AsMessageImplRef, MessageImpl, MessageOptFieldGetter};
-use crate::Result;
-
-pub struct OptionMessageImpl<MIR>(Option<MIR>);
-impl<MIR> From<Option<MIR>> for OptionMessageImpl<MIR> {
-    fn from(v: Option<MIR>) -> Self {
-        OptionMessageImpl(v)
-    }
-}
-impl<MIR, MD> MessageImpl<MD> for OptionMessageImpl<MIR> {}
-impl<MIR> AsMessageImplRef for OptionMessageImpl<MIR> {
-    type MessageImplType = Self;
-    fn as_message_impl_ref(&self) -> &Self::MessageImplType {
-        self
-    }
-}
-
-impl<FD, MIR> MessageOptFieldGetter<FD> for OptionMessageImpl<MIR>
-where
-    FD: StaticFieldDescriptor,
-    MIR: AsMessageImplRef,
-    MIR::MessageImplType: MessageOptFieldGetter<FD>,
-{
-    type OptReturnType<'msg> = <<MIR as AsMessageImplRef>::MessageImplType as MessageOptFieldGetter<FD>>::OptReturnType<'msg> where Self: 'msg;
-    fn try_get_opt_field<'a>(&'a self) -> Result<Option<Self::OptReturnType<'a>>> {
-        // just delegate to inner mesasge type
-        Ok(self
-            .0
-            .as_ref()
-            .map(|m| m.as_message_impl_ref().try_get_opt_field())
-            .transpose()?
-            .flatten())
-    }
-}
