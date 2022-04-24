@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const FD: FileDescriptor<'static> = FileDescriptor { messages: &[MD] };
-const MD: MessageDescriptor<'static> = MessageDescriptor {
+static FD: FileDescriptor<'static> = FileDescriptor { messages: &[MD] };
+static MD: MessageDescriptor<'static> = MessageDescriptor {
     file_descriptor: &FD,
     name: todo!(),
     fields: todo!(),
