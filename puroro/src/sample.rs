@@ -31,21 +31,41 @@ use crate::{ErrorKind, Result};
 pub struct Person<M>(M);
 impl<M: Message> Person<M> {
     pub fn age(&self) -> u32 {
-        self.0.get_uint32(&PersonAgeFD).unwrap()
+        self.0.get_uint32(&FD_AGE).unwrap()
+    }
+    pub fn name(&self) -> &str {
+        self.0.get_string(&FD_NAME).unwrap()
+    }
+    pub fn partner(&self) -> () {
+        self.0.get_message(&FD_PARTNER).unwrap();
     }
 }
 
-static FD: FileDescriptor = FileDescriptor { messages: &[] };
-static PersonMD: MessageDescriptor = MessageDescriptor {
-    parent: &FD,
+static FILED: FileDescriptor = FileDescriptor { messages: &[] };
+static MD_PERSON: MessageDescriptor = MessageDescriptor {
+    parent: &FILED,
     name: "Person",
-    fields: &[&PersonAgeFD],
+    fields: &[&FD_NAME, &FD_AGE, &FD_PARTNER],
 };
-static PersonAgeFD: FieldDescriptor = FieldDescriptor {
-    parent: &PersonMD,
+static FD_NAME: FieldDescriptor = FieldDescriptor {
+    parent: &MD_PERSON,
+    name: "name",
+    number: 1,
+    r#type: FieldType::String,
+    label: FieldLabel::Optional,
+};
+static FD_AGE: FieldDescriptor = FieldDescriptor {
+    parent: &MD_PERSON,
     name: "age",
     number: 2,
     r#type: FieldType::UInt32,
+    label: FieldLabel::Optional,
+};
+static FD_PARTNER: FieldDescriptor = FieldDescriptor {
+    parent: &MD_PERSON,
+    name: "partner",
+    number: 4,
+    r#type: FieldType::Message(&MD_PERSON),
     label: FieldLabel::Optional,
 };
 
