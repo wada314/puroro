@@ -11,3 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+use crate::desc::*;
+use crate::Result;
+
+pub trait Message {
+    #[inline]
+    fn inline_has_field(&self, fd: &FieldDescriptor) -> bool;
+    fn has_field(&self, fd: &FieldDescriptor) -> bool {
+        self.inline_has_field(fd)
+    }
+
+    #[inline]
+    fn inline_get_int32(&self, fd: &FieldDescriptor) -> Result<i32>;
+    fn get_int32(&self, fd: &FieldDescriptor) -> Result<i32> {
+        self.inline_get_int32(fd)
+    }
+}
