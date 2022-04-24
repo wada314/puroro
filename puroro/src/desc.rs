@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const FD: FileDescriptor<'static> = FileDescriptor { messages: &[MD] };
+const MD: MessageDescriptor<'static> = MessageDescriptor {
+    file_descriptor: &FD,
+    name: todo!(),
+    fields: todo!(),
+};
+
 pub struct FileDescriptor<'a> {
     messages: &'a [MessageDescriptor<'a>],
 }
 
 pub struct MessageDescriptor<'a> {
+    file_descriptor: &'a FileDescriptor<'a>,
     name: &'a str,
     fields: &'a [FieldDescriptor<'a>],
 }
