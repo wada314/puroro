@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub struct FileDescriptor<'a> {
+    messages: &'a [MessageDescriptor<'a>],
+}
+
 pub struct MessageDescriptor<'a> {
     name: &'a str,
     fields: &'a [FieldDescriptor<'a>],
