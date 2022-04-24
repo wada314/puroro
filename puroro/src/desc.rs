@@ -12,24 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-static FD: FileDescriptor<'static> = FileDescriptor { messages: &[MD] };
+static FD: FileDescriptor<'static> = FileDescriptor { messages: &[&MD] };
 static MD: MessageDescriptor<'static> = MessageDescriptor {
-    file_descriptor: &FD,
-    name: todo!(),
-    fields: todo!(),
+    parent: &FD,
+    name: "",
+    fields: &[],
+};
+static FID: FieldDescriptor<'static> = FieldDescriptor {
+    parent: &MD,
+    name: "",
+    number: 1,
+    r#type: FieldType::Message(&MD),
+    label: FieldLabel::Optional,
 };
 
 pub struct FileDescriptor<'a> {
-    messages: &'a [MessageDescriptor<'a>],
+    messages: &'a [&'a MessageDescriptor<'a>],
 }
 
 pub struct MessageDescriptor<'a> {
-    file_descriptor: &'a FileDescriptor<'a>,
+    parent: &'a FileDescriptor<'a>,
     name: &'a str,
-    fields: &'a [FieldDescriptor<'a>],
+    fields: &'a [&'a FieldDescriptor<'a>],
 }
 
 pub struct FieldDescriptor<'a> {
+    parent: &'a MessageDescriptor<'a>,
     name: &'a str,
     number: i32,
     r#type: FieldType<'a>,
