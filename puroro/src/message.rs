@@ -22,3 +22,24 @@ pub trait Message {
     // maybe want to return by value...
     fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn Message>;
 }
+
+impl<T> Message for &T
+where
+    T: Message,
+{
+    fn has_field(&self, fd: &FieldDescriptor) -> Result<bool> {
+        <T as Message>::has_field(*self, fd)
+    }
+
+    fn get_uint32(&self, fd: &FieldDescriptor) -> Result<u32> {
+        <T as Message>::get_uint32(*self, fd)
+    }
+
+    fn get_string(&self, fd: &FieldDescriptor) -> Result<&str> {
+        <T as Message>::get_string(*self, fd)
+    }
+
+    fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn Message> {
+        <T as Message>::get_message(*self, fd)
+    }
+}

@@ -36,8 +36,8 @@ impl<M: Message> Person<M> {
     pub fn name(&self) -> &str {
         self.0.get_string(&FD_NAME).unwrap()
     }
-    pub fn partner(&self) -> () {
-        self.0.get_message(&FD_PARTNER).unwrap();
+    pub fn partner(&self) -> Person<&dyn Message> {
+        Person(self.0.get_message(&FD_PARTNER).unwrap())
     }
 }
 
@@ -99,6 +99,24 @@ impl Message for PersonMessageImpl {
             4 => Ok(self.partner.as_deref().map(|m| m as &dyn Message).unwrap()),
             _ => Err(ErrorKind::ReflectionError)?,
         }
+    }
+}
+
+pub trait PersonTrait: Message {
+    fn age(&self) -> u32;
+    fn name(&self) -> &str;
+    fn partner(&self) -> &dyn PersonTrait;
+}
+
+impl<T: Message> PersonTrait for T {
+    fn age(&self) -> u32 {
+        <Self as Message>::get_uint32(self, &FD_AGE).unwrap()
+    }
+    fn name(&self) -> &str {
+        <Self as Message>::get_string(self, &FD_NAME).unwrap()
+    }
+    fn partner(&self) -> &dyn PersonTrait {
+        <Self as Message>::get_message(self, &FD_PARTNER).unwrap() as &dyn PersonTrait
     }
 }
 
