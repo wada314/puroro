@@ -16,15 +16,9 @@ use crate::desc::*;
 use crate::Result;
 
 pub trait Message {
-    #[inline]
-    fn inline_has_field(&self, fd: &FieldDescriptor) -> bool;
-    fn has_field(&self, fd: &FieldDescriptor) -> bool {
-        self.inline_has_field(fd)
-    }
-
-    #[inline]
-    fn inline_get_int32(&self, fd: &FieldDescriptor) -> Result<i32>;
-    fn get_int32(&self, fd: &FieldDescriptor) -> Result<i32> {
-        self.inline_get_int32(fd)
-    }
+    fn has_field(&self, fd: &FieldDescriptor) -> Result<bool>;
+    fn get_uint32(&self, fd: &FieldDescriptor) -> Result<u32>;
+    fn get_string(&self, fd: &FieldDescriptor) -> Result<&str>;
+    // maybe want to return by value...
+    fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn Message>;
 }

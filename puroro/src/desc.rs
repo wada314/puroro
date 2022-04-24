@@ -13,31 +13,31 @@
 // limitations under the License.
 
 pub struct FileDescriptor<'a> {
-    messages: &'a [&'a MessageDescriptor<'a>],
+    pub messages: &'a [&'a MessageDescriptor<'a>],
 }
 
 pub struct MessageDescriptor<'a> {
-    parent: &'a FileDescriptor<'a>,
-    name: &'a str,
-    fields: &'a [&'a FieldDescriptor<'a>],
+    pub parent: &'a FileDescriptor<'a>,
+    pub name: &'a str,
+    pub fields: &'a [&'a FieldDescriptor<'a>],
 }
 
 pub struct FieldDescriptor<'a> {
-    parent: &'a MessageDescriptor<'a>,
-    name: &'a str,
-    number: i32,
-    r#type: FieldType<'a>,
-    label: FieldLabel,
+    pub parent: &'a MessageDescriptor<'a>,
+    pub name: &'a str,
+    pub number: i32,
+    pub r#type: FieldType<'a>,
+    pub label: FieldLabel,
 }
 
 pub struct EnumDescriptor<'a> {
-    name: &'a str,
-    values: &'a [EnumValueDescriptor<'a>],
+    pub name: &'a str,
+    pub values: &'a [EnumValueDescriptor<'a>],
 }
 
 pub struct EnumValueDescriptor<'a> {
-    name: &'a str,
-    number: i32,
+    pub name: &'a str,
+    pub number: i32,
 }
 
 pub enum FieldLabel {

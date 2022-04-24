@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![doc = include_str!("lib.md")]
+//#![doc = include_str!("lib.md")]
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
@@ -25,7 +25,7 @@ pub mod desc;
 mod error;
 pub mod internal;
 pub mod message;
-mod sample;
+pub mod sample;
 pub mod tags;
 
 pub use self::common_traits::*;
