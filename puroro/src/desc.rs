@@ -12,28 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub struct MessageDescriptor {
-    name: String,
-    fields: Vec<FieldDescriptor>,
+pub struct MessageDescriptor<'a> {
+    name: &'a str,
+    fields: &'a [FieldDescriptor<'a>],
 }
 
-pub struct FieldDescriptor {
-    name: String,
+pub struct FieldDescriptor<'a> {
+    name: &'a str,
     number: i32,
-    r#type: FieldType,
+    r#type: FieldType<'a>,
+    label: FieldLabel,
 }
 
-pub struct EnumDescriptor {
-    name: String,
-    values: Vec<EnumValueDescriptor>,
+pub struct EnumDescriptor<'a> {
+    name: &'a str,
+    values: &'a [EnumValueDescriptor<'a>],
 }
 
-pub struct EnumValueDescriptor {
-    name: String,
+pub struct EnumValueDescriptor<'a> {
+    name: &'a str,
     number: i32,
 }
 
-pub enum FieldType {
+pub enum FieldLabel {
+    Required,
+    Optional,
+    Repeated,
+}
+
+pub enum FieldType<'a> {
     Int32,
     Int64,
     UInt32,
@@ -45,10 +52,10 @@ pub enum FieldType {
     SFixed32,
     SFixed64,
     Bool,
-    Enum(&'static EnumDescriptor),
+    Enum(&'a EnumDescriptor<'a>),
     Float,
     Double,
     Bytes,
     String,
-    Message(&'static MessageDescriptor),
+    Message(&'a MessageDescriptor<'a>),
 }
