@@ -36,9 +36,9 @@ impl<M: Message> Person<M> {
     pub fn name(&self) -> &str {
         self.0.get_string(&FD_NAME).unwrap()
     }
-    pub fn partner(&self) -> Person<&dyn Message> {
-        Person(self.0.get_message(&FD_PARTNER).unwrap())
-    }
+    // pub fn partner(&self) -> Person<&dyn Message> {
+    //     Person(self.0.get_message(&FD_PARTNER).unwrap())
+    // }
 }
 
 static FILED: FileDescriptor = FileDescriptor { messages: &[] };
@@ -105,7 +105,7 @@ impl Message for PersonMessageImpl {
 pub trait PersonTrait: Message {
     fn age(&self) -> u32;
     fn name(&self) -> &str;
-    fn partner(&self) -> &dyn PersonTrait;
+    // fn partner(&self) -> &dyn PersonTrait;
 }
 
 impl<T: Message> PersonTrait for T {
@@ -114,9 +114,6 @@ impl<T: Message> PersonTrait for T {
     }
     fn name(&self) -> &str {
         <Self as Message>::get_string(self, &FD_NAME).unwrap()
-    }
-    fn partner(&self) -> &dyn PersonTrait {
-        <Self as Message>::get_message(self, &FD_PARTNER).unwrap() as &dyn PersonTrait
     }
 }
 
@@ -129,6 +126,10 @@ pub fn hoge<M: Message>(person: &Person<M>) -> u32 {
 
 #[test]
 fn testhoge() {
-    let person = Person(PersonMessageImpl { age: 10 });
+    let person = Person(PersonMessageImpl {
+        age: 10,
+        name: "John".to_string(),
+        partner: None,
+    });
     assert_eq!(20, hoge(&person));
 }
