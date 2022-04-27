@@ -19,7 +19,6 @@ pub trait Message {
     fn has_field(&self, fd: &FieldDescriptor) -> Result<bool>;
     fn get_uint32(&self, fd: &FieldDescriptor) -> Result<u32>;
     fn get_string(&self, fd: &FieldDescriptor) -> Result<&str>;
-    // maybe want to return by value...
     fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn Message>;
 }
 
