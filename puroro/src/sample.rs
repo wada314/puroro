@@ -25,21 +25,9 @@
 // }
 
 use crate::desc::*;
-use crate::message::Message;
 use crate::{ErrorKind, Result};
 
-pub struct Person<M>(M);
-impl<M: Message> Person<M> {
-    pub fn age(&self) -> u32 {
-        self.0.get_uint32(&FD_AGE).unwrap()
-    }
-    pub fn name(&self) -> &str {
-        self.0.get_string(&FD_NAME).unwrap()
-    }
-    pub fn partner(&self) -> Person<&dyn Message> {
-        Person(self.0.get_message(&FD_PARTNER).unwrap())
-    }
-}
+// pub struct Person<M>(M);
 
 static FILED: FileDescriptor = FileDescriptor { messages: &[] };
 static MD_PERSON: MessageDescriptor = MessageDescriptor {
@@ -75,68 +63,49 @@ pub struct PersonMessageImpl {
     age: u32,
     partner: Option<Box<PersonMessageImpl>>,
 }
-impl Message for PersonMessageImpl {
-    fn has_field(&self, fd: &FieldDescriptor) -> Result<bool> {
-        match fd.number {
-            1 | 2 | 4 => Ok(true),
-            _ => Err(ErrorKind::ReflectionError)?,
-        }
-    }
-    fn get_uint32(&self, fd: &FieldDescriptor) -> Result<u32> {
-        match fd.number {
-            2 => Ok(self.age),
-            _ => Err(ErrorKind::ReflectionError)?,
-        }
-    }
-    fn get_string(&self, fd: &FieldDescriptor) -> Result<&str> {
-        match fd.number {
-            1 => Ok(&self.name),
-            _ => Err(ErrorKind::ReflectionError)?,
-        }
-    }
-    fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn Message> {
-        match fd.number {
-            4 => Ok(self.partner.as_deref().map(|m| m as &dyn Message).unwrap()),
-            _ => Err(ErrorKind::ReflectionError)?,
-        }
-    }
-}
+// impl DynamicReflection for PersonMessageImpl {
+//     fn has_field(&self, fd: &FieldDescriptor) -> Result<bool> {
+//         match fd.number {
+//             1 | 2 | 4 => Ok(true),
+//             _ => Err(ErrorKind::ReflectionError)?,
+//         }
+//     }
+//     fn get_uint32(&self, fd: &FieldDescriptor) -> Result<u32> {
+//         match fd.number {
+//             2 => Ok(self.age),
+//             _ => Err(ErrorKind::ReflectionError)?,
+//         }
+//     }
+//     fn get_string(&self, fd: &FieldDescriptor) -> Result<&str> {
+//         match fd.number {
+//             1 => Ok(&self.name),
+//             _ => Err(ErrorKind::ReflectionError)?,
+//         }
+//     }
+//     fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn DynamicReflection> {
+//         match fd.number {
+//             4 => Ok(self.partner.as_deref().map(|m| m as &dyn DynamicReflection).unwrap()),
+//             _ => Err(ErrorKind::ReflectionError)?,
+//         }
+//     }
+// }
 
-pub trait PersonTrait: Message {
-    fn age(&self) -> u32;
-    fn name(&self) -> &str;
-    fn partner(&self) -> &dyn Message;
-}
+// pub trait PersonTrait: DynamicReflection {
+//     fn age(&self) -> u32;
+//     fn name(&self) -> &str;
+//     fn partner(&self) -> &dyn DynamicReflection;
+// }
 
-impl<T: Message> PersonTrait for T {
-    fn age(&self) -> u32 {
-        <Self as Message>::get_uint32(self, &FD_AGE).unwrap()
-    }
-    fn name(&self) -> &str {
-        <Self as Message>::get_string(self, &FD_NAME).unwrap()
-    }
-    fn partner(&self) -> &dyn Message {
-        <Self as Message>::get_message(self, &FD_PARTNER).unwrap()
-    }
-}
+// impl<T: DynamicReflection> PersonTrait for T {
+//     fn age(&self) -> u32 {
+//         <Self as DynamicReflection>::get_uint32(self, &FD_AGE).unwrap()
+//     }
+//     fn name(&self) -> &str {
+//         <Self as DynamicReflection>::get_string(self, &FD_NAME).unwrap()
+//     }
+//     fn partner(&self) -> &dyn DynamicReflection {
+//         <Self as DynamicReflection>::get_message(self, &FD_PARTNER).unwrap()
+//     }
+// }
 
 ////////////////////////////////////////////
-
-#[inline(never)]
-pub fn hoge<M: Message>(person: &Person<M>) -> u32 {
-    person.age() + 10
-}
-
-#[test]
-fn testhoge() {
-    let person = Person(PersonMessageImpl {
-        age: 10,
-        name: "John".to_string(),
-        partner: Some(Box::new(PersonMessageImpl {
-            age: 20,
-            name: "Tom".to_string(),
-            partner: None,
-        })),
-    });
-    assert_eq!(20, hoge(&person));
-}

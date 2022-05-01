@@ -25,6 +25,7 @@ pub mod desc;
 mod error;
 pub mod internal;
 pub mod message;
+pub mod reflection;
 pub mod sample;
 pub mod tags;
 
