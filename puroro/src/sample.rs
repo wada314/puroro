@@ -24,7 +24,7 @@
 //     repeated Person children = 3;
 // }
 
-use crate::desc::*;
+use crate::reflection::dynamic::desc::*;
 use crate::{ErrorKind, Result};
 
 // pub struct Person<M>(M);
