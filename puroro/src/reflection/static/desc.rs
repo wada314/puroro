@@ -21,7 +21,7 @@ pub trait MessageDescriptor {
 }
 
 pub trait FieldDescriptor {
-    type Number;
+    type Number: typenum::ToInt<i32>;
     type FieldType: tags::FieldTypeTag;
 }
 

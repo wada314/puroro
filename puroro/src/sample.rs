@@ -76,8 +76,12 @@ mod dynamic {
 
 mod r#static {
     use crate::reflection::r#static::desc::*;
+    use crate::reflection::r#static::Reflection;
     use crate::tags;
+    use crate::ErrorKind;
     use ::typenum::{U1, U2, U3};
+
+    use super::PersonMessageImpl;
 
     pub struct MdPerson;
     pub struct FdName;
@@ -97,6 +101,34 @@ mod r#static {
     impl FieldDescriptor for FdPartner {
         type Number = U3;
         type FieldType = tags::Message<MdPerson>;
+    }
+
+    impl Reflection for PersonMessageImpl {
+        fn has_field<FD: FieldDescriptor>(&self) -> crate::Result<bool> {
+            match <FD::Number as typenum::ToInt<i32>>::to_int() {
+                1 | 2 => Ok(true),
+                4 => Ok(self.partner.is_some()),
+                _ => Err(ErrorKind::ReflectionError)?,
+            }
+        }
+
+        fn get_uint32<FD: FieldDescriptor>(&self) -> crate::Result<u32> {
+            todo!()
+        }
+
+        fn get_string<FD: FieldDescriptor>(&self) -> crate::Result<&str> {
+            todo!()
+        }
+
+        type ChildReflection<'a, FD>
+        where
+            Self: 'a,
+            FD: FieldDescriptor,
+        = PersonMessageImpl; // TBD
+
+        fn get_message<FD: FieldDescriptor>(&self) -> crate::Result<Self::ChildReflection<'_, FD>> {
+            todo!()
+        }
     }
 }
 
