@@ -24,38 +24,7 @@
 //     repeated Person children = 3;
 // }
 
-use crate::reflection::dynamic::desc::*;
 use crate::{ErrorKind, Result};
-
-// pub struct Person<M>(M);
-
-static FILED: FileDescriptor = FileDescriptor { messages: &[] };
-static MD_PERSON: MessageDescriptor = MessageDescriptor {
-    parent: &FILED,
-    name: "Person",
-    fields: &[&FD_NAME, &FD_AGE, &FD_PARTNER],
-};
-static FD_NAME: FieldDescriptor = FieldDescriptor {
-    parent: &MD_PERSON,
-    name: "name",
-    number: 1,
-    r#type: FieldType::String,
-    label: FieldLabel::Optional,
-};
-static FD_AGE: FieldDescriptor = FieldDescriptor {
-    parent: &MD_PERSON,
-    name: "age",
-    number: 2,
-    r#type: FieldType::UInt32,
-    label: FieldLabel::Optional,
-};
-static FD_PARTNER: FieldDescriptor = FieldDescriptor {
-    parent: &MD_PERSON,
-    name: "partner",
-    number: 4,
-    r#type: FieldType::Message(&MD_PERSON),
-    label: FieldLabel::Optional,
-};
 
 #[derive(Default)]
 pub struct PersonMessageImpl {
@@ -63,49 +32,93 @@ pub struct PersonMessageImpl {
     age: u32,
     partner: Option<Box<PersonMessageImpl>>,
 }
-// impl DynamicReflection for PersonMessageImpl {
-//     fn has_field(&self, fd: &FieldDescriptor) -> Result<bool> {
-//         match fd.number {
-//             1 | 2 | 4 => Ok(true),
-//             _ => Err(ErrorKind::ReflectionError)?,
-//         }
-//     }
-//     fn get_uint32(&self, fd: &FieldDescriptor) -> Result<u32> {
-//         match fd.number {
-//             2 => Ok(self.age),
-//             _ => Err(ErrorKind::ReflectionError)?,
-//         }
-//     }
-//     fn get_string(&self, fd: &FieldDescriptor) -> Result<&str> {
-//         match fd.number {
-//             1 => Ok(&self.name),
-//             _ => Err(ErrorKind::ReflectionError)?,
-//         }
-//     }
-//     fn get_message(&self, fd: &FieldDescriptor) -> Result<&dyn DynamicReflection> {
-//         match fd.number {
-//             4 => Ok(self.partner.as_deref().map(|m| m as &dyn DynamicReflection).unwrap()),
-//             _ => Err(ErrorKind::ReflectionError)?,
-//         }
-//     }
-// }
 
-// pub trait PersonTrait: DynamicReflection {
-//     fn age(&self) -> u32;
-//     fn name(&self) -> &str;
-//     fn partner(&self) -> &dyn DynamicReflection;
-// }
+pub trait PersonTrait {
+    fn name(&self) -> &str;
+    fn age(&self) -> u32;
+    type PartnerType<'a>: PersonTrait
+    where
+        Self: 'a;
+    fn partner(&self) -> Self::PartnerType<'_>;
+}
 
-// impl<T: DynamicReflection> PersonTrait for T {
-//     fn age(&self) -> u32 {
-//         <Self as DynamicReflection>::get_uint32(self, &FD_AGE).unwrap()
-//     }
-//     fn name(&self) -> &str {
-//         <Self as DynamicReflection>::get_string(self, &FD_NAME).unwrap()
-//     }
-//     fn partner(&self) -> &dyn DynamicReflection {
-//         <Self as DynamicReflection>::get_message(self, &FD_PARTNER).unwrap()
-//     }
-// }
+// pub struct Person<M>(M);
+mod dynamic {
+    use crate::reflection::dynamic::desc::*;
+    static FILED: FileDescriptor = FileDescriptor { messages: &[] };
+    static MD_PERSON: MessageDescriptor = MessageDescriptor {
+        parent: &FILED,
+        name: "Person",
+        fields: &[&FD_NAME, &FD_AGE, &FD_PARTNER],
+    };
+    static FD_NAME: FieldDescriptor = FieldDescriptor {
+        parent: &MD_PERSON,
+        name: "name",
+        number: 1,
+        r#type: FieldType::String,
+        label: FieldLabel::Optional,
+    };
+    static FD_AGE: FieldDescriptor = FieldDescriptor {
+        parent: &MD_PERSON,
+        name: "age",
+        number: 2,
+        r#type: FieldType::UInt32,
+        label: FieldLabel::Optional,
+    };
+    static FD_PARTNER: FieldDescriptor = FieldDescriptor {
+        parent: &MD_PERSON,
+        name: "partner",
+        number: 4,
+        r#type: FieldType::Message(&MD_PERSON),
+        label: FieldLabel::Optional,
+    };
+}
+
+mod r#static {
+    use crate::reflection::r#static::desc::*;
+    use crate::tags;
+    use ::typenum::{U1, U2, U3};
+
+    pub struct MdPerson;
+    pub struct FdName;
+    pub struct FdAge;
+    pub struct FdPartner;
+    impl MessageDescriptor for MdPerson {
+        type Fields = (FdName, (FdAge, (FdPartner, ())));
+    }
+    impl FieldDescriptor for FdName {
+        type Number = U1;
+        type FieldType = tags::String;
+    }
+    impl FieldDescriptor for FdAge {
+        type Number = U2;
+        type FieldType = tags::UInt32;
+    }
+    impl FieldDescriptor for FdPartner {
+        type Number = U3;
+        type FieldType = tags::Message<MdPerson>;
+    }
+}
+
+impl<T> PersonTrait for T
+where
+    T: crate::reflection::r#static::Reflection,
+{
+    fn name(&self) -> &str {
+        self.get_string::<r#static::FdName>().unwrap()
+    }
+    fn age(&self) -> u32 {
+        self.get_uint32::<r#static::FdAge>().unwrap()
+    }
+
+    type PartnerType<'a>
+    where
+        Self: 'a,
+    = <T as crate::reflection::r#static::Reflection>::ChildReflection<'a, r#static::FdPartner>;
+
+    fn partner(&self) -> Self::PartnerType<'_> {
+        self.get_message::<r#static::FdPartner>().unwrap()
+    }
+}
 
 ////////////////////////////////////////////

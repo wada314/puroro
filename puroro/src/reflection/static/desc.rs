@@ -14,7 +14,7 @@
 
 use crate::tags;
 use ::typenum;
-use ::typenum::{B0, B1, P1, P2, P3};
+use ::typenum::{B0, B1};
 
 pub trait MessageDescriptor {
     type Fields;
@@ -23,26 +23,6 @@ pub trait MessageDescriptor {
 pub trait FieldDescriptor {
     type Number;
     type FieldType: tags::FieldTypeTag;
-}
-
-struct MD;
-struct FD1;
-struct FD2;
-struct FD3;
-impl MessageDescriptor for MD {
-    type Fields = (FD1, (FD2, (FD3, ())));
-}
-impl FieldDescriptor for FD1 {
-    type Number = P1;
-    type FieldType = tags::String;
-}
-impl FieldDescriptor for FD2 {
-    type Number = P2;
-    type FieldType = tags::UInt32;
-}
-impl FieldDescriptor for FD3 {
-    type Number = P3;
-    type FieldType = tags::Message<MD>;
 }
 
 pub trait If<T, F> {
@@ -72,12 +52,12 @@ where
 }
 
 trait MdGetFieldExt<N> {
-    type Type;
+    type GetField;
 }
 impl<N, MD> MdGetFieldExt<N> for MD
 where
     MD: MessageDescriptor,
     MD::Fields: GetFieldFromTuple<N>,
 {
-    type Type = <MD::Fields as GetFieldFromTuple<N>>::Type;
+    type GetField = <MD::Fields as GetFieldFromTuple<N>>::Type;
 }
