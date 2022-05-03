@@ -20,6 +20,7 @@ pub trait MessageDescriptor {
 
 pub trait FieldDescriptor {
     const NUMBER: i32;
+    type Number: I32Trait;
     type FieldType: tags::FieldTypeTag;
 }
 
@@ -32,13 +33,43 @@ impl MessageDescriptor for MD {
 }
 impl FieldDescriptor for FD1 {
     const NUMBER: i32 = 1;
+    type Number = I32<1>;
     type FieldType = tags::String;
 }
 impl FieldDescriptor for FD2 {
     const NUMBER: i32 = 2;
+    type Number = I32<2>;
     type FieldType = tags::UInt32;
 }
 impl FieldDescriptor for FD3 {
     const NUMBER: i32 = 3;
+    type Number = I32<3>;
     type FieldType = tags::Message<MD>;
+}
+
+struct I32<const VALUE: i32>;
+trait I32Trait {
+    const VALUE: i32;
+}
+impl<const VALUE: i32> I32Trait for I32<VALUE> {
+    const VALUE: i32 = VALUE;
+}
+
+trait GetTypeFromTuple {
+    type Type;
+}
+struct FindNumberFromTuple<T, N: I32Trait>(std::marker::PhantomData<(T, N)>);
+impl<N: I32Trait> GetTypeFromTuple for FindNumberFromTuple<(), N> {
+    type Type = ();
+}
+impl<T: FieldDescriptor, U> GetTypeFromTuple for FindNumberFromTuple<(T, U), T::Number> {
+    type Type = T;
+}
+
+trait GetFieldTrait {
+    type Type;
+}
+struct GetField<const NUMBER: i32>;
+impl<const NUMBER: i32> GetFieldTrait for GetField<NUMBER> {
+    type Type = Type;
 }
