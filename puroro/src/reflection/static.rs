@@ -13,3 +13,17 @@
 // limitations under the License.
 
 pub mod desc;
+use crate::Result;
+use desc::FieldDescriptor;
+
+pub trait Reflection {
+    fn has_field<FD: FieldDescriptor>(&self) -> Result<bool>;
+    fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32>;
+    fn get_string<FD: FieldDescriptor>(&self) -> Result<&str>;
+    type ChildReflection<'a>: Reflection
+    where
+        Self: 'a;
+    fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_>>;
+}
+
+
