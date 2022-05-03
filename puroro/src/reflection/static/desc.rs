@@ -13,14 +13,15 @@
 // limitations under the License.
 
 use crate::tags;
+use ::typenum;
+use ::typenum::{B0, B1, P1, P2, P3};
 
 pub trait MessageDescriptor {
     type Fields;
 }
 
 pub trait FieldDescriptor {
-    const NUMBER: i32;
-    type Number: I32Trait;
+    type Number;
     type FieldType: tags::FieldTypeTag;
 }
 
@@ -32,44 +33,51 @@ impl MessageDescriptor for MD {
     type Fields = (FD1, (FD2, (FD3, ())));
 }
 impl FieldDescriptor for FD1 {
-    const NUMBER: i32 = 1;
-    type Number = I32<1>;
+    type Number = P1;
     type FieldType = tags::String;
 }
 impl FieldDescriptor for FD2 {
-    const NUMBER: i32 = 2;
-    type Number = I32<2>;
+    type Number = P2;
     type FieldType = tags::UInt32;
 }
 impl FieldDescriptor for FD3 {
-    const NUMBER: i32 = 3;
-    type Number = I32<3>;
+    type Number = P3;
     type FieldType = tags::Message<MD>;
 }
 
-struct I32<const VALUE: i32>;
-trait I32Trait {
-    const VALUE: i32;
-}
-impl<const VALUE: i32> I32Trait for I32<VALUE> {
-    const VALUE: i32 = VALUE;
-}
-
-trait GetTypeFromTuple {
+pub trait If<T, F> {
     type Type;
 }
-struct FindNumberFromTuple<T, N: I32Trait>(std::marker::PhantomData<(T, N)>);
-impl<N: I32Trait> GetTypeFromTuple for FindNumberFromTuple<(), N> {
-    type Type = ();
+impl<T, F> If<T, F> for B0 {
+    type Type = F;
 }
-impl<T: FieldDescriptor, U> GetTypeFromTuple for FindNumberFromTuple<(T, U), T::Number> {
+impl<T, F> If<T, F> for B1 {
     type Type = T;
 }
 
-trait GetFieldTrait {
+trait GetFieldFromTuple<N> {
     type Type;
 }
-struct GetField<const NUMBER: i32>;
-impl<const NUMBER: i32> GetFieldTrait for GetField<NUMBER> {
-    type Type = Type;
+impl<N> GetFieldFromTuple<N> for () {
+    type Type = ();
+}
+impl<T, U, N> GetFieldFromTuple<N> for (T, U)
+where
+    T: FieldDescriptor,
+    T::Number: typenum::IsEqual<N>,
+    typenum::Eq<T::Number, N>: If<T, U::Type>,
+    U: GetFieldFromTuple<N>,
+{
+    type Type = <typenum::Eq<T::Number, N> as If<T, U::Type>>::Type;
+}
+
+trait MdGetFieldExt<N> {
+    type Type;
+}
+impl<N, MD> MdGetFieldExt<N> for MD
+where
+    MD: MessageDescriptor,
+    MD::Fields: GetFieldFromTuple<N>,
+{
+    type Type = <MD::Fields as GetFieldFromTuple<N>>::Type;
 }
