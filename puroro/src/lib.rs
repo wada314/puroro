@@ -23,6 +23,7 @@
 mod common_traits;
 pub mod desc;
 mod error;
+pub mod field_number;
 pub mod internal;
 pub mod message;
 pub mod reflection;

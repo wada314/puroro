@@ -126,10 +126,11 @@ impl Reflection for PersonMessageImpl {
     }
 
     type ChildReflection<'a, FD>
-    = <((U4, &'a PersonMessageImpl), ()) as MapGet<IsTypeNumEqual<FD::Number>>>::Type
+    // = <((U4, &'a PersonMessageImpl), ()) as MapGet<IsTypeNumEqual<FD::Number>>>::Type
+    = &'a PersonMessageImpl
     where
         Self: 'a,
-        FD: FieldDescriptor; // TBD
+        FD: FieldDescriptor;
 
     fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
         if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
