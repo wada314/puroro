@@ -77,7 +77,8 @@ mod dynamic {
 use crate::reflection::r#static::desc::*;
 use crate::reflection::r#static::Reflection;
 use crate::tags;
-use ::typenum::{U1, U2, U3};
+use crate::util::{IsTypeNumEqual, MapGet};
+use ::typenum::{U1, U2, U4};
 
 pub struct MdPerson;
 pub struct FdName;
@@ -95,7 +96,7 @@ impl FieldDescriptor for FdAge {
     type FieldType = tags::UInt32;
 }
 impl FieldDescriptor for FdPartner {
-    type Number = U3;
+    type Number = U4;
     type FieldType = tags::Message<MdPerson>;
 }
 
@@ -125,7 +126,7 @@ impl Reflection for PersonMessageImpl {
     }
 
     type ChildReflection<'a, FD>
-    = &'a PersonMessageImpl
+    = <((U4, &'a PersonMessageImpl), ()) as MapGet<IsTypeNumEqual<FD::Number>>>::Type
     where
         Self: 'a,
         FD: FieldDescriptor; // TBD

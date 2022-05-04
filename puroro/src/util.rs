@@ -27,16 +27,37 @@ impl If for B1 {
 pub trait Pred<T> {
     type Type: If;
 }
+pub struct IsTypeNumEqual<N>(::std::marker::PhantomData<N>);
+impl<N, M> Pred<M> for IsTypeNumEqual<N>
+where
+    N: ::typenum::IsEqual<M>,
+    typenum::Eq<N, M>: If,
+{
+    type Type = typenum::Eq<N, M>;
+}
 
-pub trait Find<P> {
+pub trait ListFind<P> {
     type Type;
 }
-impl<P: Pred<()>> Find<P> for () {
+impl<P> ListFind<P> for () {
     type Type = ();
 }
-impl<T, U, P: Pred<T>> Find<P> for (T, U)
+impl<T, U, P: Pred<T>> ListFind<P> for (T, U)
 where
-    U: Find<P>,
+    U: ListFind<P>,
 {
-    type Type = <P::Type as If>::Type<T, <U as Find<P>>::Type>;
+    type Type = <P::Type as If>::Type<T, <U as ListFind<P>>::Type>;
+}
+
+pub trait MapGet<P> {
+    type Type;
+}
+impl<P> MapGet<P> for () {
+    type Type = ();
+}
+impl<K, V, U, P: Pred<K>> MapGet<P> for ((K, V), U)
+where
+    U: MapGet<P>,
+{
+    type Type = <P::Type as If>::Type<V, <U as MapGet<P>>::Type>;
 }
