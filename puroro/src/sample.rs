@@ -78,7 +78,7 @@ mod r#static {
     use crate::reflection::r#static::desc::*;
     use crate::reflection::r#static::Reflection;
     use crate::tags;
-    use crate::ErrorKind;
+    use crate::{ErrorKind, Result};
     use ::typenum::{U1, U2, U3};
 
     use super::PersonMessageImpl;
@@ -105,7 +105,7 @@ mod r#static {
     }
 
     impl Reflection for PersonMessageImpl {
-        fn has_field<FD: FieldDescriptor>(&self) -> crate::Result<bool> {
+        fn has_field<FD: FieldDescriptor>(&self) -> Result<bool> {
             match <FD::Number as typenum::ToInt<i32>>::to_int() {
                 1 | 2 => Ok(true),
                 4 => Ok(self.partner.is_some()),
@@ -113,12 +113,20 @@ mod r#static {
             }
         }
 
-        fn get_uint32<FD: FieldDescriptor>(&self) -> crate::Result<u32> {
-            todo!()
+        fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32> {
+            if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
+                Ok(self.age)
+            } else {
+                Err(ErrorKind::ReflectionError)?
+            }
         }
 
-        fn get_string<FD: FieldDescriptor>(&self) -> crate::Result<&str> {
-            todo!()
+        fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
+            if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
+                Ok(&self.name)
+            } else {
+                Err(ErrorKind::ReflectionError)?
+            }
         }
 
         type ChildReflection<'a, FD>
@@ -127,7 +135,7 @@ mod r#static {
             FD: FieldDescriptor,
         = &'a PersonMessageImpl; // TBD
 
-        fn get_message<FD: FieldDescriptor>(&self) -> crate::Result<Self::ChildReflection<'_, FD>> {
+        fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
             if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
                 Ok(self.partner.as_deref().unwrap()) // TODO
             } else {
