@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use crate::tags;
+use crate::util::If;
 use ::typenum;
-use ::typenum::{B0, B1};
 
 pub trait MessageDescriptor {
     type Fields;
@@ -23,16 +23,6 @@ pub trait MessageDescriptor {
 pub trait FieldDescriptor {
     type Number: typenum::ToInt<i32>;
     type FieldType: tags::FieldTypeTag;
-}
-
-pub trait If<T, F> {
-    type Type;
-}
-impl<T, F> If<T, F> for B0 {
-    type Type = F;
-}
-impl<T, F> If<T, F> for B1 {
-    type Type = T;
 }
 
 trait GetFieldFromTuple<N> {
@@ -45,10 +35,10 @@ impl<T, U, N> GetFieldFromTuple<N> for (T, U)
 where
     T: FieldDescriptor,
     T::Number: typenum::IsEqual<N>,
-    typenum::Eq<T::Number, N>: If<T, U::Type>,
+    typenum::Eq<T::Number, N>: If,
     U: GetFieldFromTuple<N>,
 {
-    type Type = <typenum::Eq<T::Number, N> as If<T, U::Type>>::Type;
+    type Type = <typenum::Eq<T::Number, N> as If>::Type<T, U::Type>;
 }
 
 trait MdGetFieldExt<N> {
