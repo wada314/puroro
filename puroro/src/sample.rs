@@ -82,6 +82,7 @@ mod r#static {
     use ::typenum::{U1, U2, U3};
 
     use super::PersonMessageImpl;
+    use super::PersonTrait;
 
     pub struct MdPerson;
     pub struct FdName;
@@ -124,10 +125,14 @@ mod r#static {
         where
             Self: 'a,
             FD: FieldDescriptor,
-        = PersonMessageImpl; // TBD
+        = &'a PersonMessageImpl; // TBD
 
         fn get_message<FD: FieldDescriptor>(&self) -> crate::Result<Self::ChildReflection<'_, FD>> {
-            todo!()
+            if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
+                Ok(self.partner.as_deref().unwrap()) // TODO
+            } else {
+                Err(ErrorKind::ReflectionError)?
+            }
         }
     }
 }

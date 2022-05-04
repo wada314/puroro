@@ -26,3 +26,23 @@ pub trait Reflection {
         FD: FieldDescriptor;
     fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>>;
 }
+
+impl<T: Reflection> Reflection for &'_ T {
+    fn has_field<FD: FieldDescriptor>(&self) -> Result<bool> {
+        <T as Reflection>::has_field::<FD>(self)
+    }
+    fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32> {
+        <T as Reflection>::get_uint32::<FD>(self)
+    }
+    fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
+        <T as Reflection>::get_string::<FD>(self)
+    }
+    type ChildReflection<'a, FD>
+    = <T as Reflection>::ChildReflection<'a, FD>
+    where
+        Self: 'a,
+        FD: FieldDescriptor;
+    fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
+        <T as Reflection>::get_message::<FD>(self)
+    }
+}
