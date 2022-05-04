@@ -77,11 +77,7 @@ mod dynamic {
 use crate::reflection::r#static::desc::*;
 use crate::reflection::r#static::Reflection;
 use crate::tags;
-use crate::{ErrorKind, Result};
 use ::typenum::{U1, U2, U3};
-
-use super::PersonMessageImpl;
-use super::PersonTrait;
 
 pub struct MdPerson;
 pub struct FdName;
@@ -129,10 +125,10 @@ impl Reflection for PersonMessageImpl {
     }
 
     type ChildReflection<'a, FD>
+    = &'a PersonMessageImpl
     where
         Self: 'a,
-        FD: FieldDescriptor,
-    = &'a PersonMessageImpl; // TBD
+        FD: FieldDescriptor; // TBD
 
     fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
         if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
