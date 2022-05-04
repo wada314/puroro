@@ -74,73 +74,71 @@ mod dynamic {
     };
 }
 
-mod r#static {
-    use crate::reflection::r#static::desc::*;
-    use crate::reflection::r#static::Reflection;
-    use crate::tags;
-    use crate::{ErrorKind, Result};
-    use ::typenum::{U1, U2, U3};
+use crate::reflection::r#static::desc::*;
+use crate::reflection::r#static::Reflection;
+use crate::tags;
+use crate::{ErrorKind, Result};
+use ::typenum::{U1, U2, U3};
 
-    use super::PersonMessageImpl;
-    use super::PersonTrait;
+use super::PersonMessageImpl;
+use super::PersonTrait;
 
-    pub struct MdPerson;
-    pub struct FdName;
-    pub struct FdAge;
-    pub struct FdPartner;
-    impl MessageDescriptor for MdPerson {
-        type Fields = (FdName, (FdAge, (FdPartner, ())));
-    }
-    impl FieldDescriptor for FdName {
-        type Number = U1;
-        type FieldType = tags::String;
-    }
-    impl FieldDescriptor for FdAge {
-        type Number = U2;
-        type FieldType = tags::UInt32;
-    }
-    impl FieldDescriptor for FdPartner {
-        type Number = U3;
-        type FieldType = tags::Message<MdPerson>;
-    }
+pub struct MdPerson;
+pub struct FdName;
+pub struct FdAge;
+pub struct FdPartner;
+impl MessageDescriptor for MdPerson {
+    type Fields = (FdName, (FdAge, (FdPartner, ())));
+}
+impl FieldDescriptor for FdName {
+    type Number = U1;
+    type FieldType = tags::String;
+}
+impl FieldDescriptor for FdAge {
+    type Number = U2;
+    type FieldType = tags::UInt32;
+}
+impl FieldDescriptor for FdPartner {
+    type Number = U3;
+    type FieldType = tags::Message<MdPerson>;
+}
 
-    impl Reflection for PersonMessageImpl {
-        fn has_field<FD: FieldDescriptor>(&self) -> Result<bool> {
-            match <FD::Number as typenum::ToInt<i32>>::to_int() {
-                1 | 2 => Ok(true),
-                4 => Ok(self.partner.is_some()),
-                _ => Err(ErrorKind::ReflectionError)?,
-            }
+impl Reflection for PersonMessageImpl {
+    fn has_field<FD: FieldDescriptor>(&self) -> Result<bool> {
+        match <FD::Number as typenum::ToInt<i32>>::to_int() {
+            1 | 2 => Ok(true),
+            4 => Ok(self.partner.is_some()),
+            _ => Err(ErrorKind::ReflectionError)?,
         }
+    }
 
-        fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32> {
-            if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
-                Ok(self.age)
-            } else {
-                Err(ErrorKind::ReflectionError)?
-            }
+    fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32> {
+        if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
+            Ok(self.age)
+        } else {
+            Err(ErrorKind::ReflectionError)?
         }
+    }
 
-        fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
-            if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
-                Ok(&self.name)
-            } else {
-                Err(ErrorKind::ReflectionError)?
-            }
+    fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
+        if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
+            Ok(&self.name)
+        } else {
+            Err(ErrorKind::ReflectionError)?
         }
+    }
 
-        type ChildReflection<'a, FD>
-        where
-            Self: 'a,
-            FD: FieldDescriptor,
-        = &'a PersonMessageImpl; // TBD
+    type ChildReflection<'a, FD>
+    where
+        Self: 'a,
+        FD: FieldDescriptor,
+    = &'a PersonMessageImpl; // TBD
 
-        fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
-            if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
-                Ok(self.partner.as_deref().unwrap()) // TODO
-            } else {
-                Err(ErrorKind::ReflectionError)?
-            }
+    fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
+        if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
+            Ok(self.partner.as_deref().unwrap()) // TODO
+        } else {
+            Err(ErrorKind::ReflectionError)?
         }
     }
 }
@@ -150,19 +148,19 @@ where
     T: crate::reflection::r#static::Reflection,
 {
     fn name(&self) -> &str {
-        self.get_string::<r#static::FdName>().unwrap()
+        self.get_string::<FdName>().unwrap()
     }
     fn age(&self) -> u32 {
-        self.get_uint32::<r#static::FdAge>().unwrap()
+        self.get_uint32::<FdAge>().unwrap()
     }
 
     type PartnerType<'a>
+    = <T as crate::reflection::r#static::Reflection>::ChildReflection<'a, FdPartner>
     where
-        Self: 'a,
-    = <T as crate::reflection::r#static::Reflection>::ChildReflection<'a, r#static::FdPartner>;
+        Self: 'a;
 
     fn partner(&self) -> Self::PartnerType<'_> {
-        self.get_message::<r#static::FdPartner>().unwrap()
+        self.get_message::<FdPartner>().unwrap()
     }
 }
 
