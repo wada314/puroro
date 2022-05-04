@@ -68,10 +68,10 @@ pub trait Pred<T> {
 pub struct IsTypeNumEqual<N>(::std::marker::PhantomData<N>);
 impl<N, M> Pred<M> for IsTypeNumEqual<N>
 where
-    N: ::typenum::IsEqual<M>,
-    typenum::Eq<N, M>: If,
+    M: FieldNumber,
+    N: FieldNumber,
 {
-    type Type = typenum::Eq<N, M>;
+    type Type = M::Eq<N>;
 }
 
 pub trait ListFind<P> {

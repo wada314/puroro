@@ -126,8 +126,8 @@ impl Reflection for PersonMessageImpl {
     }
 
     type ChildReflection<'a, FD>
-    // = <((U4, &'a PersonMessageImpl), ()) as MapGet<IsTypeNumEqual<FD::Number>>>::Type
-    = &'a PersonMessageImpl
+    = <((U4, &'a PersonMessageImpl), ()) as MapGet<IsTypeNumEqual<FD::Number>>>::Type
+    // = &'a PersonMessageImpl
     where
         Self: 'a,
         FD: FieldDescriptor;
@@ -143,7 +143,7 @@ impl Reflection for PersonMessageImpl {
 
 impl<T> PersonTrait for T
 where
-    T: crate::reflection::r#static::Reflection,
+    T: Reflection,
 {
     fn name(&self) -> &str {
         self.get_string::<FdName>().unwrap()
@@ -153,9 +153,9 @@ where
     }
 
     type PartnerType<'a>
-    = <T as crate::reflection::r#static::Reflection>::ChildReflection<'a, FdPartner>
+    = <T as Reflection>::ChildReflection<'a, FdPartner>
     where
-        Self: 'a;
+        Self: 'a, ;
 
     fn partner(&self) -> Self::PartnerType<'_> {
         self.get_message::<FdPartner>().unwrap()
