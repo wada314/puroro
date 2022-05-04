@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::tags;
-use crate::util::If;
+use crate::util::{Find, If, Pred};
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -23,6 +23,16 @@ pub trait MessageDescriptor {
 pub trait FieldDescriptor {
     type Number: typenum::ToInt<i32>;
     type FieldType: tags::FieldTypeTag;
+}
+
+struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
+impl<N, T> Pred<T> for IsFdNumberEqualTo<N>
+where
+    T: FieldDescriptor,
+    T::Number: typenum::IsEqual<N>,
+    typenum::Eq<T::Number, N>: If,
+{
+    type Type = typenum::Eq<T::Number, N>;
 }
 
 trait GetFieldFromTuple<N> {

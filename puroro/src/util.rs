@@ -24,17 +24,17 @@ impl If for B1 {
     type Type<T, F> = T;
 }
 
-pub trait Pred {
+pub trait Pred<T> {
     type Type: If;
 }
 
-pub trait Find<P: Pred> {
+pub trait Find<P> {
     type Type;
 }
-impl<P: Pred> Find<P> for () {
+impl<P: Pred<()>> Find<P> for () {
     type Type = ();
 }
-impl<T, U, P: Pred> Find<P> for (T, U)
+impl<T, U, P: Pred<T>> Find<P> for (T, U)
 where
     U: Find<P>,
 {
