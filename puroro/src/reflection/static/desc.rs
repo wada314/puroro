@@ -35,29 +35,13 @@ where
     type Type = typenum::Eq<T::Number, N>;
 }
 
-trait GetFieldFromTuple<N> {
-    type Type;
-}
-impl<N> GetFieldFromTuple<N> for () {
-    type Type = ();
-}
-impl<T, U, N> GetFieldFromTuple<N> for (T, U)
-where
-    T: FieldDescriptor,
-    T::Number: typenum::IsEqual<N>,
-    typenum::Eq<T::Number, N>: If,
-    U: GetFieldFromTuple<N>,
-{
-    type Type = <typenum::Eq<T::Number, N> as If>::Type<T, U::Type>;
-}
-
 trait MdGetFieldExt<N> {
     type GetField;
 }
 impl<N, MD> MdGetFieldExt<N> for MD
 where
     MD: MessageDescriptor,
-    MD::Fields: GetFieldFromTuple<N>,
+    MD::Fields: Find<IsFdNumberEqualTo<N>>,
 {
-    type GetField = <MD::Fields as GetFieldFromTuple<N>>::Type;
+    type GetField = <MD::Fields as Find<IsFdNumberEqualTo<N>>>::Type;
 }
