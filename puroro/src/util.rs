@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::marker::PhantomData;
 use ::typenum::{B0, B1};
 
 pub trait If {
@@ -56,8 +57,8 @@ impl Number for UTerm {
 pub trait Pred<T> {
     type Type: If;
 }
-pub struct IsTypeNumEqual<N>(::std::marker::PhantomData<N>);
-impl<N, M> Pred<M> for IsTypeNumEqual<N>
+pub struct IsNumberEqual<N>(PhantomData<N>);
+impl<N, M> Pred<M> for IsNumberEqual<N>
 where
     M: Number,
     N: Number,
@@ -69,7 +70,12 @@ where
 pub trait Func<T> {
     type Type;
 }
-pub struct FdIntoOwnedType<FD>(::std::marker::PhantomData<FD>);
+pub struct Ident<T>(PhantomData<T>);
+impl<T, _U> Func<_U> for Ident<T> {
+    type Type = T;
+}
+
+pub struct FdIntoOwnedType<FD>(PhantomData<FD>);
 impl<FD> Func<FD> for FdIntoOwnedType<FD> {
     type Type = ();
 }

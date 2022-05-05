@@ -45,7 +45,7 @@ pub trait PersonTrait {
 use crate::reflection::r#static::desc::*;
 use crate::reflection::r#static::Reflection;
 use crate::tags;
-use crate::util::{IsTypeNumEqual, MapGet};
+use crate::util::{IsNumberEqual, MapGet};
 use ::typenum::{U1, U2, U4};
 
 pub struct MdPerson;
