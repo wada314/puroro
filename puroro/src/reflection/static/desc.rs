@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::tags;
-use crate::util::{FieldNumber, If, ListFind, Pred};
+use crate::util::{Number, If, ListFind, Pred};
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -21,7 +21,7 @@ pub trait MessageDescriptor {
 }
 
 pub trait FieldDescriptor {
-    type Number: typenum::ToInt<i32> + FieldNumber;
+    type Number: typenum::ToInt<i32> + Number;
     type FieldType: tags::FieldTypeTag;
 }
 
@@ -29,8 +29,8 @@ struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
 impl<N, T> Pred<T> for IsFdNumberEqualTo<N>
 where
     T: FieldDescriptor,
-    T::Number: FieldNumber,
-    N: FieldNumber,
+    T::Number: Number,
+    N: Number,
     N::Eq<T::Number>: If,
 {
     type Type = N::Eq<T::Number>;

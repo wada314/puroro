@@ -13,13 +13,16 @@
 // limitations under the License.
 
 use crate::internal::bool::{False, True};
+use crate::util::Number;
 use ::std::marker::PhantomData;
+use ::typenum::consts::*;
 
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
 /// `wire_tag<value::value_tag>`.
 pub trait FieldTypeTag {
+    type Id: Number;
     type DefaultValueType;
     type IsLd;
     type IsMessage;
@@ -101,108 +104,126 @@ pub struct Unlabeled;
 pub struct OneofField;
 
 impl FieldTypeTag for Int32 {
+    type Id = U1;
     type DefaultValueType = i32;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = i32;
 }
 impl FieldTypeTag for Int64 {
+    type Id = U2;
     type DefaultValueType = i64;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = i64;
 }
 impl FieldTypeTag for UInt32 {
+    type Id = U3;
     type DefaultValueType = u32;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = u32;
 }
 impl FieldTypeTag for UInt64 {
+    type Id = U4;
     type DefaultValueType = u64;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = u64;
 }
 impl FieldTypeTag for SInt32 {
+    type Id = U5;
     type DefaultValueType = i32;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = i32;
 }
 impl FieldTypeTag for SInt64 {
+    type Id = U6;
     type DefaultValueType = i64;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = i64;
 }
 impl FieldTypeTag for Bool {
+    type Id = U7;
     type DefaultValueType = bool;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = bool;
 }
 impl FieldTypeTag for Bytes {
+    type Id = U8;
     type DefaultValueType = &'static [u8];
     type IsLd = True;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = &'a [u8];
 }
 impl FieldTypeTag for String {
+    type Id = U9;
     type DefaultValueType = &'static str;
     type IsLd = True;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = &'a str;
 }
 impl<E> FieldTypeTag for Enum2<E> {
+    type Id = U10;
     type DefaultValueType = E;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = E;
 }
 impl<E> FieldTypeTag for Enum3<E> {
+    type Id = U11;
     type DefaultValueType = E;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = E;
 }
 impl<M> FieldTypeTag for Message<M> {
+    type Id = U12;
     type DefaultValueType = (); // Never be instanciated
     type IsLd = True;
     type IsMessage = True;
     type NonMessageScalarGetterType<'a> = (); // Never be instanciated
 }
 impl FieldTypeTag for Float {
+    type Id = U13;
     type DefaultValueType = f32;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = f32;
 }
 impl FieldTypeTag for Double {
+    type Id = U14;
     type DefaultValueType = f64;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = f64;
 }
 impl FieldTypeTag for Fixed32 {
+    type Id = U15;
     type DefaultValueType = u32;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = u32;
 }
 impl FieldTypeTag for Fixed64 {
+    type Id = U16;
     type DefaultValueType = u64;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = u64;
 }
 impl FieldTypeTag for SFixed32 {
+    type Id = U17;
     type DefaultValueType = i32;
     type IsLd = False;
     type IsMessage = False;
     type NonMessageScalarGetterType<'a> = i32;
 }
 impl FieldTypeTag for SFixed64 {
+    type Id = U18;
     type DefaultValueType = i64;
     type IsLd = False;
     type IsMessage = False;

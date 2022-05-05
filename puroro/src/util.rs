@@ -25,29 +25,32 @@ impl If for B1 {
 }
 use ::typenum::{UInt, UTerm};
 
-pub trait FieldNumber {
+// We need this trait so that we can compare the
+// type equality with ANY M:Number type.
+// typenum's Cmp does not fulfill this condition...
+pub trait Number {
     type Lsb: If;
-    type Remains: FieldNumber;
+    type Remains: Number;
     type IsUTerm: If;
-    type Eq<M: FieldNumber>;
+    type Eq<M: Number>;
 }
-impl<U: FieldNumber> FieldNumber for UInt<U, B0> {
+impl<U: Number> Number for UInt<U, B0> {
     type Lsb = B0;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: FieldNumber> = <M::Lsb as If>::Type<B0, <U::Remains as FieldNumber>::Eq<M::Remains>>;
+    type Eq<M: Number> = <M::Lsb as If>::Type<B0, <U::Remains as Number>::Eq<M::Remains>>;
 }
-impl<U: FieldNumber> FieldNumber for UInt<U, B1> {
+impl<U: Number> Number for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: FieldNumber> = <M::Lsb as If>::Type<<U::Remains as FieldNumber>::Eq<M::Remains>, B0>;
+    type Eq<M: Number> = <M::Lsb as If>::Type<<U::Remains as Number>::Eq<M::Remains>, B0>;
 }
-impl FieldNumber for UTerm {
+impl Number for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
-    type Eq<M: FieldNumber> = <M::IsUTerm as If>::Type<B1, B0>;
+    type Eq<M: Number> = <M::IsUTerm as If>::Type<B1, B0>;
 }
 
 pub trait Pred<T> {
@@ -56,11 +59,19 @@ pub trait Pred<T> {
 pub struct IsTypeNumEqual<N>(::std::marker::PhantomData<N>);
 impl<N, M> Pred<M> for IsTypeNumEqual<N>
 where
-    M: FieldNumber,
-    N: FieldNumber,
+    M: Number,
+    N: Number,
     M::Eq<N>: If,
 {
     type Type = M::Eq<N>;
+}
+
+pub trait Func<T> {
+    type Type;
+}
+pub struct FdIntoOwnedType<FD>(::std::marker::PhantomData<FD>);
+impl<FD> Func<FD> for FdIntoOwnedType<FD> {
+    type Type = ();
 }
 
 pub trait ListFind<P> {
