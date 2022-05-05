@@ -42,38 +42,6 @@ pub trait PersonTrait {
     fn partner(&self) -> Self::PartnerType<'_>;
 }
 
-// pub struct Person<M>(M);
-mod dynamic {
-    use crate::reflection::dynamic::desc::*;
-    static FILED: FileDescriptor = FileDescriptor { messages: &[] };
-    static MD_PERSON: MessageDescriptor = MessageDescriptor {
-        parent: &FILED,
-        name: "Person",
-        fields: &[&FD_NAME, &FD_AGE, &FD_PARTNER],
-    };
-    static FD_NAME: FieldDescriptor = FieldDescriptor {
-        parent: &MD_PERSON,
-        name: "name",
-        number: 1,
-        r#type: FieldType::String,
-        label: FieldLabel::Optional,
-    };
-    static FD_AGE: FieldDescriptor = FieldDescriptor {
-        parent: &MD_PERSON,
-        name: "age",
-        number: 2,
-        r#type: FieldType::UInt32,
-        label: FieldLabel::Optional,
-    };
-    static FD_PARTNER: FieldDescriptor = FieldDescriptor {
-        parent: &MD_PERSON,
-        name: "partner",
-        number: 4,
-        r#type: FieldType::Message(&MD_PERSON),
-        label: FieldLabel::Optional,
-    };
-}
-
 use crate::reflection::r#static::desc::*;
 use crate::reflection::r#static::Reflection;
 use crate::tags;
@@ -100,47 +68,6 @@ impl FieldDescriptor for FdPartner {
     type FieldType = tags::Message<MdPerson>;
 }
 
-impl Reflection for PersonMessageImpl {
-    fn has_field<FD: FieldDescriptor>(&self) -> Result<bool> {
-        match <FD::Number as typenum::ToInt<i32>>::to_int() {
-            1 | 2 => Ok(true),
-            4 => Ok(self.partner.is_some()),
-            _ => Err(ErrorKind::ReflectionError)?,
-        }
-    }
-
-    fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32> {
-        if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
-            Ok(self.age)
-        } else {
-            Err(ErrorKind::ReflectionError)?
-        }
-    }
-
-    fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
-        if 2 == <FD::Number as typenum::ToInt<i32>>::to_int() {
-            Ok(&self.name)
-        } else {
-            Err(ErrorKind::ReflectionError)?
-        }
-    }
-
-    type ChildReflection<'a, FD>
-    = <((U4, &'a PersonMessageImpl), ()) as MapGet<IsTypeNumEqual<FD::Number>>>::Type
-    // = &'a PersonMessageImpl
-    where
-        Self: 'a,
-        FD: FieldDescriptor;
-
-    fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
-        if 4 == <FD::Number as typenum::ToInt<i32>>::to_int() {
-            Ok(self.partner.as_deref().unwrap()) // TODO
-        } else {
-            Err(ErrorKind::ReflectionError)?
-        }
-    }
-}
-
 impl<T> PersonTrait for T
 where
     T: Reflection,
@@ -155,7 +82,7 @@ where
     type PartnerType<'a>
     = <T as Reflection>::ChildReflection<'a, FdPartner>
     where
-        Self: 'a, ;
+        Self: 'a;
 
     fn partner(&self) -> Self::PartnerType<'_> {
         self.get_message::<FdPartner>().unwrap()
