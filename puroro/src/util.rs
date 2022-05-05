@@ -23,43 +23,31 @@ impl If for B0 {
 impl If for B1 {
     type Type<T, F> = T;
 }
-pub trait If2: If {
-    type Type2<T: If2, F: If2>: If2;
-}
-impl If2 for B0 {
-    type Type2<T: If2, F: If2> = F;
-}
-impl If2 for B1 {
-    type Type2<T: If2, F: If2> = T;
-}
-
 use ::typenum::{UInt, UTerm};
 
 pub trait FieldNumber {
-    type Lsb: If2;
+    type Lsb: If;
     type Remains: FieldNumber;
-    type IsUTerm: If2;
-    type Eq<M: FieldNumber>: If2;
+    type IsUTerm: If;
+    type Eq<M: FieldNumber>;
 }
 impl<U: FieldNumber> FieldNumber for UInt<U, B0> {
     type Lsb = B0;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: FieldNumber> =
-        <M::Lsb as If2>::Type2<B0, <U::Remains as FieldNumber>::Eq<M::Remains>>;
+    type Eq<M: FieldNumber> = <M::Lsb as If>::Type<B0, <U::Remains as FieldNumber>::Eq<M::Remains>>;
 }
 impl<U: FieldNumber> FieldNumber for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: FieldNumber> =
-        <M::Lsb as If2>::Type2<<U::Remains as FieldNumber>::Eq<M::Remains>, B0>;
+    type Eq<M: FieldNumber> = <M::Lsb as If>::Type<<U::Remains as FieldNumber>::Eq<M::Remains>, B0>;
 }
 impl FieldNumber for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
-    type Eq<M: FieldNumber> = <M::IsUTerm as If2>::Type2<B1, B0>;
+    type Eq<M: FieldNumber> = <M::IsUTerm as If>::Type<B1, B0>;
 }
 
 pub trait Pred<T> {
@@ -70,6 +58,7 @@ impl<N, M> Pred<M> for IsTypeNumEqual<N>
 where
     M: FieldNumber,
     N: FieldNumber,
+    M::Eq<N>: If,
 {
     type Type = M::Eq<N>;
 }

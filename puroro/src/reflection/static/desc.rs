@@ -31,6 +31,7 @@ where
     T: FieldDescriptor,
     T::Number: FieldNumber,
     N: FieldNumber,
+    N::Eq<T::Number>: If,
 {
     type Type = N::Eq<T::Number>;
 }
