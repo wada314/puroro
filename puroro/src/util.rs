@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::tags;
+use crate::tags::FieldTypeTag;
 use ::std::marker::PhantomData;
 use ::typenum::{B0, B1};
 
@@ -75,9 +77,16 @@ impl<T, _U> Func<_U> for Ident<T> {
     type Type = T;
 }
 
-pub struct FdIntoOwnedType<FD>(PhantomData<FD>);
-impl<FD> Func<FD> for FdIntoOwnedType<FD> {
-    type Type = ();
+pub struct TypeTagIntoOwnedTypeGen;
+type TypeTagIntoOwnedTypeGenMap = (
+    (<tags::UInt32 as FieldTypeTag>::Id, Ident<u32>),
+    (
+        (<tags::String as FieldTypeTag>::Id, Ident<String>),
+        ((<tags::Message<()> as FieldTypeTag>::Id, Ident<()>), ()),
+    ),
+);
+impl<T: Number> Func<T> for TypeTagIntoOwnedTypeGen {
+    type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T>>>::Type;
 }
 
 pub trait ListFind<P> {
