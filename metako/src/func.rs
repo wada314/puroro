@@ -12,11 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![feature(generic_associated_types)]
+use crate::If;
+use ::std::marker::PhantomData;
 
-pub mod bool;
-pub mod func;
-pub mod list;
+pub trait Func<T> {
+    type Type;
+}
+pub trait Pred<T>: Func<T>
+where
+    Self::Type: If,
+{
+}
+impl<T, U> Pred<U> for T
+where
+    T: Func<U>,
+    T::Type: If,
+{
+}
 
-pub use crate::bool::{If, B0, B1};
-pub use crate::func::{Func, Ident, Pred};
+pub struct Ident<T>(PhantomData<T>);
+impl<T, _U> Func<_U> for Ident<T> {
+    type Type = T;
+}

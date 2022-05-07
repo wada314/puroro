@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![feature(generic_associated_types)]
-
-pub mod bool;
-pub mod func;
-pub mod list;
-
-pub use crate::bool::{If, B0, B1};
-pub use crate::func::{Func, Ident, Pred};
+#[macro_export]
+macro_rules! tuple_list {
+    () => {
+        ()
+    };
+    ($a:ty$(, $rest:ty)* $(,)?) => {
+        ($a, tuple_list!($($rest),*))
+    };
+}
