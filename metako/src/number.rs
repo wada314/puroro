@@ -29,19 +29,20 @@ impl<U: Number> Number for UInt<U, B0> {
     type Lsb = B0;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: Number> = <<M::Lsb as If>::Not as If>::And<<U::Remains as Number>::Eq<M::Remains>>;
+    type Eq<M: Number> =
+        <<M::Lsb as If>::Not as If>::And<<Self::Remains as Number>::Eq<M::Remains>>;
 }
 impl<U: Number> Number for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: Number> = <M::Lsb as If>::And<<U::Remains as Number>::Eq<M::Remains>>;
+    type Eq<M: Number> = <M::Lsb as If>::And<<Self::Remains as Number>::Eq<M::Remains>>;
 }
 impl Number for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
-    type Eq<M: Number> = <M::IsUTerm as If>::Not;
+    type Eq<M: Number> = M::IsUTerm;
 }
 
 pub struct IsNumberEqual<N>(PhantomData<N>);

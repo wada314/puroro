@@ -84,7 +84,13 @@ where
 
 ////////////////////////////////////////////
 
-#[test]
-fn test() {
-    let f = PersonFields::default();
+mod test {
+    use super::*;
+    use crate::reflection::r#static::desc::*;
+    use ::metako::*;
+    use ::typenum::*;
+    fn test(v: <TypeTagIntoOwnedTypeGen as Func<tags::Message<MdPerson>>>::Type) {}
+    fn foo() {
+        test(10)
+    }
 }
