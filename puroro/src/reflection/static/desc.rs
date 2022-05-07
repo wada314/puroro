@@ -56,19 +56,33 @@ pub struct TypeTagIntoOwnedTypeGen;
 type TypeTagIntoOwnedTypeGenMap = make_list!(
     (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
     (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
-    (<tags::Message<()> as tags::FieldTypeTag>::Id, Ident<()>),
+    (
+        <tags::Message<()> as tags::FieldTypeTag>::Id,
+        MdIntoOwnedFieldList
+    ),
 );
 impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
+}
+
+pub struct TypeTagIntoOwnedType;
+impl<T> Func<T> for TypeTagIntoOwnedType
+where
+    T: tags::FieldTypeTag,
+    TypeTagIntoOwnedTypeGen: Func<T>,
+    <TypeTagIntoOwnedTypeGen as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
+{
+    type Type =
+        <<TypeTagIntoOwnedTypeGen as Func<T>>::Type as Func<T::MaybeSupplementalDescriptor>>::Type;
 }
 
 pub struct FdIntoOwnedType;
 impl<FD> Func<FD> for FdIntoOwnedType
 where
     FD: FieldDescriptor,
-    TypeTagIntoOwnedTypeGen: Func<FD::FieldType>,
+    TypeTagIntoOwnedType: Func<FD::FieldType>,
 {
-    type Type = <TypeTagIntoOwnedTypeGen as Func<FD::FieldType>>::Type;
+    type Type = <TypeTagIntoOwnedType as Func<FD::FieldType>>::Type;
 }
 
 pub struct MdIntoOwnedFieldList;
