@@ -65,6 +65,18 @@ impl Number for UTerm {
     type Eq<M: Number> = <M::IsUTerm as If>::Not;
 }
 
+macro_rules! tuple_list {
+    () => {
+        ()
+    };
+    ($a:ty) => {
+        ($a, ())
+    };
+    ($a:ty, $($rest:ty),*) => {
+        ($a, tuple_list!($($rest)*,))
+    };
+}
+
 pub trait Pred<T> {
     type Type: If;
 }
@@ -87,12 +99,17 @@ impl<T, _U> Func<_U> for Ident<T> {
 }
 
 pub struct TypeTagIntoOwnedTypeGen;
-type TypeTagIntoOwnedTypeGenMap = (
+// type TypeTagIntoOwnedTypeGenMap = (
+//     (<tags::UInt32 as FieldTypeTag>::Id, Ident<u32>),
+//     (
+//         (<tags::String as FieldTypeTag>::Id, Ident<String>),
+//         ((<tags::Message<()> as FieldTypeTag>::Id, Ident<()>), ()),
+//     ),
+// );
+type TypeTagIntoOwnedTypeGenMap = tuple_list!(
     (<tags::UInt32 as FieldTypeTag>::Id, Ident<u32>),
-    (
-        (<tags::String as FieldTypeTag>::Id, Ident<String>),
-        ((<tags::Message<()> as FieldTypeTag>::Id, Ident<()>), ()),
-    ),
+    (<tags::String as FieldTypeTag>::Id, Ident<String>),
+    (<tags::Message<()> as FieldTypeTag>::Id, Ident<()>)
 );
 impl<T: Number> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T>>>::Type;
