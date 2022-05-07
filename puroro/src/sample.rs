@@ -26,13 +26,6 @@
 
 use crate::{ErrorKind, Result};
 
-#[derive(Default)]
-pub struct PersonMessageImpl {
-    name: String,
-    age: u32,
-    partner: Option<Box<PersonMessageImpl>>,
-}
-
 pub trait PersonTrait {
     fn name(&self) -> &str;
     fn age(&self) -> u32;
@@ -45,7 +38,6 @@ pub trait PersonTrait {
 use crate::reflection::r#static::desc::*;
 use crate::reflection::r#static::Reflection;
 use crate::tags;
-use crate::util::{IsNumberEqual, MapGet};
 use ::typenum::{U1, U2, U4};
 
 pub struct MdPerson;

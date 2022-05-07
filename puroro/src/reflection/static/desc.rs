@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::tags;
-use crate::util::{Number, If, ListFind, Pred};
+use crate::util::{If, ListFind, Number, Pred};
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -37,12 +37,13 @@ where
 }
 
 trait MdGetFieldExt<N> {
-    type GetField;
+    type GetField: FieldDescriptor;
 }
 impl<N, MD> MdGetFieldExt<N> for MD
 where
     MD: MessageDescriptor,
     MD::Fields: ListFind<IsFdNumberEqualTo<N>>,
+    <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type: FieldDescriptor,
 {
     type GetField = <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type;
 }
