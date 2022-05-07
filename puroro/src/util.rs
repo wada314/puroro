@@ -107,6 +107,18 @@ where
     type Type = <P::Type as If>::Type<T, <U as ListFind<P>>::Type>;
 }
 
+pub struct ListMap<F>(PhantomData<F>);
+impl<F> Func<()> for ListMap<F> {
+    type Type = ();
+}
+impl<T, U, F> Func<(T, U)> for ListMap<F>
+where
+    F: Func<T>,
+    ListMap<F>: Func<U>,
+{
+    type Type = (<F as Func<T>>::Type, <ListMap<F> as Func<U>>::Type);
+}
+
 pub trait MapGet<P> {
     type Type;
 }

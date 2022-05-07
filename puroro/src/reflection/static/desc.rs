@@ -60,6 +60,14 @@ type TypeTagIntoOwnedTypeGenMap = tuple_list!(
     (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
     (<tags::Message<()> as tags::FieldTypeTag>::Id, Ident<()>),
 );
-impl<T: Number> Func<T> for TypeTagIntoOwnedTypeGen {
-    type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T>>>::Type;
+impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
+    type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T::Id>>>::Type;
+}
+
+pub struct TypeTagIntoOwnedType;
+impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedType
+where
+    TypeTagIntoOwnedTypeGen: Func<T>,
+{
+    type Type = <TypeTagIntoOwnedTypeGen as Func<T>>::Type;
 }
