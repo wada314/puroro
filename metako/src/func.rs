@@ -18,16 +18,15 @@ use ::std::marker::PhantomData;
 pub trait Func<T> {
     type Type;
 }
-pub trait Pred<T>: Func<T>
-where
-    Self::Type: If,
-{
+pub trait Pred<T> {
+    type Type: If;
 }
 impl<T, U> Pred<U> for T
 where
     T: Func<U>,
     T::Type: If,
 {
+    type Type = T::Type;
 }
 
 pub struct Ident<T>(PhantomData<T>);

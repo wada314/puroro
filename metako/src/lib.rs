@@ -17,6 +17,8 @@
 pub mod bool;
 pub mod func;
 pub mod list;
+pub mod number;
 
 pub use crate::bool::{If, B0, B1};
 pub use crate::func::{Func, Ident, Pred};
+pub use crate::number::{IsNumberEqual, Number};

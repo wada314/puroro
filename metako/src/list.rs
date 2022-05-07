@@ -12,12 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::{Func, If, Pred};
+use ::std::marker::PhantomData;
+
 #[macro_export]
-macro_rules! tuple_list {
+macro_rules! make_list {
     () => {
         ()
     };
     ($a:ty$(, $rest:ty)* $(,)?) => {
         ($a, tuple_list!($($rest),*))
     };
+}
+
+pub struct Find<P>(PhantomData<P>);
+impl<P> Func<()> for Find<P> {
+    type Type = ();
+}
+impl<T, U, P> Func<(T, U)> for Find<P>
+where
+    P: Pred<T>,
+    Find<P>: Func<U>,
+{
+    type Type = <P::Type as If>::Type<T, <Find<P> as Func<U>>::Type>;
+}
+
+pub struct Map<F>(PhantomData<F>);
+impl<F> Func<()> for Map<F> {
+    type Type = ();
+}
+impl<T, U, F> Func<(T, U)> for Map<F>
+where
+    F: Func<T>,
+    Map<F>: Func<U>,
+{
+    type Type = (<F as Func<T>>::Type, <Map<F> as Func<U>>::Type);
 }
