@@ -72,8 +72,8 @@ macro_rules! tuple_list {
     ($a:ty) => {
         ($a, ())
     };
-    ($a:ty, $($rest:ty),*) => {
-        ($a, tuple_list!($($rest)*,))
+    ($a:ty, $($rest:ty),* $(,)?) => {
+        ($a, tuple_list!($($rest),*))
     };
 }
 
@@ -99,17 +99,10 @@ impl<T, _U> Func<_U> for Ident<T> {
 }
 
 pub struct TypeTagIntoOwnedTypeGen;
-// type TypeTagIntoOwnedTypeGenMap = (
-//     (<tags::UInt32 as FieldTypeTag>::Id, Ident<u32>),
-//     (
-//         (<tags::String as FieldTypeTag>::Id, Ident<String>),
-//         ((<tags::Message<()> as FieldTypeTag>::Id, Ident<()>), ()),
-//     ),
-// );
 type TypeTagIntoOwnedTypeGenMap = tuple_list!(
     (<tags::UInt32 as FieldTypeTag>::Id, Ident<u32>),
     (<tags::String as FieldTypeTag>::Id, Ident<String>),
-    (<tags::Message<()> as FieldTypeTag>::Id, Ident<()>)
+    (<tags::Message<()> as FieldTypeTag>::Id, Ident<()>),
 );
 impl<T: Number> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T>>>::Type;
