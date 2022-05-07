@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::bool::{False, True};
-use crate::util::Number;
+use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
 

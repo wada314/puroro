@@ -18,6 +18,7 @@ pub mod bool;
 pub mod func;
 pub mod list;
 pub mod number;
+pub mod map;
 
 pub use crate::bool::{If, B0, B1};
 pub use crate::func::{Func, Ident, Pred};

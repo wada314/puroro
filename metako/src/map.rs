@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::{Func, If, Pred};
 use ::std::marker::PhantomData;
 
-pub trait MapGet<P> {
-    type Type;
-}
-impl<P> MapGet<P> for () {
+pub struct Get<P>(PhantomData<P>);
+impl<P> Func<()> for Get<P> {
     type Type = ();
 }
-impl<K, V, U, P: Pred<K>> MapGet<P> for ((K, V), U)
+impl<K, V, U, P> Func<((K, V), U)> for Get<P>
 where
-    U: MapGet<P>,
+    P: Pred<K>,
+    Get<P>: Func<U>,
 {
-    type Type = <P::Type as If>::Type<V, <U as MapGet<P>>::Type>;
+    type Type = <P::Type as If>::Type<V, <Get<P> as Func<U>>::Type>;
 }

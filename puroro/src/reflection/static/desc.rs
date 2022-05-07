@@ -13,8 +13,7 @@
 // limitations under the License.
 
 use crate::tags;
-use crate::tuple_list;
-use crate::util::{Func, Ident, If, IsNumberEqual, ListFind, MapGet, Number, Pred};
+use ::metako::*;
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -27,12 +26,11 @@ pub trait FieldDescriptor {
 }
 
 struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
-impl<N, T> Pred<T> for IsFdNumberEqualTo<N>
+impl<N, T> Func<T> for IsFdNumberEqualTo<N>
 where
     T: FieldDescriptor,
     T::Number: Number,
     N: Number,
-    N::Eq<T::Number>: If,
 {
     type Type = N::Eq<T::Number>;
 }
@@ -43,10 +41,10 @@ trait MdGetFieldExt<N> {
 impl<N, MD> MdGetFieldExt<N> for MD
 where
     MD: MessageDescriptor,
-    MD::Fields: ListFind<IsFdNumberEqualTo<N>>,
-    <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type: FieldDescriptor,
+    list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields>,
+    <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor,
 {
-    type GetField = <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type;
+    type GetField = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
 }
 
 pub struct GetSupplementalDescriptor;
@@ -55,13 +53,13 @@ impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
 }
 
 pub struct TypeTagIntoOwnedTypeGen;
-type TypeTagIntoOwnedTypeGenMap = tuple_list!(
+type TypeTagIntoOwnedTypeGenMap = make_list!(
     (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
     (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
     (<tags::Message<()> as tags::FieldTypeTag>::Id, Ident<()>),
 );
 impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
-    type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T::Id>>>::Type;
+    type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
 }
 
 pub struct TypeTagIntoOwnedType;

@@ -28,7 +28,6 @@ pub mod message;
 pub mod reflection;
 pub mod sample;
 pub mod tags;
-pub mod util;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};

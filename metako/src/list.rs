@@ -21,7 +21,7 @@ macro_rules! make_list {
         ()
     };
     ($a:ty$(, $rest:ty)* $(,)?) => {
-        ($a, tuple_list!($($rest),*))
+        ($a, make_list!($($rest),*))
     };
 }
 
