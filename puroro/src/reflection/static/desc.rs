@@ -62,10 +62,20 @@ impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
 }
 
-pub struct TypeTagIntoOwnedType;
-impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedType
+pub struct FdIntoOwnedType;
+impl<FD> Func<FD> for FdIntoOwnedType
 where
-    TypeTagIntoOwnedTypeGen: Func<T>,
+    FD: FieldDescriptor,
+    TypeTagIntoOwnedTypeGen: Func<FD::FieldType>,
 {
-    type Type = <TypeTagIntoOwnedTypeGen as Func<T>>::Type;
+    type Type = <TypeTagIntoOwnedTypeGen as Func<FD::FieldType>>::Type;
+}
+
+pub struct MdIntoOwnedFieldList;
+impl<MD> Func<MD> for MdIntoOwnedFieldList
+where
+    MD: MessageDescriptor,
+    list::Map<FdIntoOwnedType>: Func<MD::Fields>,
+{
+    type Type = <list::Map<FdIntoOwnedType> as Func<MD::Fields>>::Type;
 }
