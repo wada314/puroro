@@ -34,8 +34,9 @@ pub trait PersonTrait {
 }
 
 use crate::reflection::r#static::desc::*;
-use crate::reflection::r#static::Reflection;
+use crate::reflection::r#static::{OwnedFields, Reflection};
 use crate::tags;
+use ::metako::make_list;
 use ::typenum::{U1, U2, U4};
 
 pub struct MdPerson;
@@ -43,7 +44,7 @@ pub struct FdName;
 pub struct FdAge;
 pub struct FdPartner;
 impl MessageDescriptor for MdPerson {
-    type Fields = (FdName, (FdAge, (FdPartner, ())));
+    type Fields = make_list!(FdName, FdAge, FdPartner);
 }
 impl FieldDescriptor for FdName {
     type Number = U1;
@@ -57,6 +58,8 @@ impl FieldDescriptor for FdPartner {
     type Number = U4;
     type FieldType = tags::Message<MdPerson>;
 }
+
+type PersonFields = OwnedFields<MdPerson>;
 
 impl<T> PersonTrait for T
 where
@@ -80,3 +83,8 @@ where
 }
 
 ////////////////////////////////////////////
+
+#[test]
+fn test() {
+    let f = PersonFields::default();
+}
