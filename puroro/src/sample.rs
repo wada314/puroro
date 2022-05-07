@@ -24,8 +24,6 @@
 //     repeated Person children = 3;
 // }
 
-use crate::{ErrorKind, Result};
-
 pub trait PersonTrait {
     fn name(&self) -> &str;
     fn age(&self) -> u32;
