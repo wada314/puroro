@@ -13,7 +13,8 @@
 // limitations under the License.
 
 use crate::tags;
-use crate::util::{If, ListFind, Number, Pred};
+use crate::tuple_list;
+use crate::util::{Func, Ident, If, IsNumberEqual, ListFind, MapGet, Number, Pred};
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -46,4 +47,14 @@ where
     <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type: FieldDescriptor,
 {
     type GetField = <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type;
+}
+
+pub struct TypeTagIntoOwnedTypeGen;
+type TypeTagIntoOwnedTypeGenMap = tuple_list!(
+    (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
+    (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
+    (<tags::Message<()> as tags::FieldTypeTag>::Id, Ident<()>),
+);
+impl<T: Number> Func<T> for TypeTagIntoOwnedTypeGen {
+    type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T>>>::Type;
 }
