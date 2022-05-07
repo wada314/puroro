@@ -69,10 +69,7 @@ macro_rules! tuple_list {
     () => {
         ()
     };
-    ($a:ty) => {
-        ($a, ())
-    };
-    ($a:ty, $($rest:ty),* $(,)?) => {
+    ($a:ty$(, $rest:ty)* $(,)?) => {
         ($a, tuple_list!($($rest),*))
     };
 }
