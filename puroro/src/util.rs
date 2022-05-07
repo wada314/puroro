@@ -15,18 +15,27 @@
 use crate::tags;
 use crate::tags::FieldTypeTag;
 use ::std::marker::PhantomData;
+use ::typenum::{UInt, UTerm};
 use ::typenum::{B0, B1};
 
 pub trait If {
     type Type<T, F>;
+    type Not: If;
+    type And<T: If>: If;
+    type Or<T: If>: If;
 }
 impl If for B0 {
     type Type<T, F> = F;
+    type Not = B1;
+    type And<T: If> = B0;
+    type Or<T: If> = T;
 }
 impl If for B1 {
     type Type<T, F> = T;
+    type Not = B0;
+    type And<T: If> = T;
+    type Or<T: If> = B1;
 }
-use ::typenum::{UInt, UTerm};
 
 // We need this trait so that we can compare the
 // type equality with ANY M:Number type.
@@ -35,25 +44,25 @@ pub trait Number {
     type Lsb: If;
     type Remains: Number;
     type IsUTerm: If;
-    type Eq<M: Number>;
+    type Eq<M: Number>: If;
 }
 impl<U: Number> Number for UInt<U, B0> {
     type Lsb = B0;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: Number> = <M::Lsb as If>::Type<B0, <U::Remains as Number>::Eq<M::Remains>>;
+    type Eq<M: Number> = <<M::Lsb as If>::Not as If>::And<<U::Remains as Number>::Eq<M::Remains>>;
 }
 impl<U: Number> Number for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: Number> = <M::Lsb as If>::Type<<U::Remains as Number>::Eq<M::Remains>, B0>;
+    type Eq<M: Number> = <M::Lsb as If>::And<<U::Remains as Number>::Eq<M::Remains>>;
 }
 impl Number for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
-    type Eq<M: Number> = <M::IsUTerm as If>::Type<B1, B0>;
+    type Eq<M: Number> = <M::IsUTerm as If>::Not;
 }
 
 pub trait Pred<T> {
