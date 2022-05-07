@@ -49,11 +49,19 @@ where
     type GetField = <MD::Fields as ListFind<IsFdNumberEqualTo<N>>>::Type;
 }
 
+pub struct GetSupplementalDescriptor;
+impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
+    type Type = T::MaybeSupplementalDescriptor;
+}
+
 pub struct TypeTagIntoOwnedTypeGen;
 type TypeTagIntoOwnedTypeGenMap = tuple_list!(
     (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
     (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
-    (<tags::Message<()> as tags::FieldTypeTag>::Id, Ident<()>),
+    (
+        <tags::Message<()> as tags::FieldTypeTag>::Id,
+        GetSupplementalDescriptor
+    ),
 );
 impl<T: Number> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <TypeTagIntoOwnedTypeGenMap as MapGet<IsNumberEqual<T>>>::Type;
