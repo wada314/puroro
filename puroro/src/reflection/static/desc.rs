@@ -52,13 +52,22 @@ impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
     type Type = T::MaybeSupplementalDescriptor;
 }
 
+pub struct MdIntoOptBoxOwnedFieldList;
+impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList
+where
+    MD: MessageDescriptor,
+    MdIntoOwnedFieldList: Func<MD>,
+{
+    type Type = Option<Box<<MdIntoOwnedFieldList as Func<MD>>::Type>>;
+}
+
 pub struct TypeTagIntoOwnedTypeGen;
 type TypeTagIntoOwnedTypeGenMap = make_list!(
     (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
     (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
     (
         <tags::Message<()> as tags::FieldTypeTag>::Id,
-        MdIntoOwnedFieldList
+        MdIntoOptBoxOwnedFieldList
     ),
 );
 impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
