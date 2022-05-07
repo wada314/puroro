@@ -89,8 +89,17 @@ mod test {
     use crate::reflection::r#static::desc::*;
     use ::metako::*;
     use ::typenum::*;
-    fn test(v: <TypeTagIntoOwnedTypeGen as Func<tags::Message<MdPerson>>>::Type) {}
+    // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
     fn foo() {
-        test(10)
+        // test(10)
+    }
+    struct MD;
+    struct P<F: Func<MD>>(Box<F::Type>);
+    struct Gen;
+    impl Func<MD> for Gen {
+        type Type = P<Gen>;
+    }
+    fn hoge(p: P<Gen>) {
+        let P(q) = p;
     }
 }
