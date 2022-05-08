@@ -13,9 +13,11 @@
 // limitations under the License.
 
 pub mod desc;
+pub mod owned;
 use crate::Result;
 use ::metako::Func;
-use desc::{FieldDescriptor, MdIntoOwnedFieldList};
+use desc::FieldDescriptor;
+use owned::MdIntoOwnedFieldList;
 
 pub type OwnedFields<MD> = <MdIntoOwnedFieldList as Func<MD>>::Type;
 

@@ -59,7 +59,7 @@ impl FieldDescriptor for FdPartner {
     type FieldType = tags::Message<MdPerson>;
 }
 
-type PersonFields = OwnedFields<MdPerson>;
+pub type PersonOwnedFields = OwnedFields<MdPerson>;
 
 impl<T> PersonTrait for T
 where
@@ -83,7 +83,8 @@ where
 }
 
 ////////////////////////////////////////////
-
+////
+#[allow(unused)]
 mod test {
     use super::*;
     use crate::reflection::r#static::desc::*;
