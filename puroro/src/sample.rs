@@ -89,17 +89,29 @@ mod test {
     use crate::reflection::r#static::desc::*;
     use ::metako::*;
     use ::typenum::*;
+    struct MdPerson2;
+    impl MessageDescriptor for MdPerson2 {
+        type Fields = make_list!(FdName, FdAge);
+    }
+
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
+    // fn test(v: <MdIntoOwnedFieldList as Func<MdPerson2>>::Type) {}
     fn foo() {
         // test(10)
     }
     struct MD;
-    struct P<F: Func<MD>>(Box<F::Type>);
+    trait MDT {
+        type Field;
+    }
+    impl MDT for MD {
+        type Field = MD;
+    }
+    struct P<F: Func<MD>, MD>(Box<F::Type>);
     struct Gen;
     impl Func<MD> for Gen {
-        type Type = P<Gen>;
+        type Type = P<Gen, <MD as MDT>::Field>;
     }
-    fn hoge(p: P<Gen>) {
+    fn hoge(p: P<Gen, MD>) {
         let P(q) = p;
     }
 }

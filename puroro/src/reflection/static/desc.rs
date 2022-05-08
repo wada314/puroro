@@ -25,6 +25,13 @@ pub trait FieldDescriptor {
     type FieldType: tags::FieldTypeTag;
 }
 
+pub struct OwnedMessage<MD: MessageDescriptor>
+where
+    MdIntoOwnedFieldList: Func<MD>,
+{
+    pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
+}
+
 struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
 impl<N, T> Func<T> for IsFdNumberEqualTo<N>
 where
@@ -58,7 +65,7 @@ where
     MD: MessageDescriptor,
     MdIntoOwnedFieldList: Func<MD>,
 {
-    type Type = Option<Box<<MdIntoOwnedFieldList as Func<MD>>::Type>>;
+    type Type = Option<Box<OwnedMessage<MD>>>;
 }
 
 pub struct TypeTagIntoOwnedTypeGen;
