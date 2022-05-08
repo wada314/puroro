@@ -86,52 +86,12 @@ where
 
 mod test {
     use super::*;
+    use crate::reflection::r#static::desc::*;
     use ::metako::*;
 
-    trait MessageDescriptor2 {
-        type FieldType;
-    }
-    struct MdPerson2;
-    impl MessageDescriptor2 for MdPerson2 {
-        type FieldType = MdPerson2;
-    }
-
-    pub struct OwnedMessage<F, MD>
-    where
-        MD: MessageDescriptor2,
-        F: Func<MD>,
-    {
-        pub fields: <F as Func<MD>>::Type,
-    }
-
-    pub struct MdIntoOwnedFieldList;
-    impl<MD> Func<MD> for MdIntoOwnedFieldList
-    where
-        MD: MessageDescriptor2,
-        MD::FieldType: MessageDescriptor2,
-        MdIntoOwnedFieldList: Func<MD::FieldType>,
-    {
-        type Type = Option<Box<OwnedMessage<MdIntoOwnedFieldList, MD::FieldType>>>;
-    }
-
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
-    fn test(v: <MdIntoOwnedFieldList as Func<MdPerson2>>::Type) {}
+    fn test(v: <MdIntoOwnedFieldList as Func<MdPerson>>::Type) {}
     fn foo() {
         test(10)
-    }
-    struct MD;
-    trait MDT {
-        type Field;
-    }
-    impl MDT for MD {
-        type Field = MD;
-    }
-    struct P<F: Func<MD>, MD>(Box<F::Type>);
-    struct Gen;
-    impl Func<MD> for Gen {
-        type Type = P<Gen, <MD as MDT>::Field>;
-    }
-    fn hoge(p: P<Gen, MD>) {
-        let P(q) = p;
     }
 }
