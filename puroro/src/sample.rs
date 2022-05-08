@@ -93,7 +93,7 @@ mod test {
     #[test]
     fn foo() {
         let mut t = PersonFields::default();
-        t.1.1.0 = Some(BoxedMessage::default());
+        // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
     }
 }

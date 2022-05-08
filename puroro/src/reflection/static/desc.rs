@@ -16,6 +16,7 @@ use crate::tags;
 use ::metako::*;
 use ::std::marker::PhantomData;
 use ::std::mem::{transmute, ManuallyDrop};
+use ::std::ptr::null_mut;
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -53,8 +54,10 @@ where
     MdIntoOwnedFieldList: Func<MD>,
     <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
 {
-    pub fn take(self) -> Box<OwnedMessage<MD>> {
-        unsafe { Box::from_raw(transmute(ManuallyDrop::into_inner(self.0))) }
+    pub fn take(mut self) -> Box<OwnedMessage<MD>> {
+        let ptr = self.0;
+        self.0 = ManuallyDrop::new(null_mut());
+        unsafe { Box::from_raw(transmute(ManuallyDrop::into_inner(ptr))) }
     }
 }
 impl<MD> Default for BoxedMessage<MD>
@@ -69,6 +72,15 @@ where
             ManuallyDrop::new(unsafe { transmute(Box::into_raw(boxed)) }),
             PhantomData,
         )
+    }
+}
+impl<MD> Drop for BoxedMessage<MD> {
+    fn drop(&mut self) {
+        debug_assert_eq!(
+            *self.0,
+            null_mut(),
+            "This type should be explicitly cleaned up before automatic drop!"
+        );
     }
 }
 
