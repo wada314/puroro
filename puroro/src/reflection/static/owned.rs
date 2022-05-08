@@ -17,6 +17,7 @@ use crate::tags;
 use ::metako::*;
 use ::std::marker::PhantomData;
 use ::std::mem::{transmute, ManuallyDrop};
+use ::std::ops::{Deref, DerefMut};
 use ::std::ptr::null_mut;
 
 pub struct OwnedMessage<MD: MessageDescriptor>
@@ -38,6 +39,14 @@ where
     }
 }
 
+/// A wrapper of Box<OwnedMessage<MD>>.
+///
+/// The important thing is that this type declaration does not
+/// require any bounds for `MD` param.
+/// We need this property to avoid recursive message's infinite
+/// type recursion problem.
+/// Instead of that property, this type internally erases the type info,
+/// and is required to be manually dropped using `take` method.
 pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
 impl<MD> BoxedMessage<MD>
 where
@@ -51,6 +60,7 @@ where
         unsafe { Box::from_raw(transmute(ManuallyDrop::into_inner(ptr))) }
     }
 }
+
 impl<MD> Default for BoxedMessage<MD>
 where
     MD: MessageDescriptor,
@@ -65,6 +75,7 @@ where
         )
     }
 }
+
 impl<MD> Drop for BoxedMessage<MD> {
     fn drop(&mut self) {
         debug_assert_eq!(
@@ -74,6 +85,28 @@ impl<MD> Drop for BoxedMessage<MD> {
         );
     }
 }
+
+impl<MD> Deref for BoxedMessage<MD>
+where
+    MD: MessageDescriptor,
+    MdIntoOwnedFieldList: Func<MD>,
+{
+    type Target = OwnedMessage<MD>;
+    fn deref(&self) -> &Self::Target {
+        unsafe { transmute::<_, &OwnedMessage<MD>>(&self.0) }
+    }
+}
+
+impl<MD> DerefMut for BoxedMessage<MD>
+where
+    MD: MessageDescriptor,
+    MdIntoOwnedFieldList: Func<MD>,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { transmute::<_, &mut OwnedMessage<MD>>(&mut self.0) }
+    }
+}
+
 pub struct MdIntoOptBoxOwnedFieldList;
 impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList {
     type Type = Option<BoxedMessage<MD>>;
