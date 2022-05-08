@@ -86,18 +86,76 @@ where
 
 mod test {
     use super::*;
-    use crate::reflection::r#static::desc::*;
     use ::metako::*;
-    use ::typenum::*;
+
     struct MdPerson2;
     impl MessageDescriptor for MdPerson2 {
-        type Fields = make_list!(FdName, FdAge);
+        type Fields = make_list!(FdName, FdAge, FdPartner);
+    }
+
+    pub struct OwnedMessage<MD: MessageDescriptor>
+    where
+        MdIntoOwnedFieldList: Func<MD>,
+    {
+        pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
+    }
+
+    pub struct MdIntoOptBoxOwnedFieldList;
+    impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList
+    where
+        MD: MessageDescriptor,
+        MdIntoOwnedFieldList: Func<MD>,
+    {
+        type Type = Option<Box<OwnedMessage<MD>>>;
+    }
+
+    pub struct TypeTagIntoOwnedTypeGen;
+    type TypeTagIntoOwnedTypeGenMap = make_list!(
+        (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
+        (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
+        (
+            <tags::Message<()> as tags::FieldTypeTag>::Id,
+            MdIntoOptBoxOwnedFieldList
+        ),
+    );
+    impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
+        type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
+    }
+
+    pub struct TypeTagIntoOwnedType;
+    impl<T> Func<T> for TypeTagIntoOwnedType
+    where
+        T: tags::FieldTypeTag,
+        TypeTagIntoOwnedTypeGen: Func<T>,
+        <TypeTagIntoOwnedTypeGen as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
+    {
+        type Type = <<TypeTagIntoOwnedTypeGen as Func<T>>::Type as Func<
+            T::MaybeSupplementalDescriptor,
+        >>::Type;
+    }
+
+    pub struct FdIntoOwnedType;
+    impl<FD> Func<FD> for FdIntoOwnedType
+    where
+        FD: FieldDescriptor,
+        TypeTagIntoOwnedType: Func<FD::FieldType>,
+    {
+        type Type = <TypeTagIntoOwnedType as Func<FD::FieldType>>::Type;
+    }
+
+    pub struct MdIntoOwnedFieldList;
+    impl<MD> Func<MD> for MdIntoOwnedFieldList
+    where
+        MD: MessageDescriptor,
+        list::Map<FdIntoOwnedType>: Func<MD::Fields>,
+    {
+        type Type = <list::Map<FdIntoOwnedType> as Func<MD::Fields>>::Type;
     }
 
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
-    // fn test(v: <MdIntoOwnedFieldList as Func<MdPerson2>>::Type) {}
+    fn test(v: <MdIntoOwnedFieldList as Func<MdPerson2>>::Type) {}
     fn foo() {
-        // test(10)
+        test(10)
     }
     struct MD;
     trait MDT {
