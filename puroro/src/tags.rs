@@ -257,8 +257,8 @@ impl NumericalTypeTag for Double {
 impl NumericalTypeTag for Bool {
     type NativeType = bool;
 }
-impl<E: crate::Enum2> NumericalTypeTag for Enum<E> {
-    type NativeType = E;
+impl<E> NumericalTypeTag for Enum<E> {
+    type NativeType = (); // TODO
 }
 impl StringOrBytesTypeTag for String {
     type BorrowedType = str;

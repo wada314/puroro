@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::tags;
-use crate::{Enum2, Enum3, ErrorKind, Result};
+use crate::{ErrorKind, Result};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;
@@ -189,24 +189,12 @@ impl VariantTypeTag for tags::Bool {
     }
 }
 
-impl<E: Enum2> VariantTypeTag for tags::Enum2<E> {
-    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
-        let i: i32 = i32::try_from(i64::from_le_bytes(var.0))?;
-        Ok(E::try_from(i).map_err(|_| ErrorKind::UnknownEnumVariant(i))?)
+impl<E> VariantTypeTag for tags::Enum<E> {
+    fn from_variant(_var: &Variant) -> Result<Self::NativeType> {
+        todo!()
     }
-    fn to_variant(val: Self::NativeType) -> Result<Variant> {
-        let int_val: i32 = E::into(val);
-        Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
-    }
-}
-impl<E: Enum3> VariantTypeTag for tags::Enum3<E> {
-    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
-        let i = i32::try_from(i64::from_le_bytes(var.0))?;
-        Ok(E::from(i))
-    }
-    fn to_variant(val: Self::NativeType) -> Result<Variant> {
-        let int_val: i32 = E::into(val);
-        Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
+    fn to_variant(_val: Self::NativeType) -> Result<Variant> {
+        todo!()
     }
 }
 
