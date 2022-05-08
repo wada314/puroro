@@ -90,7 +90,7 @@ mod test {
 
     struct MdPerson2;
     impl MessageDescriptor for MdPerson2 {
-        type Fields = make_list!(FdName, FdAge, FdPartner);
+        type Fields = make_list!(FdPartner);
     }
 
     pub struct OwnedMessage<MD: MessageDescriptor>
