@@ -90,8 +90,10 @@ mod test {
     use ::metako::*;
 
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
-    fn test(v: <MdIntoOwnedFieldList as Func<MdPerson>>::Type) {}
+    #[test]
     fn foo() {
+        let mut t = PersonFields::default();
+        t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
     }
 }
