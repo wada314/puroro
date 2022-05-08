@@ -140,9 +140,9 @@ pub struct FdIntoOwnedType;
 impl<FD> Func<FD> for FdIntoOwnedType
 where
     FD: FieldDescriptor,
-    TypeTagIntoOwnedType: Func<FD::FieldType>,
+    TypeTagIntoOwnedType: Func<FD::Type>,
 {
-    type Type = <TypeTagIntoOwnedType as Func<FD::FieldType>>::Type;
+    type Type = <TypeTagIntoOwnedType as Func<FD::Type>>::Type;
 }
 
 pub struct MdIntoOwnedFieldList;

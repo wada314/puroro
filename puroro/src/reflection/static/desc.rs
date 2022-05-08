@@ -18,11 +18,13 @@ use ::typenum;
 
 pub trait MessageDescriptor {
     type Fields;
+    type Syntax: tags::ProtoSyntaxTag;
 }
 
 pub trait FieldDescriptor {
     type Number: typenum::ToInt<i32> + Number;
-    type FieldType: tags::FieldTypeTag;
+    type Label: tags::FieldLabelTag;
+    type Type: tags::FieldTypeTag;
 }
 
 struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);

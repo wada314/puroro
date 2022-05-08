@@ -17,7 +17,7 @@ use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
 
-pub trait ProtoVersionTag {
+pub trait ProtoSyntaxTag {
     type Id: Number;
 }
 
@@ -55,10 +55,10 @@ pub trait FieldLabelTag {
 pub struct Proto2;
 pub struct Proto3;
 
-impl ProtoVersionTag for Proto2 {
+impl ProtoSyntaxTag for Proto2 {
     type Id = U2;
 }
-impl ProtoVersionTag for Proto3 {
+impl ProtoSyntaxTag for Proto3 {
     type Id = U3;
 }
 
@@ -108,12 +108,10 @@ pub type Message<M> = LengthDelimited<value::Message<M>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
 pub struct Repeated;
-/// Proto2 optional field || Proto3 default (empty) label field.
-pub struct Optional;
 /// Only available in proto2.
 pub struct Required;
-/// An item of oneof.
-pub struct OneofField;
+/// Every fields except `Repeated` and `Required`.
+pub struct Optional;
 
 impl FieldTypeTag for Int32 {
     type Id = U1;
@@ -280,10 +278,5 @@ impl FieldLabelTag for Optional {
 impl FieldLabelTag for Required {
     const DO_DEFAULT_CHECK: bool = false;
     type Id = U3;
-    type IsRepeated = False;
-}
-impl FieldLabelTag for OneofField {
-    const DO_DEFAULT_CHECK: bool = false;
-    type Id = U4;
     type IsRepeated = False;
 }

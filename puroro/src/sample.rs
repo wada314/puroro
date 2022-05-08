@@ -45,18 +45,22 @@ pub struct FdAge;
 pub struct FdPartner;
 impl MessageDescriptor for MdPerson {
     type Fields = make_list!(FdName, FdAge, FdPartner);
+    type Syntax = tags::Proto3;
 }
 impl FieldDescriptor for FdName {
     type Number = U1;
-    type FieldType = tags::String;
+    type Label = tags::Optional;
+    type Type = tags::String;
 }
 impl FieldDescriptor for FdAge {
     type Number = U2;
-    type FieldType = tags::UInt32;
+    type Label = tags::Optional;
+    type Type = tags::UInt32;
 }
 impl FieldDescriptor for FdPartner {
     type Number = U4;
-    type FieldType = tags::Message<MdPerson>;
+    type Label = tags::Optional;
+    type Type = tags::Message<MdPerson>;
 }
 
 pub type PersonOwnedFields = OwnedFields<MdPerson>;
