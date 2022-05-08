@@ -98,32 +98,22 @@ mod test {
         type FieldType = tags::Message<MdPerson2>;
     }
 
-    pub struct OwnedMessage<MD: MessageDescriptor>
-    where
-        MdIntoOwnedFieldList: Func<MD>,
-    {
-        pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
-    }
-
-    pub struct MdIntoOptBoxOwnedFieldList;
-    impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList
+    pub struct OwnedMessage<MD>
     where
         MD: MessageDescriptor,
         MdIntoOwnedFieldList: Func<MD>,
     {
-        type Type = Option<Box<OwnedMessage<MD>>>;
+        pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
     }
 
     pub struct TypeTagIntoOwnedType;
     impl<T> Func<T> for TypeTagIntoOwnedType
     where
         T: tags::FieldTypeTag,
-        MdIntoOptBoxOwnedFieldList: Func<T>,
-        <MdIntoOptBoxOwnedFieldList as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
+        T::MaybeSupplementalDescriptor: MessageDescriptor,
+        MdIntoOwnedFieldList: Func<T::MaybeSupplementalDescriptor>,
     {
-        type Type = <<MdIntoOptBoxOwnedFieldList as Func<T>>::Type as Func<
-            T::MaybeSupplementalDescriptor,
-        >>::Type;
+        type Type = Option<Box<OwnedMessage<T::MaybeSupplementalDescriptor>>>;
     }
 
     pub struct FdIntoOwnedType;
