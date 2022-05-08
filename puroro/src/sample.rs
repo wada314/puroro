@@ -88,8 +88,11 @@ mod test {
     use super::*;
     use ::metako::*;
 
+    trait MessageDescriptor2 {
+        type Fields;
+    }
     struct MdPerson2;
-    impl MessageDescriptor for MdPerson2 {
+    impl MessageDescriptor2 for MdPerson2 {
         type Fields = FdPartner2;
     }
     struct FdPartner2;
@@ -100,7 +103,7 @@ mod test {
 
     pub struct OwnedMessage<MD>
     where
-        MD: MessageDescriptor,
+        MD: MessageDescriptor2,
         MdIntoOwnedFieldList: Func<MD>,
     {
         pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
@@ -110,7 +113,7 @@ mod test {
     impl<T> Func<T> for TypeTagIntoOwnedType
     where
         T: tags::FieldTypeTag,
-        T::MaybeSupplementalDescriptor: MessageDescriptor,
+        T::MaybeSupplementalDescriptor: MessageDescriptor2,
         MdIntoOwnedFieldList: Func<T::MaybeSupplementalDescriptor>,
     {
         type Type = Option<Box<OwnedMessage<T::MaybeSupplementalDescriptor>>>;
@@ -128,7 +131,7 @@ mod test {
     pub struct MdIntoOwnedFieldList;
     impl<MD> Func<MD> for MdIntoOwnedFieldList
     where
-        MD: MessageDescriptor,
+        MD: MessageDescriptor2,
         FdIntoOwnedType: Func<MD::Fields>,
     {
         type Type = <FdIntoOwnedType as Func<MD::Fields>>::Type;
