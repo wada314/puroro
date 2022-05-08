@@ -114,27 +114,14 @@ mod test {
         type Type = Option<Box<OwnedMessage<MD>>>;
     }
 
-    pub struct TypeTagIntoOwnedTypeGen;
-    type TypeTagIntoOwnedTypeGenMap = make_list!(
-        (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
-        (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
-        (
-            <tags::Message<()> as tags::FieldTypeTag>::Id,
-            MdIntoOptBoxOwnedFieldList
-        ),
-    );
-    impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
-        type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
-    }
-
     pub struct TypeTagIntoOwnedType;
     impl<T> Func<T> for TypeTagIntoOwnedType
     where
         T: tags::FieldTypeTag,
-        TypeTagIntoOwnedTypeGen: Func<T>,
-        <TypeTagIntoOwnedTypeGen as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
+        MdIntoOptBoxOwnedFieldList: Func<T>,
+        <MdIntoOptBoxOwnedFieldList as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
     {
-        type Type = <<TypeTagIntoOwnedTypeGen as Func<T>>::Type as Func<
+        type Type = <<MdIntoOptBoxOwnedFieldList as Func<T>>::Type as Func<
             T::MaybeSupplementalDescriptor,
         >>::Type;
     }
