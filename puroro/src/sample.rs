@@ -90,7 +90,12 @@ mod test {
 
     struct MdPerson2;
     impl MessageDescriptor for MdPerson2 {
-        type Fields = make_list!(FdPartner);
+        type Fields = FdPartner2;
+    }
+    struct FdPartner2;
+    impl FieldDescriptor for FdPartner2 {
+        type Number = U4;
+        type FieldType = tags::Message<MdPerson2>;
     }
 
     pub struct OwnedMessage<MD: MessageDescriptor>
@@ -147,9 +152,9 @@ mod test {
     impl<MD> Func<MD> for MdIntoOwnedFieldList
     where
         MD: MessageDescriptor,
-        list::Map<FdIntoOwnedType>: Func<MD::Fields>,
+        FdIntoOwnedType: Func<MD::Fields>,
     {
-        type Type = <list::Map<FdIntoOwnedType> as Func<MD::Fields>>::Type;
+        type Type = <FdIntoOwnedType as Func<MD::Fields>>::Type;
     }
 
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
