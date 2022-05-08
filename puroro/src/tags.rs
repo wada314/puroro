@@ -44,6 +44,7 @@ pub trait StringOrBytesTypeTag {
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {
     const DO_DEFAULT_CHECK: bool;
+    type Id: Number;
     type IsRepeated;
 }
 
@@ -267,26 +268,26 @@ impl StringOrBytesTypeTag for Bytes {
 
 impl FieldLabelTag for Repeated {
     const DO_DEFAULT_CHECK: bool = false;
+    type Id = U1;
     type IsRepeated = True;
 }
 impl FieldLabelTag for Optional {
     const DO_DEFAULT_CHECK: bool = false;
+    type Id = U2;
     type IsRepeated = False;
 }
 impl FieldLabelTag for Unlabeled {
     const DO_DEFAULT_CHECK: bool = true;
+    type Id = U3;
     type IsRepeated = False;
 }
 impl FieldLabelTag for Required {
     const DO_DEFAULT_CHECK: bool = false;
+    type Id = U4;
     type IsRepeated = False;
 }
 impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
+    type Id = U5;
     type IsRepeated = False;
 }
-
-pub struct OwnedImpl;
-pub struct OptionImpl;
-pub struct MergedImpl;
-pub struct EitherImpl;
