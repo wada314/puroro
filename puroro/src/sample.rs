@@ -93,34 +93,25 @@ mod test {
     }
     struct MdPerson2;
     impl MessageDescriptor2 for MdPerson2 {
-        type FieldType = tags::Message<MdPerson2>;
+        type FieldType = MdPerson2;
     }
 
-    pub struct OwnedMessage<MD>
+    pub struct OwnedMessage<F, MD>
     where
         MD: MessageDescriptor2,
-        MdIntoOwnedFieldList: Func<MD>,
+        F: Func<MD>,
     {
-        pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
-    }
-
-    pub struct TypeTagIntoOwnedType;
-    impl<T> Func<T> for TypeTagIntoOwnedType
-    where
-        T: tags::FieldTypeTag,
-        T::MaybeSupplementalDescriptor: MessageDescriptor2,
-        MdIntoOwnedFieldList: Func<T::MaybeSupplementalDescriptor>,
-    {
-        type Type = Option<Box<OwnedMessage<T::MaybeSupplementalDescriptor>>>;
+        pub fields: <F as Func<MD>>::Type,
     }
 
     pub struct MdIntoOwnedFieldList;
     impl<MD> Func<MD> for MdIntoOwnedFieldList
     where
         MD: MessageDescriptor2,
-        TypeTagIntoOwnedType: Func<MD::FieldType>,
+        MD::FieldType: MessageDescriptor2,
+        MdIntoOwnedFieldList: Func<MD::FieldType>,
     {
-        type Type = <TypeTagIntoOwnedType as Func<MD::FieldType>>::Type;
+        type Type = Option<Box<OwnedMessage<MdIntoOwnedFieldList, MD::FieldType>>>;
     }
 
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
