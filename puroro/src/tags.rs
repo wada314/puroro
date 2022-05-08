@@ -17,6 +17,10 @@ use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
 
+pub trait ProtoVersionTag {
+    type Id: Number;
+}
+
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
@@ -48,6 +52,16 @@ pub trait FieldLabelTag {
     type IsRepeated;
 }
 
+pub struct Proto2;
+pub struct Proto3;
+
+impl ProtoVersionTag for Proto2 {
+    type Id = U2;
+}
+impl ProtoVersionTag for Proto3 {
+    type Id = U3;
+}
+
 mod value {
     use ::std::marker::PhantomData;
     pub struct Int32;
@@ -57,8 +71,7 @@ mod value {
     pub struct UInt64;
     pub struct SInt64;
     pub struct Bool;
-    pub struct Enum2<E>(PhantomData<E>);
-    pub struct Enum3<E>(PhantomData<E>);
+    pub struct Enum<E>(PhantomData<E>);
     pub struct Float;
     pub struct Double;
     pub struct SFixed32;
@@ -90,18 +103,15 @@ pub type SFixed32 = Bits32<value::SFixed32>;
 pub type Double = Bits64<value::Double>;
 pub type Fixed64 = Bits64<value::Fixed64>;
 pub type SFixed64 = Bits64<value::SFixed64>;
-pub type Enum2<E> = Variant<value::Enum2<E>>;
-pub type Enum3<E> = Variant<value::Enum3<E>>;
+pub type Enum<E> = Variant<value::Enum<E>>;
 pub type Message<M> = LengthDelimited<value::Message<M>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
 pub struct Repeated;
-/// Proto2 optional field || Proto3 explicitly optional marked field.
+/// Proto2 optional field || Proto3 default (empty) label field.
 pub struct Optional;
 /// Only available in proto2.
 pub struct Required;
-/// Proto3 unlabeled field.
-pub struct Unlabeled;
 /// An item of oneof.
 pub struct OneofField;
 
@@ -159,14 +169,8 @@ impl FieldTypeTag for String {
     type IsLd = True;
     type IsMessage = False;
 }
-impl<E> FieldTypeTag for Enum2<E> {
+impl<E> FieldTypeTag for Enum<E> {
     type Id = U10;
-    type MaybeSupplementalDescriptor = E;
-    type IsLd = False;
-    type IsMessage = False;
-}
-impl<E> FieldTypeTag for Enum3<E> {
-    type Id = U11;
     type MaybeSupplementalDescriptor = E;
     type IsLd = False;
     type IsMessage = False;
@@ -253,10 +257,7 @@ impl NumericalTypeTag for Double {
 impl NumericalTypeTag for Bool {
     type NativeType = bool;
 }
-impl<E: crate::Enum2> NumericalTypeTag for Enum2<E> {
-    type NativeType = E;
-}
-impl<E: crate::Enum3> NumericalTypeTag for Enum3<E> {
+impl<E: crate::Enum2> NumericalTypeTag for Enum<E> {
     type NativeType = E;
 }
 impl StringOrBytesTypeTag for String {
@@ -276,18 +277,13 @@ impl FieldLabelTag for Optional {
     type Id = U2;
     type IsRepeated = False;
 }
-impl FieldLabelTag for Unlabeled {
-    const DO_DEFAULT_CHECK: bool = true;
-    type Id = U3;
-    type IsRepeated = False;
-}
 impl FieldLabelTag for Required {
     const DO_DEFAULT_CHECK: bool = false;
-    type Id = U4;
+    type Id = U3;
     type IsRepeated = False;
 }
 impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
-    type Id = U5;
+    type Id = U4;
     type IsRepeated = False;
 }
