@@ -92,6 +92,6 @@ mod test {
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
     fn test(v: <MdIntoOwnedFieldList as Func<MdPerson>>::Type) {}
     fn foo() {
-        test(10)
+        // test(10)
     }
 }

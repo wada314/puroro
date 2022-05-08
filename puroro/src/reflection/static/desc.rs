@@ -14,6 +14,8 @@
 
 use crate::tags;
 use ::metako::*;
+use ::std::marker::PhantomData;
+use ::std::mem::{transmute, ManuallyDrop};
 use ::typenum;
 
 pub trait MessageDescriptor {
@@ -30,6 +32,44 @@ where
     MdIntoOwnedFieldList: Func<MD>,
 {
     pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
+}
+impl<MD> Default for OwnedMessage<MD>
+where
+    MD: MessageDescriptor,
+    MdIntoOwnedFieldList: Func<MD>,
+    <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
+{
+    fn default() -> Self {
+        Self {
+            fields: Default::default(),
+        }
+    }
+}
+
+pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
+impl<MD> BoxedMessage<MD>
+where
+    MD: MessageDescriptor,
+    MdIntoOwnedFieldList: Func<MD>,
+    <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
+{
+    pub fn take(self) -> Box<OwnedMessage<MD>> {
+        unsafe { Box::from_raw(transmute(ManuallyDrop::into_inner(self.0))) }
+    }
+}
+impl<MD> Default for BoxedMessage<MD>
+where
+    MD: MessageDescriptor,
+    MdIntoOwnedFieldList: Func<MD>,
+    <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
+{
+    fn default() -> Self {
+        let boxed = Box::new(OwnedMessage::<MD>::default());
+        Self(
+            ManuallyDrop::new(unsafe { transmute(Box::into_raw(boxed)) }),
+            PhantomData,
+        )
+    }
 }
 
 struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
@@ -60,12 +100,8 @@ impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
 }
 
 pub struct MdIntoOptBoxOwnedFieldList;
-impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList
-where
-    MD: MessageDescriptor,
-    MdIntoOwnedFieldList: Func<MD>,
-{
-    type Type = Option<Box<OwnedMessage<MD>>>;
+impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList {
+    type Type = Option<BoxedMessage<MD>>;
 }
 
 pub struct TypeTagIntoOwnedTypeGen;
