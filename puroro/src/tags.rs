@@ -30,8 +30,6 @@ pub trait FieldTypeTag {
     // If the type is message or enum, the `MessageDescriptor` or `EnumDescriptor`
     // for the type should also be provided. otherwise `()`.
     type MaybeSupplementalDescriptor;
-    type IsLd;
-    type IsMessage;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -61,6 +59,8 @@ impl ProtoSyntaxTag for Proto2 {
 impl ProtoSyntaxTag for Proto3 {
     type Id = U3;
 }
+type Proto2Id = <Proto2 as ProtoSyntaxTag>::Id;
+type Proto3Id = <Proto3 as ProtoSyntaxTag>::Id;
 
 mod value {
     use ::std::marker::PhantomData;
@@ -116,105 +116,88 @@ pub struct Optional;
 impl FieldTypeTag for Int32 {
     type Id = U1;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for Int64 {
     type Id = U2;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for UInt32 {
     type Id = U3;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for UInt64 {
     type Id = U4;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for SInt32 {
     type Id = U5;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for SInt64 {
     type Id = U6;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for Bool {
     type Id = U7;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for Bytes {
     type Id = U8;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = True;
-    type IsMessage = False;
 }
 impl FieldTypeTag for String {
     type Id = U9;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = True;
-    type IsMessage = False;
 }
 impl<E> FieldTypeTag for Enum<E> {
     type Id = U10;
     type MaybeSupplementalDescriptor = E;
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl<M> FieldTypeTag for Message<M> {
     type Id = U12;
     type MaybeSupplementalDescriptor = M;
-    type IsLd = True;
-    type IsMessage = True;
 }
 impl FieldTypeTag for Float {
     type Id = U13;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for Double {
     type Id = U14;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for Fixed32 {
     type Id = U15;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for Fixed64 {
     type Id = U16;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for SFixed32 {
     type Id = U17;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
 impl FieldTypeTag for SFixed64 {
     type Id = U18;
     type MaybeSupplementalDescriptor = ();
-    type IsLd = False;
-    type IsMessage = False;
 }
+pub type Int32Id = <Int32 as FieldTypeTag>::Id;
+pub type SInt32Id = <SInt32 as FieldTypeTag>::Id;
+pub type UInt32Id = <UInt32 as FieldTypeTag>::Id;
+pub type Int64Id = <Int64 as FieldTypeTag>::Id;
+pub type SInt64Id = <SInt64 as FieldTypeTag>::Id;
+pub type UInt64Id = <UInt64 as FieldTypeTag>::Id;
+pub type BoolId = <Bool as FieldTypeTag>::Id;
+pub type StringId = <String as FieldTypeTag>::Id;
+pub type BytesId = <Bytes as FieldTypeTag>::Id;
+pub type FloatId = <Float as FieldTypeTag>::Id;
+pub type Fixed32Id = <Fixed32 as FieldTypeTag>::Id;
+pub type SFixed32Id = <SFixed32 as FieldTypeTag>::Id;
+pub type DoubleId = <Double as FieldTypeTag>::Id;
+pub type Fixed64Id = <Fixed64 as FieldTypeTag>::Id;
+pub type SFixed64Id = <SFixed64 as FieldTypeTag>::Id;
+pub type EnumId = <Enum<()> as FieldTypeTag>::Id;
+pub type MessageId = <Message<()> as FieldTypeTag>::Id;
 
 impl NumericalTypeTag for Int32 {
     type NativeType = i32;
@@ -280,3 +263,6 @@ impl FieldLabelTag for Required {
     type Id = U3;
     type IsRepeated = False;
 }
+pub type RepeatedId = <Repeated as FieldLabelTag>::Id;
+pub type OptionalId = <Optional as FieldLabelTag>::Id;
+pub type RequiredId = <Required as FieldLabelTag>::Id;
