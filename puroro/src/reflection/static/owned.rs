@@ -129,26 +129,29 @@ pub struct MessageAndFieldDescriptorsIntoOwnedTypeGen;
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
-    use ::metako::{Func, If, Number};
+    use ::metako::{make_list, AllOf, Func, If, Number};
 
     pub struct IsUnit;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
-        type Type =
-            <FD::HasOneofIndex as If>::And<<<FD as FieldDescriptor>::IsProto3Optional as If>::Not>;
+        type Type = <AllOf as Func<
+            make_list!(
+                FD::HasOneofIndex,
+                <<FD as FieldDescriptor>::IsProto3Optional as If>::Not
+            ),
+        >>::Type;
     }
     pub struct IsU32;
     impl<MD, FD> Func<(MD, FD)> for IsU32
     where
         FD: FieldDescriptor,
     {
-        type Type = <<<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<
-            <tags::UInt32 as tags::FieldTypeTag>::Id,
-        > as If>::And<
-            <<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<
-                <tags::Repeated as tags::FieldLabelTag>::Id,
-            > as If>::Not,
-        >;
+        type Type = <AllOf as Func<
+            make_list!(
+                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::UInt32Id>,
+                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+            ),
+        >>::Type;
     }
 }
 

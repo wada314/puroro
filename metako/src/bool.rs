@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::func::Func;
+use crate::func::Pred;
 pub use ::typenum::{B0, B1};
 
 pub trait If {
@@ -31,4 +33,28 @@ impl If for B1 {
     type Not = B0;
     type And<T: If> = T;
     type Or<T: If> = B1;
+}
+
+pub struct AnyOf;
+impl Func<()> for AnyOf {
+    type Type = B0;
+}
+impl<T, U> Func<(T, U)> for AnyOf
+where
+    T: If,
+    AnyOf: Pred<U>,
+{
+    type Type = T::Or<<AnyOf as Pred<U>>::Type>;
+}
+
+pub struct AllOf;
+impl Func<()> for AllOf {
+    type Type = B1;
+}
+impl<T, U> Func<(T, U)> for AllOf
+where
+    T: If,
+    AllOf: Pred<U>,
+{
+    type Type = T::And<<AllOf as Pred<U>>::Type>;
 }

@@ -59,8 +59,8 @@ impl ProtoSyntaxTag for Proto2 {
 impl ProtoSyntaxTag for Proto3 {
     type Id = U3;
 }
-type Proto2Id = <Proto2 as ProtoSyntaxTag>::Id;
-type Proto3Id = <Proto3 as ProtoSyntaxTag>::Id;
+pub type Proto2Id = <Proto2 as ProtoSyntaxTag>::Id;
+pub type Proto3Id = <Proto3 as ProtoSyntaxTag>::Id;
 
 mod value {
     use ::std::marker::PhantomData;

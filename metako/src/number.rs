@@ -24,6 +24,7 @@ pub trait Number {
     type Remains: Number;
     type IsUTerm: If;
     type Eq<M: Number>: If;
+    type Neq<M: Number>: If;
 }
 impl<U: Number> Number for UInt<U, B0> {
     type Lsb = B0;
@@ -31,18 +32,21 @@ impl<U: Number> Number for UInt<U, B0> {
     type IsUTerm = B0;
     type Eq<M: Number> =
         <<M::Lsb as If>::Not as If>::And<<Self::Remains as Number>::Eq<M::Remains>>;
+    type Neq<M: Number> = <Self::Eq<M> as If>::Not;
 }
 impl<U: Number> Number for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
     type Eq<M: Number> = <M::Lsb as If>::And<<Self::Remains as Number>::Eq<M::Remains>>;
+    type Neq<M: Number> = <Self::Eq<M> as If>::Not;
 }
 impl Number for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
     type Eq<M: Number> = M::IsUTerm;
+    type Neq<M: Number> = <Self::Eq<M> as If>::Not;
 }
 
 pub struct IsNumberEqual<N>(PhantomData<N>);
