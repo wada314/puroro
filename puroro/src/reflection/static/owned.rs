@@ -135,10 +135,10 @@ mod preds {
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
         type Type = <AllOf as Func<
-            make_list!(
+            make_list![
                 FD::HasOneofIndex,
                 <<FD as FieldDescriptor>::IsProto3Optional as If>::Not
-            ),
+            ],
         >>::Type;
     }
     pub struct IsU32;
@@ -149,14 +149,14 @@ mod preds {
         TypeId: Number,
     {
         type Type = <AllOf as Func<
-            make_list!(
+            make_list![
                 <AnyOf as Func<
                     <list::Map<IsNumberEqual<TypeId>> as Func<
-                        make_list!(tags::UInt32Id, tags::Fixed32Id),
+                        make_list![tags::UInt32Id, tags::Fixed32Id],
                     >>::Type,
                 >>::Type,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
-            ),
+            ],
         >>::Type;
     }
     pub struct IsString;
@@ -165,10 +165,10 @@ mod preds {
         FD: FieldDescriptor,
     {
         type Type = <AllOf as Func<
-            make_list!(
+            make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
-            ),
+            ],
         >>::Type;
     }
 }
