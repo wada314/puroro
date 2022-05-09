@@ -142,9 +142,8 @@ mod preds {
         >>::Type;
     }
     pub struct IsU32;
-    impl<MD, FD, TypeId> Func<(MD, FD)> for IsU32
+    impl<MD: MessageDescriptor, FD: FieldDescriptor, TypeId> Func<(MD, FD)> for IsU32
     where
-        FD: FieldDescriptor,
         FD::Type: tags::FieldTypeTag<Id = TypeId>,
         TypeId: Number,
     {
@@ -160,13 +159,19 @@ mod preds {
         >>::Type;
     }
     pub struct IsString;
-    impl<MD, FD> Func<(MD, FD)> for IsString
-    where
-        FD: FieldDescriptor,
-    {
+    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsString {
         type Type = <AllOf as Func<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
+                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+            ],
+        >>::Type;
+    }
+    pub struct IsOptBoxedMessage;
+    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsOptBoxedMessage {
+        type Type = <AllOf as Func<
+            make_list![
+                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
             ],
         >>::Type;
