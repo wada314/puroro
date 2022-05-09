@@ -25,6 +25,9 @@ pub trait FieldDescriptor {
     type Number: typenum::ToInt<i32> + Number;
     type Label: tags::FieldLabelTag;
     type Type: tags::FieldTypeTag;
+    type HasOneofIndex: If;
+    type OneofIndex: Number;
+    type IsProto3Optional: If;
 }
 
 struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);

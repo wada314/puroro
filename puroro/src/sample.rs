@@ -37,7 +37,7 @@ use crate::reflection::r#static::desc::*;
 use crate::reflection::r#static::{OwnedFields, Reflection};
 use crate::tags;
 use ::metako::make_list;
-use ::typenum::{U1, U2, U4};
+use ::typenum::{B0, U0, U1, U2, U4};
 
 pub struct MdPerson;
 pub struct FdName;
@@ -51,16 +51,25 @@ impl FieldDescriptor for FdName {
     type Number = U1;
     type Label = tags::Optional;
     type Type = tags::String;
+    type HasOneofIndex = B0;
+    type OneofIndex = U0;
+    type IsProto3Optional = B0;
 }
 impl FieldDescriptor for FdAge {
     type Number = U2;
     type Label = tags::Optional;
     type Type = tags::UInt32;
+    type HasOneofIndex = B0;
+    type OneofIndex = U0;
+    type IsProto3Optional = B0;
 }
 impl FieldDescriptor for FdPartner {
     type Number = U4;
     type Label = tags::Optional;
     type Type = tags::Message<MdPerson>;
+    type HasOneofIndex = B0;
+    type OneofIndex = U0;
+    type IsProto3Optional = B0;
 }
 
 pub type PersonOwnedFields = OwnedFields<MdPerson>;

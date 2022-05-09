@@ -128,17 +128,27 @@ impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
 pub struct MessageAndFieldDescriptorsIntoOwnedTypeGen;
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
-    use ::metako::{Func, If, IsNumberEqual, Number};
+    use crate::tags;
+    use ::metako::{Func, If, Number};
+
     pub struct IsUnit;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
-        type Type = (); // TODO
+        // if fd.has_oneof_index() && !fd.proto3_optional()
+        type Type =
+            <FD::HasOneofIndex as If>::And<<<FD as FieldDescriptor>::IsProto3Optional as If>::Not>;
     }
     pub struct IsU32;
     impl<MD, FD> Func<(MD, FD)> for IsU32
     where
         FD: FieldDescriptor,
     {
-        type Type = (); // TODO
+        type Type = <<<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<
+            <tags::UInt32 as tags::FieldTypeTag>::Id,
+        > as If>::And<
+            <<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<
+                <tags::Repeated as tags::FieldLabelTag>::Id,
+            > as If>::Not,
+        >;
     }
 }
 
