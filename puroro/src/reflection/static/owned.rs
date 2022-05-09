@@ -129,7 +129,7 @@ pub struct MessageAndFieldDescriptorsIntoOwnedTypeGen;
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
-    use ::metako::{make_list, AllOf, Func, If, Number};
+    use ::metako::{list, make_list, AllOf, AnyOf, Func, If, IsNumberEqual, Number};
 
     pub struct IsUnit;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
@@ -142,13 +142,31 @@ mod preds {
         >>::Type;
     }
     pub struct IsU32;
-    impl<MD, FD> Func<(MD, FD)> for IsU32
+    impl<MD, FD, TypeId> Func<(MD, FD)> for IsU32
+    where
+        FD: FieldDescriptor,
+        FD::Type: tags::FieldTypeTag<Id = TypeId>,
+        TypeId: Number,
+    {
+        type Type = <AllOf as Func<
+            make_list!(
+                <AnyOf as Func<
+                    <list::Map<IsNumberEqual<TypeId>> as Func<
+                        make_list!(tags::UInt32Id, tags::Fixed32Id),
+                    >>::Type,
+                >>::Type,
+                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+            ),
+        >>::Type;
+    }
+    pub struct IsString;
+    impl<MD, FD> Func<(MD, FD)> for IsString
     where
         FD: FieldDescriptor,
     {
         type Type = <AllOf as Func<
             make_list!(
-                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::UInt32Id>,
+                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
             ),
         >>::Type;
