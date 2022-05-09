@@ -125,6 +125,23 @@ impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
 }
 
+pub struct MessageAndFieldDescriptorsIntoOwnedTypeGen;
+mod preds {
+    use super::{FieldDescriptor, MessageDescriptor};
+    use ::metako::{Func, If, IsNumberEqual, Number};
+    pub struct IsUnit;
+    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
+        type Type = (); // TODO
+    }
+    pub struct IsU32;
+    impl<MD, FD> Func<(MD, FD)> for IsU32
+    where
+        FD: FieldDescriptor,
+    {
+        type Type = (); // TODO
+    }
+}
+
 pub struct TypeTagIntoOwnedType;
 impl<T> Func<T> for TypeTagIntoOwnedType
 where
