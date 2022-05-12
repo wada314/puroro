@@ -114,8 +114,8 @@ impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList {
 
 pub struct TypeTagIntoOwnedTypeGen;
 type TypeTagIntoOwnedTypeGenMap = make_list!(
-    (<tags::UInt32 as tags::FieldTypeTag>::Id, Ident<u32>),
-    (<tags::String as tags::FieldTypeTag>::Id, Ident<String>),
+    (<tags::UInt32 as tags::FieldTypeTag>::Id, Const<u32>),
+    (<tags::String as tags::FieldTypeTag>::Id, Const<String>),
     (
         <tags::Message<()> as tags::FieldTypeTag>::Id,
         MdIntoOptBoxOwnedFieldList
@@ -125,7 +125,44 @@ impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
     type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
 }
 
-pub struct MessageAndFieldDescriptorsIntoOwnedTypeGen;
+pub struct TypeTagIntoOwnedType;
+impl<T> Func<T> for TypeTagIntoOwnedType
+where
+    T: tags::FieldTypeTag,
+    TypeTagIntoOwnedTypeGen: Func<T>,
+    <TypeTagIntoOwnedTypeGen as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
+{
+    type Type =
+        <<TypeTagIntoOwnedTypeGen as Func<T>>::Type as Func<T::MaybeSupplementalDescriptor>>::Type;
+}
+
+pub struct FdIntoOwnedType;
+impl<FD> Func<FD> for FdIntoOwnedType
+where
+    FD: FieldDescriptor,
+    TypeTagIntoOwnedType: Func<FD::Type>,
+{
+    type Type = <TypeTagIntoOwnedType as Func<FD::Type>>::Type;
+}
+
+pub struct MdIntoOwnedFieldList;
+impl<MD> Func<MD> for MdIntoOwnedFieldList
+where
+    MD: MessageDescriptor,
+    list::Map<FdIntoOwnedType>: Func<MD::Fields>,
+{
+    type Type = <list::Map<FdIntoOwnedType> as Func<MD::Fields>>::Type;
+}
+
+pub struct MdFdIntoOptBoxOwnedFieldList;
+impl<MD, FD, FieldMD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedFieldList
+where
+    FD: FieldDescriptor,
+    <FD as FieldDescriptor>::Type: tags::FieldTypeTag<MaybeSupplementalDescriptor = FieldMD>,
+{
+    type Type = Option<BoxedMessage<FieldMD>>;
+}
+
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
@@ -177,32 +214,17 @@ mod preds {
         >>::Type;
     }
 }
-
-pub struct TypeTagIntoOwnedType;
-impl<T> Func<T> for TypeTagIntoOwnedType
+pub struct MessageAndFieldDescriptorsIntoOwnedType;
+type MessageAndFieldDescriptorsIntoOwnedTypeSwitch = make_list![
+    (preds::IsUnit, Const<()>),
+    (preds::IsU32, Const<u32>),
+    (preds::IsString, Const<String>),
+    (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedFieldList),
+];
+impl<MD, FD, Gen> Func<(MD, FD)> for MessageAndFieldDescriptorsIntoOwnedType
 where
-    T: tags::FieldTypeTag,
-    TypeTagIntoOwnedTypeGen: Func<T>,
-    <TypeTagIntoOwnedTypeGen as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
+    Switch: Func<((MD, FD), MessageAndFieldDescriptorsIntoOwnedTypeSwitch), Type = Gen>,
+    Gen: Func<(MD, FD)>,
 {
-    type Type =
-        <<TypeTagIntoOwnedTypeGen as Func<T>>::Type as Func<T::MaybeSupplementalDescriptor>>::Type;
-}
-
-pub struct FdIntoOwnedType;
-impl<FD> Func<FD> for FdIntoOwnedType
-where
-    FD: FieldDescriptor,
-    TypeTagIntoOwnedType: Func<FD::Type>,
-{
-    type Type = <TypeTagIntoOwnedType as Func<FD::Type>>::Type;
-}
-
-pub struct MdIntoOwnedFieldList;
-impl<MD> Func<MD> for MdIntoOwnedFieldList
-where
-    MD: MessageDescriptor,
-    list::Map<FdIntoOwnedType>: Func<MD::Fields>,
-{
-    type Type = <list::Map<FdIntoOwnedType> as Func<MD::Fields>>::Type;
+    type Type = <Gen as Func<(MD, FD)>>::Type;
 }

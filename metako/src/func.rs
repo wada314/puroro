@@ -29,7 +29,7 @@ where
     type Type = T::Type;
 }
 
-pub struct Ident<T>(PhantomData<T>);
-impl<T, _U> Func<_U> for Ident<T> {
+pub struct Const<T>(PhantomData<T>);
+impl<T, _U> Func<_U> for Const<T> {
     type Type = T;
 }
