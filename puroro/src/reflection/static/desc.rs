@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::marker::PhantomData;
+
 use crate::tags;
 use ::metako::*;
 use ::typenum;
@@ -30,7 +32,7 @@ pub trait FieldDescriptor {
     type IsProto3Optional: If;
 }
 
-struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
+pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
 impl<N, T> Func<T> for IsFdNumberEqualTo<N>
 where
     T: FieldDescriptor,
@@ -40,16 +42,39 @@ where
     type Type = N::Eq<T::Number>;
 }
 
-trait MdGetFieldExt<N> {
+pub trait GetFieldExt<N> {
     type GetField: FieldDescriptor;
 }
-impl<N, MD> MdGetFieldExt<N> for MD
+impl<N, MD> GetFieldExt<N> for MD
 where
     MD: MessageDescriptor,
     list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields>,
     <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor,
 {
     type GetField = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
+}
+
+pub trait GetFieldListAsMdFdExt {
+    type GetFieldListAsMdFd;
+}
+impl<MD: MessageDescriptor> GetFieldListAsMdFdExt for MD
+where
+    GetFieldListAsMdFd: Func<MD>,
+{
+    type GetFieldListAsMdFd = <GetFieldListAsMdFd as Func<MD>>::Type;
+}
+
+pub struct GetFieldListAsMdFd;
+impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFd
+where
+    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
+{
+    type Type = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
+}
+
+pub struct GetFieldListAsMdFdHelper<MD>(PhantomData<MD>);
+impl<MD, FD> Func<FD> for GetFieldListAsMdFdHelper<MD> {
+    type Type = (MD, FD);
 }
 
 pub struct GetSupplementalDescriptor;

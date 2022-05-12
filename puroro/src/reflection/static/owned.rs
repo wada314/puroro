@@ -22,15 +22,15 @@ use ::std::ptr::null_mut;
 
 pub struct OwnedMessage<MD: MessageDescriptor>
 where
-    MdIntoOwnedFieldList: Func<MD>,
+    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
 {
-    pub fields: <MdIntoOwnedFieldList as Func<MD>>::Type,
+    pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::Fields>>::Type,
 }
 impl<MD> Default for OwnedMessage<MD>
 where
     MD: MessageDescriptor,
-    MdIntoOwnedFieldList: Func<MD>,
-    <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
+    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    <list::Map<MdFdIntoOwnedType> as Func<MD::Fields>>::Type: Default,
 {
     fn default() -> Self {
         Self {
@@ -51,8 +51,7 @@ pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
 impl<MD> BoxedMessage<MD>
 where
     MD: MessageDescriptor,
-    MdIntoOwnedFieldList: Func<MD>,
-    <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
+    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
 {
     pub fn take(mut self) -> Box<OwnedMessage<MD>> {
         let ptr = self.0;
@@ -64,8 +63,8 @@ where
 impl<MD> Default for BoxedMessage<MD>
 where
     MD: MessageDescriptor,
-    MdIntoOwnedFieldList: Func<MD>,
-    <MdIntoOwnedFieldList as Func<MD>>::Type: Default,
+    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    OwnedMessage<MD>: Default,
 {
     fn default() -> Self {
         let boxed = Box::new(OwnedMessage::<MD>::default());
@@ -89,7 +88,7 @@ impl<MD> Drop for BoxedMessage<MD> {
 impl<MD> Deref for BoxedMessage<MD>
 where
     MD: MessageDescriptor,
-    MdIntoOwnedFieldList: Func<MD>,
+    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
 {
     type Target = OwnedMessage<MD>;
     fn deref(&self) -> &Self::Target {
@@ -100,7 +99,7 @@ where
 impl<MD> DerefMut for BoxedMessage<MD>
 where
     MD: MessageDescriptor,
-    MdIntoOwnedFieldList: Func<MD>,
+    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute::<_, &mut OwnedMessage<MD>>(&mut self.0) }
