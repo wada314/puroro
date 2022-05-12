@@ -214,16 +214,16 @@ mod preds {
         >>::Type;
     }
 }
-pub struct MessageAndFieldDescriptorsIntoOwnedType;
-type MessageAndFieldDescriptorsIntoOwnedTypeSwitch = make_list![
+pub struct MdFdIntoOwnedType;
+type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsUnit, Const<()>),
     (preds::IsU32, Const<u32>),
     (preds::IsString, Const<String>),
     (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedFieldList),
 ];
-impl<MD, FD, Gen> Func<(MD, FD)> for MessageAndFieldDescriptorsIntoOwnedType
+impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedType
 where
-    Switch: Func<((MD, FD), MessageAndFieldDescriptorsIntoOwnedTypeSwitch), Type = Gen>,
+    Switch: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
     Gen: Func<(MD, FD)>,
 {
     type Type = <Gen as Func<(MD, FD)>>::Type;
