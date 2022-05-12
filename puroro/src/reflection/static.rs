@@ -15,11 +15,7 @@
 pub mod desc;
 pub mod owned;
 use crate::Result;
-use ::metako::Func;
 use desc::FieldDescriptor;
-use owned::MdIntoOwnedFieldList;
-
-pub type OwnedFields<MD> = <MdIntoOwnedFieldList as Func<MD>>::Type;
 
 pub trait Reflection {
     fn has_field<FD: FieldDescriptor>(&self) -> Result<bool>;

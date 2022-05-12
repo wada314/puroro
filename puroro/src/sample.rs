@@ -34,7 +34,8 @@ pub trait PersonTrait {
 }
 
 use crate::reflection::r#static::desc::*;
-use crate::reflection::r#static::{OwnedFields, Reflection};
+use crate::reflection::r#static::owned::OwnedMessage;
+use crate::reflection::r#static::Reflection;
 use crate::tags;
 use ::metako::make_list;
 use ::typenum::{B0, U0, U1, U2, U4};
@@ -72,7 +73,7 @@ impl FieldDescriptor for FdPartner {
     type IsProto3Optional = B0;
 }
 
-pub type PersonOwnedFields = OwnedFields<MdPerson>;
+pub type PersonOwned = OwnedMessage<MdPerson>;
 
 impl<T> PersonTrait for T
 where
@@ -104,9 +105,9 @@ mod test {
     use ::metako::*;
 
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
-    #[test]
+
     fn foo() {
-        let mut t = PersonFields::default();
+        let mut t = PersonOwned::default();
         // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
     }

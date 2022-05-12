@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::desc::{FieldDescriptor, MessageDescriptor};
+use super::desc::{FieldDescriptor, GetFieldListAsMdFdExt, MessageDescriptor};
 use crate::tags;
 use ::metako::*;
 use ::std::marker::PhantomData;
@@ -22,15 +22,16 @@ use ::std::ptr::null_mut;
 
 pub struct OwnedMessage<MD: MessageDescriptor>
 where
-    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    MD: GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
-    pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::Fields>>::Type,
+    pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type,
 }
 impl<MD> Default for OwnedMessage<MD>
 where
-    MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
-    <list::Map<MdFdIntoOwnedType> as Func<MD::Fields>>::Type: Default,
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
+    <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type: Default,
 {
     fn default() -> Self {
         Self {
@@ -50,8 +51,8 @@ where
 pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
 impl<MD> BoxedMessage<MD>
 where
-    MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     pub fn take(mut self) -> Box<OwnedMessage<MD>> {
         let ptr = self.0;
@@ -62,8 +63,8 @@ where
 
 impl<MD> Default for BoxedMessage<MD>
 where
-    MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
     OwnedMessage<MD>: Default,
 {
     fn default() -> Self {
@@ -87,8 +88,8 @@ impl<MD> Drop for BoxedMessage<MD> {
 
 impl<MD> Deref for BoxedMessage<MD>
 where
-    MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     type Target = OwnedMessage<MD>;
     fn deref(&self) -> &Self::Target {
@@ -98,8 +99,8 @@ where
 
 impl<MD> DerefMut for BoxedMessage<MD>
 where
-    MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::Fields>,
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute::<_, &mut OwnedMessage<MD>>(&mut self.0) }
@@ -109,48 +110,6 @@ where
 pub struct MdIntoOptBoxOwnedFieldList;
 impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList {
     type Type = Option<BoxedMessage<MD>>;
-}
-
-pub struct TypeTagIntoOwnedTypeGen;
-type TypeTagIntoOwnedTypeGenMap = make_list!(
-    (<tags::UInt32 as tags::FieldTypeTag>::Id, Const<u32>),
-    (<tags::String as tags::FieldTypeTag>::Id, Const<String>),
-    (
-        <tags::Message<()> as tags::FieldTypeTag>::Id,
-        MdIntoOptBoxOwnedFieldList
-    ),
-);
-impl<T: tags::FieldTypeTag> Func<T> for TypeTagIntoOwnedTypeGen {
-    type Type = <map::Get<IsNumberEqual<T::Id>> as Func<TypeTagIntoOwnedTypeGenMap>>::Type;
-}
-
-pub struct TypeTagIntoOwnedType;
-impl<T> Func<T> for TypeTagIntoOwnedType
-where
-    T: tags::FieldTypeTag,
-    TypeTagIntoOwnedTypeGen: Func<T>,
-    <TypeTagIntoOwnedTypeGen as Func<T>>::Type: Func<T::MaybeSupplementalDescriptor>,
-{
-    type Type =
-        <<TypeTagIntoOwnedTypeGen as Func<T>>::Type as Func<T::MaybeSupplementalDescriptor>>::Type;
-}
-
-pub struct FdIntoOwnedType;
-impl<FD> Func<FD> for FdIntoOwnedType
-where
-    FD: FieldDescriptor,
-    TypeTagIntoOwnedType: Func<FD::Type>,
-{
-    type Type = <TypeTagIntoOwnedType as Func<FD::Type>>::Type;
-}
-
-pub struct MdIntoOwnedFieldList;
-impl<MD> Func<MD> for MdIntoOwnedFieldList
-where
-    MD: MessageDescriptor,
-    list::Map<FdIntoOwnedType>: Func<MD::Fields>,
-{
-    type Type = <list::Map<FdIntoOwnedType> as Func<MD::Fields>>::Type;
 }
 
 pub struct MdFdIntoOptBoxOwnedFieldList;
