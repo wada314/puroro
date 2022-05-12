@@ -58,3 +58,14 @@ where
 {
     type Type = T::And<<AllOf as Pred<U>>::Type>;
 }
+
+pub struct Switch;
+impl<X> Func<(X, ())> for Switch {
+    type Type = ();
+}
+impl<X, P: Pred<X>, T, U> Func<(X, ((P, T), U))> for Switch
+where
+    Switch: Func<(X, U)>,
+{
+    type Type = <<P as Pred<X>>::Type as If>::Type<T, <Switch as Func<(X, U)>>::Type>;
+}
