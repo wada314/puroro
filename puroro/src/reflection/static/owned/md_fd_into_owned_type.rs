@@ -21,7 +21,7 @@ pub struct MdFdIntoOptBoxOwnedMessage;
 impl<MD, FD, FieldMD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
 where
     FD: FieldDescriptor,
-    <FD as FieldDescriptor>::Type: tags::FieldTypeTag<MaybeSupplementalDescriptor = FieldMD>,
+    <FD as FieldDescriptor>::Type: tags::FieldTypeTag<MessageDescriptor = FieldMD>,
 {
     type Type = Option<BoxedMessage<FieldMD>>;
 }

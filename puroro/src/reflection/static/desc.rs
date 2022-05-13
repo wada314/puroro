@@ -79,5 +79,16 @@ impl<MD, FD> Func<FD> for GetFieldListAsMdFdHelper<MD> {
 
 pub struct GetSupplementalDescriptor;
 impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
-    type Type = T::MaybeSupplementalDescriptor;
+    type Type = T::MessageDescriptor;
+}
+
+pub trait GetFieldsMDExt {
+    type GetFieldsMD: MessageDescriptor;
+}
+impl<FD: FieldDescriptor, FieldMD> GetFieldsMDExt for FD
+where
+    FD::Type: tags::FieldTypeTag<MessageDescriptor = FieldMD>,
+    FieldMD: MessageDescriptor,
+{
+    type GetFieldsMD = FieldMD;
 }

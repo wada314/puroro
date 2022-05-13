@@ -29,7 +29,7 @@ pub trait FieldTypeTag {
     type Id: Number;
     // If the type is message or enum, the `MessageDescriptor` or `EnumDescriptor`
     // for the type should also be provided. otherwise `()`.
-    type MaybeSupplementalDescriptor;
+    type MessageDescriptor;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -115,71 +115,71 @@ pub struct Optional;
 
 impl FieldTypeTag for Int32 {
     type Id = U1;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for Int64 {
     type Id = U2;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for UInt32 {
     type Id = U3;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for UInt64 {
     type Id = U4;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for SInt32 {
     type Id = U5;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for SInt64 {
     type Id = U6;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for Bool {
     type Id = U7;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for Bytes {
     type Id = U8;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for String {
     type Id = U9;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl<E> FieldTypeTag for Enum<E> {
     type Id = U10;
-    type MaybeSupplementalDescriptor = E;
+    type MessageDescriptor = ();
 }
 impl<M> FieldTypeTag for Message<M> {
     type Id = U12;
-    type MaybeSupplementalDescriptor = M;
+    type MessageDescriptor = M;
 }
 impl FieldTypeTag for Float {
     type Id = U13;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for Double {
     type Id = U14;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for Fixed32 {
     type Id = U15;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for Fixed64 {
     type Id = U16;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for SFixed32 {
     type Id = U17;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 impl FieldTypeTag for SFixed64 {
     type Id = U18;
-    type MaybeSupplementalDescriptor = ();
+    type MessageDescriptor = ();
 }
 pub type Int32Id = <Int32 as FieldTypeTag>::Id;
 pub type SInt32Id = <SInt32 as FieldTypeTag>::Id;
