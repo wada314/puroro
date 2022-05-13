@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod boxed_message;
-
-use super::desc::{FieldDescriptor, GetFieldListAsMdFdExt, MessageDescriptor};
-use crate::tags;
+use super::desc::{GetFieldListAsMdFdExt, MessageDescriptor};
 use ::metako::*;
-use boxed_message::BoxedMessage;
+use md_fd_into_owned_type::MdFdIntoOwnedType;
+
+mod boxed_message;
+mod md_fd_into_owned_type;
 
 pub struct OwnedMessage<MD: MessageDescriptor>
 where
@@ -26,6 +26,7 @@ where
 {
     pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type,
 }
+
 impl<MD> Default for OwnedMessage<MD>
 where
     MD: MessageDescriptor + GetFieldListAsMdFdExt,
@@ -37,84 +38,4 @@ where
             fields: Default::default(),
         }
     }
-}
-
-pub struct MdIntoOptBoxOwnedFieldList;
-impl<MD> Func<MD> for MdIntoOptBoxOwnedFieldList {
-    type Type = Option<BoxedMessage<MD>>;
-}
-
-pub struct MdFdIntoOptBoxOwnedFieldList;
-impl<MD, FD, FieldMD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedFieldList
-where
-    FD: FieldDescriptor,
-    <FD as FieldDescriptor>::Type: tags::FieldTypeTag<MaybeSupplementalDescriptor = FieldMD>,
-{
-    type Type = Option<BoxedMessage<FieldMD>>;
-}
-
-mod preds {
-    use super::{FieldDescriptor, MessageDescriptor};
-    use crate::tags;
-    use ::metako::{list, make_list, AllOf, AnyOf, Func, If, IsNumberEqual, Number};
-
-    pub struct IsUnit;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
-        // if fd.has_oneof_index() && !fd.proto3_optional()
-        type Type = <AllOf as Func<
-            make_list![
-                FD::HasOneofIndex,
-                <<FD as FieldDescriptor>::IsProto3Optional as If>::Not
-            ],
-        >>::Type;
-    }
-    pub struct IsU32;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor, TypeId> Func<(MD, FD)> for IsU32
-    where
-        FD::Type: tags::FieldTypeTag<Id = TypeId>,
-        TypeId: Number,
-    {
-        type Type = <AllOf as Func<
-            make_list![
-                <AnyOf as Func<
-                    <list::Map<IsNumberEqual<TypeId>> as Func<
-                        make_list![tags::UInt32Id, tags::Fixed32Id],
-                    >>::Type,
-                >>::Type,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
-            ],
-        >>::Type;
-    }
-    pub struct IsString;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsString {
-        type Type = <AllOf as Func<
-            make_list![
-                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
-            ],
-        >>::Type;
-    }
-    pub struct IsOptBoxedMessage;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsOptBoxedMessage {
-        type Type = <AllOf as Func<
-            make_list![
-                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
-            ],
-        >>::Type;
-    }
-}
-pub struct MdFdIntoOwnedType;
-type MdFdIntoOwnedTypeSwitch = make_list![
-    (preds::IsUnit, Const<()>),
-    (preds::IsU32, Const<u32>),
-    (preds::IsString, Const<String>),
-    (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedFieldList),
-];
-impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedType
-where
-    Switch: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
-    Gen: Func<(MD, FD)>,
-{
-    type Type = <Gen as Func<(MD, FD)>>::Type;
 }
