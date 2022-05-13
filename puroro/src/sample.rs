@@ -27,10 +27,6 @@
 pub trait PersonTrait {
     fn name(&self) -> &str;
     fn age(&self) -> u32;
-    type PartnerType<'a>: PersonTrait
-    where
-        Self: 'a;
-    fn partner(&self) -> Self::PartnerType<'_>;
 }
 
 use crate::reflection::r#static::desc::*;
@@ -84,15 +80,6 @@ where
     }
     fn age(&self) -> u32 {
         self.get_uint32::<FdAge>().unwrap()
-    }
-
-    type PartnerType<'a>
-    = <T as Reflection>::ChildReflection<'a, FdPartner>
-    where
-        Self: 'a;
-
-    fn partner(&self) -> Self::PartnerType<'_> {
-        self.get_message::<FdPartner>().unwrap()
     }
 }
 

@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::desc::{GetFieldListAsMdFdExt, MessageDescriptor};
+use super::desc::{FieldDescriptor, GetFieldListAsMdFdExt, MessageDescriptor};
+use super::Reflection;
+use crate::tags;
+use crate::Result;
 use ::metako::*;
 use md_fd_into_owned_type::MdFdIntoOwnedType;
 
 mod boxed_message;
 mod md_fd_into_owned_type;
 
-pub struct OwnedMessage<MD: MessageDescriptor>
+pub struct OwnedMessage<MD>
 where
-    MD: GetFieldListAsMdFdExt,
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type,
@@ -37,5 +40,23 @@ where
         Self {
             fields: Default::default(),
         }
+    }
+}
+
+impl<MD> Reflection for OwnedMessage<MD>
+where
+    MD: MessageDescriptor + GetFieldListAsMdFdExt,
+    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
+{
+    fn has_field<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<bool> {
+        todo!()
+    }
+
+    fn get_uint32<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<u32> {
+        todo!()
+    }
+
+    fn get_string<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<&str> {
+        todo!()
     }
 }

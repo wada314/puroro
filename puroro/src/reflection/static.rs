@@ -14,18 +14,14 @@
 
 pub mod desc;
 pub mod owned;
+use crate::tags;
 use crate::Result;
-use desc::FieldDescriptor;
+use desc::{FieldDescriptor, MessageDescriptor};
 
 pub trait Reflection {
     fn has_field<FD: FieldDescriptor>(&self) -> Result<bool>;
     fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32>;
     fn get_string<FD: FieldDescriptor>(&self) -> Result<&str>;
-    type ChildReflection<'a, FD>: Reflection
-    where
-        Self: 'a,
-        FD: FieldDescriptor;
-    fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>>;
 }
 
 impl<T: Reflection> Reflection for &'_ T {
@@ -37,13 +33,5 @@ impl<T: Reflection> Reflection for &'_ T {
     }
     fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
         <T as Reflection>::get_string::<FD>(self)
-    }
-    type ChildReflection<'a, FD>
-    = <T as Reflection>::ChildReflection<'a, FD>
-    where
-        Self: 'a,
-        FD: FieldDescriptor;
-    fn get_message<FD: FieldDescriptor>(&self) -> Result<Self::ChildReflection<'_, FD>> {
-        <T as Reflection>::get_message::<FD>(self)
     }
 }
