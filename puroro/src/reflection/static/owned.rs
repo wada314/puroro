@@ -35,7 +35,7 @@ where
     MD: MessageDescriptor + GetFieldListAsMdFdExt,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
-    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>> 
+    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>> 
     where 
         <FD::Type as tags::FieldTypeTag>::MessageDescriptor: GetFieldListAsMdFdExt,
         list::Map<MdFdIntoOwnedType>: Func<<<FD::Type as tags::FieldTypeTag>::MessageDescriptor as GetFieldListAsMdFdExt>::GetFieldListAsMdFd>,        
