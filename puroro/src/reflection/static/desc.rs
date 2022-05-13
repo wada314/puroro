@@ -30,13 +30,18 @@ impl MessageDescriptorBase for () {
 pub trait MessageDescriptor {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
-    type GetField<N: Number>: FieldDescriptor;
+    type GetField<N: Number>: FieldDescriptor where 
+    list::Find<IsFdNumberEqualTo<N>>: Func<Self::Fields>,
+    <list::Find<IsFdNumberEqualTo<N>> as Func<Self::Fields>>::Type: FieldDescriptor;
 }
 impl<MD: MessageDescriptorBase> MessageDescriptor for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
 
-    type GetField<N: Number> = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
+    type GetField<N: Number> = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type
+    where 
+    list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields>,
+    <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor;
 }
 
 pub trait FieldDescriptor {
