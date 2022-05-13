@@ -35,7 +35,8 @@ pub trait MessageDescriptor {
 impl<MD: MessageDescriptorBase> MessageDescriptor for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetField<N: Number> = (); //<list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
+
+    type GetField<N: Number> = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -72,9 +73,11 @@ impl<N, MD> GetFieldExt<N> for MD
 where
     MD: MessageDescriptorBase,
     list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields>,
-    <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor,
+    <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type:
+        FieldDescriptor,
 {
-    type GetField = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
+    type GetField =
+        <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
 }
 
 pub trait GetFieldListAsMdFdExt {

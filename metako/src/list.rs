@@ -25,16 +25,23 @@ macro_rules! make_list {
     };
 }
 
-pub struct Find<P>(PhantomData<P>);
-impl<P> Func<()> for Find<P> {
-    type Type = ();
+pub struct FindOrDefault<P, D>(PhantomData<(P, D)>);
+impl<P, D> Func<()> for FindOrDefault<P, D> {
+    type Type = D;
 }
-impl<T, U, P> Func<(T, U)> for Find<P>
+impl<T, U, P, D> Func<(T, U)> for FindOrDefault<P, D>
 where
     P: Pred<T>,
-    Find<P>: Func<U>,
+    FindOrDefault<P, D>: Func<U>,
 {
-    type Type = <P::Type as If>::Type<T, <Find<P> as Func<U>>::Type>;
+    type Type = <P::Type as If>::Type<T, <FindOrDefault<P, D> as Func<U>>::Type>;
+}
+pub struct Find<P>(PhantomData<P>);
+impl<P, L> Func<L> for Find<P>
+where
+    FindOrDefault<P, ()>: Func<L>,
+{
+    type Type = <FindOrDefault<P, ()> as Func<L>>::Type;
 }
 
 pub struct Map<F>(PhantomData<F>);
