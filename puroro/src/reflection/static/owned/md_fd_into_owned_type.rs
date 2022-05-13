@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::desc::{FieldDescriptor, MessageDescriptor};
+use super::super::desc::{FieldDescriptor, MessageDescriptorBase};
 use super::boxed_message::BoxedMessage;
 use crate::tags;
 use ::metako::*;
@@ -27,12 +27,12 @@ where
 }
 
 mod preds {
-    use super::{FieldDescriptor, MessageDescriptor};
+    use super::{FieldDescriptor, MessageDescriptorBase};
     use crate::tags;
     use ::metako::{list, make_list, AllOf, AnyOf, Func, If, IsNumberEqual, Number};
 
     pub struct IsUnit;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
+    impl<MD: MessageDescriptorBase, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
         type Type = <AllOf as Func<
             make_list![
@@ -42,7 +42,7 @@ mod preds {
         >>::Type;
     }
     pub struct IsU32;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor, TypeId> Func<(MD, FD)> for IsU32
+    impl<MD: MessageDescriptorBase, FD: FieldDescriptor, TypeId> Func<(MD, FD)> for IsU32
     where
         FD::Type: tags::FieldTypeTag<Id = TypeId>,
         TypeId: Number,
@@ -59,7 +59,7 @@ mod preds {
         >>::Type;
     }
     pub struct IsString;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsString {
+    impl<MD: MessageDescriptorBase, FD: FieldDescriptor> Func<(MD, FD)> for IsString {
         type Type = <AllOf as Func<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
@@ -68,7 +68,7 @@ mod preds {
         >>::Type;
     }
     pub struct IsOptBoxedMessage;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsOptBoxedMessage {
+    impl<MD: MessageDescriptorBase, FD: FieldDescriptor> Func<(MD, FD)> for IsOptBoxedMessage {
         type Type = <AllOf as Func<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,

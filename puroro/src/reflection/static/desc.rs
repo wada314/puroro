@@ -19,13 +19,23 @@ use ::metako::*;
 use ::typenum;
 use ::typenum::U0;
 
-pub trait MessageDescriptor {
+pub trait MessageDescriptorBase {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
 }
-impl MessageDescriptor for () {
+impl MessageDescriptorBase for () {
     type Fields = ();
     type Syntax = ();
+}
+pub trait MessageDescriptor {
+    type Fields;
+    type Syntax: tags::ProtoSyntaxTag;
+    type GetField<N: Number>: FieldDescriptor;
+}
+impl<MD: MessageDescriptorBase> MessageDescriptor for MD {
+    type Fields = MD::Fields;
+    type Syntax = MD::Syntax;
+    type GetField<N: Number> = (); //<list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -60,7 +70,7 @@ pub trait GetFieldExt<N> {
 }
 impl<N, MD> GetFieldExt<N> for MD
 where
-    MD: MessageDescriptor,
+    MD: MessageDescriptorBase,
     list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields>,
     <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor,
 {
@@ -70,7 +80,7 @@ where
 pub trait GetFieldListAsMdFdExt {
     type GetFieldListAsMdFd;
 }
-impl<MD: MessageDescriptor> GetFieldListAsMdFdExt for MD
+impl<MD: MessageDescriptorBase> GetFieldListAsMdFdExt for MD
 where
     GetFieldListAsMdFd: Func<MD>,
 {
@@ -78,7 +88,7 @@ where
 }
 
 pub struct GetFieldListAsMdFd;
-impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFd
+impl<MD: MessageDescriptorBase> Func<MD> for GetFieldListAsMdFd
 where
     list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
 {
@@ -96,12 +106,12 @@ impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
 }
 
 pub trait GetFieldsMDExt {
-    type GetFieldsMD: MessageDescriptor;
+    type GetFieldsMD: MessageDescriptorBase;
 }
 impl<FD: FieldDescriptor, FieldMD> GetFieldsMDExt for FD
 where
     FD::Type: tags::FieldTypeTag<MessageDescriptor = FieldMD>,
-    FieldMD: MessageDescriptor,
+    FieldMD: MessageDescriptorBase,
 {
     type GetFieldsMD = FieldMD;
 }

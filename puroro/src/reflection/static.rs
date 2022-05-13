@@ -16,7 +16,7 @@ pub mod desc;
 pub mod owned;
 use crate::tags;
 use crate::Result;
-use desc::{FieldDescriptor, MessageDescriptor};
+use desc::{FieldDescriptor, MessageDescriptorBase};
 
 pub trait Reflection {
     fn has_field<FD: FieldDescriptor>(&self) -> Result<bool>;

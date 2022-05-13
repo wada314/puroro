@@ -40,7 +40,7 @@ pub struct MdPerson;
 pub struct FdName;
 pub struct FdAge;
 pub struct FdPartner;
-impl MessageDescriptor for MdPerson {
+impl MessageDescriptorBase for MdPerson {
     type Fields = make_list!(FdName, FdAge, FdPartner);
     type Syntax = tags::Proto3;
 }
