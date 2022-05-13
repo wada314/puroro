@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::bool::{False, True};
 use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
@@ -45,14 +44,15 @@ pub trait StringOrBytesTypeTag {
 /// A tag trait for types corresponding to the field label.
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {
-    const DO_DEFAULT_CHECK: bool;
     type Id: Number;
-    type IsRepeated;
 }
 
 pub struct Proto2;
 pub struct Proto3;
 
+impl ProtoSyntaxTag for () {
+    type Id = U0;
+}
 impl ProtoSyntaxTag for Proto2 {
     type Id = U2;
 }
@@ -113,6 +113,10 @@ pub struct Required;
 /// Every fields except `Repeated` and `Required`.
 pub struct Optional;
 
+impl FieldTypeTag for () {
+    type Id = U0;
+    type MessageDescriptor = ();
+}
 impl FieldTypeTag for Int32 {
     type Id = U1;
     type MessageDescriptor = ();
@@ -248,20 +252,17 @@ impl StringOrBytesTypeTag for Bytes {
     type BorrowedType = [u8];
 }
 
+impl FieldLabelTag for () {
+    type Id = U0;
+}
 impl FieldLabelTag for Repeated {
-    const DO_DEFAULT_CHECK: bool = false;
     type Id = U1;
-    type IsRepeated = True;
 }
 impl FieldLabelTag for Optional {
-    const DO_DEFAULT_CHECK: bool = false;
     type Id = U2;
-    type IsRepeated = False;
 }
 impl FieldLabelTag for Required {
-    const DO_DEFAULT_CHECK: bool = false;
     type Id = U3;
-    type IsRepeated = False;
 }
 pub type RepeatedId = <Repeated as FieldLabelTag>::Id;
 pub type OptionalId = <Optional as FieldLabelTag>::Id;

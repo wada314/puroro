@@ -17,10 +17,15 @@ use std::marker::PhantomData;
 use crate::tags;
 use ::metako::*;
 use ::typenum;
+use ::typenum::U0;
 
 pub trait MessageDescriptor {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
+}
+impl MessageDescriptor for () {
+    type Fields = ();
+    type Syntax = ();
 }
 
 pub trait FieldDescriptor {
@@ -30,6 +35,14 @@ pub trait FieldDescriptor {
     type HasOneofIndex: If;
     type OneofIndex: Number;
     type IsProto3Optional: If;
+}
+impl FieldDescriptor for () {
+    type Number = U0;
+    type Label = ();
+    type Type = ();
+    type HasOneofIndex = B0;
+    type OneofIndex = U0;
+    type IsProto3Optional = B0;
 }
 
 pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
