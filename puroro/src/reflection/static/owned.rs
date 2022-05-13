@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod boxed_message;
+
 use super::desc::{FieldDescriptor, GetFieldListAsMdFdExt, MessageDescriptor};
 use crate::tags;
 use ::metako::*;
-use ::std::marker::PhantomData;
-use ::std::mem::{transmute, ManuallyDrop};
-use ::std::ops::{Deref, DerefMut};
-use ::std::ptr::null_mut;
+use boxed_message::BoxedMessage;
 
 pub struct OwnedMessage<MD: MessageDescriptor>
 where
@@ -37,73 +36,6 @@ where
         Self {
             fields: Default::default(),
         }
-    }
-}
-
-/// A wrapper of Box<OwnedMessage<MD>>.
-///
-/// The important thing is that this type declaration does not
-/// require any bounds for `MD` param.
-/// We need this property to avoid recursive message's infinite
-/// type recursion problem.
-/// Instead of that property, this type internally erases the type info,
-/// and is required to be manually dropped using `take` method.
-pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
-impl<MD> BoxedMessage<MD>
-where
-    MD: MessageDescriptor + GetFieldListAsMdFdExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
-{
-    pub fn take(mut self) -> Box<OwnedMessage<MD>> {
-        let ptr = self.0;
-        self.0 = ManuallyDrop::new(null_mut());
-        unsafe { Box::from_raw(transmute(ManuallyDrop::into_inner(ptr))) }
-    }
-}
-
-impl<MD> Default for BoxedMessage<MD>
-where
-    MD: MessageDescriptor + GetFieldListAsMdFdExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
-    OwnedMessage<MD>: Default,
-{
-    fn default() -> Self {
-        let boxed = Box::new(OwnedMessage::<MD>::default());
-        Self(
-            ManuallyDrop::new(unsafe { transmute(Box::into_raw(boxed)) }),
-            PhantomData,
-        )
-    }
-}
-
-impl<MD> Drop for BoxedMessage<MD> {
-    fn drop(&mut self) {
-        debug_assert_eq!(
-            *self.0,
-            null_mut(),
-            "This type should be explicitly cleaned up before automatic drop!"
-        );
-    }
-}
-
-impl<MD> Deref for BoxedMessage<MD>
-where
-    MD: MessageDescriptor + GetFieldListAsMdFdExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
-{
-    type Target = OwnedMessage<MD>;
-    fn deref(&self) -> &Self::Target {
-        unsafe { transmute::<_, &OwnedMessage<MD>>(&self.0) }
-    }
-}
-
-impl<MD> DerefMut for BoxedMessage<MD>
-where
-    MD: MessageDescriptor + GetFieldListAsMdFdExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { transmute::<_, &mut OwnedMessage<MD>>(&mut self.0) }
     }
 }
 
