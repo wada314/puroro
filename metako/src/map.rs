@@ -24,5 +24,5 @@ where
     P: Pred<K>,
     Get<P>: Func<U>,
 {
-    type Type = <P::Type as If>::Type<V, <Get<P> as Func<U>>::Type>;
+    type Type = <P::Type as If>::Then<V, <Get<P> as Func<U>>::Type>;
 }

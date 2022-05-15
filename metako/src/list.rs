@@ -25,9 +25,6 @@ macro_rules! make_list {
     };
 }
 
-pub trait Pred2 {
-    type Eval<T>: If;
-}
 pub trait ListBase {
     type Car;
     type Cdr: List;
@@ -39,18 +36,14 @@ impl<T, U: List> ListBase for (T, U) {
 pub trait List {
     type Car;
     type Cdr: List;
-    type FindOrDefault<P: Pred2, D>;
 }
 impl List for () {
     type Car = ();
     type Cdr = ();
-    type FindOrDefault<P: Pred2, D> = D;
 }
 impl<L: ListBase> List for L {
     type Car = L::Car;
     type Cdr = L::Cdr;
-    type FindOrDefault<P: Pred2, D> =
-        <P::Eval<L::Car> as If>::Type<L::Car, <L::Cdr as List>::FindOrDefault<P, D>>;
 }
 
 pub struct FindOrDefault<P, D>(PhantomData<(P, D)>);
@@ -62,7 +55,7 @@ where
     P: Pred<T>,
     FindOrDefault<P, D>: Func<U>,
 {
-    type Type = <P::Type as If>::Type<T, <FindOrDefault<P, D> as Func<U>>::Type>;
+    type Type = <P::Type as If>::Then<T, <FindOrDefault<P, D> as Func<U>>::Type>;
 }
 pub struct Find<P>(PhantomData<P>);
 impl<P, L> Func<L> for Find<P>

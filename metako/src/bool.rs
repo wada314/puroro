@@ -17,19 +17,19 @@ use crate::func::Pred;
 pub use ::typenum::{B0, B1};
 
 pub trait If {
-    type Type<T, F>;
+    type Then<T, F>;
     type Not: If;
     type And<T: If>: If;
     type Or<T: If>: If;
 }
 impl If for B0 {
-    type Type<T, F> = F;
+    type Then<T, F> = F;
     type Not = B1;
     type And<T: If> = B0;
     type Or<T: If> = T;
 }
 impl If for B1 {
-    type Type<T, F> = T;
+    type Then<T, F> = T;
     type Not = B0;
     type And<T: If> = T;
     type Or<T: If> = B1;
@@ -67,5 +67,5 @@ impl<X, P: Pred<X>, T, U> Func<(X, ((P, T), U))> for Switch
 where
     Switch: Func<(X, U)>,
 {
-    type Type = <<P as Pred<X>>::Type as If>::Type<T, <Switch as Func<(X, U)>>::Type>;
+    type Type = <<P as Pred<X>>::Type as If>::Then<T, <Switch as Func<(X, U)>>::Type>;
 }

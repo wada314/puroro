@@ -56,6 +56,26 @@ impl FieldDescriptor for () {
     type IsProto3Optional = B0;
 }
 
+pub trait PredFD {
+    type Eval<FD: FieldDescriptor>: If;
+}
+pub trait ListFD {
+    type Car: FieldDescriptor;
+    type Cdr: ListFD;
+    type FindOrDefault<P: PredFD, D: FieldDescriptor>: FieldDescriptor;
+}
+impl ListFD for () {
+    type Car = ();
+    type Cdr = ();
+    type FindOrDefault<P: PredFD, D: FieldDescriptor> = D;
+}
+impl<T: FieldDescriptor, U: ListFD> ListFD for (T, U) {
+    type Car = T;
+    type Cdr = U;
+    type FindOrDefault<P: PredFD, D: FieldDescriptor> =
+        <P::Eval<Self::Car> as If>::Then<Self::Car, <Self::Cdr as ListFD>::FindOrDefault<P, D>>;
+}
+
 pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
 impl<N, T> Func<T> for IsFdNumberEqualTo<N>
 where
