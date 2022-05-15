@@ -32,10 +32,6 @@ pub trait ListBase {
     type Car;
     type Cdr: List;
 }
-impl ListBase for () {
-    type Car = ();
-    type Cdr = ();
-}
 impl<T, U: List> ListBase for (T, U) {
     type Car = T;
     type Cdr = U;
@@ -45,30 +41,16 @@ pub trait List {
     type Cdr: List;
     type FindOrDefault<P: Pred2, D>;
 }
+impl List for () {
+    type Car = ();
+    type Cdr = ();
+    type FindOrDefault<P: Pred2, D> = D;
+}
 impl<L: ListBase> List for L {
     type Car = L::Car;
     type Cdr = L::Cdr;
     type FindOrDefault<P: Pred2, D> =
         <P::Eval<L::Car> as If>::Type<L::Car, <L::Cdr as List>::FindOrDefault<P, D>>;
-}
-trait ListOfList: List {
-    type Car: List;
-    type Cdr: ListOfList;
-}
-impl<L: List> ListOfList for L
-where
-    L::Car: List,
-    L::Cdr: ListOfList,
-{
-    type Car = <L as List>::Car;
-    type Cdr = <L as List>::Cdr;
-}
-fn hoge<LL: ListOfList>(ll: LL) {
-    todo!()
-}
-fn foo() {
-    let ll: make_list!(make_list!(i32, i64), make_list!(u32, u64));
-    hoge(ll);
 }
 
 pub struct FindOrDefault<P, D>(PhantomData<(P, D)>);
