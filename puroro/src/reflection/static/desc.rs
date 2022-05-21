@@ -56,6 +56,64 @@ impl FieldDescriptor for () {
     type IsProto3Optional = B0;
 }
 
+pub trait ImplsTrait<T> {}
+pub struct ImplsFieldDescriptor;
+impl<T> ImplsTrait<ImplsFieldDescriptor> for T where T: FieldDescriptor {}
+
+pub trait If3 {
+    type Then<T, F, TR>: ImplsTrait<TR>
+    where
+        T: ImplsTrait<TR>,
+        F: ImplsTrait<TR>;
+}
+impl If3 for B0 {
+    type Then<T, F, TR>
+    = F
+    where
+        T: ImplsTrait<TR>,
+        F: ImplsTrait<TR>;
+}
+impl If3 for B1 {
+    type Then<T, F, TR>
+    = T
+    where
+        T: ImplsTrait<TR>,
+        F: ImplsTrait<TR>;
+}
+
+pub trait Pred3 {
+    type Eval<X>: If3;
+}
+pub trait List3<TR> {
+    type Car: ImplsTrait<TR>;
+    type Cdr: List3<TR>;
+    type FindOrDefault<P: Pred3, D: ImplsTrait<TR>>: ImplsTrait<TR>;
+}
+impl<TR> List3<TR> for ()
+where
+    (): ImplsTrait<TR>,
+{
+    type Car = ();
+    type Cdr = ();
+    type FindOrDefault<P: Pred3, D: ImplsTrait<TR>> = D;
+}
+impl<TR, T, U> List3<TR> for (T, U)
+where
+    T: ImplsTrait<TR>,
+    U: List3<TR>,
+{
+    type Car = T;
+    type Cdr = U;
+    type FindOrDefault<P: Pred3, D: ImplsTrait<TR>> = <P::Eval<Self::Car> as If3>::Then<
+        Self::Car,
+        <Self::Cdr as List3<TR>>::FindOrDefault<P, D>,
+        TR,
+    >;
+}
+
+pub trait IfFD {
+    type Then<T: FieldDescriptor, F: FieldDescriptor>: FieldDescriptor;
+}
 pub trait PredFD {
     type Eval<FD: FieldDescriptor>: If;
 }
@@ -72,8 +130,7 @@ impl ListFD for () {
 impl<T: FieldDescriptor, U: ListFD> ListFD for (T, U) {
     type Car = T;
     type Cdr = U;
-    type FindOrDefault<P: PredFD, D: FieldDescriptor> =
-        <P::Eval<Self::Car> as If>::Then<Self::Car, <Self::Cdr as ListFD>::FindOrDefault<P, D>>;
+    type FindOrDefault<P: PredFD, D: FieldDescriptor> = (); // <P::Eval<Self::Car> as If>::Then<Self::Car, <Self::Cdr as ListFD>::FindOrDefault<P, D>>;
 }
 
 pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
