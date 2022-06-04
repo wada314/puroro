@@ -25,15 +25,13 @@ mod md_fd_into_owned_type;
 pub struct OwnedMessage<MD>
 where
     MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
-    pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type,
+    pub fields: MD::GetOwnedFieldList,
 }
 
 impl<MD> OwnedMessage<MD>
 where
     MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>>
     where
