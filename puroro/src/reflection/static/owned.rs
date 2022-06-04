@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::desc::{FieldDescriptor, GetFieldListAsMdFdExt, MessageDescriptorBase};
+use super::desc::{FieldDescriptor, MessageDescriptor};
 use super::Reflection;
 use crate::tags;
 use crate::Result;
@@ -24,7 +24,7 @@ mod md_fd_into_owned_type;
 
 pub struct OwnedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     pub fields: <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type,
@@ -32,13 +32,12 @@ where
 
 impl<MD> OwnedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
-    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>> 
-    where 
-        <FD::Type as tags::FieldTypeTag>::MessageDescriptor: GetFieldListAsMdFdExt,
-        list::Map<MdFdIntoOwnedType>: Func<<<FD::Type as tags::FieldTypeTag>::MessageDescriptor as GetFieldListAsMdFdExt>::GetFieldListAsMdFd>,        
+    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>>
+    where
+        list::Map<MdFdIntoOwnedType>: Func<<<FD::Type as tags::FieldTypeTag>::MessageDescriptor as MessageDescriptor>::GetFieldListAsMdFd>,
     {
         todo!()
     }
@@ -46,7 +45,7 @@ where
 
 impl<MD> Default for OwnedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
     <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type: Default,
 {
@@ -59,7 +58,7 @@ where
 
 impl<MD> Reflection for OwnedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     fn has_field<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<bool> {
@@ -73,4 +72,6 @@ where
     fn get_string<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<&str> {
         todo!()
     }
+
+    // type MessageFieldType<FD: FieldDescriptor>;
 }

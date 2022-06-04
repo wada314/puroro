@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::desc::{GetFieldListAsMdFdExt, MessageDescriptorBase};
+use super::super::desc::MessageDescriptor;
 use super::{MdFdIntoOwnedType, OwnedMessage};
 use ::metako::*;
 use ::std::marker::PhantomData;
@@ -31,7 +31,7 @@ use ::std::ptr::null_mut;
 pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
 impl<MD> BoxedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     pub fn take(mut self) -> Box<OwnedMessage<MD>> {
@@ -43,7 +43,7 @@ where
 
 impl<MD> Default for BoxedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
     OwnedMessage<MD>: Default,
 {
@@ -68,7 +68,7 @@ impl<MD> Drop for BoxedMessage<MD> {
 
 impl<MD> Deref for BoxedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     type Target = OwnedMessage<MD>;
@@ -79,7 +79,7 @@ where
 
 impl<MD> DerefMut for BoxedMessage<MD>
 where
-    MD: MessageDescriptorBase + GetFieldListAsMdFdExt,
+    MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {

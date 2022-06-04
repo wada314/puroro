@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the LicensMessageDescriptor;
 
-use crate::reflection::r#static::desc::MessageDescriptorBase;
+use crate::reflection::r#static::desc::MessageDescriptor;
 use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
@@ -29,7 +29,7 @@ pub trait FieldTypeTag {
     type Id: Number;
     // If the type is message or enum, the `MessageDescriptor` or `EnumDescriptor`
     // for the type should also be provided. otherwise `()`.
-    type MessageDescriptor: MessageDescriptorBase;
+    type MessageDescriptor: MessageDescriptor;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -64,7 +64,7 @@ pub type Proto2Id = <Proto2 as ProtoSyntaxTag>::Id;
 pub type Proto3Id = <Proto3 as ProtoSyntaxTag>::Id;
 
 mod value {
-    use crate::reflection::r#static::desc::MessageDescriptorBase;
+    use crate::reflection::r#static::desc::MessageDescriptor;
     use ::std::marker::PhantomData;
 
     pub struct Int32;
@@ -83,7 +83,7 @@ mod value {
     pub struct Fixed64;
     pub struct Bytes;
     pub struct String;
-    pub struct Message<M: MessageDescriptorBase>(PhantomData<M>);
+    pub struct Message<M: MessageDescriptor>(PhantomData<M>);
 }
 
 pub struct Variant<V>(PhantomData<V>);
@@ -160,7 +160,7 @@ impl<E> FieldTypeTag for Enum<E> {
     type Id = U10;
     type MessageDescriptor = ();
 }
-impl<M: MessageDescriptorBase> FieldTypeTag for Message<M> {
+impl<M: MessageDescriptor> FieldTypeTag for Message<M> {
     type Id = U12;
     type MessageDescriptor = M;
 }

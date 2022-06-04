@@ -30,11 +30,16 @@ impl MessageDescriptorBase for () {
 pub trait MessageDescriptor {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
+    type GetFieldListAsMdFd;
     // type GetField<N: Number>: FieldDescriptor;
 }
-impl<MD: MessageDescriptorBase> MessageDescriptor for MD {
+impl<MD: MessageDescriptorBase> MessageDescriptor for MD
+where
+    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
+{
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
+    type GetFieldListAsMdFd = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
 
     // type GetField<N: Number> = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
 }
@@ -76,16 +81,6 @@ where
     <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor,
 {
     type GetField = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
-}
-
-pub trait GetFieldListAsMdFdExt {
-    type GetFieldListAsMdFd;
-}
-impl<MD: MessageDescriptorBase> GetFieldListAsMdFdExt for MD
-where
-    GetFieldListAsMdFd: Func<MD>,
-{
-    type GetFieldListAsMdFd = <GetFieldListAsMdFd as Func<MD>>::Type;
 }
 
 pub struct GetFieldListAsMdFd;
