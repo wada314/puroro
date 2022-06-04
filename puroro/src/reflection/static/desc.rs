@@ -36,7 +36,7 @@ pub trait MessageDescriptor {
 }
 impl<MD: MessageDescriptorBase, GetFieldListAsMdFd> MessageDescriptor for MD
 where
-    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields, Type = GetFieldListAsMdFd>,
+    self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
     // list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd>,
 {
     type Fields = MD::Fields;
