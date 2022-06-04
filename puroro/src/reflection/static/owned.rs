@@ -22,7 +22,6 @@ pub use md_fd_into_owned_type::MdFdIntoOwnedType;
 mod boxed_message;
 mod md_fd_into_owned_type;
 
-
 pub struct OwnedMessage<MD>
 where
     MD: MessageDescriptor,
@@ -38,6 +37,7 @@ where
 {
     pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>>
     where
+        <FD::Type as tags::FieldTypeTag>::MessageDescriptor: MessageDescriptor,
         list::Map<MdFdIntoOwnedType>: Func<<<FD::Type as tags::FieldTypeTag>::MessageDescriptor as MessageDescriptor>::GetFieldListAsMdFd>,
     {
         todo!()

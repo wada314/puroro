@@ -29,7 +29,7 @@ pub trait FieldTypeTag {
     type Id: Number;
     // If the type is message or enum, the `MessageDescriptor` or `EnumDescriptor`
     // for the type should also be provided. otherwise `()`.
-    type MessageDescriptor: MessageDescriptor;
+    type MessageDescriptor;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -83,7 +83,7 @@ mod value {
     pub struct Fixed64;
     pub struct Bytes;
     pub struct String;
-    pub struct Message<M: MessageDescriptor>(PhantomData<M>);
+    pub struct Message<MD>(PhantomData<MD>);
 }
 
 pub struct Variant<V>(PhantomData<V>);
@@ -160,9 +160,9 @@ impl<E> FieldTypeTag for Enum<E> {
     type Id = U10;
     type MessageDescriptor = ();
 }
-impl<M: MessageDescriptor> FieldTypeTag for Message<M> {
+impl<MD> FieldTypeTag for Message<MD> {
     type Id = U12;
-    type MessageDescriptor = M;
+    type MessageDescriptor = MD;
 }
 impl FieldTypeTag for Float {
     type Id = U13;

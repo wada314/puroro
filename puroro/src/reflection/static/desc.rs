@@ -32,17 +32,17 @@ pub trait MessageDescriptor {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
     type GetFieldListAsMdFd;
-    // type GetOwnedFieldList;
+    type GetOwnedFieldList;
 }
 impl<MD: MessageDescriptorBase, GetFieldListAsMdFd> MessageDescriptor for MD
 where
     self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
-    // list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd>,
+    list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd>,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
     type GetFieldListAsMdFd = GetFieldListAsMdFd;
-    // type GetOwnedFieldList = <list::Map<MdFdIntoOwnedType> as Func<GetFieldListAsMdFd>>::Type;
+    type GetOwnedFieldList = <list::Map<MdFdIntoOwnedType> as Func<GetFieldListAsMdFd>>::Type;
 }
 
 pub trait FieldDescriptor {
