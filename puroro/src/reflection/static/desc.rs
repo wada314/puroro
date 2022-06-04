@@ -14,6 +14,7 @@
 
 use std::marker::PhantomData;
 
+use super::owned::MdFdIntoOwnedType;
 use crate::tags;
 use ::metako::*;
 use ::typenum;
@@ -31,17 +32,17 @@ pub trait MessageDescriptor {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
     type GetFieldListAsMdFd;
-    // type GetField<N: Number>: FieldDescriptor;
+    // type GetOwnedFieldList;
 }
-impl<MD: MessageDescriptorBase> MessageDescriptor for MD
+impl<MD: MessageDescriptorBase, GetFieldListAsMdFd> MessageDescriptor for MD
 where
-    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
+    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields, Type = GetFieldListAsMdFd>,
+    // list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd>,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetFieldListAsMdFd = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
-
-    // type GetField<N: Number> = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
+    type GetFieldListAsMdFd = GetFieldListAsMdFd;
+    // type GetOwnedFieldList = <list::Map<MdFdIntoOwnedType> as Func<GetFieldListAsMdFd>>::Type;
 }
 
 pub trait FieldDescriptor {
