@@ -45,8 +45,7 @@ where
 impl<MD> Default for OwnedMessage<MD>
 where
     MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
-    <list::Map<MdFdIntoOwnedType> as Func<MD::GetFieldListAsMdFd>>::Type: Default,
+    MD::GetOwnedFieldList: Default,
 {
     fn default() -> Self {
         Self {
