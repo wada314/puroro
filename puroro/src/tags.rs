@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the LicensMessageDescriptor;
 
-use crate::reflection::r#static::desc::MessageDescriptor;
 use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
@@ -64,7 +63,6 @@ pub type Proto2Id = <Proto2 as ProtoSyntaxTag>::Id;
 pub type Proto3Id = <Proto3 as ProtoSyntaxTag>::Id;
 
 mod value {
-    use crate::reflection::r#static::desc::MessageDescriptor;
     use ::std::marker::PhantomData;
 
     pub struct Int32;
