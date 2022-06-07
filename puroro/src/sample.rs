@@ -100,3 +100,20 @@ mod test {
         // test(10)
     }
 }
+
+trait Impls<TR> {}
+trait MDBase {
+    type Id: Iterator;
+}
+trait MDReal {
+    type Id: Iterator;
+}
+struct TraitMD;
+impl<MD: Impls<TraitMD> + MDBase> MDReal for MD {
+    type Id = MD::Id;
+}
+
+trait ListBase<LTR> {}
+trait ListReal<LTR> {}
+struct TraitList<LTR>(std::marker::PhantomData<LTR>);
+impl<L: Impls<TraitList<TraitMD>> + ListBase<TraitMD>, LTR> ListReal<LTR> for L {}
