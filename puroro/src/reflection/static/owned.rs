@@ -29,15 +29,14 @@ where
     pub fields: MD::GetOwnedFieldList,
 }
 
+type FMD<FD> = <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor;
 impl<MD> OwnedMessage<MD>
 where
     MD: MessageDescriptor,
 {
-    pub fn get_message<FD: FieldDescriptor>(
-        &self,
-    ) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>>
+    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<FMD<FD>>>
     where
-        <FD::Type as tags::FieldTypeTag>::MessageDescriptor: MessageDescriptor,
+        FMD<FD>: MessageDescriptor,
     {
         todo!()
     }
