@@ -33,10 +33,11 @@ impl<MD> OwnedMessage<MD>
 where
     MD: MessageDescriptor,
 {
-    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>>
+    pub fn get_message<FD: FieldDescriptor>(
+        &self,
+    ) -> Result<&OwnedMessage<<FD::Type as tags::FieldTypeTag>::MessageDescriptor>>
     where
         <FD::Type as tags::FieldTypeTag>::MessageDescriptor: MessageDescriptor,
-        list::Map<MdFdIntoOwnedType>: Func<<<FD::Type as tags::FieldTypeTag>::MessageDescriptor as MessageDescriptor>::GetFieldListAsMdFd>,
     {
         todo!()
     }
