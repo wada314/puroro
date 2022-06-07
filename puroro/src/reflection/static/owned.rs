@@ -59,15 +59,15 @@ where
     MD: MessageDescriptor,
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
-    fn has_field<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<bool> {
+    fn has_field<FD: FieldDescriptor>(&self) -> crate::Result<bool> {
         todo!()
     }
 
-    fn get_uint32<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<u32> {
+    fn get_uint32<FD: FieldDescriptor>(&self) -> crate::Result<u32> {
         todo!()
     }
 
-    fn get_string<FD: super::desc::FieldDescriptor>(&self) -> crate::Result<&str> {
+    fn get_string<FD: FieldDescriptor>(&self) -> crate::Result<&str> {
         todo!()
     }
 
