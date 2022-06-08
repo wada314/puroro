@@ -33,6 +33,7 @@ pub trait MessageDescriptor {
     type Syntax: tags::ProtoSyntaxTag;
     type GetFieldListAsMdFd;
     type GetOwnedFieldList;
+    type GetFieldByNumber;
 }
 impl<MD: MessageDescriptorBase, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptor for MD
 where
@@ -43,6 +44,7 @@ where
     type Syntax = MD::Syntax;
     type GetFieldListAsMdFd = GetFieldListAsMdFd;
     type GetOwnedFieldList = GetOwnedFieldList;
+    type GetFieldByNumber = <GetGetFieldByNumber as Func<MD>>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -72,16 +74,18 @@ where
     type Type = N::Eq<T::Number>;
 }
 
-pub trait GetFieldExt<N> {
-    type GetField: FieldDescriptor;
+pub struct GetGetFieldByNumber;
+impl<MD: MessageDescriptorBase> Func<MD> for GetGetFieldByNumber {
+    type Type = GetFieldByNumber<MD>;
 }
-impl<N, MD> GetFieldExt<N> for MD
+
+pub struct GetFieldByNumber<MD>(PhantomData<MD>);
+impl<MD: MessageDescriptorBase, N: Number, FD> Func<N> for GetFieldByNumber<MD>
 where
-    MD: MessageDescriptorBase,
-    list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields>,
-    <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type: FieldDescriptor,
+    list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields, Type = FD>,
+    FD: FieldDescriptor,
 {
-    type GetField = <list::Find<IsFdNumberEqualTo<N>> as Func<MD::Fields>>::Type;
+    type Type = FD;
 }
 
 pub struct GetFieldListAsMdFd;
