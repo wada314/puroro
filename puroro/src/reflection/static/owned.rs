@@ -54,6 +54,12 @@ where
     }
 }
 
+trait FieldInstanceList<MD> {
+    fn get_field_ref_by_number<N: Number>(&self) -> <MD::GetFieldByNumber as Func<N>>::Type
+    where
+        MD::GetFieldByNumber: Func<N>;
+}
+
 impl<MD> Reflection for OwnedMessage<MD>
 where
     MD: MessageDescriptor,
