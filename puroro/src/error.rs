@@ -22,37 +22,16 @@ pub struct PuroroError {
 
 #[derive(::thiserror::Error, Debug)]
 pub enum ErrorKind {
-    #[error("The input binary has terminated in irregular position.")]
-    UnexpectedInputTermination,
     #[error("A variant integer type has too large or too small value.")]
     IntegerOverflow(#[from] std::num::TryFromIntError),
-    #[error("A boolean value is nither 0 or 1.")]
-    InvalidBooleanValue,
-    #[error("A variant integer type is longer than 10 bytes.")]
-    TooLargeVariant,
-    #[error("Unknown enum variant value: {0}.")]
-    UnknownEnumVariant(i32),
-    #[error("Invalid wire type value: {0}.")]
-    InvalidWireType(i32),
     #[error("The io returned an error: {0}")]
     IoError(#[from] std::io::Error),
     #[error("That refrection method call is not valid.")]
     ReflectionError,
-    #[error("The formatter returned an error: {0}")]
-    FormatterError(#[from] std::fmt::Error),
-    #[error("Library error: Infallible error should not actually be instanciated")]
-    InfallibleError(#[from] std::convert::Infallible),
-    #[error("Other error: {0}")]
-    OtherErrors(Box<dyn std::error::Error>),
 }
 
 impl From<std::io::Error> for PuroroError {
     fn from(input: std::io::Error) -> Self {
-        PuroroError::from(ErrorKind::from(input))
-    }
-}
-impl From<std::fmt::Error> for PuroroError {
-    fn from(input: std::fmt::Error) -> Self {
         PuroroError::from(ErrorKind::from(input))
     }
 }

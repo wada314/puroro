@@ -14,27 +14,12 @@
 
 //#![doc = include_str!("lib.md")]
 #![feature(backtrace)]
-#![feature(generic_associated_types)]
-#![feature(type_alias_impl_trait)]
-#![feature(is_sorted)]
-// Allow using GAT in document sample code.
-#![doc(test(attr(feature(generic_associated_types))))]
+// #![feature(generic_associated_types)]
+// #![feature(type_alias_impl_trait)]
+// #![feature(is_sorted)]
 
-mod common_traits;
 pub mod desc;
 mod error;
-pub mod internal;
-pub mod message;
-pub mod reflection;
-pub mod sample;
-pub mod tags;
 
-pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use ::bitvec;
-#[cfg(feature = "puroro-bumpalo")]
-pub use ::bumpalo;
-pub use ::either::Either;
