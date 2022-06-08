@@ -11,3 +11,30 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+//! A protobuf descriptor compatible (but not the same) traits.
+
+pub trait MessageDesc {
+    fn name(&self) -> &str;
+    type FieldType: FieldDesc;
+    fn fields(&self) -> &[Self::FieldType];
+
+}
+
+pub trait FieldDesc {
+    fn name(&self) -> &str;
+    fn number(&self) -> u32;
+    fn label(&self) -> Label;
+}
+
+pub enum Label {
+    Required,
+    Optional,
+    Repeated,
+}
+
+pub enum Type<'a> {
+    U32,
+    String,
+    Message(&'a ()),
+}
