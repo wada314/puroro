@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//#![doc = include_str!("lib.md")]
-#![feature(backtrace)]
-#![feature(generic_associated_types)]
-// #![feature(type_alias_impl_trait)]
-// #![feature(is_sorted)]
+use crate::desc::FieldDescriptorProtoTrait;
+use crate::Result;
 
-pub mod desc;
-mod error;
-pub mod message;
-pub mod reflection;
+pub trait Reflection {
+    fn get_field<FD: FieldDescriptorProtoTrait>(&self, fd: &FD) -> &dyn Field; // no, need allocate...
+}
 
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
+pub trait Field {
+    fn get_uint32(&self) -> Result<u32>;
+    fn get_string(&self) -> Result<String>;
+}

@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//#![doc = include_str!("lib.md")]
-#![feature(backtrace)]
-#![feature(generic_associated_types)]
-// #![feature(type_alias_impl_trait)]
-// #![feature(is_sorted)]
+use crate::reflection::Reflection;
 
-pub mod desc;
-mod error;
-pub mod message;
-pub mod reflection;
-
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
+pub trait Message {
+    fn reflection(&self) -> &dyn Reflection;
+}
