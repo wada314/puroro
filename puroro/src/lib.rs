@@ -14,7 +14,7 @@
 
 //#![doc = include_str!("lib.md")]
 #![feature(backtrace)]
-// #![feature(generic_associated_types)]
+#![feature(generic_associated_types)]
 // #![feature(type_alias_impl_trait)]
 // #![feature(is_sorted)]
 

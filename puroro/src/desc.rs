@@ -12,29 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! A protobuf descriptor compatible (but not the same) traits.
-
-pub trait MessageDesc {
-    fn name(&self) -> &str;
-    type FieldType: FieldDesc;
-    fn fields(&self) -> &[Self::FieldType];
-
+pub trait DescriptorProtoTrait {
+    type NameValueType<'a>: AsRef<str>
+    where
+        Self: 'a;
+    fn name(&self) -> Self::NameValueType<'_>;
+    type FieldValueType<'a>: FieldDescriptorProtoTrait
+    where
+        Self: 'a;
+    type FieldIteratorType<'a>: Iterator<Item = Self::FieldValueType<'a>>
+    where
+        Self: 'a;
+    fn field(&self) -> Self::FieldIteratorType<'_>;
 }
 
-pub trait FieldDesc {
-    fn name(&self) -> &str;
+pub trait FieldDescriptorProtoTrait {
+    type NameValueType<'a>: AsRef<str>
+    where
+        Self: 'a;
+    fn name(&self) -> Self::NameValueType<'_>;
     fn number(&self) -> u32;
-    fn label(&self) -> Label;
+    fn label(&self) -> field_descriptor_proto::Label;
+    fn r#type(&self) -> field_descriptor_proto::Type;
 }
 
-pub enum Label {
-    Required,
-    Optional,
-    Repeated,
-}
-
-pub enum Type<'a> {
-    U32,
-    String,
-    Message(&'a ()),
+pub mod field_descriptor_proto {
+    pub enum Label {
+        LabelRequired,
+        LabelOptional,
+        LabelRepeated,
+    }
+    pub enum Type {
+        TypeU32,
+        TypeString,
+        TypeMessage,
+    }
 }
