@@ -2874,20 +2874,14 @@ pub mod _puroro_traits {
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type ProtoFileMessageType<'this> = () where Self: 'this;
         type ProtoFileRepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>>
             where Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type CompilerVersionMessageType<'this> = () where Self: 'this;
     }
     impl<T, U> CodeGeneratorRequestTrait for (T, U)
     where
@@ -3127,10 +3121,7 @@ pub mod _puroro_traits {
         code_generator_response_delegate!(T);
     }
     impl CodeGeneratorResponseTrait for () {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type FileMessageType<'this> = () where Self: 'this;
         type FileRepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>
             where Self: 'this;
@@ -4269,10 +4260,7 @@ pub mod _puroro_nested {
                 file_delegate!(T);
             }
             impl FileTrait for () {
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = ();
+                type GeneratedCodeInfoMessageType<'this> = () where Self: 'this;
             }
             impl<T, U> FileTrait for (T, U)
             where

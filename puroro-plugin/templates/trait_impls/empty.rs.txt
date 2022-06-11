@@ -1,7 +1,7 @@
 impl {{ m.ident }}Trait for () {
     {%- for f in m.fields %}
     {%- if f.is_message %}
-    type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = ();
+    type {{ f.ident_camel_unesc }}MessageType<'this> = () where Self: 'this;
     {%- endif %}
 
     {%- if f.is_repeated %}

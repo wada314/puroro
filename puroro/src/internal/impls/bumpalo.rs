@@ -212,16 +212,16 @@ impl<T> NoAllocVec<T> {
 }
 impl<T> AddBump for NoAllocVec<T> {
     type AddToRef<'bump, 'this>
+    = ManuallyDrop<Vec<'bump, T>>
     where
-        Self: 'bump + 'this,
-    = ManuallyDrop<Vec<'bump, T>>;
+        Self: 'bump + 'this,;
     fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
         unsafe { self.as_vec_in(bump) }
     }
     type AddToMutRef<'bump, 'this>
+    = RefMutVec<'bump, 'this, T>
     where
-        Self: 'bump + 'this,
-    = RefMutVec<'bump, 'this, T>;
+        Self: 'bump + 'this,;
     fn add_bump_mut<'bump, 'this>(
         &'this mut self,
         bump: &'bump Bump,
@@ -380,16 +380,16 @@ impl NoAllocString {
 }
 impl AddBump for NoAllocString {
     type AddToRef<'bump, 'this>
+    = ManuallyDrop<String<'bump>>
     where
-        Self: 'bump + 'this,
-    = ManuallyDrop<String<'bump>>;
+        Self: 'bump + 'this,;
     fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
         unsafe { self.as_string_in(bump) }
     }
     type AddToMutRef<'bump, 'this>
+    = RefMutString<'bump, 'this>
     where
-        Self: 'bump + 'this,
-    = RefMutString<'bump, 'this>;
+        Self: 'bump + 'this,;
     fn add_bump_mut<'bump, 'this>(
         &'this mut self,
         bump: &'bump Bump,

@@ -58,10 +58,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
+        type RecursiveUnlabeledMessageType<'this> = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg where Self: 'this;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::RecursiveUnlabeledMessageType<'this>> {
@@ -179,10 +176,7 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
     {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type RecursiveUnlabeledMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn recursive_unlabeled_opt<'this>(
             &'this self,
@@ -317,10 +311,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>;
+        type RecursiveUnlabeledMessageType<'this> = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this> where Self: 'this;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::RecursiveUnlabeledMessageType<'this>> {
@@ -438,14 +429,9 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type RecursiveUnlabeledMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::RecursiveUnlabeledMessageType<'this>;
+            type RecursiveUnlabeledMessageType<'this> = <$ty>::RecursiveUnlabeledMessageType<'this> where Self: 'this;
 
-            fn recursive_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {
+            fn recursive_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {
                 (**self).recursive_unlabeled_opt()
             }
         };
@@ -486,23 +472,17 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type RecursiveUnlabeledMessageType<'this> = () where Self: 'this;
     }
     impl<T, U> MsgTrait for (T, U)
     where
         T: MsgTrait,
         U: MsgTrait,
     {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type RecursiveUnlabeledMessageType<'this> = (
             ::std::option::Option<<T as MsgTrait>::RecursiveUnlabeledMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::RecursiveUnlabeledMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn recursive_unlabeled_opt<'this>(
             &'this self,
@@ -523,13 +503,10 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type RecursiveUnlabeledMessageType<'this> = ::puroro::Either<
             <T as MsgTrait>::RecursiveUnlabeledMessageType<'this>,
             <U as MsgTrait>::RecursiveUnlabeledMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {
@@ -543,10 +520,7 @@ pub mod _puroro_traits {
     where
         T: MsgTrait,
     {
-        type RecursiveUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = T::RecursiveUnlabeledMessageType<'this>;
+        type RecursiveUnlabeledMessageType<'this> = T::RecursiveUnlabeledMessageType<'this> where Self: 'this;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {

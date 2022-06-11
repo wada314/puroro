@@ -196,10 +196,7 @@ pub mod _puroro_simple_impl {
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Msg>::string_unlabeled_opt(self)
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
+        type SubmsgUnlabeledMessageType<'this> = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg where Self: 'this;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -531,17 +528,11 @@ pub mod _puroro_impls {
                 &self.i32_unlabeled,
             )))
         }
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type I32RepeatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SubmsgUnlabeledMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
@@ -610,17 +601,11 @@ pub mod _puroro_impls {
                 &self.i32_optional,
             )))
         }
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type I32RepeatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SubmsgUnlabeledMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
@@ -693,18 +678,18 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type I32RepeatedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SubmsgUnlabeledMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -776,10 +761,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
     {
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type I32RepeatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -789,10 +771,7 @@ pub mod _puroro_impls {
                 &self.f32_unlabeled,
             )))
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SubmsgUnlabeledMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField4<ScalarType>
@@ -856,10 +835,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type I32RepeatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -867,10 +843,7 @@ pub mod _puroro_impls {
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SubmsgUnlabeledMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
@@ -934,17 +907,11 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
     {
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type I32RepeatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type SubmsgUnlabeledMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn submsg_unlabeled_opt<'this>(
             &'this self,
@@ -1211,15 +1178,13 @@ pub mod _puroro_impls {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
         }
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type I32RepeatedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
@@ -1230,10 +1195,7 @@ pub mod _puroro_impls {
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_unlabeled_opt(self)
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
+        type SubmsgUnlabeledMessageType<'this> = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this> where Self: 'this;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -1756,6 +1718,7 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
+
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
             }
@@ -1764,10 +1727,7 @@ pub mod _puroro_traits {
                 (**self).i32_optional_opt()
             }
 
-            type I32RepeatedRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::I32RepeatedRepeatedType<'this>;
+            type I32RepeatedRepeatedType<'this> = <$ty>::I32RepeatedRepeatedType<'this> where Self: 'this;
             fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
                 (**self).i32_repeated()
             }
@@ -1779,14 +1739,9 @@ pub mod _puroro_traits {
             fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_unlabeled_opt()
             }
-            type SubmsgUnlabeledMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::SubmsgUnlabeledMessageType<'this>;
+            type SubmsgUnlabeledMessageType<'this> = <$ty>::SubmsgUnlabeledMessageType<'this> where Self: 'this;
 
-            fn submsg_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
+            fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
         };
@@ -1827,17 +1782,13 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type I32RepeatedRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SubmsgUnlabeledMessageType<'this> = () where Self: 'this;
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -1854,12 +1805,10 @@ pub mod _puroro_traits {
                 .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
         }
         type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
-            <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
+                <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -1877,13 +1826,10 @@ pub mod _puroro_traits {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type SubmsgUnlabeledMessageType<'this> = (
             ::std::option::Option<<T as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn submsg_unlabeled_opt<'this>(
             &'this self,
@@ -1917,12 +1863,10 @@ pub mod _puroro_traits {
             )
         }
         type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
-            <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
+                <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -1943,13 +1887,10 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
             )
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type SubmsgUnlabeledMessageType<'this> = ::puroro::Either<
             <T as MsgTrait>::SubmsgUnlabeledMessageType<'this>,
             <U as MsgTrait>::SubmsgUnlabeledMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -1970,10 +1911,10 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.i32_optional_opt())
         }
 
-        type I32RepeatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::I32RepeatedRepeatedType<'this>>;
+        type I32RepeatedRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::I32RepeatedRepeatedType<'this>
+            > where Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.i32_repeated()),
@@ -1985,10 +1926,7 @@ pub mod _puroro_traits {
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
-        type SubmsgUnlabeledMessageType<'this>
-        where
-            Self: 'this,
-        = T::SubmsgUnlabeledMessageType<'this>;
+        type SubmsgUnlabeledMessageType<'this> = T::SubmsgUnlabeledMessageType<'this> where Self: 'this;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {

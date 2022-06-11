@@ -47,9 +47,9 @@ impl<T> VecOrOptionOrBare<T> for Option<T> {
         <Option<T>>::get_or_insert_with(self, f)
     }
     type Iter<'a>
+    = ::std::option::Iter<'a, T>
     where
-        T: 'a,
-    = ::std::option::Iter<'a, T>;
+        T: 'a,;
     fn iter(&self) -> Self::Iter<'_> {
         Option::iter(self)
     }
@@ -70,9 +70,9 @@ impl<T> VecOrOptionOrBare<T> for NoAllocBumpVec<T> {
         self.last_mut().unwrap()
     }
     type Iter<'a>
+    = ::std::slice::Iter<'a, T>
     where
-        T: 'a,
-    = ::std::slice::Iter<'a, T>;
+        T: 'a,;
     fn iter(&self) -> <Self as VecOrOptionOrBare<T>>::Iter<'_> {
         <[T]>::iter(self)
     }
@@ -88,9 +88,9 @@ impl<T> VecOrOptionOrBare<T> for Bare<T> {
         self
     }
     type Iter<'a>
+    = ::std::iter::Once<&'a T>
     where
-        T: 'a,
-    = ::std::iter::Once<&'a T>;
+        T: 'a,;
     fn iter(&self) -> Self::Iter<'_> {
         ::std::iter::once(self)
     }

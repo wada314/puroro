@@ -219,27 +219,24 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type ExplicitlyPackedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.explicitly_packed)
         }
-        type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type ExplicitlyNotPackedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn explicitly_not_packed<'this>(
             &'this self,
         ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type NotAnnotatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -323,28 +320,25 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type ExplicitlyPackedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type ExplicitlyNotPackedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn explicitly_not_packed<'this>(
             &'this self,
         ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.explicitly_not_packed)
         }
-        type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type NotAnnotatedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -428,27 +422,24 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type ExplicitlyPackedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type ExplicitlyNotPackedRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn explicitly_not_packed<'this>(
             &'this self,
         ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type NotAnnotatedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.not_annotated)
@@ -571,43 +562,37 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
-        type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type ExplicitlyPackedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.explicitly_packed)
         }
-        type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type ExplicitlyNotPackedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn explicitly_not_packed<'this>(
             &'this self,
         ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.explicitly_not_packed)
         }
-        type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type NotAnnotatedRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.not_annotated)
@@ -784,28 +769,18 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type ExplicitlyPackedRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExplicitlyPackedRepeatedType<'this>;
+
+            type ExplicitlyPackedRepeatedType<'this> = <$ty>::ExplicitlyPackedRepeatedType<'this> where Self: 'this;
             fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
                 (**self).explicitly_packed()
             }
 
-            type ExplicitlyNotPackedRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExplicitlyNotPackedRepeatedType<'this>;
-            fn explicitly_not_packed<'this>(
-                &'this self,
-            ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
+            type ExplicitlyNotPackedRepeatedType<'this> = <$ty>::ExplicitlyNotPackedRepeatedType<'this> where Self: 'this;
+            fn explicitly_not_packed<'this>(&'this self) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
                 (**self).explicitly_not_packed()
             }
 
-            type NotAnnotatedRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::NotAnnotatedRepeatedType<'this>;
+            type NotAnnotatedRepeatedType<'this> = <$ty>::NotAnnotatedRepeatedType<'this> where Self: 'this;
             fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
                 (**self).not_annotated()
             }
@@ -847,26 +822,23 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
-        type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type ExplicitlyPackedRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type ExplicitlyNotPackedRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn explicitly_not_packed<'this>(
             &'this self,
         ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type NotAnnotatedRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -877,12 +849,10 @@ pub mod _puroro_traits {
         U: MsgTrait,
     {
         type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
-            <U as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
+                <U as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -891,12 +861,10 @@ pub mod _puroro_traits {
             )
         }
         type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
-            <U as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
+                <U as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn explicitly_not_packed<'this>(
             &'this self,
@@ -907,12 +875,10 @@ pub mod _puroro_traits {
             )
         }
         type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::NotAnnotatedRepeatedType<'this>,
-            <U as MsgTrait>::NotAnnotatedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as MsgTrait>::NotAnnotatedRepeatedType<'this>,
+                <U as MsgTrait>::NotAnnotatedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -927,12 +893,10 @@ pub mod _puroro_traits {
         U: MsgTrait,
     {
         type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
-            <U as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
+                <U as MsgTrait>::ExplicitlyPackedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -942,12 +906,10 @@ pub mod _puroro_traits {
             )
         }
         type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
-            <U as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
+                <U as MsgTrait>::ExplicitlyNotPackedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn explicitly_not_packed<'this>(
             &'this self,
@@ -959,12 +921,10 @@ pub mod _puroro_traits {
             )
         }
         type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::NotAnnotatedRepeatedType<'this>,
-            <U as MsgTrait>::NotAnnotatedRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as MsgTrait>::NotAnnotatedRepeatedType<'this>,
+                <U as MsgTrait>::NotAnnotatedRepeatedType<'this>,
+            > where Self: 'this;
 
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -978,24 +938,20 @@ pub mod _puroro_traits {
     where
         T: MsgTrait,
     {
-        type ExplicitlyPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ExplicitlyPackedRepeatedType<'this>,
-        >;
+        type ExplicitlyPackedRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ExplicitlyPackedRepeatedType<'this>
+            > where Self: 'this;
         fn explicitly_packed<'this>(&'this self) -> Self::ExplicitlyPackedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.explicitly_packed()),
             )
         }
 
-        type ExplicitlyNotPackedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ExplicitlyNotPackedRepeatedType<'this>,
-        >;
+        type ExplicitlyNotPackedRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ExplicitlyNotPackedRepeatedType<'this>
+            > where Self: 'this;
         fn explicitly_not_packed<'this>(
             &'this self,
         ) -> Self::ExplicitlyNotPackedRepeatedType<'this> {
@@ -1004,12 +960,10 @@ pub mod _puroro_traits {
             )
         }
 
-        type NotAnnotatedRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::NotAnnotatedRepeatedType<'this>,
-        >;
+        type NotAnnotatedRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::NotAnnotatedRepeatedType<'this>
+            > where Self: 'this;
         fn not_annotated<'this>(&'this self) -> Self::NotAnnotatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.not_annotated()),
