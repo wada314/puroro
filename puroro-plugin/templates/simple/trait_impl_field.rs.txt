@@ -1,7 +1,7 @@
 
 {%- if f.is_message %}
 {#- [optional|repeated] MyMessage => &'this MyMessage #}
-type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = &'this {{ f.simple_field_message_path }};
+type {{ f.ident_camel_unesc }}MessageType<'this> = &'this {{ f.simple_field_message_path }} where Self: 'this;
 {%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}

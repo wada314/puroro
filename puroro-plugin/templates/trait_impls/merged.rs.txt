@@ -8,17 +8,17 @@ where
     {%- if f.is_message %}
     {%- if f.is_repeated %}
     {#- For repeated message f, each message has either `T` or `U` type, never be merged. -#}
-    type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = ::puroro::Either<
+    type {{ f.ident_camel_unesc }}MessageType<'this> = ::puroro::Either<
         <T as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'this>,
         <U as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'this>,
-    >;
+    > where Self: 'this;
     {%- else %} {#- if f.is_repeated #}
     {#- For non-repeated message f, the message is `T` and `U` merged type. -#}
     {#- There are 3+1 cases: `T` and `U` both exist, only `T`, only `U`, (and none of them). -#}
-    type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = (
+    type {{ f.ident_camel_unesc }}MessageType<'this> = (
         ::std::option::Option<<T as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'this>>,
         ::std::option::Option<<U as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'this>>,
-    );
+    ) where Self: 'this;
     {%- endif %} {#- if f.is_repeated #}
     {%- endif %} {#- if f.is_message #}
 
@@ -30,11 +30,11 @@ where
     {%- else %}
     {%- let merged_repeated_field_type = "MergedRepeatedField" %}
     {%- endif %}
-    type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this
+    type {{ f.ident_camel_unesc }}RepeatedType<'this>
         = ::puroro::internal::impls::merged::{{ merged_repeated_field_type }}<
             <T as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}RepeatedType<'this>,
             <U as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}RepeatedType<'this>,
-        >;
+        > where Self: 'this;
 
     fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this>
     {

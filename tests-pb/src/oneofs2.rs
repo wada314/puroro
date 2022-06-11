@@ -308,10 +308,7 @@ pub mod _puroro_simple_impl {
         fn g2_string_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Msg>::g2_string_opt(self)
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg;
+        type G2SubmsgMessageType<'this> = &'this self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg where Self: 'this;
         fn g2_submsg_opt<'this>(&'this self) -> Option<Self::G2SubmsgMessageType<'this>> {
             <self::Msg>::g2_submsg_opt(self)
         }
@@ -709,10 +706,7 @@ pub mod _puroro_impls {
                 &self.g1_int32,
             )))
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type G2SubmsgMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
@@ -777,10 +771,7 @@ pub mod _puroro_impls {
         fn g1_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.g1_string.as_ref())
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type G2SubmsgMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
@@ -847,10 +838,7 @@ pub mod _puroro_impls {
                 &self.g2_f32,
             )))
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type G2SubmsgMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField3<ScalarType>
@@ -915,10 +903,7 @@ pub mod _puroro_impls {
         fn g2_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.g2_string.as_ref())
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type G2SubmsgMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField4<ScalarType>
@@ -980,10 +965,7 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait,
     {
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type G2SubmsgMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn g2_submsg_opt<'this>(
             &'this self,
@@ -1055,10 +1037,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type G2SubmsgMessageType<'this> = () where Self: 'this;
 
         fn g3_int32_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
@@ -1348,10 +1327,7 @@ pub mod _puroro_impls {
         fn g2_string_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::g2_string_opt(self)
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'this>;
+        type G2SubmsgMessageType<'this> = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'this> where Self: 'this;
         fn g2_submsg_opt<'this>(&'this self) -> Option<Self::G2SubmsgMessageType<'this>> {
             <Self>::g2_submsg_opt(self)
         }
@@ -1983,10 +1959,7 @@ pub mod _puroro_traits {
             fn g2_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).g2_string_opt()
             }
-            type G2SubmsgMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::G2SubmsgMessageType<'this>;
+            type G2SubmsgMessageType<'this> = <$ty>::G2SubmsgMessageType<'this> where Self: 'this;
 
             fn g2_submsg_opt<'this>(
                 &'this self,
@@ -2035,10 +2008,7 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type G2SubmsgMessageType<'this> = () where Self: 'this;
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -2080,13 +2050,10 @@ pub mod _puroro_traits {
                 ::std::option::Option::None
             }
         }
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type G2SubmsgMessageType<'this> = (
             ::std::option::Option<<T as MsgTrait>::G2SubmsgMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::G2SubmsgMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn g2_submsg_opt<'this>(&'this self) -> Option<Self::G2SubmsgMessageType<'this>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
@@ -2162,22 +2129,16 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type G2SubmsgMessageType<'this> = ::puroro::Either<
             <T as MsgTrait>::G2SubmsgMessageType<'this>,
             <U as MsgTrait>::G2SubmsgMessageType<'this>,
-        >;
+        > where Self: 'this;
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
         T: MsgTrait,
     {
-        type G2SubmsgMessageType<'this>
-        where
-            Self: 'this,
-        = T::G2SubmsgMessageType<'this>;
+        type G2SubmsgMessageType<'this> = T::G2SubmsgMessageType<'this> where Self: 'this;
     }
 
     pub trait SubmsgTrait {

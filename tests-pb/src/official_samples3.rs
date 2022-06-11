@@ -306,10 +306,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::Test3Trait for Test3 {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1;
+        type CMessageType<'this> = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1 where Self: 'this;
         fn c_opt<'this>(&'this self) -> Option<Self::CMessageType<'this>> {
             <self::Test3>::c_opt(self)
         }
@@ -935,10 +932,7 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait,
     {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type CMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
             ::std::option::Option::Some(&self.c)
@@ -1069,10 +1063,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::Test3Trait for Test3Bumpalo<'bump> {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this>;
+        type CMessageType<'this> = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this> where Self: 'this;
         fn c_opt<'this>(&'this self) -> Option<Self::CMessageType<'this>> {
             <Self>::c_opt(self)
         }
@@ -1183,10 +1174,13 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type DRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.d)
@@ -1287,15 +1281,13 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::Test4Trait for Test4Bumpalo<'bump> {
-        type DRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type DRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.d)
@@ -1573,10 +1565,7 @@ pub mod _puroro_traits {
 
     macro_rules! test3_delegate {
         ($ty:ty) => {
-            type CMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::CMessageType<'this>;
+            type CMessageType<'this> = <$ty>::CMessageType<'this> where Self: 'this;
 
             fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
                 (**self).c_opt()
@@ -1619,23 +1608,17 @@ pub mod _puroro_traits {
         test3_delegate!(T);
     }
     impl Test3Trait for () {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type CMessageType<'this> = () where Self: 'this;
     }
     impl<T, U> Test3Trait for (T, U)
     where
         T: Test3Trait,
         U: Test3Trait,
     {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type CMessageType<'this> = (
             ::std::option::Option<<T as Test3Trait>::CMessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::CMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn c_opt<'this>(&'this self) -> Option<Self::CMessageType<'this>> {
             match (
@@ -1654,13 +1637,10 @@ pub mod _puroro_traits {
         T: Test3Trait,
         U: Test3Trait,
     {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type CMessageType<'this> = ::puroro::Either<
             <T as Test3Trait>::CMessageType<'this>,
             <U as Test3Trait>::CMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
             self.as_ref().either(
                 |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
@@ -1672,10 +1652,7 @@ pub mod _puroro_traits {
     where
         T: Test3Trait,
     {
-        type CMessageType<'this>
-        where
-            Self: 'this,
-        = T::CMessageType<'this>;
+        type CMessageType<'this> = T::CMessageType<'this> where Self: 'this;
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.c_opt())
         }
@@ -1691,10 +1668,7 @@ pub mod _puroro_traits {
 
     macro_rules! test4_delegate {
         ($ty:ty) => {
-            type DRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::DRepeatedType<'this>;
+            type DRepeatedType<'this> = <$ty>::DRepeatedType<'this> where Self: 'this;
             fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
                 (**self).d()
             }
@@ -1736,10 +1710,9 @@ pub mod _puroro_traits {
         test4_delegate!(T);
     }
     impl Test4Trait for () {
-        type DRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type DRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1750,12 +1723,10 @@ pub mod _puroro_traits {
         U: Test4Trait,
     {
         type DRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as Test4Trait>::DRepeatedType<'this>,
-            <U as Test4Trait>::DRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as Test4Trait>::DRepeatedType<'this>,
+                <U as Test4Trait>::DRepeatedType<'this>,
+            > where Self: 'this;
 
         fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -1770,12 +1741,10 @@ pub mod _puroro_traits {
         U: Test4Trait,
     {
         type DRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as Test4Trait>::DRepeatedType<'this>,
-            <U as Test4Trait>::DRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as Test4Trait>::DRepeatedType<'this>,
+                <U as Test4Trait>::DRepeatedType<'this>,
+            > where Self: 'this;
 
         fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -1789,10 +1758,10 @@ pub mod _puroro_traits {
     where
         T: Test4Trait,
     {
-        type DRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::DRepeatedType<'this>>;
+        type DRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::DRepeatedType<'this>
+            > where Self: 'this;
         fn d<'this>(&'this self) -> Self::DRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.d()),

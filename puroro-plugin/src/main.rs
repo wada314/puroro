@@ -14,8 +14,6 @@
 
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
-#![feature(arc_new_cyclic)]
-#![allow(incomplete_features)]
 
 mod error;
 mod generators;
