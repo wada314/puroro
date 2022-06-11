@@ -1,12 +1,12 @@
 {%- if f.is_message %}
-type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = &'this ScalarType;
+type {{ f.ident_camel_unesc }}MessageType<'this> = &'this ScalarType where Self: 'this;
 {%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}
 
-type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this =
+type {{ f.ident_camel_unesc }}RepeatedType<'this> =
     {%- if f.is_message %}
-    &'this RepeatedType;
+    &'this RepeatedType where Self: 'this;
     {%- endif %} {#- if f.is_message #}
     {%- if f.is_string || f.is_bytes %}
     ::puroro::AsRefRepeatedField<
@@ -15,7 +15,7 @@ type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this =
         ScalarType,
         {%- if f.is_bytes %}[u8],{%- endif %}
         {%- if f.is_string %}str,{%- endif %}
-    >;
+    > where Self: 'this;
     {%- endif %} {#- if f.is_string || f.is_bytes #}
     {%- if f.is_numerical %}
     ::puroro::CloneThenIntoRepeatedField<
@@ -23,7 +23,7 @@ type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this =
         RepeatedType,
         ScalarType,
         {{ f.single_numerical_rust_type }}
-    >;
+    > where Self: 'this;
     {%- endif %} {#- if f.is_numerical #}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
