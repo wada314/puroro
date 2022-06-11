@@ -3,7 +3,7 @@ where
     T: {{ m.trait_ident }},
     U: {{ m.trait_ident }},
 {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
 
     {%- if f.is_message %}
     type {{ f.ident_camel_unesc }}MessageType<'this> = ::puroro::Either<
@@ -64,5 +64,5 @@ where
 
     {%- endif %} {#- if f.is_repeated #}
 
-    {%- endfor %} {#- for f in m.fields #}
+    {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
 }

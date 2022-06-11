@@ -13,7 +13,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Msg {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
         i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::std::vec::Vec<i32>,
@@ -971,7 +971,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
         i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,

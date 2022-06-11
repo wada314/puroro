@@ -1,5 +1,5 @@
 impl {{ m.ident }}Trait for () {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
     {%- if f.is_message %}
     type {{ f.ident_camel_unesc }}MessageType<'this> = () where Self: 'this;
     {%- endif %}
@@ -12,5 +12,5 @@ impl {{ m.ident }}Trait for () {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
     {%- endif %}
-    {%- endfor %} {#- for f in m.fields #}
+    {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
 }

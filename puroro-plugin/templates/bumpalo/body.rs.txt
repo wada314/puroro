@@ -10,7 +10,6 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     >,
 
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
     {#- [optional] int32 => Bare<i32> #}
     {#- [optional] String => Bare<NoAllocBumpString> #}
     {#- [optional] MyMessage => Option<NoAllocBumpBox<MyMessageBumpalo<'bump>>> #}
@@ -18,7 +17,6 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     {#- repeated String => NoAllocBumpVec<NoAllocBumpString> #}
     {#- repeated MyMessage => NoAllocBumpVec<MyMessageBumpalo<'bump>> #}
     {{ f.ident }}: {{ f.bumpalo_field_type }},
-    {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
@@ -53,9 +51,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             _bitfield: ::std::default::Default::default(),
 
             {%- for f in m.fields %}
-            {%- if !f.is_explicit_oneof_field %}
             {{ f.ident }}: ::std::default::Default::default(),
-            {%- endif %} {#- if !f.is_explicit_oneof_field #}
             {%- endfor %} {#- for f in m.fields #}
 
             {%- for oneof in m.oneofs %}
@@ -65,7 +61,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {#- ######## getters ######## #}
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
     {%- if f.is_repeated %}
     
     {#- ######## repeated getter ######## #}
@@ -172,7 +168,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {%- endif %} {#- if f.is_repeated #}
-    {%- endfor %} {#- for f in m.fields #}
+    {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
     
     {%- for oneof in m.oneofs %}
     pub fn {{ oneof.field_ident }}(&self) ->
@@ -204,7 +200,6 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {#- ######## mut getter ######## #}
 
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
 
     {%- if f.is_repeated %}
 
@@ -273,7 +268,6 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {%- endif %} {#- if f.is_repeated #}
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 }
 
@@ -313,7 +307,6 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
         use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
         match field_number {
             {%- for f in m.fields %}
-            {%- if !f.is_explicit_oneof_field %}
             {{ f.number }} => {
                 {%- if f.has_optional_bit %}
                 self._bitfield.set({{ f.bitfield_index }}, true);
@@ -322,7 +315,6 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                     {{ f.bumpalo_label_and_type_tags }}
                 >::deser_field(&mut self.{{ f.ident }}, data, self._bump)
             }
-            {%- endif %}
             {%- endfor %}
 
             {%- for oneof in m.oneofs %}
@@ -360,7 +352,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
 impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<'bump>
 where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
-{%- for f in m.fields %}
+{%- for f in m.fields_and_oneof_fields %}
 {%- if f.is_message %}
     for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'a> :
         ::puroro::internal::se::SerMessageToIoWrite,
@@ -371,7 +363,7 @@ where
     where
         W: ::std::io::Write,
     {
-        {%- for f in m.fields %}
+        {%- for f in m.fields_and_oneof_fields %}
         ::puroro::internal::se::SerFieldToIoWrite::<
             {{ f.trait_label_and_type_tags }}
         >::ser_field(
@@ -384,7 +376,7 @@ where
             out,
             {{ f.allow_variant_packing }},
         )?;
-        {%- endfor %} {#- for f in m.fields #}
+        {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
         ::std::result::Result::Ok(())
     }
 }

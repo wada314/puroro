@@ -12,7 +12,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Msg {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (10 + 31) / 32]>,
         i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::std::vec::Vec<i32>,
         float_optional: ::puroro::internal::Bare<f32>,
@@ -1718,7 +1718,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (10 + 31) / 32]>,
         i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
         float_optional: ::puroro::internal::Bare<f32>,
@@ -3072,7 +3072,7 @@ pub mod _puroro_nested {
             pub struct Submsg {
                 _bitfield: ::puroro::bitvec::array::BitArray<
                     ::puroro::bitvec::order::Lsb0,
-                    [u32; (1 + 31) / 32],
+                    [u32; (2 + 31) / 32],
                 >,
                 i32_optional: ::puroro::internal::Bare<i32>,
             }
@@ -3281,7 +3281,7 @@ pub mod _puroro_nested {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 _bitfield: ::puroro::bitvec::array::BitArray<
                     ::puroro::bitvec::order::Lsb0,
-                    [u32; (1 + 31) / 32],
+                    [u32; (2 + 31) / 32],
                 >,
                 i32_optional: ::puroro::internal::Bare<i32>,
             }

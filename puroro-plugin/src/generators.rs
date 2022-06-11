@@ -70,6 +70,7 @@ struct Message {
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
+    fields_and_oneof_fields: Vec<Field>,
     oneofs: Vec<Oneof>,
     bitfield_len: i32,
     simple_ident: String,
@@ -83,6 +84,12 @@ impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
         let mut bitfield_index = 0;
         let fields: Vec<Field> = m
+            .fields()
+            .into_iter()
+            .filter(|f| !(f.oneof_index().is_some() && !f.is_optional3()))
+            .map(|f| Field::try_new(f, &mut bitfield_index))
+            .try_collect()?;
+        let fields_and_oneof_fields: Vec<Field> = m
             .fields()
             .into_iter()
             .map(|f| Field::try_new(f, &mut bitfield_index))
@@ -113,6 +120,7 @@ impl Message {
                 enums: nested_enums,
             },
             fields,
+            fields_and_oneof_fields,
             oneofs,
             bitfield_len: bitfield_index,
             simple_ident: m.rust_impl_ident(""),
