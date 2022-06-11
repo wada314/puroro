@@ -1,6 +1,6 @@
 
 pub trait {{ m.trait_ident }} {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
 
     {%- if f.is_message %}
     type {{ f.ident_camel_unesc }}MessageType<'this>: {{ f.trait_field_message_trait_path }}
@@ -64,7 +64,7 @@ pub trait {{ m.trait_ident }} {
 
 macro_rules! {{ m.trait_delegate_macro_ident }} {
     ($ty:ty) => {
-        {%- for f in m.fields %}
+        {%- for f in m.fields_and_oneof_fields %}
         {%- if f.is_message %}
         type {{ f.ident_camel_unesc }}MessageType<'this> = <$ty>::{{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this;
         {%- endif %}

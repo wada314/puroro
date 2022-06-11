@@ -4,7 +4,7 @@ impl<T> {{ m.builder_ident }}<T>
 where
     T: {{ m.trait_ident }}
 {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
 
     {%- let maybe_gp %}
     {%- if f.is_repeated %}

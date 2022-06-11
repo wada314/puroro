@@ -635,6 +635,7 @@ pub mod _puroro_traits {
         fn title_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.title_opt())
         }
+
         fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().and_then(|msg| msg.num_pages_opt())
         }

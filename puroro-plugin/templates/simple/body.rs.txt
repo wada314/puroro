@@ -5,7 +5,6 @@ pub struct {{ m.simple_ident }} {
         [u32; ({{ m.bitfield_len }} + 31) / 32],
     >,
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
     {#- [optional] i32 => Bare<i32> #}
     {#- [optional] String => Bare<String> #}
     {#- [optional] MyMessage => Option<Box<MyMessage>> #}
@@ -13,7 +12,6 @@ pub struct {{ m.simple_ident }} {
     {#- repeated String => Vec<String> #}
     {#- repeated MyMessage => Vec<MyMessage> #}
     {{ f.ident }}: {{ f.simple_field_type }},
-    {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
@@ -30,9 +28,7 @@ impl {{ m.simple_ident }} {
             _bitfield: ::std::default::Default::default(),
 
             {%- for f in m.fields %}
-            {%- if !f.is_explicit_oneof_field %}
             {{ f.ident }}: ::std::default::Default::default(),
-            {%- endif %}
             {%- endfor %}
 
             {%- for oneof in m.oneofs %}
@@ -42,7 +38,7 @@ impl {{ m.simple_ident }} {
     }
 
     {#- Immutable getter interfaces. #}
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
     {%- if f.is_repeated %}
 
     {#- repeated i32 => &[i32] #}
@@ -131,7 +127,7 @@ impl {{ m.simple_ident }} {
     }
 
     {%- endif %} {#- if f.is_repeated #}
-    {%- endfor %} {#- for f in m.fields #}
+    {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
 
     {%- for oneof in m.oneofs %}
     pub fn {{ oneof.field_ident }}(&self) ->
@@ -173,7 +169,6 @@ impl {{ m.simple_ident }} {
 
     {%- else %} {#- if f.is_repeated #}
 
-    {%- if !f.is_explicit_oneof_field %}
     {#- clear scalar field #}
     pub fn clear_{{ f.ident_unesc }}(&mut self) {
         {%- if f.has_optional_bit %}
@@ -208,7 +203,6 @@ impl {{ m.simple_ident }} {
         {%- endif %} {#- if f.is_message #}
     }
 
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endif %} {#- if f.is_repeated #}
     {%- endfor %} {#- for f in m.fields #}
 
@@ -257,7 +251,6 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
         use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
         match field_number {
             {%- for f in m.fields %}
-            {%- if !f.is_explicit_oneof_field %}
             {{ f.number }} => {
                 {%- if f.has_optional_bit %}
                 self._bitfield.set({{ f.bitfield_index }}, true);
@@ -266,7 +259,6 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
                     {{ f.simple_label_and_type_tags }}
                 >::deser_field(&mut self.{{ f.ident }}, data)
             }
-            {%- endif %}
             {%- endfor %}
 
             {%- for oneof in m.oneofs %}
@@ -307,7 +299,7 @@ where
     where
         W: ::std::io::Write,
     {
-        {%- for f in m.fields %}
+        {%- for f in m.fields_and_oneof_fields %}
         ::puroro::internal::se::SerFieldToIoWrite::<
             {{ f.trait_label_and_type_tags }}
         >::ser_field(
@@ -320,7 +312,7 @@ where
             out,
             {{ f.allow_variant_packing }},
         )?;
-        {%- endfor %} {#- for f in m.fields #}
+        {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
         ::std::result::Result::Ok(())
     }
 }
@@ -337,13 +329,13 @@ where
 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.debug_struct("{{ m.simple_ident }}")
-            {%- for f in m.fields %}
+            {%- for f in m.fields_and_oneof_fields %}
             {%- if !f.is_repeated && (f.has_optional_bit || f.is_explicit_oneof_field) %}
             .field("{{ f.ident }}", &self.{{ f.ident_unesc }}_opt())
             {%- else %} {#- if !f.is_repeated && (f.has_optional_bit || f.is_explicit_oneof_field) #}
             .field("{{ f.ident }}", &self.{{ f.ident }}())
             {%- endif %} {#- if !f.is_repeated && (f.has_optional_bit || f.is_explicit_oneof_field) #}
-            {%- endfor %} {#- for f in m.fields #}
+            {%- endfor %} {#- for f in m.fields_and_oneof_fields #}
             .finish()
     }
 }
@@ -353,9 +345,7 @@ impl ::std::clone::Clone for {{ m.simple_ident }} {
         Self {
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
             {%- for f in m.fields %}
-            {%- if !f.is_explicit_oneof_field %}
             {{ f.ident }}: ::std::clone::Clone::clone(&self.{{ f.ident }}),
-            {%- endif %} {#- if !f.is_explicit_oneof_field #}
             {%- endfor %} {#- for f in m.fields #}
             {%- for oneof in m.oneofs %}
             {{ oneof.field_ident }}: ::std::clone::Clone::clone(&self.{{ oneof.field_ident }}),
@@ -368,7 +358,6 @@ impl ::std::cmp::PartialEq for {{ m.simple_ident }} {
     fn eq(&self, rhs: &Self) -> bool {
         self._bitfield == rhs._bitfield &&
         {%- for f in m.fields %}
-        {%- if !f.is_explicit_oneof_field %}
         {%- if f.has_optional_bit %}
         {#- if the optional bit is not set (== the field is not set), #}
         {#- then we can (must) skip the actual field value check. #}
@@ -377,7 +366,6 @@ impl ::std::cmp::PartialEq for {{ m.simple_ident }} {
         {%- else %} {#- if f.has_optional_bit #}
         self.{{ f.ident }} == rhs.{{ f.ident }} &&
         {%- endif %} {#- if f.has_optional_bit #}
-        {%- endif %} {#- if !f.is_explicit_oneof_field #}
         {%- endfor %} {#- for f in m.fields #}
         {%- for oneof in m.oneofs %}
         self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&

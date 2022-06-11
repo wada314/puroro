@@ -15,7 +15,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Test1 {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
         a: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Test1> for Test1 {}
@@ -141,7 +141,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Test2 {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
         b: ::puroro::internal::Bare<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
@@ -585,7 +585,7 @@ pub mod _puroro_impls {
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
         a: ::puroro::internal::Bare<i32>,
     }
 
@@ -788,7 +788,7 @@ pub mod _puroro_impls {
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
         b: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
     }
 

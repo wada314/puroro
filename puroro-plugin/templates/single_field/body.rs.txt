@@ -1,4 +1,4 @@
-{%- for target_f in m.fields %}
+{%- for target_f in m.fields_and_oneof_fields %}
 
 {%- let maybe_gp %}
 {%- if target_f.is_repeated %}
@@ -22,7 +22,7 @@ impl{{ maybe_gp }} super::_puroro_traits::{{ m.trait_ident }}
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
     {%- if f.number == target_f.number %}
     {%- call single_field_trait_impl_field(f) %}
     {%- else %} {#- if f.number == target_f.number #}
