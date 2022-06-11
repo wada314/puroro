@@ -5,7 +5,9 @@ impl {{ m.ident }}Trait for () {
     {%- endif %}
 
     {%- if f.is_repeated %}
-    type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
+    type {{ f.ident_camel_unesc }}RepeatedType<'this> =
+        ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>
+        where Self: 'this;
     fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
