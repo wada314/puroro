@@ -409,20 +409,14 @@ pub mod _puroro_simple_impl {
         fn parameter_opt<'this>(&'this self) -> Option<&'this str> {
             <self::CodeGeneratorRequest>::parameter_opt(self)
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
+        type ProtoFileMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto where Self: 'this;
         type ProtoFileRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto];
 
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             &self.proto_file
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version;
+        type CompilerVersionMessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version where Self: 'this;
         fn compiler_version_opt<'this>(
             &'this self,
         ) -> Option<Self::CompilerVersionMessageType<'this>> {
@@ -648,7 +642,7 @@ pub mod _puroro_simple_impl {
         fn supported_features_opt<'this>(&'this self) -> Option<u64> {
             <self::CodeGeneratorResponse>::supported_features_opt(self)
         }
-        type FileMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File;
+        type FileMessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File where Self: 'this;
         type FileRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File];
 
@@ -1389,29 +1383,22 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
+        type FileToGenerateRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,str,
+    > where Self: 'this;
 
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.file_to_generate)
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>>;
+        type ProtoFileMessageType<'this> = () where Self: 'this;
+        type ProtoFileRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>> where Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type CompilerVersionMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -1487,10 +1474,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type FileToGenerateRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1498,21 +1482,12 @@ pub mod _puroro_impls {
         fn parameter_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.parameter.as_ref())
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>>;
+        type ProtoFileMessageType<'this> = () where Self: 'this;
+        type ProtoFileRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>> where Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type CompilerVersionMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -1584,30 +1559,19 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type FileToGenerateRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type ProtoFileMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type ProtoFileRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             &self.proto_file
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type CompilerVersionMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -1682,28 +1646,16 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait,
     {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type FileToGenerateRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>>;
+        type ProtoFileMessageType<'this> = () where Self: 'this;
+        type ProtoFileRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>> where Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type CompilerVersionMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn compiler_version_opt<'this>(
             &'this self,
@@ -1906,15 +1858,12 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::CodeGeneratorRequestTrait
         for CodeGeneratorRequestBumpalo<'bump>
     {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
-            ::puroro::internal::NoAllocBumpString,
-            str,
-        >;
+        type FileToGenerateRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+        ::puroro::internal::NoAllocBumpString,str,
+    > where Self: 'this;
 
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.file_to_generate)
@@ -1922,24 +1871,14 @@ pub mod _puroro_impls {
         fn parameter_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::parameter_opt(self)
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<
-            'this,
-        >;
-        type ProtoFileRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<'this>];
+        type ProtoFileMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<'this> where Self: 'this;
+        type ProtoFileRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             unsafe { self.proto_file.cast_item_unchecked() }
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionBumpalo<
-            'this,
-        >;
+        type CompilerVersionMessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionBumpalo<'this> where Self: 'this;
         fn compiler_version_opt<'this>(
             &'this self,
         ) -> Option<Self::CompilerVersionMessageType<'this>> {
@@ -2145,14 +2084,8 @@ pub mod _puroro_impls {
         fn error_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.error.as_ref())
         }
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>;
+        type FileMessageType<'this> = () where Self: 'this;
+        type FileRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>> where Self: 'this;
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2226,14 +2159,8 @@ pub mod _puroro_impls {
                 &self.supported_features,
             )))
         }
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>;
+        type FileMessageType<'this> = () where Self: 'this;
+        type FileRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>> where Self: 'this;
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2317,10 +2244,10 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-type FileMessageType<'this> where Self: 'this = &'this ScalarType;
+type FileMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type FileRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type FileRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
     &self.file
@@ -2504,9 +2431,9 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn supported_features_opt<'this>(&'this self) -> Option<u64> {
             <Self>::supported_features_opt(self)
         }
-        type FileMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileBumpalo<'this>;
-        type FileRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileBumpalo<'this>];
+        type FileMessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileBumpalo<'this> where Self: 'this;
+        type FileRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileBumpalo<'this>] where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             unsafe { self.file.cast_item_unchecked() }
@@ -2883,10 +2810,8 @@ pub mod _puroro_traits {
 
     macro_rules! code_generator_request_delegate {
         ($ty:ty) => {
-            type FileToGenerateRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FileToGenerateRepeatedType<'this>;
+
+            type FileToGenerateRepeatedType<'this> = <$ty>::FileToGenerateRepeatedType<'this> where Self: 'this;
             fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
                 (**self).file_to_generate()
             }
@@ -2894,26 +2819,15 @@ pub mod _puroro_traits {
             fn parameter_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).parameter_opt()
             }
-            type ProtoFileMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ProtoFileMessageType<'this>;
+            type ProtoFileMessageType<'this> = <$ty>::ProtoFileMessageType<'this> where Self: 'this;
 
-            type ProtoFileRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ProtoFileRepeatedType<'this>;
+            type ProtoFileRepeatedType<'this> = <$ty>::ProtoFileRepeatedType<'this> where Self: 'this;
             fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
                 (**self).proto_file()
             }
-            type CompilerVersionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::CompilerVersionMessageType<'this>;
+            type CompilerVersionMessageType<'this> = <$ty>::CompilerVersionMessageType<'this> where Self: 'this;
 
-            fn compiler_version_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::CompilerVersionMessageType<'this>> {
+            fn compiler_version_opt<'this>(&'this self) -> ::std::option::Option<Self::CompilerVersionMessageType<'this>> {
                 (**self).compiler_version_opt()
             }
         };
@@ -2954,10 +2868,9 @@ pub mod _puroro_traits {
         code_generator_request_delegate!(T);
     }
     impl CodeGeneratorRequestTrait for () {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type FileToGenerateRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>
+            where Self: 'this;
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2965,10 +2878,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>>;
+        type ProtoFileRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ProtoFileMessageType<'this>>
+            where Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2983,12 +2895,10 @@ pub mod _puroro_traits {
         U: CodeGeneratorRequestTrait,
     {
         type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
-            <U as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
+                <U as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
+            > where Self: 'this;
 
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -3001,20 +2911,15 @@ pub mod _puroro_traits {
             <U as CodeGeneratorRequestTrait>::parameter_opt(&self.1)
                 .or_else(|| <T as CodeGeneratorRequestTrait>::parameter_opt(&self.0))
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ProtoFileMessageType<'this> = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::ProtoFileMessageType<'this>,
             <U as CodeGeneratorRequestTrait>::ProtoFileMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
-            <U as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
+                <U as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
+            > where Self: 'this;
 
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -3022,17 +2927,10 @@ pub mod _puroro_traits {
                 <U as CodeGeneratorRequestTrait>::proto_file(&self.1),
             )
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = (
-            ::std::option::Option<
-                <T as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>,
-            >,
-            ::std::option::Option<
-                <U as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>,
-            >,
-        );
+        type CompilerVersionMessageType<'this> = (
+            ::std::option::Option<<T as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>>,
+            ::std::option::Option<<U as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>>,
+        ) where Self: 'this;
 
         fn compiler_version_opt<'this>(
             &'this self,
@@ -3054,12 +2952,10 @@ pub mod _puroro_traits {
         U: CodeGeneratorRequestTrait,
     {
         type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
-            <U as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
+                <U as CodeGeneratorRequestTrait>::FileToGenerateRepeatedType<'this>,
+            > where Self: 'this;
 
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -3074,20 +2970,15 @@ pub mod _puroro_traits {
                 |u| <U as CodeGeneratorRequestTrait>::parameter_opt(u),
             )
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ProtoFileMessageType<'this> = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::ProtoFileMessageType<'this>,
             <U as CodeGeneratorRequestTrait>::ProtoFileMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
-            <U as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
+                <U as CodeGeneratorRequestTrait>::ProtoFileRepeatedType<'this>,
+            > where Self: 'this;
 
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -3096,13 +2987,10 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as CodeGeneratorRequestTrait>::proto_file(u)),
             )
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type CompilerVersionMessageType<'this> = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>,
             <U as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn compiler_version_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::CompilerVersionMessageType<'this>> {
@@ -3122,12 +3010,10 @@ pub mod _puroro_traits {
     where
         T: CodeGeneratorRequestTrait,
     {
-        type FileToGenerateRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::FileToGenerateRepeatedType<'this>,
-        >;
+        type FileToGenerateRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::FileToGenerateRepeatedType<'this>
+            > where Self: 'this;
         fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.file_to_generate()),
@@ -3136,24 +3022,18 @@ pub mod _puroro_traits {
         fn parameter_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.parameter_opt())
         }
-        type ProtoFileMessageType<'this>
-        where
-            Self: 'this,
-        = T::ProtoFileMessageType<'this>;
+        type ProtoFileMessageType<'this> = T::ProtoFileMessageType<'this> where Self: 'this;
 
-        type ProtoFileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::ProtoFileRepeatedType<'this>>;
+        type ProtoFileRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ProtoFileRepeatedType<'this>
+            > where Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::ProtoFileRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.proto_file()),
             )
         }
-        type CompilerVersionMessageType<'this>
-        where
-            Self: 'this,
-        = T::CompilerVersionMessageType<'this>;
+        type CompilerVersionMessageType<'this> = T::CompilerVersionMessageType<'this> where Self: 'this;
         fn compiler_version_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::CompilerVersionMessageType<'this>> {
@@ -3203,15 +3083,9 @@ pub mod _puroro_traits {
             fn supported_features_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).supported_features_opt()
             }
-            type FileMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FileMessageType<'this>;
+            type FileMessageType<'this> = <$ty>::FileMessageType<'this> where Self: 'this;
 
-            type FileRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FileRepeatedType<'this>;
+            type FileRepeatedType<'this> = <$ty>::FileRepeatedType<'this> where Self: 'this;
             fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
                 (**self).file()
             }
@@ -3257,10 +3131,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>;
+        type FileRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>
+            where Self: 'this;
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3279,20 +3152,15 @@ pub mod _puroro_traits {
             <U as CodeGeneratorResponseTrait>::supported_features_opt(&self.1)
                 .or_else(|| <T as CodeGeneratorResponseTrait>::supported_features_opt(&self.0))
         }
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type FileMessageType<'this> = ::puroro::Either<
             <T as CodeGeneratorResponseTrait>::FileMessageType<'this>,
             <U as CodeGeneratorResponseTrait>::FileMessageType<'this>,
-        >;
+        > where Self: 'this;
         type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
-            <U as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
+                <U as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
+            > where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -3318,20 +3186,15 @@ pub mod _puroro_traits {
                 |u| <U as CodeGeneratorResponseTrait>::supported_features_opt(u),
             )
         }
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type FileMessageType<'this> = ::puroro::Either<
             <T as CodeGeneratorResponseTrait>::FileMessageType<'this>,
             <U as CodeGeneratorResponseTrait>::FileMessageType<'this>,
-        >;
+        > where Self: 'this;
         type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
-            <U as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
+                <U as CodeGeneratorResponseTrait>::FileRepeatedType<'this>,
+            > where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -3351,15 +3214,12 @@ pub mod _puroro_traits {
         fn supported_features_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().and_then(|msg| msg.supported_features_opt())
         }
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = T::FileMessageType<'this>;
+        type FileMessageType<'this> = T::FileMessageType<'this> where Self: 'this;
 
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::FileRepeatedType<'this>>;
+        type FileRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::FileRepeatedType<'this>
+            > where Self: 'this;
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.file()),
@@ -3522,7 +3382,7 @@ pub mod _puroro_nested {
                 fn content_opt<'this>(&'this self) -> Option<&'this str> {
                     <self::File>::content_opt(self)
                 }
-                type GeneratedCodeInfoMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo;
+                type GeneratedCodeInfoMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo where Self: 'this;
                 fn generated_code_info_opt<'this>(
                     &'this self,
                 ) -> Option<Self::GeneratedCodeInfoMessageType<'this>> {
@@ -3694,10 +3554,7 @@ pub mod _puroro_nested {
                 fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::Some(self.name.as_ref())
                 }
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = ();
+                type GeneratedCodeInfoMessageType<'this> = () where Self: 'this;
             }
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for FileSingleField1<ScalarType>
@@ -3762,10 +3619,7 @@ pub mod _puroro_nested {
                 fn insertion_point_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::Some(self.insertion_point.as_ref())
                 }
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = ();
+                type GeneratedCodeInfoMessageType<'this> = () where Self: 'this;
             }
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for FileSingleField2<ScalarType>
@@ -3832,10 +3686,7 @@ pub mod _puroro_nested {
                 fn content_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::Some(self.content.as_ref())
                 }
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = ();
+                type GeneratedCodeInfoMessageType<'this> = () where Self: 'this;
             }
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for FileSingleField15<ScalarType>
@@ -3900,10 +3751,7 @@ pub mod _puroro_nested {
                 ScalarType:
                     self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait,
             {
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = &'this ScalarType;
+                type GeneratedCodeInfoMessageType<'this> = &'this ScalarType where Self: 'this;
 
                 fn generated_code_info_opt<'this>(
                     &'this self,
@@ -4139,7 +3987,7 @@ pub mod _puroro_nested {
                 fn content_opt<'this>(&'this self) -> Option<&'this str> {
                     <Self>::content_opt(self)
                 }
-                type GeneratedCodeInfoMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoBumpalo<'this>;
+                type GeneratedCodeInfoMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoBumpalo<'this> where Self: 'this;
                 fn generated_code_info_opt<'this>(
                     &'this self,
                 ) -> Option<Self::GeneratedCodeInfoMessageType<'this>> {
@@ -4366,27 +4214,21 @@ pub mod _puroro_nested {
 
             macro_rules! file_delegate {
                 ($ty:ty) => {
+
                     fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).name_opt()
                     }
 
-                    fn insertion_point_opt<'this>(
-                        &'this self,
-                    ) -> ::std::option::Option<&'this str> {
+                    fn insertion_point_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).insertion_point_opt()
                     }
 
                     fn content_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).content_opt()
                     }
-                    type GeneratedCodeInfoMessageType<'this>
-                    where
-                        Self: 'this,
-                    = <$ty>::GeneratedCodeInfoMessageType<'this>;
+                    type GeneratedCodeInfoMessageType<'this> = <$ty>::GeneratedCodeInfoMessageType<'this> where Self: 'this;
 
-                    fn generated_code_info_opt<'this>(
-                        &'this self,
-                    ) -> ::std::option::Option<Self::GeneratedCodeInfoMessageType<'this>> {
+                    fn generated_code_info_opt<'this>(&'this self) -> ::std::option::Option<Self::GeneratedCodeInfoMessageType<'this>> {
                         (**self).generated_code_info_opt()
                     }
                 };
@@ -4451,13 +4293,10 @@ pub mod _puroro_nested {
                     <U as FileTrait>::content_opt(&self.1)
                         .or_else(|| <T as FileTrait>::content_opt(&self.0))
                 }
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = (
+                type GeneratedCodeInfoMessageType<'this> = (
                     ::std::option::Option<<T as FileTrait>::GeneratedCodeInfoMessageType<'this>>,
                     ::std::option::Option<<U as FileTrait>::GeneratedCodeInfoMessageType<'this>>,
-                );
+                ) where Self: 'this;
 
                 fn generated_code_info_opt<'this>(
                     &'this self,
@@ -4496,13 +4335,10 @@ pub mod _puroro_nested {
                         |u| <U as FileTrait>::content_opt(u),
                     )
                 }
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::Either<
+                type GeneratedCodeInfoMessageType<'this> = ::puroro::Either<
                     <T as FileTrait>::GeneratedCodeInfoMessageType<'this>,
                     <U as FileTrait>::GeneratedCodeInfoMessageType<'this>,
-                >;
+                > where Self: 'this;
                 fn generated_code_info_opt<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::GeneratedCodeInfoMessageType<'this>>
@@ -4532,10 +4368,7 @@ pub mod _puroro_nested {
                 fn content_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     self.as_ref().and_then(|msg| msg.content_opt())
                 }
-                type GeneratedCodeInfoMessageType<'this>
-                where
-                    Self: 'this,
-                = T::GeneratedCodeInfoMessageType<'this>;
+                type GeneratedCodeInfoMessageType<'this> = T::GeneratedCodeInfoMessageType<'this> where Self: 'this;
                 fn generated_code_info_opt<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::GeneratedCodeInfoMessageType<'this>>

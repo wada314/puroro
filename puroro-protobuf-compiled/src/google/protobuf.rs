@@ -63,10 +63,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::FileDescriptorSetTrait for FileDescriptorSet {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
+        type FileMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto where Self: 'this;
         type FileRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto];
 
@@ -450,57 +447,39 @@ pub mod _puroro_simple_impl {
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.weak_dependency)
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto;
+        type MessageTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto where Self: 'this;
         type MessageTypeRepeatedType<'this> =
             &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto];
 
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             &self.message_type
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto;
+        type EnumTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto where Self: 'this;
         type EnumTypeRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto];
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             &self.enum_type
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto;
+        type ServiceMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto where Self: 'this;
         type ServiceRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto];
 
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             &self.service
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
+        type ExtensionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto where Self: 'this;
         type ExtensionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto];
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             &self.extension
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::FileDescriptorProto>::options_opt(self)
         }
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo;
+        type SourceCodeInfoMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo where Self: 'this;
         fn source_code_info_opt<'this>(
             &'this self,
         ) -> Option<Self::SourceCodeInfoMessageType<'this>> {
@@ -978,71 +957,53 @@ pub mod _puroro_simple_impl {
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <self::DescriptorProto>::name_opt(self)
         }
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
+        type FieldMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto where Self: 'this;
         type FieldRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto];
 
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             &self.field
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
+        type ExtensionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto where Self: 'this;
         type ExtensionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto];
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             &self.extension
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto;
+        type NestedTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto where Self: 'this;
         type NestedTypeRepeatedType<'this> =
             &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto];
 
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             &self.nested_type
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto;
+        type EnumTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto where Self: 'this;
         type EnumTypeRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto];
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             &self.enum_type
         }
-        type ExtensionRangeMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange;
+        type ExtensionRangeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange where Self: 'this;
         type ExtensionRangeRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange];
 
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             &self.extension_range
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto;
+        type OneofDeclMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto where Self: 'this;
         type OneofDeclRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto];
 
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             &self.oneof_decl
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::DescriptorProto>::options_opt(self)
         }
-        type ReservedRangeMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange;
+        type ReservedRangeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange where Self: 'this;
         type ReservedRangeRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange];
 
@@ -1344,10 +1305,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::ExtensionRangeOptionsTrait for ExtensionRangeOptions {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -1823,10 +1781,7 @@ pub mod _puroro_simple_impl {
         fn json_name_opt<'this>(&'this self) -> Option<&'this str> {
             <self::FieldDescriptorProto>::json_name_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::FieldDescriptorProto>::options_opt(self)
         }
@@ -2192,10 +2147,7 @@ pub mod _puroro_simple_impl {
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <self::OneofDescriptorProto>::name_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::OneofDescriptorProto>::options_opt(self)
         }
@@ -2418,21 +2370,18 @@ pub mod _puroro_simple_impl {
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <self::EnumDescriptorProto>::name_opt(self)
         }
-        type ValueMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto;
+        type ValueMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto where Self: 'this;
         type ValueRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto];
 
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             &self.value
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::EnumDescriptorProto>::options_opt(self)
         }
-        type ReservedRangeMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange;
+        type ReservedRangeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange where Self: 'this;
         type ReservedRangeRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange];
 
@@ -2720,10 +2669,7 @@ pub mod _puroro_simple_impl {
         fn number_opt<'this>(&'this self) -> Option<i32> {
             <self::EnumValueDescriptorProto>::number_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::EnumValueDescriptorProto>::options_opt(self)
         }
@@ -2945,20 +2891,14 @@ pub mod _puroro_simple_impl {
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <self::ServiceDescriptorProto>::name_opt(self)
         }
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto;
+        type MethodMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto where Self: 'this;
         type MethodRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto];
 
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             &self.method
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::ServiceDescriptorProto>::options_opt(self)
         }
@@ -3282,10 +3222,7 @@ pub mod _puroro_simple_impl {
         fn output_type_opt<'this>(&'this self) -> Option<&'this str> {
             <self::MethodDescriptorProto>::output_type_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <self::MethodDescriptorProto>::options_opt(self)
         }
@@ -4139,10 +4076,7 @@ pub mod _puroro_simple_impl {
         fn ruby_package_opt<'this>(&'this self) -> Option<&'this str> {
             <self::FileOptions>::ruby_package_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -4768,10 +4702,7 @@ pub mod _puroro_simple_impl {
         fn map_entry_opt<'this>(&'this self) -> Option<bool> {
             <self::MessageOptions>::map_entry_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -5191,10 +5122,7 @@ pub mod _puroro_simple_impl {
         fn weak_opt<'this>(&'this self) -> Option<bool> {
             <self::FieldOptions>::weak_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -5429,10 +5357,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::OneofOptionsTrait for OneofOptions {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -5615,10 +5540,7 @@ pub mod _puroro_simple_impl {
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <self::EnumOptions>::deprecated_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -5808,10 +5730,7 @@ pub mod _puroro_simple_impl {
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <self::EnumValueOptions>::deprecated_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -5982,10 +5901,7 @@ pub mod _puroro_simple_impl {
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <self::ServiceOptions>::deprecated_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -6201,10 +6117,7 @@ pub mod _puroro_simple_impl {
         > {
             <self::MethodOptions>::idempotency_level_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption where Self: 'this;
         type UninterpretedOptionRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption];
 
@@ -6524,7 +6437,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOption {
-        type NameMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart;
+        type NameMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart where Self: 'this;
         type NameRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart];
 
@@ -6780,7 +6693,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::SourceCodeInfoTrait for SourceCodeInfo {
-        type LocationMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location;
+        type LocationMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location where Self: 'this;
         type LocationRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location];
 
@@ -6894,7 +6807,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::GeneratedCodeInfoTrait for GeneratedCodeInfo {
-        type AnnotationMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation;
+        type AnnotationMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation where Self: 'this;
         type AnnotationRepeatedType<'this> =
     &'this [self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation];
 
@@ -7019,15 +6932,10 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type FileMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type FileRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             &self.file
@@ -7143,14 +7051,9 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::FileDescriptorSetTrait for FileDescriptorSetBumpalo<'bump> {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<
-            'this,
-        >;
-        type FileRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<'this>];
+        type FileMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<'this> where Self: 'this;
+        type FileRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             unsafe { self.file.cast_item_unchecked() }
@@ -7257,79 +7160,40 @@ pub mod _puroro_impls {
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -7398,79 +7262,40 @@ pub mod _puroro_impls {
         fn package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.package.as_ref())
         }
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -7542,80 +7367,46 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
+        type DependencyRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,str,
+    > where Self: 'this;
 
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.dependency)
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -7695,81 +7486,48 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type PublicDependencyRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.public_dependency)
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -7851,81 +7609,48 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+        type WeakDependencyRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,
+        i32
+    > where Self: 'this;
 
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.weak_dependency)
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -8007,81 +7732,43 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type MessageTypeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type MessageTypeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             &self.message_type
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -8164,81 +7851,43 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type EnumTypeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type EnumTypeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             &self.enum_type
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -8327,81 +7976,43 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type ServiceMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type ServiceRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             &self.service
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -8490,81 +8101,43 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type ExtensionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type ExtensionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             &self.extension
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -8644,85 +8217,46 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::FileOptionsTrait,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             ::std::option::Option::Some(&self.options)
         }
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -8794,79 +8328,40 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::SourceCodeInfoTrait,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn source_code_info_opt<'this>(
             &'this self,
@@ -8941,79 +8436,40 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeMessageType<'this> = () where Self: 'this;
+        type MessageTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>> where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceMessageType<'this> = () where Self: 'this;
+        type ServiceRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>> where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type SourceCodeInfoMessageType<'this> = () where Self: 'this;
 
         fn syntax_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.syntax.as_ref())
@@ -9391,106 +8847,71 @@ pub mod _puroro_impls {
         fn package_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::package_opt(self)
         }
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
-            ::puroro::internal::NoAllocBumpString,
-            str,
-        >;
+        type DependencyRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+        ::puroro::internal::NoAllocBumpString,str,
+    > where Self: 'this;
 
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.dependency)
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type PublicDependencyRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.public_dependency)
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::CloneThenIntoRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<i32>,
-            i32,
-            i32,
-        >;
+        type WeakDependencyRepeatedType<'this> =
+    ::puroro::CloneThenIntoRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<i32>,
+        i32,
+        i32
+    > where Self: 'this;
 
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.weak_dependency)
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<'this>;
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this [self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<
-            'this,
-        >];
+        type MessageTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<'this> where Self: 'this;
+        type MessageTypeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             unsafe { self.message_type.cast_item_unchecked() }
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<
-            'this,
-        >;
-        type EnumTypeRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<'this>];
+        type EnumTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<'this> where Self: 'this;
+        type EnumTypeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             unsafe { self.enum_type.cast_item_unchecked() }
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoBumpalo<
-            'this,
-        >;
-        type ServiceRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoBumpalo<'this>];
+        type ServiceMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoBumpalo<'this> where Self: 'this;
+        type ServiceRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             unsafe { self.service.cast_item_unchecked() }
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<
-            'this,
-        >;
-        type ExtensionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this>];
+        type ExtensionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this> where Self: 'this;
+        type ExtensionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             unsafe { self.extension.cast_item_unchecked() }
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoBumpalo<'this>;
+        type SourceCodeInfoMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoBumpalo<'this> where Self: 'this;
         fn source_code_info_opt<'this>(
             &'this self,
         ) -> Option<Self::SourceCodeInfoMessageType<'this>> {
@@ -9956,95 +9377,43 @@ pub mod _puroro_impls {
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10119,97 +9488,46 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type FieldMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type FieldRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             &self.field
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10296,97 +9614,46 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type ExtensionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type ExtensionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             &self.extension
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10473,97 +9740,46 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type NestedTypeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type NestedTypeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             &self.nested_type
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10652,97 +9868,46 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type EnumTypeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type EnumTypeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             &self.enum_type
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10834,46 +9999,46 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-    type FieldMessageType<'this> where Self: 'this = ();
-    type FieldRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+    type FieldMessageType<'this> = () where Self: 'this;
+    type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
     fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type ExtensionMessageType<'this> where Self: 'this = ();
-    type ExtensionRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+    type ExtensionMessageType<'this> = () where Self: 'this;
+    type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
     fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type NestedTypeMessageType<'this> where Self: 'this = ();
-    type NestedTypeRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+    type NestedTypeMessageType<'this> = () where Self: 'this;
+    type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
     fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type EnumTypeMessageType<'this> where Self: 'this = ();
-    type EnumTypeRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+    type EnumTypeMessageType<'this> = () where Self: 'this;
+    type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
     fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-type ExtensionRangeMessageType<'this> where Self: 'this = &'this ScalarType;
+type ExtensionRangeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type ExtensionRangeRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type ExtensionRangeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
     &self.extension_range
 }
-    type OneofDeclMessageType<'this> where Self: 'this = ();
-    type OneofDeclRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+    type OneofDeclMessageType<'this> = () where Self: 'this;
+    type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
     fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type OptionsMessageType<'this> where Self: 'this = ();
-    type ReservedRangeMessageType<'this> where Self: 'this = ();
-    type ReservedRangeRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>>;
+    type OptionsMessageType<'this> = () where Self: 'this;
+    type ReservedRangeMessageType<'this> = () where Self: 'this;
+    type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
     fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type ReservedNameRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
     fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
@@ -10965,97 +10130,46 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OneofDeclMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type OneofDeclRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             &self.oneof_decl
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -11136,101 +10250,49 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::MessageOptionsTrait,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             ::std::option::Option::Some(&self.options)
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -11314,46 +10376,46 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-    type FieldMessageType<'this> where Self: 'this = ();
-    type FieldRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+    type FieldMessageType<'this> = () where Self: 'this;
+    type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
     fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type ExtensionMessageType<'this> where Self: 'this = ();
-    type ExtensionRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+    type ExtensionMessageType<'this> = () where Self: 'this;
+    type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
     fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type NestedTypeMessageType<'this> where Self: 'this = ();
-    type NestedTypeRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+    type NestedTypeMessageType<'this> = () where Self: 'this;
+    type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
     fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type EnumTypeMessageType<'this> where Self: 'this = ();
-    type EnumTypeRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+    type EnumTypeMessageType<'this> = () where Self: 'this;
+    type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
     fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type ExtensionRangeMessageType<'this> where Self: 'this = ();
-    type ExtensionRangeRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>>;
+    type ExtensionRangeMessageType<'this> = () where Self: 'this;
+    type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
     fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type OneofDeclMessageType<'this> where Self: 'this = ();
-    type OneofDeclRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+    type OneofDeclMessageType<'this> = () where Self: 'this;
+    type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
     fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type OptionsMessageType<'this> where Self: 'this = ();
-type ReservedRangeMessageType<'this> where Self: 'this = &'this ScalarType;
+    type OptionsMessageType<'this> = () where Self: 'this;
+type ReservedRangeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type ReservedRangeRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type ReservedRangeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
     &self.reserved_range
 }
-    type ReservedNameRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
     fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
@@ -11445,96 +10507,49 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldMessageType<'this> = () where Self: 'this;
+        type FieldRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>> where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionMessageType<'this> = () where Self: 'this;
+        type ExtensionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>> where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeMessageType<'this> = () where Self: 'this;
+        type NestedTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>> where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeMessageType<'this> = () where Self: 'this;
+        type EnumTypeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>> where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeMessageType<'this> = () where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>> where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclMessageType<'this> = () where Self: 'this;
+        type OneofDeclRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>> where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
+        type ReservedNameRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,str,
+    > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.reserved_name)
@@ -11806,98 +10821,65 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::name_opt(self)
         }
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<
-            'this,
-        >;
-        type FieldRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this>];
+        type FieldMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this> where Self: 'this;
+        type FieldRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             unsafe { self.field.cast_item_unchecked() }
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<
-            'this,
-        >;
-        type ExtensionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this>];
+        type ExtensionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this> where Self: 'this;
+        type ExtensionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             unsafe { self.extension.cast_item_unchecked() }
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<'this>;
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this [self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<
-            'this,
-        >];
+        type NestedTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<'this> where Self: 'this;
+        type NestedTypeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             unsafe { self.nested_type.cast_item_unchecked() }
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<
-            'this,
-        >;
-        type EnumTypeRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<'this>];
+        type EnumTypeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<'this> where Self: 'this;
+        type EnumTypeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             unsafe { self.enum_type.cast_item_unchecked() }
         }
-        type ExtensionRangeMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeBumpalo<'this>;
-        type ExtensionRangeRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeBumpalo<'this>];
+        type ExtensionRangeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeBumpalo<'this> where Self: 'this;
+        type ExtensionRangeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeBumpalo<'this>] where Self: 'this;
 
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             unsafe { self.extension_range.cast_item_unchecked() }
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoBumpalo<
-            'this,
-        >;
-        type OneofDeclRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoBumpalo<'this>];
+        type OneofDeclMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoBumpalo<'this> where Self: 'this;
+        type OneofDeclRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             unsafe { self.oneof_decl.cast_item_unchecked() }
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
-        type ReservedRangeMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeBumpalo<'this>;
-        type ReservedRangeRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeBumpalo<'this>];
+        type ReservedRangeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeBumpalo<'this> where Self: 'this;
+        type ReservedRangeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeBumpalo<'this>] where Self: 'this;
 
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             unsafe { self.reserved_range.cast_item_unchecked() }
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
-            ::puroro::internal::NoAllocBumpString,
-            str,
-        >;
+        type ReservedNameRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+        ::puroro::internal::NoAllocBumpString,str,
+    > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.reserved_name)
@@ -12285,15 +11267,10 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -12413,14 +11390,9 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     impl<'bump> super::_puroro_traits::ExtensionRangeOptionsTrait
         for ExtensionRangeOptionsBumpalo<'bump>
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -12537,10 +11509,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -12611,10 +11580,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.number,
             )))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -12695,10 +11661,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.label,
             )))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -12784,10 +11747,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.r#type,
             )))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -12861,10 +11821,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn type_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.type_name.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -12933,10 +11890,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn extendee_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.extendee.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -13005,10 +11959,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn default_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.default_value.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -13081,10 +12032,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.oneof_index,
             )))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -13153,10 +12101,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn json_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.json_name.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -13222,10 +12167,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::FieldOptionsTrait,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
@@ -13303,10 +12245,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::Into<bool> + ::std::clone::Clone,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
 
         fn proto3_optional_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
@@ -13801,10 +12740,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn json_name_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::json_name_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
@@ -14195,10 +13131,7 @@ ScalarType:
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -14264,10 +13197,7 @@ ScalarType:
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::OneofOptionsTrait,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
@@ -14441,10 +13371,7 @@ ScalarType:
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::name_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
@@ -14579,38 +13506,18 @@ ScalarType:
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>>;
+        type ValueMessageType<'this> = () where Self: 'this;
+        type ValueRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>> where Self: 'this;
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -14688,40 +13595,21 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type ValueMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type ValueRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             &self.value
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -14805,44 +13693,24 @@ ScalarType:
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::EnumOptionsTrait,
     {
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>>;
+        type ValueMessageType<'this> = () where Self: 'this;
+        type ValueRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>> where Self: 'this;
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             ::std::option::Option::Some(&self.options)
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -14928,21 +13796,21 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-    type ValueMessageType<'this> where Self: 'this = ();
-    type ValueRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>>;
+    type ValueMessageType<'this> = () where Self: 'this;
+    type ValueRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>> where Self: 'this;
     fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    type OptionsMessageType<'this> where Self: 'this = ();
-type ReservedRangeMessageType<'this> where Self: 'this = &'this ScalarType;
+    type OptionsMessageType<'this> = () where Self: 'this;
+type ReservedRangeMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type ReservedRangeRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type ReservedRangeRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
     &self.reserved_range
 }
-    type ReservedNameRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    type ReservedNameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
     fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
@@ -15034,39 +13902,24 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>>;
+        type ValueMessageType<'this> = () where Self: 'this;
+        type ValueRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>> where Self: 'this;
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type OptionsMessageType<'this> = () where Self: 'this;
+        type ReservedRangeMessageType<'this> = () where Self: 'this;
+        type ReservedRangeRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>> where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
+        type ReservedNameRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        RepeatedType,
+        ScalarType,str,
+    > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.reserved_name)
@@ -15276,36 +14129,30 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::name_opt(self)
         }
-        type ValueMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoBumpalo<'this>;
-        type ValueRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoBumpalo<'this>];
+        type ValueMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoBumpalo<'this> where Self: 'this;
+        type ValueRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             unsafe { self.value.cast_item_unchecked() }
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
-        type ReservedRangeMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeBumpalo<'this>;
-        type ReservedRangeRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeBumpalo<'this>];
+        type ReservedRangeMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeBumpalo<'this> where Self: 'this;
+        type ReservedRangeRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeBumpalo<'this>] where Self: 'this;
 
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             unsafe { self.reserved_range.cast_item_unchecked() }
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::AsRefRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
-            ::puroro::internal::NoAllocBumpString,
-            str,
-        >;
+        type ReservedNameRepeatedType<'this> =
+    ::puroro::AsRefRepeatedField<
+        'this,
+        ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+        ::puroro::internal::NoAllocBumpString,str,
+    > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.reserved_name)
@@ -15538,10 +14385,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -15613,10 +14457,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.number,
             )))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -15683,10 +14524,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::EnumValueOptionsTrait,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
@@ -15892,12 +14730,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn number_opt<'this>(&'this self) -> Option<i32> {
             <Self>::number_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsBumpalo<
-            'this,
-        >;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
@@ -16058,21 +14891,12 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MethodMessageType<'this>>;
+        type MethodMessageType<'this> = () where Self: 'this;
+        type MethodRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MethodMessageType<'this>> where Self: 'this;
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -16147,23 +14971,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type MethodMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type MethodRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             &self.method
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -16246,21 +15062,12 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::ServiceOptionsTrait,
     {
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MethodMessageType<'this>>;
+        type MethodMessageType<'this> = () where Self: 'this;
+        type MethodRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MethodMessageType<'this>> where Self: 'this;
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
@@ -16453,22 +15260,14 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::name_opt(self)
         }
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoBumpalo<
-            'this,
-        >;
-        type MethodRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoBumpalo<'this>];
+        type MethodMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoBumpalo<'this> where Self: 'this;
+        type MethodRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoBumpalo<'this>] where Self: 'this;
 
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             unsafe { self.method.cast_item_unchecked() }
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
@@ -16640,10 +15439,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.name.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -16712,10 +15508,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn input_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.input_type.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -16784,10 +15577,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn output_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.output_type.as_ref())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -16853,10 +15643,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::MethodOptionsTrait,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
 
         fn options_opt<'this>(
             &'this self,
@@ -16934,10 +15721,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::Into<bool> + ::std::clone::Clone,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
 
         fn client_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
@@ -17013,10 +15797,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::Into<bool> + ::std::clone::Clone,
     {
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ();
+        type OptionsMessageType<'this> = () where Self: 'this;
 
         fn server_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
@@ -17316,10 +16097,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn output_type_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::output_type_opt(self)
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsBumpalo<'this>;
+        type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsBumpalo<'this> where Self: 'this;
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             <Self>::options_opt(self)
         }
@@ -17580,16 +16358,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn java_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.java_package.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -17661,16 +16431,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn java_outer_classname_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.java_outer_classname.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -17744,16 +16506,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.java_multiple_files,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -17828,16 +16582,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.java_generate_equals_and_hash,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -17913,16 +16659,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.java_string_check_utf8,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18007,16 +16745,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.optimize_for,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18093,16 +16823,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn go_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.go_package.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18175,16 +16897,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.cc_generic_services,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18259,16 +16973,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.java_generic_services,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18343,16 +17049,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.py_generic_services,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18427,16 +17125,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.php_generic_services,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18511,16 +17201,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18593,16 +17275,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 &self.cc_enable_arenas,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18675,16 +17349,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn objc_class_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.objc_class_prefix.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18757,16 +17423,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn csharp_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.csharp_namespace.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18839,16 +17497,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn swift_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.swift_prefix.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -18921,16 +17571,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn php_class_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.php_class_prefix.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -19003,16 +17645,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn php_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.php_namespace.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -19085,16 +17719,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn php_metadata_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.php_metadata_namespace.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -19167,16 +17793,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn ruby_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.ruby_package.as_ref())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -19255,15 +17873,10 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -20065,14 +18678,9 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         fn ruby_package_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::ruby_package_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -20771,16 +19379,8 @@ ScalarType:
                 &self.message_set_wire_format,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -20858,16 +19458,8 @@ ScalarType:
                 &self.no_standard_descriptor_accessor,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -20944,16 +19536,8 @@ ScalarType:
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -21027,16 +19611,8 @@ ScalarType:
                 &self.map_entry,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -21113,15 +19689,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -21367,14 +19938,9 @@ ScalarType:
         fn map_entry_opt<'this>(&'this self) -> Option<bool> {
             <Self>::map_entry_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -21605,16 +20171,8 @@ ScalarType:
                 &self.ctype,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -21695,16 +20253,8 @@ ScalarType:
                 &self.packed,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -21787,16 +20337,8 @@ ScalarType:
                 &self.jstype,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -21877,16 +20419,8 @@ ScalarType:
                 &self.lazy,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -21959,16 +20493,8 @@ ScalarType:
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -22041,16 +20567,8 @@ ScalarType:
                 &self.weak,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -22127,15 +20645,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -22475,14 +20988,9 @@ ScalarType:
         fn weak_opt<'this>(&'this self) -> Option<bool> {
             <Self>::weak_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -22754,15 +21262,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -22878,14 +21381,9 @@ ScalarType:
     }
 
     impl<'bump> super::_puroro_traits::OneofOptionsTrait for OneofOptionsBumpalo<'bump> {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -22995,16 +21493,8 @@ ScalarType:
                 &self.allow_alias,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -23076,16 +21566,8 @@ ScalarType:
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -23161,15 +21643,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -23349,14 +21826,9 @@ ScalarType:
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <Self>::deprecated_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -23519,16 +21991,8 @@ ScalarType:
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -23605,15 +22069,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -23762,14 +22221,9 @@ ScalarType:
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <Self>::deprecated_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -23907,16 +22361,8 @@ ScalarType:
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -23993,15 +22439,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -24149,14 +22590,9 @@ ScalarType:
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <Self>::deprecated_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -24292,16 +22728,8 @@ ScalarType:
                 &self.deprecated,
             )))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -24383,8 +22811,8 @@ fn idempotency_level_opt<'this>(&'this self) -> ::std::option::Option<self::_pur
         ::std::convert::Into::into(::std::clone::Clone::clone(&self.idempotency_level))
     )
 }
-    type UninterpretedOptionMessageType<'this> where Self: 'this = ();
-    type UninterpretedOptionRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>;
+    type UninterpretedOptionMessageType<'this> = () where Self: 'this;
+    type UninterpretedOptionRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>> where Self: 'this;
     fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
@@ -24468,15 +22896,10 @@ ScalarType:
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
+        type UninterpretedOptionMessageType<'this> = &'this ScalarType where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -24671,14 +23094,9 @@ ScalarType:
         > {
             <Self>::idempotency_level_opt(self)
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<
-            'this,
-        >;
-        type UninterpretedOptionRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>];
+        type UninterpretedOptionMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this> where Self: 'this;
+        type UninterpretedOptionRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionBumpalo<'this>] where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -24851,10 +23269,10 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-type NameMessageType<'this> where Self: 'this = &'this ScalarType;
+type NameMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type NameRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type NameRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
     &self.name
@@ -24941,14 +23359,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameMessageType<'this> = () where Self: 'this;
+        type NameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>> where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -25025,14 +23437,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::Into<u64> + ::std::clone::Clone,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameMessageType<'this> = () where Self: 'this;
+        type NameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>> where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -25111,14 +23517,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::Into<i64> + ::std::clone::Clone,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameMessageType<'this> = () where Self: 'this;
+        type NameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>> where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -25197,14 +23597,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::Into<f64> + ::std::clone::Clone,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameMessageType<'this> = () where Self: 'this;
+        type NameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>> where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -25281,14 +23675,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::AsRef<[u8]>,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameMessageType<'this> = () where Self: 'this;
+        type NameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>> where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -25363,14 +23751,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameMessageType<'this> = () where Self: 'this;
+        type NameRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>> where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -25658,9 +24040,9 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     }
 
     impl<'bump> super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionBumpalo<'bump> {
-        type NameMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartBumpalo<'this>;
-        type NameRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartBumpalo<'this>];
+        type NameMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartBumpalo<'this> where Self: 'this;
+        type NameRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartBumpalo<'this>] where Self: 'this;
 
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             unsafe { self.name.cast_item_unchecked() }
@@ -25982,10 +24364,10 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-type LocationMessageType<'this> where Self: 'this = &'this ScalarType;
+type LocationMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type LocationRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type LocationRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
     &self.location
@@ -26099,9 +24481,9 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     }
 
     impl<'bump> super::_puroro_traits::SourceCodeInfoTrait for SourceCodeInfoBumpalo<'bump> {
-        type LocationMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationBumpalo<'this>;
-        type LocationRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationBumpalo<'this>];
+        type LocationMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationBumpalo<'this> where Self: 'this;
+        type LocationRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationBumpalo<'this>] where Self: 'this;
 
         fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
             unsafe { self.location.cast_item_unchecked() }
@@ -26215,10 +24597,10 @@ ScalarType:
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {
-type AnnotationMessageType<'this> where Self: 'this = &'this ScalarType;
+type AnnotationMessageType<'this> = &'this ScalarType where Self: 'this;
 
-type AnnotationRepeatedType<'this> where Self: 'this =
-    &'this RepeatedType;
+type AnnotationRepeatedType<'this> =
+    &'this RepeatedType where Self: 'this;
 
 fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
     &self.annotation
@@ -26333,9 +24715,9 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     }
 
     impl<'bump> super::_puroro_traits::GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo<'bump> {
-        type AnnotationMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationBumpalo<'this>;
-        type AnnotationRepeatedType<'this> where Self: 'this =
-    &'this [self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationBumpalo<'this>];
+        type AnnotationMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationBumpalo<'this> where Self: 'this;
+        type AnnotationRepeatedType<'this> =
+    &'this [self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationBumpalo<'this>] where Self: 'this;
 
         fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
             unsafe { self.annotation.cast_item_unchecked() }
@@ -26440,15 +24822,9 @@ pub mod _puroro_traits {
 
     macro_rules! file_descriptor_set_delegate {
         ($ty:ty) => {
-            type FileMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FileMessageType<'this>;
+            type FileMessageType<'this> = <$ty>::FileMessageType<'this> where Self: 'this;
 
-            type FileRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FileRepeatedType<'this>;
+            type FileRepeatedType<'this> = <$ty>::FileRepeatedType<'this> where Self: 'this;
             fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
                 (**self).file()
             }
@@ -26494,10 +24870,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>;
+        type FileRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FileMessageType<'this>>
+            where Self: 'this;
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -26507,20 +24882,15 @@ pub mod _puroro_traits {
         T: FileDescriptorSetTrait,
         U: FileDescriptorSetTrait,
     {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type FileMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorSetTrait>::FileMessageType<'this>,
             <U as FileDescriptorSetTrait>::FileMessageType<'this>,
-        >;
+        > where Self: 'this;
         type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FileDescriptorSetTrait>::FileRepeatedType<'this>,
-            <U as FileDescriptorSetTrait>::FileRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FileDescriptorSetTrait>::FileRepeatedType<'this>,
+                <U as FileDescriptorSetTrait>::FileRepeatedType<'this>,
+            > where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -26534,20 +24904,15 @@ pub mod _puroro_traits {
         T: FileDescriptorSetTrait,
         U: FileDescriptorSetTrait,
     {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type FileMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorSetTrait>::FileMessageType<'this>,
             <U as FileDescriptorSetTrait>::FileMessageType<'this>,
-        >;
+        > where Self: 'this;
         type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FileDescriptorSetTrait>::FileRepeatedType<'this>,
-            <U as FileDescriptorSetTrait>::FileRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FileDescriptorSetTrait>::FileRepeatedType<'this>,
+                <U as FileDescriptorSetTrait>::FileRepeatedType<'this>,
+            > where Self: 'this;
 
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -26561,15 +24926,12 @@ pub mod _puroro_traits {
     where
         T: FileDescriptorSetTrait,
     {
-        type FileMessageType<'this>
-        where
-            Self: 'this,
-        = T::FileMessageType<'this>;
+        type FileMessageType<'this> = T::FileMessageType<'this> where Self: 'this;
 
-        type FileRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::FileRepeatedType<'this>>;
+        type FileRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::FileRepeatedType<'this>
+            > where Self: 'this;
         fn file<'this>(&'this self) -> Self::FileRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.file()),
@@ -26695,6 +25057,7 @@ pub mod _puroro_traits {
 
     macro_rules! file_descriptor_proto_delegate {
         ($ty:ty) => {
+
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
@@ -26703,95 +25066,52 @@ pub mod _puroro_traits {
                 (**self).package_opt()
             }
 
-            type DependencyRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::DependencyRepeatedType<'this>;
+            type DependencyRepeatedType<'this> = <$ty>::DependencyRepeatedType<'this> where Self: 'this;
             fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
                 (**self).dependency()
             }
 
-            type PublicDependencyRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::PublicDependencyRepeatedType<'this>;
+            type PublicDependencyRepeatedType<'this> = <$ty>::PublicDependencyRepeatedType<'this> where Self: 'this;
             fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
                 (**self).public_dependency()
             }
 
-            type WeakDependencyRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::WeakDependencyRepeatedType<'this>;
+            type WeakDependencyRepeatedType<'this> = <$ty>::WeakDependencyRepeatedType<'this> where Self: 'this;
             fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
                 (**self).weak_dependency()
             }
-            type MessageTypeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::MessageTypeMessageType<'this>;
+            type MessageTypeMessageType<'this> = <$ty>::MessageTypeMessageType<'this> where Self: 'this;
 
-            type MessageTypeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::MessageTypeRepeatedType<'this>;
+            type MessageTypeRepeatedType<'this> = <$ty>::MessageTypeRepeatedType<'this> where Self: 'this;
             fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
                 (**self).message_type()
             }
-            type EnumTypeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::EnumTypeMessageType<'this>;
+            type EnumTypeMessageType<'this> = <$ty>::EnumTypeMessageType<'this> where Self: 'this;
 
-            type EnumTypeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::EnumTypeRepeatedType<'this>;
+            type EnumTypeRepeatedType<'this> = <$ty>::EnumTypeRepeatedType<'this> where Self: 'this;
             fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
                 (**self).enum_type()
             }
-            type ServiceMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ServiceMessageType<'this>;
+            type ServiceMessageType<'this> = <$ty>::ServiceMessageType<'this> where Self: 'this;
 
-            type ServiceRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ServiceRepeatedType<'this>;
+            type ServiceRepeatedType<'this> = <$ty>::ServiceRepeatedType<'this> where Self: 'this;
             fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
                 (**self).service()
             }
-            type ExtensionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExtensionMessageType<'this>;
+            type ExtensionMessageType<'this> = <$ty>::ExtensionMessageType<'this> where Self: 'this;
 
-            type ExtensionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExtensionRepeatedType<'this>;
+            type ExtensionRepeatedType<'this> = <$ty>::ExtensionRepeatedType<'this> where Self: 'this;
             fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
                 (**self).extension()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
-            fn options_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
+            fn options_opt<'this>(&'this self) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
                 (**self).options_opt()
             }
-            type SourceCodeInfoMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::SourceCodeInfoMessageType<'this>;
+            type SourceCodeInfoMessageType<'this> = <$ty>::SourceCodeInfoMessageType<'this> where Self: 'this;
 
-            fn source_code_info_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::SourceCodeInfoMessageType<'this>> {
+            fn source_code_info_opt<'this>(&'this self) -> ::std::option::Option<Self::SourceCodeInfoMessageType<'this>> {
                 (**self).source_code_info_opt()
             }
 
@@ -26836,24 +25156,21 @@ pub mod _puroro_traits {
         file_descriptor_proto_delegate!(T);
     }
     impl FileDescriptorProtoTrait for () {
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type DependencyRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>
+            where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type PublicDependencyRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type WeakDependencyRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+            where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -26861,10 +25178,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>;
+        type MessageTypeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MessageTypeMessageType<'this>>
+            where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -26872,10 +25188,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>
+            where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -26883,10 +25198,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>;
+        type ServiceRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ServiceMessageType<'this>>
+            where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -26894,10 +25208,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>
+            where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -26925,12 +25238,10 @@ pub mod _puroro_traits {
                 .or_else(|| <T as FileDescriptorProtoTrait>::package_opt(&self.0))
         }
         type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
+            > where Self: 'this;
 
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -26939,12 +25250,10 @@ pub mod _puroro_traits {
             )
         }
         type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
+            > where Self: 'this;
 
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -26953,12 +25262,10 @@ pub mod _puroro_traits {
             )
         }
         type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
+            > where Self: 'this;
 
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -26966,20 +25273,15 @@ pub mod _puroro_traits {
                 <U as FileDescriptorProtoTrait>::weak_dependency(&self.1),
             )
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type MessageTypeMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::MessageTypeMessageType<'this>,
             <U as FileDescriptorProtoTrait>::MessageTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -26987,20 +25289,15 @@ pub mod _puroro_traits {
                 <U as FileDescriptorProtoTrait>::message_type(&self.1),
             )
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type EnumTypeMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::EnumTypeMessageType<'this>,
             <U as FileDescriptorProtoTrait>::EnumTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27008,20 +25305,15 @@ pub mod _puroro_traits {
                 <U as FileDescriptorProtoTrait>::enum_type(&self.1),
             )
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ServiceMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::ServiceMessageType<'this>,
             <U as FileDescriptorProtoTrait>::ServiceMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
+            > where Self: 'this;
 
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27029,20 +25321,15 @@ pub mod _puroro_traits {
                 <U as FileDescriptorProtoTrait>::service(&self.1),
             )
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ExtensionMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::ExtensionMessageType<'this>,
             <U as FileDescriptorProtoTrait>::ExtensionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27050,13 +25337,10 @@ pub mod _puroro_traits {
                 <U as FileDescriptorProtoTrait>::extension(&self.1),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as FileDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as FileDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -27069,17 +25353,10 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = (
-            ::std::option::Option<
-                <T as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>,
-            >,
-            ::std::option::Option<
-                <U as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>,
-            >,
-        );
+        type SourceCodeInfoMessageType<'this> = (
+            ::std::option::Option<<T as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>>,
+            ::std::option::Option<<U as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>>,
+        ) where Self: 'this;
 
         fn source_code_info_opt<'this>(
             &'this self,
@@ -27118,12 +25395,10 @@ pub mod _puroro_traits {
             )
         }
         type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::DependencyRepeatedType<'this>,
+            > where Self: 'this;
 
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -27133,12 +25408,10 @@ pub mod _puroro_traits {
             )
         }
         type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::PublicDependencyRepeatedType<'this>,
+            > where Self: 'this;
 
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -27148,12 +25421,10 @@ pub mod _puroro_traits {
             )
         }
         type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::WeakDependencyRepeatedType<'this>,
+            > where Self: 'this;
 
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -27162,20 +25433,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as FileDescriptorProtoTrait>::weak_dependency(u)),
             )
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type MessageTypeMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::MessageTypeMessageType<'this>,
             <U as FileDescriptorProtoTrait>::MessageTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::MessageTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -27184,20 +25450,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as FileDescriptorProtoTrait>::message_type(u)),
             )
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type EnumTypeMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::EnumTypeMessageType<'this>,
             <U as FileDescriptorProtoTrait>::EnumTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -27206,20 +25467,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as FileDescriptorProtoTrait>::enum_type(u)),
             )
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ServiceMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::ServiceMessageType<'this>,
             <U as FileDescriptorProtoTrait>::ServiceMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::ServiceRepeatedType<'this>,
+            > where Self: 'this;
 
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -27228,20 +25484,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as FileDescriptorProtoTrait>::service(u)),
             )
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ExtensionMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::ExtensionMessageType<'this>,
             <U as FileDescriptorProtoTrait>::ExtensionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-            <U as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+                <U as FileDescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -27250,13 +25501,10 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as FileDescriptorProtoTrait>::extension(u)),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as FileDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -27271,13 +25519,10 @@ pub mod _puroro_traits {
                 },
             )
         }
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type SourceCodeInfoMessageType<'this> = ::puroro::Either<
             <T as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>,
             <U as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn source_code_info_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SourceCodeInfoMessageType<'this>> {
@@ -27310,108 +25555,86 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.package_opt())
         }
 
-        type DependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::DependencyRepeatedType<'this>>;
+        type DependencyRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::DependencyRepeatedType<'this>
+            > where Self: 'this;
         fn dependency<'this>(&'this self) -> Self::DependencyRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.dependency()),
             )
         }
 
-        type PublicDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::PublicDependencyRepeatedType<'this>,
-        >;
+        type PublicDependencyRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::PublicDependencyRepeatedType<'this>
+            > where Self: 'this;
         fn public_dependency<'this>(&'this self) -> Self::PublicDependencyRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.public_dependency()),
             )
         }
 
-        type WeakDependencyRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::WeakDependencyRepeatedType<'this>,
-        >;
+        type WeakDependencyRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::WeakDependencyRepeatedType<'this>
+            > where Self: 'this;
         fn weak_dependency<'this>(&'this self) -> Self::WeakDependencyRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.weak_dependency()),
             )
         }
-        type MessageTypeMessageType<'this>
-        where
-            Self: 'this,
-        = T::MessageTypeMessageType<'this>;
+        type MessageTypeMessageType<'this> = T::MessageTypeMessageType<'this> where Self: 'this;
 
-        type MessageTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::MessageTypeRepeatedType<'this>>;
+        type MessageTypeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::MessageTypeRepeatedType<'this>
+            > where Self: 'this;
         fn message_type<'this>(&'this self) -> Self::MessageTypeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.message_type()),
             )
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = T::EnumTypeMessageType<'this>;
+        type EnumTypeMessageType<'this> = T::EnumTypeMessageType<'this> where Self: 'this;
 
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::EnumTypeRepeatedType<'this>>;
+        type EnumTypeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::EnumTypeRepeatedType<'this>
+            > where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.enum_type()),
             )
         }
-        type ServiceMessageType<'this>
-        where
-            Self: 'this,
-        = T::ServiceMessageType<'this>;
+        type ServiceMessageType<'this> = T::ServiceMessageType<'this> where Self: 'this;
 
-        type ServiceRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::ServiceRepeatedType<'this>>;
+        type ServiceRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ServiceRepeatedType<'this>
+            > where Self: 'this;
         fn service<'this>(&'this self) -> Self::ServiceRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.service()),
             )
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = T::ExtensionMessageType<'this>;
+        type ExtensionMessageType<'this> = T::ExtensionMessageType<'this> where Self: 'this;
 
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::ExtensionRepeatedType<'this>>;
+        type ExtensionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ExtensionRepeatedType<'this>
+            > where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.extension()),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.options_opt())
         }
-        type SourceCodeInfoMessageType<'this>
-        where
-            Self: 'this,
-        = T::SourceCodeInfoMessageType<'this>;
+        type SourceCodeInfoMessageType<'this> = T::SourceCodeInfoMessageType<'this> where Self: 'this;
         fn source_code_info_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SourceCodeInfoMessageType<'this>> {
@@ -27514,108 +25737,59 @@ pub mod _puroro_traits {
 
     macro_rules! descriptor_proto_delegate {
         ($ty:ty) => {
+
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
-            type FieldMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FieldMessageType<'this>;
+            type FieldMessageType<'this> = <$ty>::FieldMessageType<'this> where Self: 'this;
 
-            type FieldRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::FieldRepeatedType<'this>;
+            type FieldRepeatedType<'this> = <$ty>::FieldRepeatedType<'this> where Self: 'this;
             fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
                 (**self).field()
             }
-            type ExtensionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExtensionMessageType<'this>;
+            type ExtensionMessageType<'this> = <$ty>::ExtensionMessageType<'this> where Self: 'this;
 
-            type ExtensionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExtensionRepeatedType<'this>;
+            type ExtensionRepeatedType<'this> = <$ty>::ExtensionRepeatedType<'this> where Self: 'this;
             fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
                 (**self).extension()
             }
-            type NestedTypeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::NestedTypeMessageType<'this>;
+            type NestedTypeMessageType<'this> = <$ty>::NestedTypeMessageType<'this> where Self: 'this;
 
-            type NestedTypeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::NestedTypeRepeatedType<'this>;
+            type NestedTypeRepeatedType<'this> = <$ty>::NestedTypeRepeatedType<'this> where Self: 'this;
             fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
                 (**self).nested_type()
             }
-            type EnumTypeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::EnumTypeMessageType<'this>;
+            type EnumTypeMessageType<'this> = <$ty>::EnumTypeMessageType<'this> where Self: 'this;
 
-            type EnumTypeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::EnumTypeRepeatedType<'this>;
+            type EnumTypeRepeatedType<'this> = <$ty>::EnumTypeRepeatedType<'this> where Self: 'this;
             fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
                 (**self).enum_type()
             }
-            type ExtensionRangeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExtensionRangeMessageType<'this>;
+            type ExtensionRangeMessageType<'this> = <$ty>::ExtensionRangeMessageType<'this> where Self: 'this;
 
-            type ExtensionRangeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ExtensionRangeRepeatedType<'this>;
+            type ExtensionRangeRepeatedType<'this> = <$ty>::ExtensionRangeRepeatedType<'this> where Self: 'this;
             fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
                 (**self).extension_range()
             }
-            type OneofDeclMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OneofDeclMessageType<'this>;
+            type OneofDeclMessageType<'this> = <$ty>::OneofDeclMessageType<'this> where Self: 'this;
 
-            type OneofDeclRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OneofDeclRepeatedType<'this>;
+            type OneofDeclRepeatedType<'this> = <$ty>::OneofDeclRepeatedType<'this> where Self: 'this;
             fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
                 (**self).oneof_decl()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
-            fn options_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
+            fn options_opt<'this>(&'this self) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
                 (**self).options_opt()
             }
-            type ReservedRangeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ReservedRangeMessageType<'this>;
+            type ReservedRangeMessageType<'this> = <$ty>::ReservedRangeMessageType<'this> where Self: 'this;
 
-            type ReservedRangeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ReservedRangeRepeatedType<'this>;
+            type ReservedRangeRepeatedType<'this> = <$ty>::ReservedRangeRepeatedType<'this> where Self: 'this;
             fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
                 (**self).reserved_range()
             }
 
-            type ReservedNameRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ReservedNameRepeatedType<'this>;
+            type ReservedNameRepeatedType<'this> = <$ty>::ReservedNameRepeatedType<'this> where Self: 'this;
             fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
                 (**self).reserved_name()
             }
@@ -27661,10 +25835,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>;
+        type FieldRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::FieldMessageType<'this>>
+            where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27672,10 +25845,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>;
+        type ExtensionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionMessageType<'this>>
+            where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27683,10 +25855,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>;
+        type NestedTypeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NestedTypeMessageType<'this>>
+            where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27694,10 +25865,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>;
+        type EnumTypeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::EnumTypeMessageType<'this>>
+            where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27705,12 +25875,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ExtensionRangeMessageType<'this>,
-        >;
+        type ExtensionRangeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ExtensionRangeMessageType<'this>>
+            where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27718,10 +25885,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>;
+        type OneofDeclRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::OneofDeclMessageType<'this>>
+            where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27733,19 +25899,15 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type ReservedRangeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>>
+            where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>
+            where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -27759,20 +25921,15 @@ pub mod _puroro_traits {
             <U as DescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as DescriptorProtoTrait>::name_opt(&self.0))
         }
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type FieldMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::FieldMessageType<'this>,
             <U as DescriptorProtoTrait>::FieldMessageType<'this>,
-        >;
+        > where Self: 'this;
         type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::FieldRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::FieldRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::FieldRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::FieldRepeatedType<'this>,
+            > where Self: 'this;
 
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27780,20 +25937,15 @@ pub mod _puroro_traits {
                 <U as DescriptorProtoTrait>::field(&self.1),
             )
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ExtensionMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::ExtensionMessageType<'this>,
             <U as DescriptorProtoTrait>::ExtensionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27801,20 +25953,15 @@ pub mod _puroro_traits {
                 <U as DescriptorProtoTrait>::extension(&self.1),
             )
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type NestedTypeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::NestedTypeMessageType<'this>,
             <U as DescriptorProtoTrait>::NestedTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27822,20 +25969,15 @@ pub mod _puroro_traits {
                 <U as DescriptorProtoTrait>::nested_type(&self.1),
             )
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type EnumTypeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::EnumTypeMessageType<'this>,
             <U as DescriptorProtoTrait>::EnumTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27843,20 +25985,15 @@ pub mod _puroro_traits {
                 <U as DescriptorProtoTrait>::enum_type(&self.1),
             )
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ExtensionRangeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::ExtensionRangeMessageType<'this>,
             <U as DescriptorProtoTrait>::ExtensionRangeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27864,20 +26001,15 @@ pub mod _puroro_traits {
                 <U as DescriptorProtoTrait>::extension_range(&self.1),
             )
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OneofDeclMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::OneofDeclMessageType<'this>,
             <U as DescriptorProtoTrait>::OneofDeclMessageType<'this>,
-        >;
+        > where Self: 'this;
         type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
+            > where Self: 'this;
 
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27885,13 +26017,10 @@ pub mod _puroro_traits {
                 <U as DescriptorProtoTrait>::oneof_decl(&self.1),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as DescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as DescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -27904,20 +26033,15 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ReservedRangeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::ReservedRangeMessageType<'this>,
             <U as DescriptorProtoTrait>::ReservedRangeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -27926,12 +26050,10 @@ pub mod _puroro_traits {
             )
         }
         type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -27951,20 +26073,15 @@ pub mod _puroro_traits {
                 |u| <U as DescriptorProtoTrait>::name_opt(u),
             )
         }
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type FieldMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::FieldMessageType<'this>,
             <U as DescriptorProtoTrait>::FieldMessageType<'this>,
-        >;
+        > where Self: 'this;
         type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::FieldRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::FieldRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::FieldRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::FieldRepeatedType<'this>,
+            > where Self: 'this;
 
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -27973,20 +26090,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as DescriptorProtoTrait>::field(u)),
             )
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ExtensionMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::ExtensionMessageType<'this>,
             <U as DescriptorProtoTrait>::ExtensionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ExtensionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -27995,20 +26107,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as DescriptorProtoTrait>::extension(u)),
             )
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type NestedTypeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::NestedTypeMessageType<'this>,
             <U as DescriptorProtoTrait>::NestedTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::NestedTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -28017,20 +26124,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as DescriptorProtoTrait>::nested_type(u)),
             )
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type EnumTypeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::EnumTypeMessageType<'this>,
             <U as DescriptorProtoTrait>::EnumTypeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::EnumTypeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -28039,20 +26141,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as DescriptorProtoTrait>::enum_type(u)),
             )
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ExtensionRangeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::ExtensionRangeMessageType<'this>,
             <U as DescriptorProtoTrait>::ExtensionRangeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ExtensionRangeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -28061,20 +26158,15 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as DescriptorProtoTrait>::extension_range(u)),
             )
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OneofDeclMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::OneofDeclMessageType<'this>,
             <U as DescriptorProtoTrait>::OneofDeclMessageType<'this>,
-        >;
+        > where Self: 'this;
         type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::OneofDeclRepeatedType<'this>,
+            > where Self: 'this;
 
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -28083,13 +26175,10 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as DescriptorProtoTrait>::oneof_decl(u)),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as DescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28098,20 +26187,15 @@ pub mod _puroro_traits {
                 |u| <U as DescriptorProtoTrait>::options_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ReservedRangeMessageType<'this> = ::puroro::Either<
             <T as DescriptorProtoTrait>::ReservedRangeMessageType<'this>,
             <U as DescriptorProtoTrait>::ReservedRangeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -28121,12 +26205,10 @@ pub mod _puroro_traits {
             )
         }
         type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-            <U as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+                <U as DescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -28143,124 +26225,94 @@ pub mod _puroro_traits {
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.name_opt())
         }
-        type FieldMessageType<'this>
-        where
-            Self: 'this,
-        = T::FieldMessageType<'this>;
+        type FieldMessageType<'this> = T::FieldMessageType<'this> where Self: 'this;
 
-        type FieldRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::FieldRepeatedType<'this>>;
+        type FieldRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::FieldRepeatedType<'this>
+            > where Self: 'this;
         fn field<'this>(&'this self) -> Self::FieldRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.field()),
             )
         }
-        type ExtensionMessageType<'this>
-        where
-            Self: 'this,
-        = T::ExtensionMessageType<'this>;
+        type ExtensionMessageType<'this> = T::ExtensionMessageType<'this> where Self: 'this;
 
-        type ExtensionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::ExtensionRepeatedType<'this>>;
+        type ExtensionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ExtensionRepeatedType<'this>
+            > where Self: 'this;
         fn extension<'this>(&'this self) -> Self::ExtensionRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.extension()),
             )
         }
-        type NestedTypeMessageType<'this>
-        where
-            Self: 'this,
-        = T::NestedTypeMessageType<'this>;
+        type NestedTypeMessageType<'this> = T::NestedTypeMessageType<'this> where Self: 'this;
 
-        type NestedTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::NestedTypeRepeatedType<'this>>;
+        type NestedTypeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::NestedTypeRepeatedType<'this>
+            > where Self: 'this;
         fn nested_type<'this>(&'this self) -> Self::NestedTypeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.nested_type()),
             )
         }
-        type EnumTypeMessageType<'this>
-        where
-            Self: 'this,
-        = T::EnumTypeMessageType<'this>;
+        type EnumTypeMessageType<'this> = T::EnumTypeMessageType<'this> where Self: 'this;
 
-        type EnumTypeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::EnumTypeRepeatedType<'this>>;
+        type EnumTypeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::EnumTypeRepeatedType<'this>
+            > where Self: 'this;
         fn enum_type<'this>(&'this self) -> Self::EnumTypeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.enum_type()),
             )
         }
-        type ExtensionRangeMessageType<'this>
-        where
-            Self: 'this,
-        = T::ExtensionRangeMessageType<'this>;
+        type ExtensionRangeMessageType<'this> = T::ExtensionRangeMessageType<'this> where Self: 'this;
 
-        type ExtensionRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ExtensionRangeRepeatedType<'this>,
-        >;
+        type ExtensionRangeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ExtensionRangeRepeatedType<'this>
+            > where Self: 'this;
         fn extension_range<'this>(&'this self) -> Self::ExtensionRangeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.extension_range()),
             )
         }
-        type OneofDeclMessageType<'this>
-        where
-            Self: 'this,
-        = T::OneofDeclMessageType<'this>;
+        type OneofDeclMessageType<'this> = T::OneofDeclMessageType<'this> where Self: 'this;
 
-        type OneofDeclRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::OneofDeclRepeatedType<'this>>;
+        type OneofDeclRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::OneofDeclRepeatedType<'this>
+            > where Self: 'this;
         fn oneof_decl<'this>(&'this self) -> Self::OneofDeclRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.oneof_decl()),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.options_opt())
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = T::ReservedRangeMessageType<'this>;
+        type ReservedRangeMessageType<'this> = T::ReservedRangeMessageType<'this> where Self: 'this;
 
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ReservedRangeRepeatedType<'this>,
-        >;
+        type ReservedRangeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ReservedRangeRepeatedType<'this>
+            > where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.reserved_range()),
             )
         }
 
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ReservedNameRepeatedType<'this>,
-        >;
+        type ReservedNameRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ReservedNameRepeatedType<'this>
+            > where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.reserved_name()),
@@ -28282,18 +26334,10 @@ pub mod _puroro_traits {
 
     macro_rules! extension_range_options_delegate {
         ($ty:ty) => {
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -28338,12 +26382,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -28355,20 +26396,15 @@ pub mod _puroro_traits {
         T: ExtensionRangeOptionsTrait,
         U: ExtensionRangeOptionsTrait,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as ExtensionRangeOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as ExtensionRangeOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -28384,20 +26420,15 @@ pub mod _puroro_traits {
         T: ExtensionRangeOptionsTrait,
         U: ExtensionRangeOptionsTrait,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as ExtensionRangeOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as ExtensionRangeOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as ExtensionRangeOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -28413,17 +26444,12 @@ pub mod _puroro_traits {
     where
         T: ExtensionRangeOptionsTrait,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -28619,10 +26645,7 @@ pub mod _puroro_traits {
             fn json_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).json_name_opt()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
             fn options_opt<'this>(
                 &'this self,
@@ -28733,13 +26756,10 @@ pub mod _puroro_traits {
             <U as FieldDescriptorProtoTrait>::json_name_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::json_name_opt(&self.0))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as FieldDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as FieldDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -28825,13 +26845,10 @@ pub mod _puroro_traits {
                 |u| <U as FieldDescriptorProtoTrait>::json_name_opt(u),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as FieldDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as FieldDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28892,10 +26909,7 @@ pub mod _puroro_traits {
         fn json_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.json_name_opt())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28939,10 +26953,7 @@ pub mod _puroro_traits {
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
             fn options_opt<'this>(
                 &'this self,
@@ -29001,13 +27012,10 @@ pub mod _puroro_traits {
             <U as OneofDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as OneofDescriptorProtoTrait>::name_opt(&self.0))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as OneofDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as OneofDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -29032,13 +27040,10 @@ pub mod _puroro_traits {
                 |u| <U as OneofDescriptorProtoTrait>::name_opt(u),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as OneofDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as OneofDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29061,10 +27066,7 @@ pub mod _puroro_traits {
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.name_opt())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29124,48 +27126,29 @@ pub mod _puroro_traits {
 
     macro_rules! enum_descriptor_proto_delegate {
         ($ty:ty) => {
+
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
-            type ValueMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ValueMessageType<'this>;
+            type ValueMessageType<'this> = <$ty>::ValueMessageType<'this> where Self: 'this;
 
-            type ValueRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ValueRepeatedType<'this>;
+            type ValueRepeatedType<'this> = <$ty>::ValueRepeatedType<'this> where Self: 'this;
             fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
                 (**self).value()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
-            fn options_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
+            fn options_opt<'this>(&'this self) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
                 (**self).options_opt()
             }
-            type ReservedRangeMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ReservedRangeMessageType<'this>;
+            type ReservedRangeMessageType<'this> = <$ty>::ReservedRangeMessageType<'this> where Self: 'this;
 
-            type ReservedRangeRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ReservedRangeRepeatedType<'this>;
+            type ReservedRangeRepeatedType<'this> = <$ty>::ReservedRangeRepeatedType<'this> where Self: 'this;
             fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
                 (**self).reserved_range()
             }
 
-            type ReservedNameRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::ReservedNameRepeatedType<'this>;
+            type ReservedNameRepeatedType<'this> = <$ty>::ReservedNameRepeatedType<'this> where Self: 'this;
             fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
                 (**self).reserved_name()
             }
@@ -29211,10 +27194,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>>;
+        type ValueRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ValueMessageType<'this>>
+            where Self: 'this;
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -29226,19 +27208,15 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::ReservedRangeMessageType<'this>,
-        >;
+        type ReservedRangeRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::ReservedRangeMessageType<'this>>
+            where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        type ReservedNameRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>
+            where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -29252,20 +27230,15 @@ pub mod _puroro_traits {
             <U as EnumDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as EnumDescriptorProtoTrait>::name_opt(&self.0))
         }
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ValueMessageType<'this> = ::puroro::Either<
             <T as EnumDescriptorProtoTrait>::ValueMessageType<'this>,
             <U as EnumDescriptorProtoTrait>::ValueMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
-            <U as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
+                <U as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
+            > where Self: 'this;
 
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -29273,13 +27246,10 @@ pub mod _puroro_traits {
                 <U as EnumDescriptorProtoTrait>::value(&self.1),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as EnumDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as EnumDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -29292,20 +27262,15 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ReservedRangeMessageType<'this> = ::puroro::Either<
             <T as EnumDescriptorProtoTrait>::ReservedRangeMessageType<'this>,
             <U as EnumDescriptorProtoTrait>::ReservedRangeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-            <U as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+                <U as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -29314,12 +27279,10 @@ pub mod _puroro_traits {
             )
         }
         type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-            <U as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedField<
+                <T as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+                <U as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -29339,20 +27302,15 @@ pub mod _puroro_traits {
                 |u| <U as EnumDescriptorProtoTrait>::name_opt(u),
             )
         }
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ValueMessageType<'this> = ::puroro::Either<
             <T as EnumDescriptorProtoTrait>::ValueMessageType<'this>,
             <U as EnumDescriptorProtoTrait>::ValueMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
-            <U as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
+                <U as EnumDescriptorProtoTrait>::ValueRepeatedType<'this>,
+            > where Self: 'this;
 
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -29361,13 +27319,10 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as EnumDescriptorProtoTrait>::value(u)),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as EnumDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as EnumDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29382,20 +27337,15 @@ pub mod _puroro_traits {
                 },
             )
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type ReservedRangeMessageType<'this> = ::puroro::Either<
             <T as EnumDescriptorProtoTrait>::ReservedRangeMessageType<'this>,
             <U as EnumDescriptorProtoTrait>::ReservedRangeMessageType<'this>,
-        >;
+        > where Self: 'this;
         type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-            <U as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+                <U as EnumDescriptorProtoTrait>::ReservedRangeRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -29405,12 +27355,10 @@ pub mod _puroro_traits {
             )
         }
         type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-            <U as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedField<
+                <T as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+                <U as EnumDescriptorProtoTrait>::ReservedNameRepeatedType<'this>,
+            > where Self: 'this;
 
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -29427,52 +27375,39 @@ pub mod _puroro_traits {
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.name_opt())
         }
-        type ValueMessageType<'this>
-        where
-            Self: 'this,
-        = T::ValueMessageType<'this>;
+        type ValueMessageType<'this> = T::ValueMessageType<'this> where Self: 'this;
 
-        type ValueRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::ValueRepeatedType<'this>>;
+        type ValueRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ValueRepeatedType<'this>
+            > where Self: 'this;
         fn value<'this>(&'this self) -> Self::ValueRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.value()),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.options_opt())
         }
-        type ReservedRangeMessageType<'this>
-        where
-            Self: 'this,
-        = T::ReservedRangeMessageType<'this>;
+        type ReservedRangeMessageType<'this> = T::ReservedRangeMessageType<'this> where Self: 'this;
 
-        type ReservedRangeRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ReservedRangeRepeatedType<'this>,
-        >;
+        type ReservedRangeRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ReservedRangeRepeatedType<'this>
+            > where Self: 'this;
         fn reserved_range<'this>(&'this self) -> Self::ReservedRangeRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.reserved_range()),
             )
         }
 
-        type ReservedNameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::ReservedNameRepeatedType<'this>,
-        >;
+        type ReservedNameRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::ReservedNameRepeatedType<'this>
+            > where Self: 'this;
         fn reserved_name<'this>(&'this self) -> Self::ReservedNameRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.reserved_name()),
@@ -29528,10 +27463,7 @@ pub mod _puroro_traits {
             fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).number_opt()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
             fn options_opt<'this>(
                 &'this self,
@@ -29595,13 +27527,10 @@ pub mod _puroro_traits {
             <U as EnumValueDescriptorProtoTrait>::number_opt(&self.1)
                 .or_else(|| <T as EnumValueDescriptorProtoTrait>::number_opt(&self.0))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as EnumValueDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as EnumValueDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -29632,13 +27561,10 @@ pub mod _puroro_traits {
                 |u| <U as EnumValueDescriptorProtoTrait>::number_opt(u),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as EnumValueDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as EnumValueDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29664,10 +27590,7 @@ pub mod _puroro_traits {
         fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.number_opt())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29716,22 +27639,13 @@ pub mod _puroro_traits {
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
-            type MethodMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::MethodMessageType<'this>;
+            type MethodMessageType<'this> = <$ty>::MethodMessageType<'this> where Self: 'this;
 
-            type MethodRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::MethodRepeatedType<'this>;
+            type MethodRepeatedType<'this> = <$ty>::MethodRepeatedType<'this> where Self: 'this;
             fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
                 (**self).method()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
             fn options_opt<'this>(
                 &'this self,
@@ -29780,10 +27694,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MethodMessageType<'this>>;
+        type MethodRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::MethodMessageType<'this>>
+            where Self: 'this;
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -29801,20 +27714,15 @@ pub mod _puroro_traits {
             <U as ServiceDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as ServiceDescriptorProtoTrait>::name_opt(&self.0))
         }
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type MethodMessageType<'this> = ::puroro::Either<
             <T as ServiceDescriptorProtoTrait>::MethodMessageType<'this>,
             <U as ServiceDescriptorProtoTrait>::MethodMessageType<'this>,
-        >;
+        > where Self: 'this;
         type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
-            <U as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
+                <U as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
+            > where Self: 'this;
 
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -29822,13 +27730,10 @@ pub mod _puroro_traits {
                 <U as ServiceDescriptorProtoTrait>::method(&self.1),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as ServiceDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as ServiceDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -29853,20 +27758,15 @@ pub mod _puroro_traits {
                 |u| <U as ServiceDescriptorProtoTrait>::name_opt(u),
             )
         }
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type MethodMessageType<'this> = ::puroro::Either<
             <T as ServiceDescriptorProtoTrait>::MethodMessageType<'this>,
             <U as ServiceDescriptorProtoTrait>::MethodMessageType<'this>,
-        >;
+        > where Self: 'this;
         type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
-            <U as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
+                <U as ServiceDescriptorProtoTrait>::MethodRepeatedType<'this>,
+            > where Self: 'this;
 
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -29875,13 +27775,10 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as ServiceDescriptorProtoTrait>::method(u)),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as ServiceDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as ServiceDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29904,24 +27801,18 @@ pub mod _puroro_traits {
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.name_opt())
         }
-        type MethodMessageType<'this>
-        where
-            Self: 'this,
-        = T::MethodMessageType<'this>;
+        type MethodMessageType<'this> = T::MethodMessageType<'this> where Self: 'this;
 
-        type MethodRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::MethodRepeatedType<'this>>;
+        type MethodRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::MethodRepeatedType<'this>
+            > where Self: 'this;
         fn method<'this>(&'this self) -> Self::MethodRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.method()),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -30012,10 +27903,7 @@ pub mod _puroro_traits {
             fn output_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).output_type_opt()
             }
-            type OptionsMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::OptionsMessageType<'this>;
+            type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
             fn options_opt<'this>(
                 &'this self,
@@ -30092,13 +27980,10 @@ pub mod _puroro_traits {
             <U as MethodDescriptorProtoTrait>::output_type_opt(&self.1)
                 .or_else(|| <T as MethodDescriptorProtoTrait>::output_type_opt(&self.0))
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = (
+        type OptionsMessageType<'this> = (
             ::std::option::Option<<T as MethodDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as MethodDescriptorProtoTrait>::OptionsMessageType<'this>>,
-        );
+        ) where Self: 'this;
 
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
@@ -30145,13 +28030,10 @@ pub mod _puroro_traits {
                 |u| <U as MethodDescriptorProtoTrait>::output_type_opt(u),
             )
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type OptionsMessageType<'this> = ::puroro::Either<
             <T as MethodDescriptorProtoTrait>::OptionsMessageType<'this>,
             <U as MethodDescriptorProtoTrait>::OptionsMessageType<'this>,
-        >;
+        > where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -30192,10 +28074,7 @@ pub mod _puroro_traits {
         fn output_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.output_type_opt())
         }
-        type OptionsMessageType<'this>
-        where
-            Self: 'this,
-        = T::OptionsMessageType<'this>;
+        type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -30441,6 +28320,7 @@ pub mod _puroro_traits {
 
     macro_rules! file_options_delegate {
         ($ty:ty) => {
+
             fn java_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).java_package_opt()
             }
@@ -30453,9 +28333,7 @@ pub mod _puroro_traits {
                 (**self).java_multiple_files_opt()
             }
 
-            fn java_generate_equals_and_hash_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<bool> {
+            fn java_generate_equals_and_hash_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).java_generate_equals_and_hash_opt()
             }
 
@@ -30463,11 +28341,7 @@ pub mod _puroro_traits {
                 (**self).java_string_check_utf8_opt()
             }
 
-            fn optimize_for_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<
-                self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
-            > {
+            fn optimize_for_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode> {
                 (**self).optimize_for_opt()
             }
 
@@ -30526,18 +28400,10 @@ pub mod _puroro_traits {
             fn ruby_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).ruby_package_opt()
             }
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -30582,12 +28448,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -30701,20 +28564,15 @@ pub mod _puroro_traits {
             <U as FileOptionsTrait>::ruby_package_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::ruby_package_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as FileOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as FileOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -30854,20 +28712,15 @@ pub mod _puroro_traits {
                 |u| <U as FileOptionsTrait>::ruby_package_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as FileOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as FileOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as FileOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -30951,17 +28804,12 @@ pub mod _puroro_traits {
         fn ruby_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.ruby_package_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31026,13 +28874,12 @@ pub mod _puroro_traits {
 
     macro_rules! message_options_delegate {
         ($ty:ty) => {
+
             fn message_set_wire_format_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).message_set_wire_format_opt()
             }
 
-            fn no_standard_descriptor_accessor_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<bool> {
+            fn no_standard_descriptor_accessor_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).no_standard_descriptor_accessor_opt()
             }
 
@@ -31043,18 +28890,10 @@ pub mod _puroro_traits {
             fn map_entry_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).map_entry_opt()
             }
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -31099,12 +28938,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31136,20 +28972,15 @@ pub mod _puroro_traits {
             <U as MessageOptionsTrait>::map_entry_opt(&self.1)
                 .or_else(|| <T as MessageOptionsTrait>::map_entry_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as MessageOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as MessageOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31189,20 +29020,15 @@ pub mod _puroro_traits {
                 |u| <U as MessageOptionsTrait>::map_entry_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as MessageOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as MessageOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as MessageOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31232,17 +29058,12 @@ pub mod _puroro_traits {
         fn map_entry_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             self.as_ref().and_then(|msg| msg.map_entry_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31341,11 +29162,8 @@ pub mod _puroro_traits {
 
     macro_rules! field_options_delegate {
         ($ty:ty) => {
-            fn ctype_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<
-                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
-            > {
+
+            fn ctype_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype> {
                 (**self).ctype_opt()
             }
 
@@ -31353,11 +29171,7 @@ pub mod _puroro_traits {
                 (**self).packed_opt()
             }
 
-            fn jstype_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<
-                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
-            > {
+            fn jstype_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype> {
                 (**self).jstype_opt()
             }
 
@@ -31372,18 +29186,10 @@ pub mod _puroro_traits {
             fn weak_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).weak_opt()
             }
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -31428,12 +29234,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31480,20 +29283,15 @@ pub mod _puroro_traits {
             <U as FieldOptionsTrait>::weak_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::weak_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as FieldOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as FieldOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31553,20 +29351,15 @@ pub mod _puroro_traits {
                 |u| <U as FieldOptionsTrait>::weak_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as FieldOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as FieldOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as FieldOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31608,17 +29401,12 @@ pub mod _puroro_traits {
         fn weak_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             self.as_ref().and_then(|msg| msg.weak_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31642,18 +29430,10 @@ pub mod _puroro_traits {
 
     macro_rules! oneof_options_delegate {
         ($ty:ty) => {
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -31698,12 +29478,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31715,20 +29492,15 @@ pub mod _puroro_traits {
         T: OneofOptionsTrait,
         U: OneofOptionsTrait,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as OneofOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as OneofOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31744,20 +29516,15 @@ pub mod _puroro_traits {
         T: OneofOptionsTrait,
         U: OneofOptionsTrait,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as OneofOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as OneofOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as OneofOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31773,17 +29540,12 @@ pub mod _puroro_traits {
     where
         T: OneofOptionsTrait,
     {
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31828,6 +29590,7 @@ pub mod _puroro_traits {
 
     macro_rules! enum_options_delegate {
         ($ty:ty) => {
+
             fn allow_alias_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).allow_alias_opt()
             }
@@ -31835,18 +29598,10 @@ pub mod _puroro_traits {
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -31891,12 +29646,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -31917,20 +29669,15 @@ pub mod _puroro_traits {
             <U as EnumOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as EnumOptionsTrait>::deprecated_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as EnumOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as EnumOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31958,20 +29705,15 @@ pub mod _puroro_traits {
                 |u| <U as EnumOptionsTrait>::deprecated_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as EnumOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as EnumOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as EnumOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -31993,17 +29735,12 @@ pub mod _puroro_traits {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             self.as_ref().and_then(|msg| msg.deprecated_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32037,21 +29774,14 @@ pub mod _puroro_traits {
 
     macro_rules! enum_value_options_delegate {
         ($ty:ty) => {
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -32096,12 +29826,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32117,20 +29844,15 @@ pub mod _puroro_traits {
             <U as EnumValueOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as EnumValueOptionsTrait>::deprecated_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as EnumValueOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as EnumValueOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -32152,20 +29874,15 @@ pub mod _puroro_traits {
                 |u| <U as EnumValueOptionsTrait>::deprecated_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as EnumValueOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as EnumValueOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as EnumValueOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -32184,17 +29901,12 @@ pub mod _puroro_traits {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             self.as_ref().and_then(|msg| msg.deprecated_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32228,21 +29940,14 @@ pub mod _puroro_traits {
 
     macro_rules! service_options_delegate {
         ($ty:ty) => {
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
-            type UninterpretedOptionMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::UninterpretedOptionRepeatedType<'this>;
-            fn uninterpreted_option<'this>(
-                &'this self,
-            ) -> Self::UninterpretedOptionRepeatedType<'this> {
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
+            fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
         };
@@ -32287,12 +29992,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32308,20 +30010,15 @@ pub mod _puroro_traits {
             <U as ServiceOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as ServiceOptionsTrait>::deprecated_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as ServiceOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as ServiceOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -32343,20 +30040,15 @@ pub mod _puroro_traits {
                 |u| <U as ServiceOptionsTrait>::deprecated_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as ServiceOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as ServiceOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as ServiceOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -32375,17 +30067,12 @@ pub mod _puroro_traits {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             self.as_ref().and_then(|msg| msg.deprecated_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32444,9 +30131,9 @@ pub mod _puroro_traits {
             fn idempotency_level_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> {
                 (**self).idempotency_level_opt()
             }
-            type UninterpretedOptionMessageType<'this> where Self: 'this = <$ty>::UninterpretedOptionMessageType<'this>;
+            type UninterpretedOptionMessageType<'this> = <$ty>::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-            type UninterpretedOptionRepeatedType<'this> where Self: 'this = <$ty>::UninterpretedOptionRepeatedType<'this>;
+            type UninterpretedOptionRepeatedType<'this> = <$ty>::UninterpretedOptionRepeatedType<'this> where Self: 'this;
             fn uninterpreted_option<'this>(&'this self) -> Self::UninterpretedOptionRepeatedType<'this> {
                 (**self).uninterpreted_option()
             }
@@ -32492,12 +30179,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            Self::UninterpretedOptionMessageType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::UninterpretedOptionMessageType<'this>>
+            where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32522,20 +30206,15 @@ pub mod _puroro_traits {
             <U as MethodOptionsTrait>::idempotency_level_opt(&self.1)
                 .or_else(|| <T as MethodOptionsTrait>::idempotency_level_opt(&self.0))
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as MethodOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as MethodOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -32567,20 +30246,15 @@ pub mod _puroro_traits {
                 |u| <U as MethodOptionsTrait>::idempotency_level_opt(u),
             )
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type UninterpretedOptionMessageType<'this> = ::puroro::Either<
             <T as MethodOptionsTrait>::UninterpretedOptionMessageType<'this>,
             <U as MethodOptionsTrait>::UninterpretedOptionMessageType<'this>,
-        >;
+        > where Self: 'this;
         type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-            <U as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+                <U as MethodOptionsTrait>::UninterpretedOptionRepeatedType<'this>,
+            > where Self: 'this;
 
         fn uninterpreted_option<'this>(
             &'this self,
@@ -32606,17 +30280,12 @@ pub mod _puroro_traits {
         > {
             self.as_ref().and_then(|msg| msg.idempotency_level_opt())
         }
-        type UninterpretedOptionMessageType<'this>
-        where
-            Self: 'this,
-        = T::UninterpretedOptionMessageType<'this>;
+        type UninterpretedOptionMessageType<'this> = T::UninterpretedOptionMessageType<'this> where Self: 'this;
 
-        type UninterpretedOptionRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<
-            T::UninterpretedOptionRepeatedType<'this>,
-        >;
+        type UninterpretedOptionRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::UninterpretedOptionRepeatedType<'this>
+            > where Self: 'this;
         fn uninterpreted_option<'this>(
             &'this self,
         ) -> Self::UninterpretedOptionRepeatedType<'this> {
@@ -32705,15 +30374,9 @@ pub mod _puroro_traits {
 
     macro_rules! uninterpreted_option_delegate {
         ($ty:ty) => {
-            type NameMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::NameMessageType<'this>;
+            type NameMessageType<'this> = <$ty>::NameMessageType<'this> where Self: 'this;
 
-            type NameRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::NameRepeatedType<'this>;
+            type NameRepeatedType<'this> = <$ty>::NameRepeatedType<'this> where Self: 'this;
             fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
                 (**self).name()
             }
@@ -32783,10 +30446,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>;
+        type NameRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::NameMessageType<'this>>
+            where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -32796,20 +30458,15 @@ pub mod _puroro_traits {
         T: UninterpretedOptionTrait,
         U: UninterpretedOptionTrait,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type NameMessageType<'this> = ::puroro::Either<
             <T as UninterpretedOptionTrait>::NameMessageType<'this>,
             <U as UninterpretedOptionTrait>::NameMessageType<'this>,
-        >;
+        > where Self: 'this;
         type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as UninterpretedOptionTrait>::NameRepeatedType<'this>,
-            <U as UninterpretedOptionTrait>::NameRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as UninterpretedOptionTrait>::NameRepeatedType<'this>,
+                <U as UninterpretedOptionTrait>::NameRepeatedType<'this>,
+            > where Self: 'this;
 
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -32853,20 +30510,15 @@ pub mod _puroro_traits {
         T: UninterpretedOptionTrait,
         U: UninterpretedOptionTrait,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type NameMessageType<'this> = ::puroro::Either<
             <T as UninterpretedOptionTrait>::NameMessageType<'this>,
             <U as UninterpretedOptionTrait>::NameMessageType<'this>,
-        >;
+        > where Self: 'this;
         type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as UninterpretedOptionTrait>::NameRepeatedType<'this>,
-            <U as UninterpretedOptionTrait>::NameRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as UninterpretedOptionTrait>::NameRepeatedType<'this>,
+                <U as UninterpretedOptionTrait>::NameRepeatedType<'this>,
+            > where Self: 'this;
 
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -32916,15 +30568,12 @@ pub mod _puroro_traits {
     where
         T: UninterpretedOptionTrait,
     {
-        type NameMessageType<'this>
-        where
-            Self: 'this,
-        = T::NameMessageType<'this>;
+        type NameMessageType<'this> = T::NameMessageType<'this> where Self: 'this;
 
-        type NameRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::NameRepeatedType<'this>>;
+        type NameRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::NameRepeatedType<'this>
+            > where Self: 'this;
         fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.name()),
@@ -32963,15 +30612,9 @@ pub mod _puroro_traits {
 
     macro_rules! source_code_info_delegate {
         ($ty:ty) => {
-            type LocationMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::LocationMessageType<'this>;
+            type LocationMessageType<'this> = <$ty>::LocationMessageType<'this> where Self: 'this;
 
-            type LocationRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::LocationRepeatedType<'this>;
+            type LocationRepeatedType<'this> = <$ty>::LocationRepeatedType<'this> where Self: 'this;
             fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
                 (**self).location()
             }
@@ -33017,10 +30660,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type LocationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::LocationMessageType<'this>>;
+        type LocationRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::LocationMessageType<'this>>
+            where Self: 'this;
         fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -33030,20 +30672,15 @@ pub mod _puroro_traits {
         T: SourceCodeInfoTrait,
         U: SourceCodeInfoTrait,
     {
-        type LocationMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type LocationMessageType<'this> = ::puroro::Either<
             <T as SourceCodeInfoTrait>::LocationMessageType<'this>,
             <U as SourceCodeInfoTrait>::LocationMessageType<'this>,
-        >;
+        > where Self: 'this;
         type LocationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
-            <U as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
+                <U as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
+            > where Self: 'this;
 
         fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -33057,20 +30694,15 @@ pub mod _puroro_traits {
         T: SourceCodeInfoTrait,
         U: SourceCodeInfoTrait,
     {
-        type LocationMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type LocationMessageType<'this> = ::puroro::Either<
             <T as SourceCodeInfoTrait>::LocationMessageType<'this>,
             <U as SourceCodeInfoTrait>::LocationMessageType<'this>,
-        >;
+        > where Self: 'this;
         type LocationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
-            <U as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
+                <U as SourceCodeInfoTrait>::LocationRepeatedType<'this>,
+            > where Self: 'this;
 
         fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -33084,15 +30716,12 @@ pub mod _puroro_traits {
     where
         T: SourceCodeInfoTrait,
     {
-        type LocationMessageType<'this>
-        where
-            Self: 'this,
-        = T::LocationMessageType<'this>;
+        type LocationMessageType<'this> = T::LocationMessageType<'this> where Self: 'this;
 
-        type LocationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::LocationRepeatedType<'this>>;
+        type LocationRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::LocationRepeatedType<'this>
+            > where Self: 'this;
         fn location<'this>(&'this self) -> Self::LocationRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.location()),
@@ -33113,15 +30742,9 @@ pub mod _puroro_traits {
 
     macro_rules! generated_code_info_delegate {
         ($ty:ty) => {
-            type AnnotationMessageType<'this>
-            where
-                Self: 'this,
-            = <$ty>::AnnotationMessageType<'this>;
+            type AnnotationMessageType<'this> = <$ty>::AnnotationMessageType<'this> where Self: 'this;
 
-            type AnnotationRepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty>::AnnotationRepeatedType<'this>;
+            type AnnotationRepeatedType<'this> = <$ty>::AnnotationRepeatedType<'this> where Self: 'this;
             fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
                 (**self).annotation()
             }
@@ -33167,10 +30790,9 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        type AnnotationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::AnnotationMessageType<'this>>;
+        type AnnotationRepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::AnnotationMessageType<'this>>
+            where Self: 'this;
         fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -33180,20 +30802,15 @@ pub mod _puroro_traits {
         T: GeneratedCodeInfoTrait,
         U: GeneratedCodeInfoTrait,
     {
-        type AnnotationMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type AnnotationMessageType<'this> = ::puroro::Either<
             <T as GeneratedCodeInfoTrait>::AnnotationMessageType<'this>,
             <U as GeneratedCodeInfoTrait>::AnnotationMessageType<'this>,
-        >;
+        > where Self: 'this;
         type AnnotationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
-            <U as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+                <T as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
+                <U as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
+            > where Self: 'this;
 
         fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -33207,20 +30824,15 @@ pub mod _puroro_traits {
         T: GeneratedCodeInfoTrait,
         U: GeneratedCodeInfoTrait,
     {
-        type AnnotationMessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
+        type AnnotationMessageType<'this> = ::puroro::Either<
             <T as GeneratedCodeInfoTrait>::AnnotationMessageType<'this>,
             <U as GeneratedCodeInfoTrait>::AnnotationMessageType<'this>,
-        >;
+        > where Self: 'this;
         type AnnotationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
-            <U as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
-        >;
+            = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+                <T as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
+                <U as GeneratedCodeInfoTrait>::AnnotationRepeatedType<'this>,
+            > where Self: 'this;
 
         fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -33234,15 +30846,12 @@ pub mod _puroro_traits {
     where
         T: GeneratedCodeInfoTrait,
     {
-        type AnnotationMessageType<'this>
-        where
-            Self: 'this,
-        = T::AnnotationMessageType<'this>;
+        type AnnotationMessageType<'this> = T::AnnotationMessageType<'this> where Self: 'this;
 
-        type AnnotationRepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::AnnotationRepeatedType<'this>>;
+        type AnnotationRepeatedType<'this> =
+            ::puroro::internal::impls::option::OptionRepeatedField<
+                T::AnnotationRepeatedType<'this>
+            > where Self: 'this;
         fn annotation<'this>(&'this self) -> Self::AnnotationRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.annotation()),
@@ -33374,7 +30983,7 @@ pub mod _puroro_nested {
                 fn end_opt<'this>(&'this self) -> Option<i32> {
                     <self::ExtensionRange>::end_opt(self)
                 }
-                type OptionsMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions;
+                type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions where Self: 'this;
                 fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
                     <self::ExtensionRange>::options_opt(self)
                 }
@@ -33707,10 +31316,7 @@ pub mod _puroro_nested {
                         ::std::clone::Clone::clone(&self.start),
                     ))
                 }
-                type OptionsMessageType<'this>
-                where
-                    Self: 'this,
-                = ();
+                type OptionsMessageType<'this> = () where Self: 'this;
             }
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -33779,10 +31385,7 @@ pub mod _puroro_nested {
                         ::std::clone::Clone::clone(&self.end),
                     ))
                 }
-                type OptionsMessageType<'this>
-                where
-                    Self: 'this,
-                = ();
+                type OptionsMessageType<'this> = () where Self: 'this;
             }
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
@@ -33853,7 +31456,7 @@ pub mod _puroro_nested {
         ScalarType:
             self::_puroro_root::google::protobuf::_puroro_traits::ExtensionRangeOptionsTrait,
         {
-        type OptionsMessageType<'this> where Self: 'this = &'this ScalarType;
+        type OptionsMessageType<'this> = &'this ScalarType where Self: 'this;
         
         fn options_opt<'this>(&'this self) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
             ::std::option::Option::Some(&self.options)
@@ -34047,7 +31650,7 @@ pub mod _puroro_nested {
                 fn end_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::end_opt(self)
                 }
-                type OptionsMessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsBumpalo<'this>;
+                type OptionsMessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsBumpalo<'this> where Self: 'this;
                 fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
                     <Self>::options_opt(self)
                 }
@@ -34560,6 +32163,7 @@ pub mod _puroro_nested {
 
             macro_rules! extension_range_delegate {
                 ($ty:ty) => {
+
                     fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).start_opt()
                     }
@@ -34567,14 +32171,9 @@ pub mod _puroro_nested {
                     fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).end_opt()
                     }
-                    type OptionsMessageType<'this>
-                    where
-                        Self: 'this,
-                    = <$ty>::OptionsMessageType<'this>;
+                    type OptionsMessageType<'this> = <$ty>::OptionsMessageType<'this> where Self: 'this;
 
-                    fn options_opt<'this>(
-                        &'this self,
-                    ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
+                    fn options_opt<'this>(&'this self) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
                         (**self).options_opt()
                     }
                 };
@@ -34634,13 +32233,10 @@ pub mod _puroro_nested {
                     <U as ExtensionRangeTrait>::end_opt(&self.1)
                         .or_else(|| <T as ExtensionRangeTrait>::end_opt(&self.0))
                 }
-                type OptionsMessageType<'this>
-                where
-                    Self: 'this,
-                = (
+                type OptionsMessageType<'this> = (
                     ::std::option::Option<<T as ExtensionRangeTrait>::OptionsMessageType<'this>>,
                     ::std::option::Option<<U as ExtensionRangeTrait>::OptionsMessageType<'this>>,
-                );
+                ) where Self: 'this;
 
                 fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
                     match (
@@ -34671,13 +32267,10 @@ pub mod _puroro_nested {
                         |u| <U as ExtensionRangeTrait>::end_opt(u),
                     )
                 }
-                type OptionsMessageType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::Either<
+                type OptionsMessageType<'this> = ::puroro::Either<
                     <T as ExtensionRangeTrait>::OptionsMessageType<'this>,
                     <U as ExtensionRangeTrait>::OptionsMessageType<'this>,
-                >;
+                > where Self: 'this;
                 fn options_opt<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -34703,10 +32296,7 @@ pub mod _puroro_nested {
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().and_then(|msg| msg.end_opt())
                 }
-                type OptionsMessageType<'this>
-                where
-                    Self: 'this,
-                = T::OptionsMessageType<'this>;
+                type OptionsMessageType<'this> = T::OptionsMessageType<'this> where Self: 'this;
                 fn options_opt<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -36917,25 +34507,22 @@ pub mod _puroro_nested {
                 for<'a> &'a RepeatedType:
                     ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+                type PathRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<
+                'this,
+                RepeatedType,
+                ScalarType,
+                i32
+            > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::CloneThenIntoRepeatedField::new(&self.path)
                 }
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type SpanRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+                type LeadingDetachedCommentsRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
                 fn leading_detached_comments<'this>(
                     &'this self,
                 ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
@@ -37020,26 +34607,23 @@ pub mod _puroro_nested {
                 for<'a> &'a RepeatedType:
                     ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
 
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+                type SpanRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<
+                'this,
+                RepeatedType,
+                ScalarType,
+                i32
+            > where Self: 'this;
 
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::CloneThenIntoRepeatedField::new(&self.span)
                 }
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+                type LeadingDetachedCommentsRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
                 fn leading_detached_comments<'this>(
                     &'this self,
                 ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
@@ -37115,17 +34699,11 @@ pub mod _puroro_nested {
             where
                 ScalarType: ::std::convert::AsRef<str>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type SpanRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
@@ -37133,10 +34711,7 @@ pub mod _puroro_nested {
                 fn leading_comments_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::Some(self.leading_comments.as_ref())
                 }
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+                type LeadingDetachedCommentsRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
                 fn leading_detached_comments<'this>(
                     &'this self,
                 ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
@@ -37205,17 +34780,11 @@ pub mod _puroro_nested {
             where
                 ScalarType: ::std::convert::AsRef<str>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type SpanRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
@@ -37223,10 +34792,7 @@ pub mod _puroro_nested {
                 fn trailing_comments_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::Some(self.trailing_comments.as_ref())
                 }
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+                type LeadingDetachedCommentsRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str> where Self: 'this;
                 fn leading_detached_comments<'this>(
                     &'this self,
                 ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
@@ -37304,25 +34870,21 @@ pub mod _puroro_nested {
                 for<'a> &'a RepeatedType:
                     ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type SpanRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
 
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
+                type LeadingDetachedCommentsRepeatedType<'this> =
+            ::puroro::AsRefRepeatedField<
+                'this,
+                RepeatedType,
+                ScalarType,str,
+            > where Self: 'this;
 
                 fn leading_detached_comments<'this>(
                     &'this self,
@@ -37536,28 +35098,24 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> super::_puroro_traits::LocationTrait for LocationBumpalo<'bump> {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::CloneThenIntoRepeatedField<
-                    'this,
-                    ::puroro::internal::NoAllocBumpVec<i32>,
-                    i32,
-                    i32,
-                >;
+                type PathRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<
+                'this,
+                ::puroro::internal::NoAllocBumpVec<i32>,
+                i32,
+                i32
+            > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::CloneThenIntoRepeatedField::new(&self.path)
                 }
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::CloneThenIntoRepeatedField<
-                    'this,
-                    ::puroro::internal::NoAllocBumpVec<i32>,
-                    i32,
-                    i32,
-                >;
+                type SpanRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<
+                'this,
+                ::puroro::internal::NoAllocBumpVec<i32>,
+                i32,
+                i32
+            > where Self: 'this;
 
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::CloneThenIntoRepeatedField::new(&self.span)
@@ -37568,15 +35126,12 @@ pub mod _puroro_nested {
                 fn trailing_comments_opt<'this>(&'this self) -> Option<&'this str> {
                     <Self>::trailing_comments_opt(self)
                 }
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::AsRefRepeatedField<
-                    'this,
-                    ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
-                    ::puroro::internal::NoAllocBumpString,
-                    str,
-                >;
+                type LeadingDetachedCommentsRepeatedType<'this> =
+            ::puroro::AsRefRepeatedField<
+                'this,
+                ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+                ::puroro::internal::NoAllocBumpString,str,
+            > where Self: 'this;
 
                 fn leading_detached_comments<'this>(
                     &'this self,
@@ -37838,41 +35393,27 @@ pub mod _puroro_nested {
 
             macro_rules! location_delegate {
                 ($ty:ty) => {
-                    type PathRepeatedType<'this>
-                    where
-                        Self: 'this,
-                    = <$ty>::PathRepeatedType<'this>;
+
+                    type PathRepeatedType<'this> = <$ty>::PathRepeatedType<'this> where Self: 'this;
                     fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                         (**self).path()
                     }
 
-                    type SpanRepeatedType<'this>
-                    where
-                        Self: 'this,
-                    = <$ty>::SpanRepeatedType<'this>;
+                    type SpanRepeatedType<'this> = <$ty>::SpanRepeatedType<'this> where Self: 'this;
                     fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                         (**self).span()
                     }
 
-                    fn leading_comments_opt<'this>(
-                        &'this self,
-                    ) -> ::std::option::Option<&'this str> {
+                    fn leading_comments_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).leading_comments_opt()
                     }
 
-                    fn trailing_comments_opt<'this>(
-                        &'this self,
-                    ) -> ::std::option::Option<&'this str> {
+                    fn trailing_comments_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).trailing_comments_opt()
                     }
 
-                    type LeadingDetachedCommentsRepeatedType<'this>
-                    where
-                        Self: 'this,
-                    = <$ty>::LeadingDetachedCommentsRepeatedType<'this>;
-                    fn leading_detached_comments<'this>(
-                        &'this self,
-                    ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
+                    type LeadingDetachedCommentsRepeatedType<'this> = <$ty>::LeadingDetachedCommentsRepeatedType<'this> where Self: 'this;
+                    fn leading_detached_comments<'this>(&'this self) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
                         (**self).leading_detached_comments()
                     }
                 };
@@ -37913,24 +35454,21 @@ pub mod _puroro_nested {
                 location_delegate!(T);
             }
             impl LocationTrait for () {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> =
+                    ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+                    where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type SpanRepeatedType<'this> =
+                    ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+                    where Self: 'this;
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+                type LeadingDetachedCommentsRepeatedType<'this> =
+                    ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>
+                    where Self: 'this;
                 fn leading_detached_comments<'this>(
                     &'this self,
                 ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
@@ -37943,12 +35481,10 @@ pub mod _puroro_nested {
                 U: LocationTrait,
             {
                 type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::merged::MergedRepeatedField<
-                    <T as LocationTrait>::PathRepeatedType<'this>,
-                    <U as LocationTrait>::PathRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::merged::MergedRepeatedField<
+                        <T as LocationTrait>::PathRepeatedType<'this>,
+                        <U as LocationTrait>::PathRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -37957,12 +35493,10 @@ pub mod _puroro_nested {
                     )
                 }
                 type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::merged::MergedRepeatedField<
-                    <T as LocationTrait>::SpanRepeatedType<'this>,
-                    <U as LocationTrait>::SpanRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::merged::MergedRepeatedField<
+                        <T as LocationTrait>::SpanRepeatedType<'this>,
+                        <U as LocationTrait>::SpanRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -37981,12 +35515,10 @@ pub mod _puroro_nested {
                         .or_else(|| <T as LocationTrait>::trailing_comments_opt(&self.0))
                 }
                 type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::merged::MergedRepeatedField<
-                    <T as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
-                    <U as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::merged::MergedRepeatedField<
+                        <T as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
+                        <U as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn leading_detached_comments<'this>(
                     &'this self,
@@ -38003,12 +35535,10 @@ pub mod _puroro_nested {
                 U: LocationTrait,
             {
                 type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::either::EitherRepeatedField<
-                    <T as LocationTrait>::PathRepeatedType<'this>,
-                    <U as LocationTrait>::PathRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::either::EitherRepeatedField<
+                        <T as LocationTrait>::PathRepeatedType<'this>,
+                        <U as LocationTrait>::PathRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -38018,12 +35548,10 @@ pub mod _puroro_nested {
                     )
                 }
                 type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::either::EitherRepeatedField<
-                    <T as LocationTrait>::SpanRepeatedType<'this>,
-                    <U as LocationTrait>::SpanRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::either::EitherRepeatedField<
+                        <T as LocationTrait>::SpanRepeatedType<'this>,
+                        <U as LocationTrait>::SpanRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -38045,12 +35573,10 @@ pub mod _puroro_nested {
                     )
                 }
                 type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::either::EitherRepeatedField<
-                    <T as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
-                    <U as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::either::EitherRepeatedField<
+                        <T as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
+                        <U as LocationTrait>::LeadingDetachedCommentsRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn leading_detached_comments<'this>(
                     &'this self,
@@ -38066,24 +35592,20 @@ pub mod _puroro_nested {
             where
                 T: LocationTrait,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::option::OptionRepeatedField<
-                    T::PathRepeatedType<'this>,
-                >;
+                type PathRepeatedType<'this> =
+                    ::puroro::internal::impls::option::OptionRepeatedField<
+                        T::PathRepeatedType<'this>
+                    > where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::option::OptionRepeatedField::new(
                         self.as_ref().map(|msg| msg.path()),
                     )
                 }
 
-                type SpanRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::option::OptionRepeatedField<
-                    T::SpanRepeatedType<'this>,
-                >;
+                type SpanRepeatedType<'this> =
+                    ::puroro::internal::impls::option::OptionRepeatedField<
+                        T::SpanRepeatedType<'this>
+                    > where Self: 'this;
                 fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                     ::puroro::internal::impls::option::OptionRepeatedField::new(
                         self.as_ref().map(|msg| msg.span()),
@@ -38096,12 +35618,10 @@ pub mod _puroro_nested {
                     self.as_ref().and_then(|msg| msg.trailing_comments_opt())
                 }
 
-                type LeadingDetachedCommentsRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::option::OptionRepeatedField<
-                    T::LeadingDetachedCommentsRepeatedType<'this>,
-                >;
+                type LeadingDetachedCommentsRepeatedType<'this> =
+                    ::puroro::internal::impls::option::OptionRepeatedField<
+                        T::LeadingDetachedCommentsRepeatedType<'this>
+                    > where Self: 'this;
                 fn leading_detached_comments<'this>(
                     &'this self,
                 ) -> Self::LeadingDetachedCommentsRepeatedType<'this> {
@@ -38425,10 +35945,13 @@ pub mod _puroro_nested {
                 for<'a> &'a RepeatedType:
                     ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+                type PathRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<
+                'this,
+                RepeatedType,
+                ScalarType,
+                i32
+            > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::CloneThenIntoRepeatedField::new(&self.path)
@@ -38503,10 +36026,7 @@ pub mod _puroro_nested {
             where
                 ScalarType: ::std::convert::AsRef<str>,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
@@ -38575,10 +36095,7 @@ pub mod _puroro_nested {
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
@@ -38649,10 +36166,7 @@ pub mod _puroro_nested {
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32> where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
@@ -38844,15 +36358,13 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> super::_puroro_traits::AnnotationTrait for AnnotationBumpalo<'bump> {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::CloneThenIntoRepeatedField<
-                    'this,
-                    ::puroro::internal::NoAllocBumpVec<i32>,
-                    i32,
-                    i32,
-                >;
+                type PathRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<
+                'this,
+                ::puroro::internal::NoAllocBumpVec<i32>,
+                i32,
+                i32
+            > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::CloneThenIntoRepeatedField::new(&self.path)
@@ -39069,10 +36581,7 @@ pub mod _puroro_nested {
 
             macro_rules! annotation_delegate {
                 ($ty:ty) => {
-                    type PathRepeatedType<'this>
-                    where
-                        Self: 'this,
-                    = <$ty>::PathRepeatedType<'this>;
+                    type PathRepeatedType<'this> = <$ty>::PathRepeatedType<'this> where Self: 'this;
                     fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                         (**self).path()
                     }
@@ -39126,10 +36635,9 @@ pub mod _puroro_nested {
                 annotation_delegate!(T);
             }
             impl AnnotationTrait for () {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+                type PathRepeatedType<'this> =
+                    ::puroro::internal::impls::empty::EmptyRepeatedField<i32>
+                    where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
                 }
@@ -39140,12 +36648,10 @@ pub mod _puroro_nested {
                 U: AnnotationTrait,
             {
                 type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::merged::MergedRepeatedField<
-                    <T as AnnotationTrait>::PathRepeatedType<'this>,
-                    <U as AnnotationTrait>::PathRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::merged::MergedRepeatedField<
+                        <T as AnnotationTrait>::PathRepeatedType<'this>,
+                        <U as AnnotationTrait>::PathRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::merged::MergedRepeatedField::new(
@@ -39175,12 +36681,10 @@ pub mod _puroro_nested {
                 U: AnnotationTrait,
             {
                 type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::either::EitherRepeatedField<
-                    <T as AnnotationTrait>::PathRepeatedType<'this>,
-                    <U as AnnotationTrait>::PathRepeatedType<'this>,
-                >;
+                    = ::puroro::internal::impls::either::EitherRepeatedField<
+                        <T as AnnotationTrait>::PathRepeatedType<'this>,
+                        <U as AnnotationTrait>::PathRepeatedType<'this>,
+                    > where Self: 'this;
 
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::either::EitherRepeatedField::new(
@@ -39212,12 +36716,10 @@ pub mod _puroro_nested {
             where
                 T: AnnotationTrait,
             {
-                type PathRepeatedType<'this>
-                where
-                    Self: 'this,
-                = ::puroro::internal::impls::option::OptionRepeatedField<
-                    T::PathRepeatedType<'this>,
-                >;
+                type PathRepeatedType<'this> =
+                    ::puroro::internal::impls::option::OptionRepeatedField<
+                        T::PathRepeatedType<'this>
+                    > where Self: 'this;
                 fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                     ::puroro::internal::impls::option::OptionRepeatedField::new(
                         self.as_ref().map(|msg| msg.path()),
