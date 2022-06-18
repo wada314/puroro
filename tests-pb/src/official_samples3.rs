@@ -1653,6 +1653,7 @@ pub mod _puroro_traits {
         T: Test3Trait,
     {
         type CMessageType<'this> = T::CMessageType<'this> where Self: 'this;
+
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.c_opt())
         }

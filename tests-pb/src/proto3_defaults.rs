@@ -54,7 +54,7 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(0).map_or(false, |v| *v) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional.clone().inner())
             } else {
                 ::std::option::Option::None
@@ -1020,7 +1020,7 @@ pub mod _puroro_impls {
             self.i32_unlabeled_opt().is_some()
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(0).map_or(false, |v| *v) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional.inner())
             } else {
                 ::std::option::Option::None
@@ -1907,6 +1907,7 @@ pub mod _puroro_traits {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
         }
+
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_optional_opt())
         }
@@ -1920,13 +1921,16 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.i32_repeated()),
             )
         }
+
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_unlabeled_opt())
         }
+
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
         type SubmsgUnlabeledMessageType<'this> = T::SubmsgUnlabeledMessageType<'this> where Self: 'this;
+
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {

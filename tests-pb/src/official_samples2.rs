@@ -28,7 +28,7 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn a_opt(&self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(0).map_or(false, |v| *v) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.a.clone().inner())
             } else {
                 ::std::option::Option::None
@@ -154,7 +154,7 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn b_opt(&self) -> ::std::option::Option<&'_ str> {
-            if self._bitfield.get(0).map_or(false, |v| *v) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
@@ -603,7 +603,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(0).map_or(false, |v| *v) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.a.inner())
             } else {
                 ::std::option::Option::None
@@ -806,7 +806,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if self._bitfield.get(0).map_or(false, |v| *v) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
@@ -1665,6 +1665,7 @@ pub mod _puroro_traits {
         T: Test3Trait,
     {
         type CMessageType<'this> = T::CMessageType<'this> where Self: 'this;
+
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.c_opt())
         }

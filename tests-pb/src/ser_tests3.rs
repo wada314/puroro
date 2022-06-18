@@ -2924,6 +2924,7 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.i32_repeated()),
             )
         }
+
         fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.float_unlabeled_opt())
         }
@@ -2937,6 +2938,7 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.float_repeated()),
             )
         }
+
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
@@ -2951,6 +2953,7 @@ pub mod _puroro_traits {
             )
         }
         type SubmsgUnlabeledMessageType<'this> = T::SubmsgUnlabeledMessageType<'this> where Self: 'this;
+
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -2967,6 +2970,7 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.submsg_repeated()),
             )
         }
+
         fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
@@ -2982,6 +2986,7 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.enum_repeated()),
             )
         }
+
         fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref()
                 .and_then(|msg| msg.very_large_field_number_opt())

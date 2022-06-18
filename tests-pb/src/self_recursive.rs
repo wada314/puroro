@@ -521,6 +521,7 @@ pub mod _puroro_traits {
         T: MsgTrait,
     {
         type RecursiveUnlabeledMessageType<'this> = T::RecursiveUnlabeledMessageType<'this> where Self: 'this;
+
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {
