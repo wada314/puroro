@@ -185,6 +185,9 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct MsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> MsgWrapper<R> {}
 }
 
 pub use _puroro_impls::*;

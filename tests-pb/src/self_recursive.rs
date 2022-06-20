@@ -151,6 +151,21 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct MsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> MsgWrapper<R> {
+        pub fn recursive_unlabeled_opt(&self) -> ::std::option::Option<()> {
+            self.0.get_message(1).unwrap()
+        }
+
+        pub fn has_recursive_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn recursive_unlabeled(&self) -> () {
+            todo!()
+        }
+    }
 }
 
 pub use _puroro_impls::*;

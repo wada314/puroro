@@ -526,6 +526,9 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct MsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> MsgWrapper<R> {}
     pub struct Submsg {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
@@ -649,6 +652,21 @@ pub mod _puroro_simple_impl {
     impl ::std::cmp::PartialEq for Submsg {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield && self.i32_unlabeled == rhs.i32_unlabeled && true
+        }
+    }
+    pub struct SubmsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> SubmsgWrapper<R> {
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(1).unwrap()
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn i32_unlabeled(&self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or(todo!())
         }
     }
 }

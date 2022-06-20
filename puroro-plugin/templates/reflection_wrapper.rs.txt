@@ -1,0 +1,34 @@
+
+pub struct {{ m.simple_ident }}Wrapper<R>(R);
+
+impl<R: ::puroro::Reflection> {{ m.simple_ident }}Wrapper<R> {
+    {#- Immutable getter interfaces. #}
+    {%- for f in m.fields %}
+    {%- if !f.is_repeated %}
+    
+    {#- [optional] i32 => Option<i32> #}
+    {#- [optional] String => Option<&dyn AsRef<str>> #}
+    {#- [optional] MyMessage => Option<TODO> #}
+    pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.wrapper_getter_opt_type }} {
+        self.0
+            .{{ f.wrapper_corresponding_reflection_getter }}({{ f.number }})
+            .unwrap()
+    }
+
+    pub fn has_{{ f.ident_unesc }}(&self) -> bool {
+        todo!()
+    }
+
+    pub fn {{ f.ident }}(&self) -> {{ f.wrapper_getter_type }} {
+        {%- if f.is_message %}
+        todo!()
+        {%- else %} {#- if f.is_message #}
+        self.{{ f.ident_unesc }}_opt().unwrap_or(
+            todo!()
+        )
+        {%- endif %} {#- if f.is_message #}
+    }
+
+    {%- endif %} {#- if f.is_repeated #}
+    {%- endfor %} {#- for f in m.fields #}
+}

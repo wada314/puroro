@@ -184,6 +184,32 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct BookWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> BookWrapper<R> {
+        pub fn title_opt(&self) -> ::std::option::Option<&'_ dyn ::std::convert::AsRef<str>> {
+            self.0.get_str(1).unwrap()
+        }
+
+        pub fn has_title(&self) -> bool {
+            todo!()
+        }
+
+        pub fn title(&self) -> &'_ dyn ::std::convert::AsRef<str> {
+            self.title_opt().unwrap_or(todo!())
+        }
+        pub fn num_pages_opt(&self) -> ::std::option::Option<u32> {
+            self.0.get_u32(2).unwrap()
+        }
+
+        pub fn has_num_pages(&self) -> bool {
+            todo!()
+        }
+
+        pub fn num_pages(&self) -> u32 {
+            self.num_pages_opt().unwrap_or(todo!())
+        }
+    }
 }
 
 pub use _puroro_impls::*;

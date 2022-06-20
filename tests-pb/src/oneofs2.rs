@@ -526,6 +526,9 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct MsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> MsgWrapper<R> {}
     pub struct Submsg {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
@@ -654,6 +657,21 @@ pub mod _puroro_simple_impl {
                 && (self._bitfield.get(0).as_deref() != Some(&true)
                     || self.i32_optional == rhs.i32_optional)
                 && true
+        }
+    }
+    pub struct SubmsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> SubmsgWrapper<R> {
+        pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(1).unwrap()
+        }
+
+        pub fn has_i32_optional(&self) -> bool {
+            todo!()
+        }
+
+        pub fn i32_optional(&self) -> i32 {
+            self.i32_optional_opt().unwrap_or(todo!())
         }
     }
 }

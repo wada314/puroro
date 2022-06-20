@@ -373,6 +373,67 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct MsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> MsgWrapper<R> {
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(1).unwrap()
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn i32_unlabeled(&self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or(todo!())
+        }
+        pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(2).unwrap()
+        }
+
+        pub fn has_i32_optional(&self) -> bool {
+            todo!()
+        }
+
+        pub fn i32_optional(&self) -> i32 {
+            self.i32_optional_opt().unwrap_or(todo!())
+        }
+        pub fn f32_unlabeled_opt(&self) -> ::std::option::Option<f32> {
+            self.0.get_f32(4).unwrap()
+        }
+
+        pub fn has_f32_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn f32_unlabeled(&self) -> f32 {
+            self.f32_unlabeled_opt().unwrap_or(todo!())
+        }
+        pub fn string_unlabeled_opt(
+            &self,
+        ) -> ::std::option::Option<&'_ dyn ::std::convert::AsRef<str>> {
+            self.0.get_str(5).unwrap()
+        }
+
+        pub fn has_string_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn string_unlabeled(&self) -> &'_ dyn ::std::convert::AsRef<str> {
+            self.string_unlabeled_opt().unwrap_or(todo!())
+        }
+        pub fn submsg_unlabeled_opt(&self) -> ::std::option::Option<()> {
+            self.0.get_message(6).unwrap()
+        }
+
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn submsg_unlabeled(&self) -> () {
+            todo!()
+        }
+    }
     pub struct Submsg {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
@@ -496,6 +557,21 @@ pub mod _puroro_simple_impl {
     impl ::std::cmp::PartialEq for Submsg {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield && self.i32_unlabeled == rhs.i32_unlabeled && true
+        }
+    }
+    pub struct SubmsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> SubmsgWrapper<R> {
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(1).unwrap()
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            todo!()
+        }
+
+        pub fn i32_unlabeled(&self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or(todo!())
         }
     }
 }

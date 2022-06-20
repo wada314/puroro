@@ -113,6 +113,20 @@ where
 
 pub trait MessageRepresentativeImpl {}
 
+// Reflection methods
+pub trait Reflection {
+    fn get_i32(&self, number: i32) -> Result<Option<i32>>;
+    fn get_u32(&self, number: i32) -> Result<Option<u32>>;
+    fn get_i64(&self, number: i32) -> Result<Option<i64>>;
+    fn get_u64(&self, number: i32) -> Result<Option<u64>>;
+    fn get_f32(&self, number: i32) -> Result<Option<f32>>;
+    fn get_f64(&self, number: i32) -> Result<Option<f64>>;
+    fn get_bool(&self, number: i32) -> Result<Option<bool>>;
+    fn get_bytes(&self, number: i32) -> Result<Option<&dyn AsRef<[u8]>>>;
+    fn get_str(&self, number: i32) -> Result<Option<&dyn AsRef<str>>>;
+    fn get_message(&self, number: i32) -> Result<Option<&dyn Reflection>>;
+}
+
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
 {

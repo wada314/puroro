@@ -210,6 +210,9 @@ struct Field {
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
+    wrapper_getter_type: String,
+    wrapper_getter_opt_type: String,
+    wrapper_corresponding_reflection_getter: String,
     single_field_type: String,
     single_numerical_rust_type: String,
     bumpalo_field_type: String,
@@ -328,6 +331,14 @@ impl Field {
                     },
                 )
             })?,
+            wrapper_getter_type: f.wrapper_getter_scalar_type("'_")?.into(),
+            wrapper_getter_opt_type: format!(
+                "::std::option::Option<{}>",
+                f.wrapper_getter_scalar_type("'_")?,
+            ),
+            wrapper_corresponding_reflection_getter: f
+                .wrapper_corresponding_reflection_getter()?
+                .into(),
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),

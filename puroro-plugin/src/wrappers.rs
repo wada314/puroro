@@ -652,7 +652,7 @@ impl Field {
                 ident_camel = self.ident_camel_unesc
             )
             .into(),
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         })
     }
     pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<Cow<'static, str>> {
@@ -669,7 +669,7 @@ impl Field {
                 ident_camel = self.ident_camel_unesc,
             )
             .into(),
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         })
     }
 
@@ -724,7 +724,7 @@ impl Field {
                 )
                 .into()
             }
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         };
         Ok(format!("::puroro::internal::Bare<{}>", bare_type).into())
     }
@@ -758,7 +758,7 @@ impl Field {
                     format!("::std::boxed::Box<{}>", bare_msg).into()
                 }
             }
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         })
     }
 
@@ -772,7 +772,7 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
                 format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         })
     }
 
@@ -797,7 +797,7 @@ impl Field {
                 format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
             }
             Trivial(field_type) => {
-                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_name()?)
+                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_path()?)
             }
         }
         .into())
@@ -811,7 +811,7 @@ impl Field {
                 LengthDelimited(String) => "::std::string::String".into(),
                 LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
                 LengthDelimited(Message(m)) => upgrade(&m)?.rust_impl_path("Simple", &[]).into(),
-                Trivial(field_type) => field_type.rust_type_name()?,
+                Trivial(field_type) => field_type.rust_type_path()?,
             };
             if self.is_repeated()? {
                 format!("&{lt} mut ::std::vec::Vec<{ty}>", lt = lt, ty = scalar_type)
@@ -819,6 +819,37 @@ impl Field {
                 format!("&{lt} mut {ty}", lt = lt, ty = scalar_type)
             }
             .into()
+        })
+    }
+
+    pub fn wrapper_getter_scalar_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => {
+                format!("&{lt} dyn ::std::convert::AsRef<str>",)
+            }
+            LengthDelimited(Bytes) => {
+                format!("&{lt} dyn ::std::convert::AsRef<[u8]>",)
+            }
+            LengthDelimited(Message(m)) => {
+                format!("()") // TODO
+            }
+            Trivial(field_type) => {
+                format!("{ty}", ty = field_type.rust_type_path()?)
+            }
+        }
+        .into())
+    }
+
+    pub fn wrapper_corresponding_reflection_getter(&self) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => "get_str".into(),
+            LengthDelimited(Bytes) => "get_bytes".into(),
+            LengthDelimited(Message(m)) => "get_message".into(),
+            Trivial(field_type) => format!("get_{ty}", ty = field_type.rust_type_path()?).into(),
         })
     }
 
@@ -846,7 +877,7 @@ impl Field {
             LengthDelimited(Message(m)) => {
                 upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]).into()
             }
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         })
     }
 
@@ -860,7 +891,7 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
-            Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_path()?,
         })
     }
 
@@ -879,7 +910,7 @@ impl Field {
                 format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
             }
             Trivial(field_type) => {
-                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_name()?)
+                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_path()?)
             }
         }
         .into())
@@ -907,7 +938,7 @@ impl Field {
             Trivial(field_type) => format!(
                 "&{lt} mut {ty}",
                 lt = this_lt,
-                ty = field_type.rust_type_name()?
+                ty = field_type.rust_type_path()?
             ),
         })
     }
@@ -937,7 +968,7 @@ impl Field {
                     "::puroro::internal::RefMutBumpVec<{bump_lt}, {this_lt}, {ty}>",
                     bump_lt = bump_lt,
                     this_lt = this_lt,
-                    ty = field_type.rust_type_name()?
+                    ty = field_type.rust_type_path()?
                 )
             }
         })
@@ -954,7 +985,7 @@ impl Field {
 
     pub fn single_numerical_rust_type(&self) -> Result<Cow<'static, str>> {
         Ok(match self.field_type()?.categories()? {
-            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_name()?,
+            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_path()?,
             _ => "".into(),
         })
     }
@@ -1281,7 +1312,7 @@ pub enum TrivialFieldType {
 }
 
 impl TrivialFieldType {
-    pub fn rust_type_name(&self) -> Result<Cow<'static, str>> {
+    pub fn rust_type_path(&self) -> Result<Cow<'static, str>> {
         Ok(match self {
             TrivialFieldType::Double => "f64".into(),
             TrivialFieldType::Float => "f32".into(),

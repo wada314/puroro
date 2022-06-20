@@ -139,6 +139,21 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct MsgWrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> MsgWrapper<R> {
+        pub fn type_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(1).unwrap()
+        }
+
+        pub fn has_type(&self) -> bool {
+            todo!()
+        }
+
+        pub fn r#type(&self) -> i32 {
+            self.type_opt().unwrap_or(todo!())
+        }
+    }
 }
 
 pub use _puroro_impls::*;

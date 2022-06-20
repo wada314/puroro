@@ -139,6 +139,21 @@ pub mod _puroro_simple_impl {
                 && true
         }
     }
+    pub struct Test1Wrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> Test1Wrapper<R> {
+        pub fn a_opt(&self) -> ::std::option::Option<i32> {
+            self.0.get_i32(1).unwrap()
+        }
+
+        pub fn has_a(&self) -> bool {
+            todo!()
+        }
+
+        pub fn a(&self) -> i32 {
+            self.a_opt().unwrap_or(todo!())
+        }
+    }
     pub struct Test2 {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
@@ -263,6 +278,21 @@ pub mod _puroro_simple_impl {
             self._bitfield == rhs._bitfield
                 && (self._bitfield.get(0).as_deref() != Some(&true) || self.b == rhs.b)
                 && true
+        }
+    }
+    pub struct Test2Wrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> Test2Wrapper<R> {
+        pub fn b_opt(&self) -> ::std::option::Option<&'_ dyn ::std::convert::AsRef<str>> {
+            self.0.get_str(2).unwrap()
+        }
+
+        pub fn has_b(&self) -> bool {
+            todo!()
+        }
+
+        pub fn b(&self) -> &'_ dyn ::std::convert::AsRef<str> {
+            self.b_opt().unwrap_or(todo!())
         }
     }
     pub struct Test3 {
@@ -401,6 +431,21 @@ pub mod _puroro_simple_impl {
             self._bitfield == rhs._bitfield && self.c == rhs.c && true
         }
     }
+    pub struct Test3Wrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> Test3Wrapper<R> {
+        pub fn c_opt(&self) -> ::std::option::Option<()> {
+            self.0.get_message(3).unwrap()
+        }
+
+        pub fn has_c(&self) -> bool {
+            todo!()
+        }
+
+        pub fn c(&self) -> () {
+            todo!()
+        }
+    }
     pub struct Test4 {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
@@ -508,6 +553,9 @@ pub mod _puroro_simple_impl {
             self._bitfield == rhs._bitfield && self.d == rhs.d && true
         }
     }
+    pub struct Test4Wrapper<R>(R);
+
+    impl<R: ::puroro::Reflection> Test4Wrapper<R> {}
 }
 
 pub use _puroro_impls::*;
