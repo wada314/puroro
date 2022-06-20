@@ -2,7 +2,7 @@ impl<T> {{ m.trait_ident }} for ::std::option::Option<T>
 where
     T: {{ m.trait_ident }},
 {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
     {%- if f.is_message %}
     type {{ f.ident_camel_unesc }}MessageType<'this> = T::{{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this;
     {%- endif %}
