@@ -295,7 +295,27 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl super::_puroro_traits::MsgTrait for Msg {}
+    impl super::_puroro_traits::MsgTrait for Msg {
+        fn g1_int32_opt<'this>(&'this self) -> Option<i32> {
+            <self::Msg>::g1_int32_opt(self)
+        }
+        fn g1_string_opt<'this>(&'this self) -> Option<&'this str> {
+            <self::Msg>::g1_string_opt(self)
+        }
+        fn g2_f32_opt<'this>(&'this self) -> Option<f32> {
+            <self::Msg>::g2_f32_opt(self)
+        }
+        fn g2_string_opt<'this>(&'this self) -> Option<&'this str> {
+            <self::Msg>::g2_string_opt(self)
+        }
+        type G2SubmsgMessageType<'this> = &'this self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg where Self: 'this;
+        fn g2_submsg_opt<'this>(&'this self) -> Option<Self::G2SubmsgMessageType<'this>> {
+            <self::Msg>::g2_submsg_opt(self)
+        }
+        fn g3_int32_opt<'this>(&'this self) -> Option<i32> {
+            <self::Msg>::g3_int32_opt(self)
+        }
+    }
 
     impl ::puroro::MessageRepresentativeImpl for Msg {}
 
@@ -1289,7 +1309,27 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {}
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+        fn g1_int32_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::g1_int32_opt(self)
+        }
+        fn g1_string_opt<'this>(&'this self) -> Option<&'this str> {
+            <Self>::g1_string_opt(self)
+        }
+        fn g2_f32_opt<'this>(&'this self) -> Option<f32> {
+            <Self>::g2_f32_opt(self)
+        }
+        fn g2_string_opt<'this>(&'this self) -> Option<&'this str> {
+            <Self>::g2_string_opt(self)
+        }
+        type G2SubmsgMessageType<'this> = &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this> where Self: 'this;
+        fn g2_submsg_opt<'this>(&'this self) -> Option<Self::G2SubmsgMessageType<'this>> {
+            <Self>::g2_submsg_opt(self)
+        }
+        fn g3_int32_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::g3_int32_opt(self)
+        }
+    }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
         fn deser_field<'this, I>(
@@ -2087,7 +2127,37 @@ pub mod _puroro_traits {
             <U as MsgTrait>::G2SubmsgMessageType<'this>,
         > where Self: 'this;
     }
-    impl<T> MsgTrait for ::std::option::Option<T> where T: MsgTrait {}
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        fn g1_int32_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.g1_int32_opt())
+        }
+
+        fn g1_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.g1_string_opt())
+        }
+
+        fn g2_f32_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.g2_f32_opt())
+        }
+
+        fn g2_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.g2_string_opt())
+        }
+        type G2SubmsgMessageType<'this> = T::G2SubmsgMessageType<'this> where Self: 'this;
+
+        fn g2_submsg_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::G2SubmsgMessageType<'this>> {
+            self.as_ref().and_then(|msg| msg.g2_submsg_opt())
+        }
+
+        fn g3_int32_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.g3_int32_opt())
+        }
+    }
 
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {

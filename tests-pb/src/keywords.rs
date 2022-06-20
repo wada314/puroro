@@ -12,7 +12,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Msg {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         r#type: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
@@ -25,7 +25,7 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn type_opt(&self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.r#type.clone().inner())
             } else {
                 ::std::option::Option::None
@@ -216,7 +216,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         r#type: ::puroro::internal::Bare<i32>,
     }
 
@@ -234,7 +234,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.r#type.inner())
             } else {
                 ::std::option::Option::None
