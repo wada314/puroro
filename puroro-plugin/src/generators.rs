@@ -83,17 +83,16 @@ struct Message {
 impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
         let mut bitfield_index = 0;
-        let fields: Vec<Field> = m
-            .fields()
-            .into_iter()
-            .filter(|f| !(f.oneof_index().is_some() && !f.is_optional3()))
-            .map(|f| Field::try_new(f, &mut bitfield_index))
-            .try_collect()?;
         let fields_and_oneof_fields: Vec<Field> = m
             .fields()
             .into_iter()
             .map(|f| Field::try_new(f, &mut bitfield_index))
             .try_collect()?;
+        let fields = fields_and_oneof_fields
+            .iter()
+            .filter(|f| !f.is_explicit_oneof_field)
+            .cloned()
+            .collect();
         let oneofs = m
             .oneofs()
             .into_iter()
@@ -179,6 +178,7 @@ impl EnumValue {
     }
 }
 
+#[derive(Clone)]
 struct Field {
     ident: String,
     ident_unesc: String,

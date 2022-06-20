@@ -13,7 +13,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Msg {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::std::vec::Vec<i32>,
@@ -54,7 +54,7 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional.clone().inner())
             } else {
                 ::std::option::Option::None
@@ -971,7 +971,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
@@ -1020,7 +1020,7 @@ pub mod _puroro_impls {
             self.i32_unlabeled_opt().is_some()
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional.inner())
             } else {
                 ::std::option::Option::None

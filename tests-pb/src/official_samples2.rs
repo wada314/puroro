@@ -15,7 +15,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Test1 {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         a: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Test1> for Test1 {}
@@ -28,7 +28,7 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn a_opt(&self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.a.clone().inner())
             } else {
                 ::std::option::Option::None
@@ -141,7 +141,7 @@ pub mod _puroro_simple_impl {
     }
     pub struct Test2 {
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         b: ::puroro::internal::Bare<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
@@ -154,7 +154,7 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn b_opt(&self) -> ::std::option::Option<&'_ str> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
@@ -585,7 +585,7 @@ pub mod _puroro_impls {
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         a: ::puroro::internal::Bare<i32>,
     }
 
@@ -603,7 +603,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.a.inner())
             } else {
                 ::std::option::Option::None
@@ -788,7 +788,7 @@ pub mod _puroro_impls {
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (2 + 31) / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         b: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
     }
 
@@ -806,7 +806,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if self._bitfield.get(1).map_or(false, |v| *v) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None

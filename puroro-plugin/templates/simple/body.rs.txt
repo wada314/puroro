@@ -232,7 +232,7 @@ impl {{ m.simple_ident }} {
 }
 
 impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
-    {%- for f in m.fields %}
+    {%- for f in m.fields_and_oneof_fields %}
     {%- call simple_trait_impl_field(f) %}
     {%- endfor %}
 }
