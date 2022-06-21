@@ -15,6 +15,7 @@
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
 
+mod descriptor_resolver;
 mod error;
 mod generators;
 mod utils;
