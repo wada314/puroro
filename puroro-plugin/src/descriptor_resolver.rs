@@ -22,7 +22,7 @@ use ::std::sync::RwLock;
 
 pub struct DescriptorResolver<'a> {
     files: Vec<&'a FileDescriptorProto>,
-    fqtn_to_desc_cache: RwLock<HashMap<String, MessageOrEnumDescriptor<'a>>>,
+    fqtn_to_desc_cache: RwLock<HashMap<String, Option<MessageOrEnumDescriptor<'a>>>>,
 }
 impl<'a> DescriptorResolver<'a> {
     pub fn init<I>(file_descriptors_iter: I) -> Result<Self>
@@ -36,11 +36,21 @@ impl<'a> DescriptorResolver<'a> {
     }
 
     pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<MessageOrEnumDescriptor<'_>> {
+        debug_assert!(!fqtn.starts_with('.'));
+        // search for cache
         if let Ok(cache) = self.fqtn_to_desc_cache.read() {
             if let Some(desc) = cache.get(fqtn) {
-                return Some(desc.clone());
+                return desc.clone();
             }
         }
+
+        fn find_from_file<'a, 'b>(
+            file: &'a FileDescriptorProto,
+            nested_type_name: &'b str,
+        ) -> Option<MessageOrEnumDescriptor<'a>> {
+            todo!()
+        }
+
         todo!()
     }
 }
