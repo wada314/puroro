@@ -10,9 +10,22 @@ impl<R: ::puroro::Reflection> {{ m.simple_ident }}Wrapper<R> {
     {#- [optional] String => Option<&dyn AsRef<str>> #}
     {#- [optional] MyMessage => Option<TODO> #}
     pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.wrapper_getter_opt_type }} {
+        {%- if f.is_message %}
+        todo!()
+        {%- else %} {#- if f.is_message #}
+        {%- if f.is_enum2 %}
+        use ::std::convert::TryInto;
+        {%- endif %} {#- if f.is_enum2 #}
         self.0
             .{{ f.wrapper_corresponding_reflection_getter }}({{ f.number }})
             .unwrap()
+        {%- if f.is_enum2 %}
+            .map(|e| e.try_into().unwrap())
+        {%- endif %} {#- if f.is_enum2 #}
+        {%- if f.is_enum3 %}
+            .map(|e| e.into())
+        {%- endif %} {#- if f.is_enum3 #}
+        {%- endif %} {#- if f.is_message #}
     }
 
     pub fn has_{{ f.ident_unesc }}(&self) -> bool {

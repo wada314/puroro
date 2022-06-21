@@ -427,7 +427,7 @@ pub mod _puroro_simple_impl {
 
     impl<R: ::puroro::Reflection> Test3Wrapper<R> {
         pub fn c_opt(&self) -> ::std::option::Option<()> {
-            self.0.get_message(3).unwrap()
+            todo!()
         }
 
         pub fn has_c(&self) -> bool {

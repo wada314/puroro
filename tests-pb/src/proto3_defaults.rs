@@ -423,7 +423,7 @@ pub mod _puroro_simple_impl {
             self.string_unlabeled_opt().unwrap_or(todo!())
         }
         pub fn submsg_unlabeled_opt(&self) -> ::std::option::Option<()> {
-            self.0.get_message(6).unwrap()
+            todo!()
         }
 
         pub fn has_submsg_unlabeled(&self) -> bool {

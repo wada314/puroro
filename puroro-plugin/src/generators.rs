@@ -189,6 +189,8 @@ struct Field {
     is_string: bool,
     is_bytes: bool,
     is_length_delimited: bool,
+    is_enum2: bool,
+    is_enum3: bool,
     is_numerical: bool,
     is_explicit_oneof_field: bool,
     is_repeated: bool,
@@ -234,6 +236,8 @@ impl Field {
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
         let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
         let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
+        let is_enum2 = matches!(f.field_type()?, wrappers::FieldType::Enum2(_));
+        let is_enum3 = matches!(f.field_type()?, wrappers::FieldType::Enum3(_));
         let is_repeated = matches!(f.field_label()?, wrappers::FieldLabel::Repeated);
         let is_unlabeled = matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled);
         let is_length_delimited = is_message || is_string || is_bytes;
@@ -249,6 +253,8 @@ impl Field {
             is_message,
             is_string,
             is_bytes,
+            is_enum2,
+            is_enum3,
             is_length_delimited,
             is_numerical: !is_length_delimited,
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),

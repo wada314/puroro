@@ -652,7 +652,8 @@ impl Field {
                 ident_camel = self.ident_camel_unesc
             )
             .into(),
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         })
     }
     pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<Cow<'static, str>> {
@@ -669,7 +670,8 @@ impl Field {
                 ident_camel = self.ident_camel_unesc,
             )
             .into(),
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         })
     }
 
@@ -713,7 +715,7 @@ impl Field {
     pub fn bumpalo_oneof_field_type(&self) -> Result<Cow<'static, str>> {
         use FieldTypeCategories::*;
         use LdFieldType::*;
-        let bare_type = match self.field_type()?.categories()? {
+        let bare_type: Cow<'static, str> = match self.field_type()?.categories()? {
             LengthDelimited(String) => "::puroro::internal::NoAllocBumpString".into(),
             LengthDelimited(Bytes) => "::puroro::internal::NoAllocBumpVec<u8>".into(),
             LengthDelimited(Message(m)) => {
@@ -724,7 +726,8 @@ impl Field {
                 )
                 .into()
             }
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         };
         Ok(format!("::puroro::internal::Bare<{}>", bare_type).into())
     }
@@ -758,7 +761,8 @@ impl Field {
                     format!("::std::boxed::Box<{}>", bare_msg).into()
                 }
             }
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         })
     }
 
@@ -772,7 +776,8 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
                 format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         })
     }
 
@@ -781,23 +786,20 @@ impl Field {
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
             LengthDelimited(String) => {
-                format!(
-                    "&{lt}[impl ::std::ops::Deref<Target=str> + ::std::fmt::Debug]",
-                    lt = lt
-                )
+                format!("&{lt}[impl ::std::ops::Deref<Target=str> + ::std::fmt::Debug]",)
             }
             LengthDelimited(Bytes) => {
-                format!(
-                    "&{lt}[impl ::std::ops::Deref<Target=[u8]> + ::std::fmt::Debug]",
-                    lt = lt
-                )
+                format!("&{lt}[impl ::std::ops::Deref<Target=[u8]> + ::std::fmt::Debug]",)
             }
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
-                format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
+                format!("&{lt}[{msg}]", msg = msg_type)
+            }
+            Enum(e) => {
+                format!("&{lt}[{ty}]", ty = upgrade(&e)?.rust_path())
             }
             Trivial(field_type) => {
-                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_path()?)
+                format!("&{lt}[{ty}]", ty = field_type.rust_type_name()?)
             }
         }
         .into())
@@ -807,11 +809,12 @@ impl Field {
         use FieldTypeCategories::*;
         use LdFieldType::*;
         Ok({
-            let scalar_type = match self.field_type()?.categories()? {
+            let scalar_type: Cow<'static, str> = match self.field_type()?.categories()? {
                 LengthDelimited(String) => "::std::string::String".into(),
                 LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
                 LengthDelimited(Message(m)) => upgrade(&m)?.rust_impl_path("Simple", &[]).into(),
-                Trivial(field_type) => field_type.rust_type_path()?,
+                Enum(e) => upgrade(&e)?.rust_path().into(),
+                Trivial(field_type) => field_type.rust_type_name()?.into(),
             };
             if self.is_repeated()? {
                 format!("&{lt} mut ::std::vec::Vec<{ty}>", lt = lt, ty = scalar_type)
@@ -826,20 +829,14 @@ impl Field {
         use FieldTypeCategories::*;
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
-            LengthDelimited(String) => {
-                format!("&{lt} dyn ::std::convert::AsRef<str>",)
-            }
-            LengthDelimited(Bytes) => {
-                format!("&{lt} dyn ::std::convert::AsRef<[u8]>",)
-            }
+            LengthDelimited(String) => format!("&{lt} dyn ::std::convert::AsRef<str>",).into(),
+            LengthDelimited(Bytes) => format!("&{lt} dyn ::std::convert::AsRef<[u8]>",).into(),
             LengthDelimited(Message(m)) => {
-                format!("()") // TODO
+                format!("()").into() // TODO
             }
-            Trivial(field_type) => {
-                format!("{ty}", ty = field_type.rust_type_path()?)
-            }
-        }
-        .into())
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
+        })
     }
 
     pub fn wrapper_corresponding_reflection_getter(&self) -> Result<Cow<'static, str>> {
@@ -849,7 +846,8 @@ impl Field {
             LengthDelimited(String) => "get_str".into(),
             LengthDelimited(Bytes) => "get_bytes".into(),
             LengthDelimited(Message(m)) => "get_message".into(),
-            Trivial(field_type) => format!("get_{ty}", ty = field_type.rust_type_path()?).into(),
+            Enum(_) => "get_i32".into(),
+            Trivial(field_type) => format!("get_{ty}", ty = field_type.rust_type_name()?).into(),
         })
     }
 
@@ -877,7 +875,8 @@ impl Field {
             LengthDelimited(Message(m)) => {
                 upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]).into()
             }
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         })
     }
 
@@ -891,7 +890,8 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
-            Trivial(field_type) => field_type.rust_type_path()?,
+            Enum(e) => upgrade(&e)?.rust_path().into(),
+            Trivial(field_type) => field_type.rust_type_name()?.into(),
         })
     }
 
@@ -909,8 +909,9 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
             }
+            Enum(e) => format!("&{lt}[{ty}]", ty = upgrade(&e)?.rust_path()),
             Trivial(field_type) => {
-                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_path()?)
+                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_name()?)
             }
         }
         .into())
@@ -935,10 +936,15 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt]);
                 format!("&{lt} mut {msg}", lt = this_lt, msg = msg_type)
             }
+            Enum(e) => format!(
+                "&{lt} mut {ty}",
+                lt = this_lt,
+                ty = upgrade(&e)?.rust_path(),
+            ),
             Trivial(field_type) => format!(
                 "&{lt} mut {ty}",
                 lt = this_lt,
-                ty = field_type.rust_type_path()?
+                ty = field_type.rust_type_name()?
             ),
         })
     }
@@ -963,12 +969,20 @@ impl Field {
                 this_lt = this_lt,
                 ty = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt])
             ),
+            Enum(e) => {
+                format!(
+                    "::puroro::internal::RefMutBumpVec<{bump_lt}, {this_lt}, {ty}>",
+                    bump_lt = bump_lt,
+                    this_lt = this_lt,
+                    ty = upgrade(&e)?.rust_path(),
+                )
+            }
             Trivial(field_type) => {
                 format!(
                     "::puroro::internal::RefMutBumpVec<{bump_lt}, {this_lt}, {ty}>",
                     bump_lt = bump_lt,
                     this_lt = this_lt,
-                    ty = field_type.rust_type_path()?
+                    ty = field_type.rust_type_name()?
                 )
             }
         })
@@ -985,7 +999,8 @@ impl Field {
 
     pub fn single_numerical_rust_type(&self) -> Result<Cow<'static, str>> {
         Ok(match self.field_type()?.categories()? {
-            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_path()?,
+            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_name()?.into(),
+            FieldTypeCategories::Enum(e) => upgrade(&e)?.rust_path().into(),
             _ => "".into(),
         })
     }
@@ -1256,8 +1271,8 @@ impl FieldType {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => LengthDelimited(LdFieldType::String),
             FieldType::Bytes => LengthDelimited(LdFieldType::Bytes),
-            FieldType::Enum2(e) => Trivial(TrivialFieldType::Enum2(e)),
-            FieldType::Enum3(e) => Trivial(TrivialFieldType::Enum3(e)),
+            FieldType::Enum2(e) => Enum(e),
+            FieldType::Enum3(e) => Enum(e),
             FieldType::Message(m) => LengthDelimited(LdFieldType::Message(m)),
         })
     }
@@ -1307,35 +1322,32 @@ pub enum TrivialFieldType {
     SFixed32,
     SFixed64,
     Bool,
-    Enum2(Weak<Enum>),
-    Enum3(Weak<Enum>),
 }
 
 impl TrivialFieldType {
-    pub fn rust_type_path(&self) -> Result<Cow<'static, str>> {
+    pub fn rust_type_name(&self) -> Result<Cow<'static, str>> {
         Ok(match self {
-            TrivialFieldType::Double => "f64".into(),
-            TrivialFieldType::Float => "f32".into(),
-            TrivialFieldType::Int32 => "i32".into(),
-            TrivialFieldType::Int64 => "i64".into(),
-            TrivialFieldType::UInt32 => "u32".into(),
-            TrivialFieldType::UInt64 => "u64".into(),
-            TrivialFieldType::SInt32 => "i32".into(),
-            TrivialFieldType::SInt64 => "i64".into(),
-            TrivialFieldType::Fixed32 => "u32".into(),
-            TrivialFieldType::Fixed64 => "u64".into(),
-            TrivialFieldType::SFixed32 => "i32".into(),
-            TrivialFieldType::SFixed64 => "i64".into(),
-            TrivialFieldType::Bool => "bool".into(),
-            TrivialFieldType::Enum2(e) | TrivialFieldType::Enum3(e) => {
-                upgrade(e)?.rust_path().into()
-            }
-        })
+            TrivialFieldType::Double => "f64",
+            TrivialFieldType::Float => "f32",
+            TrivialFieldType::Int32 => "i32",
+            TrivialFieldType::Int64 => "i64",
+            TrivialFieldType::UInt32 => "u32",
+            TrivialFieldType::UInt64 => "u64",
+            TrivialFieldType::SInt32 => "i32",
+            TrivialFieldType::SInt64 => "i64",
+            TrivialFieldType::Fixed32 => "u32",
+            TrivialFieldType::Fixed64 => "u64",
+            TrivialFieldType::SFixed32 => "i32",
+            TrivialFieldType::SFixed64 => "i64",
+            TrivialFieldType::Bool => "bool",
+        }
+        .into())
     }
 }
 
 pub enum FieldTypeCategories {
     LengthDelimited(LdFieldType),
+    Enum(Weak<Enum>),
     Trivial(TrivialFieldType),
 }
 

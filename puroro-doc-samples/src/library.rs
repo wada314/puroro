@@ -188,6 +188,8 @@ pub mod _puroro_simple_impl {
 
     impl<R: ::puroro::Reflection> BookWrapper<R> {
         pub fn title_opt(&self) -> ::std::option::Option<&'_ dyn ::std::convert::AsRef<str>> {
+            #[allow(unused)]
+            use ::std::convert::TryInto;
             self.0.get_str(1).unwrap()
         }
 
@@ -199,6 +201,8 @@ pub mod _puroro_simple_impl {
             self.title_opt().unwrap_or(todo!())
         }
         pub fn num_pages_opt(&self) -> ::std::option::Option<u32> {
+            #[allow(unused)]
+            use ::std::convert::TryInto;
             self.0.get_u32(2).unwrap()
         }
 
