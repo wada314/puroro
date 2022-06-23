@@ -48,7 +48,20 @@ impl<'a> DescriptorResolver<'a> {
             file: &'a FileDescriptorProto,
             nested_type_name: &'b str,
         ) -> Option<MessageOrEnumDescriptor<'a>> {
+            let (nested_msg_names, type_name) = {
+                match nested_type_name.rsplit_once('.') {
+                    Some((remains, type_name)) => (remains.split('.').collect(), type_name),
+                    None => (vec![], nested_type_name),
+                }
+            };
             todo!()
+        }
+
+        fn find_from_messages<I: Iterator<Item = &DescriptorProto>>(
+            messages: I,
+            name: &str,
+        ) -> Option<&DescriptorProto> {
+            messages.find(|m| m.name() == name)
         }
 
         todo!()
