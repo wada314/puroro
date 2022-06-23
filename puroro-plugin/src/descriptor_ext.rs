@@ -26,6 +26,7 @@ use ::std::rc::{Rc, Weak};
 pub struct FileDescriptorExt {
     proto: FileDescriptorProto,
     message_type: Vec<Rc<DescriptorExt>>,
+    enum_type: Vec<Rc<EnumDescriptorExt>>,
 }
 
 #[derive(Debug)]
@@ -33,6 +34,7 @@ pub struct DescriptorExt {
     proto: DescriptorProto,
     parent: WeakFileOrMessage,
     nested_type: Vec<Rc<DescriptorExt>>,
+    enum_type: Vec<Rc<EnumDescriptorExt>>,
     field: Vec<Rc<FieldDescriptorExt>>,
 }
 
@@ -94,6 +96,11 @@ impl FileDescriptorExt {
                 .iter()
                 .map(|m| DescriptorExt::new(m, WeakFileOrMessage::File(this.clone())))
                 .collect(),
+            enum_type: source
+                .enum_type()
+                .iter()
+                .map(|e| EnumDescriptorExt::new(e, WeakFileOrMessage::File(this.clone())))
+                .collect(),
         })
     }
 }
@@ -107,6 +114,11 @@ impl DescriptorExt {
                 .nested_type()
                 .iter()
                 .map(|nm| DescriptorExt::new(nm, WeakFileOrMessage::Message(this.clone())))
+                .collect(),
+            enum_type: source
+                .enum_type()
+                .iter()
+                .map(|e| EnumDescriptorExt::new(e, WeakFileOrMessage::Message(this.clone())))
                 .collect(),
             field: source
                 .field()
