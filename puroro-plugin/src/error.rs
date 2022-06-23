@@ -42,6 +42,8 @@ pub enum ErrorKind {
     PuroroError { source: ::puroro::PuroroError },
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
+    #[error(r#"Failed to upgrade a Weak pointer"#)]
+    WeakUpgradeFailure,
 }
 impl From<std::fmt::Error> for GeneratorError {
     fn from(e: std::fmt::Error) -> Self {
