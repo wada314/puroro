@@ -140,6 +140,10 @@ impl EnumDescriptorExt {
             parent: parent.clone(),
         })
     }
+
+    fn parent(&self) -> Result<RcFileOrMessage> {
+        self.parent.upgrade()
+    }
 }
 
 impl FieldDescriptorExt {
@@ -148,6 +152,10 @@ impl FieldDescriptorExt {
             proto: source.clone(),
             parent: parent.clone(),
         })
+    }
+
+    fn parent(&self) -> Result<Rc<Message>> {
+        self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)
     }
 }
 
