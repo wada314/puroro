@@ -19,6 +19,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
 };
+use ::std::borrow::Cow;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
@@ -131,6 +132,10 @@ impl DescriptorExt {
     fn parent(&self) -> Result<RcFileOrMessage> {
         self.parent.upgrade()
     }
+
+    fn package(&self) -> Result<Cow<str>> {
+        Ok(self.parent()?.package()?.into_owned().into())
+    }
 }
 
 impl EnumDescriptorExt {
@@ -154,8 +159,8 @@ impl FieldDescriptorExt {
         })
     }
 
-    fn parent(&self) -> Result<Rc<Message>> {
-        self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)
+    fn parent(&self) -> Result<Rc<DescriptorExt>> {
+        Ok(self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)?)
     }
 }
 
@@ -167,6 +172,18 @@ impl WeakFileOrMessage {
             }
             WeakFileOrMessage::Message(m) => {
                 RcFileOrMessage::Message(Weak::upgrade(m).ok_or(ErrorKind::WeakUpgradeFailure)?)
+            }
+        })
+    }
+}
+
+impl RcFileOrMessage {
+    fn package(&self) -> Result<Cow<str>> {
+        Ok(match self {
+            RcFileOrMessage::File(f) => f.package().into(),
+            RcFileOrMessage::Message(m) => {
+                let parent_package = m.package()?;
+                format!("{}.{}", parent_package, m.name()).into()
             }
         })
     }
