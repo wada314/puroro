@@ -176,6 +176,15 @@ impl DescriptorExt {
         Ok(self.parent()?.package()?.into_owned().into())
     }
 
+    pub fn fqtn(&self) -> Result<Cow<str>> {
+        let package = self.package()?;
+        if package.is_empty() {
+            Ok(self.name().into())
+        } else {
+            Ok(format!("{}.{}", package, self.name()).into())
+        }
+    }
+
     pub fn nested_type(&self) -> &[Rc<DescriptorExt>] {
         &self.nested_type
     }
@@ -195,6 +204,19 @@ impl EnumDescriptorExt {
 
     pub fn parent(&self) -> Result<RcFileOrMessage> {
         self.parent.upgrade()
+    }
+
+    pub fn package(&self) -> Result<Cow<str>> {
+        Ok(self.parent()?.package()?.into_owned().into())
+    }
+
+    pub fn fqtn(&self) -> Result<Cow<str>> {
+        let package = self.package()?;
+        if package.is_empty() {
+            Ok(self.name().into())
+        } else {
+            Ok(format!("{}.{}", package, self.name()).into())
+        }
     }
 }
 
