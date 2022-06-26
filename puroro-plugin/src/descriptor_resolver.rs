@@ -29,10 +29,14 @@ impl<'a> DescriptorResolver {
         let mut fqtn_to_desc_map = HashMap::new();
         for f in file_descriptors_iter {
             f.for_each_message(|m| {
-                fqtn_to_desc_map.insert(m.fqtn().unwrap().to_string(), RcMessageOrEnum::Message(m));
+                fqtn_to_desc_map.insert(
+                    m.try_fqtn().unwrap().to_string(),
+                    RcMessageOrEnum::Message(m),
+                );
             });
             f.for_each_enum(|e| {
-                fqtn_to_desc_map.insert(e.fqtn().unwrap().to_string(), RcMessageOrEnum::Enum(e));
+                fqtn_to_desc_map
+                    .insert(e.try_fqtn().unwrap().to_string(), RcMessageOrEnum::Enum(e));
             });
         }
         Ok(Self { fqtn_to_desc_map })

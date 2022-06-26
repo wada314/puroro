@@ -15,11 +15,13 @@
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
 };
 use ::std::borrow::Cow;
+use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
@@ -168,20 +170,26 @@ impl DescriptorExt {
         })
     }
 
-    pub fn parent(&self) -> Result<RcFileOrMessage> {
-        self.parent.upgrade()
+    pub fn try_parent(&self) -> Result<RcFileOrMessage> {
+        self.parent.try_upgrade()
     }
 
-    pub fn package_opt(&self) -> Result<Option<Cow<str>>> {
-        Ok(self.parent()?.package_opt()?.map(|s| s.into_owned().into()))
+    pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(self
+            .try_parent()?
+            .try_package_opt()?
+            .map(|s| s.into_owned().into()))
     }
 
-    pub fn enclosing_messages(&self) -> Result<Option<Cow<str>>> {
-        todo!()
+    pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(self
+            .try_parent()?
+            .try_enclosing_messages_opt()?
+            .map(|s| s.into_owned().into()))
     }
 
-    pub fn fqtn(&self) -> Result<Cow<str>> {
-        let package = self.package_opt()?;
+    pub fn try_fqtn(&self) -> Result<Cow<str>> {
+        let package = self.try_package_opt()?;
         todo!()
     }
 
@@ -202,16 +210,26 @@ impl EnumDescriptorExt {
         })
     }
 
-    pub fn parent(&self) -> Result<RcFileOrMessage> {
-        self.parent.upgrade()
+    pub fn try_parent(&self) -> Result<RcFileOrMessage> {
+        self.parent.try_upgrade()
     }
 
-    pub fn package_opt(&self) -> Result<Option<Cow<str>>> {
-        Ok(self.parent()?.package_opt()?.map(|s| s.into_owned().into()))
+    pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(self
+            .try_parent()?
+            .try_package_opt()?
+            .map(|s| s.into_owned().into()))
     }
 
-    pub fn fqtn(&self) -> Result<Cow<str>> {
-        let package = self.package_opt()?;
+    pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(self
+            .try_parent()?
+            .try_enclosing_messages_opt()?
+            .map(|s| s.into_owned().into()))
+    }
+
+    pub fn try_fqtn(&self) -> Result<Cow<str>> {
+        let package = self.try_package_opt()?;
         todo!()
     }
 }
@@ -224,13 +242,13 @@ impl FieldDescriptorExt {
         })
     }
 
-    pub fn parent(&self) -> Result<Rc<DescriptorExt>> {
+    pub fn try_parent(&self) -> Result<Rc<DescriptorExt>> {
         Ok(self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)?)
     }
 }
 
 impl WeakFileOrMessage {
-    pub fn upgrade(&self) -> Result<RcFileOrMessage> {
+    pub fn try_upgrade(&self) -> Result<RcFileOrMessage> {
         Ok(match self {
             WeakFileOrMessage::File(f) => {
                 RcFileOrMessage::File(Weak::upgrade(f).ok_or(ErrorKind::WeakUpgradeFailure)?)
@@ -243,14 +261,23 @@ impl WeakFileOrMessage {
 }
 
 impl RcFileOrMessage {
-    pub fn package_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(match self {
             RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
-            RcFileOrMessage::Message(m) => m.package_opt()?.map(|s| s.into()),
+            RcFileOrMessage::Message(m) => m.try_package_opt()?.map(|s| s.into()),
         })
     }
 
-    pub fn enclosing_messages(&self) -> Result<Option<Cow<str>>> {
-        todo!()
+    pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(match self {
+            RcFileOrMessage::File(f) => None,
+            RcFileOrMessage::Message(m) => Some(
+                m.try_enclosing_messages_opt()?
+                    .into_iter()
+                    .chain(iter::once(m.name().into()))
+                    .join(".")
+                    .into(),
+            ),
+        })
     }
 }
