@@ -189,8 +189,13 @@ impl DescriptorExt {
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
-        let package = self.try_package_opt()?;
-        todo!()
+        Ok(self
+            .try_package_opt()?
+            .into_iter()
+            .chain(self.try_enclosing_messages_opt()?.into_iter())
+            .chain(iter::once(self.name().into()))
+            .join(".")
+            .into())
     }
 
     pub fn nested_type(&self) -> &[Rc<DescriptorExt>] {
