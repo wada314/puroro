@@ -172,17 +172,17 @@ impl DescriptorExt {
         self.parent.upgrade()
     }
 
-    pub fn package(&self) -> Result<Cow<str>> {
-        Ok(self.parent()?.package()?.into_owned().into())
+    pub fn package_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(self.parent()?.package_opt()?.map(|s| s.into_owned().into()))
+    }
+
+    pub fn enclosing_messages(&self) -> Result<Option<Cow<str>>> {
+        todo!()
     }
 
     pub fn fqtn(&self) -> Result<Cow<str>> {
-        let package = self.package()?;
-        if package.is_empty() {
-            Ok(self.name().into())
-        } else {
-            Ok(format!("{}.{}", package, self.name()).into())
-        }
+        let package = self.package_opt()?;
+        todo!()
     }
 
     pub fn nested_type(&self) -> &[Rc<DescriptorExt>] {
@@ -206,17 +206,13 @@ impl EnumDescriptorExt {
         self.parent.upgrade()
     }
 
-    pub fn package(&self) -> Result<Cow<str>> {
-        Ok(self.parent()?.package()?.into_owned().into())
+    pub fn package_opt(&self) -> Result<Option<Cow<str>>> {
+        Ok(self.parent()?.package_opt()?.map(|s| s.into_owned().into()))
     }
 
     pub fn fqtn(&self) -> Result<Cow<str>> {
-        let package = self.package()?;
-        if package.is_empty() {
-            Ok(self.name().into())
-        } else {
-            Ok(format!("{}.{}", package, self.name()).into())
-        }
+        let package = self.package_opt()?;
+        todo!()
     }
 }
 
@@ -247,13 +243,14 @@ impl WeakFileOrMessage {
 }
 
 impl RcFileOrMessage {
-    pub fn package(&self) -> Result<Cow<str>> {
+    pub fn package_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(match self {
-            RcFileOrMessage::File(f) => f.package().into(),
-            RcFileOrMessage::Message(m) => {
-                let parent_package = m.package()?;
-                format!("{}.{}", parent_package, m.name()).into()
-            }
+            RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
+            RcFileOrMessage::Message(m) => m.package_opt()?.map(|s| s.into()),
         })
+    }
+
+    pub fn enclosing_messages(&self) -> Result<Option<Cow<str>>> {
+        todo!()
     }
 }
