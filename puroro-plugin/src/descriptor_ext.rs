@@ -89,7 +89,7 @@ impl Deref for FieldDescriptorExt {
 }
 
 impl FileDescriptorExt {
-    fn new(source: &FileDescriptorProto) -> Rc<Self> {
+    pub fn new(source: &FileDescriptorProto) -> Rc<Self> {
         Rc::new_cyclic(|this| Self {
             proto: source.clone(),
             message_type: source
@@ -107,7 +107,7 @@ impl FileDescriptorExt {
 }
 
 impl DescriptorExt {
-    fn new(source: &DescriptorProto, parent: WeakFileOrMessage) -> Rc<Self> {
+    pub fn new(source: &DescriptorProto, parent: WeakFileOrMessage) -> Rc<Self> {
         Rc::new_cyclic(|this| Self {
             proto: source.clone(),
             parent: parent.clone(),
@@ -129,43 +129,59 @@ impl DescriptorExt {
         })
     }
 
-    fn parent(&self) -> Result<RcFileOrMessage> {
+    pub fn parent(&self) -> Result<RcFileOrMessage> {
         self.parent.upgrade()
     }
 
-    fn package(&self) -> Result<Cow<str>> {
+    pub fn package(&self) -> Result<Cow<str>> {
         Ok(self.parent()?.package()?.into_owned().into())
+    }
+
+    pub fn nested_type(&self) -> &[Rc<DescriptorExt>] {
+        &self.nested_type
+    }
+
+    pub fn enum_type(&self) -> &[Rc<EnumDescriptorExt>] {
+        &self.enum_type
+    }
+
+    pub fn for_each_message<F: FnMut(Rc<DescriptorExt>)>(&self, mut f: F) -> F {
+        for m in self.nested_type().iter() {
+            f(m.clone());
+            f = m.for_each_message(f);
+        }
+        f
     }
 }
 
 impl EnumDescriptorExt {
-    fn new(source: &EnumDescriptorProto, parent: WeakFileOrMessage) -> Rc<Self> {
+    pub fn new(source: &EnumDescriptorProto, parent: WeakFileOrMessage) -> Rc<Self> {
         Rc::new(Self {
             proto: source.clone(),
             parent: parent.clone(),
         })
     }
 
-    fn parent(&self) -> Result<RcFileOrMessage> {
+    pub fn parent(&self) -> Result<RcFileOrMessage> {
         self.parent.upgrade()
     }
 }
 
 impl FieldDescriptorExt {
-    fn new(source: &FieldDescriptorProto, parent: Weak<DescriptorExt>) -> Rc<Self> {
+    pub fn new(source: &FieldDescriptorProto, parent: Weak<DescriptorExt>) -> Rc<Self> {
         Rc::new(Self {
             proto: source.clone(),
             parent: parent.clone(),
         })
     }
 
-    fn parent(&self) -> Result<Rc<DescriptorExt>> {
+    pub fn parent(&self) -> Result<Rc<DescriptorExt>> {
         Ok(self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)?)
     }
 }
 
 impl WeakFileOrMessage {
-    fn upgrade(&self) -> Result<RcFileOrMessage> {
+    pub fn upgrade(&self) -> Result<RcFileOrMessage> {
         Ok(match self {
             WeakFileOrMessage::File(f) => {
                 RcFileOrMessage::File(Weak::upgrade(f).ok_or(ErrorKind::WeakUpgradeFailure)?)
@@ -178,7 +194,7 @@ impl WeakFileOrMessage {
 }
 
 impl RcFileOrMessage {
-    fn package(&self) -> Result<Cow<str>> {
+    pub fn package(&self) -> Result<Cow<str>> {
         Ok(match self {
             RcFileOrMessage::File(f) => f.package().into(),
             RcFileOrMessage::Message(m) => {

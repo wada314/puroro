@@ -15,6 +15,7 @@
 use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt};
 use crate::{ErrorKind, Result};
 use ::std::collections::HashMap;
+use ::std::rc::Rc;
 
 pub struct DescriptorResolver {
     fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
@@ -22,7 +23,7 @@ pub struct DescriptorResolver {
 impl<'a> DescriptorResolver {
     pub fn init<I>(file_descriptors_iter: I) -> Result<Self>
     where
-        I: Iterator<Item = Rc<FileDescriptorProtoExt>>,
+        I: Iterator<Item = Rc<FileDescriptorExt>>,
     {
         Ok(Self {
             fqtn_to_desc_map: todo!(),
@@ -36,6 +37,6 @@ impl<'a> DescriptorResolver {
 
 #[derive(Clone)]
 pub enum RcMessageOrEnum {
-    Message(Rc<DescriptorProto>),
-    Enum(Rc<EnumDescriptorProto>),
+    Message(Rc<DescriptorExt>),
+    Enum(Rc<EnumDescriptorExt>),
 }
