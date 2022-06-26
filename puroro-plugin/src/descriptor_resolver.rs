@@ -31,7 +31,7 @@ impl<'a> DescriptorResolver {
     }
 
     pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<RcMessageOrEnum> {
-        todo!()
+        self.fqtn_to_desc_map.get(fqtn).cloned()
     }
 }
 
