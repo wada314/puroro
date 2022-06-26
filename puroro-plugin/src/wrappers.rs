@@ -14,6 +14,8 @@
 
 #![allow(unused)]
 
+use crate::descriptor_ext::FileDescriptorExt;
+use crate::descriptor_resolver::{DescriptorResolver, RcMessageOrEnum};
 use crate::utils::*;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
@@ -40,10 +42,19 @@ use puroro::tags::LengthDelimited;
 pub struct Context {
     input_files: Vec<Rc<InputFile>>,
     lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
+
+    input_files2: Vec<Rc<FileDescriptorExt>>,
+    resolver: DescriptorResolver,
 }
 
 impl Context {
     pub fn try_from_proto(proto: CodeGeneratorRequest) -> Result<Rc<Context>> {
+        let input_files2 = proto
+            .proto_file()
+            .iter()
+            .map(|file| FileDescriptorExt::new(file))
+            .collect::<Vec<_>>();
+        let resolver = DescriptorResolver::new(input_files2.iter().cloned())?;
         let context = Rc::new_cyclic(|weak_context| Context {
             input_files: proto
                 .proto_file()
@@ -52,6 +63,8 @@ impl Context {
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
             lazy_fqtn_to_type_map: OnceCell::new(),
+            input_files2,
+            resolver,
         });
         context
             .lazy_fqtn_to_type_map

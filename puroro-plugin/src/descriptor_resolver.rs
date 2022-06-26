@@ -17,11 +17,12 @@ use crate::{ErrorKind, Result};
 use ::std::collections::HashMap;
 use ::std::rc::Rc;
 
+#[derive(Debug)]
 pub struct DescriptorResolver {
     fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
 }
 impl<'a> DescriptorResolver {
-    pub fn init<I>(file_descriptors_iter: I) -> Result<Self>
+    pub fn new<I>(file_descriptors_iter: I) -> Result<Self>
     where
         I: Iterator<Item = Rc<FileDescriptorExt>>,
     {
@@ -42,7 +43,7 @@ impl<'a> DescriptorResolver {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum RcMessageOrEnum {
     Message(Rc<DescriptorExt>),
     Enum(Rc<EnumDescriptorExt>),
