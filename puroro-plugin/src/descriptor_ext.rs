@@ -104,6 +104,45 @@ impl FileDescriptorExt {
                 .collect(),
         })
     }
+
+    pub fn message_type(&self) -> &[Rc<DescriptorExt>] {
+        &self.message_type
+    }
+
+    pub fn enum_type(&self) -> &[Rc<EnumDescriptorExt>] {
+        &self.enum_type
+    }
+
+    pub fn for_each_message<F: FnMut(Rc<DescriptorExt>)>(&self, mut f: F) {
+        fn inner<F: FnMut(Rc<DescriptorExt>)>(m: Rc<DescriptorExt>, mut f: F) -> F {
+            f(Rc::clone(&m));
+            for mm in m.nested_type().iter() {
+                f = inner(Rc::clone(mm), f);
+            }
+            f
+        }
+        for m in self.message_type().iter() {
+            f = inner(Rc::clone(m), f);
+        }
+    }
+
+    pub fn for_each_enum<F: FnMut(Rc<EnumDescriptorExt>)>(&self, mut f: F) {
+        fn inner<F: FnMut(Rc<EnumDescriptorExt>)>(m: Rc<DescriptorExt>, mut f: F) -> F {
+            for e in m.enum_type().iter() {
+                f(Rc::clone(e));
+            }
+            for mm in m.nested_type().iter() {
+                f = inner(Rc::clone(mm), f);
+            }
+            f
+        }
+        for e in self.enum_type().iter() {
+            f(Rc::clone(e));
+        }
+        for m in self.message_type().iter() {
+            f = inner(Rc::clone(m), f);
+        }
+    }
 }
 
 impl DescriptorExt {
@@ -143,24 +182,6 @@ impl DescriptorExt {
 
     pub fn enum_type(&self) -> &[Rc<EnumDescriptorExt>] {
         &self.enum_type
-    }
-
-    pub fn for_each_message<F: FnMut(Rc<DescriptorExt>)>(&self, mut f: F) -> F {
-        for m in self.nested_type().iter() {
-            f(m.clone());
-            f = m.for_each_message(f);
-        }
-        f
-    }
-
-    pub fn for_each_enum<F: FnMut(Rc<EnumDescriptorExt>)>(&self, mut f: F) -> F {
-        for e in self.enum_type().iter() {
-            f(e.clone());
-        }
-        for m in self.nested_type().iter() {
-            f = m.for_each_enum(f);
-        }
-        f
     }
 }
 
