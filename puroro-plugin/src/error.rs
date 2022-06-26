@@ -44,6 +44,8 @@ pub enum ErrorKind {
     InternalError { detail: String },
     #[error(r#"Failed to upgrade a Weak pointer"#)]
     WeakUpgradeFailure,
+    #[error(r#"Failed to find a specified FQTN item"#)]
+    FqtnNotFound,
 }
 impl From<std::fmt::Error> for GeneratorError {
     fn from(e: std::fmt::Error) -> Self {

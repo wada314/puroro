@@ -45,6 +45,10 @@ impl<'a> DescriptorResolver {
     pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<RcMessageOrEnum> {
         self.fqtn_to_desc_map.get(fqtn).cloned()
     }
+
+    pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<RcMessageOrEnum> {
+        Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::FqtnNotFound)?)
+    }
 }
 
 #[derive(Debug, Clone)]
