@@ -152,6 +152,16 @@ impl DescriptorExt {
         }
         f
     }
+
+    pub fn for_each_enum<F: FnMut(Rc<EnumDescriptorExt>)>(&self, mut f: F) -> F {
+        for e in self.enum_type().iter() {
+            f(e.clone());
+        }
+        for m in self.nested_type().iter() {
+            f = m.for_each_enum(f);
+        }
+        f
+    }
 }
 
 impl EnumDescriptorExt {
