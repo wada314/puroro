@@ -12,44 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt};
 use crate::{ErrorKind, Result};
-use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-    OneofDescriptorProto,
-};
 use ::std::collections::HashMap;
-use ::std::sync::RwLock;
 
-pub struct DescriptorResolver<'a> {
-    files: Vec<&'a FileDescriptorProto>,
-    fqtn_to_desc_cache: RwLock<HashMap<String, Option<MessageOrEnumDescriptor<'a>>>>,
+pub struct DescriptorResolver {
+    fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
 }
-impl<'a> DescriptorResolver<'a> {
+impl<'a> DescriptorResolver {
     pub fn init<I>(file_descriptors_iter: I) -> Result<Self>
     where
-        I: Iterator<Item = &'a FileDescriptorProto>,
+        I: Iterator<Item = Rc<FileDescriptorProtoExt>>,
     {
         Ok(Self {
-            files: file_descriptors_iter.collect(),
-            fqtn_to_desc_cache: Default::default(),
+            fqtn_to_desc_map: todo!(),
         })
     }
 
-    pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<MessageOrEnumDescriptor<'_>> {
-        debug_assert!(!fqtn.starts_with('.'));
-        // search for cache
-        if let Ok(cache) = self.fqtn_to_desc_cache.read() {
-            if let Some(desc) = cache.get(fqtn) {
-                return desc.clone();
-            }
-        }
-
+    pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<RcMessageOrEnum> {
         todo!()
     }
 }
 
-#[derive(Clone, Copy)]
-pub enum MessageOrEnumDescriptor<'a> {
-    Message(&'a DescriptorProto),
-    Enum(&'a EnumDescriptorProto),
+#[derive(Clone)]
+pub enum RcMessageOrEnum {
+    Message(Rc<DescriptorProto>),
+    Enum(Rc<EnumDescriptorProto>),
 }
