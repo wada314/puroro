@@ -20,8 +20,10 @@ pub struct MdFdIntoOptBoxOwnedMessage;
 impl<MD, FD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
 where
     FD: FieldDescriptorExt,
+    // FD::MaybeFieldMessageDescriptor: super::super::desc::MessageDescriptorExt,
 {
     type Type = Option<BoxedMessage<FD::MaybeFieldMessageDescriptor>>;
+    // type Type = Option<Box<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
 }
 
 mod preds {
