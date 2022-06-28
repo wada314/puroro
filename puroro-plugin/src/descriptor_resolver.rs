@@ -20,7 +20,7 @@ use ::std::rc::Rc;
 #[derive(Debug)]
 pub struct DescriptorResolver {
     fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
-    package_contents: HashMap<Option<String>, PackageContents>,
+    package_contents: HashMap<String, PackageContents>,
 }
 impl<'a> DescriptorResolver {
     pub fn new<I>(file_descriptors_iter: I) -> Result<Self>
@@ -44,13 +44,11 @@ impl<'a> DescriptorResolver {
 
             // package_contents
             let packages = f.package().split('.');
-            let mut current_package = None;
+            let mut current_package = "".to_string();
             for subpackage in packages {
                 let item = package_contents.entry(current_package.clone()).or_default();
                 item.subpackages.push(subpackage.to_string());
-                current_package
-                    .get_or_insert_with(String::default)
-                    .push_str(&format!(".{}", subpackage));
+                current_package.push_str(&format!(".{}", subpackage));
             }
             let item = package_contents.entry(current_package.clone()).or_default();
             item.messages.extend(f.message_type().iter().cloned());
