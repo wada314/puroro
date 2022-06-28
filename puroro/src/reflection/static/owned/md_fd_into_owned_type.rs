@@ -20,7 +20,7 @@ pub struct MdFdIntoOptBoxOwnedMessage;
 impl<MD, FD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
 where
     FD: FieldDescriptorExt,
-    FD::MaybeFieldMessageDescriptor: super::super::desc::MessageDescriptorExt,
+    // FD::MaybeFieldMessageDescriptor: super::super::desc::MessageDescriptorExt,
 {
     type Type = Option<BoxedMessage<FD::MaybeFieldMessageDescriptor>>;
     // type Type = Option<Box<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
@@ -83,19 +83,27 @@ type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsU32, Const<u32>),
     (preds::IsString, Const<String>),
     (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedMessage),
+    (Const<B1>, Const<()>),
 ];
-// impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedType
-// where
-//     Switch: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
-//     Gen: Func<(MD, FD)>,
-// {
-//     type Type = <Gen as Func<(MD, FD)>>::Type;
-// }
-impl<MD, FD> Func<(MD, FD)> for MdFdIntoOwnedType
+impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedType
 where
-    FD: FieldDescriptorExt,
-    FD::MaybeFieldMessageDescriptor: super::super::desc::MessageDescriptorExt,
+    Switch: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
+    Gen: Func<(MD, FD)>,
 {
-    type Type = ();
-    // type Type = Option<Box<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
+    type Type = <Gen as Func<(MD, FD)>>::Type;
+}
+// impl<MD, FD> Func<(MD, FD)> for MdFdIntoOwnedType
+// where
+//     FD: FieldDescriptorExt,
+//     FD::MaybeFieldMessageDescriptor: super::super::desc::MessageDescriptorExt,
+// {
+//     type Type = Option<Box<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
+// }
+
+pub struct MdFdIntoTypeGen;
+impl<MD, FD> Func<(MD, FD)> for MdFdIntoTypeGen
+where
+    Switch: Func<((MD, FD), MdFdIntoOwnedTypeSwitch)>,
+{
+    type Type = <Switch as Func<((MD, FD), MdFdIntoOwnedTypeSwitch)>>::Type;
 }

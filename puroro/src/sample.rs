@@ -105,8 +105,8 @@ mod test {
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
 
     fn foo() {
-        // let mut t: PersonOwned;
-        let t: <FdToField as Func<FdPartner>>::Type;
+        let mut t: PersonOwned;
+        t.fields = 0;
         // let p = t.get_message::<FdPartner>();
         // let f: i32 = t.fields;
         // t.1.1.0 = Some(BoxedMessage::default());
