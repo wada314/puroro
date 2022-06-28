@@ -67,9 +67,11 @@ where
         todo!()
     }
 
-    fn get_string<FD: FieldDescriptorExt>(&self) -> crate::Result<&str> {
+    type StringFieldType<'a, FD: FieldDescriptorExt> = &'a str where Self: 'a;
+    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>> {
         todo!()
     }
+
     type MessageFieldType<'a, FD> = &'a OwnedMessage<FD::MaybeFieldMessageDescriptor>
     where
         FD: FieldDescriptorExt,

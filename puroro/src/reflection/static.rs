@@ -23,7 +23,8 @@ use self::desc::MessageDescriptorExt;
 pub trait Reflection {
     fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool>;
     fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32>;
-    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<&str>;
+    type StringFieldType<'a, FD: FieldDescriptorExt>: AsRef<str> where Self: 'a;
+    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>>;
     type MessageFieldType<'a, FD>: Reflection
     where
         FD: FieldDescriptorExt,
@@ -37,7 +38,8 @@ impl<T: Reflection> Reflection for &'_ T {
     fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32> {
         <T as Reflection>::get_uint32::<FD>(self)
     }
-    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<&str> {
+    type StringFieldType<'a, FD: FieldDescriptorExt> = T::StringFieldType<'a, FD> where Self: 'a;
+    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>> {
         <T as Reflection>::get_string::<FD>(self)
     }
     type MessageFieldType<'a, FD>  = T::MessageFieldType<'a, FD>

@@ -25,7 +25,10 @@
 // }
 
 pub trait PersonTrait {
-    fn name(&self) -> &str;
+    type NameType<'a>: AsRef<str>
+    where
+        Self: 'a;
+    fn name(&self) -> Self::NameType<'_>;
     fn age(&self) -> u32;
 }
 
@@ -75,7 +78,8 @@ impl<T> PersonTrait for T
 where
     T: Reflection,
 {
-    fn name(&self) -> &str {
+    type NameType<'a> = T::StringFieldType<'a, FdName> where Self: 'a;
+    fn name(&self) -> Self::NameType<'_> {
         self.get_string::<FdName>().unwrap()
     }
     fn age(&self) -> u32 {
