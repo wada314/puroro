@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::FileDescriptorExt;
+use crate::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt};
 use crate::utils::{
     convert_octal_escape_to_rust_style_escape, get_keyword_safe_ident, to_camel_case, upgrade,
 };
@@ -51,7 +51,7 @@ pub struct MessagesAndEnums {
 }
 
 impl MessagesAndEnums {
-    pub fn try_new(f: &wrappers::InputFile) -> Result<Self> {
+    pub fn try_new(f: &wrappers::InputFile, fexts: &[Rc<FileDescriptorExt>]) -> Result<Self> {
         let messages = f
             .messages()
             .into_iter()

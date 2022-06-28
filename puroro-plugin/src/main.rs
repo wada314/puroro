@@ -132,9 +132,11 @@ fn main() -> Result<()> {
         .input_files()
         .iter()
         .map(|file| {
+            let package = file.package().iter().join(".");
+            let input_files_ext = &resolver.package_contents(&package).unwrap().input_files;
             Ok((
-                file.package().iter().join("."),
-                generators::MessagesAndEnums::try_new(file)?,
+                package,
+                generators::MessagesAndEnums::try_new(file, input_files_ext.as_slice())?,
             ))
         })
         .collect::<Result<HashMap<_, _>>>()?;

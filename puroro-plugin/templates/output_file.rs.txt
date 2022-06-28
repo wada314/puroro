@@ -18,8 +18,8 @@ pub mod _puroro_root {
     {%- endif %}
 }
 
-{%- match input_file %}
-{%- when Some with (input_file) %}
-{{ input_file }}
+{%- match messages_and_enums %}
+{%- when Some with (messages_and_enums) %}
+{{ messages_and_enums }}
 {%- else %}
 {%- endmatch %}
