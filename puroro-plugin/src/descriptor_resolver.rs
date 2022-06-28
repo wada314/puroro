@@ -67,6 +67,16 @@ impl<'a> DescriptorResolver {
     pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<RcMessageOrEnum> {
         Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::FqtnNotFound)?)
     }
+
+    pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
+        self.package_contents.get(package).as_ref()
+    }
+
+    pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
+        Ok(self
+            .package_contents(package)
+            .ok_or(ErrorKind::FqtnNotFound)?)
+    }
 }
 
 #[derive(Debug, Clone)]
