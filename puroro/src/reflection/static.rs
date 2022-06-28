@@ -14,14 +14,21 @@
 
 pub mod desc;
 pub mod owned;
+use crate::tags;
 use crate::Result;
 use desc::FieldDescriptor;
+
+use self::desc::MessageDescriptorExt;
 
 pub trait Reflection {
     fn has_field<FD: FieldDescriptor>(&self) -> Result<bool>;
     fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32>;
     fn get_string<FD: FieldDescriptor>(&self) -> Result<&str>;
-    // type MessageFieldType<FD: FieldDescriptor>;
+    type MessageFieldType<'a, FD>: Reflection
+    where
+        FD: FieldDescriptor,
+        <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor:
+            'a + MessageDescriptorExt;
 }
 
 impl<T: Reflection> Reflection for &'_ T {
@@ -34,5 +41,9 @@ impl<T: Reflection> Reflection for &'_ T {
     fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
         <T as Reflection>::get_string::<FD>(self)
     }
-    // type MessageFieldType<FD: FieldDescriptor> = T::MessageFieldType<FD>;
+    type MessageFieldType<'a, FD>  = T::MessageFieldType<'a, FD>
+    where
+        FD: FieldDescriptor,
+        <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor:
+            'a + MessageDescriptorExt;
 }

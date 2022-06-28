@@ -69,6 +69,9 @@ where
     fn get_string<FD: FieldDescriptor>(&self) -> crate::Result<&str> {
         todo!()
     }
-
-    // type MessageFieldType<FD: FieldDescriptor>;
+    type MessageFieldType<'a, FD> = &'a OwnedMessage<<<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor>
+    where
+        FD: FieldDescriptor,
+        <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor:
+            'a + MessageDescriptorExt;
 }
