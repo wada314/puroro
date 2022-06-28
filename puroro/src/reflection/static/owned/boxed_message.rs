@@ -32,7 +32,6 @@ pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
 impl<MD> BoxedMessage<MD>
 where
     MD: MessageDescriptorExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     pub fn take(mut self) -> Box<OwnedMessage<MD>> {
         let ptr = self.0;
