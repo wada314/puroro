@@ -20,6 +20,7 @@ use ::std::rc::Rc;
 #[derive(Debug)]
 pub struct DescriptorResolver {
     fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
+    package_contents: HashMap<Option<String>, PackageContents>,
 }
 impl<'a> DescriptorResolver {
     pub fn new<I>(file_descriptors_iter: I) -> Result<Self>
@@ -27,7 +28,9 @@ impl<'a> DescriptorResolver {
         I: Iterator<Item = Rc<FileDescriptorExt>>,
     {
         let mut fqtn_to_desc_map = HashMap::new();
+        let mut package_contents: HashMap<_, PackageContents> = HashMap::new();
         for f in file_descriptors_iter {
+            // fqtn_to_desc_map
             f.for_each_message(|m| {
                 fqtn_to_desc_map.insert(
                     m.try_fqtn().unwrap().to_string(),
@@ -38,8 +41,25 @@ impl<'a> DescriptorResolver {
                 fqtn_to_desc_map
                     .insert(e.try_fqtn().unwrap().to_string(), RcMessageOrEnum::Enum(e));
             });
+
+            // package_contents
+            let packages = f.package().split('.');
+            let mut current_package = None;
+            for subpackage in packages {
+                let item = package_contents.entry(current_package.clone()).or_default();
+                item.subpackages.push(subpackage.to_string());
+                current_package
+                    .get_or_insert_with(String::default)
+                    .push_str(&format!(".{}", subpackage));
+            }
+            let item = package_contents.entry(current_package.clone()).or_default();
+            item.messages.extend(f.message_type().iter().cloned());
+            item.enums.extend(f.enum_type().iter().cloned());
         }
-        Ok(Self { fqtn_to_desc_map })
+        Ok(Self {
+            fqtn_to_desc_map,
+            package_contents,
+        })
     }
 
     pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<RcMessageOrEnum> {
@@ -55,4 +75,11 @@ impl<'a> DescriptorResolver {
 pub enum RcMessageOrEnum {
     Message(Rc<DescriptorExt>),
     Enum(Rc<EnumDescriptorExt>),
+}
+
+#[derive(Debug, Default)]
+pub struct PackageContents {
+    subpackages: Vec<String>,
+    messages: Vec<Rc<DescriptorExt>>,
+    enums: Vec<Rc<EnumDescriptorExt>>,
 }
