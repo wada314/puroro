@@ -57,7 +57,6 @@ where
 impl<MD> Reflection for OwnedMessage<MD>
 where
     MD: MessageDescriptor,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     fn has_field<FD: FieldDescriptor>(&self) -> crate::Result<bool> {
         todo!()
