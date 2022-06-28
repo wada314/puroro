@@ -48,7 +48,10 @@ impl<'a> DescriptorResolver {
             for subpackage in packages {
                 let item = package_contents.entry(current_package.clone()).or_default();
                 item.subpackages.push(subpackage.to_string());
-                current_package.push_str(&format!(".{}", subpackage));
+                if !current_package.is_empty() {
+                    current_package.push('.');
+                }
+                current_package.push_str(subpackage);
             }
             let item = package_contents.entry(current_package.clone()).or_default();
             item.input_files.push(f.clone());
