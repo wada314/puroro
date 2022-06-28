@@ -235,7 +235,13 @@ impl EnumDescriptorExt {
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
         let package = self.try_package_opt()?;
-        todo!()
+        let enclosing_messages = self.try_enclosing_messages_opt()?;
+        Ok(package
+            .into_iter()
+            .chain(enclosing_messages.into_iter())
+            .chain(iter::once(self.name().into()))
+            .join(".")
+            .into())
     }
 }
 

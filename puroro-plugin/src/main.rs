@@ -136,7 +136,7 @@ fn main() -> Result<()> {
             let input_files_ext = &resolver.package_contents(&package).unwrap().input_files;
             Ok((
                 package,
-                generators::MessagesAndEnums::try_new(file, input_files_ext.as_slice())?,
+                generators::MessagesAndEnums::try_new(file, input_files_ext.as_slice(), &resolver)?,
             ))
         })
         .collect::<Result<HashMap<_, _>>>()?;
