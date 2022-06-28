@@ -153,7 +153,7 @@ fn main() -> Result<()> {
         let output_file = output_file_contexts
             .entry(package.clone())
             .or_insert_with(|| generators::OutputFile::new(&package));
-        output_file.input_file = Some(file);
+        output_file.messages_and_enums = Some(file);
         output_file.input_files_ext = resolver
             .package_contents_or_err(&package)?
             .input_files

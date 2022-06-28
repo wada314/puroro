@@ -28,7 +28,7 @@ use ::std::rc::Rc;
 pub struct OutputFile {
     pub package: String,
     pub subpackages: Vec<String>,
-    pub input_file: Option<MessagesAndEnums>,
+    pub messages_and_enums: Option<MessagesAndEnums>,
     pub input_files_ext: Vec<Rc<FileDescriptorExt>>,
 }
 
@@ -37,7 +37,7 @@ impl OutputFile {
         Self {
             package: package.to_string(),
             subpackages: Vec::new(),
-            input_file: None,
+            messages_and_enums: None,
             input_files_ext: Vec::new(),
         }
     }
