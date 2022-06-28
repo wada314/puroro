@@ -51,8 +51,7 @@ impl<'a> DescriptorResolver {
                 current_package.push_str(&format!(".{}", subpackage));
             }
             let item = package_contents.entry(current_package.clone()).or_default();
-            item.messages.extend(f.message_type().iter().cloned());
-            item.enums.extend(f.enum_type().iter().cloned());
+            item.input_files.push(f.clone());
         }
         Ok(Self {
             fqtn_to_desc_map,
@@ -69,7 +68,7 @@ impl<'a> DescriptorResolver {
     }
 
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
-        self.package_contents.get(package).as_ref()
+        self.package_contents.get(package)
     }
 
     pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
@@ -88,6 +87,5 @@ pub enum RcMessageOrEnum {
 #[derive(Debug, Default)]
 pub struct PackageContents {
     subpackages: Vec<String>,
-    messages: Vec<Rc<DescriptorExt>>,
-    enums: Vec<Rc<EnumDescriptorExt>>,
+    input_files: Vec<Rc<FileDescriptorExt>>,
 }
