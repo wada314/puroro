@@ -20,22 +20,22 @@ use ::metako::*;
 use ::typenum;
 use ::typenum::U0;
 
-pub trait MessageDescriptorBase {
+pub trait MessageDescriptor {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
 }
-impl MessageDescriptorBase for () {
+impl MessageDescriptor for () {
     type Fields = ();
     type Syntax = ();
 }
-pub trait MessageDescriptor {
+pub trait MessageDescriptorExt {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
     type GetFieldListAsMdFd;
     type GetOwnedFieldList;
     type GetFieldByNumber;
 }
-impl<MD: MessageDescriptorBase, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptor for MD
+impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
 where
     self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
     list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
@@ -75,12 +75,12 @@ where
 }
 
 pub struct GetGetFieldByNumber;
-impl<MD: MessageDescriptorBase> Func<MD> for GetGetFieldByNumber {
+impl<MD: MessageDescriptor> Func<MD> for GetGetFieldByNumber {
     type Type = GetFieldByNumber<MD>;
 }
 
 pub struct GetFieldByNumber<MD>(PhantomData<MD>);
-impl<MD: MessageDescriptorBase, N: Number, FD> Func<N> for GetFieldByNumber<MD>
+impl<MD: MessageDescriptor, N: Number, FD> Func<N> for GetFieldByNumber<MD>
 where
     list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields, Type = FD>,
     FD: FieldDescriptor,
@@ -89,7 +89,7 @@ where
 }
 
 pub struct GetFieldListAsMdFd;
-impl<MD: MessageDescriptorBase> Func<MD> for GetFieldListAsMdFd
+impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFd
 where
     list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
 {
@@ -107,12 +107,12 @@ impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
 }
 
 pub trait GetFieldsMDExt {
-    type GetFieldsMD: MessageDescriptorBase;
+    type GetFieldsMD: MessageDescriptor;
 }
 impl<FD: FieldDescriptor, FieldMD> GetFieldsMDExt for FD
 where
     FD::Type: tags::FieldTypeTag<MessageDescriptor = FieldMD>,
-    FieldMD: MessageDescriptorBase,
+    FieldMD: MessageDescriptor,
 {
     type GetFieldsMD = FieldMD;
 }

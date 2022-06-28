@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::desc::{FieldDescriptor, MessageDescriptor};
+use super::desc::{FieldDescriptor, MessageDescriptorExt};
 use super::Reflection;
 use crate::tags;
 use crate::Result;
@@ -24,7 +24,7 @@ mod md_fd_into_owned_type;
 
 pub struct OwnedMessage<MD>
 where
-    MD: MessageDescriptor,
+    MD: MessageDescriptorExt,
 {
     pub fields: MD::GetOwnedFieldList,
 }
@@ -32,11 +32,11 @@ where
 type FMD<FD> = <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor;
 impl<MD> OwnedMessage<MD>
 where
-    MD: MessageDescriptor,
+    MD: MessageDescriptorExt,
 {
     pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<FMD<FD>>>
     where
-        FMD<FD>: MessageDescriptor,
+        FMD<FD>: MessageDescriptorExt,
     {
         todo!()
     }
@@ -44,7 +44,7 @@ where
 
 impl<MD> Default for OwnedMessage<MD>
 where
-    MD: MessageDescriptor,
+    MD: MessageDescriptorExt,
     MD::GetOwnedFieldList: Default,
 {
     fn default() -> Self {
@@ -56,7 +56,7 @@ where
 
 impl<MD> Reflection for OwnedMessage<MD>
 where
-    MD: MessageDescriptor,
+    MD: MessageDescriptorExt,
 {
     fn has_field<FD: FieldDescriptor>(&self) -> crate::Result<bool> {
         todo!()
