@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::descriptor_ext::FileDescriptorExt;
 use crate::utils::{
     convert_octal_escape_to_rust_style_escape, get_keyword_safe_ident, to_camel_case, upgrade,
 };
@@ -28,6 +29,7 @@ pub struct OutputFile {
     pub package: String,
     pub subpackages: Vec<String>,
     pub input_file: Option<MessagesAndEnums>,
+    pub input_files_ext: Vec<Rc<FileDescriptorExt>>,
 }
 
 impl OutputFile {
@@ -36,6 +38,7 @@ impl OutputFile {
             package: package.to_string(),
             subpackages: Vec::new(),
             input_file: None,
+            input_files_ext: Vec::new(),
         }
     }
 }

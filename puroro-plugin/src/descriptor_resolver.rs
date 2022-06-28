@@ -86,6 +86,6 @@ pub enum RcMessageOrEnum {
 
 #[derive(Debug, Default)]
 pub struct PackageContents {
-    subpackages: Vec<String>,
-    input_files: Vec<Rc<FileDescriptorExt>>,
+    pub subpackages: Vec<String>,
+    pub input_files: Vec<Rc<FileDescriptorExt>>,
 }

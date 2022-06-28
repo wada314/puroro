@@ -22,6 +22,8 @@ mod generators;
 mod utils;
 mod wrappers;
 
+use crate::descriptor_ext::FileDescriptorExt;
+use crate::descriptor_resolver::DescriptorResolver;
 use ::askama::Template as _;
 use ::itertools::Itertools;
 use ::puroro::Message;
@@ -115,6 +117,13 @@ fn main() -> Result<()> {
 
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
+    let input_files_ext = cgreq
+        .proto_file()
+        .iter()
+        .map(|f| FileDescriptorExt::new(f))
+        .collect_vec();
+    let resolver = DescriptorResolver::new(input_files_ext.iter().cloned())?;
+
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
@@ -141,10 +150,14 @@ fn main() -> Result<()> {
             .subpackages = v;
     }
     for (package, file) in package_to_file_descriptor_map {
-        output_file_contexts
+        let output_file = output_file_contexts
             .entry(package.clone())
-            .or_insert_with(|| generators::OutputFile::new(&package))
-            .input_file = Some(file);
+            .or_insert_with(|| generators::OutputFile::new(&package));
+        output_file.input_file = Some(file);
+        output_file.input_files_ext = resolver
+            .package_contents_or_err(&package)?
+            .input_files
+            .clone();
     }
 
     for output_contexts in output_file_contexts.values() {
