@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::desc::{FieldDescriptor, MessageDescriptor};
+use super::super::desc::{FieldDescriptor, FieldDescriptorExt, MessageDescriptor};
 use super::boxed_message::BoxedMessage;
-use crate::tags;
 use ::metako::*;
 
 pub struct MdFdIntoOptBoxOwnedMessage;
-impl<MD, FD, FieldMD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
+impl<MD, FD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
 where
-    FD: FieldDescriptor,
-    <FD as FieldDescriptor>::Type: tags::FieldTypeTag<MessageDescriptor = FieldMD>,
+    FD: FieldDescriptorExt,
 {
-    type Type = Option<BoxedMessage<FieldMD>>;
+    type Type = Option<BoxedMessage<FD::MaybeFieldMessageDescriptor>>;
 }
 
 mod preds {

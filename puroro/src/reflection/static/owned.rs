@@ -14,7 +14,6 @@
 
 use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
-use crate::tags;
 use crate::Result;
 use ::metako::*;
 pub use md_fd_into_owned_type::MdFdIntoOwnedType;
