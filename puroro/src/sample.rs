@@ -29,6 +29,12 @@ pub trait PersonTrait {
     where
         Self: 'a;
     fn name(&self) -> Self::NameType<'_>;
+    fn name_str(&self) -> &str
+    where
+        for<'a> Self: PersonTrait<NameType<'a> = &'a str>,
+    {
+        self.name()
+    }
     fn age(&self) -> u32;
 }
 
