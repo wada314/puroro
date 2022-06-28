@@ -115,7 +115,6 @@ mod test {
 mod test2 {
     trait MessageDescriptor {
         type FieldsType;
-        type PartnerMd: MessageDescriptor;
     }
 
     struct Message<MD: MessageDescriptor> {
@@ -124,9 +123,10 @@ mod test2 {
 
     struct MdPerson;
     impl MessageDescriptor for MdPerson {
-        type FieldsType = Box<Message<Self::PartnerMd>>;
-        type PartnerMd = MdPerson;
+        type FieldsType = Box<Message<MdPerson>>;
     }
 
     type Person = Message<MdPerson>;
+
+    fn test(_p: Person) {}
 }
