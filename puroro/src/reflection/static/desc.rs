@@ -14,14 +14,14 @@
 
 use std::marker::PhantomData;
 
-use super::owned::MdFdIntoOwnedType;
+use super::owned::{MdFdIntoOwnedType, OwnedMessage};
 use crate::tags;
 use ::metako::*;
 use ::typenum;
 use ::typenum::U0;
 
 pub trait MessageDescriptor {
-    type Fields;
+    type Fields: FieldDescriptorExt;
     type Syntax: tags::ProtoSyntaxTag;
 }
 impl MessageDescriptor for () {
@@ -35,16 +35,27 @@ pub trait MessageDescriptorExt {
     type GetOwnedFieldList;
     type GetFieldByNumber;
 }
-impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
+impl<MD: MessageDescriptor> MessageDescriptorExt for MD
 where
-    self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
-    list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
+// self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
+// list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
+// FdToField: Func<MD::Fields>,
+// MD::Fields: FieldDescriptorExt,
+// <MD::Fields as FieldDescriptorExt>::MaybeFieldMessageDescriptor: MessageDescriptorExt,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetFieldListAsMdFd = GetFieldListAsMdFd;
-    type GetOwnedFieldList = GetOwnedFieldList;
+    type GetFieldListAsMdFd = ();
+    type GetOwnedFieldList = <FdToField as Func<MD::Fields>>::Type;
     type GetFieldByNumber = <GetGetFieldByNumber as Func<MD>>::Type;
+}
+
+pub struct FdToField;
+impl<FD: FieldDescriptorExt> Func<FD> for FdToField
+where
+    FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
+{
+    type Type = Option<Box<OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
 }
 
 pub trait FieldDescriptor {
@@ -70,9 +81,12 @@ pub trait FieldDescriptorExt {
     type HasOneofIndex: If;
     type OneofIndex: Number;
     type IsProto3Optional: If;
-    type MaybeFieldMessageDescriptor;
+    type MaybeFieldMessageDescriptor: MessageDescriptorExt;
 }
-impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
+impl<FD: FieldDescriptor> FieldDescriptorExt for FD
+where
+    <FD::Type as tags::FieldTypeTag>::MessageDescriptor: MessageDescriptorExt,
+{
     type Number = FD::Number;
     type Label = FD::Label;
     type Type = FD::Type;
