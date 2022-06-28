@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::desc::{FieldDescriptor, MessageDescriptorExt};
+use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
 use crate::tags;
 use crate::Result;
@@ -29,14 +29,15 @@ where
     pub fields: MD::GetOwnedFieldList,
 }
 
-type FMD<FD> = <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor;
 impl<MD> OwnedMessage<MD>
 where
     MD: MessageDescriptorExt,
 {
-    pub fn get_message<FD: FieldDescriptor>(&self) -> Result<&OwnedMessage<FMD<FD>>>
+    pub fn get_message<FD: FieldDescriptorExt>(
+        &self,
+    ) -> Result<&OwnedMessage<FD::MaybeFieldMessageDescriptor>>
     where
-        FMD<FD>: MessageDescriptorExt,
+        FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
     {
         todo!()
     }
@@ -58,20 +59,20 @@ impl<MD> Reflection for OwnedMessage<MD>
 where
     MD: MessageDescriptorExt,
 {
-    fn has_field<FD: FieldDescriptor>(&self) -> crate::Result<bool> {
+    fn has_field<FD: FieldDescriptorExt>(&self) -> crate::Result<bool> {
         todo!()
     }
 
-    fn get_uint32<FD: FieldDescriptor>(&self) -> crate::Result<u32> {
+    fn get_uint32<FD: FieldDescriptorExt>(&self) -> crate::Result<u32> {
         todo!()
     }
 
-    fn get_string<FD: FieldDescriptor>(&self) -> crate::Result<&str> {
+    fn get_string<FD: FieldDescriptorExt>(&self) -> crate::Result<&str> {
         todo!()
     }
-    type MessageFieldType<'a, FD> = &'a OwnedMessage<<<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor>
+    type MessageFieldType<'a, FD> = &'a OwnedMessage<FD::MaybeFieldMessageDescriptor>
     where
-        FD: FieldDescriptor,
-        <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor:
+        FD: FieldDescriptorExt,
+        FD::MaybeFieldMessageDescriptor:
             'a + MessageDescriptorExt;
 }

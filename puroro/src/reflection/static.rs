@@ -16,34 +16,33 @@ pub mod desc;
 pub mod owned;
 use crate::tags;
 use crate::Result;
-use desc::FieldDescriptor;
+use desc::FieldDescriptorExt;
 
 use self::desc::MessageDescriptorExt;
 
 pub trait Reflection {
-    fn has_field<FD: FieldDescriptor>(&self) -> Result<bool>;
-    fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32>;
-    fn get_string<FD: FieldDescriptor>(&self) -> Result<&str>;
+    fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool>;
+    fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32>;
+    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<&str>;
     type MessageFieldType<'a, FD>: Reflection
     where
-        FD: FieldDescriptor,
-        <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor:
-            'a + MessageDescriptorExt;
+        FD: FieldDescriptorExt,
+        FD::MaybeFieldMessageDescriptor: 'a + MessageDescriptorExt;
 }
 
 impl<T: Reflection> Reflection for &'_ T {
-    fn has_field<FD: FieldDescriptor>(&self) -> Result<bool> {
+    fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool> {
         <T as Reflection>::has_field::<FD>(self)
     }
-    fn get_uint32<FD: FieldDescriptor>(&self) -> Result<u32> {
+    fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32> {
         <T as Reflection>::get_uint32::<FD>(self)
     }
-    fn get_string<FD: FieldDescriptor>(&self) -> Result<&str> {
+    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<&str> {
         <T as Reflection>::get_string::<FD>(self)
     }
     type MessageFieldType<'a, FD>  = T::MessageFieldType<'a, FD>
     where
-        FD: FieldDescriptor,
-        <<FD as FieldDescriptor>::Type as tags::FieldTypeTag>::MessageDescriptor:
+        FD: FieldDescriptorExt,
+        FD::MaybeFieldMessageDescriptor:
             'a + MessageDescriptorExt;
 }

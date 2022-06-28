@@ -63,6 +63,24 @@ impl FieldDescriptor for () {
     type OneofIndex = U0;
     type IsProto3Optional = B0;
 }
+pub trait FieldDescriptorExt {
+    type Number: typenum::ToInt<i32> + Number;
+    type Label: tags::FieldLabelTag;
+    type Type: tags::FieldTypeTag;
+    type HasOneofIndex: If;
+    type OneofIndex: Number;
+    type IsProto3Optional: If;
+    type MaybeFieldMessageDescriptor;
+}
+impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
+    type Number = FD::Number;
+    type Label = FD::Label;
+    type Type = FD::Type;
+    type HasOneofIndex = FD::HasOneofIndex;
+    type OneofIndex = FD::OneofIndex;
+    type IsProto3Optional = FD::IsProto3Optional;
+    type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
+}
 
 pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
 impl<N, T> Func<T> for IsFdNumberEqualTo<N>
