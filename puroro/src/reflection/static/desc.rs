@@ -38,21 +38,23 @@ pub trait MessageDescriptorExt {
 }
 impl<MD: MessageDescriptor> MessageDescriptorExt for MD
 where
-// self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
-// list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
-// FdToField: Func<MD::Fields>,
-// MD::Fields: FieldDescriptorExt,
-// <MD::Fields as FieldDescriptorExt>::MaybeFieldMessageDescriptor: MessageDescriptorExt,
-// <MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type: Func<(MD, MD::Fields)>,
+    // self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
+    // list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
+    // FdToField: Func<MD::Fields>,
+    // MD::Fields: FieldDescriptorExt,
+    // <MD::Fields as FieldDescriptorExt>::MaybeFieldMessageDescriptor: MessageDescriptorExt,
+    // <MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type: Func<(MD, MD::Fields)>,
+    // MdFdIntoOptBoxOwnedMessage: Func<(MD, MD::Fields)>,
+    MdFdIntoOwnedType: Func<(MD, MD::Fields)>,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
     type GetFieldListAsMdFd = (); //<self::GetFieldListAsMdFd as Func<MD>>::Type;
     // type GetOwnedFieldList = <MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type;
-    type GetOwnedFieldList = <MdFdIntoOptBoxOwnedMessage as Func<(MD, MD::Fields)>>::Type;
+    // type GetOwnedFieldList = <MdFdIntoOptBoxOwnedMessage as Func<(MD, MD::Fields)>>::Type;
     // type GetOwnedFieldList =
     //     <<MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type as Func<(MD, MD::Fields)>>::Type;
-    // type GetOwnedFieldList = <MdFdIntoOwnedType as Func<(MD, MD::Fields)>>::Type;
+    type GetOwnedFieldList = <MdFdIntoOwnedType as Func<(MD, MD::Fields)>>::Type;
     type GetFieldByNumber = <GetGetFieldByNumber as Func<MD>>::Type;
 }
 
