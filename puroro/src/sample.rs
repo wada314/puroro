@@ -111,22 +111,3 @@ mod test {
         // test(10)
     }
 }
-
-mod test2 {
-    trait MessageDescriptor {
-        type FieldsType;
-    }
-
-    struct Message<MD: MessageDescriptor> {
-        fields: MD::FieldsType,
-    }
-
-    struct MdPerson;
-    impl MessageDescriptor for MdPerson {
-        type FieldsType = Box<Message<MdPerson>>;
-    }
-
-    type Person = Message<MdPerson>;
-
-    fn test(_p: Person) {}
-}
