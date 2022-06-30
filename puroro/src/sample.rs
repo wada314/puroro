@@ -50,8 +50,7 @@ pub struct FdName;
 pub struct FdAge;
 pub struct FdPartner;
 impl MessageDescriptor for MdPerson {
-    // type Fields = make_list!(FdName, FdAge, FdPartner);
-    type Fields = FdPartner;
+    type Fields = make_list!(FdName, FdAge, FdPartner);
     type Syntax = tags::Proto3;
 }
 impl FieldDescriptor for FdName {
@@ -105,9 +104,8 @@ mod test {
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
 
     fn foo() {
-        let mut t: PersonOwned;
-        t.fields = 0;
-        // let p = t.get_message::<FdPartner>();
+        let mut t = PersonOwned::default();
+        let p = t.get_message::<FdPartner>();
         // let f: i32 = t.fields;
         // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
@@ -115,8 +113,6 @@ mod test {
 }
 
 mod test2 {
-    use metako::Func;
-
     trait MessageDescriptor {
         type FieldsType;
     }
@@ -126,19 +122,8 @@ mod test2 {
     }
 
     struct MdPerson;
-    // impl MessageDescriptor for MdPerson {
-    //     type FieldsType = <Self as FieldTypeGen>::FieldType;
-    // }
-    impl<MD> MessageDescriptor for MD
-    where
-    //MD: FieldTypeGen, // <== error!
-    {
-        type FieldsType = <FieldTypeGen as Func<Self>>::Type;
-    }
-
-    struct FieldTypeGen;
-    impl<MD: MessageDescriptor> Func<MD> for FieldTypeGen {
-        type Type = Box<Message<MD>>;
+    impl MessageDescriptor for MdPerson {
+        type FieldsType = Box<Message<MdPerson>>;
     }
 
     type Person = Message<MdPerson>;

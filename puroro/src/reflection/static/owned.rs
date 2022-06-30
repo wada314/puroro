@@ -19,7 +19,7 @@ use ::metako::*;
 pub use md_fd_into_owned_type::MdFdIntoOwnedType;
 
 mod boxed_message;
-pub mod md_fd_into_owned_type;
+mod md_fd_into_owned_type;
 
 pub struct OwnedMessage<MD>
 where

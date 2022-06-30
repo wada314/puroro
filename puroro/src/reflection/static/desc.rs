@@ -14,15 +14,14 @@
 
 use std::marker::PhantomData;
 
-use super::owned::md_fd_into_owned_type::{MdFdIntoOptBoxOwnedMessage, MdFdIntoTypeGen};
-use super::owned::{MdFdIntoOwnedType, OwnedMessage};
+use super::owned::MdFdIntoOwnedType;
 use crate::tags;
 use ::metako::*;
 use ::typenum;
 use ::typenum::U0;
 
 pub trait MessageDescriptor {
-    type Fields: FieldDescriptor + FieldDescriptorExt;
+    type Fields;
     type Syntax: tags::ProtoSyntaxTag;
 }
 impl MessageDescriptor for () {
@@ -36,25 +35,15 @@ pub trait MessageDescriptorExt {
     type GetOwnedFieldList;
     type GetFieldByNumber;
 }
-impl<MD: MessageDescriptor> MessageDescriptorExt for MD
+impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
 where
-    // self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
-    // list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
-    // FdToField: Func<MD::Fields>,
-    // MD::Fields: FieldDescriptorExt,
-    // <MD::Fields as FieldDescriptorExt>::MaybeFieldMessageDescriptor: MessageDescriptorExt,
-    // <MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type: Func<(MD, MD::Fields)>,
-    // MdFdIntoOptBoxOwnedMessage: Func<(MD, MD::Fields)>,
-    MdFdIntoOwnedType: Func<(MD, MD::Fields)>,
+    self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
+    list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetFieldListAsMdFd = (); //<self::GetFieldListAsMdFd as Func<MD>>::Type;
-    // type GetOwnedFieldList = <MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type;
-    // type GetOwnedFieldList = <MdFdIntoOptBoxOwnedMessage as Func<(MD, MD::Fields)>>::Type;
-    // type GetOwnedFieldList =
-    //     <<MdFdIntoTypeGen as Func<(MD, MD::Fields)>>::Type as Func<(MD, MD::Fields)>>::Type;
-    type GetOwnedFieldList = <MdFdIntoOwnedType as Func<(MD, MD::Fields)>>::Type;
+    type GetFieldListAsMdFd = GetFieldListAsMdFd;
+    type GetOwnedFieldList = GetOwnedFieldList;
     type GetFieldByNumber = <GetGetFieldByNumber as Func<MD>>::Type;
 }
 
@@ -81,12 +70,9 @@ pub trait FieldDescriptorExt {
     type HasOneofIndex: If;
     type OneofIndex: Number;
     type IsProto3Optional: If;
-    type MaybeFieldMessageDescriptor: MessageDescriptorExt;
+    type MaybeFieldMessageDescriptor;
 }
-impl<FD: FieldDescriptor> FieldDescriptorExt for FD
-where
-    <FD::Type as tags::FieldTypeTag>::MessageDescriptor: MessageDescriptorExt,
-{
+impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type Number = FD::Number;
     type Label = FD::Label;
     type Type = FD::Type;
