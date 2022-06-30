@@ -106,6 +106,7 @@ mod test {
     fn foo() {
         let mut t = PersonOwned::default();
         let p = t.get_message::<FdPartner>();
+
         // let f: i32 = t.fields;
         // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)

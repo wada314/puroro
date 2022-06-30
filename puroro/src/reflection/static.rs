@@ -14,8 +14,10 @@
 
 pub mod desc;
 pub mod owned;
-use crate::Result;
+use crate::{ErrorKind, Result};
 use desc::FieldDescriptorExt;
+use metako::{If, Number};
+use typenum::ToInt;
 
 use self::desc::MessageDescriptorExt;
 
@@ -55,5 +57,34 @@ impl<T: Reflection> Reflection for &'_ T {
         FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
     {
         <T as Reflection>::get_message::<FD>(self)
+    }
+}
+
+pub trait FdListAndFieldTypeList {
+    type FieldList;
+    fn get_uint32<FD: FieldDescriptorExt>(field_list: &Self::FieldList) -> Result<u32>;
+}
+
+impl FdListAndFieldTypeList for ((), ()) {
+    type FieldList = ();
+
+    fn get_uint32<FD: FieldDescriptorExt>(_field_list: &Self::FieldList) -> Result<u32> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+
+impl<FD: FieldDescriptorExt, FDRest, FieldRest> FdListAndFieldTypeList
+    for ((FD, FDRest), (u32, FieldRest))
+where
+    (FDRest, FieldRest): FdListAndFieldTypeList<FieldList = FieldRest>,
+{
+    type FieldList = (u32, FieldRest);
+
+    fn get_uint32<ParamFD: FieldDescriptorExt>(field_list: &Self::FieldList) -> Result<u32> {
+        if <FD::Number as ToInt<i32>>::to_int() == <ParamFD::Number as ToInt<i32>>::to_int() {
+            Ok(field_list.0)
+        } else {
+            <(FDRest, FieldRest) as FdListAndFieldTypeList>::get_uint32::<ParamFD>(&field_list.1)
+        }
     }
 }
