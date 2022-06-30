@@ -26,10 +26,13 @@ pub trait Reflection {
     where
         Self: 'a;
     fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>>;
-    type MessageFieldType<'a, FD>: Reflection
+    type MessageFieldType<'a, FD: FieldDescriptorExt>: Reflection
     where
-        FD: FieldDescriptorExt,
+        Self: 'a,
         FD::MaybeFieldMessageDescriptor: 'a + MessageDescriptorExt;
+    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>>
+    where
+        FD::MaybeFieldMessageDescriptor: MessageDescriptorExt;
 }
 
 impl<T: Reflection> Reflection for &'_ T {
@@ -43,9 +46,14 @@ impl<T: Reflection> Reflection for &'_ T {
     fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>> {
         <T as Reflection>::get_string::<FD>(self)
     }
-    type MessageFieldType<'a, FD>  = T::MessageFieldType<'a, FD>
+    type MessageFieldType<'a, FD: FieldDescriptorExt> = T::MessageFieldType<'a, FD>
     where
-        FD: FieldDescriptorExt,
-        FD::MaybeFieldMessageDescriptor:
-            'a + MessageDescriptorExt;
+        Self: 'a,
+        FD::MaybeFieldMessageDescriptor:'a + MessageDescriptorExt;
+    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>>
+    where
+        FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
+    {
+        <T as Reflection>::get_message::<FD>(self)
+    }
 }
