@@ -60,7 +60,7 @@ where
 {
     type Target = OwnedMessage<MD>;
     fn deref(&self) -> &Self::Target {
-        unsafe { transmute::<_, &OwnedMessage<MD>>(&self.0) }
+        unsafe { transmute(&self.0) }
     }
 }
 
@@ -70,6 +70,6 @@ where
     list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { transmute::<_, &mut OwnedMessage<MD>>(&mut self.0) }
+        unsafe { transmute(&mut self.0) }
     }
 }
