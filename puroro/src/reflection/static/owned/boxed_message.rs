@@ -29,29 +29,18 @@ use ::std::ptr::null_mut;
 /// Instead of that property, this type internally erases the type info,
 /// and is required to be manually dropped using `take` method.
 pub struct BoxedMessage<MD>(ManuallyDrop<*mut ()>, PhantomData<MD>);
-impl<MD> BoxedMessage<MD>
-where
-    MD: MessageDescriptorExt,
-{
+
+impl<MD: MessageDescriptorExt> BoxedMessage<MD> {
+    pub fn new(inner: OwnedMessage<MD>) -> Self {
+        let boxed = Box::new(inner);
+        let ptr = Box::into_raw(boxed);
+        Self(ManuallyDrop::new(unsafe { transmute(ptr) }), PhantomData)
+    }
+
     pub fn take(mut self) -> Box<OwnedMessage<MD>> {
         let ptr = self.0;
         self.0 = ManuallyDrop::new(null_mut());
         unsafe { Box::from_raw(transmute(ManuallyDrop::into_inner(ptr))) }
-    }
-}
-
-impl<MD> Default for BoxedMessage<MD>
-where
-    MD: MessageDescriptorExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
-    OwnedMessage<MD>: Default,
-{
-    fn default() -> Self {
-        let boxed = Box::new(OwnedMessage::<MD>::default());
-        Self(
-            ManuallyDrop::new(unsafe { transmute(Box::into_raw(boxed)) }),
-            PhantomData,
-        )
     }
 }
 
@@ -68,7 +57,6 @@ impl<MD> Drop for BoxedMessage<MD> {
 impl<MD> Deref for BoxedMessage<MD>
 where
     MD: MessageDescriptorExt,
-    list::Map<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
 {
     type Target = OwnedMessage<MD>;
     fn deref(&self) -> &Self::Target {
