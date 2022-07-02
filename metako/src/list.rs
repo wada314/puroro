@@ -25,14 +25,6 @@ macro_rules! make_list {
     };
 }
 
-pub trait ListBase {
-    type Car;
-    type Cdr: List;
-}
-impl<T, U: List> ListBase for (T, U) {
-    type Car = T;
-    type Cdr = U;
-}
 pub trait List {
     type Car;
     type Cdr: List;
@@ -41,9 +33,9 @@ impl List for () {
     type Car = ();
     type Cdr = ();
 }
-impl<L: ListBase> List for L {
-    type Car = L::Car;
-    type Cdr = L::Cdr;
+impl<T, U: List> List for (T, U) {
+    type Car = T;
+    type Cdr = U;
 }
 
 pub struct FindOrDefault<P, D>(PhantomData<(P, D)>);
@@ -89,4 +81,15 @@ where
     U: Map<F>,
 {
     type Type = (<F as Functor<T>>::Type, <U as Map<F>>::Type);
+}
+
+pub struct Map2<L, F>(PhantomData<(L, F)>);
+impl<L, F> List for Map2<L, F>
+where
+    L: List,
+    F: Functor<L::Car>,
+    Map2<L::Cdr, F>: List,
+{
+    type Car = <F as Functor<L::Car>>::Type;
+    type Cdr = Map2<L::Cdr, F>;
 }

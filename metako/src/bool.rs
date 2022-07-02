@@ -14,6 +14,7 @@
 
 use crate::func::Functor;
 use crate::func::Pred;
+use crate::list::List;
 use ::std::marker::PhantomData;
 pub use ::typenum::{B0, B1};
 
@@ -146,4 +147,20 @@ where
     SwitchFunctor: Functor<(X, U)>,
 {
     type Type = <<P as Pred<X>>::Type as If>::Then<T, <SwitchFunctor as Functor<(X, U)>>::Type>;
+}
+
+pub struct SwitchFunctor2<PredAndValueList>(PhantomData<PredAndValueList>);
+impl<X> Functor<X> for SwitchFunctor2<()> {
+    type Type = ();
+}
+impl<X, PredAndValueList, F, V> Functor<X> for SwitchFunctor2<PredAndValueList>
+where
+    PredAndValueList: List<Car = (F, V)>,
+    F: Pred<X>,
+    SwitchFunctor2<PredAndValueList::Cdr>: Functor<X>,
+{
+    type Type = <<F as Pred<X>>::Type as If>::Then<
+        V,
+        <SwitchFunctor2<PredAndValueList::Cdr> as Functor<X>>::Type,
+    >;
 }
