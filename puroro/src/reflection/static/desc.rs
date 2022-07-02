@@ -35,15 +35,11 @@ pub trait MessageDescriptorExt {
     type GetOwnedFieldList;
     type GetFieldByNumber;
 }
-impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
-where
-    self::GetFieldListAsMdFdFunctor: Func<MD, Type = GetFieldListAsMdFd>,
-    list::MapFunctor<MdFdIntoOwnedTypeFunctor>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
-{
+impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetFieldListAsMdFd = GetFieldListAsMdFd;
-    type GetOwnedFieldList = GetOwnedFieldList;
+    type GetFieldListAsMdFd = <MD::Fields as GetFieldListAsMdFd<MD>>::Type;
+    type GetOwnedFieldList = <MD::Fields as GetOwnedFieldList<MD>>::Type;
     type GetFieldByNumber = <GetGetFieldByNumber as Func<MD>>::Type;
 }
 
