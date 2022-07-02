@@ -18,8 +18,27 @@ use crate::list::List;
 use ::std::marker::PhantomData;
 pub use ::typenum::{B0, B1};
 
+pub trait BoolBase {
+    type Then<T, F>;
+    type Not: BoolBase;
+    type And<T: BoolBase>: BoolBase;
+    type Or<T: BoolBase>: BoolBase;
+}
+impl BoolBase for B0 {
+    type Then<T, F> = F;
+    type Not = B1;
+    type And<T: BoolBase> = B0;
+    type Or<T: BoolBase> = T;
+}
+impl BoolBase for B1 {
+    type Then<T, F> = T;
+    type Not = B0;
+    type And<T: BoolBase> = T;
+    type Or<T: BoolBase> = B1;
+}
+
 pub trait Bool {
-    type Value: If;
+    type Value: BoolBase;
 }
 impl Bool for B0 {
     type Value = B0;
@@ -29,16 +48,16 @@ impl Bool for B1 {
 }
 pub struct Not<B>(PhantomData<B>);
 impl<B: Bool> Bool for Not<B> {
-    type Value = <B::Value as If>::Not;
+    type Value = <B::Value as BoolBase>::Not;
 }
 pub struct And<P, Q>(PhantomData<(P, Q)>);
 pub struct Or<P, Q>(PhantomData<(P, Q)>);
 
 impl<P: Bool, Q: Bool> Bool for And<P, Q> {
-    type Value = <P::Value as If>::And<Q::Value>;
+    type Value = <P::Value as BoolBase>::And<Q::Value>;
 }
 impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
-    type Value = <P::Value as If>::Or<Q::Value>;
+    type Value = <P::Value as BoolBase>::Or<Q::Value>;
 }
 
 pub trait If {
