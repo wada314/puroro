@@ -31,7 +31,6 @@ impl MessageDescriptor for () {
 pub trait MessageDescriptorExt {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
-    type GetFieldListAsMdFd;
     type GetOwnedFieldList;
     type GetFieldByNumber;
 }
@@ -40,7 +39,6 @@ pub trait MessageDescriptorExt {
 impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetFieldListAsMdFd = <MD::Fields as GetFieldListAsMdFd<MD>>::Type;
     type GetOwnedFieldList = <MD::Fields as GetOwnedFieldList<MD>>::Type;
     type GetFieldByNumber = <GetGetFieldByNumber as Functor<MD>>::Type;
 }
