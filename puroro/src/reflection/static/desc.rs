@@ -80,32 +80,22 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
 }
 
-pub trait GetFieldListAsMdFd<MD> {
-    type Type;
-}
-impl<MD, Fields> GetFieldListAsMdFd<MD> for Fields
-where
-    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Functor<Fields>,
-{
-    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Functor<Fields>>::Type;
-}
-
-pub struct GetFieldListAsMdFdHelper<MD>(PhantomData<MD>);
-impl<MD, FD> Functor<FD> for GetFieldListAsMdFdHelper<MD> {
+pub struct FdIntoMdFdFunctor<MD>(PhantomData<MD>);
+impl<MD, FD> Functor<FD> for FdIntoMdFdFunctor<MD> {
     type Type = (MD, FD);
 }
 
 pub trait GetOwnedFields<MD> {
     type Type;
 }
-impl<MD, Fields, MdFdList> GetOwnedFields<MD> for Fields
+impl<MD, Fields> GetOwnedFields<MD> for Fields
 where
-    Fields: GetFieldListAsMdFd<MD, Type = MdFdList>,
-    MdFdList: list::List,
-    list::IntoTupleList: Functor<list::Map2<MdFdList, MdFdIntoOwnedTypeFunctor>>,
+    list::IntoTupleList:
+        Functor<list::Map2<list::Map2<Fields, FdIntoMdFdFunctor<MD>>, MdFdIntoOwnedTypeFunctor>>,
 {
-    type Type =
-        <list::IntoTupleList as Functor<list::Map2<MdFdList, MdFdIntoOwnedTypeFunctor>>>::Type;
+    type Type = <list::IntoTupleList as Functor<
+        list::Map2<list::Map2<Fields, FdIntoMdFdFunctor<MD>>, MdFdIntoOwnedTypeFunctor>,
+    >>::Type;
 }
 
 pub struct GetSupplementalDescriptor;
