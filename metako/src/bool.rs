@@ -14,7 +14,31 @@
 
 use crate::func::Functor;
 use crate::func::Pred;
+use ::std::marker::PhantomData;
 pub use ::typenum::{B0, B1};
+
+pub trait Bool {
+    type Value: If;
+}
+impl Bool for B0 {
+    type Value = B0;
+}
+impl Bool for B1 {
+    type Value = B1;
+}
+pub struct Not<B>(PhantomData<B>);
+impl<B: Bool> Bool for Not<B> {
+    type Value = <B::Value as If>::Not;
+}
+pub struct And<P, Q>(PhantomData<(P, Q)>);
+pub struct Or<P, Q>(PhantomData<(P, Q)>);
+
+impl<P: Bool, Q: Bool> Bool for And<P, Q> {
+    type Value = <P::Value as If>::And<Q::Value>;
+}
+impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
+    type Value = <P::Value as If>::Or<Q::Value>;
+}
 
 pub trait If {
     type Then<T, F>;
