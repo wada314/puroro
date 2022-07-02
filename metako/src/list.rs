@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Functor, Bool, Pred};
+use crate::{Bool, Functor, Pred};
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -27,13 +27,9 @@ macro_rules! make_list {
 
 pub trait List {
     type Car;
-    type Cdr: List;
+    type Cdr;
 }
-impl List for () {
-    type Car = ();
-    type Cdr = ();
-}
-impl<T, U: List> List for (T, U) {
+impl<T, U> List for (T, U) {
     type Car = T;
     type Cdr = U;
 }

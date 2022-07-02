@@ -43,6 +43,9 @@ impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
 }
 
 pub struct AnyOf<L>(PhantomData<L>);
+impl Bool for AnyOf<()> {
+    type Then<T, F> = F;
+}
 impl<L> Bool for AnyOf<L>
 where
     L: List,
@@ -53,6 +56,9 @@ where
 }
 
 pub struct AllOf<L>(PhantomData<L>);
+impl Bool for AllOf<()> {
+    type Then<T, F> = T;
+}
 impl<L> Bool for AllOf<L>
 where
     L: List,
