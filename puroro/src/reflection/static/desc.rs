@@ -32,7 +32,6 @@ pub trait MessageDescriptorExt {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
     type GetOwnedFieldList;
-    type GetFieldByNumber;
 }
 // Implementation note: Do not introduce any additional bounds except
 // `MD: MessageDescriptor`!
@@ -40,7 +39,6 @@ impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
     type GetOwnedFieldList = <MD::Fields as GetOwnedFieldList<MD>>::Type;
-    type GetFieldByNumber = <GetGetFieldByNumber as Functor<MD>>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -82,37 +80,6 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
 }
 
-pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
-impl<N, T> Functor<T> for IsFdNumberEqualTo<N>
-where
-    T: FieldDescriptor,
-    T::Number: Number,
-    N: Number,
-{
-    type Type = N::Eq<T::Number>;
-}
-
-pub struct GetGetFieldByNumber;
-impl<MD: MessageDescriptor> Functor<MD> for GetGetFieldByNumber {
-    type Type = GetFieldByNumber<MD>;
-}
-
-pub struct GetFieldByNumber<MD>(PhantomData<MD>);
-impl<MD: MessageDescriptor, N: Number, FD> Functor<N> for GetFieldByNumber<MD>
-where
-    list::Find<IsFdNumberEqualTo<N>>: Functor<MD::Fields, Type = FD>,
-    FD: FieldDescriptor,
-{
-    type Type = FD;
-}
-
-pub struct GetFieldListAsMdFdFunctor;
-impl<MD: MessageDescriptor> Functor<MD> for GetFieldListAsMdFdFunctor
-where
-    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Functor<MD::Fields>,
-{
-    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Functor<MD::Fields>>::Type;
-}
 pub trait GetFieldListAsMdFd<MD> {
     type Type;
 }
