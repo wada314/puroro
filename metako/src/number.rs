@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Functor, If, B0, B1};
+use crate::{And, Bool, Functor, Not, B0, B1};
 use ::std::marker::PhantomData;
 use ::typenum::{UInt, UTerm};
 
@@ -20,33 +20,32 @@ use ::typenum::{UInt, UTerm};
 // type equality with ANY M:Number type.
 // typenum's Cmp does not fulfill this condition...
 pub trait Number {
-    type Lsb: If;
+    type Lsb: Bool;
     type Remains: Number;
-    type IsUTerm: If;
-    type Eq<M: Number>: If;
-    type Neq<M: Number>: If;
+    type IsUTerm: Bool;
+    type Eq<M: Number>: Bool;
+    type Neq<M: Number>: Bool;
 }
 impl<U: Number> Number for UInt<U, B0> {
     type Lsb = B0;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: Number> =
-        <<M::Lsb as If>::Not as If>::And<<Self::Remains as Number>::Eq<M::Remains>>;
-    type Neq<M: Number> = <Self::Eq<M> as If>::Not;
+    type Eq<M: Number> = And<Not<M::Lsb>, <Self::Remains as Number>::Eq<M::Remains>>;
+    type Neq<M: Number> = Not<Self::Eq<M>>;
 }
 impl<U: Number> Number for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
-    type Eq<M: Number> = <M::Lsb as If>::And<<Self::Remains as Number>::Eq<M::Remains>>;
-    type Neq<M: Number> = <Self::Eq<M> as If>::Not;
+    type Eq<M: Number> = And<M::Lsb, <Self::Remains as Number>::Eq<M::Remains>>;
+    type Neq<M: Number> = Not<Self::Eq<M>>;
 }
 impl Number for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
     type Eq<M: Number> = M::IsUTerm;
-    type Neq<M: Number> = <Self::Eq<M> as If>::Not;
+    type Neq<M: Number> = Not<Self::Eq<M>>;
 }
 
 pub struct IsNumberEqualFunctor<N>(PhantomData<N>);

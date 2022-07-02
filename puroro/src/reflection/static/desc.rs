@@ -47,9 +47,9 @@ pub trait FieldDescriptor {
     type Number: typenum::ToInt<i32> + Number;
     type Label: tags::FieldLabelTag;
     type Type: tags::FieldTypeTag;
-    type HasOneofIndex: If;
+    type HasOneofIndex: Bool;
     type OneofIndex: Number;
-    type IsProto3Optional: If;
+    type IsProto3Optional: Bool;
 }
 impl FieldDescriptor for () {
     type Number = U0;
@@ -63,9 +63,9 @@ pub trait FieldDescriptorExt {
     type Number: typenum::ToInt<i32> + Number;
     type Label: tags::FieldLabelTag;
     type Type: tags::FieldTypeTag;
-    type HasOneofIndex: If;
+    type HasOneofIndex: Bool;
     type OneofIndex: Number;
-    type IsProto3Optional: If;
+    type IsProto3Optional: Bool;
     type MaybeFieldMessageDescriptor: MessageDescriptorExt;
 }
 impl<FD: FieldDescriptor> FieldDescriptorExt for FD {

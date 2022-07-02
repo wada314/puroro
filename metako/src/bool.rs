@@ -42,73 +42,32 @@ impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
     type Then<T, F> = <P as Bool>::Then<T, <Q as Bool>::Then<T, F>>;
 }
 
-pub trait If {
-    type Then<T, F>;
-    type Not: If;
-    type And<T: If>: If;
-    type Or<T: If>: If;
-}
-impl If for B0 {
-    type Then<T, F> = F;
-    type Not = B1;
-    type And<T: If> = B0;
-    type Or<T: If> = T;
-}
-impl If for B1 {
-    type Then<T, F> = T;
-    type Not = B0;
-    type And<T: If> = T;
-    type Or<T: If> = B1;
-}
-
 pub trait AnyOf {
-    type Type: If;
+    type Type: Bool;
 }
 impl AnyOf for () {
     type Type = B0;
 }
 impl<T, U> AnyOf for (T, U)
 where
-    T: If,
+    T: Bool,
     U: AnyOf,
 {
-    type Type = T::Or<<U as AnyOf>::Type>;
-}
-pub struct AnyOfFunctor;
-impl Functor<()> for AnyOfFunctor {
-    type Type = B0;
-}
-impl<T, U> Functor<(T, U)> for AnyOfFunctor
-where
-    T: If,
-    AnyOfFunctor: Pred<U>,
-{
-    type Type = T::Or<<AnyOfFunctor as Pred<U>>::Type>;
+    type Type = Or<T, <U as AnyOf>::Type>;
 }
 
 pub trait AllOf {
-    type Type: If;
+    type Type: Bool;
 }
 impl AllOf for () {
     type Type = B1;
 }
 impl<T, U> AllOf for (T, U)
 where
-    T: If,
+    T: Bool,
     U: AllOf,
 {
-    type Type = T::And<<U as AllOf>::Type>;
-}
-pub struct AllOfFunctor;
-impl Functor<()> for AllOfFunctor {
-    type Type = B1;
-}
-impl<T, U> Functor<(T, U)> for AllOfFunctor
-where
-    T: If,
-    AllOfFunctor: Pred<U>,
-{
-    type Type = T::And<<AllOfFunctor as Pred<U>>::Type>;
+    type Type = And<T, <U as AllOf>::Type>;
 }
 
 #[macro_export]
@@ -136,7 +95,7 @@ where
     P: Pred<X>,
     X: Switch<U>,
 {
-    type Type = <<P as Pred<X>>::Type as If>::Then<T, <X as Switch<U>>::Type>;
+    type Type = <<P as Pred<X>>::Type as Bool>::Then<T, <X as Switch<U>>::Type>;
 }
 
 pub struct SwitchFunctor;
@@ -147,7 +106,7 @@ impl<X, P: Pred<X>, T, U> Functor<(X, ((P, T), U))> for SwitchFunctor
 where
     SwitchFunctor: Functor<(X, U)>,
 {
-    type Type = <<P as Pred<X>>::Type as If>::Then<T, <SwitchFunctor as Functor<(X, U)>>::Type>;
+    type Type = <<P as Pred<X>>::Type as Bool>::Then<T, <SwitchFunctor as Functor<(X, U)>>::Type>;
 }
 
 pub struct SwitchFunctor2<PredAndValueList>(PhantomData<PredAndValueList>);
@@ -160,7 +119,7 @@ where
     F: Pred<X>,
     SwitchFunctor2<PredAndValueList::Cdr>: Functor<X>,
 {
-    type Type = <<F as Pred<X>>::Type as If>::Then<
+    type Type = <<F as Pred<X>>::Type as Bool>::Then<
         V,
         <SwitchFunctor2<PredAndValueList::Cdr> as Functor<X>>::Type,
     >;

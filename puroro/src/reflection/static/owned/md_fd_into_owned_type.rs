@@ -26,14 +26,14 @@ where
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
-    use ::metako::{all_of, any_of, list, make_list, Functor, If, IsNumberEqualFunctor, Number};
+    use ::metako::{all_of, any_of, list, make_list, Functor, IsNumberEqualFunctor, Not, Number};
 
     pub struct IsUnit;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
         type Type = all_of![make_list![
             FD::HasOneofIndex,
-            <<FD as FieldDescriptor>::IsProto3Optional as If>::Not
+            Not<<FD as FieldDescriptor>::IsProto3Optional>,
         ]];
     }
     pub struct IsU32;

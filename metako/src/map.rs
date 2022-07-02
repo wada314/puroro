@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Functor, If, Pred};
+use crate::{Bool, Functor, Pred};
 use ::std::marker::PhantomData;
 
 pub struct Get<P>(PhantomData<P>);
@@ -24,5 +24,5 @@ where
     P: Pred<K>,
     Get<P>: Functor<U>,
 {
-    type Type = <P::Type as If>::Then<V, <Get<P> as Functor<U>>::Type>;
+    type Type = <P::Type as Bool>::Then<V, <Get<P> as Functor<U>>::Type>;
 }

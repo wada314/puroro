@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::If;
+use crate::Bool;
 use ::std::marker::PhantomData;
 
 pub trait Functor<T> {
     type Type;
 }
 pub trait Pred<T> {
-    type Type: If;
+    type Type: Bool;
 }
 impl<T, U> Pred<U> for T
 where
     T: Functor<U>,
-    T::Type: If,
+    T::Type: Bool,
 {
     type Type = T::Type;
 }

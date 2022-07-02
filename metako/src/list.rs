@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Functor, If, Pred};
+use crate::{Functor, Bool, Pred};
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -47,7 +47,7 @@ where
     P: Pred<T>,
     FindOrDefault<P, D>: Functor<U>,
 {
-    type Type = <P::Type as If>::Then<T, <FindOrDefault<P, D> as Functor<U>>::Type>;
+    type Type = <P::Type as Bool>::Then<T, <FindOrDefault<P, D> as Functor<U>>::Type>;
 }
 pub struct Find<P>(PhantomData<P>);
 impl<P, L> Functor<L> for Find<P>
