@@ -83,7 +83,7 @@ pub trait GetOwnedFields<MD> {
 }
 impl<MD, Fields, OwnedFields> GetOwnedFields<MD> for Fields
 where
-    list::Map<Fields, FdIntoOwnedTypeFunctor<MD>>: list::IntoTupleList<TupleList = OwnedFields>,
+    list::IntoTupleList: Func<list::Map<Fields, FdIntoOwnedTypeFunctor<MD>>, Type = OwnedFields>,
 {
     type Type = OwnedFields;
 }

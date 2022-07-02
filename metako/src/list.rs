@@ -53,25 +53,16 @@ where
     type Cdr = <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>;
 }
 
-pub struct IntoTupleListFunctor;
-impl<L: List> Func<L> for IntoTupleListFunctor
+pub struct IntoTupleList;
+impl<L: List> Func<L> for IntoTupleList
 where
-    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor>: Func<L::Cdr>,
+    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleList>: Func<L::Cdr>,
 {
     type Type = <L::IsTerm as Bool>::Then<
         (),
         (
             L::Car,
-            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor> as Func<L::Cdr>>::Type,
+            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleList> as Func<L::Cdr>>::Type,
         ),
     >;
-}
-pub trait IntoTupleList {
-    type TupleList;
-}
-impl<L> IntoTupleList for L
-where
-    IntoTupleListFunctor: Func<L>,
-{
-    type TupleList = <IntoTupleListFunctor as Func<L>>::Type;
 }
