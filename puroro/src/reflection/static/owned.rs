@@ -18,7 +18,7 @@ use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
 use crate::Result;
 use ::metako::*;
-pub use md_fd_into_owned_type::MdFdIntoOwnedTypeFunctor;
+pub use md_fd_into_owned_type::FdIntoOwnedTypeFunctor;
 
 pub struct OwnedMessage<MD>
 where

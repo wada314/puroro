@@ -14,7 +14,7 @@
 
 use std::marker::PhantomData;
 
-use super::owned::MdFdIntoOwnedTypeFunctor;
+use super::owned::FdIntoOwnedTypeFunctor;
 use crate::tags;
 use ::metako::*;
 use ::typenum;
@@ -90,11 +90,10 @@ pub trait GetOwnedFields<MD> {
 }
 impl<MD, Fields> GetOwnedFields<MD> for Fields
 where
-    list::IntoTupleListFunctor:
-        Functor<list::Map2<list::Map2<Fields, FdIntoMdFdFunctor<MD>>, MdFdIntoOwnedTypeFunctor>>,
+    list::IntoTupleListFunctor: Functor<list::Map2<Fields, FdIntoOwnedTypeFunctor<MD>>>,
 {
     type Type = <list::IntoTupleListFunctor as Functor<
-        list::Map2<list::Map2<Fields, FdIntoMdFdFunctor<MD>>, MdFdIntoOwnedTypeFunctor>,
+        list::Map2<Fields, FdIntoOwnedTypeFunctor<MD>>,
     >>::Type;
 }
 

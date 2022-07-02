@@ -14,6 +14,7 @@
 
 use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
 use ::metako::*;
+use ::std::marker::PhantomData;
 
 pub struct MdFdIntoOptBoxOwnedMessageFunctor;
 impl<MD, FD> Functor<(MD, FD)> for MdFdIntoOptBoxOwnedMessageFunctor
@@ -85,10 +86,10 @@ where
     type Type = <<Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type as Functor<Self>>::Type;
 }
 
-pub struct MdFdIntoOwnedTypeFunctor;
-impl<MdFd> Functor<MdFd> for MdFdIntoOwnedTypeFunctor
+pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
+impl<MD, FD> Functor<FD> for FdIntoOwnedTypeFunctor<MD>
 where
-    MdFd: MdFdIntoOwnedType,
+    (MD, FD): MdFdIntoOwnedType,
 {
-    type Type = <MdFd as MdFdIntoOwnedType>::Type;
+    type Type = <(MD, FD) as MdFdIntoOwnedType>::Type;
 }
