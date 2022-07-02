@@ -21,7 +21,7 @@ use ::typenum;
 use ::typenum::U0;
 
 pub trait MessageDescriptor: Sized {
-    type Fields: GetFieldListAsMdFd<Self>;
+    type Fields: GetFieldListAsMdFd<Self> + GetOwnedFieldList<Self>;
     type Syntax: tags::ProtoSyntaxTag;
 }
 impl MessageDescriptor for () {
@@ -126,6 +126,18 @@ where
 pub struct GetFieldListAsMdFdHelper<MD>(PhantomData<MD>);
 impl<MD, FD> Func<FD> for GetFieldListAsMdFdHelper<MD> {
     type Type = (MD, FD);
+}
+
+pub trait GetOwnedFieldList<MD> {
+    type Type;
+}
+impl<MD, Fields> GetOwnedFieldList<MD> for Fields
+where
+    Fields: GetFieldListAsMdFd<MD>,
+    <Fields as GetFieldListAsMdFd<MD>>::Type: list::Map<MdFdIntoOwnedTypeFunctor>,
+{
+    type Type =
+        <<Fields as GetFieldListAsMdFd<MD>>::Type as list::Map<MdFdIntoOwnedTypeFunctor>>::Type;
 }
 
 pub struct GetSupplementalDescriptor;

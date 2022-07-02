@@ -86,9 +86,12 @@ type MdFdIntoOwnedTypeSwitch = make_list![
 pub trait MdFdIntoOwnedType {
     type Type;
 }
-// impl<MD, FD> MdFdIntoOwnedType for (MD, FD) {
-
-// }
+impl<MD, FD> MdFdIntoOwnedType for (MD, FD)
+where
+    Self: Switch<MdFdIntoOwnedTypeSwitch>,
+{
+    type Type = <Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type;
+}
 
 pub struct MdFdIntoOwnedTypeFunctor;
 impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedTypeFunctor
