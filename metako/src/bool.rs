@@ -85,6 +85,20 @@ where
     type Type = T::And<<AllOfFunctor as Pred<U>>::Type>;
 }
 
+#[macro_export]
+macro_rules! any_of {
+    ($list:ty) => {
+        <$list as $crate::AnyOf>::Type
+    };
+}
+
+#[macro_export]
+macro_rules! all_of {
+    ($list:ty) => {
+        <$list as $crate::AllOf>::Type
+    };
+}
+
 pub trait Switch<PredAndValueList> {
     type Type;
 }
