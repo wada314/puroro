@@ -24,7 +24,7 @@ pub struct OwnedMessage<MD>
 where
     MD: MessageDescriptorExt,
 {
-    pub fields: MD::GetOwnedFieldList,
+    pub fields: MD::OwnedFields,
 }
 
 impl<MD> OwnedMessage<MD>
@@ -44,7 +44,7 @@ where
 impl<MD> Default for OwnedMessage<MD>
 where
     MD: MessageDescriptorExt,
-    MD::GetOwnedFieldList: Default,
+    MD::OwnedFields: Default,
 {
     fn default() -> Self {
         Self {

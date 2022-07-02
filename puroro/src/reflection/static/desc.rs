@@ -21,7 +21,7 @@ use ::typenum;
 use ::typenum::U0;
 
 pub trait MessageDescriptor: Sized {
-    type Fields: GetFieldListAsMdFd<Self> + GetOwnedFieldList<Self>;
+    type Fields: GetOwnedFields<Self>;
     type Syntax: tags::ProtoSyntaxTag;
 }
 impl MessageDescriptor for () {
@@ -31,14 +31,14 @@ impl MessageDescriptor for () {
 pub trait MessageDescriptorExt {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
-    type GetOwnedFieldList;
+    type OwnedFields;
 }
 // Implementation note: Do not introduce any additional bounds except
 // `MD: MessageDescriptor`!
 impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
-    type GetOwnedFieldList = <MD::Fields as GetOwnedFieldList<MD>>::Type;
+    type OwnedFields = <MD::Fields as GetOwnedFields<MD>>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -95,10 +95,10 @@ impl<MD, FD> Functor<FD> for GetFieldListAsMdFdHelper<MD> {
     type Type = (MD, FD);
 }
 
-pub trait GetOwnedFieldList<MD> {
+pub trait GetOwnedFields<MD> {
     type Type;
 }
-impl<MD, Fields, MdFdList> GetOwnedFieldList<MD> for Fields
+impl<MD, Fields, MdFdList> GetOwnedFields<MD> for Fields
 where
     Fields: GetFieldListAsMdFd<MD, Type = MdFdList>,
     MdFdList: list::List,
