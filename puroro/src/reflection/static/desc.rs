@@ -40,7 +40,7 @@ impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Syntax = MD::Syntax;
     type GetFieldListAsMdFd = <MD::Fields as GetFieldListAsMdFd<MD>>::Type;
     type GetOwnedFieldList = <MD::Fields as GetOwnedFieldList<MD>>::Type;
-    type GetFieldByNumber = <GetGetFieldByNumber as Func<MD>>::Type;
+    type GetFieldByNumber = <GetGetFieldByNumber as Functor<MD>>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -79,7 +79,7 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
 }
 
 pub struct IsFdNumberEqualTo<N>(::std::marker::PhantomData<N>);
-impl<N, T> Func<T> for IsFdNumberEqualTo<N>
+impl<N, T> Functor<T> for IsFdNumberEqualTo<N>
 where
     T: FieldDescriptor,
     T::Number: Number,
@@ -89,38 +89,38 @@ where
 }
 
 pub struct GetGetFieldByNumber;
-impl<MD: MessageDescriptor> Func<MD> for GetGetFieldByNumber {
+impl<MD: MessageDescriptor> Functor<MD> for GetGetFieldByNumber {
     type Type = GetFieldByNumber<MD>;
 }
 
 pub struct GetFieldByNumber<MD>(PhantomData<MD>);
-impl<MD: MessageDescriptor, N: Number, FD> Func<N> for GetFieldByNumber<MD>
+impl<MD: MessageDescriptor, N: Number, FD> Functor<N> for GetFieldByNumber<MD>
 where
-    list::Find<IsFdNumberEqualTo<N>>: Func<MD::Fields, Type = FD>,
+    list::Find<IsFdNumberEqualTo<N>>: Functor<MD::Fields, Type = FD>,
     FD: FieldDescriptor,
 {
     type Type = FD;
 }
 
 pub struct GetFieldListAsMdFdFunctor;
-impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFdFunctor
+impl<MD: MessageDescriptor> Functor<MD> for GetFieldListAsMdFdFunctor
 where
-    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
+    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Functor<MD::Fields>,
 {
-    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
+    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Functor<MD::Fields>>::Type;
 }
 pub trait GetFieldListAsMdFd<MD> {
     type Type;
 }
 impl<MD, Fields> GetFieldListAsMdFd<MD> for Fields
 where
-    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Func<Fields>,
+    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Functor<Fields>,
 {
-    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Func<Fields>>::Type;
+    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Functor<Fields>>::Type;
 }
 
 pub struct GetFieldListAsMdFdHelper<MD>(PhantomData<MD>);
-impl<MD, FD> Func<FD> for GetFieldListAsMdFdHelper<MD> {
+impl<MD, FD> Functor<FD> for GetFieldListAsMdFdHelper<MD> {
     type Type = (MD, FD);
 }
 
@@ -137,7 +137,7 @@ where
 }
 
 pub struct GetSupplementalDescriptor;
-impl<T: tags::FieldTypeTag> Func<T> for GetSupplementalDescriptor {
+impl<T: tags::FieldTypeTag> Functor<T> for GetSupplementalDescriptor {
     type Type = T::MessageDescriptor;
 }
 

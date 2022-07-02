@@ -17,23 +17,22 @@ use super::boxed_message::BoxedMessage;
 use ::metako::*;
 
 pub struct MdFdIntoOptBoxOwnedMessage;
-impl<MD, FD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
+impl<MD, FD> Functor<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
 where
     FD: FieldDescriptorExt,
 {
-    // type Type = Option<BoxedMessage<FD::MaybeFieldMessageDescriptor>>;
     type Type = Option<Box<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
 }
 
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
-    use ::metako::{list, make_list, AllOf, AnyOf, Func, If, IsNumberEqual, Number};
+    use ::metako::{list, make_list, AllOf, AnyOf, Functor, If, IsNumberEqual, Number};
 
     pub struct IsUnit;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsUnit {
+    impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
-        type Type = <AllOf as Func<
+        type Type = <AllOf as Functor<
             make_list![
                 FD::HasOneofIndex,
                 <<FD as FieldDescriptor>::IsProto3Optional as If>::Not
@@ -41,15 +40,15 @@ mod preds {
         >>::Type;
     }
     pub struct IsU32;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor, TypeId> Func<(MD, FD)> for IsU32
+    impl<MD: MessageDescriptor, FD: FieldDescriptor, TypeId> Functor<(MD, FD)> for IsU32
     where
         FD::Type: tags::FieldTypeTag<Id = TypeId>,
         TypeId: Number,
     {
-        type Type = <AllOf as Func<
+        type Type = <AllOf as Functor<
             make_list![
-                <AnyOf as Func<
-                    <list::MapFunctor<IsNumberEqual<TypeId>> as Func<
+                <AnyOf as Functor<
+                    <list::MapFunctor<IsNumberEqual<TypeId>> as Functor<
                         make_list![tags::UInt32Id, tags::Fixed32Id],
                     >>::Type,
                 >>::Type,
@@ -58,8 +57,8 @@ mod preds {
         >>::Type;
     }
     pub struct IsString;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsString {
-        type Type = <AllOf as Func<
+    impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsString {
+        type Type = <AllOf as Functor<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
@@ -67,8 +66,8 @@ mod preds {
         >>::Type;
     }
     pub struct IsOptBoxedMessage;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Func<(MD, FD)> for IsOptBoxedMessage {
-        type Type = <AllOf as Func<
+    impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsOptBoxedMessage {
+        type Type = <AllOf as Functor<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
@@ -93,10 +92,10 @@ where
 }
 
 pub struct MdFdIntoOwnedTypeFunctor;
-impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedTypeFunctor
+impl<MD, FD, Gen> Functor<(MD, FD)> for MdFdIntoOwnedTypeFunctor
 where
-    SwitchFunctor: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
-    Gen: Func<(MD, FD)>,
+    SwitchFunctor: Functor<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
+    Gen: Functor<(MD, FD)>,
 {
-    type Type = <Gen as Func<(MD, FD)>>::Type;
+    type Type = <Gen as Functor<(MD, FD)>>::Type;
 }

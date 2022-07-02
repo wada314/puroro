@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::func::Func;
+use crate::func::Functor;
 use crate::func::Pred;
 pub use ::typenum::{B0, B1};
 
@@ -36,10 +36,10 @@ impl If for B1 {
 }
 
 pub struct AnyOf;
-impl Func<()> for AnyOf {
+impl Functor<()> for AnyOf {
     type Type = B0;
 }
-impl<T, U> Func<(T, U)> for AnyOf
+impl<T, U> Functor<(T, U)> for AnyOf
 where
     T: If,
     AnyOf: Pred<U>,
@@ -48,10 +48,10 @@ where
 }
 
 pub struct AllOf;
-impl Func<()> for AllOf {
+impl Functor<()> for AllOf {
     type Type = B1;
 }
-impl<T, U> Func<(T, U)> for AllOf
+impl<T, U> Functor<(T, U)> for AllOf
 where
     T: If,
     AllOf: Pred<U>,
@@ -74,12 +74,12 @@ where
 }
 
 pub struct SwitchFunctor;
-impl<X> Func<(X, ())> for SwitchFunctor {
+impl<X> Functor<(X, ())> for SwitchFunctor {
     type Type = ();
 }
-impl<X, P: Pred<X>, T, U> Func<(X, ((P, T), U))> for SwitchFunctor
+impl<X, P: Pred<X>, T, U> Functor<(X, ((P, T), U))> for SwitchFunctor
 where
-    SwitchFunctor: Func<(X, U)>,
+    SwitchFunctor: Functor<(X, U)>,
 {
-    type Type = <<P as Pred<X>>::Type as If>::Then<T, <SwitchFunctor as Func<(X, U)>>::Type>;
+    type Type = <<P as Pred<X>>::Type as If>::Then<T, <SwitchFunctor as Functor<(X, U)>>::Type>;
 }

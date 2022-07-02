@@ -15,7 +15,7 @@
 use crate::If;
 use ::std::marker::PhantomData;
 
-pub trait Func<T> {
+pub trait Functor<T> {
     type Type;
 }
 pub trait Pred<T> {
@@ -23,13 +23,13 @@ pub trait Pred<T> {
 }
 impl<T, U> Pred<U> for T
 where
-    T: Func<U>,
+    T: Functor<U>,
     T::Type: If,
 {
     type Type = T::Type;
 }
 
 pub struct Const<T>(PhantomData<T>);
-impl<T, _U> Func<_U> for Const<T> {
+impl<T, _U> Functor<_U> for Const<T> {
     type Type = T;
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Func, If, B0, B1};
+use crate::{Functor, If, B0, B1};
 use ::std::marker::PhantomData;
 use ::typenum::{UInt, UTerm};
 
@@ -50,7 +50,7 @@ impl Number for UTerm {
 }
 
 pub struct IsNumberEqual<N>(PhantomData<N>);
-impl<N, M> Func<M> for IsNumberEqual<N>
+impl<N, M> Functor<M> for IsNumberEqual<N>
 where
     M: Number,
     N: Number,

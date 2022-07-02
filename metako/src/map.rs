@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Func, If, Pred};
+use crate::{Functor, If, Pred};
 use ::std::marker::PhantomData;
 
 pub struct Get<P>(PhantomData<P>);
-impl<P> Func<()> for Get<P> {
+impl<P> Functor<()> for Get<P> {
     type Type = ();
 }
-impl<K, V, U, P> Func<((K, V), U)> for Get<P>
+impl<K, V, U, P> Functor<((K, V), U)> for Get<P>
 where
     P: Pred<K>,
-    Get<P>: Func<U>,
+    Get<P>: Functor<U>,
 {
-    type Type = <P::Type as If>::Then<V, <Get<P> as Func<U>>::Type>;
+    type Type = <P::Type as If>::Then<V, <Get<P> as Functor<U>>::Type>;
 }

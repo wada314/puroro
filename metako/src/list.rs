@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Func, If, Pred};
+use crate::{Functor, If, Pred};
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -47,34 +47,34 @@ impl<L: ListBase> List for L {
 }
 
 pub struct FindOrDefault<P, D>(PhantomData<(P, D)>);
-impl<P, D> Func<()> for FindOrDefault<P, D> {
+impl<P, D> Functor<()> for FindOrDefault<P, D> {
     type Type = D;
 }
-impl<T, U, P, D> Func<(T, U)> for FindOrDefault<P, D>
+impl<T, U, P, D> Functor<(T, U)> for FindOrDefault<P, D>
 where
     P: Pred<T>,
-    FindOrDefault<P, D>: Func<U>,
+    FindOrDefault<P, D>: Functor<U>,
 {
-    type Type = <P::Type as If>::Then<T, <FindOrDefault<P, D> as Func<U>>::Type>;
+    type Type = <P::Type as If>::Then<T, <FindOrDefault<P, D> as Functor<U>>::Type>;
 }
 pub struct Find<P>(PhantomData<P>);
-impl<P, L> Func<L> for Find<P>
+impl<P, L> Functor<L> for Find<P>
 where
-    FindOrDefault<P, ()>: Func<L>,
+    FindOrDefault<P, ()>: Functor<L>,
 {
-    type Type = <FindOrDefault<P, ()> as Func<L>>::Type;
+    type Type = <FindOrDefault<P, ()> as Functor<L>>::Type;
 }
 
 pub struct MapFunctor<F>(PhantomData<F>);
-impl<F> Func<()> for MapFunctor<F> {
+impl<F> Functor<()> for MapFunctor<F> {
     type Type = ();
 }
-impl<T, U, F> Func<(T, U)> for MapFunctor<F>
+impl<T, U, F> Functor<(T, U)> for MapFunctor<F>
 where
-    F: Func<T>,
-    MapFunctor<F>: Func<U>,
+    F: Functor<T>,
+    MapFunctor<F>: Functor<U>,
 {
-    type Type = (<F as Func<T>>::Type, <MapFunctor<F> as Func<U>>::Type);
+    type Type = (<F as Functor<T>>::Type, <MapFunctor<F> as Functor<U>>::Type);
 }
 
 pub trait Map<F> {
@@ -85,8 +85,8 @@ impl<F> Map<F> for () {
 }
 impl<T, U, F> Map<F> for (T, U)
 where
-    F: Func<T>,
+    F: Functor<T>,
     U: Map<F>,
 {
-    type Type = (<F as Func<T>>::Type, <U as Map<F>>::Type);
+    type Type = (<F as Functor<T>>::Type, <U as Map<F>>::Type);
 }

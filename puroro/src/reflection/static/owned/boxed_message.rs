@@ -67,7 +67,7 @@ where
 impl<MD> DerefMut for BoxedMessage<MD>
 where
     MD: MessageDescriptorExt,
-    list::MapFunctor<MdFdIntoOwnedTypeFunctor>: Func<MD::GetFieldListAsMdFd>,
+    list::MapFunctor<MdFdIntoOwnedTypeFunctor>: Functor<MD::GetFieldListAsMdFd>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute(&mut self.0) }

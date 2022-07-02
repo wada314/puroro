@@ -21,5 +21,5 @@ pub mod map;
 pub mod number;
 
 pub use crate::bool::{AllOf, AnyOf, If, Switch, SwitchFunctor, B0, B1};
-pub use crate::func::{Const, Func, Pred};
+pub use crate::func::{Const, Functor, Pred};
 pub use crate::number::{IsNumberEqual, Number};
