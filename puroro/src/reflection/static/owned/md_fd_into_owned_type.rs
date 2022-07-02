@@ -61,7 +61,7 @@ mod preds {
         type Type = AllOf<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+                Not<<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<tags::RepeatedId>>,
             ],
         >;
     }
@@ -70,7 +70,7 @@ mod preds {
         type Type = AllOf<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+                Not<<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<tags::RepeatedId>>,
             ],
         >;
     }
