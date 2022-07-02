@@ -127,13 +127,14 @@ impl<MD, FD> Functor<FD> for GetFieldListAsMdFdHelper<MD> {
 pub trait GetOwnedFieldList<MD> {
     type Type;
 }
-impl<MD, Fields> GetOwnedFieldList<MD> for Fields
+impl<MD, Fields, MdFdList> GetOwnedFieldList<MD> for Fields
 where
-    Fields: GetFieldListAsMdFd<MD>,
-    <Fields as GetFieldListAsMdFd<MD>>::Type: list::Map<MdFdIntoOwnedTypeFunctor>,
+    Fields: GetFieldListAsMdFd<MD, Type = MdFdList>,
+    MdFdList: list::List,
+    list::IntoTupleList: Functor<list::Map2<MdFdList, MdFdIntoOwnedTypeFunctor>>,
 {
     type Type =
-        <<Fields as GetFieldListAsMdFd<MD>>::Type as list::Map<MdFdIntoOwnedTypeFunctor>>::Type;
+        <list::IntoTupleList as Functor<list::Map2<MdFdList, MdFdIntoOwnedTypeFunctor>>>::Type;
 }
 
 pub struct GetSupplementalDescriptor;
