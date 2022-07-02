@@ -27,7 +27,7 @@ where
 mod preds {
     use super::{FieldDescriptorExt, MessageDescriptor};
     use crate::tags;
-    use ::metako::{list, make_list, AllOf, AnyOf, Func, IsNumberEqualFunctor, Not, Number};
+    use ::metako::{list, make_list, AllOf, AnyOf, Func, IsNumberEqual, Not, Number};
 
     pub struct IsUnit;
     impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Func<(MD, FD)> for IsUnit {
@@ -40,7 +40,7 @@ mod preds {
             make_list![
                 AnyOf<
                     <list::Map<
-                        IsNumberEqualFunctor<FD::TypeId>,
+                        IsNumberEqual<FD::TypeId>,
                     > as Func<make_list![tags::UInt32Id, tags::Fixed32Id]>>::Type,
                 >,
                 Not<<FD::LabelId as Number>::Eq<tags::RepeatedId>>,

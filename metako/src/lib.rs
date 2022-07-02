@@ -22,4 +22,4 @@ pub mod number;
 
 pub use crate::bool::{AllOf, And, AnyOf, Bool, Not, Or, Switch, B0, B1};
 pub use crate::func::{Const, Func, Pred};
-pub use crate::number::{IsNumberEqualFunctor, Number};
+pub use crate::number::{IsNumberEqual, Number};

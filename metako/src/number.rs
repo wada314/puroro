@@ -44,8 +44,8 @@ impl Number for UTerm {
     type Eq<M: Number> = M::IsUTerm;
 }
 
-pub struct IsNumberEqualFunctor<N>(PhantomData<N>);
-impl<N, M> Func<M> for IsNumberEqualFunctor<N>
+pub struct IsNumberEqual<N>(PhantomData<N>);
+impl<N, M> Func<M> for IsNumberEqual<N>
 where
     M: Number,
     N: Number,
