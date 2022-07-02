@@ -79,7 +79,7 @@ type MdFdIntoOwnedTypeSwitch = make_list![
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
 impl<MD, FD, IntoOwnedType, OwnedType> Functor<FD> for FdIntoOwnedTypeFunctor<MD>
 where
-    (MD, FD): Switch<MdFdIntoOwnedTypeSwitch, Type = IntoOwnedType>,
+    SwitchFunctor<MdFdIntoOwnedTypeSwitch>: Functor<(MD, FD), Type = IntoOwnedType>,
     IntoOwnedType: Functor<(MD, FD), Type = OwnedType>,
 {
     type Type = OwnedType;

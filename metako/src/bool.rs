@@ -82,29 +82,18 @@ where
     type Type = <<P as Pred<X>>::Type as Bool>::Then<T, <X as Switch<U>>::Type>;
 }
 
-pub struct SwitchFunctor;
-impl<X> Functor<(X, ())> for SwitchFunctor {
+pub struct SwitchFunctor<PredAndValueList>(PhantomData<PredAndValueList>);
+impl<X> Functor<X> for SwitchFunctor<()> {
     type Type = ();
 }
-impl<X, P: Pred<X>, T, U> Functor<(X, ((P, T), U))> for SwitchFunctor
-where
-    SwitchFunctor: Functor<(X, U)>,
-{
-    type Type = <<P as Pred<X>>::Type as Bool>::Then<T, <SwitchFunctor as Functor<(X, U)>>::Type>;
-}
-
-pub struct SwitchFunctor2<PredAndValueList>(PhantomData<PredAndValueList>);
-impl<X> Functor<X> for SwitchFunctor2<()> {
-    type Type = ();
-}
-impl<X, PredAndValueList, F, V> Functor<X> for SwitchFunctor2<PredAndValueList>
+impl<X, PredAndValueList, F, V> Functor<X> for SwitchFunctor<PredAndValueList>
 where
     PredAndValueList: List<Car = (F, V)>,
     F: Pred<X>,
-    SwitchFunctor2<PredAndValueList::Cdr>: Functor<X>,
+    SwitchFunctor<PredAndValueList::Cdr>: Functor<X>,
 {
     type Type = <<F as Pred<X>>::Type as Bool>::Then<
         V,
-        <SwitchFunctor2<PredAndValueList::Cdr> as Functor<X>>::Type,
+        <SwitchFunctor<PredAndValueList::Cdr> as Functor<X>>::Type,
     >;
 }
