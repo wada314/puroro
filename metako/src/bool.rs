@@ -43,29 +43,29 @@ impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
 }
 
 pub struct AnyOf<L>(PhantomData<L>);
-impl Bool for AnyOf<()> {
-    type Then<T, F> = F;
-}
 impl<L> Bool for AnyOf<L>
 where
     L: List,
-    L::Car: Bool,
-    AnyOf<L::Cdr>: Bool,
+    <L::IsTerm as Bool>::Then<B0, L::Car>: Bool,
+    <L::IsTerm as Bool>::Then<B0, AnyOf<L::Cdr>>: Bool,
 {
-    type Then<T, F> = <Or<L::Car, AnyOf<L::Cdr>> as Bool>::Then<T, F>;
+    type Then<T, F> = <Or<
+        <L::IsTerm as Bool>::Then<B0, L::Car>,
+        <L::IsTerm as Bool>::Then<B0, AnyOf<L::Cdr>>,
+    > as Bool>::Then<T, F>;
 }
 
 pub struct AllOf<L>(PhantomData<L>);
-impl Bool for AllOf<()> {
-    type Then<T, F> = T;
-}
 impl<L> Bool for AllOf<L>
 where
     L: List,
-    L::Car: Bool,
-    AllOf<L::Cdr>: Bool,
+    <L::IsTerm as Bool>::Then<B1, L::Car>: Bool,
+    <L::IsTerm as Bool>::Then<B1, AllOf<L::Cdr>>: Bool,
 {
-    type Then<T, F> = <And<L::Car, AllOf<L::Cdr>> as Bool>::Then<T, F>;
+    type Then<T, F> = <And<
+        <L::IsTerm as Bool>::Then<B1, L::Car>,
+        <L::IsTerm as Bool>::Then<B1, AllOf<L::Cdr>>,
+    > as Bool>::Then<T, F>;
 }
 
 pub trait AnyOf2 {
