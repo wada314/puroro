@@ -26,12 +26,14 @@ where
 mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
-    use ::metako::{list, make_list, AllOf, AnyOf, Functor, If, IsNumberEqual, Number};
+    use ::metako::{
+        list, make_list, AllOfFunctor, AnyOfFunctor, Functor, If, IsNumberEqual, Number,
+    };
 
     pub struct IsUnit;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
-        type Type = <AllOf as Functor<
+        type Type = <AllOfFunctor as Functor<
             make_list![
                 FD::HasOneofIndex,
                 <<FD as FieldDescriptor>::IsProto3Optional as If>::Not
@@ -44,9 +46,9 @@ mod preds {
         FD::Type: tags::FieldTypeTag<Id = TypeId>,
         TypeId: Number,
     {
-        type Type = <AllOf as Functor<
+        type Type = <AllOfFunctor as Functor<
             make_list![
-                <AnyOf as Functor<
+                <AnyOfFunctor as Functor<
                     <list::MapFunctor<IsNumberEqual<TypeId>> as Functor<
                         make_list![tags::UInt32Id, tags::Fixed32Id],
                     >>::Type,
@@ -57,7 +59,7 @@ mod preds {
     }
     pub struct IsString;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsString {
-        type Type = <AllOf as Functor<
+        type Type = <AllOfFunctor as Functor<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
@@ -66,7 +68,7 @@ mod preds {
     }
     pub struct IsOptBoxedMessage;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsOptBoxedMessage {
-        type Type = <AllOf as Functor<
+        type Type = <AllOfFunctor as Functor<
             make_list![
                 <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,

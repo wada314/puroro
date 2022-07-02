@@ -35,28 +35,54 @@ impl If for B1 {
     type Or<T: If> = B1;
 }
 
-pub struct AnyOf;
-impl Functor<()> for AnyOf {
+pub trait AnyOf {
+    type Type: If;
+}
+impl AnyOf for () {
     type Type = B0;
 }
-impl<T, U> Functor<(T, U)> for AnyOf
+impl<T, U> AnyOf for (T, U)
 where
     T: If,
-    AnyOf: Pred<U>,
+    U: AnyOf,
 {
-    type Type = T::Or<<AnyOf as Pred<U>>::Type>;
+    type Type = T::Or<<U as AnyOf>::Type>;
+}
+pub struct AnyOfFunctor;
+impl Functor<()> for AnyOfFunctor {
+    type Type = B0;
+}
+impl<T, U> Functor<(T, U)> for AnyOfFunctor
+where
+    T: If,
+    AnyOfFunctor: Pred<U>,
+{
+    type Type = T::Or<<AnyOfFunctor as Pred<U>>::Type>;
 }
 
-pub struct AllOf;
-impl Functor<()> for AllOf {
+pub trait AllOf {
+    type Type: If;
+}
+impl AllOf for () {
     type Type = B1;
 }
-impl<T, U> Functor<(T, U)> for AllOf
+impl<T, U> AllOf for (T, U)
 where
     T: If,
-    AllOf: Pred<U>,
+    U: AllOf,
 {
-    type Type = T::And<<AllOf as Pred<U>>::Type>;
+    type Type = T::And<<U as AllOf>::Type>;
+}
+pub struct AllOfFunctor;
+impl Functor<()> for AllOfFunctor {
+    type Type = B1;
+}
+impl<T, U> Functor<(T, U)> for AllOfFunctor
+where
+    T: If,
+    AllOfFunctor: Pred<U>,
+{
+    type Type = T::And<<AllOfFunctor as Pred<U>>::Type>;
 }
 
 pub trait Switch<PredAndValueList> {
