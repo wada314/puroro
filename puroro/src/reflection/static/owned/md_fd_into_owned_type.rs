@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::desc::{FieldDescriptor, FieldDescriptorExt, MessageDescriptor};
+use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
 use ::metako::*;
 
 pub struct MdFdIntoOptBoxOwnedMessageFunctor;
@@ -24,53 +24,44 @@ where
 }
 
 mod preds {
-    use super::{FieldDescriptor, MessageDescriptor};
+    use super::{FieldDescriptorExt, MessageDescriptor};
     use crate::tags;
     use ::metako::{list, make_list, AllOf, AnyOf, Functor, IsNumberEqualFunctor, Not, Number};
 
     pub struct IsUnit;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsUnit {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
-        type Type = AllOf<
-            make_list![
-                FD::HasOneofIndex,
-                Not<<FD as FieldDescriptor>::IsProto3Optional>,
-            ],
-        >;
+        type Type = AllOf<make_list![FD::HasOneofIndex, Not<FD::IsProto3Optional>,]>;
     }
     pub struct IsU32;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor, TypeId> Functor<(MD, FD)> for IsU32
-    where
-        FD::Type: tags::FieldTypeTag<Id = TypeId>,
-        TypeId: Number,
-    {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsU32 {
         type Type = AllOf<
             make_list![
                 AnyOf<
                     list::Map2<
                         make_list![tags::UInt32Id, tags::Fixed32Id],
-                        IsNumberEqualFunctor<TypeId>,
+                        IsNumberEqualFunctor<FD::TypeId>,
                     >,
                 >,
-                Not<<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<tags::RepeatedId>>,
+                Not<<FD::LabelId as Number>::Eq<tags::RepeatedId>>,
             ],
         >;
     }
     pub struct IsString;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsString {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsString {
         type Type = AllOf<
             make_list![
-                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::StringId>,
-                Not<<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<tags::RepeatedId>>,
+                <FD::TypeId as Number>::Eq<tags::StringId>,
+                Not<<FD::LabelId as Number>::Eq<tags::RepeatedId>>,
             ],
         >;
     }
     pub struct IsOptBoxedMessage;
-    impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsOptBoxedMessage {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsOptBoxedMessage {
         type Type = AllOf<
             make_list![
-                <<FD::Type as tags::FieldTypeTag>::Id as Number>::Eq<tags::MessageId>,
-                Not<<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<tags::RepeatedId>>,
+                <FD::TypeId as Number>::Eq<tags::MessageId>,
+                Not<<FD::LabelId as Number>::Eq<tags::RepeatedId>>,
             ],
         >;
     }

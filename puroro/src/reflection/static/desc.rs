@@ -66,6 +66,8 @@ pub trait FieldDescriptorExt {
     type HasOneofIndex: Bool;
     type OneofIndex: Number;
     type IsProto3Optional: Bool;
+    type TypeId: Number;
+    type LabelId: Number;
     type MaybeFieldMessageDescriptor: MessageDescriptorExt;
 }
 impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
@@ -75,6 +77,8 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type HasOneofIndex = FD::HasOneofIndex;
     type OneofIndex = FD::OneofIndex;
     type IsProto3Optional = FD::IsProto3Optional;
+    type TypeId = <FD::Type as tags::FieldTypeTag>::Id;
+    type LabelId = <FD::Label as tags::FieldLabelTag>::Id;
     type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
 }
 
