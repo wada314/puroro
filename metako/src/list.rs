@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Bool, Functor, Pred, B0, B1};
+use crate::{Bool, Const, Functor, Pred, B0, B1};
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -90,10 +90,10 @@ pub struct Map2<L, F>(PhantomData<(L, F)>);
 impl<L, F> List for Map2<L, F>
 where
     L: List,
-    F: Functor<L::Car>,
-    Map2<L::Cdr, F>: List,
+    <L::IsTerm as Bool>::Then<Const<()>, F>: Functor<L::Car>,
+    <L::IsTerm as Bool>::Then<(), Map2<L::Cdr, F>>: List,
 {
     type IsTerm = L::IsTerm;
-    type Car = <F as Functor<L::Car>>::Type;
-    type Cdr = Map2<L::Cdr, F>;
+    type Car = <<L::IsTerm as Bool>::Then<Const<()>, F> as Functor<L::Car>>::Type;
+    type Cdr = <L::IsTerm as Bool>::Then<(), Map2<L::Cdr, F>>;
 }
