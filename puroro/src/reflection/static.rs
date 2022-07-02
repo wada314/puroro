@@ -54,21 +54,19 @@ impl<T: Reflection> Reflection for &'_ T {
 
 pub trait FdListAndFieldTypeList {
     type FieldList;
-    fn get_uint32<FD: FieldDescriptorExt>(field_list: &Self::FieldList) -> Result<u32>;
-}
-
-impl FdListAndFieldTypeList for ((), ()) {
-    type FieldList = ();
-
     fn get_uint32<FD: FieldDescriptorExt>(_field_list: &Self::FieldList) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
 }
 
-impl<FD: FieldDescriptorExt, FDRest, FieldRest> FdListAndFieldTypeList
-    for ((FD, FDRest), (u32, FieldRest))
+impl FdListAndFieldTypeList for ((), ()) {
+    type FieldList = ();
+}
+
+impl<FD: FieldDescriptorExt, FdRest, FieldRest> FdListAndFieldTypeList
+    for ((FD, FdRest), (u32, FieldRest))
 where
-    (FDRest, FieldRest): FdListAndFieldTypeList<FieldList = FieldRest>,
+    (FdRest, FieldRest): FdListAndFieldTypeList<FieldList = FieldRest>,
 {
     type FieldList = (u32, FieldRest);
 
@@ -76,7 +74,7 @@ where
         if <FD::Number as ToInt<i32>>::to_int() == <ParamFD::Number as ToInt<i32>>::to_int() {
             Ok(field_list.0)
         } else {
-            <(FDRest, FieldRest) as FdListAndFieldTypeList>::get_uint32::<ParamFD>(&field_list.1)
+            <(FdRest, FieldRest) as FdListAndFieldTypeList>::get_uint32::<ParamFD>(&field_list.1)
         }
     }
 }
