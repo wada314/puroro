@@ -66,7 +66,7 @@ pub trait FieldDescriptorExt {
     type HasOneofIndex: If;
     type OneofIndex: Number;
     type IsProto3Optional: If;
-    type MaybeFieldMessageDescriptor;
+    type MaybeFieldMessageDescriptor: MessageDescriptor;
 }
 impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type Number = FD::Number;
