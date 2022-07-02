@@ -68,20 +68,6 @@ where
     > as Bool>::Then<T, F>;
 }
 
-pub trait Switch<PredAndValueList> {
-    type Type;
-}
-impl<X> Switch<()> for X {
-    type Type = ();
-}
-impl<P, T, U, X> Switch<((P, T), U)> for X
-where
-    P: Pred<X>,
-    X: Switch<U>,
-{
-    type Type = <<P as Pred<X>>::Type as Bool>::Then<T, <X as Switch<U>>::Type>;
-}
-
 pub struct SwitchFunctor<PredAndValueList>(PhantomData<PredAndValueList>);
 impl<X> Functor<X> for SwitchFunctor<()> {
     type Type = ();
