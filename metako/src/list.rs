@@ -98,16 +98,16 @@ where
     type Cdr = <L::IsTerm as Bool>::Then<(), Map2<L::Cdr, F>>;
 }
 
-pub struct IntoTupleList;
-impl<L: List> Functor<L> for IntoTupleList
+pub struct IntoTupleListFunctor;
+impl<L: List> Functor<L> for IntoTupleListFunctor
 where
-    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleList>: Functor<L::Cdr>,
+    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor>: Functor<L::Cdr>,
 {
     type Type = <L::IsTerm as Bool>::Then<
         (),
         (
             L::Car,
-            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleList> as Functor<L::Cdr>>::Type,
+            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor> as Functor<L::Cdr>>::Type,
         ),
     >;
 }
