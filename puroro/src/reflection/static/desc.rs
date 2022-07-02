@@ -80,11 +80,6 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
 }
 
-pub struct FdIntoMdFdFunctor<MD>(PhantomData<MD>);
-impl<MD, FD> Functor<FD> for FdIntoMdFdFunctor<MD> {
-    type Type = (MD, FD);
-}
-
 pub trait GetOwnedFields<MD> {
     type Type;
 }
@@ -93,20 +88,4 @@ where
     list::Map<Fields, FdIntoOwnedTypeFunctor<MD>>: list::IntoTupleList<TupleList = OwnedFields>,
 {
     type Type = OwnedFields;
-}
-
-pub struct GetSupplementalDescriptor;
-impl<T: tags::FieldTypeTag> Functor<T> for GetSupplementalDescriptor {
-    type Type = T::MessageDescriptor;
-}
-
-pub trait GetFieldsMDExt {
-    type GetFieldsMD: MessageDescriptor;
-}
-impl<FD: FieldDescriptor, FieldMD> GetFieldsMDExt for FD
-where
-    FD::Type: tags::FieldTypeTag<MessageDescriptor = FieldMD>,
-    FieldMD: MessageDescriptor,
-{
-    type GetFieldsMD = FieldMD;
 }
