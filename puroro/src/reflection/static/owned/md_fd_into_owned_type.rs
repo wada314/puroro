@@ -77,16 +77,23 @@ mod preds {
         >>::Type;
     }
 }
-pub struct MdFdIntoOwnedType;
 type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsUnit, Const<()>),
     (preds::IsU32, Const<u32>),
     (preds::IsString, Const<String>),
     (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedMessage),
 ];
-impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedType
+pub trait MdFdIntoOwnedType {
+    type Type;
+}
+// impl<MD, FD> MdFdIntoOwnedType for (MD, FD) {
+
+// }
+
+pub struct MdFdIntoOwnedTypeFunctor;
+impl<MD, FD, Gen> Func<(MD, FD)> for MdFdIntoOwnedTypeFunctor
 where
-    Switch: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
+    SwitchFunctor: Func<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
     Gen: Func<(MD, FD)>,
 {
     type Type = <Gen as Func<(MD, FD)>>::Type;

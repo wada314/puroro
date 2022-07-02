@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::desc::MessageDescriptorExt;
-use super::{MdFdIntoOwnedType, OwnedMessage};
+use super::{MdFdIntoOwnedTypeFunctor, OwnedMessage};
 use ::metako::*;
 use ::std::marker::PhantomData;
 use ::std::mem::{transmute, ManuallyDrop};
@@ -67,7 +67,7 @@ where
 impl<MD> DerefMut for BoxedMessage<MD>
 where
     MD: MessageDescriptorExt,
-    list::MapFunctor<MdFdIntoOwnedType>: Func<MD::GetFieldListAsMdFd>,
+    list::MapFunctor<MdFdIntoOwnedTypeFunctor>: Func<MD::GetFieldListAsMdFd>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute(&mut self.0) }

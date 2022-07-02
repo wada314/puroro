@@ -59,13 +59,27 @@ where
     type Type = T::And<<AllOf as Pred<U>>::Type>;
 }
 
-pub struct Switch;
-impl<X> Func<(X, ())> for Switch {
+pub trait Switch<PredAndValueList> {
+    type Type;
+}
+impl<X> Switch<()> for X {
     type Type = ();
 }
-impl<X, P: Pred<X>, T, U> Func<(X, ((P, T), U))> for Switch
+impl<P, T, U, X> Switch<((P, T), U)> for X
 where
-    Switch: Func<(X, U)>,
+    P: Pred<X>,
+    X: Switch<U>,
 {
-    type Type = <<P as Pred<X>>::Type as If>::Then<T, <Switch as Func<(X, U)>>::Type>;
+    type Type = <<P as Pred<X>>::Type as If>::Then<T, <X as Switch<U>>::Type>;
+}
+
+pub struct SwitchFunctor;
+impl<X> Func<(X, ())> for SwitchFunctor {
+    type Type = ();
+}
+impl<X, P: Pred<X>, T, U> Func<(X, ((P, T), U))> for SwitchFunctor
+where
+    SwitchFunctor: Func<(X, U)>,
+{
+    type Type = <<P as Pred<X>>::Type as If>::Then<T, <SwitchFunctor as Func<(X, U)>>::Type>;
 }

@@ -16,7 +16,7 @@ use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
 use crate::Result;
 use ::metako::*;
-pub use md_fd_into_owned_type::MdFdIntoOwnedType;
+pub use md_fd_into_owned_type::MdFdIntoOwnedTypeFunctor;
 
 mod boxed_message;
 mod md_fd_into_owned_type;

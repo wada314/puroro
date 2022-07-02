@@ -14,7 +14,7 @@
 
 use std::marker::PhantomData;
 
-use super::owned::MdFdIntoOwnedType;
+use super::owned::MdFdIntoOwnedTypeFunctor;
 use crate::tags;
 use ::metako::*;
 use ::typenum;
@@ -38,7 +38,7 @@ pub trait MessageDescriptorExt {
 impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
 where
     self::GetFieldListAsMdFdFunctor: Func<MD, Type = GetFieldListAsMdFd>,
-    list::MapFunctor<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
+    list::MapFunctor<MdFdIntoOwnedTypeFunctor>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
