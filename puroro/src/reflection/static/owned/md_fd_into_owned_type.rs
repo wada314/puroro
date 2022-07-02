@@ -27,7 +27,7 @@ mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
     use ::metako::{
-        list, make_list, AllOfFunctor, AnyOf, Functor, If, IsNumberEqualFunctor, Number,
+        list, make_list, AllOf, AllOfFunctor, AnyOf, Functor, If, IsNumberEqualFunctor, Number,
     };
 
     pub struct IsUnit;
@@ -46,14 +46,12 @@ mod preds {
         FD::Type: tags::FieldTypeTag<Id = TypeId>,
         TypeId: Number,
     {
-        type Type = <AllOfFunctor as Functor<
-            make_list![
-                <<make_list![tags::UInt32Id, tags::Fixed32Id] as list::Map<
-                    IsNumberEqualFunctor<TypeId>,
-                >>::Type as AnyOf>::Type,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
-            ],
-        >>::Type;
+        type Type = <make_list![
+            <<make_list![tags::UInt32Id, tags::Fixed32Id] as list::Map<
+                IsNumberEqualFunctor<TypeId>,
+            >>::Type as AnyOf>::Type,
+            <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+        ] as AllOf>::Type;
     }
     pub struct IsString;
     impl<MD: MessageDescriptor, FD: FieldDescriptor> Functor<(MD, FD)> for IsString {
