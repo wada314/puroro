@@ -68,48 +68,6 @@ where
     > as Bool>::Then<T, F>;
 }
 
-pub trait AnyOf2 {
-    type Type: Bool;
-}
-impl AnyOf2 for () {
-    type Type = B0;
-}
-impl<T, U> AnyOf2 for (T, U)
-where
-    T: Bool,
-    U: AnyOf2,
-{
-    type Type = Or<T, <U as AnyOf2>::Type>;
-}
-
-pub trait AllOf2 {
-    type Type: Bool;
-}
-impl AllOf2 for () {
-    type Type = B1;
-}
-impl<T, U> AllOf2 for (T, U)
-where
-    T: Bool,
-    U: AllOf2,
-{
-    type Type = And<T, <U as AllOf2>::Type>;
-}
-
-#[macro_export]
-macro_rules! any_of {
-    ($list:ty) => {
-        <$list as $crate::AnyOf2>::Type
-    };
-}
-
-#[macro_export]
-macro_rules! all_of {
-    ($list:ty) => {
-        <$list as $crate::AllOf2>::Type
-    };
-}
-
 pub trait Switch<PredAndValueList> {
     type Type;
 }
