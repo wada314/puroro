@@ -42,45 +42,65 @@ impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
     type Then<T, F> = <P as Bool>::Then<T, <Q as Bool>::Then<T, F>>;
 }
 
-pub trait AnyOf {
-    type Type: Bool;
-}
-impl AnyOf for () {
-    type Type = B0;
-}
-impl<T, U> AnyOf for (T, U)
+pub struct AnyOf<L>(PhantomData<L>);
+impl<L> Bool for AnyOf<L>
 where
-    T: Bool,
-    U: AnyOf,
+    L: List,
+    L::Car: Bool,
+    AnyOf<L::Cdr>: Bool,
 {
-    type Type = Or<T, <U as AnyOf>::Type>;
+    type Then<T, F> = <Or<L::Car, AnyOf<L::Cdr>> as Bool>::Then<T, F>;
 }
 
-pub trait AllOf {
+pub struct AllOf<L>(PhantomData<L>);
+impl<L> Bool for AllOf<L>
+where
+    L: List,
+    L::Car: Bool,
+    AllOf<L::Cdr>: Bool,
+{
+    type Then<T, F> = <And<L::Car, AllOf<L::Cdr>> as Bool>::Then<T, F>;
+}
+
+pub trait AnyOf2 {
     type Type: Bool;
 }
-impl AllOf for () {
-    type Type = B1;
+impl AnyOf2 for () {
+    type Type = B0;
 }
-impl<T, U> AllOf for (T, U)
+impl<T, U> AnyOf2 for (T, U)
 where
     T: Bool,
-    U: AllOf,
+    U: AnyOf2,
 {
-    type Type = And<T, <U as AllOf>::Type>;
+    type Type = Or<T, <U as AnyOf2>::Type>;
+}
+
+pub trait AllOf2 {
+    type Type: Bool;
+}
+impl AllOf2 for () {
+    type Type = B1;
+}
+impl<T, U> AllOf2 for (T, U)
+where
+    T: Bool,
+    U: AllOf2,
+{
+    type Type = And<T, <U as AllOf2>::Type>;
 }
 
 #[macro_export]
 macro_rules! any_of {
     ($list:ty) => {
-        <$list as $crate::AnyOf>::Type
+        <$list as $crate::AnyOf2>::Type
     };
 }
 
 #[macro_export]
 macro_rules! all_of {
     ($list:ty) => {
-        <$list as $crate::AllOf>::Type
+        <$list as $crate::AllOf2>::Type
     };
 }
 

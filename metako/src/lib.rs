@@ -20,6 +20,6 @@ pub mod list;
 pub mod map;
 pub mod number;
 
-pub use crate::bool::{AllOf, And, AnyOf, Bool, Not, Or, Switch, SwitchFunctor, B0, B1};
+pub use crate::bool::{AllOf2, And, AnyOf2, Bool, Not, Or, Switch, SwitchFunctor, B0, B1};
 pub use crate::func::{Const, Functor, Pred};
 pub use crate::number::{IsNumberEqualFunctor, Number};
