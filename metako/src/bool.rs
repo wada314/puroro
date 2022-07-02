@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::func::Func;
-use crate::func::{Const, Pred};
+use crate::func::{Const, Func, Pred};
 use crate::list::List;
 use ::std::marker::PhantomData;
 pub use ::typenum::{B0, B1};
@@ -68,13 +67,13 @@ where
     > as Bool>::Then<T, F>;
 }
 
-pub struct SwitchFunctor<PredAndValueList>(PhantomData<PredAndValueList>);
-impl<T, L, P, V, Succ> Func<T> for SwitchFunctor<L>
+pub struct Switch<PredAndValueList>(PhantomData<PredAndValueList>);
+impl<T, L, P, V, Succ> Func<T> for Switch<L>
 where
     L: List,
     L::IsTerm: Bool<Then<(Const<B1>, ()), L::Car> = (P, V)>,
     P: Pred<T>,
-    <L::IsTerm as Bool>::Then<Const<()>, SwitchFunctor<L::Cdr>>: Func<T, Type = Succ>,
+    <L::IsTerm as Bool>::Then<Const<()>, Switch<L::Cdr>>: Func<T, Type = Succ>,
 {
     type Type = <<P as Pred<T>>::Type as Bool>::Then<V, Succ>;
 }
