@@ -50,7 +50,7 @@ mod preds {
         type Type = <AllOf as Func<
             make_list![
                 <AnyOf as Func<
-                    <list::Map<IsNumberEqual<TypeId>> as Func<
+                    <list::MapFunctor<IsNumberEqual<TypeId>> as Func<
                         make_list![tags::UInt32Id, tags::Fixed32Id],
                     >>::Type,
                 >>::Type,

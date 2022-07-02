@@ -38,7 +38,7 @@ pub trait MessageDescriptorExt {
 impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
 where
     self::GetFieldListAsMdFdFunctor: Func<MD, Type = GetFieldListAsMdFd>,
-    list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
+    list::MapFunctor<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
 {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
@@ -109,18 +109,18 @@ where
 pub struct GetFieldListAsMdFdFunctor;
 impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFdFunctor
 where
-    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
+    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
 {
-    type Type = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
+    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
 }
 pub trait GetFieldListAsMdFd<MD> {
     type Type;
 }
 impl<MD, Fields> GetFieldListAsMdFd<MD> for Fields
 where
-    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<Fields>,
+    list::MapFunctor<GetFieldListAsMdFdHelper<MD>>: Func<Fields>,
 {
-    type Type = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<Fields>>::Type;
+    type Type = <list::MapFunctor<GetFieldListAsMdFdHelper<MD>> as Func<Fields>>::Type;
 }
 
 pub struct GetFieldListAsMdFdHelper<MD>(PhantomData<MD>);

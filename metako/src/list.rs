@@ -65,14 +65,28 @@ where
     type Type = <FindOrDefault<P, ()> as Func<L>>::Type;
 }
 
-pub struct Map<F>(PhantomData<F>);
-impl<F> Func<()> for Map<F> {
+pub struct MapFunctor<F>(PhantomData<F>);
+impl<F> Func<()> for MapFunctor<F> {
     type Type = ();
 }
-impl<T, U, F> Func<(T, U)> for Map<F>
+impl<T, U, F> Func<(T, U)> for MapFunctor<F>
 where
     F: Func<T>,
-    Map<F>: Func<U>,
+    MapFunctor<F>: Func<U>,
 {
-    type Type = (<F as Func<T>>::Type, <Map<F> as Func<U>>::Type);
+    type Type = (<F as Func<T>>::Type, <MapFunctor<F> as Func<U>>::Type);
+}
+
+pub trait Map<F> {
+    type Type;
+}
+impl<F> Map<F> for () {
+    type Type = ();
+}
+impl<T, U, F> Map<F> for (T, U)
+where
+    F: Func<T>,
+    U: Map<F>,
+{
+    type Type = (<F as Func<T>>::Type, <U as Map<F>>::Type);
 }
