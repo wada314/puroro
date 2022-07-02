@@ -17,7 +17,7 @@ use ::metako::*;
 use ::std::marker::PhantomData;
 
 pub struct MdFdIntoOptBoxOwnedMessageFunctor;
-impl<MD, FD> Functor<(MD, FD)> for MdFdIntoOptBoxOwnedMessageFunctor
+impl<MD, FD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessageFunctor
 where
     FD: FieldDescriptorExt,
 {
@@ -27,15 +27,15 @@ where
 mod preds {
     use super::{FieldDescriptorExt, MessageDescriptor};
     use crate::tags;
-    use ::metako::{list, make_list, AllOf, AnyOf, Functor, IsNumberEqualFunctor, Not, Number};
+    use ::metako::{list, make_list, AllOf, AnyOf, Func, IsNumberEqualFunctor, Not, Number};
 
     pub struct IsUnit;
-    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsUnit {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Func<(MD, FD)> for IsUnit {
         // if fd.has_oneof_index() && !fd.proto3_optional()
         type Type = AllOf<make_list![FD::HasOneofIndex, Not<FD::IsProto3Optional>,]>;
     }
     pub struct IsU32;
-    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsU32 {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Func<(MD, FD)> for IsU32 {
         type Type = AllOf<
             make_list![
                 AnyOf<
@@ -49,7 +49,7 @@ mod preds {
         >;
     }
     pub struct IsString;
-    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsString {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Func<(MD, FD)> for IsString {
         type Type = AllOf<
             make_list![
                 <FD::TypeId as Number>::Eq<tags::StringId>,
@@ -58,7 +58,7 @@ mod preds {
         >;
     }
     pub struct IsOptBoxedMessage;
-    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Functor<(MD, FD)> for IsOptBoxedMessage {
+    impl<MD: MessageDescriptor, FD: FieldDescriptorExt> Func<(MD, FD)> for IsOptBoxedMessage {
         type Type = AllOf<
             make_list![
                 <FD::TypeId as Number>::Eq<tags::MessageId>,
@@ -77,10 +77,10 @@ type MdFdIntoOwnedTypeSwitch = make_list![
 ];
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
-impl<MD, FD, IntoOwnedType, OwnedType> Functor<FD> for FdIntoOwnedTypeFunctor<MD>
+impl<MD, FD, IntoOwnedType, OwnedType> Func<FD> for FdIntoOwnedTypeFunctor<MD>
 where
-    SwitchFunctor<MdFdIntoOwnedTypeSwitch>: Functor<(MD, FD), Type = IntoOwnedType>,
-    IntoOwnedType: Functor<(MD, FD), Type = OwnedType>,
+    SwitchFunctor<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = IntoOwnedType>,
+    IntoOwnedType: Func<(MD, FD), Type = OwnedType>,
 {
     type Type = OwnedType;
 }

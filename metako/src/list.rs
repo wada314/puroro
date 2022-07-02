@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Bool, Const, Functor, B0, B1};
+use crate::{Bool, Const, Func, B0, B1};
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -45,24 +45,24 @@ pub struct Map<L, F>(PhantomData<(L, F)>);
 impl<L, F> List for Map<L, F>
 where
     L: List,
-    <L::IsTerm as Bool>::Then<Const<()>, F>: Functor<L::Car>,
+    <L::IsTerm as Bool>::Then<Const<()>, F>: Func<L::Car>,
     <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>: List,
 {
     type IsTerm = L::IsTerm;
-    type Car = <<L::IsTerm as Bool>::Then<Const<()>, F> as Functor<L::Car>>::Type;
+    type Car = <<L::IsTerm as Bool>::Then<Const<()>, F> as Func<L::Car>>::Type;
     type Cdr = <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>;
 }
 
 pub struct IntoTupleListFunctor;
-impl<L: List> Functor<L> for IntoTupleListFunctor
+impl<L: List> Func<L> for IntoTupleListFunctor
 where
-    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor>: Functor<L::Cdr>,
+    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor>: Func<L::Cdr>,
 {
     type Type = <L::IsTerm as Bool>::Then<
         (),
         (
             L::Car,
-            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor> as Functor<L::Cdr>>::Type,
+            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleListFunctor> as Func<L::Cdr>>::Type,
         ),
     >;
 }
@@ -71,7 +71,7 @@ pub trait IntoTupleList {
 }
 impl<L> IntoTupleList for L
 where
-    IntoTupleListFunctor: Functor<L>,
+    IntoTupleListFunctor: Func<L>,
 {
-    type TupleList = <IntoTupleListFunctor as Functor<L>>::Type;
+    type TupleList = <IntoTupleListFunctor as Func<L>>::Type;
 }

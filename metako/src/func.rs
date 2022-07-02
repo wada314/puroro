@@ -15,7 +15,7 @@
 use crate::Bool;
 use ::std::marker::PhantomData;
 
-pub trait Functor<T> {
+pub trait Func<T> {
     type Type;
 }
 pub trait Pred<T> {
@@ -23,13 +23,13 @@ pub trait Pred<T> {
 }
 impl<T, U> Pred<U> for T
 where
-    T: Functor<U>,
+    T: Func<U>,
     T::Type: Bool,
 {
     type Type = T::Type;
 }
 
 pub struct Const<T>(PhantomData<T>);
-impl<T, _U> Functor<_U> for Const<T> {
+impl<T, _U> Func<_U> for Const<T> {
     type Type = T;
 }
