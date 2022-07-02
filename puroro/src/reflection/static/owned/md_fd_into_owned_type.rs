@@ -52,7 +52,7 @@ mod preds {
                         IsNumberEqualFunctor<TypeId>,
                     >,
                 >,
-                <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
+                Not<<<FD::Label as tags::FieldLabelTag>::Id as Number>::Eq<tags::RepeatedId>>,
             ],
         >;
     }

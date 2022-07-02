@@ -24,28 +24,24 @@ pub trait Number {
     type Remains: Number;
     type IsUTerm: Bool;
     type Eq<M: Number>: Bool;
-    type Neq<M: Number>: Bool;
 }
 impl<U: Number> Number for UInt<U, B0> {
     type Lsb = B0;
     type Remains = U;
     type IsUTerm = B0;
     type Eq<M: Number> = And<Not<M::Lsb>, <Self::Remains as Number>::Eq<M::Remains>>;
-    type Neq<M: Number> = Not<Self::Eq<M>>;
 }
 impl<U: Number> Number for UInt<U, B1> {
     type Lsb = B1;
     type Remains = U;
     type IsUTerm = B0;
     type Eq<M: Number> = And<M::Lsb, <Self::Remains as Number>::Eq<M::Remains>>;
-    type Neq<M: Number> = Not<Self::Eq<M>>;
 }
 impl Number for UTerm {
     type Lsb = B0;
     type Remains = UTerm;
     type IsUTerm = B1;
     type Eq<M: Number> = M::IsUTerm;
-    type Neq<M: Number> = Not<Self::Eq<M>>;
 }
 
 pub struct IsNumberEqualFunctor<N>(PhantomData<N>);
