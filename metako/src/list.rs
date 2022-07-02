@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Bool, Const, Functor, Pred, B0, B1};
+use crate::{Bool, Const, Functor, B0, B1};
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -39,25 +39,6 @@ impl<T, U: List> List for (T, U) {
     type IsTerm = B0;
     type Car = T;
     type Cdr = U;
-}
-
-pub struct FindOrDefault<P, D>(PhantomData<(P, D)>);
-impl<P, D> Functor<()> for FindOrDefault<P, D> {
-    type Type = D;
-}
-impl<T, U, P, D> Functor<(T, U)> for FindOrDefault<P, D>
-where
-    P: Pred<T>,
-    FindOrDefault<P, D>: Functor<U>,
-{
-    type Type = <P::Type as Bool>::Then<T, <FindOrDefault<P, D> as Functor<U>>::Type>;
-}
-pub struct Find<P>(PhantomData<P>);
-impl<P, L> Functor<L> for Find<P>
-where
-    FindOrDefault<P, ()>: Functor<L>,
-{
-    type Type = <FindOrDefault<P, ()> as Functor<L>>::Type;
 }
 
 pub struct Map<L, F>(PhantomData<(L, F)>);

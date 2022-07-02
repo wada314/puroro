@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
-
 use super::owned::FdIntoOwnedTypeFunctor;
 use crate::tags;
 use ::metako::*;
