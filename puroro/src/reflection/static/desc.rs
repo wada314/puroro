@@ -20,8 +20,8 @@ use ::metako::*;
 use ::typenum;
 use ::typenum::U0;
 
-pub trait MessageDescriptor {
-    type Fields;
+pub trait MessageDescriptor: Sized {
+    type Fields: GetFieldListAsMdFd<Self>;
     type Syntax: tags::ProtoSyntaxTag;
 }
 impl MessageDescriptor for () {
@@ -37,7 +37,7 @@ pub trait MessageDescriptorExt {
 }
 impl<MD: MessageDescriptor, GetFieldListAsMdFd, GetOwnedFieldList> MessageDescriptorExt for MD
 where
-    self::GetFieldListAsMdFd: Func<MD, Type = GetFieldListAsMdFd>,
+    self::GetFieldListAsMdFdFunctor: Func<MD, Type = GetFieldListAsMdFd>,
     list::Map<MdFdIntoOwnedType>: Func<GetFieldListAsMdFd, Type = GetOwnedFieldList>,
 {
     type Fields = MD::Fields;
@@ -106,12 +106,21 @@ where
     type Type = FD;
 }
 
-pub struct GetFieldListAsMdFd;
-impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFd
+pub struct GetFieldListAsMdFdFunctor;
+impl<MD: MessageDescriptor> Func<MD> for GetFieldListAsMdFdFunctor
 where
     list::Map<GetFieldListAsMdFdHelper<MD>>: Func<MD::Fields>,
 {
     type Type = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<MD::Fields>>::Type;
+}
+pub trait GetFieldListAsMdFd<MD> {
+    type Type;
+}
+impl<MD, Fields> GetFieldListAsMdFd<MD> for Fields
+where
+    list::Map<GetFieldListAsMdFdHelper<MD>>: Func<Fields>,
+{
+    type Type = <list::Map<GetFieldListAsMdFdHelper<MD>> as Func<Fields>>::Type;
 }
 
 pub struct GetFieldListAsMdFdHelper<MD>(PhantomData<MD>);
