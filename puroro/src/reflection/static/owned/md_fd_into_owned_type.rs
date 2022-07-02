@@ -75,21 +75,12 @@ type MdFdIntoOwnedTypeSwitch = make_list![
     // default
     (Const<B1>, Const<()>),
 ];
-pub trait MdFdIntoOwnedType {
-    type Type;
-}
-impl<MdFd> MdFdIntoOwnedType for MdFd
-where
-    Self: Switch<MdFdIntoOwnedTypeSwitch>,
-    <Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type: Functor<Self>,
-{
-    type Type = <<Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type as Functor<Self>>::Type;
-}
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
-impl<MD, FD> Functor<FD> for FdIntoOwnedTypeFunctor<MD>
+impl<MD, FD, IntoOwnedType, OwnedType> Functor<FD> for FdIntoOwnedTypeFunctor<MD>
 where
-    (MD, FD): MdFdIntoOwnedType,
+    (MD, FD): Switch<MdFdIntoOwnedTypeSwitch, Type = IntoOwnedType>,
+    IntoOwnedType: Functor<(MD, FD), Type = OwnedType>,
 {
-    type Type = <(MD, FD) as MdFdIntoOwnedType>::Type;
+    type Type = OwnedType;
 }
