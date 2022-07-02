@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod md_fd_into_owned_type;
+
 use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
 use crate::Result;
 use ::metako::*;
 pub use md_fd_into_owned_type::MdFdIntoOwnedTypeFunctor;
-
-mod boxed_message;
-mod md_fd_into_owned_type;
 
 pub struct OwnedMessage<MD>
 where

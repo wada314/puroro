@@ -16,7 +16,6 @@ pub mod desc;
 pub mod owned;
 use crate::{ErrorKind, Result};
 use desc::FieldDescriptorExt;
-use metako::{If, Number};
 use typenum::ToInt;
 
 use self::desc::MessageDescriptorExt;

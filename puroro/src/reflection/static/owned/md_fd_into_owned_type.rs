@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use super::super::desc::{FieldDescriptor, FieldDescriptorExt, MessageDescriptor};
-use super::boxed_message::BoxedMessage;
 use ::metako::*;
 
 pub struct MdFdIntoOptBoxOwnedMessageFunctor;

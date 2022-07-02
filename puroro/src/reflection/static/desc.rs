@@ -35,6 +35,8 @@ pub trait MessageDescriptorExt {
     type GetOwnedFieldList;
     type GetFieldByNumber;
 }
+// Implementation note: Do not introduce any additional bounds except
+// `MD: MessageDescriptor`!
 impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
