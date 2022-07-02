@@ -16,8 +16,8 @@ use super::super::desc::{FieldDescriptor, FieldDescriptorExt, MessageDescriptor}
 use super::boxed_message::BoxedMessage;
 use ::metako::*;
 
-pub struct MdFdIntoOptBoxOwnedMessage;
-impl<MD, FD> Functor<(MD, FD)> for MdFdIntoOptBoxOwnedMessage
+pub struct MdFdIntoOptBoxOwnedMessageFunctor;
+impl<MD, FD> Functor<(MD, FD)> for MdFdIntoOptBoxOwnedMessageFunctor
 where
     FD: FieldDescriptorExt,
 {
@@ -79,23 +79,23 @@ type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsUnit, Const<()>),
     (preds::IsU32, Const<u32>),
     (preds::IsString, Const<String>),
-    (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedMessage),
+    (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedMessageFunctor),
 ];
 pub trait MdFdIntoOwnedType {
     type Type;
 }
-impl<MD, FD> MdFdIntoOwnedType for (MD, FD)
+impl<MdFd> MdFdIntoOwnedType for MdFd
 where
     Self: Switch<MdFdIntoOwnedTypeSwitch>,
+    <Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type: Functor<Self>,
 {
-    type Type = <Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type;
+    type Type = <<Self as Switch<MdFdIntoOwnedTypeSwitch>>::Type as Functor<Self>>::Type;
 }
 
 pub struct MdFdIntoOwnedTypeFunctor;
-impl<MD, FD, Gen> Functor<(MD, FD)> for MdFdIntoOwnedTypeFunctor
+impl<MdFd> Functor<MdFd> for MdFdIntoOwnedTypeFunctor
 where
-    SwitchFunctor: Functor<((MD, FD), MdFdIntoOwnedTypeSwitch), Type = Gen>,
-    Gen: Functor<(MD, FD)>,
+    MdFd: MdFdIntoOwnedType,
 {
-    type Type = <Gen as Functor<(MD, FD)>>::Type;
+    type Type = <MdFd as MdFdIntoOwnedType>::Type;
 }

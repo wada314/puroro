@@ -104,10 +104,10 @@ mod test {
     // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
 
     fn foo() {
-        let mut t = PersonOwned::default();
+        let mut t = <PersonOwned as Default>::default();
         let p = t.get_message::<FdPartner>();
 
-        // let f: i32 = t.fields;
+        //let f: i32 = t.fields;
         // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
     }
