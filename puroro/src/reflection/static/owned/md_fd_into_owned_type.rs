@@ -79,6 +79,8 @@ type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsU32, Const<u32>),
     (preds::IsString, Const<String>),
     (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedMessageFunctor),
+    // default
+    (Const<B1>, Const<()>),
 ];
 pub trait MdFdIntoOwnedType {
     type Type;
