@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::func::{Const, Func, Pred};
-use crate::list::List;
+use crate::func::{Func, Pred};
 use ::std::marker::PhantomData;
 pub use ::typenum::{B0, B1};
 
@@ -42,38 +41,37 @@ impl<P: Bool, Q: Bool> Bool for Or<P, Q> {
 }
 
 pub struct AnyOf<L>(PhantomData<L>);
-impl<L> Bool for AnyOf<L>
+impl Bool for AnyOf<()> {
+    type Then<T, F> = F;
+}
+impl<Car, Cdr> Bool for AnyOf<(Car, Cdr)>
 where
-    L: List,
-    <L::IsTerm as Bool>::Then<B0, L::Car>: Bool,
-    <L::IsTerm as Bool>::Then<B0, AnyOf<L::Cdr>>: Bool,
+    Car: Bool,
+    AnyOf<Cdr>: Bool,
 {
-    type Then<T, F> = <Or<
-        <L::IsTerm as Bool>::Then<B0, L::Car>,
-        <L::IsTerm as Bool>::Then<B0, AnyOf<L::Cdr>>,
-    > as Bool>::Then<T, F>;
+    type Then<T, F> = <Or<Car, AnyOf<Cdr>> as Bool>::Then<T, F>;
 }
 
 pub struct AllOf<L>(PhantomData<L>);
-impl<L> Bool for AllOf<L>
+impl Bool for AllOf<()> {
+    type Then<T, F> = T;
+}
+impl<Car, Cdr> Bool for AllOf<(Car, Cdr)>
 where
-    L: List,
-    <L::IsTerm as Bool>::Then<B1, L::Car>: Bool,
-    <L::IsTerm as Bool>::Then<B1, AllOf<L::Cdr>>: Bool,
+    Car: Bool,
+    AllOf<Cdr>: Bool,
 {
-    type Then<T, F> = <And<
-        <L::IsTerm as Bool>::Then<B1, L::Car>,
-        <L::IsTerm as Bool>::Then<B1, AllOf<L::Cdr>>,
-    > as Bool>::Then<T, F>;
+    type Then<T, F> = <And<Car, AllOf<Cdr>> as Bool>::Then<T, F>;
 }
 
 pub struct Switch<PredAndValueList>(PhantomData<PredAndValueList>);
-impl<T, L, P, V, Succ> Func<T> for Switch<L>
+impl<T> Func<T> for Switch<()> {
+    type Type = ();
+}
+impl<T, P, V, Cdr> Func<T> for Switch<((P, V), Cdr)>
 where
-    L: List,
-    L::IsTerm: Bool<Then<(Const<B1>, ()), L::Car> = (P, V)>,
     P: Pred<T>,
-    <L::IsTerm as Bool>::Then<Const<()>, Switch<L::Cdr>>: Func<T, Type = Succ>,
+    Switch<Cdr>: Func<T>,
 {
-    type Type = <<P as Pred<T>>::Type as Bool>::Then<V, Succ>;
+    type Type = <<P as Pred<T>>::Type as Bool>::Then<V, <Switch<Cdr> as Func<T>>::Type>;
 }

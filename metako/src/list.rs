@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Bool, Const, Func, B0, B1};
+use crate::Func;
 use ::std::marker::PhantomData;
 
 #[macro_export]
@@ -25,44 +25,14 @@ macro_rules! make_list {
     };
 }
 
-pub trait List {
-    type IsTerm: Bool;
-    type Car;
-    type Cdr: List;
+pub struct Map<F>(PhantomData<F>);
+impl<F> Func<()> for Map<F> {
+    type Type = ();
 }
-impl List for () {
-    type IsTerm = B1;
-    type Car = ();
-    type Cdr = ();
-}
-impl<T, U: List> List for (T, U) {
-    type IsTerm = B0;
-    type Car = T;
-    type Cdr = U;
-}
-
-pub struct Map<L, F>(PhantomData<(L, F)>);
-impl<L, F> List for Map<L, F>
+impl<Car, Cdr, F> Func<(Car, Cdr)> for Map<F>
 where
-    L: List,
-    <L::IsTerm as Bool>::Then<Const<()>, F>: Func<L::Car>,
-    <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>: List,
+    Self: Func<Cdr>,
+    F: Func<Car>,
 {
-    type IsTerm = L::IsTerm;
-    type Car = <<L::IsTerm as Bool>::Then<Const<()>, F> as Func<L::Car>>::Type;
-    type Cdr = <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>;
-}
-
-pub struct IntoTupleList;
-impl<L: List> Func<L> for IntoTupleList
-where
-    <L::IsTerm as Bool>::Then<Const<()>, IntoTupleList>: Func<L::Cdr>,
-{
-    type Type = <L::IsTerm as Bool>::Then<
-        (),
-        (
-            L::Car,
-            <<L::IsTerm as Bool>::Then<Const<()>, IntoTupleList> as Func<L::Cdr>>::Type,
-        ),
-    >;
+    type Type = (<F as Func<Car>>::Type, <Self as Func<Cdr>>::Type);
 }

@@ -39,10 +39,9 @@ mod preds {
         type Type = AllOf<
             make_list![
                 AnyOf<
-                    list::Map<
-                        make_list![tags::UInt32Id, tags::Fixed32Id],
+                    <list::Map<
                         IsNumberEqualFunctor<FD::TypeId>,
-                    >,
+                    > as Func<make_list![tags::UInt32Id, tags::Fixed32Id]>>::Type,
                 >,
                 Not<<FD::LabelId as Number>::Eq<tags::RepeatedId>>,
             ],
