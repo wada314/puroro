@@ -111,3 +111,12 @@ where
         ),
     >;
 }
+pub trait IntoTupleList {
+    type TupleList;
+}
+impl<L> IntoTupleList for L
+where
+    IntoTupleListFunctor: Functor<L>,
+{
+    type TupleList = <IntoTupleListFunctor as Functor<L>>::Type;
+}

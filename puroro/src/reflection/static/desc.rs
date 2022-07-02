@@ -88,13 +88,11 @@ impl<MD, FD> Functor<FD> for FdIntoMdFdFunctor<MD> {
 pub trait GetOwnedFields<MD> {
     type Type;
 }
-impl<MD, Fields> GetOwnedFields<MD> for Fields
+impl<MD, Fields, OwnedFields> GetOwnedFields<MD> for Fields
 where
-    list::IntoTupleListFunctor: Functor<list::Map2<Fields, FdIntoOwnedTypeFunctor<MD>>>,
+    list::Map2<Fields, FdIntoOwnedTypeFunctor<MD>>: list::IntoTupleList<TupleList = OwnedFields>,
 {
-    type Type = <list::IntoTupleListFunctor as Functor<
-        list::Map2<Fields, FdIntoOwnedTypeFunctor<MD>>,
-    >>::Type;
+    type Type = OwnedFields;
 }
 
 pub struct GetSupplementalDescriptor;
