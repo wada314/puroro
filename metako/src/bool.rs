@@ -46,13 +46,14 @@ impl Bool for B0 {
 impl Bool for B1 {
     type Value = B1;
 }
+
 pub struct Not<B>(PhantomData<B>);
-impl<B: Bool> Bool for Not<B> {
-    type Value = <B::Value as BoolBase>::Not;
-}
 pub struct And<P, Q>(PhantomData<(P, Q)>);
 pub struct Or<P, Q>(PhantomData<(P, Q)>);
 
+impl<B: Bool> Bool for Not<B> {
+    type Value = <B::Value as BoolBase>::Not;
+}
 impl<P: Bool, Q: Bool> Bool for And<P, Q> {
     type Value = <P::Value as BoolBase>::And<Q::Value>;
 }
