@@ -49,8 +49,8 @@ impl Number for UTerm {
     type Neq<M: Number> = <Self::Eq<M> as If>::Not;
 }
 
-pub struct IsNumberEqual<N>(PhantomData<N>);
-impl<N, M> Functor<M> for IsNumberEqual<N>
+pub struct IsNumberEqualFunctor<N>(PhantomData<N>);
+impl<N, M> Functor<M> for IsNumberEqualFunctor<N>
 where
     M: Number,
     N: Number,

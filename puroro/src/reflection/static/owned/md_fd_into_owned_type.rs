@@ -27,7 +27,7 @@ mod preds {
     use super::{FieldDescriptor, MessageDescriptor};
     use crate::tags;
     use ::metako::{
-        list, make_list, AllOfFunctor, AnyOfFunctor, Functor, If, IsNumberEqual, Number,
+        list, make_list, AllOfFunctor, AnyOf, Functor, If, IsNumberEqualFunctor, Number,
     };
 
     pub struct IsUnit;
@@ -48,11 +48,9 @@ mod preds {
     {
         type Type = <AllOfFunctor as Functor<
             make_list![
-                <AnyOfFunctor as Functor<
-                    <list::MapFunctor<IsNumberEqual<TypeId>> as Functor<
-                        make_list![tags::UInt32Id, tags::Fixed32Id],
-                    >>::Type,
-                >>::Type,
+                <<make_list![tags::UInt32Id, tags::Fixed32Id] as list::Map<
+                    IsNumberEqualFunctor<TypeId>,
+                >>::Type as AnyOf>::Type,
                 <<FD::Label as tags::FieldLabelTag>::Id as Number>::Neq<tags::RepeatedId>,
             ],
         >>::Type;
