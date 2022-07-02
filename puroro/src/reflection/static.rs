@@ -18,8 +18,6 @@ use crate::{ErrorKind, Result};
 use desc::FieldDescriptorExt;
 use typenum::ToInt;
 
-use self::desc::MessageDescriptorExt;
-
 pub trait Reflection {
     fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool>;
     fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32>;
@@ -30,10 +28,8 @@ pub trait Reflection {
     type MessageFieldType<'a, FD: FieldDescriptorExt>: Reflection
     where
         Self: 'a,
-        FD::MaybeFieldMessageDescriptor: 'a + MessageDescriptorExt;
-    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>>
-    where
-        FD::MaybeFieldMessageDescriptor: MessageDescriptorExt;
+        FD::MaybeFieldMessageDescriptor: 'a;
+    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>>;
 }
 
 impl<T: Reflection> Reflection for &'_ T {
@@ -50,11 +46,8 @@ impl<T: Reflection> Reflection for &'_ T {
     type MessageFieldType<'a, FD: FieldDescriptorExt> = T::MessageFieldType<'a, FD>
     where
         Self: 'a,
-        FD::MaybeFieldMessageDescriptor:'a + MessageDescriptorExt;
-    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>>
-    where
-        FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
-    {
+        FD::MaybeFieldMessageDescriptor:'a;
+    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>> {
         <T as Reflection>::get_message::<FD>(self)
     }
 }
