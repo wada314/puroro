@@ -16,7 +16,7 @@ use ::metako::Number;
 use ::std::marker::PhantomData;
 use ::typenum::consts::*;
 
-use crate::reflection::r#static::desc::MessageDescriptor;
+use crate::reflection::r#static::desc::MessageDescriptorExt;
 
 pub trait ProtoSyntaxTag {
     type Id: Number;
@@ -28,9 +28,9 @@ pub trait ProtoSyntaxTag {
 /// `wire_tag<value::value_tag>`.
 pub trait FieldTypeTag {
     type Id: Number;
-    // If the type is message, the `MessageDescriptor`
+    // If the type is message, the `MessageDescriptorExt`
     // for the type should also be provided. otherwise `()`.
-    type MessageDescriptor: MessageDescriptor;
+    type MessageDescriptor: MessageDescriptorExt;
 }
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
@@ -160,7 +160,7 @@ impl<E> FieldTypeTag for Enum<E> {
     type Id = U10;
     type MessageDescriptor = ();
 }
-impl<MD: MessageDescriptor> FieldTypeTag for Message<MD> {
+impl<MD: MessageDescriptorExt> FieldTypeTag for Message<MD> {
     type Id = U12;
     type MessageDescriptor = MD;
 }
