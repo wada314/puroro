@@ -39,7 +39,7 @@ mod preds {
         type Type = AllOf<
             make_list![
                 AnyOf<
-                    list::Map2<
+                    list::Map<
                         make_list![tags::UInt32Id, tags::Fixed32Id],
                         IsNumberEqualFunctor<FD::TypeId>,
                     >,

@@ -60,42 +60,16 @@ where
     type Type = <FindOrDefault<P, ()> as Functor<L>>::Type;
 }
 
-pub struct MapFunctor<F>(PhantomData<F>);
-impl<F> Functor<()> for MapFunctor<F> {
-    type Type = ();
-}
-impl<T, U, F> Functor<(T, U)> for MapFunctor<F>
-where
-    F: Functor<T>,
-    MapFunctor<F>: Functor<U>,
-{
-    type Type = (<F as Functor<T>>::Type, <MapFunctor<F> as Functor<U>>::Type);
-}
-
-pub trait Map<F> {
-    type Type;
-}
-impl<F> Map<F> for () {
-    type Type = ();
-}
-impl<T, U, F> Map<F> for (T, U)
-where
-    F: Functor<T>,
-    U: Map<F>,
-{
-    type Type = (<F as Functor<T>>::Type, <U as Map<F>>::Type);
-}
-
-pub struct Map2<L, F>(PhantomData<(L, F)>);
-impl<L, F> List for Map2<L, F>
+pub struct Map<L, F>(PhantomData<(L, F)>);
+impl<L, F> List for Map<L, F>
 where
     L: List,
     <L::IsTerm as Bool>::Then<Const<()>, F>: Functor<L::Car>,
-    <L::IsTerm as Bool>::Then<(), Map2<L::Cdr, F>>: List,
+    <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>: List,
 {
     type IsTerm = L::IsTerm;
     type Car = <<L::IsTerm as Bool>::Then<Const<()>, F> as Functor<L::Car>>::Type;
-    type Cdr = <L::IsTerm as Bool>::Then<(), Map2<L::Cdr, F>>;
+    type Cdr = <L::IsTerm as Bool>::Then<(), Map<L::Cdr, F>>;
 }
 
 pub struct IntoTupleListFunctor;
