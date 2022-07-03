@@ -16,8 +16,9 @@ mod md_fd_into_owned_type;
 
 use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
-use crate::Result;
+use crate::{ErrorKind, Result};
 use ::metako::*;
+use ::typenum::ToInt;
 pub use md_fd_into_owned_type::FdIntoOwnedTypeFunctor;
 
 pub struct OwnedMessage<MD>
@@ -25,20 +26,6 @@ where
     MD: MessageDescriptorExt,
 {
     pub fields: MD::OwnedFields,
-}
-
-impl<MD> OwnedMessage<MD>
-where
-    MD: MessageDescriptorExt,
-{
-    pub fn get_message<FD: FieldDescriptorExt>(
-        &self,
-    ) -> Result<&OwnedMessage<FD::MaybeFieldMessageDescriptor>>
-    where
-        FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
-    {
-        todo!()
-    }
 }
 
 impl<MD> Default for OwnedMessage<MD>
@@ -79,5 +66,32 @@ where
         FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
     {
         todo!()
+    }
+}
+
+pub trait FdListAndFieldTypeList {
+    type FieldList;
+    fn get_uint32<FD: FieldDescriptorExt>(_field_list: &Self::FieldList) -> Result<u32> {
+        Err(ErrorKind::ReflectionError)?
+    }
+}
+
+impl FdListAndFieldTypeList for ((), ()) {
+    type FieldList = ();
+}
+
+impl<FD: FieldDescriptorExt, FdRest, FieldRest> FdListAndFieldTypeList
+    for ((FD, FdRest), (u32, FieldRest))
+where
+    (FdRest, FieldRest): FdListAndFieldTypeList<FieldList = FieldRest>,
+{
+    type FieldList = (u32, FieldRest);
+
+    fn get_uint32<ParamFD: FieldDescriptorExt>(field_list: &Self::FieldList) -> Result<u32> {
+        if <FD::Number as ToInt<i32>>::to_int() == <ParamFD::Number as ToInt<i32>>::to_int() {
+            Ok(field_list.0)
+        } else {
+            <(FdRest, FieldRest) as FdListAndFieldTypeList>::get_uint32::<ParamFD>(&field_list.1)
+        }
     }
 }

@@ -14,9 +14,8 @@
 
 pub mod desc;
 pub mod owned;
-use crate::{ErrorKind, Result};
+use crate::Result;
 use desc::FieldDescriptorExt;
-use typenum::ToInt;
 
 pub trait Reflection {
     fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool>;
@@ -49,32 +48,5 @@ impl<T: Reflection> Reflection for &'_ T {
         FD::MaybeFieldMessageDescriptor:'a;
     fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>> {
         <T as Reflection>::get_message::<FD>(self)
-    }
-}
-
-pub trait FdListAndFieldTypeList {
-    type FieldList;
-    fn get_uint32<FD: FieldDescriptorExt>(_field_list: &Self::FieldList) -> Result<u32> {
-        Err(ErrorKind::ReflectionError)?
-    }
-}
-
-impl FdListAndFieldTypeList for ((), ()) {
-    type FieldList = ();
-}
-
-impl<FD: FieldDescriptorExt, FdRest, FieldRest> FdListAndFieldTypeList
-    for ((FD, FdRest), (u32, FieldRest))
-where
-    (FdRest, FieldRest): FdListAndFieldTypeList<FieldList = FieldRest>,
-{
-    type FieldList = (u32, FieldRest);
-
-    fn get_uint32<ParamFD: FieldDescriptorExt>(field_list: &Self::FieldList) -> Result<u32> {
-        if <FD::Number as ToInt<i32>>::to_int() == <ParamFD::Number as ToInt<i32>>::to_int() {
-            Ok(field_list.0)
-        } else {
-            <(FdRest, FieldRest) as FdListAndFieldTypeList>::get_uint32::<ParamFD>(&field_list.1)
-        }
     }
 }
