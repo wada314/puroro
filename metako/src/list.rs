@@ -43,8 +43,27 @@ impl<B, F> Func<()> for Fold<B, F> {
 }
 impl<Car, Cdr, B, F, NewB, Result> Func<(Car, Cdr)> for Fold<B, F>
 where
-    F: Func<(B, Car), Type=NewB>,
-    Fold<NewB, F>: Func<Cdr, Type=Result>,
+    F: Func<(B, Car), Type = NewB>,
+    Fold<NewB, F>: Func<Cdr, Type = Result>,
 {
     type Type = Result;
 }
+
+pub struct Zip;
+impl Func<((), ())> for Zip {
+    type Type = ();
+}
+impl<ACar, ACdr, BCar, BCdr> Func<((ACar, ACdr), (BCar, BCdr))> for Zip
+where
+    Zip: Func<(ACdr, BCdr)>,
+{
+    type Type = ((ACar, BCar), <Zip as Func<(ACdr, BCdr)>>::Type);
+}
+
+// fn hoge() {
+//     type T1 = make_list![i8, i16, i32];
+//     type T2 = make_list![u8, u16, u32];
+//     type Zipped = <Zip as Func<(T1, T2)>>::Type;
+//     let mut x: Zipped;
+//     x = 0;
+// }
