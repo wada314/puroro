@@ -107,6 +107,8 @@ mod test {
         let mut t = <PersonOwned as Default>::default();
         let p = t.get_message::<FdPartner>();
 
+        // let mut i: <MdPerson as MessageDescriptorExt>::CountBits;
+        // i = 0;
         // let f: i32 = t.fields;
         // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
