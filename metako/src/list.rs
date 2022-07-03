@@ -41,13 +41,10 @@ pub struct Fold<B, F>(PhantomData<(B, F)>);
 impl<B, F> Func<()> for Fold<B, F> {
     type Type = B;
 }
-impl<Car, Cdr, B, F> Func<(Car, Cdr)> for Fold<B, F>
+impl<Car, Cdr, B, F, NewB, Result> Func<(Car, Cdr)> for Fold<B, F>
 where
-    F: Func<(B, Car)>,
-    Fold<F, <F as Func<(B, Car)>>::Type>: Func<Cdr>,
+    F: Func<(B, Car), Type=NewB>,
+    Fold<NewB, F>: Func<Cdr, Type=Result>,
 {
-    type Type = (
-        <F as Func<(B, Car)>>::Type,
-        <Fold<F, <F as Func<(B, Car)>>::Type> as Func<Cdr>>::Type,
-    );
+    type Type = Result;
 }

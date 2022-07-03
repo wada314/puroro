@@ -103,6 +103,10 @@ pub struct AddBits<T, U>(::std::marker::PhantomData<(T, U)>);
 impl<T: CountBits, U: CountBits> CountBits for AddBits<T, U> {
     const NUM_BITS: usize = T::NUM_BITS + U::NUM_BITS;
 }
+pub struct AddBitsFunc;
+impl<T: CountBits, U: CountBits> Func<(T, U)> for AddBitsFunc {
+    type Type = AddBits<T, U>;
+}
 
 pub struct IntoBits1Func;
 impl<T> Func<T> for IntoBits1Func {
@@ -110,11 +114,12 @@ impl<T> Func<T> for IntoBits1Func {
 }
 
 pub struct FieldsIntoCountBitsFunc;
-impl<Fields> Func<Fields> for FieldsIntoCountBitsFunc
+impl<Fields, ListOf1, Sum> Func<Fields> for FieldsIntoCountBitsFunc
 where
-    list::Map<Const<ConstBits<1>>>: Func<Fields>,
+    list::Map<Const<ConstBits<1>>>: Func<Fields, Type = ListOf1>,
+    list::Fold<ConstBits<0>, AddBitsFunc>: Func<ListOf1, Type=Sum>,
 {
-    type Type = <list::Map<Const<ConstBits<1>>> as Func<Fields>>::Type;
+    type Type = Sum;
 }
 
 pub trait FieldsIntoCountBits {
