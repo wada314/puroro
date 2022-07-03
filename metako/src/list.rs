@@ -62,25 +62,32 @@ where
 
 type Sample = ((i8, (i16, ())), ((u8, (u16, ())), ()));
 pub struct Transpose;
-impl Func<((), ())> for Transpose {
+impl Func<()> for Transpose {
     type Type = ();
 }
 
-// ((A, ()), ()) => ((A, ()), ())
-//
-// ( (A, (B, ())), () )
-// => ( (A, ()), ((B, ()), ()))
-impl<Caar, Cadr, CadrTr> Func<((Caar, Cadr), ())> for Transpose
+// (
+//  (1, (2, ())),
+//  (
+//    (3, (4, ())),
+//    ()
+//  )
+// )
+// ==>
+// (
+//  (1, (3, ())),
+//  (
+//    (2, (4, ())),
+//    ()
+//  )
+// )
+impl<Car, Cdr, CarTr, CdrTr> Func<(Car, Cdr)> for Transpose
 where
-    Transpose: Func<(Cadr, ()), Type = CadrTr>,
-{
-    type Type = ((Caar, ()), CadrTr);
-}
-impl<Caar, Cdr, CdrTr> Func<((Caar, ()), Cdr)> for Transpose
-where
+    Transpose: Func<Car, Type = CarTr>,
     Transpose: Func<Cdr, Type = CdrTr>,
+    Zip: Func<(CarTr, CdrTr)>,
 {
-    type Type = ((Caar, CdrTr), ());
+    type Type = <Zip as Func<(CarTr, CdrTr)>>::Type;
 }
 
 fn hoge() {
@@ -89,7 +96,12 @@ fn hoge() {
     type T3 = make_list![f32, f64, bool];
     type TT = make_list![T1, T2, T3];
     type T31 = make_list![make_list![i8], make_list![i16], make_list![i32]];
-    type T13 = <Transpose as Func<T31>>::Type;
-    let mut x: T31;
+    type T31Tr = <Transpose as Func<T31>>::Type;
+    type T13 = make_list![T1];
+    type T22 = make_list![make_list![i8, i16], make_list![u8, u16]];
+    type T22Tr = <Transpose as Func<T22>>::Type;
+    let mut x: T22;
+    let mut y: T22Tr;
     x = 0;
+    y = 0;
 }
