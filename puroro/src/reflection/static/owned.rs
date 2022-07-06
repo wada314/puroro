@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod field_type;
 mod md_fd_into_owned_type;
 
+use std::ops::Index;
+
+pub use self::md_fd_into_owned_type::FdIntoOwnedTypeFunctor;
 use super::desc::{FieldDescriptorExt, MessageDescriptorExt};
 use super::Reflection;
 use crate::{ErrorKind, Result};
 use ::metako::*;
 use ::typenum::ToInt;
-pub use md_fd_into_owned_type::FdIntoOwnedTypeFunctor;
 
 pub struct OwnedMessage<MD>
 where
@@ -38,6 +41,16 @@ where
             fields: Default::default(),
         }
     }
+}
+
+pub trait OwnedField {
+    fn has_field(&self) -> Result<bool>;
+    fn get_uint32<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<u32> {
+        Err(ErrorKind::ReflectionError)?
+    }
+
+    const BITFIELD_START_INDEX: usize;
+    const BITFIELD_NEXT_INDEX: usize;
 }
 
 impl<MD> Reflection for OwnedMessage<MD>
