@@ -44,7 +44,7 @@ where
 }
 
 pub trait OwnedField {
-    fn has_field(&self) -> Result<bool>;
+    fn has_field<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<bool>;
     fn get_uint32<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }

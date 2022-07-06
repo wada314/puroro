@@ -19,8 +19,24 @@ use ::std::ops::Index;
 pub struct U32ScalarOwnedField<const BITFIELD_START_INDEX: usize>(u32);
 
 impl<const BITFIELD_START_INDEX: usize> OwnedField for U32ScalarOwnedField<BITFIELD_START_INDEX> {
-    fn has_field(&self) -> Result<bool> {
+    fn has_field<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<bool> {
         Ok(self.0 != Default::default())
+    }
+
+    fn get_uint32<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<u32> {
+        Ok(self.0)
+    }
+
+    const BITFIELD_START_INDEX: usize = BITFIELD_START_INDEX;
+
+    const BITFIELD_NEXT_INDEX: usize = BITFIELD_START_INDEX + 0;
+}
+
+pub struct U32OptionalOwnedField<const BITFIELD_START_INDEX: usize>(u32);
+
+impl<const BITFIELD_START_INDEX: usize> OwnedField for U32OptionalOwnedField<BITFIELD_START_INDEX> {
+    fn has_field<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<bool> {
+        Ok(bitfield[Self::BITFIELD_START_INDEX])
     }
 
     fn get_uint32<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<u32> {
