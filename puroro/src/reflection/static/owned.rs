@@ -70,11 +70,12 @@ where
         todo!()
     }
 
-    type MessageFieldType<'a, FD: FieldDescriptorExt> = &'a OwnedMessage<FD::MaybeFieldMessageDescriptor>
+    type MessageFieldType<'a, FD: 'a + FieldDescriptorExt> = &'a OwnedMessage<FD::MaybeFieldMessageDescriptor>
     where
-        Self: 'a,
-        FD::MaybeFieldMessageDescriptor: 'a;
-    fn get_message<FD: FieldDescriptorExt>(&self) -> Result<Self::MessageFieldType<'_, FD>>
+        Self: 'a;
+    fn get_message<'a, FD: 'a + FieldDescriptorExt>(
+        &'a self,
+    ) -> Result<Self::MessageFieldType<'a, FD>>
     where
         FD::MaybeFieldMessageDescriptor: MessageDescriptorExt,
     {
