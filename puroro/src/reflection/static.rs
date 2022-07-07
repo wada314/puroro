@@ -20,7 +20,7 @@ use desc::FieldDescriptorExt;
 pub trait Reflection {
     fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool>;
     fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32>;
-    type StringFieldType<'a, FD: FieldDescriptorExt>: AsRef<str>
+    type StringFieldType<'a, FD: FieldDescriptorExt>: AsRef<str> + Default
     where
         Self: 'a;
     fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>>;
@@ -50,6 +50,34 @@ impl<T: Reflection> Reflection for &'_ T {
         &'a self,
     ) -> Result<Self::MessageFieldType<'a, FD>> {
         <T as Reflection>::get_message::<FD>(self)
+    }
+}
+
+impl<T: Reflection> Reflection for Option<T> {
+    fn has_field<FD: FieldDescriptorExt>(&self) -> Result<bool> {
+        self.as_ref()
+            .map_or(Ok(false), |t| <T as Reflection>::has_field::<FD>(t))
+    }
+    fn get_uint32<FD: FieldDescriptorExt>(&self) -> Result<u32> {
+        self.as_ref().map_or(Ok(Default::default()), |t| {
+            <T as Reflection>::get_uint32::<FD>(t)
+        })
+    }
+    type StringFieldType<'a, FD: FieldDescriptorExt> = T::StringFieldType<'a, FD> where Self: 'a;
+    fn get_string<FD: FieldDescriptorExt>(&self) -> Result<Self::StringFieldType<'_, FD>> {
+        self.as_ref().map_or(Ok(Default::default()), |t| {
+            <T as Reflection>::get_string::<FD>(t)
+        })
+    }
+    type MessageFieldType<'a, FD: 'a + FieldDescriptorExt> = Option<T::MessageFieldType<'a, FD>>
+    where
+        Self: 'a;
+    fn get_message<'a, FD: 'a + FieldDescriptorExt>(
+        &'a self,
+    ) -> Result<Self::MessageFieldType<'a, FD>> {
+        self.as_ref().map_or(Ok(None), |t| {
+            <T as Reflection>::get_message::<FD>(t).map(|m| Some(m))
+        })
     }
 }
 

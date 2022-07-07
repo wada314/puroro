@@ -48,6 +48,24 @@ pub trait OwnedField {
     fn get_uint32<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<u32> {
         Err(ErrorKind::ReflectionError)?
     }
+    type StringType<'a>: AsRef<str>
+    where
+        Self: 'a;
+    fn get_string<B: Index<usize, Output = bool>>(
+        &self,
+        _bitfield: &B,
+    ) -> Result<Self::StringType<'_>> {
+        Err(ErrorKind::ReflectionError)?
+    }
+    type MessageType<'a>: Reflection
+    where
+        Self: 'a;
+    fn get_message<B: Index<usize, Output = bool>>(
+        &self,
+        _bitfield: &B,
+    ) -> Result<Self::MessageType<'_>> {
+        Err(ErrorKind::ReflectionError)?
+    }
 
     const BITFIELD_START_INDEX: usize;
     const BITFIELD_NEXT_INDEX: usize;
