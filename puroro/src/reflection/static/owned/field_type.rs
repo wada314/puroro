@@ -76,7 +76,6 @@ impl<T: Default, const BITFIELD_START_INDEX: usize> Default
     }
 }
 
-#[derive(Default)]
 pub struct MessageScalarOwnedField<T, const BITFIELD_START_INDEX: usize>(Option<Box<T>>);
 impl<T: Reflection, const BITFIELD_START_INDEX: usize> OwnedField
     for MessageScalarOwnedField<T, BITFIELD_START_INDEX>
@@ -100,4 +99,11 @@ impl<T: Reflection, const BITFIELD_START_INDEX: usize> OwnedField
 
     const BITFIELD_START_INDEX: usize = BITFIELD_START_INDEX;
     const BITFIELD_NEXT_INDEX: usize = BITFIELD_START_INDEX + 0;
+}
+impl<T, const BITFIELD_START_INDEX: usize> Default
+    for MessageScalarOwnedField<T, BITFIELD_START_INDEX>
+{
+    fn default() -> Self {
+        Self(None)
+    }
 }

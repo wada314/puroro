@@ -76,6 +76,11 @@ type MdFdIntoOwnedTypeSwitch = make_list![
     (Const<B1>, Const<()>),
 ];
 
+pub struct OptionalFieldTypeGen<T>(PhantomData<T>);
+impl<T, const BITFEILD_INDEX: usize> Func<[(); BITFEILD_INDEX]> for OptionalFieldTypeGen<T> {
+    type Type = OptionalOwnedField<T, BITFEILD_INDEX>;
+}
+
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
 impl<MD, FD, IntoOwnedType, OwnedType> Func<FD> for FdIntoOwnedTypeFunctor<MD>
 where
