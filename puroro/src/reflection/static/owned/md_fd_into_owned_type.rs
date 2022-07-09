@@ -26,6 +26,11 @@ where
     type Type = ScalarMessageOwnedField<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>, 999>;
 }
 
+pub struct IncrementNumber<const N: usize>;
+impl<const N: usize, const X: usize> UsizeFunc<X> for IncrementNumber<N> {
+    const VALUE: usize = N + X;
+}
+
 mod preds {
     use super::{FieldDescriptorExt, MessageDescriptor};
     use crate::tags;
@@ -69,12 +74,21 @@ mod preds {
     }
 }
 type MdFdIntoOwnedTypeSwitch = make_list![
-    (preds::IsUnit, Const<()>),
-    (preds::IsU32, OptionalFieldTypeGen<u32>),
-    (preds::IsString, OptionalFieldTypeGen<String>),
-    (preds::IsOptBoxedMessage, ScalarMessageFieldTypeGen),
+    (preds::IsUnit, (Const<()>, IncrementNumber<0>)),
+    (
+        preds::IsU32,
+        (OptionalFieldTypeGen<u32>, IncrementNumber<1>)
+    ),
+    (
+        preds::IsString,
+        (OptionalFieldTypeGen<String>, IncrementNumber<1>)
+    ),
+    (
+        preds::IsOptBoxedMessage,
+        (ScalarMessageFieldTypeGen, IncrementNumber<0>)
+    ),
     // default
-    (Const<B1>, Const<()>),
+    (Const<B1>, (Const<()>, IncrementNumber<0>)),
 ];
 
 pub struct OptionalFieldTypeGen<T>(PhantomData<T>);
@@ -94,12 +108,16 @@ where
 }
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
-impl<MD, FD, IntoOwnedType, OwnedType, const BITFIELD_INDEX: usize> Func<([(); BITFIELD_INDEX], FD)>
-    for FdIntoOwnedTypeFunctor<MD>
+impl<MD, FD, IntoOwnedType, OwnedType, NextBitfieldIndex, const BITFIELD_INDEX: usize>
+    Func<([(); BITFIELD_INDEX], FD)> for FdIntoOwnedTypeFunctor<MD>
 where
-    Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = IntoOwnedType>,
+    Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = (IntoOwnedType, NextBitfieldIndex)>,
     IntoOwnedType: Func<(MD, FD, [(); BITFIELD_INDEX]), Type = OwnedType>,
-    OwnedType: OwnedField,
+    // OwnedType: OwnedField,
+    NextBitfieldIndex: UsizeFunc<BITFIELD_INDEX>,
 {
-    type Type = ([(); BITFIELD_INDEX], OwnedType);
+    type Type = (
+        [(); <NextBitfieldIndex as UsizeFunc<BITFIELD_INDEX>>::VALUE],
+        OwnedType,
+    );
 }
