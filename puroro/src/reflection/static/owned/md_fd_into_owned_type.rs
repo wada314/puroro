@@ -13,15 +13,16 @@
 // limitations under the License.
 
 use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
+use super::field_type::{MessageScalarOwnedField, OptionalOwnedField};
 use ::metako::*;
 use ::std::marker::PhantomData;
 
-pub struct MdFdIntoOptBoxOwnedMessageFunctor;
-impl<MD, FD> Func<(MD, FD)> for MdFdIntoOptBoxOwnedMessageFunctor
+pub struct MdFdIntoMessageFieldFunctor;
+impl<MD, FD> Func<(MD, FD)> for MdFdIntoMessageFieldFunctor
 where
     FD: FieldDescriptorExt,
 {
-    type Type = Option<Box<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>>>;
+    type Type = MessageScalarOwnedField<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>, 999>;
 }
 
 mod preds {
@@ -68,9 +69,9 @@ mod preds {
 }
 type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsUnit, Const<()>),
-    (preds::IsU32, Const<u32>),
-    (preds::IsString, Const<String>),
-    (preds::IsOptBoxedMessage, MdFdIntoOptBoxOwnedMessageFunctor),
+    (preds::IsU32, Const<OptionalOwnedField<u32, 999>>),
+    (preds::IsString, Const<OptionalOwnedField<String, 999>>),
+    (preds::IsOptBoxedMessage, MdFdIntoMessageFieldFunctor),
     // default
     (Const<B1>, Const<()>),
 ];
