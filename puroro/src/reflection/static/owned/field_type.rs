@@ -13,8 +13,10 @@
 // limitations under the License.
 
 use super::{OwnedField, Reflection};
+use crate::reflection::r#static::desc::UsizeValue;
 use crate::{ErrorKind, Result};
 use ::std::ops::Index;
+use std::marker::PhantomData;
 
 pub trait TryIntoOwnedFieldGetter {
     fn try_into_uint32(&self) -> Result<u32> {
@@ -35,23 +37,23 @@ impl TryIntoOwnedFieldGetter for String {
     }
 }
 
-pub struct OptionalOwnedField<T, const BITFIELD_START_INDEX: usize>(T);
+pub struct OptionalOwnedField<T, BitfieldIndex>(T, PhantomData<BitfieldIndex>);
 
-impl<T: TryIntoOwnedFieldGetter, const BITFIELD_START_INDEX: usize> OwnedField
-    for OptionalOwnedField<T, BITFIELD_START_INDEX>
+impl<T: TryIntoOwnedFieldGetter, BitfieldIndex: UsizeValue> OwnedField
+    for OptionalOwnedField<T, BitfieldIndex>
 {
     fn has_field<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<bool> {
-        Ok(bitfield[BITFIELD_START_INDEX])
+        Ok(bitfield[BitfieldIndex::VALUE])
     }
     fn get_uint32<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<u32> {
-        Ok(if bitfield[BITFIELD_START_INDEX] {
+        Ok(if bitfield[BitfieldIndex::VALUE] {
             <T as TryIntoOwnedFieldGetter>::try_into_uint32(&self.0)?
         } else {
             Default::default()
         })
     }
     fn get_string<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<&str> {
-        Ok(if bitfield[BITFIELD_START_INDEX] {
+        Ok(if bitfield[BitfieldIndex::VALUE] {
             <T as TryIntoOwnedFieldGetter>::try_into_string(&self.0)?
         } else {
             Default::default()
@@ -65,18 +67,14 @@ impl<T: TryIntoOwnedFieldGetter, const BITFIELD_START_INDEX: usize> OwnedField
     where
         Self: 'a;
 }
-impl<T: Default, const BITFIELD_START_INDEX: usize> Default
-    for OptionalOwnedField<T, BITFIELD_START_INDEX>
-{
+impl<T: Default, BitfieldIndex> Default for OptionalOwnedField<T, BitfieldIndex> {
     fn default() -> Self {
-        Self(Default::default())
+        Self(Default::default(), PhantomData)
     }
 }
 
-pub struct ScalarMessageOwnedField<T, const BITFIELD_START_INDEX: usize>(Option<Box<T>>);
-impl<T, const BITFIELD_START_INDEX: usize> OwnedField
-    for ScalarMessageOwnedField<T, BITFIELD_START_INDEX>
-{
+pub struct ScalarMessageOwnedField<T, BitfieldIndex>(Option<Box<T>>, PhantomData<BitfieldIndex>);
+impl<T, BitfieldIndex> OwnedField for ScalarMessageOwnedField<T, BitfieldIndex> {
     fn has_field<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<bool> {
         Ok(self.0.is_some())
     }
@@ -94,10 +92,8 @@ impl<T, const BITFIELD_START_INDEX: usize> OwnedField
     where
         Self: 'a;
 }
-impl<T, const BITFIELD_START_INDEX: usize> Default
-    for ScalarMessageOwnedField<T, BITFIELD_START_INDEX>
-{
+impl<T, BitfieldIndex> Default for ScalarMessageOwnedField<T, BitfieldIndex> {
     fn default() -> Self {
-        Self(None)
+        Self(None, PhantomData)
     }
 }

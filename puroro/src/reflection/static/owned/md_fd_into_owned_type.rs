@@ -18,14 +18,6 @@ use super::{OwnedField, OwnedMessage};
 use ::metako::*;
 use ::std::marker::PhantomData;
 
-pub struct MdFdIntoMessageFieldFunctor;
-impl<MD, FD> Func<(MD, FD)> for MdFdIntoMessageFieldFunctor
-where
-    FD: FieldDescriptorExt,
-{
-    type Type = ScalarMessageOwnedField<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>, 999>;
-}
-
 pub struct IncrementNumber<const N: usize>;
 impl<X: UsizeValue, const N: usize> Func<X> for IncrementNumber<N> {
     type Type = UsizeAdd<Usize<N>, X>;
@@ -92,32 +84,29 @@ type MdFdIntoOwnedTypeSwitch = make_list![
 ];
 
 pub struct OptionalFieldTypeGen<T>(PhantomData<T>);
-impl<T, MD, FD, const BITFEILD_INDEX: usize> Func<(MD, FD, [(); BITFEILD_INDEX])>
-    for OptionalFieldTypeGen<T>
-{
-    type Type = OptionalOwnedField<T, BITFEILD_INDEX>;
+impl<T, MD, FD, BitfieldIndex> Func<(MD, FD, BitfieldIndex)> for OptionalFieldTypeGen<T> {
+    type Type = OptionalOwnedField<T, BitfieldIndex>;
 }
 pub struct ScalarMessageFieldTypeGen;
-impl<MD, FD, const BITFEILD_INDEX: usize> Func<(MD, FD, [(); BITFEILD_INDEX])>
-    for ScalarMessageFieldTypeGen
+impl<MD, FD, BitfieldIndex> Func<(MD, FD, BitfieldIndex)> for ScalarMessageFieldTypeGen
 where
     FD: FieldDescriptorExt,
 {
     type Type =
-        ScalarMessageOwnedField<OwnedMessage<FD::MaybeFieldMessageDescriptor>, BITFEILD_INDEX>;
+        ScalarMessageOwnedField<OwnedMessage<FD::MaybeFieldMessageDescriptor>, BitfieldIndex>;
 }
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
-impl<MD, FD, IntoOwnedType, OwnedType, NextBitfieldIndex, const BITFIELD_INDEX: usize>
-    Func<(Usize<BITFIELD_INDEX>, FD)> for FdIntoOwnedTypeFunctor<MD>
+impl<MD, FD, IntoOwnedType, OwnedType, BitfieldIndex, NextBitfieldIndexGen>
+    Func<(BitfieldIndex, FD)> for FdIntoOwnedTypeFunctor<MD>
 where
-    Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = (IntoOwnedType, NextBitfieldIndex)>,
-    IntoOwnedType: Func<(MD, FD, Usize<BITFIELD_INDEX>), Type = OwnedType>,
+    Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = (IntoOwnedType, NextBitfieldIndexGen)>,
+    IntoOwnedType: Func<(MD, FD, BitfieldIndex), Type = OwnedType>,
     // OwnedType: OwnedField,
-    NextBitfieldIndex: Func<Usize<BITFIELD_INDEX>>,
+    NextBitfieldIndexGen: Func<BitfieldIndex>,
 {
     type Type = (
-        <NextBitfieldIndex as Func<Usize<BITFIELD_INDEX>>>::Type,
+        <NextBitfieldIndexGen as Func<BitfieldIndex>>::Type,
         OwnedType,
     );
 }

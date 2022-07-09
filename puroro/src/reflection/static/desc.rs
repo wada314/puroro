@@ -80,7 +80,9 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
 }
 
+#[derive(Default)]
 pub struct Usize<const VALUE: usize>;
+#[derive(Default)]
 pub struct UsizeAdd<X, Y>(PhantomData<(X, Y)>);
 pub trait UsizeValue {
     const VALUE: usize;
