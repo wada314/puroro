@@ -66,9 +66,6 @@ pub trait OwnedField {
     ) -> Result<Self::MessageType<'_>> {
         Err(ErrorKind::ReflectionError)?
     }
-
-    const BITFIELD_START_INDEX: usize;
-    const BITFIELD_NEXT_INDEX: usize;
 }
 
 impl<MD> Reflection for OwnedMessage<MD>

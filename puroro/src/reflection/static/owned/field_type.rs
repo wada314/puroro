@@ -41,17 +41,17 @@ impl<T: TryIntoOwnedFieldGetter, const BITFIELD_START_INDEX: usize> OwnedField
     for OptionalOwnedField<T, BITFIELD_START_INDEX>
 {
     fn has_field<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<bool> {
-        Ok(bitfield[Self::BITFIELD_START_INDEX])
+        Ok(bitfield[BITFIELD_START_INDEX])
     }
     fn get_uint32<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<u32> {
-        Ok(if bitfield[Self::BITFIELD_START_INDEX] {
+        Ok(if bitfield[BITFIELD_START_INDEX] {
             <T as TryIntoOwnedFieldGetter>::try_into_uint32(&self.0)?
         } else {
             Default::default()
         })
     }
     fn get_string<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<&str> {
-        Ok(if bitfield[Self::BITFIELD_START_INDEX] {
+        Ok(if bitfield[BITFIELD_START_INDEX] {
             <T as TryIntoOwnedFieldGetter>::try_into_string(&self.0)?
         } else {
             Default::default()
@@ -64,9 +64,6 @@ impl<T: TryIntoOwnedFieldGetter, const BITFIELD_START_INDEX: usize> OwnedField
     type MessageType<'a> = ()
     where
         Self: 'a;
-
-    const BITFIELD_START_INDEX: usize = BITFIELD_START_INDEX;
-    const BITFIELD_NEXT_INDEX: usize = BITFIELD_START_INDEX + 1;
 }
 impl<T: Default, const BITFIELD_START_INDEX: usize> Default
     for OptionalOwnedField<T, BITFIELD_START_INDEX>
@@ -96,9 +93,6 @@ impl<T, const BITFIELD_START_INDEX: usize> OwnedField
     type MessageType<'a> = Option<&'a T>
     where
         Self: 'a;
-
-    const BITFIELD_START_INDEX: usize = BITFIELD_START_INDEX;
-    const BITFIELD_NEXT_INDEX: usize = BITFIELD_START_INDEX + 0;
 }
 impl<T, const BITFIELD_START_INDEX: usize> Default
     for ScalarMessageOwnedField<T, BITFIELD_START_INDEX>
