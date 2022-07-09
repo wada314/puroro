@@ -57,7 +57,7 @@ pub trait OwnedField {
     ) -> Result<Self::StringType<'_>> {
         Err(ErrorKind::ReflectionError)?
     }
-    type MessageType<'a>: Reflection
+    type MessageType<'a>
     where
         Self: 'a;
     fn get_message<B: Index<usize, Output = bool>>(

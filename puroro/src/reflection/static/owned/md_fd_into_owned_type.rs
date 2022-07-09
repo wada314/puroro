@@ -99,7 +99,7 @@ impl<MD, FD, IntoOwnedType, OwnedType, const BITFIELD_INDEX: usize> Func<([(); B
 where
     Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = IntoOwnedType>,
     IntoOwnedType: Func<(MD, FD, [(); BITFIELD_INDEX]), Type = OwnedType>,
-    // OwnedType: OwnedField,
+    OwnedType: OwnedField,
 {
     type Type = ([(); BITFIELD_INDEX], OwnedType);
 }
