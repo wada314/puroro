@@ -24,6 +24,13 @@
 //     repeated Person children = 3;
 // }
 
+use crate::reflection::r#static::desc::*;
+use crate::reflection::r#static::owned::OwnedMessage;
+use crate::reflection::r#static::Reflection;
+use crate::tags;
+use ::metako::make_list;
+use ::typenum::{B0, U0, U1, U2, U4};
+
 pub trait PersonTrait {
     type NameType<'a>: AsRef<str>
     where
@@ -36,14 +43,11 @@ pub trait PersonTrait {
         self.name()
     }
     fn age(&self) -> u32;
+    type PartnerType<'a>: PersonTrait
+    where
+        Self: 'a;
+    fn partner(&self) -> Self::PartnerType<'_>;
 }
-
-use crate::reflection::r#static::desc::*;
-use crate::reflection::r#static::owned::OwnedMessage;
-use crate::reflection::r#static::Reflection;
-use crate::tags;
-use ::metako::make_list;
-use ::typenum::{B0, U0, U1, U2, U4};
 
 pub struct MdPerson;
 pub struct FdName;
@@ -91,26 +95,25 @@ where
     fn age(&self) -> u32 {
         self.get_uint32::<FdAge>().unwrap()
     }
+
+    type PartnerType<'a> = T::MessageFieldType<'a, FdPartner>
+    where
+        Self: 'a;
+    fn partner(&self) -> Self::PartnerType<'_> {
+        self.get_message::<FdPartner>().unwrap()
+    }
 }
 
 ////////////////////////////////////////////
 ////
-#[allow(unused)]
-mod test {
-    use super::*;
-    use crate::reflection::r#static::desc::*;
-    use ::metako::*;
 
-    // fn test(v: <TypeTagIntoOwnedType as Func<tags::Message<MdPerson>>>::Type) {}
+fn foo() {
+    let mut t = <PersonOwned as Default>::default();
+    let p = t.partner();
 
-    fn foo() {
-        let mut t = <PersonOwned as Default>::default();
-        let p = t.get_message::<FdPartner>();
-
-        // let mut i: [i32; <<MdPerson as MessageDescriptorExt>::CountBits as CountBits>::NUM_BITS];
-        // i = 0;
-        // let f: i32 = t.fields;
-        // t.1.1.0 = Some(BoxedMessage::default());
-        // test(10)
-    }
+    // let mut i: [i32; <<MdPerson as MessageDescriptorExt>::CountBits as CountBits>::NUM_BITS];
+    // i = 0;
+    // let f: i32 = t.fields;
+    // t.1.1.0 = Some(BoxedMessage::default());
+    // test(10)
 }
