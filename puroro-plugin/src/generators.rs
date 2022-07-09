@@ -17,9 +17,8 @@ use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Result;
 use ::askama::Template;
-use ::itertools::Itertools;
 
-#[derive(Template)]
+#[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
 pub struct Module {
     pub ident: String,
@@ -31,7 +30,7 @@ pub struct Module {
 }
 impl Module {
     pub fn try_new(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident = get_keyword_safe_ident(&to_camel_case(&p.name)).into();
+        let ident = get_keyword_safe_ident(&to_lower_snake_case(&p.name)).into();
         let is_root_package = p.name.is_empty();
         let full_package = p.full_package.clone();
         let subpackages = p
@@ -68,14 +67,14 @@ impl Module {
             ident,
             is_root_package,
             full_package,
-            submodules,
+            submodules: submodules,
             messages,
             enums,
         })
     }
 }
 
-#[derive(Template)]
+#[derive(Template, Debug)]
 #[template(path = "message.rs.txt")]
 pub struct Message {
     pub ident: String,
@@ -94,7 +93,7 @@ impl Message {
     }
 }
 
-#[derive(Template)]
+#[derive(Template, Debug)]
 #[template(path = "enum.rs.txt")]
 pub struct Enum {
     pub ident: String,

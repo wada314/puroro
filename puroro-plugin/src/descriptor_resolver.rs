@@ -14,6 +14,7 @@
 
 use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt};
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::std::collections::HashMap;
 use ::std::rc::Rc;
 
@@ -44,20 +45,28 @@ impl<'a> DescriptorResolver {
             });
 
             // package_contents
-            let packages = f.package().split('.');
-            let mut current_package = "".to_string();
-            for subpackage in packages {
-                let item = package_contents.entry(current_package.clone()).or_default();
-                item.name = subpackage.into();
-                item.full_package = current_package.clone();
+            let package_iter = f.package().split('.');
+            let mut cur_package_vec: Vec<String> = Vec::new();
+            for subpackage in package_iter {
+                let cur_package_string = cur_package_vec.iter().join(".");
+                let item = package_contents
+                    .entry(cur_package_string.clone())
+                    .or_insert_with(|| PackageContents {
+                        name: cur_package_vec.last().cloned().unwrap_or_default(),
+                        full_package: cur_package_string.clone(),
+                        subpackages: Vec::new(),
+                        input_files: Vec::new(),
+                    });
                 item.subpackages.push(subpackage.to_string());
-                if !current_package.is_empty() {
-                    current_package.push('.');
-                }
-                current_package.push_str(subpackage);
-                item.full_package = current_package.clone();
+                cur_package_vec.push(subpackage.to_string());
             }
-            let item = package_contents.entry(current_package.clone()).or_default();
+
+            let last_package_string = cur_package_vec.iter().join(".");
+            let item = package_contents
+                .entry(last_package_string.clone())
+                .or_default();
+            item.name = cur_package_vec.last().cloned().unwrap_or_default();
+            item.full_package = last_package_string;
             item.input_files.push(f.clone());
         }
         Ok(Self {
@@ -93,6 +102,7 @@ impl<'a> DescriptorResolver {
     }
 
     pub fn all_packages(&self) -> impl Iterator<Item = &PackageContents> {
+        dbg!(&self.package_contents);
         self.package_contents.values()
     }
 }
