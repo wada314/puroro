@@ -97,16 +97,12 @@ where
 }
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
-impl<MD, FD, IntoOwnedType, OwnedType, BitfieldIndex, NextBitfieldIndexGen>
+impl<MD, FD, FieldTypeGen, FieldType, BitfieldIndex, NextBitfieldIndexGen, NextBitfieldIndex>
     Func<(BitfieldIndex, FD)> for FdIntoOwnedTypeFunctor<MD>
 where
-    Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = (IntoOwnedType, NextBitfieldIndexGen)>,
-    IntoOwnedType: Func<(MD, FD, BitfieldIndex), Type = OwnedType>,
-    // OwnedType: OwnedField,
-    NextBitfieldIndexGen: Func<BitfieldIndex>,
+    Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = (FieldTypeGen, NextBitfieldIndexGen)>,
+    FieldTypeGen: Func<(MD, FD, BitfieldIndex), Type = FieldType>,
+    NextBitfieldIndexGen: Func<BitfieldIndex, Type = NextBitfieldIndex>,
 {
-    type Type = (
-        <NextBitfieldIndexGen as Func<BitfieldIndex>>::Type,
-        OwnedType,
-    );
+    type Type = (NextBitfieldIndex, FieldType);
 }
