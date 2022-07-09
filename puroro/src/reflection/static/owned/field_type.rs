@@ -29,6 +29,11 @@ impl TryIntoOwnedFieldGetter for u32 {
         Ok(*self)
     }
 }
+impl TryIntoOwnedFieldGetter for String {
+    fn try_into_string(&self) -> Result<&str> {
+        Ok(&self)
+    }
+}
 
 pub struct U32ScalarOwnedField<const BITFIELD_START_INDEX: usize>(u32);
 
@@ -96,14 +101,13 @@ impl<T: Reflection, const BITFIELD_START_INDEX: usize> OwnedField
         &self,
         _bitfield: &B,
     ) -> Result<Self::MessageType<'_>> {
-        todo!()
+        Ok(self.0.as_deref())
     }
 
     type StringType<'a> = &'a str
     where
         Self: 'a;
-
-    type MessageType<'a> = &'a T
+    type MessageType<'a> = Option<&'a T>
     where
         Self: 'a;
 
