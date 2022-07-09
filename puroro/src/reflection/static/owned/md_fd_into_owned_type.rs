@@ -14,7 +14,7 @@
 
 use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
 use super::field_type::{OptionalOwnedField, ScalarMessageOwnedField};
-use super::OwnedMessage;
+use super::{OwnedField, OwnedMessage};
 use ::metako::*;
 use ::std::marker::PhantomData;
 
@@ -99,6 +99,7 @@ impl<MD, FD, IntoOwnedType, OwnedType, const BITFIELD_INDEX: usize> Func<([(); B
 where
     Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = IntoOwnedType>,
     IntoOwnedType: Func<(MD, FD, [(); BITFIELD_INDEX]), Type = OwnedType>,
+    // OwnedType: OwnedField,
 {
     type Type = ([(); BITFIELD_INDEX], OwnedType);
 }
