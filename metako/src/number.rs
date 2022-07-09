@@ -52,3 +52,29 @@ where
 {
     type Type = M::Eq<N>;
 }
+
+pub struct AddConst<N, const X: usize>(PhantomData<N>);
+impl<N: Number> Number for AddConst<N, 0> {
+    type Lsb = N::Lsb;
+    type Remains = N::Remains;
+    type IsUTerm = N::IsUTerm;
+    type Eq<M: Number> = N::Eq<M>;
+}
+impl<N: Number> Number for AddConst<N, 1>
+where
+    <N::Lsb as Bool>::Then<AddConst<N::Remains, 1>, N::Remains>: Number,
+{
+    type Lsb = Not<N::Lsb>;
+    type Remains = <N::Lsb as Bool>::Then<AddConst<N::Remains, 1>, N::Remains>;
+    type IsUTerm = B0;
+    type Eq<M: Number> = <Self::Remains as Number>::Eq<M>;
+}
+impl<N: Number> Number for AddConst<N, 2>
+where
+    AddConst<N::Remains, 1>: Number,
+{
+    type Lsb = N::Lsb;
+    type Remains = AddConst<N::Remains, 1>;
+    type IsUTerm = B0;
+    type Eq<M: Number> = <Self::Remains as Number>::Eq<M>;
+}

@@ -109,7 +109,7 @@ mod test {
 
         // let mut i: [i32; <<MdPerson as MessageDescriptorExt>::CountBits as CountBits>::NUM_BITS];
         // i = 0;
-        let f: i32 = t.fields;
+        // let f: i32 = t.fields;
         // t.1.1.0 = Some(BoxedMessage::default());
         // test(10)
     }
