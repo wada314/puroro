@@ -14,7 +14,7 @@
 
 use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
-use crate::utils::{get_keyword_safe_ident, to_camel_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -85,7 +85,12 @@ pub struct Message {
 impl Message {
     #[allow(unused)]
     pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
-        todo!()
+        let ident = get_keyword_safe_ident(&to_camel_case(m.name())).into();
+        let submodule_ident = get_keyword_safe_ident(&to_lower_snake_case(m.name())).into();
+        Ok(Message {
+            ident,
+            submodule_ident,
+        })
     }
 }
 
