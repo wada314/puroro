@@ -99,11 +99,11 @@ fn main() -> Result<()> {
 
     let modules: Vec<Module> = resolver
         .all_packages()
-        .map(|p| Module::try_new(p, &resolver))
+        .map(|p| Module::try_from_package(p, &resolver))
         .try_collect()?;
 
     for module in modules.iter() {
-        let filename = package_to_filename(&module.full_package);
+        let filename = package_to_filename(&module.full_path);
         // Do render!
         let mut contents = module.render().unwrap();
         if let Some(new_contents) = format_rust_file(&contents) {

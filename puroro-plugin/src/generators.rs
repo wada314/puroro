@@ -17,22 +17,23 @@ use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Result;
 use ::askama::Template;
+use ::itertools::Itertools;
 
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
 pub struct Module {
     pub ident: String,
     pub is_root_package: bool,
-    pub full_package: String,
+    pub full_path: String,
     pub submodules: Vec<Module>,
     pub messages: Vec<Message>,
     pub enums: Vec<Enum>,
 }
 impl Module {
-    pub fn try_new(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_from_package(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
         let ident = get_keyword_safe_ident(&to_lower_snake_case(&p.name)).into();
         let is_root_package = p.name.is_empty();
-        let full_package = p.full_package.clone();
+        let full_path = p.full_package.clone();
         let subpackages = p
             .subpackages
             .iter()
@@ -40,14 +41,14 @@ impl Module {
                 let new_package = if is_root_package {
                     sp.clone()
                 } else {
-                    format!("{}.{}", full_package, sp)
+                    format!("{}.{}", full_path, sp)
                 };
                 resolver.package_contents_or_err(&new_package)
             })
             .collect::<Result<Vec<_>>>()?;
         let submodules = subpackages
             .iter()
-            .map(|p| Module::try_new(*p, resolver))
+            .map(|p| Module::try_from_package(*p, resolver))
             .collect::<Result<Vec<_>>>()?;
         let messages = p
             .input_files
@@ -66,8 +67,41 @@ impl Module {
         Ok(Module {
             ident,
             is_root_package,
-            full_package,
-            submodules: submodules,
+            full_path,
+            submodules,
+            messages,
+            enums,
+        })
+    }
+
+    pub fn try_from_message(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
+        let ident = to_lower_snake_case(m.name());
+        let is_root_package = false;
+        let full_path = m
+            .try_package_opt()?
+            .into_iter()
+            .chain(m.try_enclosing_messages_opt()?.into_iter())
+            .join(".");
+        let submodules = m
+            .nested_type()
+            .into_iter()
+            .map(|d| Module::try_from_message(d, resolver))
+            .collect::<Result<Vec<_>>>()?;
+        let messages = m
+            .nested_type()
+            .into_iter()
+            .map(|d| Message::try_new(d, resolver))
+            .collect::<Result<Vec<_>>>()?;
+        let enums = m
+            .enum_type()
+            .into_iter()
+            .map(|e| Enum::try_new(e, resolver))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(Module {
+            ident,
+            is_root_package,
+            full_path,
+            submodules,
             messages,
             enums,
         })
