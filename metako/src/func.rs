@@ -17,10 +17,6 @@ use ::std::marker::PhantomData;
 
 pub trait Func<T> {
     type Type;
-    const USIZE_VALUE: usize = 0;
-}
-pub trait UsizeFunc<const X: usize> {
-    const VALUE: usize;
 }
 pub trait Pred<T> {
     type Type: Bool;
