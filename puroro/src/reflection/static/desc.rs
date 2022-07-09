@@ -19,7 +19,7 @@ use ::typenum;
 use ::typenum::U0;
 
 pub trait MessageDescriptor: Sized {
-    type Fields: GetOwnedFields<Self> + FieldsIntoCountBits;
+    type Fields: GetOwnedFields<Self>;
     type Syntax: tags::ProtoSyntaxTag;
 }
 impl MessageDescriptor for () {
@@ -30,7 +30,6 @@ pub trait MessageDescriptorExt {
     type Fields;
     type Syntax: tags::ProtoSyntaxTag;
     type OwnedFields;
-    type CountBits;
 }
 // Implementation note: Do not introduce any additional bounds except
 // `MD: MessageDescriptor`!
@@ -38,7 +37,6 @@ impl<MD: MessageDescriptor> MessageDescriptorExt for MD {
     type Fields = MD::Fields;
     type Syntax = MD::Syntax;
     type OwnedFields = <MD::Fields as GetOwnedFields<MD>>::Type;
-    type CountBits = <MD::Fields as FieldsIntoCountBits>::Type;
 }
 
 pub trait FieldDescriptor {
@@ -83,51 +81,10 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
 pub trait GetOwnedFields<MD> {
     type Type;
 }
-impl<MD, Fields, OwnedFields> GetOwnedFields<MD> for Fields
+impl<MD, Fields, LastState, OwnedFields> GetOwnedFields<MD> for Fields
 where
-    list::Map<FdIntoOwnedTypeFunctor<MD>>: Func<Fields, Type = OwnedFields>,
+    list::Scan<FdIntoOwnedTypeFunctor<MD>>:
+        Func<(Fields, [(); 0]), Type = (LastState, OwnedFields)>,
 {
     type Type = OwnedFields;
-}
-
-pub trait CountBits {
-    const NUM_BITS: usize;
-}
-
-pub struct ConstBits<const NUM_BITS: usize>;
-impl<const NUM_BITS: usize> CountBits for ConstBits<NUM_BITS> {
-    const NUM_BITS: usize = NUM_BITS;
-}
-
-pub struct AddBits<T, U>(::std::marker::PhantomData<(T, U)>);
-impl<T: CountBits, U: CountBits> CountBits for AddBits<T, U> {
-    const NUM_BITS: usize = T::NUM_BITS + U::NUM_BITS;
-}
-pub struct AddBitsFunc;
-impl<T: CountBits, U: CountBits> Func<(T, U)> for AddBitsFunc {
-    type Type = AddBits<T, U>;
-}
-
-pub struct IntoBits1Func;
-impl<T> Func<T> for IntoBits1Func {
-    type Type = ConstBits<1>;
-}
-
-pub struct FieldsIntoCountBitsFunc;
-impl<Fields, ListOf1, Sum> Func<Fields> for FieldsIntoCountBitsFunc
-where
-    list::Map<Const<ConstBits<1>>>: Func<Fields, Type = ListOf1>,
-    list::Fold<ConstBits<0>, AddBitsFunc>: Func<ListOf1, Type=Sum>,
-{
-    type Type = Sum;
-}
-
-pub trait FieldsIntoCountBits {
-    type Type;
-}
-impl<Fields> FieldsIntoCountBits for Fields
-where
-    FieldsIntoCountBitsFunc: Func<Fields>,
-{
-    type Type = <FieldsIntoCountBitsFunc as Func<Fields>>::Type;
 }

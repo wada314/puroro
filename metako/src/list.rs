@@ -77,3 +77,15 @@ where
 {
     type Type = Result;
 }
+
+pub struct Scan<F>(PhantomData<F>);
+impl<F, State> Func<((), State)> for Scan<F> {
+    type Type = ((), State);
+}
+impl<F, Car, Cdr, State, NextState, Mapped> Func<((Car, Cdr), State)> for Scan<F>
+where
+    F: Func<(State, Car), Type = (NextState, Mapped)>,
+    Self: Func<(Cdr, NextState)>,
+{
+    type Type = (Mapped, <Self as Func<(Cdr, NextState)>>::Type); 
+}

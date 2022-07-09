@@ -94,10 +94,11 @@ where
 }
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
-impl<MD, FD, IntoOwnedType, OwnedType> Func<FD> for FdIntoOwnedTypeFunctor<MD>
+impl<MD, FD, IntoOwnedType, OwnedType, const BITFIELD_INDEX: usize> Func<([(); BITFIELD_INDEX], FD)>
+    for FdIntoOwnedTypeFunctor<MD>
 where
     Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = IntoOwnedType>,
-    IntoOwnedType: Func<(MD, FD, [(); 999]), Type = OwnedType>,
+    IntoOwnedType: Func<(MD, FD, [(); BITFIELD_INDEX]), Type = OwnedType>,
 {
-    type Type = OwnedType;
+    type Type = ([(); BITFIELD_INDEX], OwnedType);
 }
