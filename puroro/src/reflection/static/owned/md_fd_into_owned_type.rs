@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::desc::{FieldDescriptorExt, MessageDescriptor, Usize, UsizeAdd, UsizeValue};
+use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
 use super::field_type::{OptionalOwnedField, ScalarMessageOwnedField};
-use super::{OwnedField, OwnedMessage};
+use super::OwnedMessage;
 use ::metako::*;
 use ::std::marker::PhantomData;
-
-pub struct IncrementNumber<const N: usize>;
-impl<X: UsizeValue, const N: usize> Func<X> for IncrementNumber<N> {
-    type Type = UsizeAdd<Usize<N>, X>;
-}
 
 mod preds {
     use super::{FieldDescriptorExt, MessageDescriptor};
@@ -66,21 +61,15 @@ mod preds {
     }
 }
 type MdFdIntoOwnedTypeSwitch = make_list![
-    (preds::IsUnit, (Const<()>, IncrementNumber<0>)),
-    (
-        preds::IsU32,
-        (OptionalFieldTypeGen<u32>, IncrementNumber<1>)
-    ),
-    (
-        preds::IsString,
-        (OptionalFieldTypeGen<String>, IncrementNumber<1>)
-    ),
+    (preds::IsUnit, (Const<()>, AddConst<0>)),
+    (preds::IsU32, (OptionalFieldTypeGen<u32>, AddConst<1>)),
+    (preds::IsString, (OptionalFieldTypeGen<String>, AddConst<1>)),
     (
         preds::IsOptBoxedMessage,
-        (ScalarMessageFieldTypeGen, IncrementNumber<0>)
+        (ScalarMessageFieldTypeGen, AddConst<0>)
     ),
     // default
-    (Const<B1>, (Const<()>, IncrementNumber<0>)),
+    (Const<B1>, (Const<()>, AddConst<0>)),
 ];
 
 pub struct OptionalFieldTypeGen<T>(PhantomData<T>);

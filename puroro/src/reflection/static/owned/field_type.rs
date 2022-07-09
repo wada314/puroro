@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{OwnedField, Reflection};
-use crate::reflection::r#static::desc::UsizeValue;
+use typenum::ToInt;
+
+use super::OwnedField;
 use crate::{ErrorKind, Result};
 use ::std::ops::Index;
 use std::marker::PhantomData;
@@ -39,21 +40,21 @@ impl TryIntoOwnedFieldGetter for String {
 
 pub struct OptionalOwnedField<T, BitfieldIndex>(T, PhantomData<BitfieldIndex>);
 
-impl<T: TryIntoOwnedFieldGetter, BitfieldIndex: UsizeValue> OwnedField
+impl<T: TryIntoOwnedFieldGetter, BitfieldIndex: ToInt<usize>> OwnedField
     for OptionalOwnedField<T, BitfieldIndex>
 {
     fn has_field<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<bool> {
-        Ok(bitfield[BitfieldIndex::VALUE])
+        Ok(bitfield[BitfieldIndex::to_int()])
     }
     fn get_uint32<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<u32> {
-        Ok(if bitfield[BitfieldIndex::VALUE] {
+        Ok(if bitfield[BitfieldIndex::to_int()] {
             <T as TryIntoOwnedFieldGetter>::try_into_uint32(&self.0)?
         } else {
             Default::default()
         })
     }
     fn get_string<B: Index<usize, Output = bool>>(&self, bitfield: &B) -> Result<&str> {
-        Ok(if bitfield[BitfieldIndex::VALUE] {
+        Ok(if bitfield[BitfieldIndex::to_int()] {
             <T as TryIntoOwnedFieldGetter>::try_into_string(&self.0)?
         } else {
             Default::default()

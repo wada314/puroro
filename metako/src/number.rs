@@ -14,7 +14,8 @@
 
 use crate::{And, Bool, Func, Not, B0, B1};
 use ::std::marker::PhantomData;
-use ::typenum::{UInt, UTerm};
+use ::std::ops::Add;
+use ::typenum::{Add1, UInt, UTerm};
 
 // We need this trait so that we can compare the
 // type equality with ANY M:Number type.
@@ -53,28 +54,20 @@ where
     type Type = M::Eq<N>;
 }
 
-pub struct AddConst<N, const X: usize>(PhantomData<N>);
-impl<N: Number> Number for AddConst<N, 0> {
-    type Lsb = N::Lsb;
-    type Remains = N::Remains;
-    type IsUTerm = N::IsUTerm;
-    type Eq<M: Number> = N::Eq<M>;
+pub struct AddConst<const X: usize>;
+impl<N> Func<N> for AddConst<0> {
+    type Type = N;
 }
-impl<N: Number> Number for AddConst<N, 1>
+impl<N> Func<N> for AddConst<1>
 where
-    <N::Lsb as Bool>::Then<AddConst<N::Remains, 1>, N::Remains>: Number,
+    N: Add<B1>,
 {
-    type Lsb = Not<N::Lsb>;
-    type Remains = <N::Lsb as Bool>::Then<AddConst<N::Remains, 1>, N::Remains>;
-    type IsUTerm = B0;
-    type Eq<M: Number> = <Self::Remains as Number>::Eq<M>;
+    type Type = Add1<N>;
 }
-impl<N: Number> Number for AddConst<N, 2>
+impl<N> Func<N> for AddConst<2>
 where
-    AddConst<N::Remains, 1>: Number,
+    AddConst<1>: Func<N>,
+    <AddConst<1> as Func<N>>::Type: Add<B1>,
 {
-    type Lsb = N::Lsb;
-    type Remains = AddConst<N::Remains, 1>;
-    type IsUTerm = B0;
-    type Eq<M: Number> = <Self::Remains as Number>::Eq<M>;
+    type Type = Add1<<AddConst<1> as Func<N>>::Type>;
 }
