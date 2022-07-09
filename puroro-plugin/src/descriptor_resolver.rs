@@ -62,12 +62,12 @@ impl<'a> DescriptorResolver {
             }
 
             let last_package_string = cur_package_vec.iter().join(".");
-            let item = package_contents
+            let term_item = package_contents
                 .entry(last_package_string.clone())
                 .or_default();
-            item.name = cur_package_vec.last().cloned().unwrap_or_default();
-            item.full_package = last_package_string;
-            item.input_files.push(f.clone());
+            term_item.name = cur_package_vec.last().cloned().unwrap_or_default();
+            term_item.full_package = last_package_string;
+            term_item.input_files.push(f.clone());
         }
         Ok(Self {
             fqtn_to_desc_map,

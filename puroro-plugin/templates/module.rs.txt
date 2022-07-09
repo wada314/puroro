@@ -22,7 +22,6 @@ pub mod _puroro_root {
 {#-################ Message structs ################}
 
 {%- for m in messages %}
-{{ m }}
 {%- endfor %} {#- for m in messages #}
 
 {#-################ Enums ################}
