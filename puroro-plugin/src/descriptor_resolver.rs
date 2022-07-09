@@ -73,7 +73,9 @@ impl<'a> DescriptorResolver {
 
     #[allow(unused)]
     pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<RcMessageOrEnum> {
-        Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::FqtnNotFound)?)
+        Ok(self
+            .fqtn_to_desc(fqtn)
+            .ok_or(ErrorKind::FqtnNotFound { fqtn: fqtn.into() })?)
     }
 
     #[allow(unused)]
@@ -85,7 +87,9 @@ impl<'a> DescriptorResolver {
     pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
         Ok(self
             .package_contents(package)
-            .ok_or(ErrorKind::FqtnNotFound)?)
+            .ok_or(ErrorKind::FqtnNotFound {
+                fqtn: package.into(),
+            })?)
     }
 
     pub fn all_packages(&self) -> impl Iterator<Item = &PackageContents> {

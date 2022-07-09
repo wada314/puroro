@@ -14,14 +14,10 @@
 
 use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
-use crate::utils::{
-    convert_octal_escape_to_rust_style_escape, get_keyword_safe_ident, to_camel_case, upgrade,
-};
-use crate::{ErrorKind, Result};
+use crate::utils::{get_keyword_safe_ident, to_camel_case};
+use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
-use ::std::borrow::Cow;
-use ::std::rc::Rc;
 
 #[derive(Template)]
 #[template(path = "module.rs.txt")]
@@ -30,8 +26,8 @@ pub struct Module {
     pub is_root_package: bool,
     pub full_package: String,
     pub submodules: Vec<Module>,
-    pub messages: Vec<Rc<Message>>,
-    pub enums: Vec<Rc<Enum>>,
+    pub messages: Vec<Message>,
+    pub enums: Vec<Enum>,
 }
 impl Module {
     pub fn try_new(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
@@ -49,18 +45,32 @@ impl Module {
                 };
                 resolver.package_contents_or_err(&new_package)
             })
-            .try_collect::<_, Vec<_>, _>()?;
+            .collect::<Result<Vec<_>>>()?;
         let submodules = subpackages
             .iter()
             .map(|p| Module::try_new(*p, resolver))
-            .try_collect::<_, Vec<_>, _>()?;
+            .collect::<Result<Vec<_>>>()?;
+        let messages = p
+            .input_files
+            .iter()
+            .map(|f| f.message_type().iter())
+            .flatten()
+            .map(|m| Message::try_new(m, resolver))
+            .collect::<Result<Vec<_>>>()?;
+        let enums = p
+            .input_files
+            .iter()
+            .map(|f| f.enum_type().iter())
+            .flatten()
+            .map(|e| Enum::try_new(e, resolver))
+            .collect::<Result<Vec<_>>>()?;
         Ok(Module {
             ident,
             is_root_package,
             full_package,
             submodules,
-            messages: todo!(),
-            enums: todo!(),
+            messages,
+            enums,
         })
     }
 }
@@ -74,7 +84,7 @@ pub struct Message {
 
 impl Message {
     #[allow(unused)]
-    pub fn try_new(m: &DescriptorExt) -> Result<Self> {
+    pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         todo!()
     }
 }
@@ -87,7 +97,7 @@ pub struct Enum {
 
 impl Enum {
     #[allow(unused)]
-    pub fn try_new(e: &EnumDescriptorExt) -> Result<Self> {
+    pub fn try_new(e: &EnumDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         todo!()
     }
 }

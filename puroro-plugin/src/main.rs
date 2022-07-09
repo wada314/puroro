@@ -22,24 +22,22 @@ mod generators;
 mod utils;
 mod wrappers;
 
+use self::generators::Module;
 use crate::descriptor_ext::FileDescriptorExt;
 use crate::descriptor_resolver::DescriptorResolver;
 use ::askama::Template as _;
 use ::itertools::Itertools;
 use ::puroro::Message;
-use ::puroro_protobuf_compiled::google;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::{
     Feature, File,
 };
 use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
-use ::std::collections::{HashMap, HashSet};
 use ::std::env;
 use ::std::io::{stdin, stdout, Read};
 use ::std::process::Command;
 use ::std::process::Stdio;
-use generators::Module;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
