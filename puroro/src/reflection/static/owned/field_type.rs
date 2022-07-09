@@ -76,9 +76,9 @@ impl<T: Default, const BITFIELD_START_INDEX: usize> Default
     }
 }
 
-pub struct MessageScalarOwnedField<T, const BITFIELD_START_INDEX: usize>(Option<Box<T>>);
+pub struct ScalarMessageOwnedField<T, const BITFIELD_START_INDEX: usize>(Option<Box<T>>);
 impl<T: Reflection, const BITFIELD_START_INDEX: usize> OwnedField
-    for MessageScalarOwnedField<T, BITFIELD_START_INDEX>
+    for ScalarMessageOwnedField<T, BITFIELD_START_INDEX>
 {
     fn has_field<B: Index<usize, Output = bool>>(&self, _bitfield: &B) -> Result<bool> {
         Ok(self.0.is_some())
@@ -101,7 +101,7 @@ impl<T: Reflection, const BITFIELD_START_INDEX: usize> OwnedField
     const BITFIELD_NEXT_INDEX: usize = BITFIELD_START_INDEX + 0;
 }
 impl<T, const BITFIELD_START_INDEX: usize> Default
-    for MessageScalarOwnedField<T, BITFIELD_START_INDEX>
+    for ScalarMessageOwnedField<T, BITFIELD_START_INDEX>
 {
     fn default() -> Self {
         Self(None)

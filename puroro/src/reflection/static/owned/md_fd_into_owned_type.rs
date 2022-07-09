@@ -13,7 +13,8 @@
 // limitations under the License.
 
 use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
-use super::field_type::{MessageScalarOwnedField, OptionalOwnedField};
+use super::field_type::{OptionalOwnedField, ScalarMessageOwnedField};
+use super::OwnedMessage;
 use ::metako::*;
 use ::std::marker::PhantomData;
 
@@ -22,7 +23,7 @@ impl<MD, FD> Func<(MD, FD)> for MdFdIntoMessageFieldFunctor
 where
     FD: FieldDescriptorExt,
 {
-    type Type = MessageScalarOwnedField<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>, 999>;
+    type Type = ScalarMessageOwnedField<super::OwnedMessage<FD::MaybeFieldMessageDescriptor>, 999>;
 }
 
 mod preds {
@@ -69,23 +70,34 @@ mod preds {
 }
 type MdFdIntoOwnedTypeSwitch = make_list![
     (preds::IsUnit, Const<()>),
-    (preds::IsU32, Const<OptionalOwnedField<u32, 999>>),
-    (preds::IsString, Const<OptionalOwnedField<String, 999>>),
-    (preds::IsOptBoxedMessage, MdFdIntoMessageFieldFunctor),
+    (preds::IsU32, OptionalFieldTypeGen<u32>),
+    (preds::IsString, OptionalFieldTypeGen<String>),
+    (preds::IsOptBoxedMessage, ScalarMessageFieldTypeGen),
     // default
     (Const<B1>, Const<()>),
 ];
 
 pub struct OptionalFieldTypeGen<T>(PhantomData<T>);
-impl<T, const BITFEILD_INDEX: usize> Func<[(); BITFEILD_INDEX]> for OptionalFieldTypeGen<T> {
+impl<T, MD, FD, const BITFEILD_INDEX: usize> Func<(MD, FD, [(); BITFEILD_INDEX])>
+    for OptionalFieldTypeGen<T>
+{
     type Type = OptionalOwnedField<T, BITFEILD_INDEX>;
+}
+pub struct ScalarMessageFieldTypeGen;
+impl<MD, FD, const BITFEILD_INDEX: usize> Func<(MD, FD, [(); BITFEILD_INDEX])>
+    for ScalarMessageFieldTypeGen
+where
+    FD: FieldDescriptorExt,
+{
+    type Type =
+        ScalarMessageOwnedField<OwnedMessage<FD::MaybeFieldMessageDescriptor>, BITFEILD_INDEX>;
 }
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
 impl<MD, FD, IntoOwnedType, OwnedType> Func<FD> for FdIntoOwnedTypeFunctor<MD>
 where
     Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = IntoOwnedType>,
-    IntoOwnedType: Func<(MD, FD), Type = OwnedType>,
+    IntoOwnedType: Func<(MD, FD, [(); 999]), Type = OwnedType>,
 {
     type Type = OwnedType;
 }
