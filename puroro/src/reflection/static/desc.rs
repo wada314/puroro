@@ -100,7 +100,7 @@ pub trait GetOwnedFields<MD> {
 impl<MD, Fields, LastState, OwnedFields> GetOwnedFields<MD> for Fields
 where
     list::Scan<FdIntoOwnedTypeFunctor<MD>>:
-        Func<(Fields, Usize<0>), Type = (LastState, OwnedFields)>,
+        Func<(Usize<0>, Fields), Type = (LastState, OwnedFields)>,
 {
     type Type = OwnedFields;
 }
