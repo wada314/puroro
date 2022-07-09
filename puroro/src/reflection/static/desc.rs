@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::marker::PhantomData;
+
 use super::owned::FdIntoOwnedTypeFunctor;
 use crate::tags;
 use ::metako::*;
@@ -78,13 +80,25 @@ impl<FD: FieldDescriptor> FieldDescriptorExt for FD {
     type MaybeFieldMessageDescriptor = <FD::Type as tags::FieldTypeTag>::MessageDescriptor;
 }
 
+pub struct Usize<const VALUE: usize>;
+pub struct UsizeAdd<X, Y>(PhantomData<(X, Y)>);
+pub trait UsizeValue {
+    const VALUE: usize;
+}
+impl<const VALUE: usize> UsizeValue for Usize<VALUE> {
+    const VALUE: usize = VALUE;
+}
+impl<X: UsizeValue, Y: UsizeValue> UsizeValue for UsizeAdd<X, Y> {
+    const VALUE: usize = X::VALUE + Y::VALUE;
+}
+
 pub trait GetOwnedFields<MD> {
     type Type;
 }
 impl<MD, Fields, LastState, OwnedFields> GetOwnedFields<MD> for Fields
 where
     list::Scan<FdIntoOwnedTypeFunctor<MD>>:
-        Func<(Fields, [(); 0]), Type = (LastState, OwnedFields)>,
+        Func<(Fields, Usize<0>), Type = (LastState, OwnedFields)>,
 {
     type Type = OwnedFields;
 }

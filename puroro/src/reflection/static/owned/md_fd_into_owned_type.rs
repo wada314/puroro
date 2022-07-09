@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::desc::{FieldDescriptorExt, MessageDescriptor};
+use super::super::desc::{FieldDescriptorExt, MessageDescriptor, Usize, UsizeAdd, UsizeValue};
 use super::field_type::{OptionalOwnedField, ScalarMessageOwnedField};
 use super::{OwnedField, OwnedMessage};
 use ::metako::*;
@@ -27,8 +27,8 @@ where
 }
 
 pub struct IncrementNumber<const N: usize>;
-impl<const N: usize, const X: usize> UsizeFunc<X> for IncrementNumber<N> {
-    const VALUE: usize = N + X;
+impl<X: UsizeValue, const N: usize> Func<X> for IncrementNumber<N> {
+    type Type = UsizeAdd<Usize<N>, X>;
 }
 
 mod preds {
@@ -109,15 +109,15 @@ where
 
 pub struct FdIntoOwnedTypeFunctor<MD>(PhantomData<MD>);
 impl<MD, FD, IntoOwnedType, OwnedType, NextBitfieldIndex, const BITFIELD_INDEX: usize>
-    Func<([(); BITFIELD_INDEX], FD)> for FdIntoOwnedTypeFunctor<MD>
+    Func<(Usize<BITFIELD_INDEX>, FD)> for FdIntoOwnedTypeFunctor<MD>
 where
     Switch<MdFdIntoOwnedTypeSwitch>: Func<(MD, FD), Type = (IntoOwnedType, NextBitfieldIndex)>,
-    IntoOwnedType: Func<(MD, FD, [(); BITFIELD_INDEX]), Type = OwnedType>,
+    IntoOwnedType: Func<(MD, FD, Usize<BITFIELD_INDEX>), Type = OwnedType>,
     // OwnedType: OwnedField,
-    NextBitfieldIndex: UsizeFunc<BITFIELD_INDEX>,
+    NextBitfieldIndex: Func<Usize<BITFIELD_INDEX>>,
 {
     type Type = (
-        [(); <NextBitfieldIndex as UsizeFunc<BITFIELD_INDEX>>::VALUE],
+        <NextBitfieldIndex as Func<Usize<BITFIELD_INDEX>>>::Type,
         OwnedType,
     );
 }
