@@ -79,6 +79,10 @@ impl<'a> DescriptorResolver {
             .package_contents(package)
             .ok_or(ErrorKind::FqtnNotFound)?)
     }
+
+    pub fn all_packages(&self) -> impl Iterator<Item = &PackageContents> {
+        self.package_contents.values()
+    }
 }
 
 #[derive(Debug, Clone)]

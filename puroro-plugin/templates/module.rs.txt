@@ -1,0 +1,30 @@
+{#-################ Module-level code ################}
+// A generated source code by puroro library
+{%- if is_root_package %}
+#![feature(generic_associated_types)]
+// package (root)
+{%- else %}
+// package {{ full_package }}
+{%- endif %}
+
+{%- for submodule in submodules %}
+pub mod {{ submodule.ident }};
+{%- endfor %}
+
+pub mod _puroro_root {
+    {%- if is_root_package %}
+    pub use super::*;
+    {%- else %}
+    pub use super::super::_puroro_root::*;
+    {%- endif %}
+}
+
+{#-################ Message structs ################}
+
+{%- for m in messages %}
+{%- endfor %} {#- for m in messages #}
+
+{#-################ Enums ################}
+
+{%- for e in enums %}
+{%- endfor %} {#- for e in enums #}

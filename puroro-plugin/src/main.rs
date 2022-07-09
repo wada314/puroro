@@ -39,36 +39,10 @@ use ::std::env;
 use ::std::io::{stdin, stdout, Read};
 use ::std::process::Command;
 use ::std::process::Stdio;
+use generators::Module;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
-
-fn make_package_to_subpackages_map(
-    files: &[google::protobuf::FileDescriptorProto],
-) -> HashMap<String, HashSet<String>> {
-    let mut map = HashMap::new();
-    for file in files {
-        let package_string = file.package();
-        let package_vec = package_string
-            .split('.')
-            .filter_map(|p| {
-                if p.is_empty() {
-                    None
-                } else {
-                    Some(p.to_string())
-                }
-            })
-            .collect::<Vec<_>>();
-        for i in 0..(package_vec.len()) {
-            let cur_package = package_vec.iter().take(i).join(".");
-            let subpackage = package_vec[i].clone();
-            map.entry(cur_package)
-                .or_insert(HashSet::new())
-                .insert(subpackage);
-        }
-    }
-    map
-}
 
 fn package_to_filename(package: &str) -> String {
     if package.is_empty() {
@@ -115,8 +89,6 @@ fn format_rust_file(input: &str) -> Option<String> {
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
 
-    let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
-
     let input_files_ext = cgreq
         .proto_file()
         .iter()
@@ -127,45 +99,15 @@ fn main() -> Result<()> {
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let package_to_subpackage_map = make_package_to_subpackages_map(cgreq.proto_file());
-    let package_to_file_descriptor_map = wrapped_cgreq
-        .input_files()
-        .iter()
-        .map(|file| {
-            let package = file.package().iter().join(".");
-            let input_files_ext = &resolver.package_contents(&package).unwrap().input_files;
-            Ok((
-                package,
-                generators::MessagesAndEnums::try_new(file, input_files_ext.as_slice(), &resolver)?,
-            ))
-        })
-        .collect::<Result<HashMap<_, _>>>()?;
+    let modules: Vec<Module> = resolver
+        .all_packages()
+        .map(|p| Module::try_new(p))
+        .try_collect()?;
 
-    // merge 2 hashmaps, create a HashMap of OutputFile
-    let mut output_file_contexts = HashMap::<String, generators::OutputFile>::new();
-    for (package, subpackages) in package_to_subpackage_map {
-        let mut v = subpackages.into_iter().collect_vec();
-        v.sort();
-        output_file_contexts
-            .entry(package.clone())
-            .or_insert_with(|| generators::OutputFile::new(&package))
-            .subpackages = v;
-    }
-    for (package, file) in package_to_file_descriptor_map {
-        let output_file = output_file_contexts
-            .entry(package.clone())
-            .or_insert_with(|| generators::OutputFile::new(&package));
-        output_file.messages_and_enums = Some(file);
-        output_file.input_files_ext = resolver
-            .package_contents_or_err(&package)?
-            .input_files
-            .clone();
-    }
-
-    for output_contexts in output_file_contexts.values() {
-        let filename = package_to_filename(&output_contexts.package);
+    for module in modules.iter() {
+        let filename = package_to_filename(&module.full_package);
         // Do render!
-        let mut contents = output_contexts.render().unwrap();
+        let mut contents = module.render().unwrap();
         if let Some(new_contents) = format_rust_file(&contents) {
             contents = new_contents;
         } else {
