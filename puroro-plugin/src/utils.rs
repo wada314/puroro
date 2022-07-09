@@ -108,6 +108,7 @@ pub fn upgrade<T>(weak: &Weak<T>) -> Result<Rc<T>> {
     })?)
 }
 
+#[allow(unused)]
 pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> {
     // protoc escapes 0x7F~0xFF character as octal escape "\234".
     // Rust does not support that style so we need to re-encode it.

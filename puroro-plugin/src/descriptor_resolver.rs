@@ -19,6 +19,7 @@ use ::std::rc::Rc;
 
 #[derive(Debug)]
 pub struct DescriptorResolver {
+    #[allow(unused)]
     fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
     package_contents: HashMap<String, PackageContents>,
 }
@@ -47,11 +48,14 @@ impl<'a> DescriptorResolver {
             let mut current_package = "".to_string();
             for subpackage in packages {
                 let item = package_contents.entry(current_package.clone()).or_default();
+                item.name = subpackage.into();
+                item.full_package = current_package.clone();
                 item.subpackages.push(subpackage.to_string());
                 if !current_package.is_empty() {
                     current_package.push('.');
                 }
                 current_package.push_str(subpackage);
+                item.full_package = current_package.clone();
             }
             let item = package_contents.entry(current_package.clone()).or_default();
             item.input_files.push(f.clone());
@@ -62,18 +66,22 @@ impl<'a> DescriptorResolver {
         })
     }
 
+    #[allow(unused)]
     pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<RcMessageOrEnum> {
         self.fqtn_to_desc_map.get(fqtn).cloned()
     }
 
+    #[allow(unused)]
     pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<RcMessageOrEnum> {
         Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::FqtnNotFound)?)
     }
 
+    #[allow(unused)]
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
         self.package_contents.get(package)
     }
 
+    #[allow(unused)]
     pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
         Ok(self
             .package_contents(package)
@@ -93,6 +101,8 @@ pub enum RcMessageOrEnum {
 
 #[derive(Debug, Default)]
 pub struct PackageContents {
+    pub name: String,
+    pub full_package: String,
     pub subpackages: Vec<String>,
     pub input_files: Vec<Rc<FileDescriptorExt>>,
 }

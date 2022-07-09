@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use crate::descriptor_ext::*;
-use crate::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt};
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::utils::{
     convert_octal_escape_to_rust_style_escape, get_keyword_safe_ident, to_camel_case, upgrade,
@@ -30,13 +29,39 @@ pub struct Module {
     pub ident: String,
     pub is_root_package: bool,
     pub full_package: String,
-    pub submodules: Vec<Rc<Module>>,
+    pub submodules: Vec<Module>,
     pub messages: Vec<Rc<Message>>,
     pub enums: Vec<Rc<Enum>>,
 }
 impl Module {
-    pub fn try_new(p: &PackageContents) -> Result<Self> {
-        todo!()
+    pub fn try_new(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
+        let ident = get_keyword_safe_ident(&to_camel_case(&p.name)).into();
+        let is_root_package = p.name.is_empty();
+        let full_package = p.full_package.clone();
+        let subpackages = p
+            .subpackages
+            .iter()
+            .map(|sp| {
+                let new_package = if is_root_package {
+                    sp.clone()
+                } else {
+                    format!("{}.{}", full_package, sp)
+                };
+                resolver.package_contents_or_err(&new_package)
+            })
+            .try_collect::<_, Vec<_>, _>()?;
+        let submodules = subpackages
+            .iter()
+            .map(|p| Module::try_new(*p, resolver))
+            .try_collect::<_, Vec<_>, _>()?;
+        Ok(Module {
+            ident,
+            is_root_package,
+            full_package,
+            submodules,
+            messages: todo!(),
+            enums: todo!(),
+        })
     }
 }
 
@@ -48,6 +73,7 @@ pub struct Message {
 }
 
 impl Message {
+    #[allow(unused)]
     pub fn try_new(m: &DescriptorExt) -> Result<Self> {
         todo!()
     }
@@ -60,6 +86,7 @@ pub struct Enum {
 }
 
 impl Enum {
+    #[allow(unused)]
     pub fn try_new(e: &EnumDescriptorExt) -> Result<Self> {
         todo!()
     }

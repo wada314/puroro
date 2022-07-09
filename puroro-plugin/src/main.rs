@@ -101,7 +101,7 @@ fn main() -> Result<()> {
 
     let modules: Vec<Module> = resolver
         .all_packages()
-        .map(|p| Module::try_new(p))
+        .map(|p| Module::try_new(p, &resolver))
         .try_collect()?;
 
     for module in modules.iter() {

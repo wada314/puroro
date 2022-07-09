@@ -37,6 +37,7 @@ pub struct DescriptorExt {
     parent: WeakFileOrMessage,
     nested_type: Vec<Rc<DescriptorExt>>,
     enum_type: Vec<Rc<EnumDescriptorExt>>,
+    #[allow(unused)]
     field: Vec<Rc<FieldDescriptorExt>>,
 }
 
@@ -49,6 +50,7 @@ pub struct EnumDescriptorExt {
 #[derive(Debug)]
 pub struct FieldDescriptorExt {
     proto: FieldDescriptorProto,
+    #[allow(unused)]
     parent: Weak<DescriptorExt>,
 }
 
@@ -252,6 +254,7 @@ impl FieldDescriptorExt {
         })
     }
 
+    #[allow(unused)]
     pub fn try_parent(&self) -> Result<Rc<DescriptorExt>> {
         Ok(self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)?)
     }
@@ -280,7 +283,7 @@ impl RcFileOrMessage {
 
     pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(match self {
-            RcFileOrMessage::File(f) => None,
+            RcFileOrMessage::File(_) => None,
             RcFileOrMessage::Message(m) => Some(
                 m.try_enclosing_messages_opt()?
                     .into_iter()
