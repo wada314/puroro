@@ -56,6 +56,7 @@ impl Module {
             .map(|f| f.message_type().iter())
             .flatten()
             .map(|m| Module::try_from_message(m, resolver))
+            .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
         submodules.append(&mut submodules_from_messages);

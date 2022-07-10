@@ -97,12 +97,19 @@ fn main() -> Result<()> {
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let modules: Vec<Module> = resolver
-        .all_packages()
-        .map(|p| Module::try_from_package(p, &resolver))
-        .try_collect()?;
+    let root_module = Module::try_from_package(resolver.package_contents_or_err("")?, &resolver)?;
 
-    for module in modules.iter() {
+    let modules = {
+        let mut queue = vec![&root_module];
+        let mut found_modules = Vec::new();
+        while let Some(module) = queue.pop() {
+            queue.extend(module.submodules.iter());
+            found_modules.push(module);
+        }
+        found_modules
+    };
+
+    for module in modules {
         let filename = package_to_filename(&module.full_path);
         // Do render!
         let mut contents = module.render().unwrap();

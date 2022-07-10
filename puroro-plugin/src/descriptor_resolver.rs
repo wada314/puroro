@@ -87,12 +87,10 @@ impl<'a> DescriptorResolver {
             .ok_or(ErrorKind::FqtnNotFound { fqtn: fqtn.into() })?)
     }
 
-    #[allow(unused)]
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
         self.package_contents.get(package)
     }
 
-    #[allow(unused)]
     pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
         Ok(self
             .package_contents(package)
@@ -101,6 +99,7 @@ impl<'a> DescriptorResolver {
             })?)
     }
 
+    #[allow(unused)]
     pub fn all_packages(&self) -> impl Iterator<Item = &PackageContents> {
         dbg!(&self.package_contents);
         self.package_contents.values()
