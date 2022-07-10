@@ -21,11 +21,13 @@
 
 mod common_traits;
 mod error;
+mod generic_message;
 pub mod internal;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
+pub use generic_message::GenericMessage;
 
 // Re-exports
 pub use ::bitvec;
@@ -35,28 +37,3 @@ pub use ::either::Either;
 
 pub trait FieldDescriptorType {}
 pub trait DescriptorType {}
-
-pub trait GenericMessage {
-    type MessageType<'a, FD>: GenericMessage
-    where
-        Self: 'a;
-    fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>>;
-}
-
-impl<T: GenericMessage> GenericMessage for Option<T> {
-    type MessageType<'a, FD> = Option<T::MessageType<'a, FD>>
-    where
-        Self: 'a;
-    fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>> {
-        self.as_ref().map(|t| T::get_message(t)).transpose()
-    }
-}
-
-impl<'a, T: GenericMessage> GenericMessage for &'a T {
-    type MessageType<'b, FD> = T::MessageType<'b, FD>
-    where
-        Self: 'b;
-    fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>> {
-        T::get_message(*self)
-    }
-}
