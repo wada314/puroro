@@ -16,25 +16,42 @@ use super::FieldDescriptorType;
 use crate::Result;
 
 pub trait GenericMessage {
+    type StringType<'a, FD>: AsRef<str> + Default
+    where
+        Self: 'a;
     type MessageType<'a, FD>: GenericMessage
     where
         Self: 'a;
+    fn get_string<FD: FieldDescriptorType>(&self) -> Result<Self::StringType<'_, FD>>;
     fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>>;
 }
 
 impl<T: GenericMessage> GenericMessage for Option<T> {
+    type StringType<'a, FD> = T::StringType<'a, FD>
+    where
+        Self: 'a;
     type MessageType<'a, FD> = Option<T::MessageType<'a, FD>>
     where
         Self: 'a;
+    fn get_string<FD: FieldDescriptorType>(&self) -> Result<Self::StringType<'_, FD>> {
+        self.as_ref()
+            .map_or_else(|| Ok(Default::default()), |t| T::get_string::<FD>(t))
+    }
     fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>> {
         self.as_ref().map(|t| T::get_message(t)).transpose()
     }
 }
 
 impl<'a, T: GenericMessage> GenericMessage for &'a T {
+    type StringType<'b, FD> = T::StringType<'b, FD>
+    where
+        Self: 'b;
     type MessageType<'b, FD> = T::MessageType<'b, FD>
     where
         Self: 'b;
+    fn get_string<FD: FieldDescriptorType>(&self) -> Result<Self::StringType<'_, FD>> {
+        T::get_string(*self)
+    }
     fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>> {
         T::get_message(*self)
     }
