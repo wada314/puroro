@@ -9,6 +9,10 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
+pub struct Book<T>(T);
+
+impl<T: self::_puroro::GenericMessage> Book<T> {}
+
 pub struct BookOwned {
     _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 4], self::_puroro::bitvec::order::Lsb0>,
 }
