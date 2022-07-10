@@ -51,3 +51,12 @@ impl<T: GenericMessage> GenericMessage for Option<T> {
         self.as_ref().map(|t| T::get_message(t)).transpose()
     }
 }
+
+impl<'a, T: GenericMessage> GenericMessage for &'a T {
+    type MessageType<'b, FD> = T::MessageType<'b, FD>
+    where
+        Self: 'b;
+    fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>> {
+        T::get_message(*self)
+    }
+}
