@@ -122,24 +122,24 @@ impl Module {
 #[derive(Template, Debug)]
 #[template(path = "message.rs.txt")]
 pub struct Message {
-    pub ident: String,
-    pub submodule_ident: String,
+    pub ident_camel: String,
+    pub ident_lsnake: String,
     pub fields: Vec<Field>,
 }
 
 impl Message {
     #[allow(unused)]
     pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident = get_keyword_safe_ident(&to_camel_case(m.name())).into();
-        let submodule_ident = get_keyword_safe_ident(&to_lower_snake_case(m.name())).into();
+        let ident_camel = get_keyword_safe_ident(&to_camel_case(m.name())).into();
+        let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(m.name())).into();
         let fields = m
             .field()
             .into_iter()
             .map(|f| Field::try_new(f, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Message {
-            ident,
-            submodule_ident,
+            ident_camel,
+            ident_lsnake,
             fields,
         })
     }
@@ -148,7 +148,7 @@ impl Message {
 #[derive(Template, Debug)]
 #[template(path = "enum.rs.txt")]
 pub struct Enum {
-    pub ident: String,
+    pub ident_camel: String,
 }
 
 impl Enum {
@@ -160,7 +160,8 @@ impl Enum {
 
 #[derive(Debug)]
 pub struct Field {
-    pub ident: String,
+    pub ident_lsnake: String,
+    pub ident_camel: String,
     pub rule: FieldRule,
     pub r#type: FieldType,
 }
@@ -169,7 +170,8 @@ impl Field {
     pub fn try_new(f: &FieldDescriptorExt, _resolver: &DescriptorResolver) -> Result<Self> {
         use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label::*;
         use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Type::*;
-        let ident = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
+        let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
+        let ident_camel = get_keyword_safe_ident(&to_camel_case(f.name())).into();
         let rule = match (
             f.try_parent()?.try_get_file()?.syntax(),
             f.label(),
@@ -189,7 +191,8 @@ impl Field {
             _ => FieldType::Int32,
         };
         Ok(Self {
-            ident,
+            ident_lsnake,
+            ident_camel,
             rule,
             r#type,
         })
