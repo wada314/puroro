@@ -14,7 +14,7 @@
 
 use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case, upgrade};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -148,4 +148,31 @@ impl Enum {
     pub fn try_new(e: &EnumDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         todo!()
     }
+}
+
+#[derive(Debug)]
+pub struct Field {
+    pub ident: String,
+    pub rule: FieldRule,
+}
+
+impl Field {
+    pub fn try_new(f: &FieldDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
+        use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label;
+        let ident = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
+        // let rule = match (f.try_get_file()?. f.label()) {
+
+        // };
+        Ok(Self {
+            ident,
+            rule: todo!(),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum FieldRule {
+    Optional,
+    Singular,
+    Repeated,
 }
