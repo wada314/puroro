@@ -32,3 +32,22 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
+
+pub trait FieldDescriptorType {}
+pub trait DescriptorType {}
+
+pub trait GenericMessage {
+    type MessageType<'a, FD>: GenericMessage
+    where
+        Self: 'a;
+    fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>>;
+}
+
+impl<T: GenericMessage> GenericMessage for Option<T> {
+    type MessageType<'a, FD> = Option<T::MessageType<'a, FD>>
+    where
+        Self: 'a;
+    fn get_message<FD: FieldDescriptorType>(&self) -> Result<Self::MessageType<'_, FD>> {
+        self.as_ref().map(|t| T::get_message(t)).transpose()
+    }
+}
