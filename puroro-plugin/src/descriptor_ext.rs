@@ -14,7 +14,6 @@
 
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
-use crate::utils::upgrade;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -36,10 +35,8 @@ pub struct FileDescriptorExt {
 pub struct DescriptorExt {
     proto: DescriptorProto,
     parent: WeakFileOrMessage,
-    file: Weak<FileDescriptorExt>,
     nested_type: Vec<Rc<DescriptorExt>>,
     enum_type: Vec<Rc<EnumDescriptorExt>>,
-    #[allow(unused)]
     field: Vec<Rc<FieldDescriptorExt>>,
 }
 
@@ -155,7 +152,6 @@ impl DescriptorExt {
         Rc::new_cyclic(|this| Self {
             proto: source.clone(),
             parent: parent.clone(),
-            file: parent.try_get_file().unwrap(),
             nested_type: source
                 .nested_type()
                 .iter()
@@ -174,24 +170,24 @@ impl DescriptorExt {
         })
     }
 
-    pub fn try_parent(&self) -> Result<RcFileOrMessage> {
+    pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
         self.parent.try_upgrade()
     }
 
     pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
-        Ok(upgrade(&self.parent.try_get_file()?)?)
+        self.parent.try_get_file()
     }
 
     pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
-            .try_parent()?
+            .try_get_parent()?
             .try_package_opt()?
             .map(|s| s.into_owned().into()))
     }
 
     pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
-            .try_parent()?
+            .try_get_parent()?
             .try_enclosing_messages_opt()?
             .map(|s| s.into_owned().into()))
     }
@@ -212,6 +208,10 @@ impl DescriptorExt {
 
     pub fn enum_type(&self) -> &[Rc<EnumDescriptorExt>] {
         &self.enum_type
+    }
+
+    pub fn field(&self) -> &[Rc<FieldDescriptorExt>] {
+        &self.field
     }
 }
 
@@ -279,12 +279,12 @@ impl WeakFileOrMessage {
         })
     }
 
-    pub fn try_get_file(&self) -> Result<Weak<FileDescriptorExt>> {
+    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
         let mut f_or_m = self.try_upgrade()?;
         loop {
             match f_or_m {
-                RcFileOrMessage::File(f) => break Ok(Rc::downgrade(&f)),
-                RcFileOrMessage::Message(m) => f_or_m = m.try_parent()?,
+                RcFileOrMessage::File(f) => break Ok(f.clone()),
+                RcFileOrMessage::Message(m) => f_or_m = m.try_get_parent()?,
             }
         }
     }

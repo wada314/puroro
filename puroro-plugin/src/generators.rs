@@ -14,7 +14,8 @@
 
 use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case, upgrade};
+use crate::error::ErrorKind;
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -123,6 +124,7 @@ impl Module {
 pub struct Message {
     pub ident: String,
     pub submodule_ident: String,
+    pub fields: Vec<Field>,
 }
 
 impl Message {
@@ -130,9 +132,15 @@ impl Message {
     pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         let ident = get_keyword_safe_ident(&to_camel_case(m.name())).into();
         let submodule_ident = get_keyword_safe_ident(&to_lower_snake_case(m.name())).into();
+        let fields = m
+            .field()
+            .into_iter()
+            .map(|f| Field::try_new(f, resolver))
+            .collect::<Result<Vec<_>>>()?;
         Ok(Message {
             ident,
             submodule_ident,
+            fields,
         })
     }
 }
@@ -157,16 +165,23 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn try_new(f: &FieldDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
-        use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label;
+    pub fn try_new(f: &FieldDescriptorExt, _resolver: &DescriptorResolver) -> Result<Self> {
+        use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label::*;
         let ident = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
-        // let rule = match (f.try_get_file()?. f.label()) {
-
-        // };
-        Ok(Self {
-            ident,
-            rule: todo!(),
-        })
+        let rule = match (
+            f.try_parent()?.try_get_file()?.syntax(),
+            f.label(),
+            f.proto3_optional(),
+        ) {
+            ("proto2", LabelOptional | LabelRequired, _) => FieldRule::Optional,
+            ("proto3", LabelOptional, false) => FieldRule::Singular,
+            ("proto3", LabelOptional, true) => FieldRule::Optional,
+            (_, LabelRepeated, _) => FieldRule::Repeated,
+            _ => Err(ErrorKind::InternalError {
+                detail: "Unknown syntax/label/proto3opt combination.".to_string(),
+            })?,
+        };
+        Ok(Self { ident, rule })
     }
 }
 
