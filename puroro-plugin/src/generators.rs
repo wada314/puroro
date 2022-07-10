@@ -181,8 +181,13 @@ impl Field {
             ("proto3", LabelOptional, false) => FieldRule::Singular,
             ("proto3", LabelOptional, true) => FieldRule::Optional,
             (_, LabelRepeated, _) => FieldRule::Repeated,
-            _ => Err(ErrorKind::InternalError {
-                detail: "Unknown syntax/label/proto3opt combination.".to_string(),
+            (syntax, label, opt) => Err(ErrorKind::InternalError {
+                detail: format!(
+                    "Unknown syntax/label/proto3opt combination: ({}, {}, {})",
+                    syntax,
+                    Into::<i32>::into(label),
+                    opt
+                ),
             })?,
         };
         let r#type = match f.r#type() {
