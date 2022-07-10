@@ -162,11 +162,13 @@ impl Enum {
 pub struct Field {
     pub ident: String,
     pub rule: FieldRule,
+    pub r#type: FieldType,
 }
 
 impl Field {
     pub fn try_new(f: &FieldDescriptorExt, _resolver: &DescriptorResolver) -> Result<Self> {
         use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label::*;
+        use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Type::*;
         let ident = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
         let rule = match (
             f.try_parent()?.try_get_file()?.syntax(),
@@ -181,7 +183,16 @@ impl Field {
                 detail: "Unknown syntax/label/proto3opt combination.".to_string(),
             })?,
         };
-        Ok(Self { ident, rule })
+        let r#type = match f.r#type() {
+            TypeString => FieldType::String,
+            TypeMessage => FieldType::Message,
+            _ => FieldType::Int32,
+        };
+        Ok(Self {
+            ident,
+            rule,
+            r#type,
+        })
     }
 }
 
@@ -190,4 +201,23 @@ pub enum FieldRule {
     Optional,
     Singular,
     Repeated,
+}
+
+#[allow(unused)]
+#[derive(Debug)]
+pub enum FieldType {
+    Int32,
+    UInt32,
+    SInt32,
+    Fixed32,
+    Int64,
+    UInt64,
+    SInt64,
+    Fixed64,
+    Bool,
+    Float,
+    Double,
+    Bytes,
+    String,
+    Message,
 }

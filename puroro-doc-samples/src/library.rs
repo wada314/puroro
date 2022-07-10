@@ -11,7 +11,19 @@ pub mod _puroro {
 
 pub struct Book<T>(T);
 
-impl<T: self::_puroro::GenericMessage> Book<T> {}
+impl<T: self::_puroro::GenericMessage> Book<T> {
+    pub fn title(&self) -> () {
+        todo!()
+    }
+
+    // title
+
+    pub fn num_pages(&self) -> () {
+        todo!()
+    }
+
+    // num_pages
+}
 
 pub struct BookOwned {
     _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 4], self::_puroro::bitvec::order::Lsb0>,
