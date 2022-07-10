@@ -46,10 +46,19 @@ impl Module {
                 resolver.package_contents_or_err(&new_package)
             })
             .collect::<Result<Vec<_>>>()?;
-        let submodules = subpackages
+        let submodules_from_packages = subpackages
             .iter()
             .map(|p| Module::try_from_package(*p, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let mut submodules_from_messages = p
+            .input_files
+            .iter()
+            .map(|f| f.message_type().iter())
+            .flatten()
+            .map(|m| Module::try_from_message(m, resolver))
+            .collect::<Result<Vec<_>>>()?;
+        let mut submodules = submodules_from_packages;
+        submodules.append(&mut submodules_from_messages);
         let messages = p
             .input_files
             .iter()

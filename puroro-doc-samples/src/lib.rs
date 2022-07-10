@@ -6,3 +6,7 @@ pub mod library;
 pub mod _puroro_root {
     pub use super::*;
 }
+
+pub mod _puroro {
+    pub use ::puroro::*;
+}

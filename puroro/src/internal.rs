@@ -28,19 +28,8 @@ pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 
-use ::bitvec::order::BitOrder;
-use ::bitvec::slice::BitSlice;
-use ::bitvec::store::BitStore;
 use ::std::fmt::{self, Debug};
 use ::std::ops::{Deref, DerefMut};
-
-pub fn get_bitvec_bit<O, T>(slice: &BitSlice<O, T>, index: usize) -> bool
-where
-    O: BitOrder,
-    T: BitStore,
-{
-    *slice.get(index).expect("bitvec index out of bound.")
-}
 
 pub trait IsDefault {
     fn is_default(&self) -> bool;
