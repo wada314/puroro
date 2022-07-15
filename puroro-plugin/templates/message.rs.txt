@@ -1,20 +1,17 @@
 
-pub struct {{ ident_camel }}<T>(T);
-
-impl<T: self::_puroro::GenericMessage> {{ ident_camel }}<T> {
+pub struct {{ ident_camel }} {
     {%- for f in fields %}
     {% match f.rule %}
     {% when FieldRule::Repeated %}
     {% else %}
-    pub fn {{ f.ident_lsnake }}(&self) -> () {
-        todo!()
-    }
+    {{ f.ident_lsnake }}: (),
     {% endmatch %}
     {%- endfor %} {#- for f in fields #}
+
+    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 4], self::_puroro::bitvec::order::Lsb0>,
 }
 
 pub struct {{ ident_camel }}Owned {
-    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 4], self::_puroro::bitvec::order::Lsb0>,
 }
 
 pub mod {{ ident_lsnake }} {

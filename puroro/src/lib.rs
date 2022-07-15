@@ -21,13 +21,11 @@
 
 mod common_traits;
 mod error;
-mod generic_message;
 pub mod internal;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
-pub use generic_message::GenericMessage;
 
 // Re-exports
 pub use ::bitvec;
