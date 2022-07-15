@@ -1,11 +1,12 @@
 
 pub struct {{ ident_camel }} {
     {%- for f in fields %}
-    {% match f.rule %}
-    {% when FieldRule::Repeated %}
-    {% else %}
-    {{ f.ident_lsnake }}: (),
-    {% endmatch %}
+    {%- match f.rule %}
+    {%- when FieldRule::Repeated %}
+    {%- else %}
+    // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
+    {{ f.ident_lsnake }}: {{ f.rust_field_type }},
+    {%- endmatch %}
     {%- endfor %} {#- for f in fields #}
 
     _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 4], self::_puroro::bitvec::order::Lsb0>,

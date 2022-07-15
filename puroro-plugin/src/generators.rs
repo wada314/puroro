@@ -15,12 +15,12 @@
 use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case, upgrade};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
-use ::std::rc::Rc;
+use ::std::rc::{Rc, Weak};
 
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
@@ -165,12 +165,12 @@ pub struct Field {
     pub ident_lsnake: String,
     pub ident_camel: String,
     pub rule: FieldRule,
-    pub r#type: FieldType,
+    pub wire_type: WireType,
     pub rust_field_type: String,
 }
 
 impl Field {
-    pub fn try_new(f: &FieldDescriptorExt, _resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(f: &FieldDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
         use google::protobuf::field_descriptor_proto::Type::*;
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
@@ -193,27 +193,44 @@ impl Field {
                 ),
             })?,
         };
-        let r#type = match f.r#type() {
-            TypeString => FieldType::String,
-            TypeMessage => FieldType::Message,
-            _ => FieldType::Int32,
-        };
-        let rust_field_type_name = match (r#type.wire_type(), r#type) {
-            (WireType::Variant, _) => format!(""),
+        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), resolver)?;
+        let rust_field_type_name = match (&rule, &wire_type) {
+            (FieldRule::Optional, WireType::Variant(_)) => {
+                format!("OptionalNumericField<{}, {}, {}>", "i32", "()", 0)
+            }
+            (FieldRule::Singular, WireType::Variant(_)) => {
+                format!("SingularNumericField<{}, {}, {}>", "i32", "()", 0)
+            }
+            (FieldRule::Optional, WireType::LengthDelimited(LengthDelimitedType::String)) => {
+                format!("OptionalStringField<{}>", 0)
+            }
+            (FieldRule::Singular, WireType::LengthDelimited(LengthDelimitedType::String)) => {
+                format!("SingularStringField<{}>", 0)
+            }
+            (
+                FieldRule::Optional | FieldRule::Singular,
+                WireType::LengthDelimited(LengthDelimitedType::Message(weak_m)),
+            ) => {
+                let m = upgrade(weak_m)?;
+                format!("ScalarHeapMessageField<{}, {}>", m.name(), 0)
+            }
             _ => format!(""),
         };
-        let rust_field_type = format!("self::_puroro::internal::{}", rust_field_type_name);
+        let rust_field_type = format!(
+            "self::_puroro::internal::field_types::{}",
+            rust_field_type_name
+        );
         Ok(Self {
             ident_lsnake,
             ident_camel,
             rule,
-            r#type,
+            wire_type,
             rust_field_type,
         })
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum FieldRule {
     Optional,
     Singular,
@@ -250,7 +267,9 @@ impl WireType {
             TypeSint64 => Variant(SInt64),
             TypeBool => Variant(Bool),
             TypeEnum => match resolver.fqtn_to_desc_or_err(type_name)? {
-                RcMessageOrEnum::Message(_) => Err(ErrorKind::FqtnNotFound { fqtn: type_name })?,
+                RcMessageOrEnum::Message(_) => Err(ErrorKind::FqtnNotFound {
+                    fqtn: type_name.to_string(),
+                })?,
                 RcMessageOrEnum::Enum(e) => Variant(Enum(Rc::downgrade(&e))),
             },
             TypeFixed32 => Bits32(Fixed32),
@@ -264,7 +283,9 @@ impl WireType {
             TypeGroup => Err(ErrorKind::GroupNotSupported)?,
             TypeMessage => match resolver.fqtn_to_desc_or_err(type_name)? {
                 RcMessageOrEnum::Message(m) => LengthDelimited(Message(Rc::downgrade(&m))),
-                RcMessageOrEnum::Enum(_) => Err(ErrorKind::FqtnNotFound { fqtn: type_name })?,
+                RcMessageOrEnum::Enum(_) => Err(ErrorKind::FqtnNotFound {
+                    fqtn: type_name.to_string(),
+                })?,
             },
         })
     }

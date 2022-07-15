@@ -14,13 +14,16 @@
 
 use ::std::marker::PhantomData;
 
-pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+pub struct SingularNumericField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+    RustType,
+    PhantomData<ProtoType>,
+);
+pub struct OptionalNumericField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
     RustType,
     PhantomData<ProtoType>,
 );
 
+pub struct SingularStringField<const BITFIELD_INDEX: usize>(String);
 pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
 
 pub struct ScalarHeapMessageField<M, const BITFIELD_INDEX: usize>(Option<Box<M>>);
-
-
