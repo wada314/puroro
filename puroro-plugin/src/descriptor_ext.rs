@@ -178,17 +178,17 @@ impl DescriptorExt {
         self.parent.try_get_file()
     }
 
-    pub fn try_package_path_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_get_parent()?
-            .try_package_opt()?
+            .try_get_package_path_opt()?
             .map(|s| s.into_owned().into()))
     }
 
     pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_get_parent()?
-            .try_enclosing_messages_opt()?
+            .try_enclosing_messages_path_opt()?
             .map(|s| s.into_owned().into()))
     }
 
@@ -210,7 +210,7 @@ impl DescriptorExt {
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
         Ok(self
-            .try_package_path_opt()?
+            .try_get_package_path_opt()?
             .into_iter()
             .chain(self.try_enclosing_messages_path_opt()?.into_iter())
             .chain(iter::once(self.name().into()))
@@ -243,17 +243,17 @@ impl EnumDescriptorExt {
         self.parent.try_upgrade()
     }
 
-    pub fn try_package_path_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_parent()?
-            .try_package_opt()?
+            .try_get_package_path_opt()?
             .map(|s| s.into_owned().into()))
     }
 
     pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_parent()?
-            .try_enclosing_messages_opt()?
+            .try_enclosing_messages_path_opt()?
             .map(|s| s.into_owned().into()))
     }
 
@@ -274,7 +274,7 @@ impl EnumDescriptorExt {
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
-        let package = self.try_package_path_opt()?;
+        let package = self.try_get_package_path_opt()?;
         let enclosing_messages = self.try_enclosing_messages_path_opt()?;
         Ok(package
             .into_iter()
@@ -323,14 +323,14 @@ impl WeakFileOrMessage {
 }
 
 impl RcFileOrMessage {
-    pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(match self {
             RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
-            RcFileOrMessage::Message(m) => m.try_package_path_opt()?.map(|s| s.into()),
+            RcFileOrMessage::Message(m) => m.try_get_package_path_opt()?.map(|s| s.into()),
         })
     }
 
-    pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(match self {
             RcFileOrMessage::File(_) => None,
             RcFileOrMessage::Message(m) => Some(

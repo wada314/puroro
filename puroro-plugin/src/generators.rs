@@ -92,7 +92,7 @@ impl Module {
         let ident = to_lower_snake_case(m.name());
         let is_root_package = false;
         let full_path = m
-            .try_package_path_opt()?
+            .try_get_package_path_opt()?
             .into_iter()
             .chain(m.try_enclosing_messages_path_opt()?.into_iter())
             .join(".");
