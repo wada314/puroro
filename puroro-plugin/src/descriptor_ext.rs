@@ -196,15 +196,17 @@ impl DescriptorExt {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let parent = match self.try_parent() {
+        let parent = match self.try_get_parent() {
             Ok(RcFileOrMessage::File(_)) => None,
             Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
             Err(e) => Some(Err(e)),
         };
-        ::std::iter::successors(parent, |m| match m.try_parent() {
-            Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-            Err(e) => Some(Err(e)),
+        ::std::iter::successors(parent, |rm| {
+            rm.as_ref().ok().and_then(|m| match m.try_get_parent() {
+                Ok(RcFileOrMessage::File(_)) => None,
+                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+                Err(e) => Some(Err(e)),
+            })
         })
     }
 
@@ -239,20 +241,20 @@ impl EnumDescriptorExt {
         })
     }
 
-    pub fn try_parent(&self) -> Result<RcFileOrMessage> {
+    pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
         self.parent.try_upgrade()
     }
 
     pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
-            .try_parent()?
+            .try_get_parent()?
             .try_get_package_path_opt()?
             .map(|s| s.into_owned().into()))
     }
 
     pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
-            .try_parent()?
+            .try_get_parent()?
             .try_enclosing_messages_path_opt()?
             .map(|s| s.into_owned().into()))
     }
@@ -261,15 +263,17 @@ impl EnumDescriptorExt {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let parent = match self.try_parent() {
+        let parent = match self.try_get_parent() {
             Ok(RcFileOrMessage::File(_)) => None,
             Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
             Err(e) => Some(Err(e)),
         };
-        ::std::iter::successors(parent, |m| match m.try_parent() {
-            Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-            Err(e) => Some(Err(e)),
+        ::std::iter::successors(parent, |rm| {
+            rm.as_ref().ok().and_then(|m| match m.try_get_parent() {
+                Ok(RcFileOrMessage::File(_)) => None,
+                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+                Err(e) => Some(Err(e)),
+            })
         })
     }
 

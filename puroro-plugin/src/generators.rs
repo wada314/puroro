@@ -175,8 +175,8 @@ impl Field {
         use google::protobuf::field_descriptor_proto::Label::*;
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
         let ident_camel = get_keyword_safe_ident(&to_camel_case(f.name())).into();
-        let syntax = f.try_parent()?.try_get_file()?.syntax();
-        let rule = match (syntax, f.label(), f.proto3_optional()) {
+        let syntax = f.try_parent()?.try_get_file()?.syntax().to_string();
+        let rule = match (syntax.as_str(), f.label(), f.proto3_optional()) {
             ("proto2", LabelOptional | LabelRequired, _) => FieldRule::Optional,
             ("proto3", LabelOptional, false) => FieldRule::Singular,
             ("proto3", LabelOptional, true) => FieldRule::Optional,
@@ -190,7 +190,7 @@ impl Field {
                 ),
             })?,
         };
-        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), syntax, resolver)?;
+        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), &syntax, resolver)?;
         let rust_field_type_name = match (&rule, &wire_type) {
             (FieldRule::Optional, WireType::Variant(_)) => {
                 format!("OptionalNumericField<{}, {}, {}>", "i32", "()", 0)
