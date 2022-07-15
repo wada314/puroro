@@ -196,18 +196,11 @@ impl DescriptorExt {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let parent = match self.try_get_parent() {
-            Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-            Err(e) => Some(Err(e)),
-        };
-        ::std::iter::successors(parent, |rm| {
-            rm.as_ref().ok().and_then(|m| match m.try_get_parent() {
-                Ok(RcFileOrMessage::File(_)) => None,
-                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-                Err(e) => Some(Err(e)),
-            })
-        })
+        let (ok, err) = self.try_get_parent().map_or_else(
+            |e| (None, Some(Err(e))),
+            |p| (Some(p.try_traverse_enclosing_messages()), None),
+        );
+        ok.into_iter().flatten().chain(err.into_iter())
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
@@ -263,18 +256,11 @@ impl EnumDescriptorExt {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let parent = match self.try_get_parent() {
-            Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-            Err(e) => Some(Err(e)),
-        };
-        ::std::iter::successors(parent, |rm| {
-            rm.as_ref().ok().and_then(|m| match m.try_get_parent() {
-                Ok(RcFileOrMessage::File(_)) => None,
-                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-                Err(e) => Some(Err(e)),
-            })
-        })
+        let (ok, err) = self.try_get_parent().map_or_else(
+            |e| (None, Some(Err(e))),
+            |p| (Some(p.try_traverse_enclosing_messages()), None),
+        );
+        ok.into_iter().flatten().chain(err.into_iter())
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
@@ -344,6 +330,23 @@ impl RcFileOrMessage {
                     .join(".")
                     .into(),
             ),
+        })
+    }
+
+    // returns in inner message to outer message order
+    pub fn try_traverse_enclosing_messages(
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
+        let opt_parent = match self {
+            RcFileOrMessage::File(_) => None,
+            RcFileOrMessage::Message(parent) => Some(Ok(parent.clone())),
+        };
+        ::std::iter::successors(opt_parent, |rm| {
+            rm.as_ref().ok().and_then(|m| match m.try_get_parent() {
+                Ok(RcFileOrMessage::File(_)) => None,
+                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+                Err(e) => Some(Err(e)),
+            })
         })
     }
 }
