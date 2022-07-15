@@ -241,6 +241,12 @@ impl EnumDescriptorExt {
             .map(|s| s.into_owned().into()))
     }
 
+    pub fn try_traverse_enclosing_messages(
+        &self,
+    ) -> Result<impl Iterator<Item = Rc<DescriptorExt>>> {
+        todo!()
+    }
+
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
         let package = self.try_package_opt()?;
         let enclosing_messages = self.try_enclosing_messages_opt()?;

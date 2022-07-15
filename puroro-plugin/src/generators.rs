@@ -20,6 +20,7 @@ use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
+use ::std::borrow::Cow;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Template, Debug)]
@@ -172,7 +173,6 @@ pub struct Field {
 impl Field {
     pub fn try_new(f: &FieldDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
-        use google::protobuf::field_descriptor_proto::Type::*;
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
         let ident_camel = get_keyword_safe_ident(&to_camel_case(f.name())).into();
         let syntax = f.try_parent()?.try_get_file()?.syntax();
@@ -272,7 +272,7 @@ impl WireType {
                     "proto2" => Enum2(Rc::downgrade(&e)),
                     "proto3" => Enum3(Rc::downgrade(&e)),
                     _ => Err(ErrorKind::UnknownProtoSyntax {
-                        name: syntax.into_string(),
+                        name: syntax.to_string(),
                     })?,
                 }),
             },
@@ -312,13 +312,13 @@ impl VariantType {
     pub fn into_owned_rust_type(&self) -> Cow<'static, str> {
         use VariantType::*;
         match self {
-            Int32 => "i32",
-            UInt32 => "u32",
-            SInt32 => "i32",
-            Int64 => "i64",
-            UInt64 => "u64",
-            SInt64 => "i64",
-            Bool => "bool",
+            Int32 => "i32".into(),
+            UInt32 => "u32".into(),
+            SInt32 => "i32".into(),
+            Int64 => "i64".into(),
+            UInt64 => "u64".into(),
+            SInt64 => "i64".into(),
+            Bool => "bool".into(),
             Enum2(_) => todo!(),
             Enum3(_) => todo!(),
         }
@@ -347,5 +347,5 @@ pub enum Bits64Type {
 }
 
 fn enum_rust_type_full_path(e: &EnumDescriptorExt) -> Result<String> {
-    
+    todo!()
 }
