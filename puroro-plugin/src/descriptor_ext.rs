@@ -334,19 +334,6 @@ impl RcFileOrMessage {
         })
     }
 
-    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
-        Ok(match self {
-            RcFileOrMessage::File(_) => None,
-            RcFileOrMessage::Message(m) => Some(
-                m.try_enclosing_messages_path_opt()?
-                    .into_iter()
-                    .chain(iter::once(m.name().into()))
-                    .join(".")
-                    .into(),
-            ),
-        })
-    }
-
     // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
         &self,
