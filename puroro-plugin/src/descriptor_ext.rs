@@ -330,7 +330,7 @@ impl RcFileOrMessage {
     pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
         Ok(match self {
             RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
-            RcFileOrMessage::Message(m) => m.try_get_package_path_opt()?.map(|s| s.into()),
+            RcFileOrMessage::Message(m) => m.try_get_package_path_opt()?,
         })
     }
 
