@@ -15,7 +15,7 @@
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
+use ::itertools::{Either, Itertools};
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
@@ -196,11 +196,11 @@ impl DescriptorExt {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let (ok, err) = self.try_get_parent().map_or_else(
-            |e| (None, Some(Err(e))),
-            |p| (Some(p.try_traverse_enclosing_messages()), None),
-        );
-        ok.into_iter().flatten().chain(err.into_iter())
+        let either: Either<_, _> = self.try_get_parent().into();
+        either
+            .map_left(|e| ::std::iter::once(Err(e)))
+            .map_right(|parent| parent.try_traverse_enclosing_messages())
+            .into_iter()
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
@@ -256,11 +256,11 @@ impl EnumDescriptorExt {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let (ok, err) = self.try_get_parent().map_or_else(
-            |e| (None, Some(Err(e))),
-            |p| (Some(p.try_traverse_enclosing_messages()), None),
-        );
-        ok.into_iter().flatten().chain(err.into_iter())
+        let either: Either<_, _> = self.try_get_parent().into();
+        either
+            .map_left(|e| ::std::iter::once(Err(e)))
+            .map_right(|parent| parent.try_traverse_enclosing_messages())
+            .into_iter()
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
