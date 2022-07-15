@@ -192,6 +192,21 @@ impl DescriptorExt {
             .map(|s| s.into_owned().into()))
     }
 
+    pub fn try_traverse_enclosing_messages(
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
+        let parent = match self.try_parent() {
+            Ok(RcFileOrMessage::File(_)) => None,
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+            Err(e) => Some(Err(e)),
+        };
+        ::std::iter::successors(parent, |m| match m.try_parent() {
+            Ok(RcFileOrMessage::File(_)) => None,
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+            Err(e) => Some(Err(e)),
+        })
+    }
+
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
         Ok(self
             .try_package_opt()?
@@ -243,8 +258,17 @@ impl EnumDescriptorExt {
 
     pub fn try_traverse_enclosing_messages(
         &self,
-    ) -> Result<impl Iterator<Item = Rc<DescriptorExt>>> {
-        todo!()
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
+        let parent = match self.try_parent() {
+            Ok(RcFileOrMessage::File(_)) => None,
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+            Err(e) => Some(Err(e)),
+        };
+        ::std::iter::successors(parent, |m| match m.try_parent() {
+            Ok(RcFileOrMessage::File(_)) => None,
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+            Err(e) => Some(Err(e)),
+        })
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
