@@ -19,6 +19,8 @@ use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
+use ::puroro_protobuf_compiled::google;
+use ::std::rc::Rc;
 
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
@@ -164,12 +166,13 @@ pub struct Field {
     pub ident_camel: String,
     pub rule: FieldRule,
     pub r#type: FieldType,
+    pub rust_field_type: String,
 }
 
 impl Field {
     pub fn try_new(f: &FieldDescriptorExt, _resolver: &DescriptorResolver) -> Result<Self> {
-        use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label::*;
-        use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Type::*;
+        use google::protobuf::field_descriptor_proto::Label::*;
+        use google::protobuf::field_descriptor_proto::Type::*;
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
         let ident_camel = get_keyword_safe_ident(&to_camel_case(f.name())).into();
         let rule = match (
@@ -195,11 +198,17 @@ impl Field {
             TypeMessage => FieldType::Message,
             _ => FieldType::Int32,
         };
+        let rust_field_type_name = match (r#type.wire_type(), r#type) {
+            (WireType::Variant, _) => format!(""),
+            _ => format!(""),
+        };
+        let rust_field_type = format!("self::_puroro::internal::{}", rust_field_type_name);
         Ok(Self {
             ident_lsnake,
             ident_camel,
             rule,
             r#type,
+            rust_field_type,
         })
     }
 }
@@ -211,21 +220,85 @@ pub enum FieldRule {
     Repeated,
 }
 
-#[allow(unused)]
-#[derive(Debug)]
-pub enum FieldType {
+#[derive(Debug, Clone)]
+pub enum WireType {
+    Variant(VariantType),
+    LengthDelimited(LengthDelimitedType),
+    Bits32(Bits32Type),
+    Bits64(Bits64Type),
+}
+
+impl WireType {
+    fn from_proto_type(
+        r#type: google::protobuf::field_descriptor_proto::Type,
+        type_name: &str,
+        resolver: &DescriptorResolver,
+    ) -> Result<WireType> {
+        use crate::descriptor_resolver::RcMessageOrEnum;
+        use google::protobuf::field_descriptor_proto::Type::*;
+        use Bits32Type::*;
+        use Bits64Type::*;
+        use LengthDelimitedType::*;
+        use VariantType::*;
+        use WireType::*;
+        Ok(match r#type {
+            TypeInt32 => Variant(Int32),
+            TypeUint32 => Variant(UInt32),
+            TypeSint32 => Variant(SInt32),
+            TypeInt64 => Variant(Int64),
+            TypeUint64 => Variant(UInt64),
+            TypeSint64 => Variant(SInt64),
+            TypeBool => Variant(Bool),
+            TypeEnum => match resolver.fqtn_to_desc_or_err(type_name)? {
+                RcMessageOrEnum::Message(_) => Err(ErrorKind::FqtnNotFound { fqtn: type_name })?,
+                RcMessageOrEnum::Enum(e) => Variant(Enum(Rc::downgrade(&e))),
+            },
+            TypeFixed32 => Bits32(Fixed32),
+            TypeSfixed32 => Bits32(SFixed32),
+            TypeFloat => Bits32(Float),
+            TypeFixed64 => Bits64(Fixed64),
+            TypeSfixed64 => Bits64(SFixed64),
+            TypeDouble => Bits64(Double),
+            TypeString => LengthDelimited(String),
+            TypeBytes => LengthDelimited(Bytes),
+            TypeGroup => Err(ErrorKind::GroupNotSupported)?,
+            TypeMessage => match resolver.fqtn_to_desc_or_err(type_name)? {
+                RcMessageOrEnum::Message(m) => LengthDelimited(Message(Rc::downgrade(&m))),
+                RcMessageOrEnum::Enum(_) => Err(ErrorKind::FqtnNotFound { fqtn: type_name })?,
+            },
+        })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum VariantType {
     Int32,
     UInt32,
     SInt32,
-    Fixed32,
     Int64,
     UInt64,
     SInt64,
-    Fixed64,
     Bool,
-    Float,
-    Double,
-    Bytes,
+    Enum(Weak<EnumDescriptorExt>),
+}
+
+#[derive(Debug, Clone)]
+pub enum LengthDelimitedType {
     String,
-    Message,
+    Bytes,
+    Message(Weak<DescriptorExt>),
+}
+
+#[derive(Debug, Clone)]
+pub enum Bits32Type {
+    Fixed32,
+    SFixed32,
+    Float,
+}
+
+#[derive(Debug, Clone)]
+pub enum Bits64Type {
+    Fixed64,
+    SFixed64,
+    Double,
 }

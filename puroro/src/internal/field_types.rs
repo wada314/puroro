@@ -12,7 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod field_types;
-pub mod types;
-pub mod utils;
-pub mod variant;
+use ::std::marker::PhantomData;
+
+pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+    RustType,
+    PhantomData<ProtoType>,
+);
+
+pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
+
+pub struct ScalarHeapMessageField<M, const BITFIELD_INDEX: usize>(Option<Box<M>>);
+
+
