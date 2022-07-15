@@ -175,11 +175,8 @@ impl Field {
         use google::protobuf::field_descriptor_proto::Type::*;
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
         let ident_camel = get_keyword_safe_ident(&to_camel_case(f.name())).into();
-        let rule = match (
-            f.try_parent()?.try_get_file()?.syntax(),
-            f.label(),
-            f.proto3_optional(),
-        ) {
+        let syntax = f.try_parent()?.try_get_file()?.syntax();
+        let rule = match (syntax, f.label(), f.proto3_optional()) {
             ("proto2", LabelOptional | LabelRequired, _) => FieldRule::Optional,
             ("proto3", LabelOptional, false) => FieldRule::Singular,
             ("proto3", LabelOptional, true) => FieldRule::Optional,
@@ -193,7 +190,7 @@ impl Field {
                 ),
             })?,
         };
-        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), resolver)?;
+        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), syntax, resolver)?;
         let rust_field_type_name = match (&rule, &wire_type) {
             (FieldRule::Optional, WireType::Variant(_)) => {
                 format!("OptionalNumericField<{}, {}, {}>", "i32", "()", 0)
@@ -249,6 +246,7 @@ impl WireType {
     fn from_proto_type(
         r#type: google::protobuf::field_descriptor_proto::Type,
         type_name: &str,
+        syntax: &str,
         resolver: &DescriptorResolver,
     ) -> Result<WireType> {
         use crate::descriptor_resolver::RcMessageOrEnum;
@@ -270,7 +268,13 @@ impl WireType {
                 RcMessageOrEnum::Message(_) => Err(ErrorKind::FqtnNotFound {
                     fqtn: type_name.to_string(),
                 })?,
-                RcMessageOrEnum::Enum(e) => Variant(Enum(Rc::downgrade(&e))),
+                RcMessageOrEnum::Enum(e) => Variant(match syntax {
+                    "proto2" => Enum2(Rc::downgrade(&e)),
+                    "proto3" => Enum3(Rc::downgrade(&e)),
+                    _ => Err(ErrorKind::UnknownProtoSyntax {
+                        name: syntax.into_string(),
+                    })?,
+                }),
             },
             TypeFixed32 => Bits32(Fixed32),
             TypeSfixed32 => Bits32(SFixed32),
@@ -300,7 +304,25 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum(Weak<EnumDescriptorExt>),
+    Enum2(Weak<EnumDescriptorExt>),
+    Enum3(Weak<EnumDescriptorExt>),
+}
+
+impl VariantType {
+    pub fn into_owned_rust_type(&self) -> Cow<'static, str> {
+        use VariantType::*;
+        match self {
+            Int32 => "i32",
+            UInt32 => "u32",
+            SInt32 => "i32",
+            Int64 => "i64",
+            UInt64 => "u64",
+            SInt64 => "i64",
+            Bool => "bool",
+            Enum2(_) => todo!(),
+            Enum3(_) => todo!(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -322,4 +344,8 @@ pub enum Bits64Type {
     Fixed64,
     SFixed64,
     Double,
+}
+
+fn enum_rust_type_full_path(e: &EnumDescriptorExt) -> Result<String> {
+    
 }
