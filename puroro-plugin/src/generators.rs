@@ -92,9 +92,9 @@ impl Module {
         let ident = to_lower_snake_case(m.name());
         let is_root_package = false;
         let full_path = m
-            .try_package_opt()?
+            .try_package_path_opt()?
             .into_iter()
-            .chain(m.try_enclosing_messages_opt()?.into_iter())
+            .chain(m.try_enclosing_messages_path_opt()?.into_iter())
             .join(".");
         let submodules = m
             .nested_type()

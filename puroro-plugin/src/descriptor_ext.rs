@@ -178,20 +178,21 @@ impl DescriptorExt {
         self.parent.try_get_file()
     }
 
-    pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_package_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_get_parent()?
             .try_package_opt()?
             .map(|s| s.into_owned().into()))
     }
 
-    pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_get_parent()?
             .try_enclosing_messages_opt()?
             .map(|s| s.into_owned().into()))
     }
 
+    // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
@@ -209,9 +210,9 @@ impl DescriptorExt {
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
         Ok(self
-            .try_package_opt()?
+            .try_package_path_opt()?
             .into_iter()
-            .chain(self.try_enclosing_messages_opt()?.into_iter())
+            .chain(self.try_enclosing_messages_path_opt()?.into_iter())
             .chain(iter::once(self.name().into()))
             .join(".")
             .into())
@@ -242,20 +243,21 @@ impl EnumDescriptorExt {
         self.parent.try_upgrade()
     }
 
-    pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_package_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_parent()?
             .try_package_opt()?
             .map(|s| s.into_owned().into()))
     }
 
-    pub fn try_enclosing_messages_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(self
             .try_parent()?
             .try_enclosing_messages_opt()?
             .map(|s| s.into_owned().into()))
     }
 
+    // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
@@ -272,8 +274,8 @@ impl EnumDescriptorExt {
     }
 
     pub fn try_fqtn(&self) -> Result<Cow<str>> {
-        let package = self.try_package_opt()?;
-        let enclosing_messages = self.try_enclosing_messages_opt()?;
+        let package = self.try_package_path_opt()?;
+        let enclosing_messages = self.try_enclosing_messages_path_opt()?;
         Ok(package
             .into_iter()
             .chain(enclosing_messages.into_iter())
@@ -324,7 +326,7 @@ impl RcFileOrMessage {
     pub fn try_package_opt(&self) -> Result<Option<Cow<str>>> {
         Ok(match self {
             RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
-            RcFileOrMessage::Message(m) => m.try_package_opt()?.map(|s| s.into()),
+            RcFileOrMessage::Message(m) => m.try_package_path_opt()?.map(|s| s.into()),
         })
     }
 
@@ -332,7 +334,7 @@ impl RcFileOrMessage {
         Ok(match self {
             RcFileOrMessage::File(_) => None,
             RcFileOrMessage::Message(m) => Some(
-                m.try_enclosing_messages_opt()?
+                m.try_enclosing_messages_path_opt()?
                     .into_iter()
                     .chain(iter::once(m.name().into()))
                     .join(".")
