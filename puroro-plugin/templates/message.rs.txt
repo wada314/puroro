@@ -26,23 +26,5 @@ pub mod {{ ident_lsnake }} {
         pub use super::super::_puroro_root::*;
     }
 
-    pub mod _field_descriptors {
-        mod _puroro {
-            pub use super::super::_puroro::*;
-        }
-        mod _puroro_root {
-            pub use super::super::_puroro_root::*;
-        }
-
-        {%- for f in fields %}
-        pub struct {{ f.ident_camel }};
-        impl self::_puroro::FieldDescriptorType for {{ f.ident_camel }} {
-
-        }
-        {%- endfor %} {#- for f in fields #}
-
-    }
-    pub use _field_descriptors::*;
-
 }
 
