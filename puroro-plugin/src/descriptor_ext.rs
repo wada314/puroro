@@ -178,18 +178,25 @@ impl DescriptorExt {
         self.parent.try_get_file()
     }
 
-    pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
-        Ok(self
-            .try_get_parent()?
-            .try_get_package_path_opt()?
-            .map(|s| s.into_owned().into()))
+    pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
+        Ok(self.try_get_parent()?.try_get_package_path_opt()?)
     }
 
-    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
-        Ok(self
-            .try_get_parent()?
-            .try_enclosing_messages_path_opt()?
-            .map(|s| s.into_owned().into()))
+    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
+        let vec_msgs = self
+            .try_traverse_enclosing_messages()
+            .collect::<Result<Vec<_>>>()?;
+        if vec_msgs.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(
+                vec_msgs
+                    .into_iter()
+                    .rev()
+                    .map(|m| m.name().to_string())
+                    .join("."),
+            ))
+        }
     }
 
     // returns in inner message to outer message order
@@ -203,7 +210,7 @@ impl DescriptorExt {
             .into_iter()
     }
 
-    pub fn try_fqtn(&self) -> Result<Cow<str>> {
+    pub fn try_fqtn(&self) -> Result<String> {
         Ok(self
             .try_get_package_path_opt()?
             .into_iter()
@@ -238,18 +245,25 @@ impl EnumDescriptorExt {
         self.parent.try_upgrade()
     }
 
-    pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
-        Ok(self
-            .try_get_parent()?
-            .try_get_package_path_opt()?
-            .map(|s| s.into_owned().into()))
+    pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
+        Ok(self.try_get_parent()?.try_get_package_path_opt()?)
     }
 
-    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
-        Ok(self
-            .try_get_parent()?
-            .try_enclosing_messages_path_opt()?
-            .map(|s| s.into_owned().into()))
+    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
+        let vec_msgs = self
+            .try_traverse_enclosing_messages()
+            .collect::<Result<Vec<_>>>()?;
+        if vec_msgs.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(
+                vec_msgs
+                    .into_iter()
+                    .rev()
+                    .map(|m| m.name().to_string())
+                    .join("."),
+            ))
+        }
     }
 
     // returns in inner message to outer message order
@@ -263,7 +277,7 @@ impl EnumDescriptorExt {
             .into_iter()
     }
 
-    pub fn try_fqtn(&self) -> Result<Cow<str>> {
+    pub fn try_fqtn(&self) -> Result<String> {
         let package = self.try_get_package_path_opt()?;
         let enclosing_messages = self.try_enclosing_messages_path_opt()?;
         Ok(package
@@ -313,14 +327,14 @@ impl WeakFileOrMessage {
 }
 
 impl RcFileOrMessage {
-    pub fn try_get_package_path_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
         Ok(match self {
             RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
             RcFileOrMessage::Message(m) => m.try_get_package_path_opt()?.map(|s| s.into()),
         })
     }
 
-    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<Cow<str>>> {
+    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
         Ok(match self {
             RcFileOrMessage::File(_) => None,
             RcFileOrMessage::Message(m) => Some(
