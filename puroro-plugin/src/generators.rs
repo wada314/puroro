@@ -135,10 +135,11 @@ impl Message {
     pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         let ident_camel = get_keyword_safe_ident(&to_camel_case(m.name())).into();
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(m.name())).into();
+        let mut bit_index = 0usize;
         let fields = m
             .field()
             .into_iter()
-            .map(|f| Field::try_new(f, resolver))
+            .map(|f| Field::try_new(f, &mut bit_index, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Message {
             ident_camel,
@@ -171,7 +172,11 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn try_new(f: &FieldDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(
+        f: &FieldDescriptorExt,
+        bit_index: &mut usize,
+        resolver: &DescriptorResolver,
+    ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(f.name())).into();
         let ident_camel = get_keyword_safe_ident(&to_camel_case(f.name())).into();
@@ -191,25 +196,35 @@ impl Field {
             })?,
         };
         let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), &syntax, resolver)?;
+        let bit_index_for_optional = {
+            let index = *bit_index;
+            if matches!(rule, FieldRule::Optional) {
+                *bit_index += 1;
+            }
+            index
+        };
         let rust_field_type_name = match (&rule, &wire_type) {
             (FieldRule::Optional, WireType::Variant(_)) => {
-                format!("OptionalNumericField<{}, {}, {}>", "i32", "()", 0)
+                format!(
+                    "OptionalNumericField<{}, {}, {}>",
+                    "i32", "()", bit_index_for_optional
+                )
             }
             (FieldRule::Singular, WireType::Variant(_)) => {
-                format!("SingularNumericField<{}, {}, {}>", "i32", "()", 0)
+                format!("SingularNumericField<{}, {}>", "i32", "()")
             }
             (FieldRule::Optional, WireType::LengthDelimited(LengthDelimitedType::String)) => {
-                format!("OptionalStringField<{}>", 0)
+                format!("OptionalStringField<{}>", bit_index_for_optional)
             }
             (FieldRule::Singular, WireType::LengthDelimited(LengthDelimitedType::String)) => {
-                format!("SingularStringField<{}>", 0)
+                format!("SingularStringField")
             }
             (
                 FieldRule::Optional | FieldRule::Singular,
                 WireType::LengthDelimited(LengthDelimitedType::Message(weak_m)),
             ) => {
                 let m = upgrade(weak_m)?;
-                format!("ScalarHeapMessageField<{}, {}>", m.name(), 0)
+                format!("SingularHeapMessageField<{}>", m.name())
             }
             _ => format!(""),
         };
