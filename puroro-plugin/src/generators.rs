@@ -172,6 +172,7 @@ pub struct Field {
     pub rule: FieldRule,
     pub wire_type: WireType,
     pub rust_field_type: String,
+    pub rust_getter_type: String,
 }
 
 impl Field {
@@ -241,12 +242,16 @@ impl Field {
             "self::_puroro::internal::field_types::{}",
             rust_field_type_name
         );
+        let rust_getter_type = wire_type
+            .into_getter_rust_type(matches!(&rule, &FieldRule::Repeated))
+            .into_owned();
         Ok(Self {
             ident_lsnake,
             ident_camel,
             rule,
             wire_type,
             rust_field_type,
+            rust_getter_type,
         })
     }
 }
@@ -318,19 +323,23 @@ impl WireType {
         })
     }
 
-    pub fn into_getter_rust_type(&self) -> Cow<'static, str> {
+    pub fn into_getter_rust_type(&self, is_repeated: bool) -> Cow<'static, str> {
         use Bits32Type::*;
         use Bits64Type::*;
         use LengthDelimitedType::*;
         use VariantType::*;
         use WireType::*;
-        match self {
-            Variant(v) => v.into_owned_rust_type(),
-            LengthDelimited(String) => "&str".into(),
-            LengthDelimited(Bytes) => "&[u8]".into(),
-            LengthDelimited(Message(_)) => todo!(),
-            Bits32(b) => b.into_owned_rust_type(),
-            Bits64(b) => b.into_owned_rust_type(),
+        if is_repeated {
+            todo!()
+        } else {
+            match self {
+                Variant(v) => v.into_owned_rust_type(),
+                LengthDelimited(String) => "&str".into(),
+                LengthDelimited(Bytes) => "&[u8]".into(),
+                LengthDelimited(Message(_)) => todo!(),
+                Bits32(b) => b.into_owned_rust_type(),
+                Bits64(b) => b.into_owned_rust_type(),
+            }
         }
     }
 }

@@ -18,8 +18,10 @@ impl {{ ident_camel }} {
     {%- when FieldRule::Repeated %}
     {%- else %}
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
-    pub fn {{ f.ident_lsnake }}(&self) -> i32 {
-        todo!()
+    pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
+        <{{ f.rust_field_type }} as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.{{ f.ident_lsnake }}, &self._bitfield,
+        )
     }
     {%- endmatch %}
     {%- endfor %} {#- for f in fields #}

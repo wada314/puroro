@@ -20,12 +20,16 @@ pub struct Book {
 
 impl Book {
     // Singular, LengthDelimited(String)
-    pub fn title(&self) -> i32 {
-        todo!()
+    pub fn title(&self) -> &str {
+        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.title, &self._bitfield,
+        )
     }
     // Singular, Variant(UInt32)
-    pub fn num_pages(&self) -> i32 {
-        todo!()
+    pub fn num_pages(&self) -> u32 {
+        <self::_puroro::internal::field_types::SingularNumericField<u32, ()> as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.num_pages, &self._bitfield,
+        )
     }
 }
 
