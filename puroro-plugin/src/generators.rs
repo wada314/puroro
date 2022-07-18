@@ -207,14 +207,20 @@ impl Field {
             index
         };
         let rust_field_type_name = match (&rule, &wire_type) {
-            (FieldRule::Optional, WireType::Variant(_)) => {
+            (FieldRule::Optional, WireType::Variant(v)) => {
                 format!(
                     "OptionalNumericField<{}, {}, {}>",
-                    "i32", "()", bit_index_for_optional
+                    v.into_owned_rust_type(),
+                    "()",
+                    bit_index_for_optional
                 )
             }
-            (FieldRule::Singular, WireType::Variant(_)) => {
-                format!("SingularNumericField<{}, {}>", "i32", "()")
+            (FieldRule::Singular, WireType::Variant(v)) => {
+                format!(
+                    "SingularNumericField<{}, {}>",
+                    v.into_owned_rust_type(),
+                    "()"
+                )
             }
             (FieldRule::Optional, WireType::LengthDelimited(LengthDelimitedType::String)) => {
                 format!("OptionalStringField<{}>", bit_index_for_optional)
@@ -357,11 +363,33 @@ pub enum Bits32Type {
     Float,
 }
 
+impl Bits32Type {
+    fn into_owned_rust_type(&self) -> Cow<'static, str> {
+        use Bits32Type::*;
+        match self {
+            Fixed32 => "u32".into(),
+            SFixed32 => "i32".into(),
+            Float => "f32".into(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Bits64Type {
     Fixed64,
     SFixed64,
     Double,
+}
+
+impl Bits64Type {
+    fn into_owned_rust_type(&self) -> Cow<'static, str> {
+        use Bits64Type::*;
+        match self {
+            Fixed64 => "u64".into(),
+            SFixed64 => "i64".into(),
+            Double => "f64".into(),
+        }
+    }
 }
 
 fn enum_rust_type_full_path(e: &EnumDescriptorExt) -> Result<String> {

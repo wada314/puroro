@@ -19,7 +19,6 @@ use ::itertools::{Either, Itertools};
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
-use ::std::borrow::Cow;
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};

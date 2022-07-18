@@ -13,7 +13,7 @@ pub struct Book {
     // Singular, LengthDelimited(String)
     title: self::_puroro::internal::field_types::SingularStringField,
     // Singular, Variant(UInt32)
-    num_pages: self::_puroro::internal::field_types::SingularNumericField<i32, ()>,
+    num_pages: self::_puroro::internal::field_types::SingularNumericField<u32, ()>,
 
     _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 0], self::_puroro::bitvec::order::Lsb0>,
 }
