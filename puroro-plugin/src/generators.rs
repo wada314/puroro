@@ -317,6 +317,22 @@ impl WireType {
             },
         })
     }
+
+    pub fn into_getter_rust_type(&self) -> Cow<'static, str> {
+        use Bits32Type::*;
+        use Bits64Type::*;
+        use LengthDelimitedType::*;
+        use VariantType::*;
+        use WireType::*;
+        match self {
+            Variant(v) => v.into_owned_rust_type(),
+            LengthDelimited(String) => "&str".into(),
+            LengthDelimited(Bytes) => "&[u8]".into(),
+            LengthDelimited(Message(_)) => todo!(),
+            Bits32(b) => b.into_owned_rust_type(),
+            Bits64(b) => b.into_owned_rust_type(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
