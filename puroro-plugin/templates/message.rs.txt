@@ -12,7 +12,17 @@ pub struct {{ ident_camel }} {
     _bitfield: self::_puroro::bitvec::array::BitArray<[u32; {{ (bits_length + 7) / 8 }}], self::_puroro::bitvec::order::Lsb0>,
 }
 
-pub struct {{ ident_camel }}Owned {
+impl {{ ident_camel }} {
+    {%- for f in fields %}
+    {%- match f.rule %}
+    {%- when FieldRule::Repeated %}
+    {%- else %}
+    // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
+    pub fn {{ f.ident_lsnake }}(&self) -> i32 {
+        todo!()
+    }
+    {%- endmatch %}
+    {%- endfor %} {#- for f in fields #}
 }
 
 pub mod {{ ident_lsnake }} {

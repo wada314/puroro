@@ -18,7 +18,16 @@ pub struct Book {
     _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 0], self::_puroro::bitvec::order::Lsb0>,
 }
 
-pub struct BookOwned {}
+impl Book {
+    // Singular, LengthDelimited(String)
+    pub fn title(&self) -> i32 {
+        todo!()
+    }
+    // Singular, Variant(UInt32)
+    pub fn num_pages(&self) -> i32 {
+        todo!()
+    }
+}
 
 pub mod book {
 
