@@ -66,7 +66,14 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
         if bitvec[BITFIELD_INDEX] {
             self.0.as_ref()
         } else {
-            Default::default()
+            Default::default() // TODO: proto specified default value
         }
+    }
+}
+
+impl<M> FieldType for SingularHeapMessageField<M> {
+    type GetterType<'a> = Option<&'a M> where Self: 'a;
+    fn get_field<B: Index<usize, Output = bool>>(&self, _bitvec: &B) -> Self::GetterType<'_> {
+        self.0.as_deref()
     }
 }
