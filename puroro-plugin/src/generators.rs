@@ -423,11 +423,12 @@ fn enum_rust_type_full_path(e: &EnumDescriptorExt) -> Result<String> {
 
 fn message_rust_type_full_path(m: &DescriptorExt) -> Result<String> {
     let packages_str_opt = m.try_get_package_path_opt()?;
-    let packages_vec = m
-        .try_get_package_path_opt()?
+    let packages_vec = packages_str_opt
+        .as_ref()
         .map(|p| p.split('.'))
         .into_iter()
         .flatten()
+        .map(|s| s.to_string())
         .collect::<Vec<_>>();
     let enclosing_messages = {
         let mut v = m
@@ -438,19 +439,20 @@ fn message_rust_type_full_path(m: &DescriptorExt) -> Result<String> {
     };
     let modules_vec = {
         let mut v = packages_vec;
-        v.extend(enclosing_messages.into_iter().map(|m| m.name()));
+        v.extend(enclosing_messages.into_iter().map(|m| m.name().to_string()));
         // lower snake_nize, escape keywords
         v.into_iter()
-            .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)))
+            .map(|s| get_keyword_safe_ident(&to_lower_snake_case(&s)).into_owned())
             .collect::<Vec<_>>()
     };
+    let ident_camel = get_keyword_safe_ident(&to_camel_case(m.name())).into_owned();
     Ok(if modules_vec.is_empty() {
-        format!("self::_puroro_root::{}", m.ident_camel)
+        format!("self::_puroro_root::{}", ident_camel)
     } else {
         format!(
             "self::_puroro_root::{}::{}",
             modules_vec.into_iter().join("::"),
-            m.ident_camel
+            ident_camel
         )
     })
 }

@@ -350,3 +350,8 @@ impl RcFileOrMessage {
         })
     }
 }
+
+enum MessageOrEnum<M, E> {
+    Message(M),
+    Enum(E),
+}
