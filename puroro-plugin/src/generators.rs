@@ -94,7 +94,7 @@ impl Module {
         let full_path = m
             .try_get_package_path_opt()?
             .into_iter()
-            .chain(m.try_enclosing_messages_path_opt()?.into_iter())
+            .chain(m.try_get_enclosing_messages_path_opt()?.into_iter())
             .join(".");
         let submodules = m
             .nested_type()
@@ -419,4 +419,38 @@ impl Bits64Type {
 
 fn enum_rust_type_full_path(e: &EnumDescriptorExt) -> Result<String> {
     todo!()
+}
+
+fn message_rust_type_full_path(m: &DescriptorExt) -> Result<String> {
+    let packages_str_opt = m.try_get_package_path_opt()?;
+    let packages_vec = m
+        .try_get_package_path_opt()?
+        .map(|p| p.split('.'))
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+    let enclosing_messages = {
+        let mut v = m
+            .try_traverse_enclosing_messages()
+            .collect::<Result<Vec<_>>>()?;
+        v.reverse();
+        v
+    };
+    let modules_vec = {
+        let mut v = packages_vec;
+        v.extend(enclosing_messages.into_iter().map(|m| m.name()));
+        // lower snake_nize, escape keywords
+        v.into_iter()
+            .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)))
+            .collect::<Vec<_>>()
+    };
+    Ok(if modules_vec.is_empty() {
+        format!("self::_puroro_root::{}", m.ident_camel)
+    } else {
+        format!(
+            "self::_puroro_root::{}::{}",
+            modules_vec.into_iter().join("::"),
+            m.ident_camel
+        )
+    })
 }

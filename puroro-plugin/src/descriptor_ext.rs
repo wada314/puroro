@@ -181,7 +181,7 @@ impl DescriptorExt {
         Ok(self.try_get_parent()?.try_get_package_path_opt()?)
     }
 
-    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
+    pub fn try_get_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
         let vec_msgs = self
             .try_traverse_enclosing_messages()
             .collect::<Result<Vec<_>>>()?;
@@ -213,7 +213,7 @@ impl DescriptorExt {
         Ok(self
             .try_get_package_path_opt()?
             .into_iter()
-            .chain(self.try_enclosing_messages_path_opt()?.into_iter())
+            .chain(self.try_get_enclosing_messages_path_opt()?.into_iter())
             .chain(iter::once(self.name().into()))
             .join(".")
             .into())
@@ -248,7 +248,7 @@ impl EnumDescriptorExt {
         Ok(self.try_get_parent()?.try_get_package_path_opt()?)
     }
 
-    pub fn try_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
+    pub fn try_get_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
         let vec_msgs = self
             .try_traverse_enclosing_messages()
             .collect::<Result<Vec<_>>>()?;
@@ -278,7 +278,7 @@ impl EnumDescriptorExt {
 
     pub fn try_fqtn(&self) -> Result<String> {
         let package = self.try_get_package_path_opt()?;
-        let enclosing_messages = self.try_enclosing_messages_path_opt()?;
+        let enclosing_messages = self.try_get_enclosing_messages_path_opt()?;
         Ok(package
             .into_iter()
             .chain(enclosing_messages.into_iter())
