@@ -15,7 +15,7 @@ pub struct Book {
     // Singular, Variant(UInt32)
     num_pages: self::_puroro::internal::field_types::SingularNumericField<i32, ()>,
 
-    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 4], self::_puroro::bitvec::order::Lsb0>,
+    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 0], self::_puroro::bitvec::order::Lsb0>,
 }
 
 pub struct BookOwned {}

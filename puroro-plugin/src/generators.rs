@@ -128,6 +128,7 @@ pub struct Message {
     pub ident_camel: String,
     pub ident_lsnake: String,
     pub fields: Vec<Field>,
+    pub bits_length: usize,
 }
 
 impl Message {
@@ -135,16 +136,18 @@ impl Message {
     pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
         let ident_camel = get_keyword_safe_ident(&to_camel_case(m.name())).into();
         let ident_lsnake = get_keyword_safe_ident(&to_lower_snake_case(m.name())).into();
-        let mut bit_index = 0usize;
+        let mut bits_index = 0usize;
         let fields = m
             .field()
             .into_iter()
-            .map(|f| Field::try_new(f, &mut bit_index, resolver))
+            .map(|f| Field::try_new(f, &mut bits_index, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let bits_length = bits_index;
         Ok(Message {
             ident_camel,
             ident_lsnake,
             fields,
+            bits_length,
         })
     }
 }
