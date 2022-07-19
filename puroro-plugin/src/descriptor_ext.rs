@@ -205,7 +205,7 @@ impl DescriptorExt {
         let either: Either<_, _> = self.try_get_parent().into();
         either
             .map_left(|e| ::std::iter::once(Err(e)))
-            .map_right(|parent| parent.try_traverse_enclosing_messages())
+            .map_right(|parent| parent.try_traverse_self_and_enclosing_messages())
             .into_iter()
     }
 
@@ -272,7 +272,7 @@ impl EnumDescriptorExt {
         let either: Either<_, _> = self.try_get_parent().into();
         either
             .map_left(|e| ::std::iter::once(Err(e)))
-            .map_right(|parent| parent.try_traverse_enclosing_messages())
+            .map_right(|parent| parent.try_traverse_self_and_enclosing_messages())
             .into_iter()
     }
 
@@ -334,7 +334,7 @@ impl RcFileOrMessage {
     }
 
     // returns in inner message to outer message order
-    pub fn try_traverse_enclosing_messages(
+    pub fn try_traverse_self_and_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
         let opt_parent = match self {
@@ -354,4 +354,34 @@ impl RcFileOrMessage {
 enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
+}
+
+impl<M, E> MessageOrEnum<M, E>
+where
+    M: Deref<Target = DescriptorExt>,
+    E: Deref<Target = EnumDescriptorExt>,
+{
+    pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
+        match self {
+            MessageOrEnum::Message(m) => m.try_get_parent(),
+            MessageOrEnum::Enum(e) => e.try_get_parent(),
+        }
+    }
+
+    pub fn try_traverse_enclosing_messages(
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
+        let opt_try_parent = match self.try_get_parent() {
+            Ok(RcFileOrMessage::File(_)) => None,
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent.clone())),
+            Err(e) => Some(Err(e)),
+        };
+        ::std::iter::successors(opt_try_parent, |try_m| {
+            try_m.as_ref().ok().and_then(|m| match m.try_get_parent() {
+                Ok(RcFileOrMessage::File(_)) => None,
+                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+                Err(e) => Some(Err(e)),
+            })
+        })
+    }
 }
