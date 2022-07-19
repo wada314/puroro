@@ -318,6 +318,13 @@ impl<F, M> FileOrMessage<F, M> {
             Message(m) => h(m),
         }
     }
+    pub fn as_ref(&self) -> FileOrMessage<&F, &M> {
+        use FileOrMessage::*;
+        match self {
+            File(f) => File(f),
+            Message(m) => Message(m),
+        }
+    }
 }
 
 impl FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>> {
@@ -359,7 +366,8 @@ where
     M: Deref,
 {
     pub fn as_deref(&self) -> FileOrMessage<&<F as Deref>::Target, &<M as Deref>::Target> {
-        self.map(|f| f.deref(), |m| m.deref())
+        self.as_ref()
+            .map(|f| <F as Deref>::deref(f), |m| <M as Deref>::deref(m))
     }
 }
 
@@ -384,12 +392,10 @@ where
         }
     }
 
-    pub fn try_traverse_enclosing_messages(
-        &self,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
+    pub fn try_traverse_enclosing_messages(&self) -> impl Iterator<Item = Result<&DescriptorExt>> {
         let opt_try_parent = match self.try_get_parent() {
             Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent.clone())),
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent.deref())),
             Err(e) => Some(Err(e)),
         };
         ::std::iter::successors(opt_try_parent, |try_m| {
