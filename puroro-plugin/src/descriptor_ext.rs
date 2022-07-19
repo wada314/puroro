@@ -166,7 +166,12 @@ impl DescriptorExt {
     }
 
     pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
-        Ok(self.try_get_parent()?.try_get_package_path_opt()?)
+        let package = self.try_get_file()?.package();
+        if package.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(package.to_string()))
+        }
     }
 
     pub fn try_get_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
@@ -188,13 +193,11 @@ impl DescriptorExt {
 
     // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
-        &self,
+        self: &Rc<Self>,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let either: Either<_, _> = self.try_get_parent().into();
-        either
-            .map_left(|e| ::std::iter::once(Err(e)))
-            .map_right(|parent| parent.try_traverse_self_and_enclosing_messages())
-            .into_iter()
+        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> =
+            MessageOrEnum::Message(self.clone());
+        m_or_e.try_traverse_enclosing_messages()
     }
 
     pub fn try_fqtn(&self) -> Result<String> {
