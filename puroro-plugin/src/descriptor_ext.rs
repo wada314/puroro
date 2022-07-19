@@ -52,18 +52,6 @@ pub struct FieldDescriptorExt {
     parent: Weak<DescriptorExt>,
 }
 
-#[derive(Debug, Clone)]
-pub enum WeakFileOrMessage {
-    File(Weak<FileDescriptorExt>),
-    Message(Weak<DescriptorExt>),
-}
-
-#[derive(Debug, Clone)]
-pub enum RcFileOrMessage {
-    File(Rc<FileDescriptorExt>),
-    Message(Rc<DescriptorExt>),
-}
-
 impl Deref for FileDescriptorExt {
     type Target = FileDescriptorProto;
     fn deref(&self) -> &Self::Target {
@@ -174,7 +162,7 @@ impl DescriptorExt {
     }
 
     pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
-        self.parent.try_get_file()
+        self.try_get_parent()?.try_get_file()
     }
 
     pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
@@ -302,6 +290,7 @@ impl FieldDescriptorExt {
     }
 }
 
+#[derive(Debug, Clone)]
 enum FileOrMessage<F, M> {
     File(F),
     Message(M),
@@ -341,55 +330,40 @@ impl FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>> {
     }
 }
 
-impl WeakFileOrMessage {
-    pub fn try_upgrade(&self) -> Result<RcFileOrMessage> {
-        Ok(match self {
-            WeakFileOrMessage::File(f) => {
-                RcFileOrMessage::File(Weak::upgrade(f).ok_or(ErrorKind::WeakUpgradeFailure)?)
-            }
-            WeakFileOrMessage::Message(m) => {
-                RcFileOrMessage::Message(Weak::upgrade(m).ok_or(ErrorKind::WeakUpgradeFailure)?)
-            }
-        })
-    }
-
-    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
-        let mut f_or_m = self.try_upgrade()?;
+impl FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>> {
+    pub fn try_get_file(self) -> Result<Rc<FileDescriptorExt>> {
+        use FileOrMessage::*;
+        let mut f_or_m = self;
         loop {
             match f_or_m {
-                RcFileOrMessage::File(f) => break Ok(f.clone()),
-                RcFileOrMessage::Message(m) => f_or_m = m.try_get_parent()?,
+                File(f) => break Ok(f),
+                Message(m) => f_or_m = m.try_get_parent()?,
             }
         }
     }
 }
 
-impl RcFileOrMessage {
-    pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
-        Ok(match self {
-            RcFileOrMessage::File(f) => f.package_opt().map(|s| s.into()),
-            RcFileOrMessage::Message(m) => m.try_get_package_path_opt()?,
-        })
-    }
+impl<F, M> FileOrMessage<F, M>
+where
+    F: Deref<Target = FileDescriptorExt>,
+    M: Deref<Target = DescriptorExt>,
+{
+}
 
-    // returns in inner message to outer message order
-    pub fn try_traverse_self_and_enclosing_messages(
-        &self,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let opt_parent = match self {
-            RcFileOrMessage::File(_) => None,
-            RcFileOrMessage::Message(parent) => Some(Ok(parent.clone())),
-        };
-        ::std::iter::successors(opt_parent, |rm| {
-            rm.as_ref().ok().and_then(|m| match m.try_get_parent() {
-                Ok(RcFileOrMessage::File(_)) => None,
-                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
-                Err(e) => Some(Err(e)),
-            })
-        })
+impl<F, M> FileOrMessage<F, M>
+where
+    F: Deref,
+    M: Deref,
+{
+    pub fn as_deref(&self) -> FileOrMessage<&<F as Deref>::Target, &<M as Deref>::Target> {
+        self.map(|f| f.deref(), |m| m.deref())
     }
 }
 
+type RcFileOrMessage = FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>>;
+type WeakFileOrMessage = FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>>;
+
+#[derive(Debug, Clone)]
 enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
