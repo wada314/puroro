@@ -302,6 +302,45 @@ impl FieldDescriptorExt {
     }
 }
 
+enum FileOrMessage<F, M> {
+    File(F),
+    Message(M),
+}
+
+impl<F, M> FileOrMessage<F, M> {
+    pub fn map<G: FnOnce(F) -> F2, H: FnOnce(M) -> M2, F2, M2>(
+        self,
+        g: G,
+        h: H,
+    ) -> FileOrMessage<F2, M2> {
+        use FileOrMessage::*;
+        match self {
+            File(f) => File(g(f)),
+            Message(m) => Message(h(m)),
+        }
+    }
+    pub fn either<G: FnOnce(F) -> T, H: FnOnce(M) -> T, T>(self, g: G, h: H) -> T {
+        use FileOrMessage::*;
+        match self {
+            File(f) => g(f),
+            Message(m) => h(m),
+        }
+    }
+}
+
+impl FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>> {
+    pub fn try_upgrade(&self) -> Result<FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>>> {
+        Ok(match self {
+            FileOrMessage::File(f) => {
+                FileOrMessage::File(Weak::upgrade(f).ok_or(ErrorKind::WeakUpgradeFailure)?)
+            }
+            FileOrMessage::Message(m) => {
+                FileOrMessage::Message(Weak::upgrade(m).ok_or(ErrorKind::WeakUpgradeFailure)?)
+            }
+        })
+    }
+}
+
 impl WeakFileOrMessage {
     pub fn try_upgrade(&self) -> Result<RcFileOrMessage> {
         Ok(match self {
