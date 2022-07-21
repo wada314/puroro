@@ -414,7 +414,7 @@ impl Bits64Type {
     }
 }
 
-fn enum_rust_type_full_path(e: &EnumDescriptorExt) -> Result<String> {
+fn enum_rust_type_full_path(_e: &EnumDescriptorExt) -> Result<String> {
     todo!()
 }
 

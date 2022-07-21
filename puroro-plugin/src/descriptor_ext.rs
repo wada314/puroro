@@ -166,7 +166,8 @@ impl DescriptorExt {
     }
 
     pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
-        let package = self.try_get_file()?.package();
+        let file = self.try_get_file()?;
+        let package = file.package();
         if package.is_empty() {
             Ok(None)
         } else {
@@ -236,7 +237,13 @@ impl EnumDescriptorExt {
     }
 
     pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
-        Ok(self.try_get_parent()?.try_get_package_path_opt()?)
+        let file = self.try_get_parent()?.try_get_file()?;
+        let package = file.package();
+        if package.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(package.to_string()))
+        }
     }
 
     pub fn try_get_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
@@ -258,10 +265,10 @@ impl EnumDescriptorExt {
 
     // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
-        self: &Rc<Self>,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> =
-            MessageOrEnum::Enum(Rc::clone(&self));
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> + '_ {
+        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, &EnumDescriptorExt> =
+            MessageOrEnum::Enum(self);
         m_or_e.try_traverse_enclosing_messages()
     }
 
@@ -377,8 +384,8 @@ where
     }
 }
 
-type RcFileOrMessage = FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>>;
-type WeakFileOrMessage = FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>>;
+pub type RcFileOrMessage = FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>>;
+pub type WeakFileOrMessage = FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>>;
 
 #[derive(Debug, Clone)]
 enum MessageOrEnum<M, E> {
