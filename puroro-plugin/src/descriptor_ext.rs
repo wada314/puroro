@@ -307,7 +307,7 @@ impl FieldDescriptorExt {
 }
 
 #[derive(Debug, Clone)]
-enum FileOrMessage<F, M> {
+pub enum FileOrMessage<F, M> {
     File(F),
     Message(M),
 }
@@ -388,7 +388,7 @@ pub type RcFileOrMessage = FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt
 pub type WeakFileOrMessage = FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>>;
 
 #[derive(Debug, Clone)]
-enum MessageOrEnum<M, E> {
+pub enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
 }
