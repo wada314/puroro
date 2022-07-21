@@ -17,10 +17,12 @@ use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case, upgrade};
 use crate::Result;
+use ::askama::shared::parser::Target;
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
 use ::std::borrow::Cow;
+use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Template, Debug)]
@@ -419,7 +421,15 @@ fn enum_rust_type_full_path(_e: &EnumDescriptorExt) -> Result<String> {
 }
 
 fn message_rust_type_full_path(m: &DescriptorExt) -> Result<String> {
-    let packages_str_opt = m.try_get_package_path_opt()?;
+    todo!()
+}
+
+fn more_rust_type_full_path<M, E>(more: MessageOrEnum<M, E>) -> Result<String>
+where
+    M: Deref<Target = DescriptorExt>,
+    E: Deref<Target = EnumDescriptorExt>,
+{
+    let packages_str_opt = more.try_get_package_path_opt()?;
     let packages_vec = packages_str_opt
         .as_ref()
         .map(|p| p.split('.'))
@@ -428,7 +438,7 @@ fn message_rust_type_full_path(m: &DescriptorExt) -> Result<String> {
         .map(|s| s.to_string())
         .collect::<Vec<_>>();
     let enclosing_messages = {
-        let mut v = m
+        let mut v = more
             .try_traverse_enclosing_messages()
             .collect::<Result<Vec<_>>>()?;
         v.reverse();
