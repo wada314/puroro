@@ -193,10 +193,10 @@ impl DescriptorExt {
 
     // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
-        self: &Rc<Self>,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> =
-            MessageOrEnum::Message(Rc::clone(&self));
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> + '_ {
+        let m_or_e: MessageOrEnum<&DescriptorExt, Rc<EnumDescriptorExt>> =
+            MessageOrEnum::Message(self);
         m_or_e.try_traverse_enclosing_messages()
     }
 
@@ -262,6 +262,14 @@ impl EnumDescriptorExt {
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
         let m_or_e: MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> =
             MessageOrEnum::Enum(Rc::clone(&self));
+        m_or_e.try_traverse_enclosing_messages()
+    }
+
+    pub fn try_traverse_enclosing_messages2(
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> + '_ {
+        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, &EnumDescriptorExt> =
+            MessageOrEnum::Enum(self);
         m_or_e.try_traverse_enclosing_messages()
     }
 
@@ -389,9 +397,7 @@ where
             MessageOrEnum::Enum(e) => e.try_get_parent(),
         }
     }
-}
 
-impl MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> {
     pub fn try_traverse_enclosing_messages(
         &self,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
