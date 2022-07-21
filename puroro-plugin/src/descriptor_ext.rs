@@ -15,7 +15,7 @@
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
 use crate::{ErrorKind, Result};
-use ::itertools::{Either, Itertools};
+use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
@@ -196,7 +196,7 @@ impl DescriptorExt {
         self: &Rc<Self>,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
         let m_or_e: MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> =
-            MessageOrEnum::Message(self.clone());
+            MessageOrEnum::Message(Rc::clone(&self));
         m_or_e.try_traverse_enclosing_messages()
     }
 
@@ -258,13 +258,11 @@ impl EnumDescriptorExt {
 
     // returns in inner message to outer message order
     pub fn try_traverse_enclosing_messages(
-        &self,
+        self: &Rc<Self>,
     ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let either: Either<_, _> = self.try_get_parent().into();
-        either
-            .map_left(|e| ::std::iter::once(Err(e)))
-            .map_right(|parent| parent.try_traverse_self_and_enclosing_messages())
-            .into_iter()
+        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> =
+            MessageOrEnum::Enum(Rc::clone(&self));
+        m_or_e.try_traverse_enclosing_messages()
     }
 
     pub fn try_fqtn(&self) -> Result<String> {
@@ -391,17 +389,21 @@ where
             MessageOrEnum::Enum(e) => e.try_get_parent(),
         }
     }
+}
 
-    pub fn try_traverse_enclosing_messages(&self) -> impl Iterator<Item = Result<&DescriptorExt>> {
+impl MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>> {
+    pub fn try_traverse_enclosing_messages(
+        &self,
+    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
         let opt_try_parent = match self.try_get_parent() {
             Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent.deref())),
+            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(Rc::clone(&parent))),
             Err(e) => Some(Err(e)),
         };
         ::std::iter::successors(opt_try_parent, |try_m| {
             try_m.as_ref().ok().and_then(|m| match m.try_get_parent() {
                 Ok(RcFileOrMessage::File(_)) => None,
-                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(parent)),
+                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(Rc::clone(&parent))),
                 Err(e) => Some(Err(e)),
             })
         })

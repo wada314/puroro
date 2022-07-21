@@ -324,10 +324,7 @@ impl WireType {
     }
 
     pub fn into_getter_rust_type(&self, is_repeated: bool) -> Cow<'static, str> {
-        use Bits32Type::*;
-        use Bits64Type::*;
         use LengthDelimitedType::*;
-        use VariantType::*;
         use WireType::*;
         if is_repeated {
             todo!()
