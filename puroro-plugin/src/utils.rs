@@ -15,10 +15,31 @@
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
+use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
-use std::borrow::Cow;
+
+enum WordCase2 {
+    CamelCase,
+    LowerSnakeCase,
+    UpperSnakeCase,
+}
+
+pub trait StrExt {
+    fn convert_word_case(&self, case: WordCase2) -> Cow<str>;
+    fn matches_word_case(&self, case: WordCase2) -> bool;
+}
+
+impl<T: AsRef<str>> StrExt for T {
+    fn convert_word_case(&self, case: WordCase2) -> Cow<str> {
+        todo!()
+    }
+
+    fn matches_word_case(&self, case: WordCase2) -> bool {
+        todo!()
+    }
+}
 
 enum WordCase {
     CamelCase,
