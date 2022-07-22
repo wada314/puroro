@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum};
+use super::descriptor_ext::{
+    Context, DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum,
+};
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case, upgrade};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::collections::HashMap;
@@ -112,4 +115,15 @@ pub struct PackageContents {
     pub full_package: String,
     pub subpackages: Vec<String>,
     pub input_files: Vec<Rc<FileDescriptorExt>>,
+}
+
+trait ContextExt {
+    fn get_rust_fqtn_for(&self, name: &str) -> String;
+}
+impl<'a> ContextExt for Context<'a> {
+    fn get_rust_fqtn_for(&self, name: &str) -> String {
+        let enclosing_message_names = self.enclosing_messages().into_iter().map(|m| m.name());
+        let package_names = self.file_packages().chain(enclosing_message_names);
+        todo!()
+    }
 }
