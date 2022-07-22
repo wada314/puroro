@@ -15,7 +15,7 @@
 #![allow(unused)]
 
 use crate::descriptor_ext::FileDescriptorExt;
-use crate::descriptor_resolver::{DescriptorResolver, RcMessageOrEnum};
+use crate::descriptor_resolver::DescriptorResolver;
 use crate::utils::*;
 use crate::{ErrorKind, Result};
 use ::askama::Template;

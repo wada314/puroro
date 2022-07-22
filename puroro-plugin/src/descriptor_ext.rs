@@ -441,6 +441,8 @@ where
     }
 }
 
+pub type RcMessageOrEnum = MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>>;
+
 pub struct Context<'a> {
     file: &'a FileDescriptorExt,
     enclosing_messages: &'a [&'a DescriptorExt],

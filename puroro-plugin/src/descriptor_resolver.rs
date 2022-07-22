@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt};
+use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::collections::HashMap;
@@ -104,12 +104,6 @@ impl<'a> DescriptorResolver {
         dbg!(&self.package_contents);
         self.package_contents.values()
     }
-}
-
-#[derive(Debug, Clone)]
-pub enum RcMessageOrEnum {
-    Message(Rc<DescriptorExt>),
-    Enum(Rc<EnumDescriptorExt>),
 }
 
 #[derive(Debug, Default)]

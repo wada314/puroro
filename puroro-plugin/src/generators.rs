@@ -280,7 +280,6 @@ impl WireType {
         syntax: &str,
         resolver: &DescriptorResolver,
     ) -> Result<WireType> {
-        use crate::descriptor_resolver::RcMessageOrEnum;
         use google::protobuf::field_descriptor_proto::Type::*;
         use Bits32Type::*;
         use Bits64Type::*;
