@@ -402,6 +402,13 @@ where
     M: Deref<Target = DescriptorExt>,
     E: Deref<Target = EnumDescriptorExt>,
 {
+    pub fn name(&self) -> &str {
+        match self {
+            MessageOrEnum::Message(m) => m.name(),
+            MessageOrEnum::Enum(e) => e.name(),
+        }
+    }
+
     pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
         match self {
             MessageOrEnum::Message(m) => m.try_get_parent(),

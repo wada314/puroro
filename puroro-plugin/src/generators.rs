@@ -429,11 +429,11 @@ where
     M: Deref<Target = DescriptorExt>,
     E: Deref<Target = EnumDescriptorExt>,
 {
-    let packages_str = more.try_get_file()?.package();
-    let packages_str_opt = if packages_str.is_empty() {
+    let file = more.try_get_file()?;
+    let packages_str_opt = if file.package().is_empty() {
         None
     } else {
-        Some(packages_str)
+        Some(file.package())
     };
     let packages_vec = packages_str_opt
         .as_ref()
@@ -457,7 +457,7 @@ where
             .map(|s| get_keyword_safe_ident(&to_lower_snake_case(&s)).into_owned())
             .collect::<Vec<_>>()
     };
-    let ident_camel = get_keyword_safe_ident(&to_camel_case(m.name())).into_owned();
+    let ident_camel = get_keyword_safe_ident(&to_camel_case(more.name())).into_owned();
     Ok(if modules_vec.is_empty() {
         format!("self::_puroro_root::{}", ident_camel)
     } else {
