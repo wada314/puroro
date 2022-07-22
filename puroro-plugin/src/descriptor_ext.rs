@@ -452,4 +452,13 @@ impl<'a> Context<'a> {
     pub fn enclosing_messages(&self) -> &[&DescriptorExt] {
         self.enclosing_messages
     }
+
+    pub fn file_packages(&self) -> impl Iterator<Item = &str> {
+        let opt_str = if self.file.package().is_empty() {
+            None
+        } else {
+            Some(self.file.package())
+        };
+        opt_str.map(|s| s.split('.')).into_iter().flatten()
+    }
 }
