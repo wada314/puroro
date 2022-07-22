@@ -440,3 +440,16 @@ where
         })
     }
 }
+
+pub struct Context<'a> {
+    file: &'a FileDescriptorExt,
+    enclosing_messages: &'a [&'a DescriptorExt],
+}
+impl<'a> Context<'a> {
+    pub fn file(&self) -> &FileDescriptorExt {
+        self.file
+    }
+    pub fn enclosing_messages(&self) -> &[&DescriptorExt] {
+        self.enclosing_messages
+    }
+}
