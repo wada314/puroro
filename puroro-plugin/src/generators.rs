@@ -429,7 +429,12 @@ where
     M: Deref<Target = DescriptorExt>,
     E: Deref<Target = EnumDescriptorExt>,
 {
-    let packages_str_opt = more.try_get_package_path_opt()?;
+    let packages_str = more.try_get_file()?.package();
+    let packages_str_opt = if packages_str.is_empty() {
+        None
+    } else {
+        Some(packages_str)
+    };
     let packages_vec = packages_str_opt
         .as_ref()
         .map(|p| p.split('.'))

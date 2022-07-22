@@ -236,6 +236,10 @@ impl EnumDescriptorExt {
         self.parent.try_upgrade()
     }
 
+    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
+        self.try_get_parent()?.try_get_file()
+    }
+
     pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
         let file = self.try_get_parent()?.try_get_file()?;
         let package = file.package();
@@ -402,6 +406,13 @@ where
         match self {
             MessageOrEnum::Message(m) => m.try_get_parent(),
             MessageOrEnum::Enum(e) => e.try_get_parent(),
+        }
+    }
+
+    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
+        match self {
+            MessageOrEnum::Message(m) => m.try_get_file(),
+            MessageOrEnum::Enum(e) => e.try_get_file(),
         }
     }
 
