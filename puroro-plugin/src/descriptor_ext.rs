@@ -116,24 +116,24 @@ impl FileDescriptorExt {
         }
     }
 
-    pub fn all_messages_in_file(
-        &self,
-    ) -> impl Iterator<Item = (&'_ Context<'_>, &'_ DescriptorExt)> {
+    pub fn all_messages_in_file(&self) -> impl Iterator<Item = (Context<'_>, &'_ DescriptorExt)> {
         let mut stack = Vec::new();
         let mut message_path = Vec::new();
         stack.push(self.message_type().into_iter());
         iter::from_fn(move || {
-            let context = Context {
-                file: self,
-                enclosing_messages: &message_path,
-            };
             loop {
                 if let Some(last_iter) = stack.last_mut() {
                     if let Some(next_msg) = last_iter.next() {
                         stack.push(next_msg.nested_type().into_iter());
-                        break Some((todo!(), &next_msg));
+                        message_path.push(&next_msg);
+                        let mut context = Context {
+                            file: self,
+                            enclosing_messages: &message_path,
+                        };
+                        break Some((context, Rc::as_ref(next_msg)));
                     } else {
                         stack.pop();
+                        message_path.pop();
                         continue;
                     }
                 } else {
