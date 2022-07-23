@@ -262,17 +262,17 @@ mod test {
     #[test]
     fn test_case_check() {
         use WordCase2::*;
-        const str1: &'static str = "ThisIsAPen";
-        const str2: &'static str = "this_is_a_pen";
-        const str3: &'static str = "THIS_IS_A_PEN";
-        assert_eq!(true, str1.word_case_matches(CamelCase));
-        assert_eq!(false, str1.word_case_matches(LowerSnakeCase));
-        assert_eq!(false, str1.word_case_matches(UpperSnakeCase));
-        assert_eq!(false, str2.word_case_matches(CamelCase));
-        assert_eq!(true, str2.word_case_matches(LowerSnakeCase));
-        assert_eq!(false, str2.word_case_matches(UpperSnakeCase));
-        assert_eq!(false, str3.word_case_matches(CamelCase));
-        assert_eq!(false, str3.word_case_matches(LowerSnakeCase));
-        assert_eq!(true, str3.word_case_matches(UpperSnakeCase));
+        const STR1: &'static str = "ThisIsAPen";
+        const STR2: &'static str = "this_is_a_pen";
+        const STR3: &'static str = "THIS_IS_A_PEN";
+        assert_eq!(true, STR1.word_case_matches(CamelCase));
+        assert_eq!(false, STR1.word_case_matches(LowerSnakeCase));
+        assert_eq!(false, STR1.word_case_matches(UpperSnakeCase));
+        assert_eq!(false, STR2.word_case_matches(CamelCase));
+        assert_eq!(true, STR2.word_case_matches(LowerSnakeCase));
+        assert_eq!(false, STR2.word_case_matches(UpperSnakeCase));
+        assert_eq!(false, STR3.word_case_matches(CamelCase));
+        assert_eq!(false, STR3.word_case_matches(LowerSnakeCase));
+        assert_eq!(true, STR3.word_case_matches(UpperSnakeCase));
     }
 }
