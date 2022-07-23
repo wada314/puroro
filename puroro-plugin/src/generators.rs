@@ -15,7 +15,7 @@
 use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
-use crate::utils::{upgrade, StrExt as _, WordCase2};
+use crate::utils::{upgrade, StrExt as _};
 use crate::Result;
 use ::askama::shared::parser::Target;
 use ::askama::Template;
@@ -37,11 +37,7 @@ pub struct Module {
 }
 impl Module {
     pub fn try_from_package(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident = p
-            .name
-            .to_word_case(WordCase2::LowerSnakeCase)
-            .escape_rust_keywords()
-            .into();
+        let ident = p.name.to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = p.name.is_empty();
         let full_path = p.full_package.clone();
         let subpackages = p
@@ -95,11 +91,7 @@ impl Module {
     }
 
     pub fn try_from_message(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident = m
-            .name()
-            .to_word_case(WordCase2::LowerSnakeCase)
-            .escape_rust_keywords()
-            .into();
+        let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
         let full_path = m
             .try_get_package_path_opt()?
@@ -144,16 +136,8 @@ pub struct Message {
 impl Message {
     #[allow(unused)]
     pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident_camel = m
-            .name()
-            .to_word_case(WordCase2::CamelCase)
-            .escape_rust_keywords()
-            .into();
-        let ident_lsnake = m
-            .name()
-            .to_word_case(WordCase2::LowerSnakeCase)
-            .escape_rust_keywords()
-            .into();
+        let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
+        let ident_lsnake = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
         let fields = m
             .field()
@@ -201,16 +185,8 @@ impl Field {
     ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
 
-        let ident_camel = f
-            .name()
-            .to_word_case(WordCase2::CamelCase)
-            .escape_rust_keywords()
-            .into();
-        let ident_lsnake = f
-            .name()
-            .to_word_case(WordCase2::LowerSnakeCase)
-            .escape_rust_keywords()
-            .into();
+        let ident_camel = f.name().to_camel_case().escape_rust_keywords().into();
+        let ident_lsnake = f.name().to_lower_snake_case().escape_rust_keywords().into();
         let syntax = f.try_parent()?.try_get_file()?.syntax().to_string();
         let rule = match (syntax.as_str(), f.label(), f.proto3_optional()) {
             ("proto2", LabelOptional | LabelRequired, _) => FieldRule::Optional,
@@ -478,16 +454,12 @@ where
         v.extend(enclosing_messages.into_iter().map(|m| m.name().to_string()));
         // lower snake_nize, escape keywords
         v.into_iter()
-            .map(|s| {
-                s.to_word_case(WordCase2::LowerSnakeCase)
-                    .escape_rust_keywords()
-                    .into_owned()
-            })
+            .map(|s| s.to_lower_snake_case().escape_rust_keywords().into_owned())
             .collect::<Vec<_>>()
     };
     let ident_camel = more
         .name()
-        .to_word_case(WordCase2::CamelCase)
+        .to_camel_case()
         .escape_rust_keywords()
         .into_owned();
     Ok(if modules_vec.is_empty() {

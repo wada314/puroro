@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::{
-    Context, DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum,
-};
-use crate::utils::{StrExt as _};
+use super::descriptor_ext::{Context, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::collections::HashMap;

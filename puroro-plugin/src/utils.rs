@@ -21,30 +21,30 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone, Copy)]
-pub enum WordCase2 {
+enum WordCase {
     CamelCase,
     LowerSnakeCase,
     UpperSnakeCase,
 }
 
 pub trait StrExt {
-    fn to_word_case(&self, case: WordCase2) -> Cow<str>;
-    fn word_case_matches(&self, case: WordCase2) -> bool;
+    fn to_word_case(&self, case: WordCase) -> Cow<str>;
+    fn word_case_matches(&self, case: WordCase) -> bool;
     fn escape_rust_keywords(&self) -> Cow<str>;
 
     fn to_lower_snake_case(&self) -> Cow<str> {
-        self.to_word_case(WordCase2::LowerSnakeCase)
+        self.to_word_case(WordCase::LowerSnakeCase)
     }
     fn to_upper_snake_case(&self) -> Cow<str> {
-        self.to_word_case(WordCase2::UpperSnakeCase)
+        self.to_word_case(WordCase::UpperSnakeCase)
     }
     fn to_camel_case(&self) -> Cow<str> {
-        self.to_word_case(WordCase2::CamelCase)
+        self.to_word_case(WordCase::CamelCase)
     }
 }
 
 impl<T: AsRef<str>> StrExt for T {
-    fn to_word_case(&self, case: WordCase2) -> Cow<str> {
+    fn to_word_case(&self, case: WordCase) -> Cow<str> {
         if self.word_case_matches(case) {
             return Cow::Borrowed(self.as_ref());
         }
@@ -75,7 +75,7 @@ impl<T: AsRef<str>> StrExt for T {
         let words = src_words
             .into_iter()
             .map(|s| match case {
-                WordCase2::CamelCase => s
+                WordCase::CamelCase => s
                     .char_indices()
                     .map(|(i, c)| {
                         if i == 0 {
@@ -85,32 +85,32 @@ impl<T: AsRef<str>> StrExt for T {
                         }
                     })
                     .collect::<String>(),
-                WordCase2::LowerSnakeCase => s.to_ascii_lowercase(),
-                WordCase2::UpperSnakeCase => s.to_ascii_uppercase(),
+                WordCase::LowerSnakeCase => s.to_ascii_lowercase(),
+                WordCase::UpperSnakeCase => s.to_ascii_uppercase(),
             })
             .collect::<Vec<_>>();
         Cow::Owned(match case {
-            WordCase2::CamelCase => words.concat(),
-            WordCase2::LowerSnakeCase => words.join("_"),
-            WordCase2::UpperSnakeCase => words.join("_"),
+            WordCase::CamelCase => words.concat(),
+            WordCase::LowerSnakeCase => words.join("_"),
+            WordCase::UpperSnakeCase => words.join("_"),
         })
     }
 
-    fn word_case_matches(&self, case: WordCase2) -> bool {
+    fn word_case_matches(&self, case: WordCase) -> bool {
         let s = AsRef::<str>::as_ref(self);
         match case {
-            WordCase2::CamelCase => {
+            WordCase::CamelCase => {
                 s.chars().all(|c| c.is_ascii_alphanumeric())
                     && s.chars().next().is_some_and(|c| c.is_ascii_uppercase())
             }
-            WordCase2::LowerSnakeCase => {
+            WordCase::LowerSnakeCase => {
                 s.chars().next().is_some_and(|c| c.is_ascii_lowercase())
                     && s.chars()
                         .all(|c| c == '_' || c.is_ascii_lowercase() || c.is_ascii_digit())
                     && s.split('_')
                         .all(|w| w.chars().next().is_some_and(|c| c.is_ascii_lowercase()))
             }
-            WordCase2::UpperSnakeCase => {
+            WordCase::UpperSnakeCase => {
                 s.chars().next().is_some_and(|c| c.is_ascii_uppercase())
                     && s.chars()
                         .all(|c| c == '_' || c.is_ascii_uppercase() || c.is_ascii_digit())
@@ -153,7 +153,7 @@ where
     let outer_messages = outer_messages.map(|s| {
         format!(
             "_puroro_nested::{}",
-            s.to_word_case(WordCase2::LowerSnakeCase)
+            s.to_word_case(WordCase::LowerSnakeCase)
                 .escape_rust_keywords()
         )
     });
@@ -229,11 +229,11 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
 
 #[cfg(test)]
 mod test {
-    use super::{StrExt, WordCase2};
+    use super::{StrExt, WordCase};
 
     #[test]
     fn test_case_check() {
-        use WordCase2::*;
+        use WordCase::*;
         const STR1: &'static str = "ThisIsAPen";
         const STR2: &'static str = "this_is_a_pen";
         const STR3: &'static str = "THIS_IS_A_PEN";
