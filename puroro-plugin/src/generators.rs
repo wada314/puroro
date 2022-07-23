@@ -17,7 +17,6 @@ use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
 use crate::utils::{upgrade, StrExt as _};
 use crate::Result;
-use ::askama::shared::parser::Target;
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;

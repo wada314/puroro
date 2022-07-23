@@ -21,7 +21,8 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone, Copy)]
-enum WordCase {
+#[allow(unused)]
+pub enum WordCase {
     CamelCase,
     LowerSnakeCase,
     UpperSnakeCase,

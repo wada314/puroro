@@ -39,7 +39,6 @@ use ::std::env;
 use ::std::io::{stdin, stdout, Read};
 use ::std::process::Command;
 use ::std::process::Stdio;
-use utils::StrExt;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
