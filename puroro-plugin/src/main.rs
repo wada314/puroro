@@ -14,6 +14,7 @@
 
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
+#![feature(is_some_with)]
 
 mod descriptor_ext;
 mod descriptor_resolver;

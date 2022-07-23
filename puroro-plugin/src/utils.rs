@@ -20,6 +20,7 @@ use ::std::collections::HashSet;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
+#[derive(Debug, Clone, Copy)]
 enum WordCase2 {
     CamelCase,
     LowerSnakeCase,
@@ -37,7 +38,23 @@ impl<T: AsRef<str>> StrExt for T {
     }
 
     fn matches_word_case(&self, case: WordCase2) -> bool {
-        todo!()
+        let s = AsRef::<str>::as_ref(self);
+        match case {
+            WordCase2::CamelCase => {
+                s.chars().all(|c| c.is_ascii_alphanumeric())
+                    && s.chars().next().is_some_and(|c| c.is_ascii_uppercase())
+            }
+            WordCase2::LowerSnakeCase => {
+                s.chars().next().is_some_and(|c| c.is_ascii_lowercase())
+                    && s.chars()
+                        .all(|c| c == '_' || c.is_ascii_lowercase() || c.is_ascii_digit())
+            }
+            WordCase2::UpperSnakeCase => {
+                s.chars().next().is_some_and(|c| c.is_ascii_uppercase())
+                    && s.chars()
+                        .all(|c| c == '_' || c.is_ascii_uppercase() || c.is_ascii_digit())
+            }
+        }
     }
 }
 
