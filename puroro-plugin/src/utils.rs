@@ -34,7 +34,55 @@ pub trait StrExt {
 
 impl<T: AsRef<str>> StrExt for T {
     fn convert_word_case(&self, case: WordCase2) -> Cow<str> {
-        todo!()
+        if self.matches_word_case(case) {
+            return Cow::Borrowed(self.as_ref());
+        }
+        let src_words = {
+            let mut words = Vec::new();
+            let mut word = String::new();
+            let mut last_char_was_uppercase = false;
+            for c in self.as_ref().chars() {
+                if c == '_' {
+                    words.push(word);
+                    word = String::new();
+                    last_char_was_uppercase = false;
+                } else if c.is_ascii_uppercase() {
+                    if !last_char_was_uppercase {
+                        words.push(word);
+                        word = String::new();
+                    }
+                    word.push(c);
+                    last_char_was_uppercase = true;
+                } else {
+                    word.push(c);
+                    last_char_was_uppercase = false;
+                }
+            }
+            words.push(word);
+            words
+        };
+        let words = src_words
+            .into_iter()
+            .map(|s| match case {
+                WordCase2::CamelCase => s
+                    .char_indices()
+                    .map(|(i, c)| {
+                        if i == 0 {
+                            c.to_ascii_uppercase()
+                        } else {
+                            c.to_ascii_lowercase()
+                        }
+                    })
+                    .collect::<String>(),
+                WordCase2::LowerSnakeCase => s.to_ascii_lowercase(),
+                WordCase2::UpperSnakeCase => s.to_ascii_uppercase(),
+            })
+            .collect::<Vec<_>>();
+        Cow::Owned(match case {
+            WordCase2::CamelCase => words.concat(),
+            WordCase2::LowerSnakeCase => words.join("_"),
+            WordCase2::UpperSnakeCase => words.join("_"),
+        })
     }
 
     fn matches_word_case(&self, case: WordCase2) -> bool {
@@ -48,11 +96,15 @@ impl<T: AsRef<str>> StrExt for T {
                 s.chars().next().is_some_and(|c| c.is_ascii_lowercase())
                     && s.chars()
                         .all(|c| c == '_' || c.is_ascii_lowercase() || c.is_ascii_digit())
+                    && s.split('_')
+                        .all(|w| w.chars().next().is_some_and(|c| c.is_ascii_lowercase()))
             }
             WordCase2::UpperSnakeCase => {
                 s.chars().next().is_some_and(|c| c.is_ascii_uppercase())
                     && s.chars()
                         .all(|c| c == '_' || c.is_ascii_uppercase() || c.is_ascii_digit())
+                    && s.split('_')
+                        .all(|w| w.chars().next().is_some_and(|c| c.is_ascii_uppercase()))
             }
         }
     }
