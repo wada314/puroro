@@ -127,6 +127,19 @@ impl FileDescriptorExt {
                 file: self,
                 enclosing_messages: &message_path,
             };
+            loop {
+                if let Some(last_iter) = stack.last_mut() {
+                    if let Some(next_msg) = last_iter.next() {
+                        stack.push(next_msg.nested_type().into_iter());
+                        break Some((todo!(), &next_msg));
+                    } else {
+                        stack.pop();
+                        continue;
+                    }
+                } else {
+                    break None;
+                }
+            }
         })
     }
 
