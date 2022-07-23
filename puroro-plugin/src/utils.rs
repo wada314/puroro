@@ -28,13 +28,13 @@ enum WordCase2 {
 }
 
 pub trait StrExt {
-    fn convert_word_case(&self, case: WordCase2) -> Cow<str>;
-    fn matches_word_case(&self, case: WordCase2) -> bool;
+    fn to_word_case(&self, case: WordCase2) -> Cow<str>;
+    fn word_case_matches(&self, case: WordCase2) -> bool;
 }
 
 impl<T: AsRef<str>> StrExt for T {
-    fn convert_word_case(&self, case: WordCase2) -> Cow<str> {
-        if self.matches_word_case(case) {
+    fn to_word_case(&self, case: WordCase2) -> Cow<str> {
+        if self.word_case_matches(case) {
             return Cow::Borrowed(self.as_ref());
         }
         let src_words = {
@@ -85,7 +85,7 @@ impl<T: AsRef<str>> StrExt for T {
         })
     }
 
-    fn matches_word_case(&self, case: WordCase2) -> bool {
+    fn word_case_matches(&self, case: WordCase2) -> bool {
         let s = AsRef::<str>::as_ref(self);
         match case {
             WordCase2::CamelCase => {
@@ -253,4 +253,26 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
         .into_iter()
         .map(|b| format!(r"\x{:02x}", b))
         .collect::<String>())
+}
+
+#[cfg(test)]
+mod test {
+    use super::{StrExt, WordCase2};
+
+    #[test]
+    fn test_case_check() {
+        use WordCase2::*;
+        const str1: &'static str = "ThisIsAPen";
+        const str2: &'static str = "this_is_a_pen";
+        const str3: &'static str = "THIS_IS_A_PEN";
+        assert_eq!(true, str1.word_case_matches(CamelCase));
+        assert_eq!(false, str1.word_case_matches(LowerSnakeCase));
+        assert_eq!(false, str1.word_case_matches(UpperSnakeCase));
+        assert_eq!(false, str2.word_case_matches(CamelCase));
+        assert_eq!(true, str2.word_case_matches(LowerSnakeCase));
+        assert_eq!(false, str2.word_case_matches(UpperSnakeCase));
+        assert_eq!(false, str3.word_case_matches(CamelCase));
+        assert_eq!(false, str3.word_case_matches(LowerSnakeCase));
+        assert_eq!(true, str3.word_case_matches(UpperSnakeCase));
+    }
 }
