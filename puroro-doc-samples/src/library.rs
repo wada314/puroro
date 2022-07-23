@@ -33,7 +33,7 @@ impl Book {
     }
 }
 
-pub mod book {
+pub mod _book {
 
     mod _puroro {
         pub use super::super::_puroro::*;

@@ -15,7 +15,7 @@
 use super::descriptor_ext::{
     Context, DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum,
 };
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case, upgrade};
+use crate::utils::{StrExt as _};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::collections::HashMap;

@@ -21,7 +21,7 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone, Copy)]
-enum WordCase2 {
+pub enum WordCase2 {
     CamelCase,
     LowerSnakeCase,
     UpperSnakeCase,
@@ -30,6 +30,7 @@ enum WordCase2 {
 pub trait StrExt {
     fn to_word_case(&self, case: WordCase2) -> Cow<str>;
     fn word_case_matches(&self, case: WordCase2) -> bool;
+    fn escape_rust_keywords(&self) -> Cow<str>;
 }
 
 impl<T: AsRef<str>> StrExt for T {
@@ -106,6 +107,14 @@ impl<T: AsRef<str>> StrExt for T {
                     && s.split('_')
                         .all(|w| w.chars().next().is_some_and(|c| c.is_ascii_uppercase()))
             }
+        }
+    }
+
+    fn escape_rust_keywords(&self) -> Cow<str> {
+        if KEYWORDS.contains(self.as_ref()) {
+            Cow::Owned(format!("r#{}", self.as_ref()))
+        } else {
+            Cow::Borrowed(self.as_ref())
         }
     }
 }
