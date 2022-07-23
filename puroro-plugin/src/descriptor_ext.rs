@@ -22,6 +22,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
+use puroro_protobuf_compiled::google::protobuf::DescriptorProtoTrait;
 
 #[derive(Debug)]
 pub struct FileDescriptorExt {
@@ -113,6 +114,20 @@ impl FileDescriptorExt {
         for m in self.message_type().iter() {
             f = inner(Rc::clone(m), f);
         }
+    }
+
+    pub fn all_messages_in_file(
+        &self,
+    ) -> impl Iterator<Item = (&'_ Context<'_>, &'_ DescriptorExt)> {
+        let mut stack = Vec::new();
+        let mut message_path = Vec::new();
+        stack.push(self.message_type().into_iter());
+        iter::from_fn(move || {
+            let context = Context {
+                file: self,
+                enclosing_messages: &message_path,
+            };
+        })
     }
 
     pub fn for_each_enum<F: FnMut(Rc<EnumDescriptorExt>)>(&self, mut f: F) {
@@ -443,8 +458,10 @@ where
 
 pub type RcMessageOrEnum = MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>>;
 
+#[derive(Debug, Clone)]
 pub struct Context<'a> {
     file: &'a FileDescriptorExt,
+    // root to child order.
     enclosing_messages: &'a [&'a DescriptorExt],
 }
 impl<'a> Context<'a> {
