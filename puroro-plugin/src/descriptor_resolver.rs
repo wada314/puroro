@@ -16,14 +16,12 @@ use super::descriptor_ext::{Context, FileDescriptorExt, RcMessageOrEnum};
 use crate::utils::StrExt;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
-use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::iter;
 use ::std::rc::Rc;
 
 #[derive(Debug)]
 pub struct DescriptorResolver {
-    #[allow(unused)]
     fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
     package_contents: HashMap<String, PackageContents>,
 }
