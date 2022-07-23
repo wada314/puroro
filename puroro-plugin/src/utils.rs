@@ -31,6 +31,16 @@ pub trait StrExt {
     fn to_word_case(&self, case: WordCase2) -> Cow<str>;
     fn word_case_matches(&self, case: WordCase2) -> bool;
     fn escape_rust_keywords(&self) -> Cow<str>;
+
+    fn to_lower_snake_case(&self) -> Cow<str> {
+        self.to_word_case(WordCase2::LowerSnakeCase)
+    }
+    fn to_upper_snake_case(&self) -> Cow<str> {
+        self.to_word_case(WordCase2::UpperSnakeCase)
+    }
+    fn to_camel_case(&self) -> Cow<str> {
+        self.to_word_case(WordCase2::CamelCase)
+    }
 }
 
 impl<T: AsRef<str>> StrExt for T {
@@ -119,46 +129,6 @@ impl<T: AsRef<str>> StrExt for T {
     }
 }
 
-enum WordCase {
-    CamelCase,
-    LowerCase,
-}
-fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase) -> String {
-    let mut word_begins_next = true;
-    let mut last_was_lower_case = true;
-    let mut out = String::new();
-    for (i, c) in input.chars().enumerate() {
-        if c == '_' {
-            word_begins_next = true;
-            last_was_lower_case = false;
-            continue;
-        } else {
-            let word_begins = (last_was_lower_case && c.is_ascii_uppercase()) || word_begins_next;
-            last_was_lower_case = c.is_ascii_lowercase();
-            word_begins_next = false;
-            if word_begins {
-                if generate_snake_case && i != 0 {
-                    out.push('_');
-                }
-                if let WordCase::LowerCase = out_word_case {
-                    out.push(c.to_ascii_lowercase());
-                } else {
-                    out.push(c.to_ascii_uppercase());
-                }
-            } else {
-                out.push(c.to_ascii_lowercase());
-            }
-        }
-    }
-    out
-}
-pub fn to_lower_snake_case(input: &str) -> String {
-    convert_cases(input, true, WordCase::LowerCase)
-}
-pub fn to_camel_case(input: &str) -> String {
-    convert_cases(input, false, WordCase::CamelCase)
-}
-
 lazy_static! {
     static ref KEYWORDS: HashSet<&'static str> = [
         "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn",
@@ -173,26 +143,19 @@ lazy_static! {
     .collect::<HashSet<&'static str>>();
 }
 
-pub fn get_keyword_safe_ident(input: &str) -> Cow<'_, str> {
-    if KEYWORDS.contains(input) {
-        Cow::Owned(format!("r#{}", input))
-    } else {
-        Cow::Borrowed(input)
-    }
-}
-
 pub fn make_module_path<'a, I, J>(package: I, outer_messages: J) -> String
 where
     I: Iterator<Item = &'a str>,
     J: Iterator<Item = &'a str> + Clone,
 {
-    let package = package.map(|s| get_keyword_safe_ident(s));
+    let package = package.map(|s| s.escape_rust_keywords().to_string());
 
     let outer_messages = outer_messages.map(|s| {
-        Cow::Owned(format!(
+        format!(
             "_puroro_nested::{}",
-            get_keyword_safe_ident(&to_lower_snake_case(s))
-        ))
+            s.to_word_case(WordCase2::LowerSnakeCase)
+                .escape_rust_keywords()
+        )
     });
     let mut modules_iter = iter::once("self".into())
         .chain(iter::once("_puroro_root".into()))

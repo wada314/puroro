@@ -39,6 +39,7 @@ use ::std::env;
 use ::std::io::{stdin, stdout, Read};
 use ::std::process::Command;
 use ::std::process::Stdio;
+use utils::StrExt;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
@@ -47,11 +48,7 @@ fn package_to_filename(package: &str) -> String {
     if package.is_empty() {
         "lib.rs".to_string()
     } else {
-        package
-            .split('.')
-            .map(|f| utils::get_keyword_safe_ident(f))
-            .join("/")
-            + ".rs"
+        package.split('.').join("/") + ".rs"
     }
 }
 
