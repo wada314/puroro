@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::{Context, FileDescriptorExt, RcMessageOrEnum};
+use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum};
 use crate::utils::StrExt;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -115,21 +115,10 @@ pub struct PackageContents {
     pub input_files: Vec<Rc<FileDescriptorExt>>,
 }
 
-trait ContextExt {
-    fn get_rust_fqtn_for_item(&self, item_name: &str) -> String;
-}
-impl<'a> ContextExt for Context<'a> {
-    fn get_rust_fqtn_for_item(&self, item_name: &str) -> String {
-        let enclosing_message_names = self.enclosing_messages().into_iter().map(|m| m.name());
-        let package_names = self.file_packages().chain(enclosing_message_names);
-        let module_names =
-            package_names.map(|s| s.to_lower_snake_case().escape_rust_keywords().to_string());
-        let rust_item_name = item_name.to_camel_case().escape_rust_keywords().to_string();
-        ["self", "_puroro_root"]
-            .into_iter()
-            .map_into()
-            .chain(module_names)
-            .chain(iter::once(rust_item_name))
-            .join("::")
-    }
+fn visit_messages_and_enums<VM, VE>(file: &FileDescriptorExt, visit_message: VM, visit_enum: VE)
+where
+    VM: FnMut(&DescriptorExt, &[&DescriptorExt]),
+    VE: FnMut(&EnumDescriptorExt, &[&DescriptorExt]),
+{
+    todo!()
 }

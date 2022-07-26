@@ -116,33 +116,6 @@ impl FileDescriptorExt {
         }
     }
 
-    pub fn all_messages_in_file(&self) -> impl Iterator<Item = (Context<'_>, &'_ DescriptorExt)> {
-        let mut stack = Vec::new();
-        let mut message_path = Vec::new();
-        stack.push(self.message_type().into_iter());
-        iter::from_fn(move || {
-            loop {
-                if let Some(last_iter) = stack.last_mut() {
-                    if let Some(next_msg) = last_iter.next() {
-                        stack.push(next_msg.nested_type().into_iter());
-                        message_path.push(&next_msg);
-                        let mut context = Context {
-                            file: self,
-                            enclosing_messages: &message_path,
-                        };
-                        break Some((context, Rc::as_ref(next_msg)));
-                    } else {
-                        stack.pop();
-                        message_path.pop();
-                        continue;
-                    }
-                } else {
-                    break None;
-                }
-            }
-        })
-    }
-
     pub fn for_each_enum<F: FnMut(Rc<EnumDescriptorExt>)>(&self, mut f: F) {
         fn inner<F: FnMut(Rc<EnumDescriptorExt>)>(m: Rc<DescriptorExt>, mut f: F) -> F {
             for e in m.enum_type().iter() {
@@ -470,27 +443,3 @@ where
 }
 
 pub type RcMessageOrEnum = MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>>;
-
-#[derive(Debug, Clone)]
-pub struct Context<'a> {
-    file: &'a FileDescriptorExt,
-    // root to child order.
-    enclosing_messages: &'a [&'a DescriptorExt],
-}
-impl<'a> Context<'a> {
-    pub fn file(&self) -> &FileDescriptorExt {
-        self.file
-    }
-    pub fn enclosing_messages(&self) -> &[&DescriptorExt] {
-        self.enclosing_messages
-    }
-
-    pub fn file_packages(&self) -> impl Iterator<Item = &str> {
-        let opt_str = if self.file.package().is_empty() {
-            None
-        } else {
-            Some(self.file.package())
-        };
-        opt_str.map(|s| s.split('.')).into_iter().flatten()
-    }
-}
