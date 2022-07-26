@@ -120,5 +120,6 @@ where
     VM: FnMut(&DescriptorExt, &[&DescriptorExt]),
     VE: FnMut(&EnumDescriptorExt, &[&DescriptorExt]),
 {
+    let mut path = Vec::new();
     todo!()
 }
