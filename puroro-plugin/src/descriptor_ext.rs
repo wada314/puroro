@@ -376,6 +376,30 @@ where
     F: Deref<Target = FileDescriptorExt>,
     M: Deref<Target = DescriptorExt>,
 {
+    pub fn messages_and_enums(
+        &self,
+    ) -> impl Iterator<Item = MessageOrEnum<&DescriptorExt, &EnumDescriptorExt>> {
+        match self {
+            FileOrMessage::File(f) => {
+                let messages = FileDescriptorProto::message_type(f)
+                    .into_iter()
+                    .map(|m| MessageOrEnum::Message(m));
+                let enums = FileDescriptorProto::enum_type(f)
+                    .into_iter()
+                    .map(|e| MessageOrEnum::Enum(e));
+                messages.chain(enums)
+            }
+            FileOrMessage::Message(m) => {
+                let messages = DescriptorProto::nested_type(m)
+                    .into_iter()
+                    .map(|m| MessageOrEnum::Message(m));
+                let enums = DescriptorProto::enum_type(m)
+                    .into_iter()
+                    .map(|e| MessageOrEnum::Enum(e));
+                messages.chain(enums)
+            }
+        }
+    }
 }
 
 impl<F, M> FileOrMessage<F, M>
