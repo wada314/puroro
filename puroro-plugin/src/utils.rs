@@ -228,6 +228,29 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
         .collect::<String>())
 }
 
+pub struct Package(Vec<String>);
+
+impl Package {
+    pub fn new<S: AsRef<str>>(package_str: S) -> Self {
+        Self(
+            package_str
+                .as_ref()
+                .split('.')
+                .map(|s| s.to_string())
+                .collect(),
+        )
+    }
+
+    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (String, &str)> {
+        self.0.iter().scan("".to_string(), |path, package| {
+            let return_path = path.clone();
+            path.push('.');
+            path.push_str(&package);
+            (return_path, &package)
+        })
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::{StrExt, WordCase};
