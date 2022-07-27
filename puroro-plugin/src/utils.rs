@@ -228,28 +228,27 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
         .collect::<String>())
 }
 
-pub struct Package(Vec<String>);
+pub struct Package<S>(S);
 
-impl Package {
-    pub fn new<S: AsRef<str>>(package_str: S) -> Self {
-        Self(
-            package_str
-                .as_ref()
-                .split('.')
-                .map(|s| s.to_string())
-                .collect(),
-        )
+impl<S> Package<S> {
+    pub fn new(package_str: S) -> Self {
+        Self(package_str)
     }
+}
 
+impl<S: AsRef<str>> Package<S> {
     pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (String, &str)> {
-        self.0.iter().scan("".to_string(), |path, package| {
-            let return_path = path.clone();
-            if !path.is_empty() {
-                path.push('.');
-            }
-            path.push_str(&package);
-            Some((return_path, package.as_str()))
-        })
+        self.0
+            .as_ref()
+            .split('.')
+            .scan("".to_string(), |path, package| {
+                let return_path = path.clone();
+                if !path.is_empty() {
+                    path.push('.');
+                }
+                path.push_str(&package);
+                Some((return_path, package))
+            })
     }
 }
 
