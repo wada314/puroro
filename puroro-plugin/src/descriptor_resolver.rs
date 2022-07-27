@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::MessageOrEnum;
+use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -33,29 +33,28 @@ impl<'a> DescriptorResolver<'a> {
         let mut fqtn_to_desc_map = HashMap::new();
         let mut package_contents: HashMap<_, PackageContents> = HashMap::new();
         for f in file_descriptors_iter {
-            // package_contents
-            let package_iter = f.package().split('.');
-            let mut cur_package_vec: Vec<String> = Vec::new();
-            for subpackage in package_iter {
-                let cur_package_string = cur_package_vec.iter().join(".");
+            // package_contents for parent packages
+            for (cur_package, subpackage) in f.package_ext().packages_and_subpackages() {
                 let item = package_contents
-                    .entry(cur_package_string.clone())
+                    .entry(cur_package.clone())
                     .or_insert_with(|| PackageContents {
-                        name: cur_package_vec.last().cloned().unwrap_or_default(),
-                        full_package: cur_package_string.clone(),
+                        name: cur_package
+                            .rsplit_once('.')
+                            .map_or(String::default(), |(_, name)| name.to_string()),
+                        full_package: cur_package.clone(),
                         subpackages: Vec::new(),
                         input_files: Vec::new(),
                     });
                 item.subpackages.push(subpackage.to_string());
-                cur_package_vec.push(subpackage.to_string());
             }
 
-            let last_package_string = cur_package_vec.iter().join(".");
-            let term_item = package_contents
-                .entry(last_package_string.clone())
-                .or_default();
-            term_item.name = cur_package_vec.last().cloned().unwrap_or_default();
-            term_item.full_package = last_package_string;
+            // package_contents for the leaf package
+            let term_item = package_contents.entry(f.package().to_string()).or_default();
+            term_item.name = f
+                .package()
+                .rsplit_once('.')
+                .map_or(String::default(), |(_, name)| name.to_string());
+            term_item.full_package = f.package().to_string();
             term_item.input_files.push(f);
         }
         Ok(Self {
