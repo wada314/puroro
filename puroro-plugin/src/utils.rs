@@ -244,16 +244,18 @@ impl Package {
     pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (String, &str)> {
         self.0.iter().scan("".to_string(), |path, package| {
             let return_path = path.clone();
-            path.push('.');
+            if !path.is_empty() {
+                path.push('.');
+            }
             path.push_str(&package);
-            (return_path, &package)
+            Some((return_path, package.as_str()))
         })
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::{StrExt, WordCase};
+    use super::{Package, StrExt, WordCase};
 
     #[test]
     fn test_case_check() {
@@ -270,5 +272,15 @@ mod test {
         assert_eq!(false, STR3.word_case_matches(CamelCase));
         assert_eq!(false, STR3.word_case_matches(LowerSnakeCase));
         assert_eq!(true, STR3.word_case_matches(UpperSnakeCase));
+    }
+
+    #[test]
+    fn test_subpackages() {
+        let package = Package::new("foo.bar.baz");
+        let mut iter = package.packages_and_subpackages();
+        assert_eq!(Some(("".to_string(), "foo")), iter.next());
+        assert_eq!(Some(("foo".to_string(), "bar")), iter.next());
+        assert_eq!(Some(("foo.bar".to_string(), "baz")), iter.next());
+        assert_eq!(None, iter.next());
     }
 }

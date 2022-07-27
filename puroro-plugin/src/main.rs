@@ -23,7 +23,6 @@ mod generators;
 mod utils;
 
 use self::generators::Module;
-use crate::descriptor_ext::FileDescriptorExt;
 use crate::descriptor_resolver::DescriptorResolver;
 use ::askama::Template as _;
 use ::itertools::Itertools;
@@ -83,12 +82,8 @@ fn format_rust_file(input: &str) -> Option<String> {
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
 
-    let input_files_ext = cgreq
-        .proto_file()
-        .iter()
-        .map(|f| FileDescriptorExt::new(f))
-        .collect_vec();
-    let resolver = DescriptorResolver::new(input_files_ext.iter().cloned())?;
+    let input_files = cgreq.proto_file();
+    let resolver = DescriptorResolver::new(input_files.iter())?;
 
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;

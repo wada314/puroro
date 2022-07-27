@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::*;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
-use crate::utils::{upgrade, StrExt as _};
+use crate::utils::{StrExt as _};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
 use ::std::borrow::Cow;
-use ::std::ops::Deref;
-use ::std::rc::{Rc, Weak};
+use google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
+};
 
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
@@ -89,14 +89,10 @@ impl Module {
         })
     }
 
-    pub fn try_from_message(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_from_message(m: &DescriptorProto, resolver: &DescriptorResolver) -> Result<Self> {
         let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
-        let full_path = m
-            .try_get_package_path_opt()?
-            .into_iter()
-            .chain(m.try_get_enclosing_messages_path_opt()?.into_iter())
-            .join(".");
+        let full_path = todo!();
         let submodules = m
             .nested_type()
             .into_iter()
@@ -134,7 +130,7 @@ pub struct Message {
 
 impl Message {
     #[allow(unused)]
-    pub fn try_new(m: &DescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(m: &DescriptorProto, resolver: &DescriptorResolver) -> Result<Self> {
         let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
@@ -161,7 +157,7 @@ pub struct Enum {
 
 impl Enum {
     #[allow(unused)]
-    pub fn try_new(e: &EnumDescriptorExt, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(e: &EnumDescriptorProto, resolver: &DescriptorResolver) -> Result<Self> {
         todo!()
     }
 }
@@ -178,7 +174,7 @@ pub struct Field {
 
 impl Field {
     pub fn try_new(
-        f: &FieldDescriptorExt,
+        f: &FieldDescriptorProto,
         bit_index: &mut usize,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
@@ -186,7 +182,7 @@ impl Field {
 
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = f.name().to_lower_snake_case().escape_rust_keywords().into();
-        let syntax = f.try_parent()?.try_get_file()?.syntax().to_string();
+        let syntax: String = todo!();
         let rule = match (syntax.as_str(), f.label(), f.proto3_optional()) {
             ("proto2", LabelOptional | LabelRequired, _) => FieldRule::Optional,
             ("proto3", LabelOptional, false) => FieldRule::Singular,
@@ -233,10 +229,9 @@ impl Field {
             }
             (
                 FieldRule::Optional | FieldRule::Singular,
-                WireType::LengthDelimited(LengthDelimitedType::Message(weak_m)),
+                WireType::LengthDelimited(LengthDelimitedType::Message),
             ) => {
-                let m = upgrade(weak_m)?;
-                format!("SingularHeapMessageField<{}>", m.name())
+                format!("SingularHeapMessageField<{}>", todo!())
             }
             _ => format!(""),
         };
@@ -294,18 +289,7 @@ impl WireType {
             TypeUint64 => Variant(UInt64),
             TypeSint64 => Variant(SInt64),
             TypeBool => Variant(Bool),
-            TypeEnum => match resolver.fqtn_to_desc_or_err(type_name)? {
-                RcMessageOrEnum::Message(_) => Err(ErrorKind::FqtnNotFound {
-                    fqtn: type_name.to_string(),
-                })?,
-                RcMessageOrEnum::Enum(e) => Variant(match syntax {
-                    "proto2" => Enum2(Rc::downgrade(&e)),
-                    "proto3" => Enum3(Rc::downgrade(&e)),
-                    _ => Err(ErrorKind::UnknownProtoSyntax {
-                        name: syntax.to_string(),
-                    })?,
-                }),
-            },
+            TypeEnum => todo!(),
             TypeFixed32 => Bits32(Fixed32),
             TypeSfixed32 => Bits32(SFixed32),
             TypeFloat => Bits32(Float),
@@ -315,12 +299,7 @@ impl WireType {
             TypeString => LengthDelimited(String),
             TypeBytes => LengthDelimited(Bytes),
             TypeGroup => Err(ErrorKind::GroupNotSupported)?,
-            TypeMessage => match resolver.fqtn_to_desc_or_err(type_name)? {
-                RcMessageOrEnum::Message(m) => LengthDelimited(Message(Rc::downgrade(&m))),
-                RcMessageOrEnum::Enum(_) => Err(ErrorKind::FqtnNotFound {
-                    fqtn: type_name.to_string(),
-                })?,
-            },
+            TypeMessage => todo!(),
         })
     }
 
@@ -334,7 +313,7 @@ impl WireType {
                 Variant(v) => v.into_owned_rust_type(),
                 LengthDelimited(String) => "&str".into(),
                 LengthDelimited(Bytes) => "&[u8]".into(),
-                LengthDelimited(Message(_)) => todo!(),
+                LengthDelimited(Message) => todo!(),
                 Bits32(b) => b.into_owned_rust_type(),
                 Bits64(b) => b.into_owned_rust_type(),
             }
@@ -351,8 +330,8 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(Weak<EnumDescriptorExt>),
-    Enum3(Weak<EnumDescriptorExt>),
+    Enum2,
+    Enum3,
 }
 
 impl VariantType {
@@ -366,8 +345,8 @@ impl VariantType {
             UInt64 => "u64".into(),
             SInt64 => "i64".into(),
             Bool => "bool".into(),
-            Enum2(_) => todo!(),
-            Enum3(_) => todo!(),
+            Enum2 => todo!(),
+            Enum3 => todo!(),
         }
     }
 }
@@ -376,7 +355,7 @@ impl VariantType {
 pub enum LengthDelimitedType {
     String,
     Bytes,
-    Message(Weak<DescriptorExt>),
+    Message,
 }
 
 #[derive(Debug, Clone)]
@@ -413,61 +392,4 @@ impl Bits64Type {
             Double => "f64".into(),
         }
     }
-}
-
-fn enum_rust_type_full_path(_e: &EnumDescriptorExt) -> Result<String> {
-    todo!()
-}
-
-fn message_rust_type_full_path(m: &DescriptorExt) -> Result<String> {
-    todo!()
-}
-
-fn more_rust_type_full_path<M, E>(more: MessageOrEnum<M, E>) -> Result<String>
-where
-    M: Deref<Target = DescriptorExt>,
-    E: Deref<Target = EnumDescriptorExt>,
-{
-    let file = more.try_get_file()?;
-    let packages_str_opt = if file.package().is_empty() {
-        None
-    } else {
-        Some(file.package())
-    };
-    let packages_vec = packages_str_opt
-        .as_ref()
-        .map(|p| p.split('.'))
-        .into_iter()
-        .flatten()
-        .map(|s| s.to_string())
-        .collect::<Vec<_>>();
-    let enclosing_messages = {
-        let mut v = more
-            .try_traverse_enclosing_messages()
-            .collect::<Result<Vec<_>>>()?;
-        v.reverse();
-        v
-    };
-    let modules_vec = {
-        let mut v = packages_vec;
-        v.extend(enclosing_messages.into_iter().map(|m| m.name().to_string()));
-        // lower snake_nize, escape keywords
-        v.into_iter()
-            .map(|s| s.to_lower_snake_case().escape_rust_keywords().into_owned())
-            .collect::<Vec<_>>()
-    };
-    let ident_camel = more
-        .name()
-        .to_camel_case()
-        .escape_rust_keywords()
-        .into_owned();
-    Ok(if modules_vec.is_empty() {
-        format!("self::_puroro_root::{}", ident_camel)
-    } else {
-        format!(
-            "self::_puroro_root::{}::{}",
-            modules_vec.into_iter().join("::"),
-            ident_camel
-        )
-    })
 }

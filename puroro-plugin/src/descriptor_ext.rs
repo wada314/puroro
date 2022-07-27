@@ -14,14 +14,10 @@
 
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
-use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
-use ::std::iter;
-use ::std::ops::Deref;
-use ::std::rc::{Rc, Weak};
+use ::std::fmt::Debug;
 
 pub trait FileDescriptorExt {}
 
@@ -39,7 +35,7 @@ pub trait FieldDescriptorExt {}
 
 impl FieldDescriptorExt for FieldDescriptorProto {}
 
-pub trait FileOrMessage {
+pub trait FileOrMessage: Debug {
     fn messages(&self) -> &[DescriptorProto];
     fn enums(&self) -> &[EnumDescriptorProto];
 }
@@ -62,7 +58,7 @@ impl FileOrMessage for DescriptorProto {
     }
 }
 
-pub trait MessageOrEnum {
+pub trait MessageOrEnum: Debug {
     fn name(&self) -> &str;
 }
 
