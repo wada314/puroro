@@ -38,7 +38,7 @@ impl<'a> DescriptorResolver<'a> {
                 let item = package_contents
                     .entry(cur_package.clone())
                     .or_insert_with(|| PackageContents {
-                        name: cur_package
+                        package_name: cur_package
                             .rsplit_once('.')
                             .map_or(String::default(), |(_, name)| name.to_string()),
                         full_package: cur_package.clone(),
@@ -50,7 +50,7 @@ impl<'a> DescriptorResolver<'a> {
 
             // package_contents for the leaf package
             let term_item = package_contents.entry(f.package().to_string()).or_default();
-            term_item.name = f
+            term_item.package_name = f
                 .package()
                 .rsplit_once('.')
                 .map_or(String::default(), |(_, name)| name.to_string());
@@ -84,7 +84,7 @@ impl<'a> DescriptorResolver<'a> {
 
 #[derive(Debug, Default)]
 pub struct PackageContents<'a> {
-    pub name: String,
+    pub package_name: String,
     pub full_package: String,
     pub subpackages: Vec<String>,
     pub input_files: Vec<&'a FileDescriptorProto>,

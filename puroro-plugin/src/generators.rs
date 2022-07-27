@@ -14,7 +14,7 @@
 
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
-use crate::utils::{StrExt as _};
+use crate::utils::StrExt as _;
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -36,8 +36,12 @@ pub struct Module {
 }
 impl Module {
     pub fn try_from_package(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident = p.name.to_lower_snake_case().escape_rust_keywords().into();
-        let is_root_package = p.name.is_empty();
+        let ident = p
+            .package_name
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .into();
+        let is_root_package = p.package_name.is_empty();
         let full_path = p.full_package.clone();
         let subpackages = p
             .subpackages
