@@ -22,7 +22,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
-use puroro_protobuf_compiled::google::protobuf::DescriptorProtoTrait;
+use puroro_protobuf_compiled::google::protobuf::{DescriptorProtoTrait, FileDescriptorProtoTrait};
 
 #[derive(Debug)]
 pub struct FileDescriptorExt {
@@ -379,26 +379,20 @@ where
     pub fn messages_and_enums(
         &self,
     ) -> impl Iterator<Item = MessageOrEnum<&DescriptorExt, &EnumDescriptorExt>> {
-        match self {
-            FileOrMessage::File(f) => {
-                let messages = FileDescriptorProto::message_type(f)
-                    .into_iter()
-                    .map(|m| MessageOrEnum::Message(m));
-                let enums = FileDescriptorProto::enum_type(f)
-                    .into_iter()
-                    .map(|e| MessageOrEnum::Enum(e));
-                messages.chain(enums)
-            }
-            FileOrMessage::Message(m) => {
-                let messages = DescriptorProto::nested_type(m)
-                    .into_iter()
-                    .map(|m| MessageOrEnum::Message(m));
-                let enums = DescriptorProto::enum_type(m)
-                    .into_iter()
-                    .map(|e| MessageOrEnum::Enum(e));
-                messages.chain(enums)
-            }
-        }
+        let (messages, enums) = match self {
+            FileOrMessage::File(f) => (
+                FileDescriptorProto::message_type(f),
+                FileDescriptorProto::enum_type(f),
+            ),
+            FileOrMessage::Message(m) => (
+                DescriptorProto::nested_type(m),
+                DescriptorProto::enum_type(m),
+            ),
+        };
+        let m_iter = messages.into_iter().map(|m| MessageOrEnum::Message(m));
+        let e_iter = enums.into_iter().map(|e| MessageOrEnum::Enum(e));
+
+        m_iter.chain(e_iter)
     }
 }
 
