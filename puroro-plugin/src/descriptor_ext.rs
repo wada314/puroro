@@ -22,442 +22,58 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
-use puroro_protobuf_compiled::google::protobuf::{DescriptorProtoTrait, FileDescriptorProtoTrait};
 
-#[derive(Debug)]
-pub struct FileDescriptorExt {
-    proto: FileDescriptorProto,
-    message_type: Vec<Rc<DescriptorExt>>,
-    enum_type: Vec<Rc<EnumDescriptorExt>>,
+pub trait FileDescriptorExt {}
+
+impl FileDescriptorExt for FileDescriptorProto {}
+
+pub trait DescriptorExt {}
+
+impl DescriptorExt for DescriptorProto {}
+
+pub trait EnumDescriptorExt {}
+
+impl EnumDescriptorExt for EnumDescriptorProto {}
+
+pub trait FieldDescriptorExt {}
+
+impl FieldDescriptorExt for FieldDescriptorProto {}
+
+pub trait FileOrMessage {
+    fn messages(&self) -> &[DescriptorProto];
+    fn enums(&self) -> &[EnumDescriptorProto];
 }
 
-#[derive(Debug)]
-pub struct DescriptorExt {
-    proto: DescriptorProto,
-    parent: WeakFileOrMessage,
-    nested_type: Vec<Rc<DescriptorExt>>,
-    enum_type: Vec<Rc<EnumDescriptorExt>>,
-    field: Vec<Rc<FieldDescriptorExt>>,
-}
-
-#[derive(Debug)]
-pub struct EnumDescriptorExt {
-    proto: EnumDescriptorProto,
-    parent: WeakFileOrMessage,
-}
-
-#[derive(Debug)]
-pub struct FieldDescriptorExt {
-    proto: FieldDescriptorProto,
-    #[allow(unused)]
-    parent: Weak<DescriptorExt>,
-}
-
-impl Deref for FileDescriptorExt {
-    type Target = FileDescriptorProto;
-    fn deref(&self) -> &Self::Target {
-        &self.proto
+impl FileOrMessage for FileDescriptorProto {
+    fn messages(&self) -> &[DescriptorProto] {
+        self.message_type()
     }
-}
-impl Deref for DescriptorExt {
-    type Target = DescriptorProto;
-    fn deref(&self) -> &Self::Target {
-        &self.proto
-    }
-}
-impl Deref for EnumDescriptorExt {
-    type Target = EnumDescriptorProto;
-    fn deref(&self) -> &Self::Target {
-        &self.proto
-    }
-}
-impl Deref for FieldDescriptorExt {
-    type Target = FieldDescriptorProto;
-    fn deref(&self) -> &Self::Target {
-        &self.proto
+    fn enums(&self) -> &[EnumDescriptorProto] {
+        self.enum_type()
     }
 }
 
-impl FileDescriptorExt {
-    pub fn new(source: &FileDescriptorProto) -> Rc<Self> {
-        Rc::new_cyclic(|this| Self {
-            proto: source.clone(),
-            message_type: source
-                .message_type()
-                .iter()
-                .map(|m| DescriptorExt::new(m, WeakFileOrMessage::File(this.clone())))
-                .collect(),
-            enum_type: source
-                .enum_type()
-                .iter()
-                .map(|e| EnumDescriptorExt::new(e, WeakFileOrMessage::File(this.clone())))
-                .collect(),
-        })
+impl FileOrMessage for DescriptorProto {
+    fn messages(&self) -> &[DescriptorProto] {
+        self.nested_type()
     }
-
-    pub fn message_type(&self) -> &[Rc<DescriptorExt>] {
-        &self.message_type
-    }
-
-    pub fn enum_type(&self) -> &[Rc<EnumDescriptorExt>] {
-        &self.enum_type
-    }
-
-    pub fn for_each_message<F: FnMut(Rc<DescriptorExt>)>(&self, mut f: F) {
-        fn inner<F: FnMut(Rc<DescriptorExt>)>(m: Rc<DescriptorExt>, mut f: F) -> F {
-            f(Rc::clone(&m));
-            for mm in m.nested_type().iter() {
-                f = inner(Rc::clone(mm), f);
-            }
-            f
-        }
-        for m in self.message_type().iter() {
-            f = inner(Rc::clone(m), f);
-        }
-    }
-
-    pub fn for_each_enum<F: FnMut(Rc<EnumDescriptorExt>)>(&self, mut f: F) {
-        fn inner<F: FnMut(Rc<EnumDescriptorExt>)>(m: Rc<DescriptorExt>, mut f: F) -> F {
-            for e in m.enum_type().iter() {
-                f(Rc::clone(e));
-            }
-            for mm in m.nested_type().iter() {
-                f = inner(Rc::clone(mm), f);
-            }
-            f
-        }
-        for e in self.enum_type().iter() {
-            f(Rc::clone(e));
-        }
-        for m in self.message_type().iter() {
-            f = inner(Rc::clone(m), f);
-        }
+    fn enums(&self) -> &[EnumDescriptorProto] {
+        self.enum_type()
     }
 }
 
-impl DescriptorExt {
-    pub fn new(source: &DescriptorProto, parent: WeakFileOrMessage) -> Rc<Self> {
-        Rc::new_cyclic(|this| Self {
-            proto: source.clone(),
-            parent: parent.clone(),
-            nested_type: source
-                .nested_type()
-                .iter()
-                .map(|nm| DescriptorExt::new(nm, WeakFileOrMessage::Message(this.clone())))
-                .collect(),
-            enum_type: source
-                .enum_type()
-                .iter()
-                .map(|e| EnumDescriptorExt::new(e, WeakFileOrMessage::Message(this.clone())))
-                .collect(),
-            field: source
-                .field()
-                .iter()
-                .map(|f| FieldDescriptorExt::new(f, this.clone()))
-                .collect(),
-        })
-    }
+pub trait MessageOrEnum {
+    fn name(&self) -> &str;
+}
 
-    pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
-        self.parent.try_upgrade()
-    }
-
-    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
-        self.try_get_parent()?.try_get_file()
-    }
-
-    pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
-        let file = self.try_get_file()?;
-        let package = file.package();
-        if package.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(package.to_string()))
-        }
-    }
-
-    pub fn try_get_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
-        let vec_msgs = self
-            .try_traverse_enclosing_messages()
-            .collect::<Result<Vec<_>>>()?;
-        if vec_msgs.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(
-                vec_msgs
-                    .into_iter()
-                    .rev()
-                    .map(|m| m.name().to_string())
-                    .join("."),
-            ))
-        }
-    }
-
-    // returns in inner message to outer message order
-    pub fn try_traverse_enclosing_messages(
-        &self,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> + '_ {
-        let m_or_e: MessageOrEnum<&DescriptorExt, Rc<EnumDescriptorExt>> =
-            MessageOrEnum::Message(self);
-        m_or_e.try_traverse_enclosing_messages()
-    }
-
-    pub fn try_fqtn(&self) -> Result<String> {
-        Ok(self
-            .try_get_package_path_opt()?
-            .into_iter()
-            .chain(self.try_get_enclosing_messages_path_opt()?.into_iter())
-            .chain(iter::once(self.name().into()))
-            .join(".")
-            .into())
-    }
-
-    pub fn nested_type(&self) -> &[Rc<DescriptorExt>] {
-        &self.nested_type
-    }
-
-    pub fn enum_type(&self) -> &[Rc<EnumDescriptorExt>] {
-        &self.enum_type
-    }
-
-    pub fn field(&self) -> &[Rc<FieldDescriptorExt>] {
-        &self.field
+impl MessageOrEnum for DescriptorProto {
+    fn name(&self) -> &str {
+        DescriptorProto::name(self)
     }
 }
 
-impl EnumDescriptorExt {
-    pub fn new(source: &EnumDescriptorProto, parent: WeakFileOrMessage) -> Rc<Self> {
-        Rc::new(Self {
-            proto: source.clone(),
-            parent: parent.clone(),
-        })
-    }
-
-    pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
-        self.parent.try_upgrade()
-    }
-
-    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
-        self.try_get_parent()?.try_get_file()
-    }
-
-    pub fn try_get_package_path_opt(&self) -> Result<Option<String>> {
-        let file = self.try_get_parent()?.try_get_file()?;
-        let package = file.package();
-        if package.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(package.to_string()))
-        }
-    }
-
-    pub fn try_get_enclosing_messages_path_opt(&self) -> Result<Option<String>> {
-        let vec_msgs = self
-            .try_traverse_enclosing_messages()
-            .collect::<Result<Vec<_>>>()?;
-        if vec_msgs.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(
-                vec_msgs
-                    .into_iter()
-                    .rev()
-                    .map(|m| m.name().to_string())
-                    .join("."),
-            ))
-        }
-    }
-
-    // returns in inner message to outer message order
-    pub fn try_traverse_enclosing_messages(
-        &self,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> + '_ {
-        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, &EnumDescriptorExt> =
-            MessageOrEnum::Enum(self);
-        m_or_e.try_traverse_enclosing_messages()
-    }
-
-    pub fn try_traverse_enclosing_messages2(
-        &self,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> + '_ {
-        let m_or_e: MessageOrEnum<Rc<DescriptorExt>, &EnumDescriptorExt> =
-            MessageOrEnum::Enum(self);
-        m_or_e.try_traverse_enclosing_messages()
-    }
-
-    pub fn try_fqtn(&self) -> Result<String> {
-        let package = self.try_get_package_path_opt()?;
-        let enclosing_messages = self.try_get_enclosing_messages_path_opt()?;
-        Ok(package
-            .into_iter()
-            .chain(enclosing_messages.into_iter())
-            .chain(iter::once(self.name().into()))
-            .join(".")
-            .into())
+impl MessageOrEnum for EnumDescriptorProto {
+    fn name(&self) -> &str {
+        EnumDescriptorProto::name(self)
     }
 }
-
-impl FieldDescriptorExt {
-    pub fn new(source: &FieldDescriptorProto, parent: Weak<DescriptorExt>) -> Rc<Self> {
-        Rc::new(Self {
-            proto: source.clone(),
-            parent: parent.clone(),
-        })
-    }
-
-    #[allow(unused)]
-    pub fn try_parent(&self) -> Result<Rc<DescriptorExt>> {
-        Ok(self.parent.upgrade().ok_or(ErrorKind::WeakUpgradeFailure)?)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum FileOrMessage<F, M> {
-    File(F),
-    Message(M),
-}
-
-impl<F, M> FileOrMessage<F, M> {
-    pub fn map<G: FnOnce(F) -> F2, H: FnOnce(M) -> M2, F2, M2>(
-        self,
-        g: G,
-        h: H,
-    ) -> FileOrMessage<F2, M2> {
-        use FileOrMessage::*;
-        match self {
-            File(f) => File(g(f)),
-            Message(m) => Message(h(m)),
-        }
-    }
-    pub fn either<G: FnOnce(F) -> T, H: FnOnce(M) -> T, T>(self, g: G, h: H) -> T {
-        use FileOrMessage::*;
-        match self {
-            File(f) => g(f),
-            Message(m) => h(m),
-        }
-    }
-    pub fn as_ref(&self) -> FileOrMessage<&F, &M> {
-        use FileOrMessage::*;
-        match self {
-            File(f) => File(f),
-            Message(m) => Message(m),
-        }
-    }
-}
-
-impl FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>> {
-    pub fn try_upgrade(&self) -> Result<FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>>> {
-        Ok(match self {
-            FileOrMessage::File(f) => {
-                FileOrMessage::File(Weak::upgrade(f).ok_or(ErrorKind::WeakUpgradeFailure)?)
-            }
-            FileOrMessage::Message(m) => {
-                FileOrMessage::Message(Weak::upgrade(m).ok_or(ErrorKind::WeakUpgradeFailure)?)
-            }
-        })
-    }
-}
-
-impl FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>> {
-    pub fn try_get_file(self) -> Result<Rc<FileDescriptorExt>> {
-        use FileOrMessage::*;
-        let mut f_or_m = self;
-        loop {
-            match f_or_m {
-                File(f) => break Ok(f),
-                Message(m) => f_or_m = m.try_get_parent()?,
-            }
-        }
-    }
-}
-
-impl<F, M> FileOrMessage<F, M>
-where
-    F: Deref<Target = FileDescriptorExt>,
-    M: Deref<Target = DescriptorExt>,
-{
-    pub fn messages_and_enums(
-        &self,
-    ) -> impl Iterator<Item = MessageOrEnum<&DescriptorExt, &EnumDescriptorExt>> {
-        let (messages, enums) = match self {
-            FileOrMessage::File(f) => (
-                FileDescriptorProto::message_type(f),
-                FileDescriptorProto::enum_type(f),
-            ),
-            FileOrMessage::Message(m) => (
-                DescriptorProto::nested_type(m),
-                DescriptorProto::enum_type(m),
-            ),
-        };
-        let m_iter = messages.into_iter().map(|m| MessageOrEnum::Message(m));
-        let e_iter = enums.into_iter().map(|e| MessageOrEnum::Enum(e));
-
-        m_iter.chain(e_iter)
-    }
-}
-
-impl<F, M> FileOrMessage<F, M>
-where
-    F: Deref,
-    M: Deref,
-{
-    pub fn as_deref(&self) -> FileOrMessage<&<F as Deref>::Target, &<M as Deref>::Target> {
-        self.as_ref()
-            .map(|f| <F as Deref>::deref(f), |m| <M as Deref>::deref(m))
-    }
-}
-
-pub type RcFileOrMessage = FileOrMessage<Rc<FileDescriptorExt>, Rc<DescriptorExt>>;
-pub type WeakFileOrMessage = FileOrMessage<Weak<FileDescriptorExt>, Weak<DescriptorExt>>;
-
-#[derive(Debug, Clone)]
-pub enum MessageOrEnum<M, E> {
-    Message(M),
-    Enum(E),
-}
-
-impl<M, E> MessageOrEnum<M, E>
-where
-    M: Deref<Target = DescriptorExt>,
-    E: Deref<Target = EnumDescriptorExt>,
-{
-    pub fn name(&self) -> &str {
-        match self {
-            MessageOrEnum::Message(m) => m.name(),
-            MessageOrEnum::Enum(e) => e.name(),
-        }
-    }
-
-    pub fn try_get_parent(&self) -> Result<RcFileOrMessage> {
-        match self {
-            MessageOrEnum::Message(m) => m.try_get_parent(),
-            MessageOrEnum::Enum(e) => e.try_get_parent(),
-        }
-    }
-
-    pub fn try_get_file(&self) -> Result<Rc<FileDescriptorExt>> {
-        match self {
-            MessageOrEnum::Message(m) => m.try_get_file(),
-            MessageOrEnum::Enum(e) => e.try_get_file(),
-        }
-    }
-
-    pub fn try_traverse_enclosing_messages(
-        &self,
-    ) -> impl Iterator<Item = Result<Rc<DescriptorExt>>> {
-        let opt_try_parent = match self.try_get_parent() {
-            Ok(RcFileOrMessage::File(_)) => None,
-            Ok(RcFileOrMessage::Message(parent)) => Some(Ok(Rc::clone(&parent))),
-            Err(e) => Some(Err(e)),
-        };
-        ::std::iter::successors(opt_try_parent, |try_m| {
-            try_m.as_ref().ok().and_then(|m| match m.try_get_parent() {
-                Ok(RcFileOrMessage::File(_)) => None,
-                Ok(RcFileOrMessage::Message(parent)) => Some(Ok(Rc::clone(&parent))),
-                Err(e) => Some(Err(e)),
-            })
-        })
-    }
-}
-
-pub type RcMessageOrEnum = MessageOrEnum<Rc<DescriptorExt>, Rc<EnumDescriptorExt>>;

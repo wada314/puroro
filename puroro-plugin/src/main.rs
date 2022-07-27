@@ -21,7 +21,6 @@ mod descriptor_resolver;
 mod error;
 mod generators;
 mod utils;
-mod wrappers;
 
 use self::generators::Module;
 use crate::descriptor_ext::FileDescriptorExt;

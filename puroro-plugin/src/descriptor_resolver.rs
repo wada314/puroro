@@ -12,39 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::{DescriptorExt, EnumDescriptorExt, FileDescriptorExt, RcMessageOrEnum};
-use crate::utils::StrExt;
+use super::descriptor_ext::MessageOrEnum;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
+use ::puroro_protobuf_compiled::google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
+};
 use ::std::collections::HashMap;
-use ::std::iter;
-use ::std::rc::Rc;
 
 #[derive(Debug)]
-pub struct DescriptorResolver {
-    fqtn_to_desc_map: HashMap<String, RcMessageOrEnum>,
-    package_contents: HashMap<String, PackageContents>,
+pub struct DescriptorResolver<'a> {
+    fqtn_to_desc_map: HashMap<String, &'a dyn MessageOrEnum>,
+    package_contents: HashMap<String, PackageContents<'a>>,
 }
-impl<'a> DescriptorResolver {
+impl<'a> DescriptorResolver<'a> {
     pub fn new<I>(file_descriptors_iter: I) -> Result<Self>
     where
-        I: Iterator<Item = Rc<FileDescriptorExt>>,
+        I: Iterator<Item = &'a FileDescriptorProto>,
     {
         let mut fqtn_to_desc_map = HashMap::new();
         let mut package_contents: HashMap<_, PackageContents> = HashMap::new();
         for f in file_descriptors_iter {
-            // fqtn_to_desc_map
-            f.for_each_message(|m| {
-                fqtn_to_desc_map.insert(
-                    m.try_fqtn().unwrap().to_string(),
-                    RcMessageOrEnum::Message(m),
-                );
-            });
-            f.for_each_enum(|e| {
-                fqtn_to_desc_map
-                    .insert(e.try_fqtn().unwrap().to_string(), RcMessageOrEnum::Enum(e));
-            });
-
             // package_contents
             let package_iter = f.package().split('.');
             let mut cur_package_vec: Vec<String> = Vec::new();
@@ -68,24 +56,12 @@ impl<'a> DescriptorResolver {
                 .or_default();
             term_item.name = cur_package_vec.last().cloned().unwrap_or_default();
             term_item.full_package = last_package_string;
-            term_item.input_files.push(f.clone());
+            term_item.input_files.push(f);
         }
         Ok(Self {
             fqtn_to_desc_map,
             package_contents,
         })
-    }
-
-    #[allow(unused)]
-    pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<RcMessageOrEnum> {
-        self.fqtn_to_desc_map.get(fqtn).cloned()
-    }
-
-    #[allow(unused)]
-    pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<RcMessageOrEnum> {
-        Ok(self
-            .fqtn_to_desc(fqtn)
-            .ok_or(ErrorKind::FqtnNotFound { fqtn: fqtn.into() })?)
     }
 
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
@@ -108,18 +84,18 @@ impl<'a> DescriptorResolver {
 }
 
 #[derive(Debug, Default)]
-pub struct PackageContents {
+pub struct PackageContents<'a> {
     pub name: String,
     pub full_package: String,
     pub subpackages: Vec<String>,
-    pub input_files: Vec<Rc<FileDescriptorExt>>,
+    pub input_files: Vec<&'a FileDescriptorProto>,
 }
 
-fn visit_messages_and_enums<VM, VE>(file: &FileDescriptorExt, visit_message: VM, visit_enum: VE)
+fn visit_messages_and_enums<VM, VE>(file: &FileDescriptorProto, visit_message: VM, visit_enum: VE)
 where
-    VM: FnMut(&DescriptorExt, &[&DescriptorExt]),
-    VE: FnMut(&EnumDescriptorExt, &[&DescriptorExt]),
+    VM: FnMut(&DescriptorProto, &[&DescriptorProto]),
+    VE: FnMut(&EnumDescriptorProto, &[&DescriptorProto]),
 {
-    let mut path = Vec::new();
+    // let mut path = Vec::new();
     todo!()
 }
