@@ -36,13 +36,11 @@ pub struct Module {
 }
 impl Module {
     pub fn try_from_package(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident = p
-            .package_name
-            .to_lower_snake_case()
-            .escape_rust_keywords()
-            .into();
-        let is_root_package = p.package_name.is_empty();
-        let full_path = p.full_package.clone();
+        let ident = p.package_name.map_or_else(Default::default, |s| {
+            s.to_lower_snake_case().escape_rust_keywords().into()
+        });
+        let is_root_package = p.package_name.is_none();
+        let full_path = p.full_package.to_string();
         let subpackages = p
             .subpackages
             .iter()

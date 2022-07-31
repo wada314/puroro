@@ -237,7 +237,7 @@ impl<S> Package<S> {
 }
 
 impl<S: AsRef<str>> Package<S> {
-    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (&str, &str)> {
+    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (Package<&str>, &str)> {
         self.0.as_ref().split('.').scan(0, |path_end, package| {
             let path = &self.0.as_ref()[0..*path_end];
 
@@ -246,7 +246,7 @@ impl<S: AsRef<str>> Package<S> {
             }
             *path_end += package.len();
 
-            Some((path, package))
+            Some((Package::new(path), package))
         })
     }
 
