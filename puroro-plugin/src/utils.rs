@@ -237,18 +237,17 @@ impl<S> Package<S> {
 }
 
 impl<S: AsRef<str>> Package<S> {
-    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (String, &str)> {
-        self.0
-            .as_ref()
-            .split('.')
-            .scan("".to_string(), |path, package| {
-                let return_path = path.clone();
-                if !path.is_empty() {
-                    path.push('.');
-                }
-                path.push_str(&package);
-                Some((return_path, package))
-            })
+    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (&str, &str)> {
+        self.0.as_ref().split('.').scan(0, |path_end, package| {
+            let path = &self.0.as_ref()[0..*path_end];
+
+            if *path_end != 0 {
+                *path_end += 1;
+            }
+            *path_end += package.len();
+
+            Some((path, package))
+        })
     }
 }
 
@@ -277,9 +276,9 @@ mod test {
     fn test_subpackages() {
         let package = Package::new("foo.bar.baz");
         let mut iter = package.packages_and_subpackages();
-        assert_eq!(Some(("".to_string(), "foo")), iter.next());
-        assert_eq!(Some(("foo".to_string(), "bar")), iter.next());
-        assert_eq!(Some(("foo.bar".to_string(), "baz")), iter.next());
+        assert_eq!(Some(("", "foo")), iter.next());
+        assert_eq!(Some(("foo", "bar")), iter.next());
+        assert_eq!(Some(("foo.bar", "baz")), iter.next());
         assert_eq!(None, iter.next());
     }
 }

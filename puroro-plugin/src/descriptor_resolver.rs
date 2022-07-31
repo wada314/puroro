@@ -36,12 +36,12 @@ impl<'a> DescriptorResolver<'a> {
             // package_contents for parent packages
             for (cur_package, subpackage) in f.package_ext().packages_and_subpackages() {
                 let item = package_contents
-                    .entry(cur_package.clone())
+                    .entry(cur_package.to_string())
                     .or_insert_with(|| PackageContents {
                         package_name: cur_package
                             .rsplit_once('.')
                             .map_or(String::default(), |(_, name)| name.to_string()),
-                        full_package: cur_package.clone(),
+                        full_package: cur_package.to_string(),
                         subpackages: Vec::new(),
                         input_files: Vec::new(),
                     });
