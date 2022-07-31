@@ -38,8 +38,8 @@ impl<'a> DescriptorResolver<'a> {
                 let item = package_contents
                     .entry(cur_package.full_package_path().to_string())
                     .or_insert_with(|| PackageContents {
-                        package_name: cur_package.leaf_package_name(),
-                        full_package: cur_package.full_package_path(),
+                        package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
+                        full_package: cur_package.full_package_path().to_string(),
                         subpackages: Vec::new(),
                         input_files: Vec::new(),
                     });
@@ -48,8 +48,8 @@ impl<'a> DescriptorResolver<'a> {
 
             // package_contents for the leaf package
             let term_item = package_contents.entry(f.package().to_string()).or_default();
-            term_item.package_name = f.package_ext().leaf_package_name();
-            term_item.full_package = f.package();
+            term_item.package_name = f.package_ext().leaf_package_name().map(|s| s.to_string());
+            term_item.full_package = f.package().to_string();
             term_item.input_files.push(f);
         }
         Ok(Self {
@@ -79,8 +79,8 @@ impl<'a> DescriptorResolver<'a> {
 
 #[derive(Debug, Default)]
 pub struct PackageContents<'a> {
-    pub package_name: Option<&'a str>,
-    pub full_package: &'a str,
+    pub package_name: Option<String>,
+    pub full_package: String,
     pub subpackages: Vec<String>,
     pub input_files: Vec<&'a FileDescriptorProto>,
 }
