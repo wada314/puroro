@@ -249,6 +249,17 @@ impl<S: AsRef<str>> Package<S> {
             Some((path, package))
         })
     }
+
+    pub fn leaf_package_name(&self) -> Option<&str> {
+        match self.0.as_ref().rsplit_once('p') {
+            Some((_, p)) => Some(p),
+            None => None,
+        }
+    }
+
+    pub fn full_package_path(&self) -> &str {
+        self.0.as_ref()
+    }
 }
 
 #[cfg(test)]
