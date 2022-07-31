@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
+use crate::descriptor_ext::FileOrMessage;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -85,11 +86,34 @@ pub struct PackageContents<'a> {
     pub input_files: Vec<&'a FileDescriptorProto>,
 }
 
-fn visit_messages_and_enums<VM, VE>(file: &FileDescriptorProto, visit_message: VM, visit_enum: VE)
-where
+// need test
+fn visit_messages_and_enums<VM, VE>(
+    file: &FileDescriptorProto,
+    mut visit_message: VM,
+    mut visit_enum: VE,
+) where
     VM: FnMut(&DescriptorProto, &[&DescriptorProto]),
     VE: FnMut(&EnumDescriptorProto, &[&DescriptorProto]),
 {
-    // let mut path = Vec::new();
+    let mut path = Vec::new();
+    let mut iters_queue = Vec::new();
+    iters_queue.push(file.messages().into_iter());
+    loop {
+        if let Some(mut tail_iter) = iters_queue.pop() {
+            if let Some(next_leaf) = tail_iter.next() {
+                iters_queue.push(tail_iter);
+                iters_queue.push(next_leaf.messages().into_iter());
+                path.push(next_leaf);
+            } else {
+                let form: &dyn FileOrMessage = path.pop().map_or(file, |m| m);
+                for m in form.messages() {
+                    visit_message(m, &path);
+                }
+                for e in form.enums() {
+                    visit_enum(e, &path);
+                }
+            }
+        }
+    }
     todo!()
 }
