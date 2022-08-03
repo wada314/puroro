@@ -98,22 +98,79 @@ fn visit_messages_and_enums<VM, VE>(
     let mut path = Vec::new();
     let mut iters_queue = Vec::new();
     iters_queue.push(file.messages().into_iter());
-    loop {
-        if let Some(mut tail_iter) = iters_queue.pop() {
-            if let Some(next_leaf) = tail_iter.next() {
-                iters_queue.push(tail_iter);
-                iters_queue.push(next_leaf.messages().into_iter());
-                path.push(next_leaf);
-            } else {
-                let form: &dyn FileOrMessage = path.pop().map_or(file, |m| m);
-                for m in form.messages() {
-                    visit_message(m, &path);
-                }
-                for e in form.enums() {
-                    visit_enum(e, &path);
-                }
+    while let Some(mut tail_iter) = iters_queue.pop() {
+        if let Some(next_leaf) = tail_iter.next() {
+            iters_queue.push(tail_iter);
+            iters_queue.push(next_leaf.messages().into_iter());
+            path.push(next_leaf);
+        } else {
+            let f_or_m: &dyn FileOrMessage = path.pop().map_or(file, |m| m);
+            for m in f_or_m.messages() {
+                visit_message(m, &path);
+            }
+            for e in f_or_m.enums() {
+                visit_enum(e, &path);
             }
         }
     }
-    todo!()
+}
+
+#[cfg(test)]
+mod test {
+    use super::DescriptorProto as DP;
+    use super::EnumDescriptorProto as EDP;
+    use super::FileDescriptorProto as FDP;
+    use super::*;
+    use ::std::collections::HashSet;
+
+    #[test]
+    fn test_visit() {
+        let mut enum1 = EDP::default();
+        *enum1.name_mut() = "e1".to_string();
+        let mut msg1 = DP::default();
+        *msg1.name_mut() = "m1".to_string();
+        let mut enum11 = EDP::default();
+        *enum11.name_mut() = "e11".to_string();
+        msg1.enum_type_mut().push(enum11);
+        let mut msg11 = DP::default();
+        msg1.nested_type_mut().push(msg11);
+        let mut file = FDP::default();
+        file.message_type_mut().push(msg1);
+        file.enum_type_mut().push(enum1);
+
+        let mut visited_msgs = HashSet::new();
+        let mut visited_enums = HashSet::new();
+        visit_messages_and_enums(
+            &file,
+            |m, path| {
+                assert!(visited_msgs.insert(format!(
+                    "{}::{}",
+                    path.iter().map(|item| item.name()).join("."),
+                    m.name(),
+                )))
+            },
+            |e, path| {
+                assert!(visited_enums.insert(format!(
+                    "{}::{}",
+                    path.iter().map(|item| item.name()).join("."),
+                    e.name(),
+                )))
+            },
+        );
+
+        // assert!(visited_msgs.contains("::m1"));
+        // assert!(visited_msgs.contains("m1::m11"));
+        // assert_eq!(2usize, visited_msgs.len());
+        assert_eq!(
+            ["::m1", "m1::m11"]
+                .into_iter()
+                .map(str::to_string)
+                .collect::<HashSet<_>>(),
+            visited_msgs
+        );
+
+        assert!(visited_enums.contains("::e1"));
+        assert!(visited_enums.contains("m1::e11"));
+        assert_eq!(2usize, visited_enums.len());
+    }
 }

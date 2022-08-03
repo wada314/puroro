@@ -228,6 +228,7 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
         .collect::<String>())
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package<S>(S);
 
 impl<S> Package<S> {
@@ -287,9 +288,9 @@ mod test {
     fn test_subpackages() {
         let package = Package::new("foo.bar.baz");
         let mut iter = package.packages_and_subpackages();
-        assert_eq!(Some(("", "foo")), iter.next());
-        assert_eq!(Some(("foo", "bar")), iter.next());
-        assert_eq!(Some(("foo.bar", "baz")), iter.next());
+        assert_eq!(Some((Package::new(""), "foo")), iter.next());
+        assert_eq!(Some((Package::new("foo"), "bar")), iter.next());
+        assert_eq!(Some((Package::new("foo.bar"), "baz")), iter.next());
         assert_eq!(None, iter.next());
     }
 }
