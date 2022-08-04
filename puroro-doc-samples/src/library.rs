@@ -1,9 +1,8 @@
 // A generated source code by puroro library
-#![feature(generic_associated_types)]
-// package (root)
+// package library
 
 pub mod _puroro_root {
-    pub use super::*;
+    pub use super::super::_puroro_root::*;
 }
 
 pub mod _puroro {

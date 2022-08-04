@@ -222,9 +222,11 @@ impl<S: AsRef<str>> Package<S> {
     }
 
     pub fn leaf_package_name(&self) -> Option<&str> {
-        match self.0.as_ref().rsplit_once('p') {
-            Some((_, p)) => Some(p),
-            None => None,
+        let s = self.0.as_ref();
+        match (s.is_empty(), s.rsplit_once('.')) {
+            (false, Some((_, p))) => Some(p),
+            (false, None) => Some(s),
+            (true, _) => None,
         }
     }
 
