@@ -104,13 +104,14 @@ fn visit_messages_and_enums<VM, VE>(
             iters_queue.push(next_leaf.messages().into_iter());
             path.push(next_leaf);
         } else {
-            let f_or_m: &dyn FileOrMessage = path.pop().map_or(file, |m| m);
+            let f_or_m: &dyn FileOrMessage = path.last().map_or(file, |m| *m);
             for m in f_or_m.messages() {
                 visit_message(m, &path);
             }
             for e in f_or_m.enums() {
                 visit_enum(e, &path);
             }
+            path.pop();
         }
     }
 }
@@ -133,6 +134,7 @@ mod test {
         *enum11.name_mut() = "e11".to_string();
         msg1.enum_type_mut().push(enum11);
         let mut msg11 = DP::default();
+        *msg11.name_mut() = "m11".to_string();
         msg1.nested_type_mut().push(msg11);
         let mut file = FDP::default();
         file.message_type_mut().push(msg1);
