@@ -13,12 +13,9 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
-use ::std::iter;
-use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone, Copy)]
 #[allow(unused)]
@@ -142,33 +139,6 @@ lazy_static! {
     .iter()
     .copied()
     .collect::<HashSet<&'static str>>();
-}
-
-pub fn make_module_path<'a, I, J>(package: I, outer_messages: J) -> String
-where
-    I: Iterator<Item = &'a str>,
-    J: Iterator<Item = &'a str> + Clone,
-{
-    let package = package.map(|s| s.escape_rust_keywords().to_string());
-
-    let outer_messages = outer_messages.map(|s| {
-        format!(
-            "_puroro_nested::{}",
-            s.to_word_case(WordCase::LowerSnakeCase)
-                .escape_rust_keywords()
-        )
-    });
-    let mut modules_iter = iter::once("self".into())
-        .chain(iter::once("_puroro_root".into()))
-        .chain(package)
-        .chain(outer_messages);
-    modules_iter.join("::")
-}
-
-pub fn upgrade<T>(weak: &Weak<T>) -> Result<Rc<T>> {
-    Ok(Weak::upgrade(weak).ok_or(ErrorKind::InternalError {
-        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-    })?)
 }
 
 #[allow(unused)]
