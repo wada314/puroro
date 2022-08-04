@@ -62,7 +62,7 @@ impl Module {
             .iter()
             .map(|f| f.message_type().iter())
             .flatten()
-            .map(|m| Module::try_from_message(m, resolver))
+            .map(|m| Module::try_from_message(m, &full_path, resolver))
             .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
@@ -91,14 +91,22 @@ impl Module {
         })
     }
 
-    pub fn try_from_message(m: &DescriptorProto, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_from_message(
+        m: &DescriptorProto,
+        package: &str,
+        resolver: &DescriptorResolver,
+    ) -> Result<Self> {
         let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
-        let full_path = todo!();
+        let full_path = if package.is_empty() {
+            m.name().to_string()
+        } else {
+            format!("{}.{}", package, m.name())
+        };
         let submodules = m
             .nested_type()
             .into_iter()
-            .map(|d| Module::try_from_message(d, resolver))
+            .map(|d| Module::try_from_message(d, &full_path, resolver))
             .collect::<Result<Vec<_>>>()?;
         let messages = m
             .nested_type()

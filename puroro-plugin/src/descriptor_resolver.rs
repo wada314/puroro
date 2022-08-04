@@ -16,9 +16,7 @@ use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::descriptor_ext::FileOrMessage;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
-use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
-};
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::std::collections::HashMap;
 
 #[derive(Debug)]
