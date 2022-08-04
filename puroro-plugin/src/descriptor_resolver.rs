@@ -32,7 +32,7 @@ impl<'a> DescriptorResolver<'a> {
         I: Iterator<Item = &'a FileDescriptorProto>,
     {
         let mut fqtn_to_desc_map = HashMap::new();
-        let mut package_contents: HashMap<_, PackageContents> = HashMap::new();
+        let mut package_contents = HashMap::new();
         for f in file_descriptors_iter {
             Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
             Self::generate_package_contents(&mut package_contents, f);
@@ -44,7 +44,7 @@ impl<'a> DescriptorResolver<'a> {
     }
 
     fn generate_fqtn_to_desc_map(
-        fqtn_to_desc_map: &mut HashMap<String, &dyn MessageOrEnum>,
+        fqtn_to_desc_map: &mut HashMap<String, &'a dyn MessageOrEnum>,
         file: &'a FileDescriptorProto,
     ) {
         visit_messages_and_enums(file, |m, path| {
@@ -53,6 +53,7 @@ impl<'a> DescriptorResolver<'a> {
                 .chain(nested_msgs)
                 .chain(::std::iter::once(m.name()))
                 .join(".");
+            fqtn_to_desc_map.insert(fqtn, m);
         })
     }
 
@@ -112,9 +113,9 @@ pub struct PackageContents<'a> {
     pub input_files: Vec<&'a FileDescriptorProto>,
 }
 
-fn visit_messages_and_enums<F>(file: &FileDescriptorProto, mut visit: F)
+fn visit_messages_and_enums<'a, F>(file: &'a FileDescriptorProto, mut visit: F)
 where
-    F: FnMut(&dyn MessageOrEnum, &[&DescriptorProto]),
+    F: FnMut(&'a dyn MessageOrEnum, &[&DescriptorProto]),
 {
     let mut path = Vec::new();
     let mut iters_queue = Vec::new();
