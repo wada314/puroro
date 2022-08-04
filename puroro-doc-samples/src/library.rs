@@ -10,24 +10,24 @@ pub mod _puroro {
 }
 
 pub struct Book {
-    // Optional, LengthDelimited(String)
-    title: self::_puroro::internal::field_types::OptionalStringField<0>,
-    // Optional, Variant(UInt32)
-    num_pages: self::_puroro::internal::field_types::OptionalNumericField<u32, (), 1>,
+    // Singular, LengthDelimited(String)
+    title: self::_puroro::internal::field_types::SingularStringField,
+    // Singular, Variant(UInt32)
+    num_pages: self::_puroro::internal::field_types::SingularNumericField<u32, ()>,
 
-    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 1], self::_puroro::bitvec::order::Lsb0>,
+    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 0], self::_puroro::bitvec::order::Lsb0>,
 }
 
 impl Book {
-    // Optional, LengthDelimited(String)
+    // Singular, LengthDelimited(String)
     pub fn title(&self) -> &str {
-        <self::_puroro::internal::field_types::OptionalStringField<0> as self::_puroro::internal::field_types::FieldType>::get_field(
+        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.title, &self._bitfield,
         )
     }
-    // Optional, Variant(UInt32)
+    // Singular, Variant(UInt32)
     pub fn num_pages(&self) -> u32 {
-        <self::_puroro::internal::field_types::OptionalNumericField<u32, (), 1> as self::_puroro::internal::field_types::FieldType>::get_field(
+        <self::_puroro::internal::field_types::SingularNumericField<u32, ()> as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.num_pages, &self._bitfield,
         )
     }

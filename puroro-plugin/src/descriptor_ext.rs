@@ -35,7 +35,7 @@ impl FileDescriptorExt for FileDescriptorProto {
     fn try_syntax(&self) -> Result<Syntax> {
         Ok(match self.syntax() {
             "proto2" | "" => Syntax::Proto2,
-            "proto3" => Syntax::Proto2,
+            "proto3" => Syntax::Proto3,
             _ => Err(ErrorKind::UnknownProtoSyntax {
                 name: self.syntax().to_string(),
             })?,
