@@ -86,6 +86,10 @@ impl<'a> DescriptorResolver<'a> {
         term_item.input_files.push(file);
     }
 
+    pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<&dyn MessageOrEnum> {
+        self.fqtn_to_desc_map.get(fqtn).map(|m| *m)
+    }
+
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
         self.package_contents.get(package)
     }
