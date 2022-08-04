@@ -34,29 +34,36 @@ impl<'a> DescriptorResolver<'a> {
         let mut fqtn_to_desc_map = HashMap::new();
         let mut package_contents: HashMap<_, PackageContents> = HashMap::new();
         for f in file_descriptors_iter {
-            // package_contents for parent packages
-            for (cur_package, subpackage) in f.package_ext().packages_and_subpackages() {
-                let item = package_contents
-                    .entry(cur_package.full_package_path().to_string())
-                    .or_insert_with(|| PackageContents {
-                        package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
-                        full_package: cur_package.full_package_path().to_string(),
-                        subpackages: Vec::new(),
-                        input_files: Vec::new(),
-                    });
-                item.subpackages.push(subpackage.to_string());
-            }
-
-            // package_contents for the leaf package
-            let term_item = package_contents.entry(f.package().to_string()).or_default();
-            term_item.package_name = f.package_ext().leaf_package_name().map(|s| s.to_string());
-            term_item.full_package = f.package().to_string();
-            term_item.input_files.push(f);
+            Self::generate_package_contents(&mut package_contents, f);
         }
         Ok(Self {
             fqtn_to_desc_map,
             package_contents,
         })
+    }
+
+    fn generate_package_contents(
+        package_contents: &mut HashMap<String, PackageContents>,
+        file: &FileDescriptorProto,
+    ) {
+        // package_contents for parent packages
+        for (cur_package, subpackage) in f.package_ext().packages_and_subpackages() {
+            let item = package_contents
+                .entry(cur_package.full_package_path().to_string())
+                .or_insert_with(|| PackageContents {
+                    package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
+                    full_package: cur_package.full_package_path().to_string(),
+                    subpackages: Vec::new(),
+                    input_files: Vec::new(),
+                });
+            item.subpackages.push(subpackage.to_string());
+        }
+
+        // package_contents for the leaf package
+        let term_item = package_contents.entry(f.package().to_string()).or_default();
+        term_item.package_name = f.package_ext().leaf_package_name().map(|s| s.to_string());
+        term_item.full_package = f.package().to_string();
+        term_item.input_files.push(f);
     }
 
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
@@ -86,7 +93,6 @@ pub struct PackageContents<'a> {
     pub input_files: Vec<&'a FileDescriptorProto>,
 }
 
-// need test
 fn visit_messages_and_enums<VM, VE>(
     file: &FileDescriptorProto,
     mut visit_message: VM,
