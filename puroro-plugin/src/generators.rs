@@ -205,22 +205,22 @@ impl Field {
 
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = f.name().to_lower_snake_case().escape_rust_keywords().into();
-        let syntax = f.try_syntax()?;
-        let rule = match (syntax.as_str(), f.label(), f.proto3_optional()) {
+        let syntax = file.try_syntax()?;
+        let rule = match (syntax, f.label(), f.proto3_optional()) {
             (Syntax::Proto2, LabelOptional | LabelRequired, _) => FieldRule::Optional,
             (Syntax::Proto3, LabelOptional, false) => FieldRule::Singular,
             (Syntax::Proto3, LabelOptional, true) => FieldRule::Optional,
             (_, LabelRepeated, _) => FieldRule::Repeated,
             (syntax, label, opt) => Err(ErrorKind::InternalError {
                 detail: format!(
-                    "Unknown syntax/label/proto3opt combination: ({}, {}, {})",
+                    "Unknown syntax/label/proto3opt combination: ({:?}, {}, {})",
                     syntax,
                     Into::<i32>::into(label),
                     opt
                 ),
             })?,
         };
-        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), &syntax, resolver)?;
+        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), syntax, resolver)?;
         let bit_index_for_optional = {
             let index = *bit_index;
             if matches!(rule, FieldRule::Optional) {
@@ -295,7 +295,7 @@ impl WireType {
     fn from_proto_type(
         r#type: google::protobuf::field_descriptor_proto::Type,
         type_name: &str,
-        syntax: &str,
+        syntax: Syntax,
         resolver: &DescriptorResolver,
     ) -> Result<WireType> {
         use google::protobuf::field_descriptor_proto::Type::*;
