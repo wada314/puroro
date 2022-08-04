@@ -40,7 +40,7 @@ impl Module {
             s.to_lower_snake_case().escape_rust_keywords().into()
         });
         let is_root_package = p.package_name.is_none();
-        let full_path = p.full_package.to_string();
+        let full_path = p.full_package.as_str().to_string();
         let subpackages = p
             .subpackages
             .iter()
@@ -48,7 +48,7 @@ impl Module {
                 let new_package = if is_root_package {
                     sp.clone()
                 } else {
-                    format!("{}.{}", full_path, sp)
+                    format!("{}.{}", full_path.as_str(), sp)
                 };
                 resolver.package_contents_or_err(&new_package)
             })

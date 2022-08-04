@@ -228,7 +228,7 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
         .collect::<String>())
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Package<S>(S);
 
 impl<S> Package<S> {
@@ -259,6 +259,14 @@ impl<S: AsRef<str>> Package<S> {
     }
 
     pub fn full_package_path(&self) -> &str {
+        self.0.as_ref()
+    }
+
+    pub fn to_owned(&self) -> Package<String> {
+        Package::new(self.0.as_ref().to_string())
+    }
+
+    pub fn as_str(&self) -> &str {
         self.0.as_ref()
     }
 }

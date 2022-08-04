@@ -14,6 +14,7 @@
 
 use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::descriptor_ext::FileOrMessage;
+use crate::utils::Package;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
@@ -65,7 +66,7 @@ impl<'a> DescriptorResolver<'a> {
                 .entry(cur_package.full_package_path().to_string())
                 .or_insert_with(|| PackageContents {
                     package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
-                    full_package: cur_package.full_package_path().to_string(),
+                    full_package: cur_package.to_owned(),
                     subpackages: Vec::new(),
                     input_files: Vec::new(),
                 });
@@ -80,7 +81,7 @@ impl<'a> DescriptorResolver<'a> {
             .package_ext()
             .leaf_package_name()
             .map(|s| s.to_string());
-        term_item.full_package = file.package().to_string();
+        term_item.full_package = file.package_ext().to_owned();
         term_item.input_files.push(file);
     }
 
@@ -110,7 +111,7 @@ impl<'a> DescriptorResolver<'a> {
 #[derive(Debug, Default)]
 pub struct PackageContents<'a> {
     pub package_name: Option<String>,
-    pub full_package: String,
+    pub full_package: Package<String>,
     pub subpackages: Vec<String>,
     pub input_files: Vec<&'a FileDescriptorProto>,
 }
