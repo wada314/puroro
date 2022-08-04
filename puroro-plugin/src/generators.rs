@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::descriptor_ext::{FileDescriptorExt, Syntax};
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
 use crate::utils::StrExt as _;
@@ -204,11 +205,11 @@ impl Field {
 
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = f.name().to_lower_snake_case().escape_rust_keywords().into();
-        let syntax: String = todo!();
+        let syntax = f.try_syntax()?;
         let rule = match (syntax.as_str(), f.label(), f.proto3_optional()) {
-            ("proto2", LabelOptional | LabelRequired, _) => FieldRule::Optional,
-            ("proto3", LabelOptional, false) => FieldRule::Singular,
-            ("proto3", LabelOptional, true) => FieldRule::Optional,
+            (Syntax::Proto2, LabelOptional | LabelRequired, _) => FieldRule::Optional,
+            (Syntax::Proto3, LabelOptional, false) => FieldRule::Singular,
+            (Syntax::Proto3, LabelOptional, true) => FieldRule::Optional,
             (_, LabelRepeated, _) => FieldRule::Repeated,
             (syntax, label, opt) => Err(ErrorKind::InternalError {
                 detail: format!(

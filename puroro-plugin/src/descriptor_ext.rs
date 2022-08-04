@@ -14,6 +14,7 @@
 
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
+use crate::error::ErrorKind;
 use crate::utils::Package;
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
@@ -22,12 +23,30 @@ use ::std::fmt::Debug;
 
 pub trait FileDescriptorExt {
     fn package_ext(&self) -> Package<&str>;
+
+    fn try_syntax(&self) -> Result<Syntax>;
 }
 
 impl FileDescriptorExt for FileDescriptorProto {
     fn package_ext(&self) -> Package<&str> {
         Package::new(FileDescriptorProto::package(self))
     }
+
+    fn try_syntax(&self) -> Result<Syntax> {
+        Ok(match self.syntax() {
+            "proto2" | "" => Syntax::Proto2,
+            "proto3" => Syntax::Proto2,
+            _ => ErrorKind::UnknownProtoSyntax {
+                name: self.syntax().to_string(),
+            },
+        })
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Syntax {
+    Proto2,
+    Proto3,
 }
 
 pub trait DescriptorExt {}
