@@ -34,11 +34,25 @@ impl<'a> DescriptorResolver<'a> {
         let mut fqtn_to_desc_map = HashMap::new();
         let mut package_contents: HashMap<_, PackageContents> = HashMap::new();
         for f in file_descriptors_iter {
+            Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
             Self::generate_package_contents(&mut package_contents, f);
         }
         Ok(Self {
             fqtn_to_desc_map,
             package_contents,
+        })
+    }
+
+    fn generate_fqtn_to_desc_map(
+        fqtn_to_desc_map: &mut HashMap<String, &dyn MessageOrEnum>,
+        file: &'a FileDescriptorProto,
+    ) {
+        visit_messages_and_enums(file, |m, path| {
+            let nested_msgs = path.into_iter().map(|m| m.name());
+            let fqtn = ::std::iter::once(file.package())
+                .chain(nested_msgs)
+                .chain(::std::iter::once(m.name()))
+                .join(".");
         })
     }
 
@@ -98,13 +112,9 @@ pub struct PackageContents<'a> {
     pub input_files: Vec<&'a FileDescriptorProto>,
 }
 
-fn visit_messages_and_enums<VM, VE>(
-    file: &FileDescriptorProto,
-    mut visit_message: VM,
-    mut visit_enum: VE,
-) where
-    VM: FnMut(&DescriptorProto, &[&DescriptorProto]),
-    VE: FnMut(&EnumDescriptorProto, &[&DescriptorProto]),
+fn visit_messages_and_enums<F>(file: &FileDescriptorProto, mut visit: F)
+where
+    F: FnMut(&dyn MessageOrEnum, &[&DescriptorProto]),
 {
     let mut path = Vec::new();
     let mut iters_queue = Vec::new();
@@ -117,10 +127,10 @@ fn visit_messages_and_enums<VM, VE>(
         } else {
             let f_or_m: &dyn FileOrMessage = path.last().map_or(file, |m| *m);
             for m in f_or_m.messages() {
-                visit_message(m, &path);
+                visit(m as &dyn MessageOrEnum, &path);
             }
             for e in f_or_m.enums() {
-                visit_enum(e, &path);
+                visit(e as &dyn MessageOrEnum, &path);
             }
             path.pop();
         }
@@ -151,39 +161,21 @@ mod test {
         file.message_type_mut().push(msg1);
         file.enum_type_mut().push(enum1);
 
-        let mut visited_msgs = HashSet::new();
-        let mut visited_enums = HashSet::new();
-        visit_messages_and_enums(
-            &file,
-            |m, path| {
-                assert!(visited_msgs.insert(format!(
-                    "{}::{}",
-                    path.iter().map(|item| item.name()).join("."),
-                    m.name(),
-                )))
-            },
-            |e, path| {
-                assert!(visited_enums.insert(format!(
-                    "{}::{}",
-                    path.iter().map(|item| item.name()).join("."),
-                    e.name(),
-                )))
-            },
-        );
+        let mut visited = HashSet::new();
+        visit_messages_and_enums(&file, |m, path| {
+            assert!(visited.insert(format!(
+                "{}::{}",
+                path.iter().map(|item| item.name()).join("."),
+                m.name(),
+            )))
+        });
 
         assert_eq!(
-            ["::m1", "m1::m11"]
+            ["::m1", "m1::m11", "::e1", "m1::e11"]
                 .into_iter()
                 .map(str::to_string)
                 .collect::<HashSet<_>>(),
-            visited_msgs
-        );
-        assert_eq!(
-            ["::e1", "m1::e11"]
-                .into_iter()
-                .map(str::to_string)
-                .collect::<HashSet<_>>(),
-            visited_enums
+            visited
         );
     }
 }
