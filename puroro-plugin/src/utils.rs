@@ -263,6 +263,22 @@ impl<S: AsRef<str>> Package<S> {
     }
 }
 
+impl<S, T> ::std::ops::Add<T> for &Package<S>
+where
+    S: AsRef<str>,
+    T: AsRef<str>,
+{
+    type Output = Package<String>;
+    fn add(self, rhs: T) -> Self::Output {
+        let mut new_string = self.0.as_ref().to_string();
+        if !new_string.is_empty() {
+            new_string.push('.');
+        }
+        new_string.push_str(rhs.as_ref());
+        Package::new(new_string)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::{Package, StrExt, WordCase};
