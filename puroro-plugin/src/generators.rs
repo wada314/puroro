@@ -145,7 +145,7 @@ impl Message {
     #[allow(unused)]
     pub fn try_new(
         m: &DescriptorProto,
-        f: &FileDescriptorProto,
+        file: &FileDescriptorProto,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
         let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
@@ -154,7 +154,7 @@ impl Message {
         let fields = m
             .field()
             .into_iter()
-            .map(|f| Field::try_new(f, &mut bits_index, resolver))
+            .map(|f| Field::try_new(f, file, &mut bits_index, resolver))
             .collect::<Result<Vec<_>>>()?;
         let bits_length = bits_index;
         Ok(Message {
@@ -176,7 +176,7 @@ impl Enum {
     #[allow(unused)]
     pub fn try_new(
         e: &EnumDescriptorProto,
-        f: &FileDescriptorProto,
+        file: &FileDescriptorProto,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
         todo!()
@@ -196,6 +196,7 @@ pub struct Field {
 impl Field {
     pub fn try_new(
         f: &FieldDescriptorProto,
+        file: &FileDescriptorProto,
         bit_index: &mut usize,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
