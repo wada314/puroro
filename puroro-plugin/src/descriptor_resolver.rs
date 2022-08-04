@@ -160,9 +160,6 @@ mod test {
             },
         );
 
-        // assert!(visited_msgs.contains("::m1"));
-        // assert!(visited_msgs.contains("m1::m11"));
-        // assert_eq!(2usize, visited_msgs.len());
         assert_eq!(
             ["::m1", "m1::m11"]
                 .into_iter()
@@ -170,9 +167,12 @@ mod test {
                 .collect::<HashSet<_>>(),
             visited_msgs
         );
-
-        assert!(visited_enums.contains("::e1"));
-        assert!(visited_enums.contains("m1::e11"));
-        assert_eq!(2usize, visited_enums.len());
+        assert_eq!(
+            ["::e1", "m1::e11"]
+                .into_iter()
+                .map(str::to_string)
+                .collect::<HashSet<_>>(),
+            visited_enums
+        );
     }
 }
