@@ -60,9 +60,11 @@ impl Module {
         let mut submodules_from_messages = p
             .input_files
             .iter()
-            .map(|f| f.message_type().iter())
-            .flatten()
-            .map(|m| Module::try_from_message(m, &full_path, resolver))
+            .flat_map(|f| {
+                f.message_type()
+                    .iter()
+                    .map(|m| Module::try_from_message(m, f, &full_path, resolver))
+            })
             .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
@@ -70,16 +72,16 @@ impl Module {
         let messages = p
             .input_files
             .iter()
-            .map(|f| f.message_type().iter())
-            .flatten()
-            .map(|m| Message::try_new(m, resolver))
+            .flat_map(|f| {
+                f.message_type()
+                    .iter()
+                    .map(|m| Message::try_new(m, f, resolver))
+            })
             .collect::<Result<Vec<_>>>()?;
         let enums = p
             .input_files
             .iter()
-            .map(|f| f.enum_type().iter())
-            .flatten()
-            .map(|e| Enum::try_new(e, resolver))
+            .flat_map(|f| f.enum_type().iter().map(|e| Enum::try_new(e, f, resolver)))
             .collect::<Result<Vec<_>>>()?;
         Ok(Module {
             ident,
@@ -93,6 +95,7 @@ impl Module {
 
     pub fn try_from_message(
         m: &DescriptorProto,
+        f: &FileDescriptorProto,
         package: &str,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
@@ -106,17 +109,17 @@ impl Module {
         let submodules = m
             .nested_type()
             .into_iter()
-            .map(|d| Module::try_from_message(d, &full_path, resolver))
+            .map(|d| Module::try_from_message(d, f, &full_path, resolver))
             .collect::<Result<Vec<_>>>()?;
         let messages = m
             .nested_type()
             .into_iter()
-            .map(|d| Message::try_new(d, resolver))
+            .map(|d| Message::try_new(d, f, resolver))
             .collect::<Result<Vec<_>>>()?;
         let enums = m
             .enum_type()
             .into_iter()
-            .map(|e| Enum::try_new(e, resolver))
+            .map(|e| Enum::try_new(e, f, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Module {
             ident,
@@ -140,7 +143,11 @@ pub struct Message {
 
 impl Message {
     #[allow(unused)]
-    pub fn try_new(m: &DescriptorProto, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(
+        m: &DescriptorProto,
+        f: &FileDescriptorProto,
+        resolver: &DescriptorResolver,
+    ) -> Result<Self> {
         let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
@@ -167,7 +174,11 @@ pub struct Enum {
 
 impl Enum {
     #[allow(unused)]
-    pub fn try_new(e: &EnumDescriptorProto, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(
+        e: &EnumDescriptorProto,
+        f: &FileDescriptorProto,
+        resolver: &DescriptorResolver,
+    ) -> Result<Self> {
         todo!()
     }
 }
