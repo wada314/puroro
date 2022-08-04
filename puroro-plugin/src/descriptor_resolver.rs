@@ -89,6 +89,12 @@ impl<'a> DescriptorResolver<'a> {
         self.fqtn_to_desc_map.get(fqtn).map(|m| *m)
     }
 
+    pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<&dyn MessageOrEnum> {
+        Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
+            name: fqtn.to_string(),
+        })?)
+    }
+
     pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
         self.package_contents.get(package)
     }
