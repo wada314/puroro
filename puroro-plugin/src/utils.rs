@@ -16,6 +16,7 @@ use crate::{ErrorKind, Result};
 use ::lazy_static::lazy_static;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
+use std::borrow::Borrow;
 
 #[derive(Debug, Clone, Copy)]
 #[allow(unused)]
@@ -280,6 +281,14 @@ impl<'a> Fqtn<&'a str, &'a str> {
                 package: Package::new(""),
                 name: fqtn,
             }
+        }
+    }
+}
+impl<S: AsRef<str>, T: AsRef<str>> Fqtn<S, T> {
+    pub fn to_owned(&self) -> Fqtn<String, String> {
+        Fqtn {
+            package: self.package.to_owned(),
+            name: self.name.as_ref().to_string(),
         }
     }
 }
