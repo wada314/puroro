@@ -13,10 +13,12 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
+use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
-use std::borrow::Borrow;
+use ::std::iter;
 
 #[derive(Debug, Clone, Copy)]
 #[allow(unused)]
@@ -260,31 +262,51 @@ where
     }
 }
 
-pub struct Fqtn<S> {
-    package: Package<S>,
-    nested_messages: Vec<S>,
-    name: S,
-}
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+pub struct Fqtn<S>(S);
 impl<S> Fqtn<S> {
-    pub fn new(package: Package<S>, nested_messages: Vec<S>, name: S) -> Self {
-        Self {
-            package,
-            nested_messages,
-            name,
-        }
+    pub fn new(s: S) -> Self {
+        Self(s)
+    }
+}
+impl Fqtn<String> {
+    pub fn from_elements<S: AsRef<str>, T: AsRef<str>, U: AsRef<str>>(
+        package: Package<S>,
+        nested_messages: Vec<T>,
+        name: U,
+    ) -> Self {
+        let s = package
+            .as_str()
+            .is_empty()
+            .then_some(package.as_str())
+            .into_iter();
+        let t = nested_messages.iter().map(|s| s.as_ref());
+        let u = iter::once(name.as_ref());
+        Self(s.chain(t).chain(u).join(".").to_string())
     }
 }
 impl<S: AsRef<str>> Fqtn<S> {
     pub fn to_owned(&self) -> Fqtn<String> {
-        Fqtn {
-            package: self.package.to_owned(),
-            nested_messages: self
-                .nested_messages
-                .iter()
-                .map(|s| <S as AsRef<str>>::as_ref(s).to_string())
-                .collect(),
-            name: self.name.as_ref().to_string(),
+        Fqtn(self.0.as_ref().to_string())
+    }
+
+    pub fn to_rust_path(&self) -> String {
+        let (path_nodes, leaf) = match self.0.as_ref().rsplit_once('.') {
+            Some((path, leaf)) => (Some(path.split('.')).into_iter().flatten(), leaf),
+            None => (None.into_iter().flatten(), self.0.as_ref()),
+        };
+        let escaped_path_nodes =
+            path_nodes.map(|s| s.to_lower_snake_case().escape_rust_keywords().into_owned());
+        let escaped_leaf = leaf.to_camel_case().escape_rust_keywords().into_owned();
+        let mut result = String::new();
+        result.push_str("_puroro_root");
+        for node in escaped_path_nodes {
+            result.push_str("::");
+            result.push_str(&node);
         }
+        result.push_str("::");
+        result.push_str(&escaped_leaf);
+        result
     }
 }
 
