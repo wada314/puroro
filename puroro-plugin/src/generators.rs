@@ -252,7 +252,7 @@ impl Field {
             }
             (
                 FieldRule::Optional | FieldRule::Singular,
-                WireType::LengthDelimited(LengthDelimitedType::Message),
+                WireType::LengthDelimited(LengthDelimitedType::Message(_)),
             ) => {
                 format!("SingularHeapMessageField<{}>", todo!())
             }
@@ -312,7 +312,10 @@ impl WireType {
             TypeUint64 => Variant(UInt64),
             TypeSint64 => Variant(SInt64),
             TypeBool => Variant(Bool),
-            TypeEnum => todo!(),
+            TypeEnum => match syntax {
+                Syntax::Proto2 => Variant(Enum2(type_name.to_string())),
+                Syntax::Proto3 => Variant(Enum3(type_name.to_string())),
+            },
             TypeFixed32 => Bits32(Fixed32),
             TypeSfixed32 => Bits32(SFixed32),
             TypeFloat => Bits32(Float),
@@ -322,7 +325,7 @@ impl WireType {
             TypeString => LengthDelimited(String),
             TypeBytes => LengthDelimited(Bytes),
             TypeGroup => Err(ErrorKind::GroupNotSupported)?,
-            TypeMessage => todo!(),
+            TypeMessage => LengthDelimited(Message(type_name.to_string())),
         })
     }
 
@@ -336,7 +339,7 @@ impl WireType {
                 Variant(v) => v.into_owned_rust_type(),
                 LengthDelimited(String) => "&str".into(),
                 LengthDelimited(Bytes) => "&[u8]".into(),
-                LengthDelimited(Message) => todo!(),
+                LengthDelimited(Message(_)) => todo!(),
                 Bits32(b) => b.into_owned_rust_type(),
                 Bits64(b) => b.into_owned_rust_type(),
             }
@@ -353,8 +356,8 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2,
-    Enum3,
+    Enum2(String),
+    Enum3(String),
 }
 
 impl VariantType {
@@ -368,8 +371,8 @@ impl VariantType {
             UInt64 => "u64".into(),
             SInt64 => "i64".into(),
             Bool => "bool".into(),
-            Enum2 => todo!(),
-            Enum3 => todo!(),
+            Enum2(_) => todo!(),
+            Enum3(_) => todo!(),
         }
     }
 }
@@ -378,7 +381,7 @@ impl VariantType {
 pub enum LengthDelimitedType {
     String,
     Bytes,
-    Message,
+    Message(String),
 }
 
 #[derive(Debug, Clone)]

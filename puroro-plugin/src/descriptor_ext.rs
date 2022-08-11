@@ -20,6 +20,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
 use ::std::fmt::Debug;
+use itertools::Either;
 
 pub trait FileDescriptorExt {
     fn package_ext(&self) -> Package<&str>;
@@ -86,16 +87,45 @@ impl FileOrMessage for DescriptorProto {
 
 pub trait MessageOrEnum: Debug {
     fn name(&self) -> &str;
+    fn to_either(&self) -> Either<&DescriptorProto, &EnumDescriptorProto>;
+    fn is_message(&self) -> bool {
+        matches!(self.to_either(), Either::Left(_))
+    }
+    fn is_enum(&self) -> bool {
+        matches!(self.to_either(), Either::Right(_))
+    }
+    fn as_message(&self) -> Result<&DescriptorProto> {
+        match self.to_either() {
+            Either::Left(msg) => Ok(msg),
+            Either::Right(_) => Err(ErrorKind::InternalError {
+                detail: "enum has found where message is expected".to_string(),
+            })?,
+        }
+    }
+    fn as_enum(&self) -> Result<&EnumDescriptorProto> {
+        match self.to_either() {
+            Either::Left(_) => Err(ErrorKind::InternalError {
+                detail: "enum has found where message is expected".to_string(),
+            })?,
+            Either::Right(e) => Ok(e),
+        }
+    }
 }
 
 impl MessageOrEnum for DescriptorProto {
     fn name(&self) -> &str {
         DescriptorProto::name(self)
     }
+    fn to_either(&self) -> Either<&DescriptorProto, &EnumDescriptorProto> {
+        Either::Left(self)
+    }
 }
 
 impl MessageOrEnum for EnumDescriptorProto {
     fn name(&self) -> &str {
         EnumDescriptorProto::name(self)
+    }
+    fn to_either(&self) -> Either<&DescriptorProto, &EnumDescriptorProto> {
+        Either::Right(self)
     }
 }
