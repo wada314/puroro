@@ -259,6 +259,31 @@ where
     }
 }
 
+pub struct Fqtn<S, T> {
+    package: Package<S>,
+    name: T,
+}
+impl<S, T> Fqtn<S, T> {
+    pub fn new(package: Package<S>, name: T) -> Self {
+        Self { package, name }
+    }
+}
+impl<'a> Fqtn<&'a str, &'a str> {
+    pub fn from_str(fqtn: &'a str) -> Self {
+        if let Some((package_str, name)) = fqtn.rsplit_once('.') {
+            Self {
+                package: Package::new(package_str),
+                name,
+            }
+        } else {
+            Self {
+                package: Package::new(""),
+                name: fqtn,
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::{Package, StrExt, WordCase};
