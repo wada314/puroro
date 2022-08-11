@@ -260,34 +260,29 @@ where
     }
 }
 
-pub struct Fqtn<S, T> {
+pub struct Fqtn<S> {
     package: Package<S>,
-    name: T,
+    nested_messages: Vec<S>,
+    name: S,
 }
-impl<S, T> Fqtn<S, T> {
-    pub fn new(package: Package<S>, name: T) -> Self {
-        Self { package, name }
-    }
-}
-impl<'a> Fqtn<&'a str, &'a str> {
-    pub fn from_str(fqtn: &'a str) -> Self {
-        if let Some((package_str, name)) = fqtn.rsplit_once('.') {
-            Self {
-                package: Package::new(package_str),
-                name,
-            }
-        } else {
-            Self {
-                package: Package::new(""),
-                name: fqtn,
-            }
+impl<S> Fqtn<S> {
+    pub fn new(package: Package<S>, nested_messages: Vec<S>, name: S) -> Self {
+        Self {
+            package,
+            nested_messages,
+            name,
         }
     }
 }
-impl<S: AsRef<str>, T: AsRef<str>> Fqtn<S, T> {
-    pub fn to_owned(&self) -> Fqtn<String, String> {
+impl<S: AsRef<str>> Fqtn<S> {
+    pub fn to_owned(&self) -> Fqtn<String> {
         Fqtn {
             package: self.package.to_owned(),
+            nested_messages: self
+                .nested_messages
+                .iter()
+                .map(|s| <S as AsRef<str>>::as_ref(s).to_string())
+                .collect(),
             name: self.name.as_ref().to_string(),
         }
     }
