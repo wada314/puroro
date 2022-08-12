@@ -14,7 +14,7 @@
 
 //! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
 
-use crate::utils::Package;
+use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
@@ -58,9 +58,20 @@ pub trait EnumDescriptorExt {}
 
 impl EnumDescriptorExt for EnumDescriptorProto {}
 
-pub trait FieldDescriptorExt {}
+pub trait FieldDescriptorExt {
+    fn fqtn_opt(&self) -> Option<Fqtn<&str>>;
+}
 
-impl FieldDescriptorExt for FieldDescriptorProto {}
+impl FieldDescriptorExt for FieldDescriptorProto {
+    fn fqtn_opt(&self) -> Option<Fqtn<&str>> {
+        let type_name = self.type_name();
+        if type_name.is_empty() {
+            None
+        } else {
+            Some(Fqtn::new(type_name))
+        }
+    }
+}
 
 pub trait FileOrMessage: Debug {
     fn messages(&self) -> &[DescriptorProto];

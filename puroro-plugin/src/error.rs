@@ -40,12 +40,10 @@ pub enum ErrorKind {
     InvalidString { string: String },
     #[error(r#"An error from puroro: "{source}""#)]
     PuroroError { source: ::puroro::PuroroError },
+    #[error(r#"Expected the field descriptor's type_name field is filled, but is not"#)]
+    MissingTypeName,
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
-    #[error(r#"Failed to upgrade a Weak pointer"#)]
-    WeakUpgradeFailure,
-    #[error(r#"Failed to find a specified FQTN item"#)]
-    FqtnNotFound { fqtn: String },
 }
 impl From<std::fmt::Error> for GeneratorError {
     fn from(e: std::fmt::Error) -> Self {

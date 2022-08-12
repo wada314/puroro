@@ -104,8 +104,8 @@ impl<'a> DescriptorResolver<'a> {
     pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
         Ok(self
             .package_contents(package)
-            .ok_or(ErrorKind::FqtnNotFound {
-                fqtn: package.into(),
+            .ok_or(ErrorKind::UnknownTypeName  {
+                name: package.into(),
             })?)
     }
 

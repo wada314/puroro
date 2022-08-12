@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::{FileDescriptorExt, Syntax};
+use crate::descriptor_ext::{FieldDescriptorExt, FileDescriptorExt, Syntax};
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
-use crate::utils::StrExt as _;
+use crate::utils::{Fqtn, StrExt as _};
 use crate::Result;
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -220,7 +220,7 @@ impl Field {
                 ),
             })?,
         };
-        let wire_type = WireType::from_proto_type(f.r#type(), f.type_name(), syntax, resolver)?;
+        let wire_type = WireType::from_proto_type(f.r#type(), f.fqtn_opt(), syntax, resolver)?;
         let bit_index_for_optional = {
             let index = *bit_index;
             if matches!(rule, FieldRule::Optional) {
@@ -294,7 +294,7 @@ pub enum WireType {
 impl WireType {
     fn from_proto_type(
         r#type: google::protobuf::field_descriptor_proto::Type,
-        type_name: &str,
+        fqtn: Option<Fqtn<&str>>,
         syntax: Syntax,
         resolver: &DescriptorResolver,
     ) -> Result<WireType> {
@@ -313,8 +313,12 @@ impl WireType {
             TypeSint64 => Variant(SInt64),
             TypeBool => Variant(Bool),
             TypeEnum => match syntax {
-                Syntax::Proto2 => Variant(Enum2(type_name.to_string())),
-                Syntax::Proto3 => Variant(Enum3(type_name.to_string())),
+                Syntax::Proto2 => {
+                    Variant(Enum2(fqtn.ok_or(ErrorKind::MissingTypeName)?.to_owned()))
+                }
+                Syntax::Proto3 => {
+                    Variant(Enum3(fqtn.ok_or(ErrorKind::MissingTypeName)?.to_owned()))
+                }
             },
             TypeFixed32 => Bits32(Fixed32),
             TypeSfixed32 => Bits32(SFixed32),
@@ -325,7 +329,9 @@ impl WireType {
             TypeString => LengthDelimited(String),
             TypeBytes => LengthDelimited(Bytes),
             TypeGroup => Err(ErrorKind::GroupNotSupported)?,
-            TypeMessage => LengthDelimited(Message(type_name.to_string())),
+            TypeMessage => {
+                LengthDelimited(Message(fqtn.ok_or(ErrorKind::MissingTypeName)?.to_owned()))
+            }
         })
     }
 
@@ -356,8 +362,8 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(String),
-    Enum3(String),
+    Enum2(Fqtn<String>),
+    Enum3(Fqtn<String>),
 }
 
 impl VariantType {
@@ -381,7 +387,7 @@ impl VariantType {
 pub enum LengthDelimitedType {
     String,
     Bytes,
-    Message(String),
+    Message(Fqtn<String>),
 }
 
 #[derive(Debug, Clone)]
