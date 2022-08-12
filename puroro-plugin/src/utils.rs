@@ -315,6 +315,11 @@ impl<S: AsRef<str>> Fqtn<S> {
         result
     }
 }
+impl<S: Borrow<str>> Borrow<str> for Fqtn<S> {
+    fn borrow(&self) -> &str {
+        self.0.borrow()
+    }
+}
 
 #[cfg(test)]
 mod test {
