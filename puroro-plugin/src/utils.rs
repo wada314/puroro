@@ -271,8 +271,8 @@ impl<S> Fqtn<S> {
 }
 impl Fqtn<String> {
     pub fn from_elements<S: AsRef<str>, T: AsRef<str>, U: AsRef<str>>(
-        package: Package<S>,
-        nested_messages: Vec<T>,
+        package: &Package<S>,
+        nested_messages: &[T],
         name: U,
     ) -> Self {
         let s = package
