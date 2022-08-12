@@ -14,7 +14,7 @@
 
 use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::descriptor_ext::FileOrMessage;
-use crate::utils::Package;
+use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
@@ -22,7 +22,7 @@ use ::std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
-    fqtn_to_desc_map: HashMap<String, &'a dyn MessageOrEnum>,
+    fqtn_to_desc_map: HashMap<Fqtn<String>, &'a dyn MessageOrEnum>,
     package_contents: HashMap<String, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
@@ -43,15 +43,12 @@ impl<'a> DescriptorResolver<'a> {
     }
 
     fn generate_fqtn_to_desc_map(
-        fqtn_to_desc_map: &mut HashMap<String, &'a dyn MessageOrEnum>,
+        fqtn_to_desc_map: &mut HashMap<Fqtn<String>, &'a dyn MessageOrEnum>,
         file: &'a FileDescriptorProto,
     ) {
         visit_messages_and_enums(file, |m, path| {
             let nested_msgs = path.into_iter().map(|m| m.name());
-            let fqtn = ::std::iter::once(file.package())
-                .chain(nested_msgs)
-                .chain(::std::iter::once(m.name()))
-                .join(".");
+            let fqtn = Fqtn::from_elements(&file.package_ext(), nested_msgs, m.name());
             fqtn_to_desc_map.insert(fqtn, m);
         })
     }
@@ -85,8 +82,9 @@ impl<'a> DescriptorResolver<'a> {
         term_item.input_files.push(file);
     }
 
-    pub fn fqtn_to_desc(&self, fqtn: &str) -> Option<&dyn MessageOrEnum> {
-        self.fqtn_to_desc_map.get(fqtn).map(|m| *m)
+    pub fn fqtn_to_desc(&self, fqtn_str: &str) -> Option<&dyn MessageOrEnum> {
+        let fqtn = Fqtn::new(fqtn_str.to_string());
+        self.fqtn_to_desc_map.get(&fqtn).map(|m| *m)
     }
 
     pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<&dyn MessageOrEnum> {
