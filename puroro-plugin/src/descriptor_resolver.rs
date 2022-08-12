@@ -18,7 +18,9 @@ use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
+use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
+use ::std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
@@ -82,14 +84,16 @@ impl<'a> DescriptorResolver<'a> {
         term_item.input_files.push(file);
     }
 
-    pub fn fqtn_to_desc(&self, fqtn_str: &str) -> Option<&dyn MessageOrEnum> {
-        let fqtn = Fqtn::new(fqtn_str.to_string());
-        self.fqtn_to_desc_map.get(&fqtn).map(|m| *m)
+    pub fn fqtn_to_desc<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<&dyn MessageOrEnum> {
+        self.fqtn_to_desc_map.get::<str>(fqtn.borrow()).map(|m| *m)
     }
 
-    pub fn fqtn_to_desc_or_err(&self, fqtn: &str) -> Result<&dyn MessageOrEnum> {
+    pub fn fqtn_to_desc_or_err<S: Borrow<str> + Debug>(
+        &self,
+        fqtn: &Fqtn<S>,
+    ) -> Result<&dyn MessageOrEnum> {
         Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
-            name: fqtn.to_string(),
+            name: format!("{:?}", fqtn),
         })?)
     }
 
