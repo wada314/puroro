@@ -345,7 +345,7 @@ impl WireType {
                 Variant(v) => v.into_owned_rust_type(),
                 LengthDelimited(String) => "&str".into(),
                 LengthDelimited(Bytes) => "&[u8]".into(),
-                LengthDelimited(Message(_)) => todo!(),
+                LengthDelimited(Message(fqtn)) => format!("&{}", fqtn.to_rust_path()).into(),
                 Bits32(b) => b.into_owned_rust_type(),
                 Bits64(b) => b.into_owned_rust_type(),
             }
@@ -377,8 +377,8 @@ impl VariantType {
             UInt64 => "u64".into(),
             SInt64 => "i64".into(),
             Bool => "bool".into(),
-            Enum2(_) => todo!(),
-            Enum3(_) => todo!(),
+            Enum2(fqtn) => fqtn.to_rust_path().into(),
+            Enum3(fqtn) => fqtn.to_rust_path().into(),
         }
     }
 }
