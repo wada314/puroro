@@ -14,7 +14,7 @@
 
 //! Typetags for Proto field types.
 
-use crate::{ErrorKind, Result};
+use crate::Result;
 use ::std::marker::PhantomData;
 
 // Variants
@@ -46,6 +46,7 @@ pub trait NumericalType {
     type RustType;
 }
 pub trait VariantType: NumericalType {
+    #[allow(unused)]
     fn from_bytes(bytes: [u8; 8]) -> Result<Self::RustType> {
         todo!()
     }
@@ -100,13 +101,16 @@ impl NumericalType for SFixed64 {
 
 impl VariantType for Int32 {
     fn from_bytes(bytes: [u8; 8]) -> Result<Self::RustType> {
-        Ok(i64::from_le_bytes(bytes)
-            .try_into()
-            .map_err(|e| ErrorKind::IntegerOverflow(e))?)
+        let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
+        Ok(i32::from_le_bytes(val_u32.to_le_bytes()))
     }
 }
 impl VariantType for Int64 {}
-impl VariantType for UInt32 {}
+impl VariantType for UInt32 {
+    fn from_bytes(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes).try_into()?)
+    }
+}
 impl VariantType for UInt64 {}
 impl VariantType for SInt32 {}
 impl VariantType for SInt64 {}
