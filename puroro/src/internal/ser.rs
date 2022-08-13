@@ -13,8 +13,10 @@
 // limitations under the License.
 
 use crate::internal::variant::Variant;
-use crate::{ErrorKind, PuroroError};
+use crate::{ErrorKind, PuroroError, Result};
 use ::std::convert::TryFrom;
+use ::std::io::Result as IoResult;
+use ::std::iter;
 
 #[derive(Debug, Clone)]
 pub enum FieldData<T> {
@@ -54,6 +56,30 @@ impl<T> FieldData<T> {
             FieldData::Bits32(x) => FieldData::Bits32(x),
             FieldData::Bits64(x) => FieldData::Bits64(x),
         }
+    }
+}
+
+impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
+    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<(i32, Self)> {
+        let var_i32 = Variant::decode_bytes(bytes.by_ref())?.get_i32()?;
+        let wire_type: WireType = (var_i32 & 0x7).try_into()?;
+        let number = var_i32 >> 3;
+
+        let field_data = match wire_type {
+            WireType::Variant => FieldData::Variant(Variant::decode_bytes(bytes)?),
+            WireType::LengthDelimited => {
+                let length: usize = Variant::decode_bytes(bytes.by_ref())?
+                    .get_i32()?
+                    .try_into()?;
+                FieldData::LengthDelimited(bytes.take(length))
+            }
+            WireType::StartGroup => todo!(),
+            WireType::EndGroup => todo!(),
+            WireType::Bits32 => todo!(),
+            WireType::Bits64 => todo!(),
+        };
+
+        Ok((number, field_data))
     }
 }
 

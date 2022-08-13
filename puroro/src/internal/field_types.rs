@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::ser::FieldData;
 use crate::internal::variant::Variant;
 use crate::{tags, Result};
 use ::std::io::Result as IoResult;
@@ -27,7 +28,7 @@ pub trait FieldType {
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: IndexMut<usize, Output = bool>>(
         &mut self,
         bitvec: &mut B,
-        iter: &mut I,
+        field_data: FieldData<&mut I>,
     ) -> Result<()> {
         todo!()
     }
@@ -54,15 +55,6 @@ impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustTyp
     type GetterType<'a> = RustType where Self: 'a;
     fn get_field<B: Index<usize, Output = bool>>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.clone()
-    }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: IndexMut<usize, Output = bool>>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: &mut I,
-    ) -> Result<()> {
-        let var = Variant::decode_bytes(iter.by_ref())?;
-        self.0 = var.get::<ProtoType>()?;
-        Ok(())
     }
 }
 

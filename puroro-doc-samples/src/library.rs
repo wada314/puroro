@@ -57,8 +57,8 @@ impl self::_puroro::Message for Book {
         let mut msg = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
-            let (wire, number) =
-                self::_puroro::internal::utils::wire_and_number_from_bytes_iter(peekable.by_ref())?;
+            let (number, field_data) =
+                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
         }
         Ok(msg)
     }
@@ -98,8 +98,8 @@ impl self::_puroro::Message for Author {
         let mut msg = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
-            let (wire, number) =
-                self::_puroro::internal::utils::wire_and_number_from_bytes_iter(peekable.by_ref())?;
+            let (number, field_data) =
+                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
         }
         Ok(msg)
     }
