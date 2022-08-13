@@ -24,9 +24,11 @@ pub trait FieldType {
     fn get_field<B: Index<usize, Output = bool>>(&self, bitvec: &B) -> Self::GetterType<'_>;
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: IndexMut<usize, Output = bool>>(
         &mut self,
-        bitvec: &mut B,
-        iter: I, // TODO consider recursive case
-    ) -> Result<()>;
+        _bitvec: &mut B,
+        _iter: &mut I,
+    ) -> Result<()> {
+        todo!()
+    }
 }
 
 pub struct SingularNumericField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);

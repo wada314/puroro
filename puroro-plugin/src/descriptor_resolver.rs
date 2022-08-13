@@ -16,7 +16,6 @@ use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::descriptor_ext::FileOrMessage;
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
@@ -104,7 +103,7 @@ impl<'a> DescriptorResolver<'a> {
     pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
         Ok(self
             .package_contents(package)
-            .ok_or(ErrorKind::UnknownTypeName  {
+            .ok_or(ErrorKind::UnknownTypeName {
                 name: package.into(),
             })?)
     }
