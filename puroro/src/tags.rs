@@ -92,3 +92,13 @@ impl NumericalType for Fixed64 {
 impl NumericalType for SFixed64 {
     type RustType = i64;
 }
+
+impl VariantType for Int32 {}
+impl VariantType for Int64 {}
+impl VariantType for UInt32 {}
+impl VariantType for UInt64 {}
+impl VariantType for SInt32 {}
+impl VariantType for SInt64 {}
+impl VariantType for Bool {}
+impl<E> VariantType for Enum2<E> {}
+impl<E> VariantType for Enum3<E> {}
