@@ -19,11 +19,10 @@
 // Allow using GAT in document sample code.
 #![doc(test(attr(feature(generic_associated_types))))]
 
-mod common_traits;
 mod error;
 pub mod internal;
+pub mod tags;
 
-pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
