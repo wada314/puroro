@@ -13,7 +13,10 @@ pub struct Book {
     // Singular, LengthDelimited(String)
     title: self::_puroro::internal::field_types::SingularStringField,
     // Singular, Variant(UInt32)
-    num_pages: self::_puroro::internal::field_types::SingularNumericField<u32, ()>,
+    num_pages: self::_puroro::internal::field_types::SingularVariantField<
+        u32,
+        self::_puroro::tags::UInt32,
+    >,
     // Singular, LengthDelimited(Message(Fqtn(".library.Author")))
     author: self::_puroro::internal::field_types::SingularHeapMessageField<
         _puroro_root::library::Author,
@@ -31,7 +34,7 @@ impl Book {
     }
     // Singular, Variant(UInt32)
     pub fn num_pages(&self) -> u32 {
-        <self::_puroro::internal::field_types::SingularNumericField<u32, ()> as self::_puroro::internal::field_types::FieldType>::get_field(
+        <self::_puroro::internal::field_types::SingularVariantField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.num_pages, &self._bitfield,
         )
     }

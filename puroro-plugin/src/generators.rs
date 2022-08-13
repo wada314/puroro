@@ -231,17 +231,17 @@ impl Field {
         let rust_field_type_name = match (&rule, &wire_type) {
             (FieldRule::Optional, WireType::Variant(v)) => {
                 format!(
-                    "OptionalNumericField<{}, {}, {}>",
+                    "OptionalVariantField<{}, {}, {}>",
                     v.into_owned_rust_type(),
-                    "()",
+                    v.into_tag_type(),
                     bit_index_for_optional
                 )
             }
             (FieldRule::Singular, WireType::Variant(v)) => {
                 format!(
-                    "SingularNumericField<{}, {}>",
+                    "SingularVariantField<{}, {}>",
                     v.into_owned_rust_type(),
-                    "()"
+                    v.into_tag_type(),
                 )
             }
             (FieldRule::Optional, WireType::LengthDelimited(LengthDelimitedType::String)) => {
@@ -353,6 +353,14 @@ impl WireType {
             }
         }
     }
+
+    pub fn into_tag_type(&self) -> Cow<'static, str> {
+        use WireType::*;
+        match self {
+            Variant(v) => v.into_tag_type(),
+            _ => todo!(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -381,6 +389,21 @@ impl VariantType {
             Bool => "bool".into(),
             Enum2(fqtn) => fqtn.to_rust_path().into(),
             Enum3(fqtn) => fqtn.to_rust_path().into(),
+        }
+    }
+
+    pub fn into_tag_type(&self) -> Cow<'static, str> {
+        use VariantType::*;
+        match self {
+            Int32 => "self::_puroro::tags::Int32".into(),
+            UInt32 => "self::_puroro::tags::UInt32".into(),
+            SInt32 => "self::_puroro::tags::SInt32".into(),
+            Int64 => "self::_puroro::tags::Int64".into(),
+            UInt64 => "self::_puroro::tags::UInt64".into(),
+            SInt64 => "self::_puroro::tags::SInt64".into(),
+            Bool => "self::_puroro::tags::Bool".into(),
+            Enum2(e) => format!("self::_puroro::tags::Enum2<{}>", e.to_rust_path()).into(),
+            Enum3(e) => format!("self::_puroro::tags::Enum3<{}>", e.to_rust_path()).into(),
         }
     }
 }
