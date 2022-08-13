@@ -192,6 +192,7 @@ pub struct Field {
     pub wire_type: WireType,
     pub rust_field_type: String,
     pub rust_getter_type: String,
+    pub number: i32,
 }
 
 impl Field {
@@ -265,6 +266,7 @@ impl Field {
         let rust_getter_type = wire_type
             .into_getter_rust_type(matches!(&rule, &FieldRule::Repeated))
             .into_owned();
+        let number = f.number();
         Ok(Self {
             ident_lsnake,
             ident_camel,
@@ -272,6 +274,7 @@ impl Field {
             wire_type,
             rust_field_type,
             rust_getter_type,
+            number,
         })
     }
 }

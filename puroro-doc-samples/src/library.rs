@@ -54,11 +54,35 @@ impl self::_puroro::Message for Book {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
-        let mut msg = ::std::default::Default::default();
+        let mut msg: Self = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
             let (number, field_data) =
                 self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+            match number {
+                1 => <
+                    self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType
+                >::deser_from_iter(
+                    &mut msg.title,
+                    &mut msg._bitfield,
+                    field_data,
+                )?,
+                2 => <
+                    self::_puroro::internal::field_types::SingularVariantField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_types::FieldType
+                >::deser_from_iter(
+                    &mut msg.num_pages,
+                    &mut msg._bitfield,
+                    field_data,
+                )?,
+                3 => <
+                    self::_puroro::internal::field_types::SingularHeapMessageField<_puroro_root::library::Author> as self::_puroro::internal::field_types::FieldType
+                >::deser_from_iter(
+                    &mut msg.author,
+                    &mut msg._bitfield,
+                    field_data,
+                )?,
+                _ => todo!(),
+            }
         }
         Ok(msg)
     }
@@ -95,11 +119,21 @@ impl self::_puroro::Message for Author {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
-        let mut msg = ::std::default::Default::default();
+        let mut msg: Self = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
             let (number, field_data) =
                 self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+            match number {
+                1 => <
+                    self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType
+                >::deser_from_iter(
+                    &mut msg.name,
+                    &mut msg._bitfield,
+                    field_data,
+                )?,
+                _ => todo!(),
+            }
         }
         Ok(msg)
     }

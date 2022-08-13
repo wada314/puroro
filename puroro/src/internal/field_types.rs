@@ -28,7 +28,7 @@ pub trait FieldType {
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: IndexMut<usize, Output = bool>>(
         &mut self,
         bitvec: &mut B,
-        field_data: FieldData<&mut I>,
+        field_data: FieldData<I>,
     ) -> Result<()> {
         todo!()
     }
