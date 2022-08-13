@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::Result;
+use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
-use ::std::ops::Index;
+use ::std::ops::{Index, IndexMut};
 
 pub trait FieldType {
     type GetterType<'a>
     where
         Self: 'a;
     fn get_field<B: Index<usize, Output = bool>>(&self, bitvec: &B) -> Self::GetterType<'_>;
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: IndexMut<usize, Output = bool>>(
+        &mut self,
+        bitvec: &mut B,
+        iter: I, // TODO consider recursive case
+    ) -> Result<()>;
 }
 
 pub struct SingularNumericField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
