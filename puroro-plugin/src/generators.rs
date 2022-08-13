@@ -252,9 +252,9 @@ impl Field {
             }
             (
                 FieldRule::Optional | FieldRule::Singular,
-                WireType::LengthDelimited(LengthDelimitedType::Message(_)),
+                WireType::LengthDelimited(LengthDelimitedType::Message(fqtn)),
             ) => {
-                format!("SingularHeapMessageField<{}>", todo!())
+                format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
             }
             _ => format!(""),
         };
@@ -345,7 +345,9 @@ impl WireType {
                 Variant(v) => v.into_owned_rust_type(),
                 LengthDelimited(String) => "&str".into(),
                 LengthDelimited(Bytes) => "&[u8]".into(),
-                LengthDelimited(Message(fqtn)) => format!("&{}", fqtn.to_rust_path()).into(),
+                LengthDelimited(Message(fqtn)) => {
+                    format!("Option<&{}>", fqtn.to_rust_path()).into()
+                }
                 Bits32(b) => b.into_owned_rust_type(),
                 Bits64(b) => b.into_owned_rust_type(),
             }

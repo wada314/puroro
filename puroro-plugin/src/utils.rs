@@ -297,7 +297,9 @@ impl<S: AsRef<str>> Fqtn<S> {
     }
 
     pub fn to_rust_path(&self) -> String {
-        let (path_nodes, leaf) = match self.0.as_ref().rsplit_once('.') {
+        assert!(self.0.as_ref().starts_with('.'));
+        let absl_path = &self.0.as_ref()[1..];
+        let (path_nodes, leaf) = match absl_path.rsplit_once('.') {
             Some((path, leaf)) => (Some(path.split('.')).into_iter().flatten(), leaf),
             None => (None.into_iter().flatten(), self.0.as_ref()),
         };

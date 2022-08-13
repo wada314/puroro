@@ -30,7 +30,6 @@ pub struct OptionalNumericField<RustType, ProtoType, const BITFIELD_INDEX: usize
 
 pub struct SingularStringField(String);
 pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
-
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);
 
 impl<RustType: Clone, ProtoType> FieldType for SingularNumericField<RustType, ProtoType> {
