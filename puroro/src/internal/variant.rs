@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::tags;
 use crate::{ErrorKind, Result};
 use std::io::Result as IoResult;
 use std::io::Write;
@@ -85,5 +86,9 @@ impl Variant {
     }
     pub fn is_zero(&self) -> bool {
         self.0.iter().all(|x| *x == 0)
+    }
+
+    pub fn get<T: tags::VariantType>(&self) -> Result<T::RustType> {
+        Ok(T::from_bytes(self.0)?)
     }
 }
