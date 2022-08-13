@@ -9,6 +9,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
+#[derive(Default, Clone)]
 pub struct Book {
     // Singular, LengthDelimited(String)
     title: self::_puroro::internal::field_types::SingularStringField,
@@ -49,6 +50,20 @@ impl Book {
     }
 }
 
+impl self::_puroro::Message for Book {
+    fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        iter: I,
+    ) -> self::_puroro::Result<Self> {
+        let mut msg = ::std::default::Default::default();
+        let mut peekable = iter.peekable();
+        while peekable.peek().is_some() {
+            let (wire, number) =
+                self::_puroro::internal::utils::wire_and_number_from_bytes_iter(peekable.by_ref())?;
+        }
+        Ok(msg)
+    }
+}
+
 pub mod _book {
 
     mod _puroro {
@@ -59,6 +74,7 @@ pub mod _book {
     }
 }
 
+#[derive(Default, Clone)]
 pub struct Author {
     // Singular, LengthDelimited(String)
     name: self::_puroro::internal::field_types::SingularStringField,
@@ -72,6 +88,20 @@ impl Author {
         <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.name, &self._bitfield,
         )
+    }
+}
+
+impl self::_puroro::Message for Author {
+    fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        iter: I,
+    ) -> self::_puroro::Result<Self> {
+        let mut msg = ::std::default::Default::default();
+        let mut peekable = iter.peekable();
+        while peekable.peek().is_some() {
+            let (wire, number) =
+                self::_puroro::internal::utils::wire_and_number_from_bytes_iter(peekable.by_ref())?;
+        }
+        Ok(msg)
     }
 }
 

@@ -12,8 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::types::WireType;
+use crate::internal::variant::Variant;
+use crate::Result;
 use ::std::borrow::Borrow;
+use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
+
+pub fn wire_and_number_from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(
+    mut iter: I,
+) -> Result<(WireType, i32)> {
+    let var_i32 = Variant::decode_bytes(&mut iter)?.get_i32()?;
+    Ok(((var_i32 & 0x7).try_into()?, (var_i32 >> 3)))
+}
 
 pub struct BorrowedIter<B: ?Sized, I>(I, PhantomData<B>);
 impl<B: ?Sized, I> BorrowedIter<B, I> {

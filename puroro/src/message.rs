@@ -12,24 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![doc = include_str!("lib.md")]
-#![feature(backtrace)]
-#![feature(generic_associated_types)]
-#![feature(type_alias_impl_trait)]
-// Allow using GAT in document sample code.
-#![doc(test(attr(feature(generic_associated_types))))]
+use crate::Result;
+use ::std::io::Result as IoResult;
 
-mod error;
-pub mod internal;
-pub mod message;
-pub mod tags;
-
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use crate::message::Message;
-pub use ::bitvec;
-#[cfg(feature = "puroro-bumpalo")]
-pub use ::bumpalo;
-pub use ::either::Either;
+pub trait Message: Sized {
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(iter: I) -> Result<Self>;
+}

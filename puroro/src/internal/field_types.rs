@@ -33,14 +33,19 @@ pub trait FieldType {
     }
 }
 
+#[derive(Default, Clone)]
 pub struct SingularVariantField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
+#[derive(Default, Clone)]
 pub struct OptionalVariantField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
     RustType,
     PhantomData<ProtoType>,
 );
 
+#[derive(Default, Clone)]
 pub struct SingularStringField(String);
+#[derive(Default, Clone)]
 pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
+#[derive(Default, Clone)]
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);
 
 impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>>

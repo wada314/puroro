@@ -18,27 +18,45 @@ use crate::Result;
 use ::std::marker::PhantomData;
 
 // Variants
+#[derive(Default, Clone)]
 pub struct Int32;
+#[derive(Default, Clone)]
 pub struct Int64;
+#[derive(Default, Clone)]
 pub struct UInt32;
+#[derive(Default, Clone)]
 pub struct UInt64;
+#[derive(Default, Clone)]
 pub struct SInt32;
+#[derive(Default, Clone)]
 pub struct SInt64;
+#[derive(Default, Clone)]
 pub struct Bool;
+#[derive(Default, Clone)]
 pub struct Enum2<E>(PhantomData<E>);
+#[derive(Default, Clone)]
 pub struct Enum3<E>(PhantomData<E>);
 
 // Length delimited types
+#[derive(Default, Clone)]
 pub struct Bytes;
+#[derive(Default, Clone)]
 pub struct String;
+#[derive(Default, Clone)]
 pub struct Message<M>(PhantomData<M>);
 
 // Fixed 32 / 64 bit types
+#[derive(Default, Clone)]
 pub struct Float;
+#[derive(Default, Clone)]
 pub struct Fixed32;
+#[derive(Default, Clone)]
 pub struct SFixed32;
+#[derive(Default, Clone)]
 pub struct Double;
+#[derive(Default, Clone)]
 pub struct Fixed64;
+#[derive(Default, Clone)]
 pub struct SFixed64;
 
 // Traits
