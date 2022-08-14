@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
 use crate::internal::variant::Variant;
 use crate::{tags, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
-use ::std::ops::{Index, IndexMut};
 
 pub trait FieldType {
     type GetterType<'a>
     where
         Self: 'a;
-    fn get_field<B: Index<usize, Output = bool>>(&self, bitvec: &B) -> Self::GetterType<'_>;
+    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_>;
     #[allow(unused)]
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: IndexMut<usize, Output = bool>>(
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
         field_data: FieldData<I>,
@@ -53,7 +53,7 @@ impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustTyp
     FieldType for SingularVariantField<RustType, ProtoType>
 {
     type GetterType<'a> = RustType where Self: 'a;
-    fn get_field<B: Index<usize, Output = bool>>(&self, _bitvec: &B) -> Self::GetterType<'_> {
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.clone()
     }
 }
@@ -62,8 +62,8 @@ impl<RustType: Clone + Default, ProtoType, const BITFIELD_INDEX: usize> FieldTyp
     for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
 {
     type GetterType<'a> = RustType where Self: 'a;
-    fn get_field<B: Index<usize, Output = bool>>(&self, bitvec: &B) -> Self::GetterType<'_> {
-        if bitvec[BITFIELD_INDEX] {
+    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_> {
+        if bitvec.get::<BITFIELD_INDEX>() {
             self.0.clone()
         } else {
             Default::default() // TODO: proto specified default value
@@ -73,15 +73,15 @@ impl<RustType: Clone + Default, ProtoType, const BITFIELD_INDEX: usize> FieldTyp
 
 impl FieldType for SingularStringField {
     type GetterType<'a> = &'a str where Self: 'a;
-    fn get_field<B: Index<usize, Output = bool>>(&self, _bitvec: &B) -> Self::GetterType<'_> {
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.as_ref()
     }
 }
 
 impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_INDEX> {
     type GetterType<'a> = &'a str where Self: 'a;
-    fn get_field<B: Index<usize, Output = bool>>(&self, bitvec: &B) -> Self::GetterType<'_> {
-        if bitvec[BITFIELD_INDEX] {
+    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_> {
+        if bitvec.get::<BITFIELD_INDEX>() {
             self.0.as_ref()
         } else {
             Default::default() // TODO: proto specified default value
@@ -91,7 +91,7 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
 
 impl<M> FieldType for SingularHeapMessageField<M> {
     type GetterType<'a> = Option<&'a M> where Self: 'a;
-    fn get_field<B: Index<usize, Output = bool>>(&self, _bitvec: &B) -> Self::GetterType<'_> {
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.as_deref()
     }
 }
