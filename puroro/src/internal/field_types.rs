@@ -88,6 +88,18 @@ impl FieldType for SingularStringField {
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.as_ref()
     }
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(iter) = &mut field_data {
+            
+        } else {
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+        }
+        Ok(())
+    }
 }
 
 impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_INDEX> {
