@@ -23,7 +23,7 @@ pub struct Book {
         _puroro_root::library::Author,
     >,
 
-    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 0], self::_puroro::bitvec::order::Lsb0>,
+    _bitfield: self::_puroro::bitvec::BitArray<0>,
 }
 
 impl Book {
@@ -103,7 +103,7 @@ pub struct Author {
     // Singular, LengthDelimited(String)
     name: self::_puroro::internal::field_types::SingularStringField,
 
-    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; 0], self::_puroro::bitvec::order::Lsb0>,
+    _bitfield: self::_puroro::bitvec::BitArray<0>,
 }
 
 impl Author {

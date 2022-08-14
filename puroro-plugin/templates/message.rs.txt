@@ -10,7 +10,7 @@ pub struct {{ ident_camel }} {
     {%- endmatch %}
     {%- endfor %} {#- for f in fields #}
 
-    _bitfield: self::_puroro::bitvec::array::BitArray<[u32; {{ (bits_length + 7) / 8 }}], self::_puroro::bitvec::order::Lsb0>,
+    _bitfield: self::_puroro::bitvec::BitArray<{{ (bits_length + 7) / 8 }}>,
 }
 
 impl {{ ident_camel }} {

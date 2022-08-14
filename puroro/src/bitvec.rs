@@ -12,25 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![doc = include_str!("lib.md")]
-#![feature(backtrace)]
-#![feature(generic_associated_types)]
-#![feature(type_alias_impl_trait)]
-// Allow using GAT in document sample code.
-#![doc(test(attr(feature(generic_associated_types))))]
+//! A thin wrapper over the bitvec crate.
 
-pub mod bitvec;
-mod error;
-pub mod internal;
-pub mod message;
-pub mod tags;
-
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use crate::message::Message;
-
-#[cfg(feature = "puroro-bumpalo")]
-pub use ::bumpalo;
-pub use ::either::Either;
+pub type BitArray<const LEN32: usize> = ::bitvec::array::BitArray<[u32; LEN32]>;
