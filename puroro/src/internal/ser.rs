@@ -57,6 +57,15 @@ impl<T> FieldData<T> {
             FieldData::Bits64(x) => FieldData::Bits64(x),
         }
     }
+
+    pub fn wire_type(&self) -> WireType {
+        match self {
+            FieldData::Variant(_) => WireType::Variant,
+            FieldData::LengthDelimited(_) => WireType::LengthDelimited,
+            FieldData::Bits32(_) => WireType::Bits32,
+            FieldData::Bits64(_) => WireType::Bits64,
+        }
+    }
 }
 
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {

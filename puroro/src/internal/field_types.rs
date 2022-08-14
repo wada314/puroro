@@ -15,7 +15,7 @@
 use crate::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
 use crate::internal::variant::Variant;
-use crate::{tags, Result};
+use crate::{tags, ErrorKind, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
@@ -55,6 +55,18 @@ impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustTyp
     type GetterType<'a> = RustType where Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.clone()
+    }
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        _bitvec: &mut B,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        if let FieldData::Variant(var) = &field_data {
+            self.0 = var.get::<ProtoType>()?;
+        } else {
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+        }
+        Ok(())
     }
 }
 
