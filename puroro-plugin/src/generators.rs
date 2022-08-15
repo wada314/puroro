@@ -257,7 +257,7 @@ impl Field {
             ) => {
                 format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
             }
-            _ => format!(""),
+            _ => format!(""), // TODO
         };
         let rust_field_type = format!(
             "self::_puroro::internal::field_types::{}",
@@ -342,17 +342,22 @@ impl WireType {
         use LengthDelimitedType::*;
         use WireType::*;
         if is_repeated {
-            todo!()
+            match self {
+                Variant(var) => format!("&[{}]", var.into_owned_rust_type()).into(),
+                LengthDelimited(_) => "&[()]".into(), // TODO
+                Bits32(x) => format!("&[{}]", x.into_owned_rust_type()).into(),
+                Bits64(x) => format!("&[{}]", x.into_owned_rust_type()).into(),
+            }
         } else {
             match self {
-                Variant(v) => v.into_owned_rust_type(),
+                Variant(var) => var.into_owned_rust_type(),
                 LengthDelimited(String) => "&str".into(),
                 LengthDelimited(Bytes) => "&[u8]".into(),
                 LengthDelimited(Message(fqtn)) => {
                     format!("Option<&{}>", fqtn.to_rust_path()).into()
                 }
-                Bits32(b) => b.into_owned_rust_type(),
-                Bits64(b) => b.into_owned_rust_type(),
+                Bits32(x) => x.into_owned_rust_type(),
+                Bits64(x) => x.into_owned_rust_type(),
             }
         }
     }
@@ -361,7 +366,9 @@ impl WireType {
         use WireType::*;
         match self {
             Variant(v) => v.into_tag_type(),
-            _ => todo!(),
+            LengthDelimited(ld) => ld.into_tag_type(),
+            Bits32(x) => x.into_tag_type(),
+            Bits64(x) => x.into_tag_type(),
         }
     }
 }
@@ -418,6 +425,17 @@ pub enum LengthDelimitedType {
     Message(Fqtn<String>),
 }
 
+impl LengthDelimitedType {
+    pub fn into_tag_type(&self) -> Cow<'static, str> {
+        use LengthDelimitedType::*;
+        match self {
+            String => "self::_puroro::tags::String".into(),
+            Bytes => "self::_puroro::tags::Bytes".into(),
+            Message(m) => format!("self::_puroro::tags::Message<{}>", m.to_rust_path()).into(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Bits32Type {
     Fixed32,
@@ -432,6 +450,15 @@ impl Bits32Type {
             Fixed32 => "u32".into(),
             SFixed32 => "i32".into(),
             Float => "f32".into(),
+        }
+    }
+
+    pub fn into_tag_type(&self) -> Cow<'static, str> {
+        use Bits32Type::*;
+        match self {
+            Fixed32 => "self::_puroro::tags::Fixed32".into(),
+            SFixed32 => "self::_puroro::tags::SFixed32".into(),
+            Float => "self::_puroro::tags::Float".into(),
         }
     }
 }
@@ -450,6 +477,15 @@ impl Bits64Type {
             Fixed64 => "u64".into(),
             SFixed64 => "i64".into(),
             Double => "f64".into(),
+        }
+    }
+
+    pub fn into_tag_type(&self) -> Cow<'static, str> {
+        use Bits64Type::*;
+        match self {
+            Fixed64 => "self::_puroro::tags::Fixed64".into(),
+            SFixed64 => "self::_puroro::tags::SFixed64".into(),
+            Double => "self::_puroro::tags::Double".into(),
         }
     }
 }
