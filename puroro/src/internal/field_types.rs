@@ -34,6 +34,17 @@ pub trait FieldType {
 }
 
 #[derive(Default, Clone)]
+pub struct Dummy;
+impl FieldType for Dummy {
+    type GetterType<'a> = ()
+    where
+        Self: 'a;
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
+        todo!()
+    }
+}
+
+#[derive(Default, Clone)]
 pub struct SingularVariantField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
 pub struct OptionalVariantField<RustType, ProtoType, const BITFIELD_INDEX: usize>(

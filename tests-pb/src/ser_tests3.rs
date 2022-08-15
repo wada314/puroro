@@ -1,4 +1,3 @@
-
 // A generated source code by puroro library
 // package ser_tests3
 pub mod _msg;
@@ -14,17 +13,24 @@ pub mod _puroro {
 #[derive(Default, Clone)]
 pub struct Msg {
     // Singular, Variant(Int32)
-    i32_unlabeled: self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
+    i32_unlabeled:
+        self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
     // Singular, Bits32(Float)
-    float_unlabeled: self::_puroro::internal::field_types::,
+    float_unlabeled: self::_puroro::internal::field_types::Dummy,
     // Singular, LengthDelimited(String)
     string_unlabeled: self::_puroro::internal::field_types::SingularStringField,
     // Singular, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
-    submsg_unlabeled: self::_puroro::internal::field_types::SingularHeapMessageField<_puroro_root::ser_tests3::_msg::Submsg>,
+    submsg_unlabeled: self::_puroro::internal::field_types::SingularHeapMessageField<
+        _puroro_root::ser_tests3::_msg::Submsg,
+    >,
     // Singular, Variant(Enum3(Fqtn(".ser_tests3.Enum")))
-    enum_unlabeled: self::_puroro::internal::field_types::SingularVariantField<_puroro_root::ser_tests3::Enum, self::_puroro::tags::Enum3<_puroro_root::ser_tests3::Enum>>,
+    enum_unlabeled: self::_puroro::internal::field_types::SingularVariantField<
+        _puroro_root::ser_tests3::Enum,
+        self::_puroro::tags::Enum3<_puroro_root::ser_tests3::Enum>,
+    >,
     // Singular, Variant(Int32)
-    very_large_field_number: self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
+    very_large_field_number:
+        self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
 
     _bitfield: self::_puroro::bitvec::BitArray<0>,
 }
@@ -38,7 +44,7 @@ impl Msg {
     }
     // Singular, Bits32(Float)
     pub fn float_unlabeled(&self) -> f32 {
-        <self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType>::get_field(
+        <self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.float_unlabeled, &self._bitfield,
         )
     }
@@ -50,14 +56,21 @@ impl Msg {
     }
     // Singular, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
     pub fn submsg_unlabeled(&self) -> Option<&_puroro_root::ser_tests3::_msg::Submsg> {
-        <self::_puroro::internal::field_types::SingularHeapMessageField<_puroro_root::ser_tests3::_msg::Submsg> as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.submsg_unlabeled, &self._bitfield,
+        <self::_puroro::internal::field_types::SingularHeapMessageField<
+            _puroro_root::ser_tests3::_msg::Submsg,
+        > as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.submsg_unlabeled,
+            &self._bitfield,
         )
     }
     // Singular, Variant(Enum3(Fqtn(".ser_tests3.Enum")))
     pub fn enum_unlabeled(&self) -> _puroro_root::ser_tests3::Enum {
-        <self::_puroro::internal::field_types::SingularVariantField<_puroro_root::ser_tests3::Enum, self::_puroro::tags::Enum3<_puroro_root::ser_tests3::Enum>> as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.enum_unlabeled, &self._bitfield,
+        <self::_puroro::internal::field_types::SingularVariantField<
+            _puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::ser_tests3::Enum>,
+        > as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.enum_unlabeled,
+            &self._bitfield,
         )
     }
     // Singular, Variant(Int32)
@@ -69,11 +82,14 @@ impl Msg {
 }
 
 impl self::_puroro::Message for Msg {
-    fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
+    fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        iter: I,
+    ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
-            let (number, field_data) = self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+            let (number, field_data) =
+                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
             match number {
                 1 => <
                     self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32> as self::_puroro::internal::field_types::FieldType
@@ -83,21 +99,21 @@ impl self::_puroro::Message for Msg {
                     field_data,
                 )?,
                 2 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.i32_repeated,
                     &mut msg._bitfield,
                     field_data,
                 )?,
                 3 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.float_unlabeled,
                     &mut msg._bitfield,
                     field_data,
                 )?,
                 4 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.float_repeated,
                     &mut msg._bitfield,
@@ -111,7 +127,7 @@ impl self::_puroro::Message for Msg {
                     field_data,
                 )?,
                 6 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.string_repeated,
                     &mut msg._bitfield,
@@ -125,7 +141,7 @@ impl self::_puroro::Message for Msg {
                     field_data,
                 )?,
                 8 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.submsg_repeated,
                     &mut msg._bitfield,
@@ -139,7 +155,7 @@ impl self::_puroro::Message for Msg {
                     field_data,
                 )?,
                 10 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.enum_repeated,
                     &mut msg._bitfield,
@@ -167,5 +183,4 @@ pub mod _msg {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-
 }

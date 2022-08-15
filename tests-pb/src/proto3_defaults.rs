@@ -1,4 +1,3 @@
-
 // A generated source code by puroro library
 // package proto3_defaults
 
@@ -13,15 +12,22 @@ pub mod _puroro {
 #[derive(Default, Clone)]
 pub struct Msg {
     // Singular, Variant(Int32)
-    i32_unlabeled: self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
+    i32_unlabeled:
+        self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
     // Optional, Variant(Int32)
-    i32_optional: self::_puroro::internal::field_types::OptionalVariantField<i32, self::_puroro::tags::Int32, 0>,
+    i32_optional: self::_puroro::internal::field_types::OptionalVariantField<
+        i32,
+        self::_puroro::tags::Int32,
+        0,
+    >,
     // Singular, Bits32(Float)
-    f32_unlabeled: self::_puroro::internal::field_types::,
+    f32_unlabeled: self::_puroro::internal::field_types::Dummy,
     // Singular, LengthDelimited(String)
     string_unlabeled: self::_puroro::internal::field_types::SingularStringField,
     // Singular, LengthDelimited(Message(Fqtn(".proto3_defaults.Submsg")))
-    submsg_unlabeled: self::_puroro::internal::field_types::SingularHeapMessageField<_puroro_root::proto3_defaults::Submsg>,
+    submsg_unlabeled: self::_puroro::internal::field_types::SingularHeapMessageField<
+        _puroro_root::proto3_defaults::Submsg,
+    >,
 
     _bitfield: self::_puroro::bitvec::BitArray<1>,
 }
@@ -35,13 +41,18 @@ impl Msg {
     }
     // Optional, Variant(Int32)
     pub fn i32_optional(&self) -> i32 {
-        <self::_puroro::internal::field_types::OptionalVariantField<i32, self::_puroro::tags::Int32, 0> as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.i32_optional, &self._bitfield,
+        <self::_puroro::internal::field_types::OptionalVariantField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.i32_optional,
+            &self._bitfield,
         )
     }
     // Singular, Bits32(Float)
     pub fn f32_unlabeled(&self) -> f32 {
-        <self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType>::get_field(
+        <self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.f32_unlabeled, &self._bitfield,
         )
     }
@@ -53,18 +64,24 @@ impl Msg {
     }
     // Singular, LengthDelimited(Message(Fqtn(".proto3_defaults.Submsg")))
     pub fn submsg_unlabeled(&self) -> Option<&_puroro_root::proto3_defaults::Submsg> {
-        <self::_puroro::internal::field_types::SingularHeapMessageField<_puroro_root::proto3_defaults::Submsg> as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.submsg_unlabeled, &self._bitfield,
+        <self::_puroro::internal::field_types::SingularHeapMessageField<
+            _puroro_root::proto3_defaults::Submsg,
+        > as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.submsg_unlabeled,
+            &self._bitfield,
         )
     }
 }
 
 impl self::_puroro::Message for Msg {
-    fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
+    fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        iter: I,
+    ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
-            let (number, field_data) = self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+            let (number, field_data) =
+                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
             match number {
                 1 => <
                     self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32> as self::_puroro::internal::field_types::FieldType
@@ -81,14 +98,14 @@ impl self::_puroro::Message for Msg {
                     field_data,
                 )?,
                 3 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.i32_repeated,
                     &mut msg._bitfield,
                     field_data,
                 )?,
                 4 => <
-                    self::_puroro::internal::field_types:: as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
                     &mut msg.f32_unlabeled,
                     &mut msg._bitfield,
@@ -123,13 +140,13 @@ pub mod _msg {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-
 }
 
 #[derive(Default, Clone)]
 pub struct Submsg {
     // Singular, Variant(Int32)
-    i32_unlabeled: self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
+    i32_unlabeled:
+        self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32>,
 
     _bitfield: self::_puroro::bitvec::BitArray<0>,
 }
@@ -144,15 +161,19 @@ impl Submsg {
 }
 
 impl self::_puroro::Message for Submsg {
-    fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
+    fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        iter: I,
+    ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         let mut peekable = iter.peekable();
         while peekable.peek().is_some() {
-            let (number, field_data) = self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+            let (number, field_data) =
+                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
             match number {
-                1 => <
-                    self::_puroro::internal::field_types::SingularVariantField<i32, self::_puroro::tags::Int32> as self::_puroro::internal::field_types::FieldType
-                >::deser_from_iter(
+                1 => <self::_puroro::internal::field_types::SingularVariantField<
+                    i32,
+                    self::_puroro::tags::Int32,
+                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
                     &mut msg.i32_unlabeled,
                     &mut msg._bitfield,
                     field_data,
@@ -172,5 +193,4 @@ pub mod _submsg {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-
 }

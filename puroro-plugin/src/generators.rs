@@ -258,7 +258,7 @@ impl Field {
             ) => {
                 format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
             }
-            _ => format!(""), // TODO
+            _ => format!("Dummy"), // TODO
         };
         let rust_field_type = format!(
             "self::_puroro::internal::field_types::{}",
