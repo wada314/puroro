@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::ser::WireType;
-use crate::internal::variant::Variant;
-use crate::Result;
 use ::std::borrow::Borrow;
-use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
 pub struct BorrowedIter<B: ?Sized, I>(I, PhantomData<B>);

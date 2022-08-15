@@ -14,7 +14,6 @@
 
 use crate::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
-use crate::internal::variant::Variant;
 use crate::{tags, ErrorKind, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
@@ -90,11 +89,12 @@ impl FieldType for SingularStringField {
     }
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
-        bitvec: &mut B,
-        field_data: FieldData<I>,
+        _bitvec: &mut B,
+        mut field_data: FieldData<I>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = &mut field_data {
-            
+            let vec = iter.collect::<IoResult<Vec<u8>>>()?;
+            self.0 = String::from_utf8(vec)?;
         } else {
             Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
         }

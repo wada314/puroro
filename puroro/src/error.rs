@@ -85,3 +85,8 @@ impl From<std::num::TryFromIntError> for PuroroError {
         PuroroError::from(ErrorKind::from(input))
     }
 }
+impl From<std::string::FromUtf8Error> for PuroroError {
+    fn from(input: std::string::FromUtf8Error) -> Self {
+        PuroroError::from(ErrorKind::from(input))
+    }
+}
