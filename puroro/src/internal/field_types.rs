@@ -18,6 +18,8 @@ use crate::{tags, ErrorKind, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
+use super::variant::Variant;
+
 pub trait FieldType {
     type GetterType<'a>
     where
@@ -106,15 +108,16 @@ impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustTyp
     }
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
-        bitvec: &mut B,
+        _bitvec: &mut B,
         mut field_data: FieldData<I>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(var) => self.0.push(var.get::<ProtoType>()?),
-            FieldData::LengthDelimited(iter) => {
-                let mut piter = iter.peekable();
-                
-            },
+            FieldData::LengthDelimited(mut iter) => {
+                while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
+                    self.0.push(var.get::<ProtoType>()?)
+                }
+            }
             _ => todo!(),
         }
         Ok(())
