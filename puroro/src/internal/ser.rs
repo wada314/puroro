@@ -69,26 +69,33 @@ impl<T> FieldData<T> {
 }
 
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
-    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<(i32, Self)> {
-        let var_i32 = Variant::decode_bytes(bytes.by_ref())?.get_i32()?;
-        let wire_type: WireType = (var_i32 & 0x7).try_into()?;
-        let number = var_i32 >> 3;
+    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
+        if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
+            let var_i32 = var.get_i32()?;
+            let wire_type: WireType = (var_i32 & 0x7).try_into()?;
+            let number = var_i32 >> 3;
 
-        let field_data = match wire_type {
-            WireType::Variant => FieldData::Variant(Variant::decode_bytes(bytes)?),
-            WireType::LengthDelimited => {
-                let length: usize = Variant::decode_bytes(bytes.by_ref())?
-                    .get_i32()?
-                    .try_into()?;
-                FieldData::LengthDelimited(bytes.take(length))
-            }
-            WireType::StartGroup => todo!(),
-            WireType::EndGroup => todo!(),
-            WireType::Bits32 => todo!(),
-            WireType::Bits64 => todo!(),
-        };
+            let field_data = match wire_type {
+                WireType::Variant => FieldData::Variant(
+                    Variant::decode_bytes(bytes)?.ok_or(ErrorKind::UnexpectedInputTermination)?,
+                ),
+                WireType::LengthDelimited => {
+                    let length: usize = Variant::decode_bytes(bytes.by_ref())?
+                        .ok_or(ErrorKind::UnexpectedInputTermination)?
+                        .get_i32()?
+                        .try_into()?;
+                    FieldData::LengthDelimited(bytes.take(length))
+                }
+                WireType::StartGroup => todo!(),
+                WireType::EndGroup => todo!(),
+                WireType::Bits32 => todo!(),
+                WireType::Bits64 => todo!(),
+            };
 
-        Ok((number, field_data))
+            Ok(Some((number, field_data)))
+        } else {
+            Ok(None)
+        }
     }
 }
 

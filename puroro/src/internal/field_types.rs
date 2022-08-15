@@ -51,6 +51,8 @@ pub struct OptionalVariantField<RustType, ProtoType, const BITFIELD_INDEX: usize
     RustType,
     PhantomData<ProtoType>,
 );
+#[derive(Default, Clone)]
+pub struct RepeatedVariantField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
 pub struct SingularStringField(String);
@@ -90,6 +92,32 @@ impl<RustType: Clone + Default, ProtoType, const BITFIELD_INDEX: usize> FieldTyp
         } else {
             Default::default() // TODO: proto specified default value
         }
+    }
+}
+
+impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>>
+    FieldType for RepeatedVariantField<RustType, ProtoType>
+{
+    type GetterType<'a> = &'a [RustType]
+    where
+        Self: 'a;
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
+        self.0.as_slice()
+    }
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        mut field_data: FieldData<I>,
+    ) -> Result<()> {
+        match field_data {
+            FieldData::Variant(var) => self.0.push(var.get::<ProtoType>()?),
+            FieldData::LengthDelimited(iter) => {
+                let mut piter = iter.peekable();
+                
+            },
+            _ => todo!(),
+        }
+        Ok(())
     }
 }
 

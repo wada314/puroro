@@ -26,21 +26,22 @@ impl Variant {
     fn new(bytes: [u8; 8]) -> Self {
         Variant(bytes)
     }
-    pub fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
+    pub fn decode_bytes<I>(bytes: &mut I) -> Result<Option<Self>>
     where
         I: Iterator<Item = IoResult<u8>>,
     {
         let mut x = 0u64;
         for i in 0..9 {
-            match bytes.next() {
-                Some(maybe_byte) => {
+            match (i, bytes.next()) {
+                (_, Some(maybe_byte)) => {
                     let byte = maybe_byte?;
                     x |= ((byte & 0x7F) as u64) << (i * 7);
                     if byte < 0x80 {
-                        return Ok(Variant(x.to_ne_bytes()));
+                        return Ok(Some(Variant(x.to_ne_bytes())));
                     }
                 }
-                None => Err(ErrorKind::UnexpectedInputTermination)?,
+                (0, None) => return Ok(None),
+                (_, None) => Err(ErrorKind::UnexpectedInputTermination)?,
             }
         }
         // i == 9, so now checking a last MSBit.
@@ -51,7 +52,7 @@ impl Variant {
                 if byte & 0xFE != 0 {
                     Err(ErrorKind::TooLargeVariant)?
                 } else {
-                    return Ok(Variant(x.to_ne_bytes()));
+                    return Ok(Some(Variant(x.to_ne_bytes())));
                 }
             }
             None => Err(ErrorKind::UnexpectedInputTermination)?,
