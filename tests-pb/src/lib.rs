@@ -19,3 +19,7 @@ pub mod ser_tests3;
 pub mod _puroro_root {
     pub use super::*;
 }
+
+pub mod _puroro {
+    pub use ::puroro::*;
+}

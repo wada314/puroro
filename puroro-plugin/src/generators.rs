@@ -180,7 +180,8 @@ impl Enum {
         file: &FileDescriptorProto,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
-        todo!()
+        let ident_camel = e.name().to_camel_case().escape_rust_keywords().into_owned();
+        Ok(Enum { ident_camel })
     }
 }
 
