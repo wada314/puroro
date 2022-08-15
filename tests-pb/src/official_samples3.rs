@@ -166,10 +166,20 @@ pub mod _test3 {
 
 #[derive(Default, Clone)]
 pub struct Test4 {
+    // Repeated, Variant(Int32)
+    d: self::_puroro::internal::field_types::RepeatedVariantField<i32, self::_puroro::tags::Int32>,
+
     _bitfield: self::_puroro::bitvec::BitArray<0>,
 }
 
-impl Test4 {}
+impl Test4 {
+    // Repeated, Variant(Int32)
+    pub fn d(&self) -> &[i32] {
+        <self::_puroro::internal::field_types::RepeatedVariantField<i32, self::_puroro::tags::Int32> as self::_puroro::internal::field_types::FieldType>::get_field(
+            &self.d, &self._bitfield,
+        )
+    }
+}
 
 impl self::_puroro::Message for Test4 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -180,9 +190,10 @@ impl self::_puroro::Message for Test4 {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                4 => <
-                    self::_puroro::internal::field_types::Dummy as self::_puroro::internal::field_types::FieldType
-                >::deser_from_iter(
+                4 => <self::_puroro::internal::field_types::RepeatedVariantField<
+                    i32,
+                    self::_puroro::tags::Int32,
+                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
                     &mut msg.d,
                     &mut msg._bitfield,
                     field_data,

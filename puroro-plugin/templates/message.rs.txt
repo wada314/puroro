@@ -2,12 +2,8 @@
 #[derive(Default, Clone)]
 pub struct {{ ident_camel }} {
     {%- for f in fields %}
-    {%- match f.rule %}
-    {%- when FieldRule::Repeated %}
-    {%- else %}
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
     {{ f.ident_lsnake }}: {{ f.rust_field_type }},
-    {%- endmatch %}
     {%- endfor %} {#- for f in fields #}
 
     _bitfield: self::_puroro::bitvec::BitArray<{{ (bits_length + 7) / 8 }}>,
@@ -15,16 +11,12 @@ pub struct {{ ident_camel }} {
 
 impl {{ ident_camel }} {
     {%- for f in fields %}
-    {%- match f.rule %}
-    {%- when FieldRule::Repeated %}
-    {%- else %}
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
     pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
         <{{ f.rust_field_type }} as self::_puroro::internal::field_types::FieldType>::get_field(
             &self.{{ f.ident_lsnake }}, &self._bitfield,
         )
     }
-    {%- endmatch %}
     {%- endfor %} {#- for f in fields #}
 }
 

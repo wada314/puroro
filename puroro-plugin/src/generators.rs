@@ -246,6 +246,13 @@ impl Field {
                     v.into_tag_type(),
                 )
             }
+            (FieldRule::Repeated, WireType::Variant(v)) => {
+                format!(
+                    "RepeatedVariantField<{}, {}>",
+                    v.into_owned_rust_type(),
+                    v.into_tag_type(),
+                )
+            }
             (FieldRule::Optional, WireType::LengthDelimited(LengthDelimitedType::String)) => {
                 format!("OptionalStringField<{}>", bit_index_for_optional)
             }

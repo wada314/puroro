@@ -14,11 +14,10 @@
 
 use crate::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
+use crate::internal::variant::Variant;
 use crate::{tags, ErrorKind, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
-
-use super::variant::Variant;
 
 pub trait FieldType {
     type GetterType<'a>
@@ -109,7 +108,7 @@ impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustTyp
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        mut field_data: FieldData<I>,
+        field_data: FieldData<I>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(var) => self.0.push(var.get::<ProtoType>()?),

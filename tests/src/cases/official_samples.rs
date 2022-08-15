@@ -17,7 +17,7 @@
 use ::puroro::Message;
 use ::std::borrow::Cow;
 use ::std::default::Default;
-use ::tests_pb::official_samples2 as s2;
+// use ::tests_pb::official_samples2 as s2;
 use ::tests_pb::official_samples3 as s3;
 
 const TEST1_INPUT: &[u8] = &[0x08, 0x96, 0x01];
@@ -30,66 +30,63 @@ const TEST2_EXPECTED: &str = "testing";
 const TEST3_EXPECTED: i32 = 150;
 const TEST4_EXPECTED: &[i32] = &[3, 270, 86942];
 
-#[test]
-fn proto2_test1_simple() {
-    use std::io::Read as _;
-    let t1 = s2::Test1::from_bytes(TEST1_INPUT.bytes()).unwrap();
-    assert_eq!(TEST1_EXPECTED, t1.a());
-}
+// #[test]
+// fn proto2_test1_simple() {
+//     use std::io::Read as _;
+//     let t1 = s2::Test1::from_bytes(TEST1_INPUT.bytes()).unwrap();
+//     assert_eq!(TEST1_EXPECTED, t1.a());
+// }
 
 #[test]
 fn proto3_test1_simple() {
     use std::io::Read as _;
-    let t1 = s3::Test1::from_bytes(TEST1_INPUT.bytes()).unwrap();
+    let t1 = s3::Test1::from_bytes_iter(TEST1_INPUT.bytes()).unwrap();
     assert_eq!(TEST1_EXPECTED, t1.a());
 }
 
-#[test]
-fn proto2_test2_simple() {
-    use std::io::Read as _;
-    let mut t2 = s2::Test2::default();
-    t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
-    assert_eq!(TEST2_EXPECTED.to_string(), t2.b());
-}
+// #[test]
+// fn proto2_test2_simple() {
+//     use std::io::Read as _;
+//     let mut t2 = s2::Test2::default();
+//     t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
+//     assert_eq!(TEST2_EXPECTED.to_string(), t2.b());
+// }
 
 #[test]
 fn proto3_test2_simple() {
     use std::io::Read as _;
-    let mut t2 = s3::Test2::default();
-    t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
+    let mut t2 = s3::Test2::from_bytes_iter(TEST2_INPUT.bytes()).unwrap();
     assert_eq!(TEST2_EXPECTED, t2.b());
 }
 
-#[test]
-fn proto2_test3_simple() {
-    use std::io::Read as _;
-    let mut t3 = s2::Test3::default();
-    t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
-    assert!(t3.c().is_some());
-    assert_eq!(TEST3_EXPECTED, t3.c().unwrap().a());
-}
+// #[test]
+// fn proto2_test3_simple() {
+//     use std::io::Read as _;
+//     let mut t3 = s2::Test3::default();
+//     t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
+//     assert!(t3.c().is_some());
+//     assert_eq!(TEST3_EXPECTED, t3.c().unwrap().a());
+// }
 
 #[test]
 fn proto3_test3_simple() {
     use std::io::Read as _;
-    let mut t3 = s3::Test3::default();
-    t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
+    let mut t3 = s3::Test3::from_bytes_iter(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c().is_some());
     assert_eq!(TEST3_EXPECTED, t3.c().unwrap().a());
 }
 
-#[test]
-fn proto2_test4_simple() {
-    use std::io::Read as _;
-    let mut t4 = s2::Test4::default();
-    t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, t4.d());
-}
+// #[test]
+// fn proto2_test4_simple() {
+//     use std::io::Read as _;
+//     let mut t4 = s2::Test4::default();
+//     t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
+//     assert_eq!(TEST4_EXPECTED, t4.d());
+// }
 
 #[test]
 fn proto3_test4_simple() {
     use std::io::Read as _;
-    let mut t4 = s3::Test4::default();
-    t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
+    let mut t4 = s3::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
     assert_eq!(TEST4_EXPECTED, t4.d());
 }
