@@ -52,13 +52,12 @@ impl Book {
 
 impl self::_puroro::Message for Book {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
-        let mut peekable = iter.peekable();
-        while peekable.peek().is_some() {
-            let (number, field_data) =
-                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+        while let Some((number, field_data)) =
+            self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
+        {
             match number {
                 1 => <
                     self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType
@@ -117,13 +116,12 @@ impl Author {
 
 impl self::_puroro::Message for Author {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
-        let mut peekable = iter.peekable();
-        while peekable.peek().is_some() {
-            let (number, field_data) =
-                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+        while let Some((number, field_data)) =
+            self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
+        {
             match number {
                 1 => <
                     self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType
