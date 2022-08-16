@@ -13,9 +13,13 @@ impl {{ ident_camel }} {
     {%- for f in fields %}
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
     pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
-        <{{ f.rust_field_type }} as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.{{ f.ident_lsnake }}, &self._bitfield,
+        {%- match f.rule%}
+        {%- when FieldRule::Repeated %}
+        {%- else %}
+        <{{ f.rust_field_type }} as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+            &self.{{ f.ident_lsnake }}, &self._bitfield, ::std::default::Default::default(),
         )
+        {%- endmatch %}
     }
     {%- endfor %} {#- for f in fields #}
 }
@@ -23,21 +27,26 @@ impl {{ ident_camel }} {
 impl self::_puroro::Message for {{ ident_camel }} {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(mut iter: I) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
+        msg.merge_from_bytes_iter(iter)?;
+        Ok(msg)
+    }
+
+    fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, iter: I) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 {%- for f in fields %}
                 {{ f.number }} => <
                     {{ f.rust_field_type }} as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
-                    &mut msg.{{ f.ident_lsnake }},
-                    &mut msg._bitfield,
+                    &mut self.{{ f.ident_lsnake }},
+                    &mut self._bitfield,
                     field_data,
                 )?,
                 {%- endfor %} {#- for f in fields #}
                 _ => todo!(),
             }
         }
-        Ok(msg)
+        Ok(())
     }
 }
 

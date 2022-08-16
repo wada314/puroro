@@ -12,58 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::bitvec::BitSlice;
-use crate::internal::ser::{FieldData, WireType};
-use crate::internal::variant::Variant;
-use crate::{tags, ErrorKind, Result};
-use ::std::io::Result as IoResult;
+mod base_trait;
+mod non_repeated;
+
+pub use base_trait::FieldType;
+pub use non_repeated::NonRepeatedFieldType;
+
 use ::std::marker::PhantomData;
 
-pub trait FieldType {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_>;
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        field_data: FieldData<I>,
-    ) -> Result<()> {
-        match field_data {
-            FieldData::Variant(v) => self.deser_from_variant(bitvec, v),
-            FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
-            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits),
-            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits),
-        }
-    }
-    fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::Variant as i32))?
-    }
-    fn deser_from_bits32<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::Bits32 as i32))?
-    }
-    fn deser_from_bits64<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::Bits64 as i32))?
-    }
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        iter: I,
-    ) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as i32))?
-    }
+pub trait RepeatedFieldType: FieldType {
+    type ScalarType;
+    fn get_field(&self) -> &[Self::ScalarType];
 }
 
 #[derive(Default, Clone)]
 pub struct Dummy;
-impl FieldType for Dummy {
-    type GetterType<'a> = ()
-    where
-        Self: 'a;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
-        todo!()
-    }
-}
+impl FieldType for Dummy {}
 
 #[derive(Default, Clone)]
 pub struct SingularVariantField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -81,113 +45,3 @@ pub struct SingularStringField(String);
 pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
 #[derive(Default, Clone)]
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);
-
-impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>>
-    FieldType for SingularVariantField<RustType, ProtoType>
-{
-    type GetterType<'a> = RustType where Self: 'a;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
-        self.0.clone()
-    }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        field_data: FieldData<I>,
-    ) -> Result<()> {
-        if let FieldData::Variant(var) = &field_data {
-            self.0 = var.get::<ProtoType>()?;
-        } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
-        }
-        Ok(())
-    }
-}
-
-impl<RustType: Clone + Default, ProtoType, const BITFIELD_INDEX: usize> FieldType
-    for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
-{
-    type GetterType<'a> = RustType where Self: 'a;
-    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_> {
-        if bitvec.get::<BITFIELD_INDEX>() {
-            self.0.clone()
-        } else {
-            Default::default() // TODO: proto specified default value
-        }
-    }
-}
-
-impl<RustType: Clone, ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>>
-    FieldType for RepeatedVariantField<RustType, ProtoType>
-{
-    type GetterType<'a> = &'a [RustType]
-    where
-        Self: 'a;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
-        self.0.as_slice()
-    }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        field_data: FieldData<I>,
-    ) -> Result<()> {
-        match field_data {
-            FieldData::Variant(var) => self.0.push(var.get::<ProtoType>()?),
-            FieldData::LengthDelimited(mut iter) => {
-                while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
-                    self.0.push(var.get::<ProtoType>()?)
-                }
-            }
-            _ => todo!(),
-        }
-        Ok(())
-    }
-}
-
-impl FieldType for SingularStringField {
-    type GetterType<'a> = &'a str where Self: 'a;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
-        self.0.as_ref()
-    }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        mut field_data: FieldData<I>,
-    ) -> Result<()> {
-        if let FieldData::LengthDelimited(iter) = &mut field_data {
-            let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-            self.0 = String::from_utf8(vec)?;
-        } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
-        }
-        Ok(())
-    }
-}
-
-impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_INDEX> {
-    type GetterType<'a> = &'a str where Self: 'a;
-    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_> {
-        if bitvec.get::<BITFIELD_INDEX>() {
-            self.0.as_ref()
-        } else {
-            Default::default() // TODO: proto specified default value
-        }
-    }
-}
-
-impl<M: crate::Message> FieldType for SingularHeapMessageField<M> {
-    type GetterType<'a> = Option<&'a M> where Self: 'a;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
-        self.0.as_deref()
-    }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        field_data: FieldData<I>,
-    ) -> Result<()> {
-        if let FieldData::LengthDelimited(iter) = field_data {
-            todo!()
-        } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
-        }
-    }
-}

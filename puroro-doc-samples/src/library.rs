@@ -29,23 +29,24 @@ pub struct Book {
 impl Book {
     // Singular, LengthDelimited(String)
     pub fn title(&self) -> &str {
-        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.title, &self._bitfield,
+        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+            &self.title, &self._bitfield, ::std::default::Default::default(),
         )
     }
     // Singular, Variant(UInt32)
     pub fn num_pages(&self) -> u32 {
-        <self::_puroro::internal::field_types::SingularVariantField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.num_pages, &self._bitfield,
+        <self::_puroro::internal::field_types::SingularVariantField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+            &self.num_pages, &self._bitfield, ::std::default::Default::default(),
         )
     }
     // Singular, LengthDelimited(Message(Fqtn(".library.Author")))
     pub fn author(&self) -> Option<&_puroro_root::library::Author> {
         <self::_puroro::internal::field_types::SingularHeapMessageField<
             _puroro_root::library::Author,
-        > as self::_puroro::internal::field_types::FieldType>::get_field(
+        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
             &self.author,
             &self._bitfield,
+            ::std::default::Default::default(),
         )
     }
 }
@@ -55,6 +56,14 @@ impl self::_puroro::Message for Book {
         mut iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
+        msg.merge_from_bytes_iter(iter)?;
+        Ok(msg)
+    }
+
+    fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        &mut self,
+        iter: I,
+    ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
@@ -62,28 +71,28 @@ impl self::_puroro::Message for Book {
                 1 => <
                     self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
-                    &mut msg.title,
-                    &mut msg._bitfield,
+                    &mut self.title,
+                    &mut self._bitfield,
                     field_data,
                 )?,
                 2 => <
                     self::_puroro::internal::field_types::SingularVariantField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
-                    &mut msg.num_pages,
-                    &mut msg._bitfield,
+                    &mut self.num_pages,
+                    &mut self._bitfield,
                     field_data,
                 )?,
                 3 => <
                     self::_puroro::internal::field_types::SingularHeapMessageField<_puroro_root::library::Author> as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
-                    &mut msg.author,
-                    &mut msg._bitfield,
+                    &mut self.author,
+                    &mut self._bitfield,
                     field_data,
                 )?,
                 _ => todo!(),
             }
         }
-        Ok(msg)
+        Ok(())
     }
 }
 
@@ -108,8 +117,8 @@ pub struct Author {
 impl Author {
     // Singular, LengthDelimited(String)
     pub fn name(&self) -> &str {
-        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType>::get_field(
-            &self.name, &self._bitfield,
+        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+            &self.name, &self._bitfield, ::std::default::Default::default(),
         )
     }
 }
@@ -119,6 +128,14 @@ impl self::_puroro::Message for Author {
         mut iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
+        msg.merge_from_bytes_iter(iter)?;
+        Ok(msg)
+    }
+
+    fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        &mut self,
+        iter: I,
+    ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
@@ -126,14 +143,14 @@ impl self::_puroro::Message for Author {
                 1 => <
                     self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::FieldType
                 >::deser_from_iter(
-                    &mut msg.name,
-                    &mut msg._bitfield,
+                    &mut self.name,
+                    &mut self._bitfield,
                     field_data,
                 )?,
                 _ => todo!(),
             }
         }
-        Ok(msg)
+        Ok(())
     }
 }
 
