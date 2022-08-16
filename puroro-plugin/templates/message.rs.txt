@@ -15,6 +15,9 @@ impl {{ ident_camel }} {
     pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
         {%- match f.rule%}
         {%- when FieldRule::Repeated %}
+        <{{ f.rust_field_type }} as self::_puroro::internal::field_types::RepeatedFieldType>::get_field(
+            &self.{{ f.ident_lsnake }}, &self._bitfield, 
+        )
         {%- else %}
         <{{ f.rust_field_type }} as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
             &self.{{ f.ident_lsnake }}, &self._bitfield, ::std::default::Default::default(),

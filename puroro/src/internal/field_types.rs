@@ -14,16 +14,13 @@
 
 mod base_trait;
 mod non_repeated;
+mod repeated;
 
 pub use base_trait::FieldType;
 pub use non_repeated::NonRepeatedFieldType;
+pub use repeated::RepeatedFieldType;
 
 use ::std::marker::PhantomData;
-
-pub trait RepeatedFieldType: FieldType {
-    type ScalarType;
-    fn get_field(&self) -> &[Self::ScalarType];
-}
 
 #[derive(Default, Clone)]
 pub struct Dummy;

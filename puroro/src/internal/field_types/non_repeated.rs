@@ -34,8 +34,8 @@ pub trait NonRepeatedFieldType: FieldType {
 
 impl<RustType, ProtoType> NonRepeatedFieldType for SingularVariantField<RustType, ProtoType>
 where
-    RustType: 'static + PartialEq + Default + Clone,
-    ProtoType: 'static + tags::VariantType + tags::NumericalType<RustType = RustType>,
+    RustType: PartialEq + Default + Clone,
+    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
 {
     type GetterType<'a> = RustType
     where

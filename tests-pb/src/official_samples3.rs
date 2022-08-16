@@ -28,7 +28,7 @@ impl Test1 {
 
 impl self::_puroro::Message for Test1 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -37,7 +37,7 @@ impl self::_puroro::Message for Test1 {
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
@@ -87,7 +87,7 @@ impl Test2 {
 
 impl self::_puroro::Message for Test2 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -96,7 +96,7 @@ impl self::_puroro::Message for Test2 {
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
@@ -151,7 +151,7 @@ impl Test3 {
 
 impl self::_puroro::Message for Test3 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -160,7 +160,7 @@ impl self::_puroro::Message for Test3 {
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
@@ -200,12 +200,16 @@ pub struct Test4 {
 
 impl Test4 {
     // Repeated, Variant(Int32)
-    pub fn d(&self) -> &[i32] {}
+    pub fn d(&self) -> &[i32] {
+        <self::_puroro::internal::field_types::RepeatedVariantField<i32, self::_puroro::tags::Int32> as self::_puroro::internal::field_types::RepeatedFieldType>::get_field(
+            &self.d, &self._bitfield, 
+        )
+    }
 }
 
 impl self::_puroro::Message for Test4 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -214,7 +218,7 @@ impl self::_puroro::Message for Test4 {
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
