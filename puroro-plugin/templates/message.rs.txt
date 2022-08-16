@@ -25,13 +25,13 @@ impl {{ ident_camel }} {
 }
 
 impl self::_puroro::Message for {{ ident_camel }} {
-    fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(mut iter: I) -> self::_puroro::Result<Self> {
+    fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
     }
 
-    fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, iter: I) -> self::_puroro::Result<()> {
+    fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 {%- for f in fields %}

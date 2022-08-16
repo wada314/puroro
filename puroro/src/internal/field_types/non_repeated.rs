@@ -15,6 +15,7 @@
 use super::*;
 use crate::bitvec::BitSlice;
 use crate::tags;
+use crate::Message;
 
 pub trait NonRepeatedFieldType: FieldType {
     type GetterType<'a>
@@ -76,11 +77,35 @@ impl NonRepeatedFieldType for SingularStringField {
     where
         Self: 'a;
 
-    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_> {
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::OptGetterType<'_> {
         if self.0.is_empty() {
             None
         } else {
             Some(self.0.as_ref())
         }
+    }
+}
+
+impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
+where
+    M: Message + Default,
+{
+    type GetterType<'a> = Option<&'a M>
+    where
+        Self: 'a;
+    fn get_field<'a, B: BitSlice>(
+        &'a self,
+        bitvec: &B,
+        _default: Self::GetterType<'a>,
+    ) -> Self::GetterType<'a> {
+        self.get_field_opt(bitvec)
+    }
+
+    type OptGetterType<'a> = Option<&'a M>
+    where
+        Self: 'a;
+
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::OptGetterType<'_> {
+        self.0.as_deref()
     }
 }

@@ -53,7 +53,7 @@ impl Book {
 
 impl self::_puroro::Message for Book {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -62,7 +62,7 @@ impl self::_puroro::Message for Book {
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
@@ -125,7 +125,7 @@ impl Author {
 
 impl self::_puroro::Message for Author {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -134,7 +134,7 @@ impl self::_puroro::Message for Author {
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        iter: I,
+        mut iter: I,
     ) -> self::_puroro::Result<()> {
         while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
