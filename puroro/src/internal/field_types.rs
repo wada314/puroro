@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::bitvec::BitSlice;
-use crate::internal::ser::FieldData;
+use crate::internal::ser::{FieldData, WireType};
 use crate::internal::variant::Variant;
 use crate::{tags, ErrorKind, Result};
 use ::std::io::Result as IoResult;
@@ -24,13 +24,33 @@ pub trait FieldType {
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::GetterType<'_>;
-    #[allow(unused)]
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
         field_data: FieldData<I>,
     ) -> Result<()> {
-        todo!()
+        match field_data {
+            FieldData::Variant(v) => self.deser_from_variant(bitvec, v),
+            FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
+            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits),
+            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits),
+        }
+    }
+    fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
+        Err(ErrorKind::InvalidWireType(WireType::Variant as i32))?
+    }
+    fn deser_from_bits32<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
+        Err(ErrorKind::InvalidWireType(WireType::Bits32 as i32))?
+    }
+    fn deser_from_bits64<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
+        Err(ErrorKind::InvalidWireType(WireType::Bits64 as i32))?
+    }
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as i32))?
     }
 }
 
@@ -154,9 +174,20 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
     }
 }
 
-impl<M> FieldType for SingularHeapMessageField<M> {
+impl<M: crate::Message> FieldType for SingularHeapMessageField<M> {
     type GetterType<'a> = Option<&'a M> where Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterType<'_> {
         self.0.as_deref()
+    }
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(iter) = field_data {
+            todo!()
+        } else {
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+        }
     }
 }
