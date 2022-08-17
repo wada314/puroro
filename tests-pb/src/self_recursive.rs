@@ -24,9 +24,10 @@ impl Msg {
     pub fn recursive_unlabeled(&self) -> Option<&_puroro_root::self_recursive::Msg> {
         <self::_puroro::internal::field_types::SingularHeapMessageField<
             _puroro_root::self_recursive::Msg,
-        > as self::_puroro::internal::field_types::FieldType>::get_field(
+        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
             &self.recursive_unlabeled,
             &self._bitfield,
+            ::std::default::Default::default(),
         )
     }
 }
@@ -36,22 +37,29 @@ impl self::_puroro::Message for Msg {
         iter: I,
     ) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
-        let mut peekable = iter.peekable();
-        while peekable.peek().is_some() {
-            let (number, field_data) =
-                self::_puroro::internal::ser::FieldData::from_bytes_iter(peekable.by_ref())?;
+        msg.merge_from_bytes_iter(iter)?;
+        Ok(msg)
+    }
+
+    fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
+        &mut self,
+        mut iter: I,
+    ) -> self::_puroro::Result<()> {
+        while let Some((number, field_data)) =
+            self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
+        {
             match number {
                 1 => <self::_puroro::internal::field_types::SingularHeapMessageField<
                     _puroro_root::self_recursive::Msg,
                 > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
-                    &mut msg.recursive_unlabeled,
-                    &mut msg._bitfield,
+                    &mut self.recursive_unlabeled,
+                    &mut self._bitfield,
                     field_data,
                 )?,
                 _ => todo!(),
             }
         }
-        Ok(msg)
+        Ok(())
     }
 }
 

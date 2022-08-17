@@ -3,6 +3,7 @@
 // package (root)
 pub mod official_samples2;
 pub mod official_samples3;
+pub mod self_recursive;
 
 pub mod _puroro_root {
     pub use super::*;

@@ -22,7 +22,7 @@ mod official_samples;
 // mod proto2_defaults;
 // mod variants_packed;
 // mod proto3_defaults;
-// mod self_recursive;
+mod self_recursive;
 // mod simple_get_set;
 // mod simple_misc_traits;
 // mod simple_ser_tests;
