@@ -52,7 +52,7 @@ where
     where
         Self: 'a;
 
-    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_> {
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::OptGetterType<'_> {
         if self.0 == RustType::default() {
             None
         } else {

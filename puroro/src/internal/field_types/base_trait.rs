@@ -116,7 +116,7 @@ where
         _bitvec: &mut B,
         iter: I,
     ) -> Result<()> {
-        let mut msg = self.0.get_or_insert_with(Default::default).as_mut();
-        todo!()
+        let msg = self.0.get_or_insert_with(Default::default).as_mut();
+        Ok(msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?)
     }
 }
