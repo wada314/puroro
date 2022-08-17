@@ -111,7 +111,33 @@ where
     }
 }
 
-impl<RustType, ProtoType> FieldType for SingularFixedLengthField<RustType, ProtoType> {}
+impl<RustType, ProtoType> FieldType for SingularFixed32Field<RustType, ProtoType>
+where
+    RustType: Default + PartialEq,
+    ProtoType: tags::NumericalType<RustType = RustType> + tags::FixedLengthType<Bytes = [u8; 4]>,
+{
+    fn deser_from_bits32<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
+        let x = <ProtoType as tags::FixedLengthType>::from_bytes(bits)?;
+        if x != RustType::default() {
+            self.0 = x;
+        }
+        Ok(())
+    }
+}
+
+impl<RustType, ProtoType> FieldType for SingularFixed64Field<RustType, ProtoType>
+where
+    RustType: Default + PartialEq,
+    ProtoType: tags::NumericalType<RustType = RustType> + tags::FixedLengthType<Bytes = [u8; 8]>,
+{
+    fn deser_from_bits64<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
+        let x = <ProtoType as tags::FixedLengthType>::from_bytes(bits)?;
+        if x != RustType::default() {
+            self.0 = x;
+        }
+        Ok(())
+    }
+}
 
 impl FieldType for SingularStringField {
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(

@@ -90,6 +90,42 @@ where
     }
 }
 
+impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
+    for SingularFixed32Field<RustType, ProtoType>
+where
+    RustType: PartialEq + Default + Clone,
+    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+{
+    type GetterType<'a> = RustType
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
+        if self.0 == RustType::default() {
+            None
+        } else {
+            Some(self.0.clone())
+        }
+    }
+}
+
+impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
+    for SingularFixed64Field<RustType, ProtoType>
+where
+    RustType: PartialEq + Default + Clone,
+    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+{
+    type GetterType<'a> = RustType
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
+        if self.0 == RustType::default() {
+            None
+        } else {
+            Some(self.0.clone())
+        }
+    }
+}
+
 impl NonRepeatedNonMessageFieldType for SingularStringField {
     type GetterType<'a> = &'a str
     where

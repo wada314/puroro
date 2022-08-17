@@ -37,7 +37,9 @@ pub struct OptionalVariantField<RustType, ProtoType, const BITFIELD_INDEX: usize
 pub struct RepeatedVariantField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
-pub struct SingularFixedLengthField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
+pub struct SingularFixed32Field<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
+#[derive(Default, Clone)]
+pub struct SingularFixed64Field<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
 pub struct SingularStringField(String);
