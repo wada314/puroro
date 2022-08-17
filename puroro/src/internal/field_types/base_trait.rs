@@ -66,10 +66,14 @@ pub trait FieldType {
 
 impl<RustType, ProtoType> FieldType for SingularVariantField<RustType, ProtoType>
 where
+    RustType: PartialEq + Default,
     ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
-        self.0 = variant.get::<ProtoType>()?;
+        let v = variant.get::<ProtoType>()?;
+        if v != RustType::default() {
+            self.0 = v;
+        }
         Ok(())
     }
 }
@@ -114,7 +118,10 @@ impl FieldType for SingularStringField {
         iter: I,
     ) -> Result<()> {
         let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-        self.0 = String::from_utf8(vec)?;
+        let s = String::from_utf8(vec)?;
+        if !s.is_empty() {
+            self.0 = s
+        }
         Ok(())
     }
 }
