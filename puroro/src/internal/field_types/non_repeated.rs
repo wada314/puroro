@@ -61,6 +61,32 @@ where
     }
 }
 
+impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
+    for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
+where
+    RustType: Clone,
+    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+{
+    type GetterType<'a> = RustType
+    where
+        Self: 'a;
+    fn get_field<'a, B: BitSlice>(
+        &'a self,
+        bitvec: &B,
+        default: Self::GetterType<'a>,
+    ) -> Self::GetterType<'a> {
+        self.get_field_opt(bitvec).unwrap_or(default)
+    }
+
+    type OptGetterType<'a> = Option<RustType>
+    where
+        Self: 'a;
+
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_> {
+        bitvec.get::<BITFIELD_INDEX>().then_some(self.0.clone())
+    }
+}
+
 impl NonRepeatedFieldType for SingularStringField {
     type GetterType<'a> = &'a str
     where
