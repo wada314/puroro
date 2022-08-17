@@ -69,6 +69,13 @@ pub trait VariantType: NumericalType {
         todo!()
     }
 }
+pub trait FixedLengthType: NumericalType {
+    type Bytes;
+    #[allow(unused)]
+    fn from_bytes(bytes: Self::Bytes) -> Result<Self::RustType> {
+        todo!()
+    }
+}
 
 // Trait impls
 impl NumericalType for Int32 {
@@ -135,3 +142,25 @@ impl VariantType for SInt64 {}
 impl VariantType for Bool {}
 impl<E> VariantType for Enum2<E> {}
 impl<E> VariantType for Enum3<E> {}
+
+impl FixedLengthType for Fixed32 {
+    type Bytes = [u8; 4];
+}
+impl FixedLengthType for SFixed32 {
+    type Bytes = [u8; 4];
+}
+impl FixedLengthType for Float {
+    type Bytes = [u8; 4];
+    fn from_bytes(bytes: Self::Bytes) -> Result<Self::RustType> {
+        Ok(f32::from_le_bytes(bytes))
+    }
+}
+impl FixedLengthType for Fixed64 {
+    type Bytes = [u8; 8];
+}
+impl FixedLengthType for SFixed64 {
+    type Bytes = [u8; 8];
+}
+impl FixedLengthType for Double {
+    type Bytes = [u8; 8];
+}

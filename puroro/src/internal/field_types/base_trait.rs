@@ -111,6 +111,8 @@ where
     }
 }
 
+impl<RustType, ProtoType> FieldType for SingularFixedLengthField<RustType, ProtoType> {}
+
 impl FieldType for SingularStringField {
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
