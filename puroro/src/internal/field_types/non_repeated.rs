@@ -32,12 +32,15 @@ pub trait NonRepeatedFieldType: FieldType {
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_>;
 }
 
-impl<RustType, ProtoType> NonRepeatedFieldType for SingularVariantField<RustType, ProtoType>
-where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
-{
-    type GetterType<'a> = RustType
+pub trait NonRepeatedNonMessageFieldType: FieldType {
+    type GetterType<'a>
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>>;
+}
+
+impl<T: NonRepeatedNonMessageFieldType> NonRepeatedFieldType for T {
+    type GetterType<'a> = T::GetterType<'a>
     where
         Self: 'a;
     fn get_field<'a, B: BitSlice>(
@@ -47,12 +50,24 @@ where
     ) -> Self::GetterType<'a> {
         self.get_field_opt(bitvec).unwrap_or(default)
     }
-
-    type OptGetterType<'a> = Option<RustType>
+    type OptGetterType<'a> = Option<T::GetterType<'a>>
     where
         Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_> {
+        self.get_field_opt(bitvec)
+    }
+}
 
-    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::OptGetterType<'_> {
+impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
+    for SingularVariantField<RustType, ProtoType>
+where
+    RustType: PartialEq + Default + Clone,
+    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+{
+    type GetterType<'a> = RustType
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
         if self.0 == RustType::default() {
             None
         } else {
@@ -61,7 +76,7 @@ where
     }
 }
 
-impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
+impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
     for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
 where
     RustType: Clone,
@@ -70,45 +85,32 @@ where
     type GetterType<'a> = RustType
     where
         Self: 'a;
-    fn get_field<'a, B: BitSlice>(
-        &'a self,
-        bitvec: &B,
-        default: Self::GetterType<'a>,
-    ) -> Self::GetterType<'a> {
-        self.get_field_opt(bitvec).unwrap_or(default)
-    }
-
-    type OptGetterType<'a> = Option<RustType>
-    where
-        Self: 'a;
-
-    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_> {
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
         bitvec.get::<BITFIELD_INDEX>().then_some(self.0.clone())
     }
 }
 
-impl NonRepeatedFieldType for SingularStringField {
+impl NonRepeatedNonMessageFieldType for SingularStringField {
     type GetterType<'a> = &'a str
     where
         Self: 'a;
-    fn get_field<'a, B: BitSlice>(
-        &'a self,
-        bitvec: &B,
-        default: Self::GetterType<'a>,
-    ) -> Self::GetterType<'a> {
-        self.get_field_opt(bitvec).unwrap_or(default)
-    }
-
-    type OptGetterType<'a> = Option<&'a str>
-    where
-        Self: 'a;
-
-    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::OptGetterType<'_> {
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
         if self.0.is_empty() {
             None
         } else {
             Some(self.0.as_ref())
         }
+    }
+}
+
+impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
+    for OptionalStringField<BITFIELD_INDEX>
+{
+    type GetterType<'a> = &'a str
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
+        bitvec.get::<BITFIELD_INDEX>().then_some(&self.0)
     }
 }
 
