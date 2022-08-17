@@ -74,6 +74,18 @@ where
     }
 }
 
+impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
+    for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
+where
+    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+{
+    fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
+        self.0 = variant.get::<ProtoType>()?;
+        bitvec.set::<BITFIELD_INDEX>(true);
+        Ok(())
+    }
+}
+
 impl<RustType, ProtoType> FieldType for RepeatedVariantField<RustType, ProtoType>
 where
     ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
@@ -103,6 +115,19 @@ impl FieldType for SingularStringField {
     ) -> Result<()> {
         let vec = iter.collect::<IoResult<Vec<u8>>>()?;
         self.0 = String::from_utf8(vec)?;
+        Ok(())
+    }
+}
+
+impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_INDEX> {
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
+        self.0 = String::from_utf8(vec)?;
+        bitvec.set::<BITFIELD_INDEX>(true);
         Ok(())
     }
 }
