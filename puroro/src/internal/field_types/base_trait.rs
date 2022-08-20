@@ -64,10 +64,10 @@ pub trait FieldType {
     }
 }
 
-impl<RustType, ProtoType> FieldType for SingularVariantField<RustType, ProtoType>
+impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
     RustType: PartialEq + Default,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         let v = variant.get::<ProtoType>()?;
@@ -76,23 +76,47 @@ where
         }
         Ok(())
     }
+    fn deser_from_bits32<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
+        let x = <ProtoType as tags::NumericalType>::from_fixed32(bits)?;
+        if x != RustType::default() {
+            self.0 = x;
+        }
+        Ok(())
+    }
+    fn deser_from_bits64<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
+        let x = <ProtoType as tags::NumericalType>::from_fixed64(bits)?;
+        if x != RustType::default() {
+            self.0 = x;
+        }
+        Ok(())
+    }
 }
 
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
-    for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
+    for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
         bitvec.set::<BITFIELD_INDEX>(true);
         Ok(())
     }
+    fn deser_from_bits32<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
+        self.0 = <ProtoType as tags::NumericalType>::from_fixed32(bits)?;
+        bitvec.set::<BITFIELD_INDEX>(true);
+        Ok(())
+    }
+    fn deser_from_bits64<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
+        self.0 = <ProtoType as tags::NumericalType>::from_fixed64(bits)?;
+        bitvec.set::<BITFIELD_INDEX>(true);
+        Ok(())
+    }
 }
 
-impl<RustType, ProtoType> FieldType for RepeatedVariantField<RustType, ProtoType>
+impl<RustType, ProtoType> FieldType for RepeatedNumericalField<RustType, ProtoType>
 where
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0.push(variant.get::<ProtoType>()?);
@@ -109,32 +133,14 @@ where
         }
         Ok(())
     }
-}
-
-impl<RustType, ProtoType> FieldType for SingularFixed32Field<RustType, ProtoType>
-where
-    RustType: Default + PartialEq,
-    ProtoType: tags::NumericalType<RustType = RustType> + tags::FixedLengthType<Bytes = [u8; 4]>,
-{
     fn deser_from_bits32<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
-        let x = <ProtoType as tags::FixedLengthType>::from_bytes(bits)?;
-        if x != RustType::default() {
-            self.0 = x;
-        }
+        self.0
+            .push(<ProtoType as tags::NumericalType>::from_fixed32(bits)?);
         Ok(())
     }
-}
-
-impl<RustType, ProtoType> FieldType for SingularFixed64Field<RustType, ProtoType>
-where
-    RustType: Default + PartialEq,
-    ProtoType: tags::NumericalType<RustType = RustType> + tags::FixedLengthType<Bytes = [u8; 8]>,
-{
     fn deser_from_bits64<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
-        let x = <ProtoType as tags::FixedLengthType>::from_bytes(bits)?;
-        if x != RustType::default() {
-            self.0 = x;
-        }
+        self.0
+            .push(<ProtoType as tags::NumericalType>::from_fixed64(bits)?);
         Ok(())
     }
 }

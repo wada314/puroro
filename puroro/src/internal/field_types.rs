@@ -27,19 +27,14 @@ pub struct Dummy;
 impl FieldType for Dummy {}
 
 #[derive(Default, Clone)]
-pub struct SingularVariantField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
+pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
-pub struct OptionalVariantField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
     RustType,
     PhantomData<ProtoType>,
 );
 #[derive(Default, Clone)]
-pub struct RepeatedVariantField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
-
-#[derive(Default, Clone)]
-pub struct SingularFixed32Field<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
-#[derive(Default, Clone)]
-pub struct SingularFixed64Field<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
+pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
 pub struct SingularStringField(String);

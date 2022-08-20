@@ -59,10 +59,10 @@ impl<T: NonRepeatedNonMessageFieldType> NonRepeatedFieldType for T {
 }
 
 impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
-    for SingularVariantField<RustType, ProtoType>
+    for SingularNumericalField<RustType, ProtoType>
 where
     RustType: PartialEq + Default + Clone,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type GetterType<'a> = RustType
     where
@@ -77,52 +77,16 @@ where
 }
 
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
-    for OptionalVariantField<RustType, ProtoType, BITFIELD_INDEX>
+    for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
     RustType: Clone,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type GetterType<'a> = RustType
     where
         Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
         bitvec.get::<BITFIELD_INDEX>().then_some(self.0.clone())
-    }
-}
-
-impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
-    for SingularFixed32Field<RustType, ProtoType>
-where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
-{
-    type GetterType<'a> = RustType
-    where
-        Self: 'a;
-    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
-        if self.0 == RustType::default() {
-            None
-        } else {
-            Some(self.0.clone())
-        }
-    }
-}
-
-impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
-    for SingularFixed64Field<RustType, ProtoType>
-where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
-{
-    type GetterType<'a> = RustType
-    where
-        Self: 'a;
-    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
-        if self.0 == RustType::default() {
-            None
-        } else {
-            Some(self.0.clone())
-        }
     }
 }
 

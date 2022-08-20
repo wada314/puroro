@@ -89,8 +89,8 @@ impl Variant {
         self.0.iter().all(|x| *x == 0)
     }
 
-    pub fn get<T: tags::VariantType>(&self) -> Result<T::RustType> {
-        Ok(T::from_bytes(self.0)?)
+    pub fn get<T: tags::NumericalType>(&self) -> Result<T::RustType> {
+        Ok(T::from_variant(self.0)?)
     }
 
     pub fn get_i32(&self) -> Result<i32> {

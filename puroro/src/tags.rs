@@ -14,7 +14,7 @@
 
 //! Typetags for Proto field types.
 
-use crate::Result;
+use crate::{ErrorKind, Result};
 use ::std::marker::PhantomData;
 
 // Variants
@@ -62,30 +62,33 @@ pub struct SFixed64;
 // Traits
 pub trait NumericalType {
     type RustType;
-}
-pub trait VariantType: NumericalType {
-    #[allow(unused)]
-    fn from_bytes(bytes: [u8; 8]) -> Result<Self::RustType> {
-        todo!()
+    fn from_variant(_bytes: [u8; 8]) -> Result<Self::RustType> {
+        Err(ErrorKind::UnexpectedWireType)?
     }
-}
-pub trait FixedLengthType: NumericalType {
-    type Bytes;
-    #[allow(unused)]
-    fn from_bytes(bytes: Self::Bytes) -> Result<Self::RustType> {
-        todo!()
+    fn from_fixed32(_bytes: [u8; 4]) -> Result<Self::RustType> {
+        Err(ErrorKind::UnexpectedWireType)?
+    }
+    fn from_fixed64(_bytes: [u8; 8]) -> Result<Self::RustType> {
+        Err(ErrorKind::UnexpectedWireType)?
     }
 }
 
 // Trait impls
 impl NumericalType for Int32 {
     type RustType = i32;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
+        Ok(i32::from_le_bytes(val_u32.to_le_bytes()))
+    }
 }
 impl NumericalType for Int64 {
     type RustType = i64;
 }
 impl NumericalType for UInt32 {
     type RustType = u32;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes).try_into()?)
+    }
 }
 impl NumericalType for UInt64 {
     type RustType = u64;
@@ -107,6 +110,9 @@ impl<E> NumericalType for Enum3<E> {
 }
 impl NumericalType for Float {
     type RustType = f32;
+    fn from_fixed32(bytes: [u8; 4]) -> Result<Self::RustType> {
+        Ok(f32::from_le_bytes(bytes))
+    }
 }
 impl NumericalType for Fixed32 {
     type RustType = u32;
@@ -122,45 +128,4 @@ impl NumericalType for Fixed64 {
 }
 impl NumericalType for SFixed64 {
     type RustType = i64;
-}
-
-impl VariantType for Int32 {
-    fn from_bytes(bytes: [u8; 8]) -> Result<Self::RustType> {
-        let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
-        Ok(i32::from_le_bytes(val_u32.to_le_bytes()))
-    }
-}
-impl VariantType for Int64 {}
-impl VariantType for UInt32 {
-    fn from_bytes(bytes: [u8; 8]) -> Result<Self::RustType> {
-        Ok(u64::from_le_bytes(bytes).try_into()?)
-    }
-}
-impl VariantType for UInt64 {}
-impl VariantType for SInt32 {}
-impl VariantType for SInt64 {}
-impl VariantType for Bool {}
-impl<E> VariantType for Enum2<E> {}
-impl<E> VariantType for Enum3<E> {}
-
-impl FixedLengthType for Fixed32 {
-    type Bytes = [u8; 4];
-}
-impl FixedLengthType for SFixed32 {
-    type Bytes = [u8; 4];
-}
-impl FixedLengthType for Float {
-    type Bytes = [u8; 4];
-    fn from_bytes(bytes: Self::Bytes) -> Result<Self::RustType> {
-        Ok(f32::from_le_bytes(bytes))
-    }
-}
-impl FixedLengthType for Fixed64 {
-    type Bytes = [u8; 8];
-}
-impl FixedLengthType for SFixed64 {
-    type Bytes = [u8; 8];
-}
-impl FixedLengthType for Double {
-    type Bytes = [u8; 8];
 }

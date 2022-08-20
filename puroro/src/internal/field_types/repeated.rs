@@ -21,10 +21,10 @@ pub trait RepeatedFieldType: FieldType {
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
 }
 
-impl<RustType, ProtoType> RepeatedFieldType for RepeatedVariantField<RustType, ProtoType>
+impl<RustType, ProtoType> RepeatedFieldType for RepeatedNumericalField<RustType, ProtoType>
 where
     RustType: PartialEq + Default + Clone,
-    ProtoType: tags::VariantType + tags::NumericalType<RustType = RustType>,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type ScalarType = RustType;
 

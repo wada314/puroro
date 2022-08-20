@@ -230,42 +230,44 @@ impl Field {
             }
             index
         };
-        let rust_field_type_name = match (&rule, &wire_type) {
-            (FieldRule::Optional, WireType::Variant(v)) => {
-                format!(
-                    "OptionalVariantField<{}, {}, {}>",
-                    v.into_owned_rust_type(),
-                    v.into_tag_type(),
-                    bit_index_for_optional
-                )
+        let rust_field_type_name = {
+            use FieldRule::*;
+            use LengthDelimitedType::*;
+            use WireType::*;
+            match (&rule, &wire_type) {
+                (Optional, Variant(_) | Bits32(_) | Bits64(_)) => {
+                    format!(
+                        "OptionalNumericalField<{}, {}, {}>",
+                        wire_type.into_owned_rust_type(),
+                        wire_type.into_tag_type(),
+                        bit_index_for_optional
+                    )
+                }
+                (Singular, Variant(_) | Bits32(_) | Bits64(_)) => {
+                    format!(
+                        "SingularNumericalField<{}, {}>",
+                        wire_type.into_owned_rust_type(),
+                        wire_type.into_tag_type(),
+                    )
+                }
+                (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => {
+                    format!(
+                        "RepeatedNumericalField<{}, {}>",
+                        wire_type.into_owned_rust_type(),
+                        wire_type.into_tag_type(),
+                    )
+                }
+                (Optional, LengthDelimited(String)) => {
+                    format!("OptionalStringField<{}>", bit_index_for_optional)
+                }
+                (Singular, LengthDelimited(String)) => {
+                    format!("SingularStringField")
+                }
+                (Optional | Singular, LengthDelimited(Message(fqtn))) => {
+                    format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
+                }
+                _ => format!("Dummy"), // TODO
             }
-            (FieldRule::Singular, WireType::Variant(v)) => {
-                format!(
-                    "SingularVariantField<{}, {}>",
-                    v.into_owned_rust_type(),
-                    v.into_tag_type(),
-                )
-            }
-            (FieldRule::Repeated, WireType::Variant(v)) => {
-                format!(
-                    "RepeatedVariantField<{}, {}>",
-                    v.into_owned_rust_type(),
-                    v.into_tag_type(),
-                )
-            }
-            (FieldRule::Optional, WireType::LengthDelimited(LengthDelimitedType::String)) => {
-                format!("OptionalStringField<{}>", bit_index_for_optional)
-            }
-            (FieldRule::Singular, WireType::LengthDelimited(LengthDelimitedType::String)) => {
-                format!("SingularStringField")
-            }
-            (
-                FieldRule::Optional | FieldRule::Singular,
-                WireType::LengthDelimited(LengthDelimitedType::Message(fqtn)),
-            ) => {
-                format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
-            }
-            _ => format!("Dummy"), // TODO
         };
         let rust_field_type = format!(
             "self::_puroro::internal::field_types::{}",
@@ -370,6 +372,16 @@ impl WireType {
         }
     }
 
+    pub fn into_owned_rust_type(&self) -> Cow<'static, str> {
+        use WireType::*;
+        match self {
+            Variant(v) => v.into_owned_rust_type(),
+            LengthDelimited(ld) => ld.into_owned_rust_type(),
+            Bits32(x) => x.into_owned_rust_type(),
+            Bits64(x) => x.into_owned_rust_type(),
+        }
+    }
+
     pub fn into_tag_type(&self) -> Cow<'static, str> {
         use WireType::*;
         match self {
@@ -434,6 +446,15 @@ pub enum LengthDelimitedType {
 }
 
 impl LengthDelimitedType {
+    pub fn into_owned_rust_type(&self) -> Cow<'static, str> {
+        use LengthDelimitedType::*;
+        match self {
+            Bytes => "::std::vec::Vec<u8>".into(),
+            String => "::std::string::String".into(),
+            Message(fqtn) => fqtn.to_rust_path().into(),
+        }
+    }
+
     pub fn into_tag_type(&self) -> Cow<'static, str> {
         use LengthDelimitedType::*;
         match self {
