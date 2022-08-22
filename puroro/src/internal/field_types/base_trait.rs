@@ -173,6 +173,18 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
     }
 }
 
+impl FieldType for RepeatedStringField {
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        _bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
+        self.0.push(String::from_utf8(vec)?);
+        Ok(())
+    }
+}
+
 impl<M> FieldType for SingularHeapMessageField<M>
 where
     M: Message + Default,
@@ -184,5 +196,20 @@ where
     ) -> Result<()> {
         let msg = self.0.get_or_insert_with(Default::default).as_mut();
         Ok(msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?)
+    }
+}
+
+impl<M> FieldType for RepeatedMessageField<M>
+where
+    M: Message + Default,
+{
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        _bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        let msg = M::from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
+        self.0.push(msg);
+        Ok(())
     }
 }

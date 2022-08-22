@@ -41,4 +41,9 @@ pub struct SingularStringField(String);
 #[derive(Default, Clone)]
 pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
 #[derive(Default, Clone)]
+pub struct RepeatedStringField(Vec<String>);
+
+#[derive(Default, Clone)]
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);
+#[derive(Default, Clone)]
+pub struct RepeatedMessageField<M>(Vec<M>);
