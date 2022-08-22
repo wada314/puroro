@@ -74,6 +74,14 @@ pub trait NumericalType {
     fn to_variant(_val: Self::RustType) -> Result<[u8; 8]> {
         Err(ErrorKind::UnexpectedWireType)?
     }
+    fn to_wire_type(_val: Self::RustType) -> Result<NumericalWireType> {
+        unimplemented!()
+    }
+}
+pub enum NumericalWireType {
+    Variant([u8; 8]),
+    Bits32([u8; 4]),
+    Bits64([u8; 8]),
 }
 
 // Trait impls
