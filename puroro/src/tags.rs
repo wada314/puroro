@@ -65,10 +65,10 @@ pub trait NumericalType {
     fn from_variant(_bytes: [u8; 8]) -> Result<Self::RustType> {
         Err(ErrorKind::UnexpectedWireType)?
     }
-    fn from_fixed32(_bytes: [u8; 4]) -> Result<Self::RustType> {
+    fn from_bits32(_bytes: [u8; 4]) -> Result<Self::RustType> {
         Err(ErrorKind::UnexpectedWireType)?
     }
-    fn from_fixed64(_bytes: [u8; 8]) -> Result<Self::RustType> {
+    fn from_bits64(_bytes: [u8; 8]) -> Result<Self::RustType> {
         Err(ErrorKind::UnexpectedWireType)?
     }
     fn to_variant(_val: Self::RustType) -> Result<[u8; 8]> {
@@ -119,7 +119,7 @@ impl<E> NumericalType for Enum3<E> {
 }
 impl NumericalType for Float {
     type RustType = f32;
-    fn from_fixed32(bytes: [u8; 4]) -> Result<Self::RustType> {
+    fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
         Ok(f32::from_le_bytes(bytes))
     }
 }
