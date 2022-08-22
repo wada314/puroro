@@ -71,6 +71,9 @@ pub trait NumericalType {
     fn from_fixed64(_bytes: [u8; 8]) -> Result<Self::RustType> {
         Err(ErrorKind::UnexpectedWireType)?
     }
+    fn to_variant(_val: Self::RustType) -> Result<[u8; 8]> {
+        Err(ErrorKind::UnexpectedWireType)?
+    }
 }
 
 // Trait impls
@@ -80,6 +83,9 @@ impl NumericalType for Int32 {
         let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
         Ok(i32::from_le_bytes(val_u32.to_le_bytes()))
     }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val.into()))
+    }
 }
 impl NumericalType for Int64 {
     type RustType = i64;
@@ -88,6 +94,9 @@ impl NumericalType for UInt32 {
     type RustType = u32;
     fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
         Ok(u64::from_le_bytes(bytes).try_into()?)
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(val.into()))
     }
 }
 impl NumericalType for UInt64 {

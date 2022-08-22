@@ -92,8 +92,11 @@ impl Variant {
     pub fn get<T: tags::NumericalType>(&self) -> Result<T::RustType> {
         Ok(T::from_variant(self.0)?)
     }
-
     pub fn get_i32(&self) -> Result<i32> {
         Ok(self.get::<tags::Int32>()?)
+    }
+
+    pub fn from<T: tags::NumericalType>(val: T::RustType) -> Result<Self> {
+        todo!()
     }
 }
