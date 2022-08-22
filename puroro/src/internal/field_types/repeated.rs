@@ -15,6 +15,7 @@
 use super::*;
 use crate::bitvec::BitSlice;
 use crate::tags;
+use crate::Message;
 
 pub trait RepeatedFieldType: FieldType {
     type ScalarType;
@@ -28,6 +29,20 @@ where
 {
     type ScalarType = RustType;
 
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
+        self.0.as_slice()
+    }
+}
+
+impl RepeatedFieldType for RepeatedStringField {
+    type ScalarType = String;
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
+        self.0.as_slice()
+    }
+}
+
+impl<M: Message + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
+    type ScalarType = M;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
