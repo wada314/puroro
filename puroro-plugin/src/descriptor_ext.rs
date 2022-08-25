@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Extend the raw protobuf descriptors to add a pointer to the parent descriptor.
-
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::{
