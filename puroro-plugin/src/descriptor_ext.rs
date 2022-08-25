@@ -18,6 +18,7 @@ use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
+    OneofDescriptorProto,
 };
 use ::std::fmt::Debug;
 use itertools::Either;
@@ -73,6 +74,9 @@ impl FieldDescriptorExt for FieldDescriptorProto {
     }
 }
 
+pub trait OneofDescriptorExt {}
+impl OneofDescriptorExt for OneofDescriptorProto {}
+
 pub trait FileOrMessage: Debug {
     fn messages(&self) -> &[DescriptorProto];
     fn enums(&self) -> &[EnumDescriptorProto];
@@ -121,6 +125,27 @@ pub trait MessageOrEnum: Debug {
             Either::Right(e) => Ok(e),
         }
     }
+}
+
+enum FieldType {
+    Int32,
+    UInt32,
+    SInt32,
+    Int64,
+    UInt64,
+    SInt64,
+    Enum2(Fqtn<String>),
+    Enum3(Fqtn<String>),
+    Fixed32,
+    SFixed32,
+    Fixed64,
+    SFixed64,
+    Float,
+    Double,
+    Bool,
+    String,
+    Bytes,
+    Message(Fqtn<String>),
 }
 
 impl MessageOrEnum for DescriptorProto {
