@@ -186,19 +186,11 @@ where
         out: &mut W,
     ) -> Result<()> {
         if let Some(first) = self.0.first() {
-            ser_wire_and_number(
-                match ProtoType::to_wire_type(first.clone())? {
-                    tags::NumericalWireType::Variant(_) => WireType::LengthDelimited,
-                    tags::NumericalWireType::Bits32(_) => WireType::Bits32,
-                    tags::NumericalWireType::Bits64(_) => WireType::Bits64,
-                },
-                number,
-                out,
-            )?;
-
             match ProtoType::to_wire_type(first.clone())? {
                 tags::NumericalWireType::Variant(_) => {
                     // write as length delimited
+                    ser_wire_and_number(WireType::LengthDelimited, number, out)?;
+
                     let mut tempvec = Vec::new();
                     for item in &self.0 {
                         if let tags::NumericalWireType::Variant(bits) =
@@ -212,10 +204,13 @@ where
                     }
                     let length_var = Variant::from_i32(tempvec.len().try_into()?);
                     length_var.encode_bytes(out)?;
-                    out.write_all(&tempvec)
+                    out.write_all(&tempvec)?;
                 }
-                tags::NumericalWireType::Bits32(_) => todo!(),
-                tags::NumericalWireType::Bits64(_) => todo!(),
+                tags::NumericalWireType::Bits32(_) | tags::NumericalWireType::Bits64(_) => {
+                    for item in &self.0 {
+                        ser_numerical_shared::<_, ProtoType, _>(item.clone(), number, out)?;
+                    }
+                }
             };
         }
         Ok(())
