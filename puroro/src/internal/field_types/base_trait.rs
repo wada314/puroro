@@ -106,35 +106,52 @@ where
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        let wire = <ProtoType as tags::NumericalType>::to_wire_type(self.0.clone())?;
-
-        let wire_index = match wire {
-            tags::NumericalWireType::Variant(_) => WireType::Variant,
-            tags::NumericalWireType::Bits32(_) => WireType::Bits32,
-            tags::NumericalWireType::Bits64(_) => WireType::Bits64,
-        } as i32;
-        let header = Variant::from_i32((number << 3) | wire_index);
-        header.encode_bytes(out)?;
-
-        match wire {
-            tags::NumericalWireType::Variant(bits) => {
-                let var = Variant::new(bits);
-                var.encode_bytes(out)?;
-            }
-            tags::NumericalWireType::Bits32(bits) => {
-                out.write(&bits)?;
-            }
-            tags::NumericalWireType::Bits64(bits) => {
-                out.write(&bits)?;
-            }
+        if self.0 == Default::default() {
+            return Ok(());
         }
+        ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
         Ok(())
     }
+}
+
+fn ser_numerical_shared<RustType, ProtoType, W>(
+    val: RustType,
+    number: i32,
+    out: &mut W,
+) -> Result<()>
+where
+    ProtoType: tags::NumericalType<RustType = RustType>,
+    W: Write,
+{
+    let wire = <ProtoType as tags::NumericalType>::to_wire_type(val)?;
+
+    let wire_index = match wire {
+        tags::NumericalWireType::Variant(_) => WireType::Variant,
+        tags::NumericalWireType::Bits32(_) => WireType::Bits32,
+        tags::NumericalWireType::Bits64(_) => WireType::Bits64,
+    } as i32;
+    let header = Variant::from_i32((number << 3) | wire_index);
+    header.encode_bytes(out)?;
+
+    match wire {
+        tags::NumericalWireType::Variant(bits) => {
+            let var = Variant::new(bits);
+            var.encode_bytes(out)?;
+        }
+        tags::NumericalWireType::Bits32(bits) => {
+            out.write(&bits)?;
+        }
+        tags::NumericalWireType::Bits64(bits) => {
+            out.write(&bits)?;
+        }
+    }
+    Ok(())
 }
 
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
+    RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
@@ -150,6 +167,18 @@ where
     fn deser_from_bits64<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
         self.0 = <ProtoType as tags::NumericalType>::from_bits64(bits)?;
         bitvec.set::<BITFIELD_INDEX>(true);
+        Ok(())
+    }
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        if !bitvec.get::<BITFIELD_INDEX>() {
+            return Ok(());
+        }
+        ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
         Ok(())
     }
 }
