@@ -20,6 +20,7 @@ use crate::tags;
 use crate::Message;
 use crate::{ErrorKind, Result};
 use ::std::io::Result as IoResult;
+use ::std::io::Write;
 
 pub trait FieldType {
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -62,11 +63,20 @@ pub trait FieldType {
     ) -> Result<()> {
         Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as i32))?
     }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        #[allow(unused)] bitvec: &B,
+        #[allow(unused)] number: i32,
+        #[allow(unused)] out: &mut W,
+    ) -> Result<()> {
+        unimplemented!()
+    }
 }
 
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
-    RustType: PartialEq + Default,
+    RustType: PartialEq + Default + Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
@@ -87,6 +97,36 @@ where
         let x = <ProtoType as tags::NumericalType>::from_bits64(bits)?;
         if x != RustType::default() {
             self.0 = x;
+        }
+        Ok(())
+    }
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        _bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        let wire = <ProtoType as tags::NumericalType>::to_wire_type(self.0.clone())?;
+
+        let wire_index = match wire {
+            tags::NumericalWireType::Variant(_) => WireType::Variant,
+            tags::NumericalWireType::Bits32(_) => WireType::Bits32,
+            tags::NumericalWireType::Bits64(_) => WireType::Bits64,
+        } as i32;
+        let header = Variant::from_i32((number << 3) | wire_index);
+        header.encode_bytes(out)?;
+
+        match wire {
+            tags::NumericalWireType::Variant(bits) => {
+                let var = Variant::new(bits);
+                var.encode_bytes(out)?;
+            }
+            tags::NumericalWireType::Bits32(bits) => {
+                out.write(&bits)?;
+            }
+            tags::NumericalWireType::Bits64(bits) => {
+                out.write(&bits)?;
+            }
         }
         Ok(())
     }

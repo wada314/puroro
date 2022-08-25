@@ -23,7 +23,7 @@ pub struct Variant([u8; 8]);
 
 impl Variant {
     #[allow(unused)]
-    fn new(bytes: [u8; 8]) -> Self {
+    pub fn new(bytes: [u8; 8]) -> Self {
         Variant(bytes)
     }
     pub fn decode_bytes<I>(bytes: &mut I) -> Result<Option<Self>>
@@ -96,7 +96,7 @@ impl Variant {
         Ok(self.get::<tags::Int32>()?)
     }
 
-    pub fn from<T: tags::NumericalType>(val: T::RustType) -> Result<Self> {
-        todo!()
+    pub fn from_i32(val: i32) -> Self {
+        Self::new(i64::to_le_bytes(val.into()))
     }
 }
