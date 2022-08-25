@@ -185,6 +185,7 @@ where
 
 impl<RustType, ProtoType> FieldType for RepeatedNumericalField<RustType, ProtoType>
 where
+    RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
@@ -210,6 +211,40 @@ where
     fn deser_from_bits64<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
         self.0
             .push(<ProtoType as tags::NumericalType>::from_bits64(bits)?);
+        Ok(())
+    }
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        _bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        if let Some(first) = self.0.first() {
+            let wire_index = match ProtoType::to_wire_type(first.clone())? {
+                tags::NumericalWireType::Variant(_) => WireType::LengthDelimited,
+                tags::NumericalWireType::Bits32(_) => WireType::Bits32,
+                tags::NumericalWireType::Bits64(_) => WireType::Bits64,
+            } as i32;
+            let header = Variant::from_i32((number << 3) | wire_index);
+            header.encode_bytes(out)?;
+
+            match ProtoType::to_wire_type(first.clone())? {
+                tags::NumericalWireType::Variant(_) => {
+                    // write as length delimited
+                    let mut tempvec = Vec::new();
+                    for item in &self.0 {
+                        if let tags::NumericalWireType::Variant(bits) = item.clone().to_owned() {
+                            let var = Variant::new(bits);
+                            var.encode_bytes(&mut tempvec)?;
+                        } else {
+                            Err(ErrorKind::InvalidWireType(()))?
+                        }
+                    }
+                }
+                tags::NumericalWireType::Bits32(_) => todo!(),
+                tags::NumericalWireType::Bits64(_) => todo!(),
+            };
+        }
         Ok(())
     }
 }
