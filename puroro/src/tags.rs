@@ -94,6 +94,11 @@ impl NumericalType for Int32 {
     fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
         Ok(i64::to_le_bytes(val.into()))
     }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(
+            self.val.into(),
+        )))
+    }
 }
 impl NumericalType for Int64 {
     type RustType = i64;
@@ -105,6 +110,11 @@ impl NumericalType for UInt32 {
     }
     fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
         Ok(u64::to_le_bytes(val.into()))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(
+            self.val.into(),
+        )))
     }
 }
 impl NumericalType for UInt64 {
@@ -129,6 +139,9 @@ impl NumericalType for Float {
     type RustType = f32;
     fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
         Ok(f32::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits32(f32::to_le_bytes(self.0)))
     }
 }
 impl NumericalType for Fixed32 {
