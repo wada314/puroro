@@ -20,6 +20,7 @@ mod descriptor_ext;
 mod descriptor_resolver;
 mod error;
 mod generators;
+mod restructure;
 mod utils;
 
 use self::generators::Module;

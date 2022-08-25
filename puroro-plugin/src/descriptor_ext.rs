@@ -125,27 +125,6 @@ pub trait MessageOrEnum: Debug {
     }
 }
 
-enum FieldType {
-    Int32,
-    UInt32,
-    SInt32,
-    Int64,
-    UInt64,
-    SInt64,
-    Enum2(Fqtn<String>),
-    Enum3(Fqtn<String>),
-    Fixed32,
-    SFixed32,
-    Fixed64,
-    SFixed64,
-    Float,
-    Double,
-    Bool,
-    String,
-    Bytes,
-    Message(Fqtn<String>),
-}
-
 impl MessageOrEnum for DescriptorProto {
     fn name(&self) -> &str {
         DescriptorProto::name(self)
