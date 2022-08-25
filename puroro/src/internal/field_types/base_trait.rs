@@ -114,40 +114,6 @@ where
     }
 }
 
-fn ser_numerical_shared<RustType, ProtoType, W>(
-    val: RustType,
-    number: i32,
-    out: &mut W,
-) -> Result<()>
-where
-    ProtoType: tags::NumericalType<RustType = RustType>,
-    W: Write,
-{
-    let wire = <ProtoType as tags::NumericalType>::to_wire_type(val)?;
-
-    let wire_index = match wire {
-        tags::NumericalWireType::Variant(_) => WireType::Variant,
-        tags::NumericalWireType::Bits32(_) => WireType::Bits32,
-        tags::NumericalWireType::Bits64(_) => WireType::Bits64,
-    } as i32;
-    let header = Variant::from_i32((number << 3) | wire_index);
-    header.encode_bytes(out)?;
-
-    match wire {
-        tags::NumericalWireType::Variant(bits) => {
-            let var = Variant::new(bits);
-            var.encode_bytes(out)?;
-        }
-        tags::NumericalWireType::Bits32(bits) => {
-            out.write(&bits)?;
-        }
-        tags::NumericalWireType::Bits64(bits) => {
-            out.write(&bits)?;
-        }
-    }
-    Ok(())
-}
-
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
@@ -220,26 +186,33 @@ where
         out: &mut W,
     ) -> Result<()> {
         if let Some(first) = self.0.first() {
-            let wire_index = match ProtoType::to_wire_type(first.clone())? {
-                tags::NumericalWireType::Variant(_) => WireType::LengthDelimited,
-                tags::NumericalWireType::Bits32(_) => WireType::Bits32,
-                tags::NumericalWireType::Bits64(_) => WireType::Bits64,
-            } as i32;
-            let header = Variant::from_i32((number << 3) | wire_index);
-            header.encode_bytes(out)?;
+            ser_wire_and_number(
+                match ProtoType::to_wire_type(first.clone())? {
+                    tags::NumericalWireType::Variant(_) => WireType::LengthDelimited,
+                    tags::NumericalWireType::Bits32(_) => WireType::Bits32,
+                    tags::NumericalWireType::Bits64(_) => WireType::Bits64,
+                },
+                number,
+                out,
+            )?;
 
             match ProtoType::to_wire_type(first.clone())? {
                 tags::NumericalWireType::Variant(_) => {
                     // write as length delimited
                     let mut tempvec = Vec::new();
                     for item in &self.0 {
-                        if let tags::NumericalWireType::Variant(bits) = item.clone().to_owned() {
+                        if let tags::NumericalWireType::Variant(bits) =
+                            <ProtoType as tags::NumericalType>::to_wire_type(item.clone())?
+                        {
                             let var = Variant::new(bits);
                             var.encode_bytes(&mut tempvec)?;
                         } else {
-                            Err(ErrorKind::InvalidWireType(()))?
+                            unreachable!()
                         }
                     }
+                    let length_var = Variant::from_i32(tempvec.len().try_into()?);
+                    length_var.encode_bytes(out)?;
+                    out.write_all(&tempvec)
                 }
                 tags::NumericalWireType::Bits32(_) => todo!(),
                 tags::NumericalWireType::Bits64(_) => todo!(),
@@ -316,4 +289,45 @@ where
         self.0.push(msg);
         Ok(())
     }
+}
+
+fn ser_wire_and_number<W: Write>(wire: WireType, number: i32, out: &mut W) -> Result<()> {
+    let var = Variant::from_i32((number << 3) | (wire as i32));
+    var.encode_bytes(out)?;
+    Ok(())
+}
+
+fn ser_numerical_shared<RustType, ProtoType, W>(
+    val: RustType,
+    number: i32,
+    out: &mut W,
+) -> Result<()>
+where
+    ProtoType: tags::NumericalType<RustType = RustType>,
+    W: Write,
+{
+    let wire = <ProtoType as tags::NumericalType>::to_wire_type(val)?;
+    ser_wire_and_number(
+        match wire {
+            tags::NumericalWireType::Variant(_) => WireType::Variant,
+            tags::NumericalWireType::Bits32(_) => WireType::Bits32,
+            tags::NumericalWireType::Bits64(_) => WireType::Bits64,
+        },
+        number,
+        out,
+    )?;
+
+    match wire {
+        tags::NumericalWireType::Variant(bits) => {
+            let var = Variant::new(bits);
+            var.encode_bytes(out)?;
+        }
+        tags::NumericalWireType::Bits32(bits) => {
+            out.write_all(&bits)?;
+        }
+        tags::NumericalWireType::Bits64(bits) => {
+            out.write_all(&bits)?;
+        }
+    }
+    Ok(())
 }
