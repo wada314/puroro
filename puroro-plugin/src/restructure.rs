@@ -22,17 +22,51 @@ use ::std::ops::Deref;
 
 pub struct Message<'a> {
     proto: &'a DescriptorProto,
+    fields: OnceCell<Box<[Field<'a>]>>,
+    oneofs: OnceCell<Box<[Oneof<'a>]>>,
 }
 impl<'a> Message<'a> {
     pub fn new(proto: &'a DescriptorProto) -> Self {
-        Self { proto }
+        Self {
+            proto,
+            fields: OnceCell::default(),
+            oneofs: OnceCell::default(),
+        }
     }
     pub fn proto(&self) -> &DescriptorProto {
         &self.proto
     }
+    pub fn fields(&self) -> &[Field<'a>] {
+        todo!()
+    }
+    pub fn field(&self) -> &[Field<'a>] {
+        self.fields()
+    }
+    pub fn oneofs(&self) -> &[Oneof<'a>] {
+        todo!()
+    }
 }
 impl Deref for Message<'_> {
     type Target = DescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
+    }
+}
+
+pub struct Field<'a> {
+    proto: &'a FieldDescriptorProto,
+    parent: &'a Message<'a>,
+}
+impl<'a> Field<'a> {
+    pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Message<'a>) -> Self {
+        Self { proto, parent }
+    }
+    pub fn proto(&self) -> &FieldDescriptorProto {
+        &self.proto
+    }
+}
+impl Deref for Field<'_> {
+    type Target = FieldDescriptorProto;
     fn deref(&self) -> &Self::Target {
         &self.proto
     }
