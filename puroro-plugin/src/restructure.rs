@@ -12,26 +12,87 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(unused)]
 use ::once_cell::unsync::OnceCell;
+#[allow(unused)]
+use ::puroro_protobuf_compiled::google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
+    OneofDescriptorProto,
+};
+use ::std::ops::Deref;
+
+pub struct Message<'a> {
+    proto: &'a DescriptorProto,
+}
+impl<'a> Message<'a> {
+    pub fn new(proto: &'a DescriptorProto) -> Self {
+        Self { proto }
+    }
+    pub fn proto(&self) -> &DescriptorProto {
+        &self.proto
+    }
+}
+impl Deref for Message<'_> {
+    type Target = DescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
+    }
+}
 
 pub struct Oneof<'a> {
-    name: &'a str,
+    proto: &'a OneofDescriptorProto,
+    parent: &'a Message<'a>,
+    oneof_index: i32,
     fields: OnceCell<Box<[OneofField<'a>]>>,
 }
-impl Oneof<'_> {
-    pub fn name(&self) -> &str {
-        self.name
+impl<'a> Oneof<'a> {
+    pub fn new(proto: &'a OneofDescriptorProto, parent: &'a Message<'a>, oneof_index: i32) -> Self {
+        Self {
+            proto,
+            parent,
+            oneof_index,
+            fields: OnceCell::default(),
+        }
+    }
+    pub fn proto(&self) -> &OneofDescriptorProto {
+        &self.proto
+    }
+    pub fn fields(&'a self) -> &[OneofField<'a>] {
+        let parent = self.parent;
+        let oneof_index = self.oneof_index;
+        self.fields.get_or_init(|| {
+            let mut fields = Vec::new();
+            for field_candidate in parent.proto().field() {
+                if field_candidate.oneof_index_opt() == Some(oneof_index) {
+                    fields.push(OneofField::new(field_candidate, self))
+                }
+            }
+            fields.into_boxed_slice()
+        })
+    }
+}
+impl Deref for Oneof<'_> {
+    type Target = OneofDescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
     }
 }
 
 pub struct OneofField<'a> {
+    proto: &'a FieldDescriptorProto,
     parent: &'a Oneof<'a>,
-    name: &'a str,
 }
-impl OneofField<'_> {
-    pub fn name(&self) -> &str {
-        self.name
+impl<'a> OneofField<'a> {
+    pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Oneof<'a>) -> Self {
+        Self { proto, parent }
+    }
+    pub fn proto(&self) -> &FieldDescriptorProto {
+        &self.proto
+    }
+}
+impl Deref for OneofField<'_> {
+    type Target = FieldDescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
     }
 }
 
