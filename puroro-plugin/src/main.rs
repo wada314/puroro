@@ -85,6 +85,10 @@ fn main() -> Result<()> {
 
     let input_files = cgreq.proto_file();
     let resolver = DescriptorResolver::new(input_files.iter())?;
+    let restructed = input_files
+        .iter()
+        .map(|f| crate::restructure::File::new(f))
+        .collect::<Vec<_>>();
 
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
