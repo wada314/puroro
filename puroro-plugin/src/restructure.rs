@@ -19,6 +19,39 @@ use ::puroro_protobuf_compiled::google::protobuf::{
     OneofDescriptorProto,
 };
 use ::std::ops::Deref;
+use puroro_protobuf_compiled::google::protobuf::FileDescriptorProtoTrait;
+
+pub struct File<'a> {
+    proto: &'a FileDescriptorProto,
+    messages: OnceCell<Box<[Message<'a>]>>,
+}
+impl<'a> File<'a> {
+    pub fn new(proto: &'a FileDescriptorProto) -> Self {
+        Self {
+            proto,
+            messages: OnceCell::default(),
+        }
+    }
+    pub fn proto(&self) -> &FileDescriptorProto {
+        &self.proto
+    }
+    pub fn messages(&'a self) -> &[Message<'_>] {
+        self.messages.get_or_init(|| {
+            self.proto()
+                .message_type()
+                .into_iter()
+                .map(|m| Message::new(m))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
+    }
+}
+impl Deref for File<'_> {
+    type Target = FileDescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
+    }
+}
 
 pub struct Message<'a> {
     proto: &'a DescriptorProto,
@@ -36,13 +69,21 @@ impl<'a> Message<'a> {
     pub fn proto(&self) -> &DescriptorProto {
         &self.proto
     }
-    pub fn fields(&self) -> &[Field<'a>] {
-        todo!()
+    pub fn fields(&'a self) -> &[Field<'_>] {
+        self.fields.get_or_init(|| {
+            self.proto()
+                .field()
+                .into_iter()
+                .filter(|f| !f.proto3_optional())
+                .map(|f| Field::new(f, self))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
     }
-    pub fn field(&self) -> &[Field<'a>] {
+    pub fn field(&'a self) -> &[Field<'_>] {
         self.fields()
     }
-    pub fn oneofs(&self) -> &[Oneof<'a>] {
+    pub fn oneofs(&'a self) -> &[Oneof<'_>] {
         todo!()
     }
 }
