@@ -84,7 +84,24 @@ impl<'a> Message<'a> {
         self.fields()
     }
     pub fn oneofs(&'a self) -> &[Oneof<'_>] {
-        todo!()
+        self.oneofs.get_or_init(|| {
+            let max_oneof_index = self
+                .proto()
+                .field()
+                .iter()
+                .filter_map(|f| {
+                    (!f.proto3_optional() && f.has_oneof_index()).then_some(f.oneof_index())
+                })
+                .max();
+            self.proto()
+                .oneof_decl()
+                .iter()
+                .take(max_oneof_index.map_or(0, |i| i + 1) as usize)
+                .enumerate()
+                .map(|(i, o)| Oneof::new(o, self, i as i32))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
     }
 }
 impl Deref for Message<'_> {
