@@ -40,7 +40,7 @@ impl<'a> File<'a> {
             self.proto()
                 .message_type()
                 .into_iter()
-                .map(|m| Message::new(m, Either::Left(self)))
+                .map(|m| Message::new(m, FileOrMessageRef::File(self)))
                 .collect::<Vec<_>>()
                 .into_boxed_slice()
         })
@@ -55,17 +55,19 @@ impl Deref for File<'_> {
 
 pub struct Message<'a> {
     proto: &'a DescriptorProto,
-    parent: Either<&'a File<'a>, &'a Message<'a>>,
+    parent: FileOrMessageRef<'a>,
     fields: OnceCell<Box<[Field<'a>]>>,
     oneofs: OnceCell<Box<[Oneof<'a>]>>,
+    messages: OnceCell<Box<[Message<'a>]>>,
 }
 impl<'a> Message<'a> {
-    pub fn new(proto: &'a DescriptorProto, parent: Either<&'a File<'a>, &'a Message<'a>>) -> Self {
+    pub fn new(proto: &'a DescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
         Self {
             proto,
             parent,
             fields: OnceCell::default(),
             oneofs: OnceCell::default(),
+            messages: OnceCell::default(),
         }
     }
     pub fn proto(&self) -> &DescriptorProto {
@@ -101,6 +103,16 @@ impl<'a> Message<'a> {
                 .take(max_oneof_index.map_or(0, |i| i + 1) as usize)
                 .enumerate()
                 .map(|(i, o)| Oneof::new(o, self, i as i32))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
+    }
+    pub fn messages(&'a self) -> &[Message<'_>] {
+        self.messages.get_or_init(|| {
+            self.proto()
+                .nested_type()
+                .into_iter()
+                .map(|m| Message::new(m, FileOrMessageRef::Message(self)))
                 .collect::<Vec<_>>()
                 .into_boxed_slice()
         })
@@ -188,6 +200,11 @@ impl Deref for OneofField<'_> {
     fn deref(&self) -> &Self::Target {
         &self.proto
     }
+}
+
+pub enum FileOrMessageRef<'a> {
+    File(&'a File<'a>),
+    Message(&'a Message<'a>),
 }
 
 enum FieldType {
