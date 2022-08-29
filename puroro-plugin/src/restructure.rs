@@ -24,12 +24,14 @@ use ::std::ops::Deref;
 pub struct File<'a> {
     proto: &'a FileDescriptorProto,
     messages: OnceCell<Box<[Message<'a>]>>,
+    enums: OnceCell<Box<[Enum<'a>]>>,
 }
 impl<'a> File<'a> {
     pub fn new(proto: &'a FileDescriptorProto) -> Self {
         Self {
             proto,
             messages: OnceCell::default(),
+            enums: OnceCell::default(),
         }
     }
     pub fn proto(&self) -> &FileDescriptorProto {
@@ -41,6 +43,16 @@ impl<'a> File<'a> {
                 .message_type()
                 .into_iter()
                 .map(|m| Message::new(m, FileOrMessageRef::File(self)))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
+    }
+    pub fn enums(&'a self) -> &[Enum<'_>] {
+        self.enums.get_or_init(|| {
+            self.proto()
+                .enum_type()
+                .into_iter()
+                .map(|e| Enum::new(e, FileOrMessageRef::File(self)))
                 .collect::<Vec<_>>()
                 .into_boxed_slice()
         })
@@ -59,6 +71,7 @@ pub struct Message<'a> {
     fields: OnceCell<Box<[Field<'a>]>>,
     oneofs: OnceCell<Box<[Oneof<'a>]>>,
     messages: OnceCell<Box<[Message<'a>]>>,
+    enums: OnceCell<Box<[Enum<'a>]>>,
 }
 impl<'a> Message<'a> {
     pub fn new(proto: &'a DescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
@@ -68,6 +81,7 @@ impl<'a> Message<'a> {
             fields: OnceCell::default(),
             oneofs: OnceCell::default(),
             messages: OnceCell::default(),
+            enums: OnceCell::default(),
         }
     }
     pub fn proto(&self) -> &DescriptorProto {
@@ -117,9 +131,38 @@ impl<'a> Message<'a> {
                 .into_boxed_slice()
         })
     }
+    pub fn enums(&'a self) -> &[Enum<'_>] {
+        self.enums.get_or_init(|| {
+            self.proto()
+                .enum_type()
+                .into_iter()
+                .map(|e| Enum::new(e, FileOrMessageRef::Message(self)))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
+    }
 }
 impl Deref for Message<'_> {
     type Target = DescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
+    }
+}
+
+pub struct Enum<'a> {
+    proto: &'a EnumDescriptorProto,
+    parent: FileOrMessageRef<'a>,
+}
+impl<'a> Enum<'a> {
+    pub fn new(proto: &'a EnumDescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
+        Self { proto, parent }
+    }
+    pub fn proto(&self) -> &EnumDescriptorProto {
+        &self.proto
+    }
+}
+impl Deref for Enum<'_> {
+    type Target = EnumDescriptorProto;
     fn deref(&self) -> &Self::Target {
         &self.proto
     }
