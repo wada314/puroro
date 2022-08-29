@@ -14,6 +14,7 @@
 
 use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::descriptor_ext::FileOrMessage;
+use crate::restructure::File;
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
@@ -67,6 +68,7 @@ impl<'a> DescriptorResolver<'a> {
                     full_package: cur_package.to_owned(),
                     subpackages: Vec::new(),
                     input_files: Vec::new(),
+                    input_files2: Vec::new(),
                 });
             item.subpackages.push(subpackage.to_string());
         }
@@ -81,6 +83,7 @@ impl<'a> DescriptorResolver<'a> {
             .map(|s| s.to_string());
         term_item.full_package = file.package_ext().to_owned();
         term_item.input_files.push(file);
+        term_item.input_files2.push(File::new(file))
     }
 
     pub fn fqtn_to_desc<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<&dyn MessageOrEnum> {
@@ -96,11 +99,11 @@ impl<'a> DescriptorResolver<'a> {
         })?)
     }
 
-    pub fn package_contents(&self, package: &str) -> Option<&PackageContents> {
+    pub fn package_contents(&self, package: &str) -> Option<&PackageContents<'a>> {
         self.package_contents.get(package)
     }
 
-    pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents> {
+    pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents<'a>> {
         Ok(self
             .package_contents(package)
             .ok_or(ErrorKind::UnknownTypeName {
@@ -109,8 +112,7 @@ impl<'a> DescriptorResolver<'a> {
     }
 
     #[allow(unused)]
-    pub fn all_packages(&self) -> impl Iterator<Item = &PackageContents> {
-        dbg!(&self.package_contents);
+    pub fn all_packages(&'a self) -> impl Iterator<Item = &PackageContents<'a>> {
         self.package_contents.values()
     }
 }
@@ -121,6 +123,7 @@ pub struct PackageContents<'a> {
     pub full_package: Package<String>,
     pub subpackages: Vec<String>,
     pub input_files: Vec<&'a FileDescriptorProto>,
+    pub input_files2: Vec<File<'a>>,
 }
 
 fn visit_messages_and_enums<'a, F>(file: &'a FileDescriptorProto, mut visit: F)

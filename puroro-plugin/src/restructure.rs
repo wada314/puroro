@@ -21,6 +21,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 };
 use ::std::ops::Deref;
 
+#[derive(Debug)]
 pub struct File<'a> {
     proto: &'a FileDescriptorProto,
     messages: OnceCell<Box<[Message<'a>]>>,
@@ -65,6 +66,7 @@ impl Deref for File<'_> {
     }
 }
 
+#[derive(Debug)]
 pub struct Message<'a> {
     proto: &'a DescriptorProto,
     parent: FileOrMessageRef<'a>,
@@ -149,6 +151,7 @@ impl Deref for Message<'_> {
     }
 }
 
+#[derive(Debug)]
 pub struct Enum<'a> {
     proto: &'a EnumDescriptorProto,
     parent: FileOrMessageRef<'a>,
@@ -168,6 +171,7 @@ impl Deref for Enum<'_> {
     }
 }
 
+#[derive(Debug)]
 pub struct Field<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Message<'a>,
@@ -187,6 +191,7 @@ impl Deref for Field<'_> {
     }
 }
 
+#[derive(Debug)]
 pub struct Oneof<'a> {
     proto: &'a OneofDescriptorProto,
     parent: &'a Message<'a>,
@@ -226,6 +231,7 @@ impl Deref for Oneof<'_> {
     }
 }
 
+#[derive(Debug)]
 pub struct OneofField<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Oneof<'a>,
@@ -245,11 +251,13 @@ impl Deref for OneofField<'_> {
     }
 }
 
+#[derive(Debug)]
 pub enum FileOrMessageRef<'a> {
     File(&'a File<'a>),
     Message(&'a Message<'a>),
 }
 
+#[derive(Debug)]
 enum FieldType {
     Int32,
     UInt32,
