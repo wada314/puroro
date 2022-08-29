@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::itertools::Either;
 use ::once_cell::unsync::OnceCell;
 #[allow(unused)]
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -19,7 +20,6 @@ use ::puroro_protobuf_compiled::google::protobuf::{
     OneofDescriptorProto,
 };
 use ::std::ops::Deref;
-use puroro_protobuf_compiled::google::protobuf::FileDescriptorProtoTrait;
 
 pub struct File<'a> {
     proto: &'a FileDescriptorProto,
@@ -40,7 +40,7 @@ impl<'a> File<'a> {
             self.proto()
                 .message_type()
                 .into_iter()
-                .map(|m| Message::new(m))
+                .map(|m| Message::new(m, Either::Left(self)))
                 .collect::<Vec<_>>()
                 .into_boxed_slice()
         })
@@ -55,13 +55,15 @@ impl Deref for File<'_> {
 
 pub struct Message<'a> {
     proto: &'a DescriptorProto,
+    parent: Either<&'a File<'a>, &'a Message<'a>>,
     fields: OnceCell<Box<[Field<'a>]>>,
     oneofs: OnceCell<Box<[Oneof<'a>]>>,
 }
 impl<'a> Message<'a> {
-    pub fn new(proto: &'a DescriptorProto) -> Self {
+    pub fn new(proto: &'a DescriptorProto, parent: Either<&'a File<'a>, &'a Message<'a>>) -> Self {
         Self {
             proto,
+            parent,
             fields: OnceCell::default(),
             oneofs: OnceCell::default(),
         }
