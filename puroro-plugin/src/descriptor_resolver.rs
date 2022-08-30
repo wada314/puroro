@@ -14,7 +14,7 @@
 
 use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
 use crate::descriptor_ext::FileOrMessage;
-use crate::restructure::File;
+use crate::restructure::{File, MessageOrEnumRef};
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
@@ -25,21 +25,24 @@ use ::std::fmt::Debug;
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
     fqtn_to_desc_map: HashMap<Fqtn<String>, &'a dyn MessageOrEnum>,
+    fqtn_to_desc_map2: HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
     package_contents: HashMap<String, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
-    pub fn new<I>(file_descriptors_iter: I) -> Result<Self>
+    pub fn new<I>(input_files: I) -> Result<Self>
     where
-        I: Iterator<Item = &'a FileDescriptorProto>,
+        I: Iterator<Item = &'a File<'a>>,
     {
         let mut fqtn_to_desc_map = HashMap::new();
+        let mut fqtn_to_desc_map2 = HashMap::new();
         let mut package_contents = HashMap::new();
-        for f in file_descriptors_iter {
-            Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
-            Self::generate_package_contents(&mut package_contents, f);
+        for f in input_files {
+            Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f.proto());
+            Self::generate_package_contents(&mut package_contents, f.proto());
         }
         Ok(Self {
             fqtn_to_desc_map,
+            fqtn_to_desc_map2,
             package_contents,
         })
     }

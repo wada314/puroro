@@ -83,12 +83,12 @@ fn format_rust_file(input: &str) -> Option<String> {
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
 
-    let input_files = cgreq.proto_file();
-    let resolver = DescriptorResolver::new(input_files.iter())?;
-    let restructed = input_files
-        .iter()
+    let input_files = cgreq
+        .proto_file()
+        .into_iter()
         .map(|f| crate::restructure::File::new(f))
         .collect::<Vec<_>>();
+    let resolver = DescriptorResolver::new(input_files.iter())?;
 
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;

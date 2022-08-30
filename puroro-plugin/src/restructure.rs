@@ -258,6 +258,12 @@ pub enum FileOrMessageRef<'a> {
 }
 
 #[derive(Debug)]
+pub enum MessageOrEnumRef<'a> {
+    Message(&'a Message<'a>),
+    Enum(&'a Enum<'a>),
+}
+
+#[derive(Debug)]
 enum FieldType {
     Int32,
     UInt32,
