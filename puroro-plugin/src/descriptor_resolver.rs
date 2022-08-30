@@ -38,6 +38,7 @@ impl<'a> DescriptorResolver<'a> {
         let mut package_contents = HashMap::new();
         for f in input_files {
             Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f.proto());
+            Self::generate_fqtn_to_desc_map2(&mut fqtn_to_desc_map2, f);
             Self::generate_package_contents(&mut package_contents, f.proto());
         }
         Ok(Self {
@@ -56,6 +57,13 @@ impl<'a> DescriptorResolver<'a> {
             let fqtn = Fqtn::from_elements(&file.package_ext(), nested_msgs, m.name());
             fqtn_to_desc_map.insert(fqtn, m);
         })
+    }
+
+    fn generate_fqtn_to_desc_map2(
+        fqtn_to_desc_map: &mut HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
+        file: &File<'a>,
+    ) {
+        todo!()
     }
 
     fn generate_package_contents(
