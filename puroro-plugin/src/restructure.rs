@@ -21,18 +21,22 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 };
 use ::std::ops::Deref;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct File<'a> {
     proto: &'a FileDescriptorProto,
     messages: OnceCell<Box<[Message<'a>]>>,
+    all_messages: OnceCell<Box<[Message<'a>]>>,
     enums: OnceCell<Box<[Enum<'a>]>>,
+    all_enums: OnceCell<Box<[Enum<'a>]>>,
 }
 impl<'a> File<'a> {
     pub fn new(proto: &'a FileDescriptorProto) -> Self {
         Self {
             proto,
             messages: OnceCell::default(),
+            all_messages: OnceCell::default(),
             enums: OnceCell::default(),
+            all_enums: OnceCell::default(),
         }
     }
     pub fn proto(&self) -> &FileDescriptorProto {
@@ -48,12 +52,36 @@ impl<'a> File<'a> {
                 .into_boxed_slice()
         })
     }
+    pub fn all_messages(&'a self) -> &[Message<'_>] {
+        self.all_messages.get_or_init(|| {
+            let mut queue = self.messages().to_vec();
+            let mut result = Vec::with_capacity(queue.len());
+            while let Some(m) = queue.pop() {
+                queue.extend_from_slice(m.messages());
+                result.push(m);
+            }
+            result.into_boxed_slice()
+        })
+    }
     pub fn enums(&'a self) -> &[Enum<'_>] {
         self.enums.get_or_init(|| {
             self.proto()
                 .enum_type()
                 .into_iter()
                 .map(|e| Enum::new(e, FileOrMessageRef::File(self)))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
+    }
+    pub fn all_enums(&'a self) -> &[Enum<'_>] {
+        self.all_enums.get_or_init(|| {
+            let direct = self.enums().into_iter().cloned();
+            let indirect = self
+                .all_messages()
+                .into_iter()
+                .flat_map(|m| m.enums().into_iter().cloned());
+            direct
+                .chain(indirect)
                 .collect::<Vec<_>>()
                 .into_boxed_slice()
         })
@@ -66,7 +94,7 @@ impl Deref for File<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Message<'a> {
     proto: &'a DescriptorProto,
     parent: FileOrMessageRef<'a>,
@@ -151,7 +179,7 @@ impl Deref for Message<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Enum<'a> {
     proto: &'a EnumDescriptorProto,
     parent: FileOrMessageRef<'a>,
@@ -171,7 +199,7 @@ impl Deref for Enum<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Field<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Message<'a>,
@@ -191,7 +219,7 @@ impl Deref for Field<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Oneof<'a> {
     proto: &'a OneofDescriptorProto,
     parent: &'a Message<'a>,
@@ -231,7 +259,7 @@ impl Deref for Oneof<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OneofField<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Oneof<'a>,
@@ -251,19 +279,19 @@ impl Deref for OneofField<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FileOrMessageRef<'a> {
     File(&'a File<'a>),
     Message(&'a Message<'a>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum MessageOrEnumRef<'a> {
     Message(&'a Message<'a>),
     Enum(&'a Enum<'a>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum FieldType {
     Int32,
     UInt32,
