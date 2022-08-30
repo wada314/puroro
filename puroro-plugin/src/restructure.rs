@@ -25,9 +25,9 @@ use ::std::ops::Deref;
 pub struct File<'a> {
     proto: &'a FileDescriptorProto,
     messages: OnceCell<Box<[Message<'a>]>>,
-    all_messages: OnceCell<Box<[Message<'a>]>>,
+    all_messages: OnceCell<Box<[&'a Message<'a>]>>,
     enums: OnceCell<Box<[Enum<'a>]>>,
-    all_enums: OnceCell<Box<[Enum<'a>]>>,
+    all_enums: OnceCell<Box<[&'a Enum<'a>]>>,
 }
 impl<'a> File<'a> {
     pub fn new(proto: &'a FileDescriptorProto) -> Self {
@@ -52,13 +52,13 @@ impl<'a> File<'a> {
                 .into_boxed_slice()
         })
     }
-    pub fn all_messages(&'a self) -> &[Message<'_>] {
+    pub fn all_messages(&'a self) -> &[&Message<'_>] {
         self.all_messages.get_or_init(|| {
-            let mut queue = self.messages().to_vec();
+            let mut queue = self.messages().into_iter().collect::<Vec<_>>();
             let mut result = Vec::with_capacity(queue.len());
             while let Some(m) = queue.pop() {
-                queue.extend_from_slice(m.messages());
-                result.push(m.clone());
+                queue.extend(m.messages().into_iter());
+                result.push(m);
             }
             result.into_boxed_slice()
         })
@@ -73,13 +73,13 @@ impl<'a> File<'a> {
                 .into_boxed_slice()
         })
     }
-    pub fn all_enums(&'a self) -> &[Enum<'_>] {
+    pub fn all_enums(&'a self) -> &[&Enum<'_>] {
         self.all_enums.get_or_init(|| {
-            let direct = self.enums().into_iter().cloned();
+            let direct = self.enums().into_iter();
             let indirect = self
                 .all_messages()
                 .into_iter()
-                .flat_map(|m| m.enums().into_iter().cloned());
+                .flat_map(|m| m.enums().into_iter());
             direct
                 .chain(indirect)
                 .collect::<Vec<_>>()
