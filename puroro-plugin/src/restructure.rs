@@ -58,7 +58,7 @@ impl<'a> File<'a> {
             let mut result = Vec::with_capacity(queue.len());
             while let Some(m) = queue.pop() {
                 queue.extend_from_slice(m.messages());
-                result.push(m);
+                result.push(m.clone());
             }
             result.into_boxed_slice()
         })
