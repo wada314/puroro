@@ -333,7 +333,7 @@ impl<'a> MessageOrEnumExt<'a> for Message<'a> {
         &self.fqtn
     }
     fn name(&'a self) -> &str {
-        <Message>::name(self)
+        self.proto().name()
     }
     fn parent(&'a self) -> FileOrMessageRef<'_> {
         <Message>::parent(self)
@@ -344,7 +344,7 @@ impl<'a> MessageOrEnumExt<'a> for Enum<'a> {
         &self.fqtn
     }
     fn name(&'a self) -> &str {
-        <Enum>::name(self)
+        self.proto().name()
     }
     fn parent(&'a self) -> FileOrMessageRef<'_> {
         <Enum>::parent(self)
