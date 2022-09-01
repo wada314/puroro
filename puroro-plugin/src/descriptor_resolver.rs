@@ -106,11 +106,24 @@ impl<'a> DescriptorResolver<'a> {
         self.fqtn_to_desc_map.get::<str>(fqtn.borrow()).map(|m| *m)
     }
 
+    pub fn fqtn_to_desc2<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<MessageOrEnumRef<'a>> {
+        self.fqtn_to_desc_map2.get::<str>(fqtn.borrow()).cloned()
+    }
+
     pub fn fqtn_to_desc_or_err<S: Borrow<str> + Debug>(
         &self,
         fqtn: &Fqtn<S>,
     ) -> Result<&dyn MessageOrEnum> {
         Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
+            name: format!("{:?}", fqtn),
+        })?)
+    }
+
+    pub fn fqtn_to_desc_or_err2<S: Borrow<str> + Debug>(
+        &self,
+        fqtn: &Fqtn<S>,
+    ) -> Result<MessageOrEnumRef<'a>> {
+        Ok(self.fqtn_to_desc2(fqtn).ok_or(ErrorKind::UnknownTypeName {
             name: format!("{:?}", fqtn),
         })?)
     }
