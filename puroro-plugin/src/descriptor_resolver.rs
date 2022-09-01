@@ -61,9 +61,14 @@ impl<'a> DescriptorResolver<'a> {
 
     fn generate_fqtn_to_desc_map2(
         fqtn_to_desc_map: &mut HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
-        file: &File<'a>,
+        file: &'a File<'a>,
     ) {
-        todo!()
+        for &m in file.all_messages() {
+            fqtn_to_desc_map.insert(m.fqtn().to_owned(), MessageOrEnumRef::Message(m));
+        }
+        for &e in file.all_enums() {
+            fqtn_to_desc_map.insert(e.fqtn().to_owned(), MessageOrEnumRef::Enum(e));
+        }
     }
 
     fn generate_package_contents(
