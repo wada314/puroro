@@ -177,16 +177,7 @@ impl<'a> Message<'a> {
         })
     }
     pub fn fqtn(&'a self) -> Fqtn<&str> {
-        self.fqtn
-            .get_or_init(|| {
-                Fqtn::new(match self.parent() {
-                    FileOrMessageRef::File(f) => format!(".{}.{}", f.package(), self.name()),
-                    FileOrMessageRef::Message(m) => {
-                        format!(".{}.{}", m.fqtn(), self.name())
-                    }
-                })
-            })
-            .as_ref()
+        <Self as MessageOrEnumExt>::fqtn(self)
     }
 }
 impl Deref for Message<'_> {
@@ -200,16 +191,24 @@ impl Deref for Message<'_> {
 pub struct Enum<'a> {
     proto: &'a EnumDescriptorProto,
     parent: FileOrMessageRef<'a>,
+    fqtn: OnceCell<Fqtn<String>>,
 }
 impl<'a> Enum<'a> {
     pub fn new(proto: &'a EnumDescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
-        Self { proto, parent }
+        Self {
+            proto,
+            parent,
+            fqtn: OnceCell::default(),
+        }
     }
     pub fn proto(&'a self) -> &EnumDescriptorProto {
         &self.proto
     }
     pub fn parent(&'a self) -> FileOrMessageRef<'_> {
         self.parent.clone()
+    }
+    pub fn fqtn(&'a self) -> Fqtn<&str> {
+        <Self as MessageOrEnumExt>::fqtn(self)
     }
 }
 impl Deref for Enum<'_> {
@@ -309,6 +308,47 @@ pub enum FileOrMessageRef<'a> {
 pub enum MessageOrEnumRef<'a> {
     Message(&'a Message<'a>),
     Enum(&'a Enum<'a>),
+}
+
+trait MessageOrEnumExt<'a> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>>;
+    fn name(&'a self) -> &str;
+    fn parent(&'a self) -> FileOrMessageRef<'_>;
+
+    fn fqtn(&'a self) -> Fqtn<&str> {
+        self.fqtn_once_cell()
+            .get_or_init(|| {
+                Fqtn::new(match self.parent() {
+                    FileOrMessageRef::File(f) => format!(".{}.{}", f.package(), self.name()),
+                    FileOrMessageRef::Message(m) => {
+                        format!(".{}.{}", m.fqtn(), self.name())
+                    }
+                })
+            })
+            .as_ref()
+    }
+}
+impl<'a> MessageOrEnumExt<'a> for Message<'a> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>> {
+        &self.fqtn
+    }
+    fn name(&'a self) -> &str {
+        <Message>::name(self)
+    }
+    fn parent(&'a self) -> FileOrMessageRef<'_> {
+        <Message>::parent(self)
+    }
+}
+impl<'a> MessageOrEnumExt<'a> for Enum<'a> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>> {
+        &self.fqtn
+    }
+    fn name(&'a self) -> &str {
+        <Enum>::name(self)
+    }
+    fn parent(&'a self) -> FileOrMessageRef<'_> {
+        <Enum>::parent(self)
+    }
 }
 
 #[derive(Debug, Clone)]
