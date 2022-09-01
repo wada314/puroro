@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::utils::Fqtn;
 use ::once_cell::unsync::OnceCell;
 #[allow(unused)]
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -101,6 +102,7 @@ pub struct Message<'a> {
     oneofs: OnceCell<Box<[Oneof<'a>]>>,
     messages: OnceCell<Box<[Message<'a>]>>,
     enums: OnceCell<Box<[Enum<'a>]>>,
+    fqtn: OnceCell<Fqtn<String>>,
 }
 impl<'a> Message<'a> {
     pub fn new(proto: &'a DescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
@@ -111,6 +113,7 @@ impl<'a> Message<'a> {
             oneofs: OnceCell::default(),
             messages: OnceCell::default(),
             enums: OnceCell::default(),
+            fqtn: OnceCell::default(),
         }
     }
     pub fn proto(&'a self) -> &DescriptorProto {
@@ -172,6 +175,18 @@ impl<'a> Message<'a> {
                 .collect::<Vec<_>>()
                 .into_boxed_slice()
         })
+    }
+    pub fn fqtn(&'a self) -> Fqtn<&str> {
+        self.fqtn
+            .get_or_init(|| {
+                Fqtn::new(match self.parent() {
+                    FileOrMessageRef::File(f) => format!(".{}.{}", f.package(), self.name()),
+                    FileOrMessageRef::Message(m) => {
+                        format!(".{}.{}", m.fqtn(), self.name())
+                    }
+                })
+            })
+            .as_ref()
     }
 }
 impl Deref for Message<'_> {

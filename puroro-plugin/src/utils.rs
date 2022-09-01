@@ -19,6 +19,7 @@ use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 use ::std::iter;
+use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy)]
 #[allow(unused)]
@@ -296,6 +297,10 @@ impl<S: AsRef<str>> Fqtn<S> {
         Fqtn(self.0.as_ref().to_string())
     }
 
+    pub fn as_ref(&self) -> Fqtn<&str> {
+        Fqtn(self.0.as_ref())
+    }
+
     pub fn to_rust_path(&self) -> String {
         assert!(self.0.as_ref().starts_with('.'));
         let absl_path = &self.0.as_ref()[1..];
@@ -315,6 +320,11 @@ impl<S: AsRef<str>> Fqtn<S> {
         result.push_str("::");
         result.push_str(&escaped_leaf);
         result
+    }
+}
+impl<S: Display> Display for Fqtn<S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        S::fmt(&self.0, f)
     }
 }
 impl<S: Borrow<str>> Borrow<str> for Fqtn<S> {
