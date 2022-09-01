@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::itertools::Either;
 use ::once_cell::unsync::OnceCell;
 #[allow(unused)]
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -39,7 +38,7 @@ impl<'a> File<'a> {
             all_enums: OnceCell::default(),
         }
     }
-    pub fn proto(&self) -> &FileDescriptorProto {
+    pub fn proto(&'a self) -> &FileDescriptorProto {
         &self.proto
     }
     pub fn messages(&'a self) -> &[Message<'_>] {
@@ -114,8 +113,11 @@ impl<'a> Message<'a> {
             enums: OnceCell::default(),
         }
     }
-    pub fn proto(&self) -> &DescriptorProto {
+    pub fn proto(&'a self) -> &DescriptorProto {
         &self.proto
+    }
+    pub fn parent(&'a self) -> FileOrMessageRef<'_> {
+        self.parent.clone()
     }
     pub fn fields(&'a self) -> &[Field<'_>] {
         self.fields.get_or_init(|| {
@@ -188,8 +190,11 @@ impl<'a> Enum<'a> {
     pub fn new(proto: &'a EnumDescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
         Self { proto, parent }
     }
-    pub fn proto(&self) -> &EnumDescriptorProto {
+    pub fn proto(&'a self) -> &EnumDescriptorProto {
         &self.proto
+    }
+    pub fn parent(&'a self) -> FileOrMessageRef<'_> {
+        self.parent.clone()
     }
 }
 impl Deref for Enum<'_> {
