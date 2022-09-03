@@ -83,7 +83,6 @@ impl<'a> DescriptorResolver<'a> {
                     package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
                     full_package: cur_package.to_owned(),
                     subpackages: Vec::new(),
-                    input_files: Vec::new(),
                     input_files2: Vec::new(),
                 });
             item.subpackages.push(subpackage.to_string());
@@ -98,7 +97,6 @@ impl<'a> DescriptorResolver<'a> {
             .leaf_package_name()
             .map(|s| s.to_string());
         term_item.full_package = file.package_ext().to_owned();
-        term_item.input_files.push(file);
         term_item.input_files2.push(File::new(file))
     }
 
@@ -151,7 +149,6 @@ pub struct PackageContents<'a> {
     pub package_name: Option<String>,
     pub full_package: Package<String>,
     pub subpackages: Vec<String>,
-    pub input_files: Vec<&'a FileDescriptorProto>,
     pub input_files2: Vec<File<'a>>,
 }
 

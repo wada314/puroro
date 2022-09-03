@@ -4,7 +4,7 @@
 #![feature(generic_associated_types)]
 // package (root)
 {%- else %}
-// package {{ full_path }}
+// package {{ fqtn }}
 {%- endif %}
 
 {%- for submodule in submodules %}

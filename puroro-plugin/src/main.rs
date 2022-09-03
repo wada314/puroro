@@ -106,7 +106,7 @@ fn main() -> Result<()> {
     };
 
     for module in modules {
-        let filename = package_to_filename(&module.full_path);
+        let filename = package_to_filename(&module.fqtn);
         // Do render!
         let mut contents = module.render().unwrap();
         if let Some(new_contents) = format_rust_file(&contents) {

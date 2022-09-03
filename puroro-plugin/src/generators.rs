@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::{FieldDescriptorExt, FileDescriptorExt, Syntax};
+use crate::descriptor_ext::{FieldDescriptorExt, FileDescriptorExt, FileOrMessage, Syntax};
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::error::ErrorKind;
 use crate::utils::{Fqtn, StrExt as _};
-use crate::Result;
+use crate::{restructure, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
@@ -30,7 +30,7 @@ use google::protobuf::{
 pub struct Module {
     pub ident: String,
     pub is_root_package: bool,
-    pub full_path: String,
+    pub fqtn: String,
     pub submodules: Vec<Module>,
     pub messages: Vec<Message>,
     pub enums: Vec<Enum>,
@@ -59,35 +59,33 @@ impl Module {
             .map(|p| Module::try_from_package(*p, resolver))
             .collect::<Result<Vec<_>>>()?;
         let mut submodules_from_messages = p
-            .input_files
+            .input_files2
             .iter()
             .flat_map(|f| {
-                f.message_type()
+                f.messages()
                     .iter()
-                    .map(|m| Module::try_from_message(m, f, &full_path, resolver))
+                    .map(|m| Module::try_from_message(m, resolver))
             })
             .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
         submodules.append(&mut submodules_from_messages);
         let messages = p
-            .input_files
+            .input_files2
             .iter()
-            .flat_map(|f| {
-                f.message_type()
-                    .iter()
-                    .map(|m| Message::try_new(m, f, resolver))
-            })
+            .flat_map(|f| f.messages().iter())
+            .map(|m| Message::try_new(m, resolver))
             .collect::<Result<Vec<_>>>()?;
         let enums = p
-            .input_files
+            .input_files2
             .iter()
-            .flat_map(|f| f.enum_type().iter().map(|e| Enum::try_new(e, f, resolver)))
+            .flat_map(|f| f.enums().into_iter())
+            .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Module {
             ident,
             is_root_package,
-            full_path,
+            fqtn: full_path,
             submodules,
             messages,
             enums,
@@ -95,37 +93,31 @@ impl Module {
     }
 
     pub fn try_from_message(
-        m: &DescriptorProto,
-        f: &FileDescriptorProto,
-        package: &str,
+        m: &restructure::Message,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
         let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
-        let full_path = if package.is_empty() {
-            m.name().to_string()
-        } else {
-            format!("{}.{}", package, m.name())
-        };
+        let fqtn = m.fqtn().to_string();
         let submodules = m
-            .nested_type()
+            .messages()
             .into_iter()
-            .map(|d| Module::try_from_message(d, f, &full_path, resolver))
+            .map(|d| Module::try_from_message(d, resolver))
             .collect::<Result<Vec<_>>>()?;
         let messages = m
-            .nested_type()
+            .messages()
             .into_iter()
-            .map(|d| Message::try_new(d, f, resolver))
+            .map(|d| Message::try_new(d, resolver))
             .collect::<Result<Vec<_>>>()?;
         let enums = m
-            .enum_type()
+            .enums()
             .into_iter()
-            .map(|e| Enum::try_new(e, f, resolver))
+            .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Module {
             ident,
             is_root_package,
-            full_path,
+            fqtn,
             submodules,
             messages,
             enums,
@@ -144,18 +136,14 @@ pub struct Message {
 
 impl Message {
     #[allow(unused)]
-    pub fn try_new(
-        m: &DescriptorProto,
-        file: &FileDescriptorProto,
-        resolver: &DescriptorResolver,
-    ) -> Result<Self> {
+    pub fn try_new(m: &restructure::Message, resolver: &DescriptorResolver) -> Result<Self> {
         let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
         let fields = m
             .field()
             .into_iter()
-            .map(|f| Field::try_new(f, file, &mut bits_index, resolver))
+            .map(|f| Field::try_new(f, &mut bits_index, resolver))
             .collect::<Result<Vec<_>>>()?;
         let bits_length = bits_index;
         Ok(Message {
@@ -175,11 +163,7 @@ pub struct Enum {
 
 impl Enum {
     #[allow(unused)]
-    pub fn try_new(
-        e: &EnumDescriptorProto,
-        file: &FileDescriptorProto,
-        resolver: &DescriptorResolver,
-    ) -> Result<Self> {
+    pub fn try_new(e: &restructure::Enum, resolver: &DescriptorResolver) -> Result<Self> {
         let ident_camel = e.name().to_camel_case().escape_rust_keywords().into_owned();
         Ok(Enum { ident_camel })
     }
@@ -199,7 +183,6 @@ pub struct Field {
 impl Field {
     pub fn try_new(
         f: &FieldDescriptorProto,
-        file: &FileDescriptorProto,
         bit_index: &mut usize,
         resolver: &DescriptorResolver,
     ) -> Result<Self> {
