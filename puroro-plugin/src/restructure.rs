@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::utils::Fqtn;
+use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 #[allow(unused)]
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -86,6 +87,15 @@ impl<'a> File<'a> {
                 .into_boxed_slice()
         })
     }
+    pub fn try_syntax(&'a self) -> Result<Syntax> {
+        Ok(match self.proto().syntax() {
+            "proto2" | "" => Syntax::Proto2,
+            "proto3" => Syntax::Proto3,
+            e => Err(ErrorKind::UnknownProtoSyntax {
+                name: e.to_string(),
+            })?,
+        })
+    }
 }
 impl Deref for File<'_> {
     type Target = FileDescriptorProto;
@@ -103,6 +113,7 @@ pub struct Message<'a> {
     messages: OnceCell<Box<[Message<'a>]>>,
     enums: OnceCell<Box<[Enum<'a>]>>,
     fqtn: OnceCell<Fqtn<String>>,
+    file: OnceCell<&'a File<'a>>,
 }
 impl<'a> Message<'a> {
     pub fn new(proto: &'a DescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
@@ -114,6 +125,7 @@ impl<'a> Message<'a> {
             messages: OnceCell::default(),
             enums: OnceCell::default(),
             fqtn: OnceCell::default(),
+            file: OnceCell::default(),
         }
     }
     pub fn proto(&'a self) -> &DescriptorProto {
@@ -179,6 +191,17 @@ impl<'a> Message<'a> {
     pub fn fqtn(&'a self) -> Fqtn<&str> {
         <Self as MessageOrEnumExt>::fqtn(self)
     }
+    pub fn file(&'a self) -> &File<'_> {
+        self.file.get_or_init(|| {
+            let mut m = self;
+            loop {
+                match m.parent() {
+                    FileOrMessageRef::File(f) => break f,
+                    FileOrMessageRef::Message(pm) => m = pm,
+                }
+            }
+        })
+    }
 }
 impl Deref for Message<'_> {
     type Target = DescriptorProto;
@@ -229,6 +252,9 @@ impl<'a> Field<'a> {
     }
     pub fn proto(&self) -> &FieldDescriptorProto {
         &self.proto
+    }
+    pub fn parent(&'a self) -> &Message<'_> {
+        self.parent
     }
 }
 impl Deref for Field<'_> {
@@ -371,4 +397,10 @@ enum FieldType {
     String,
     Bytes,
     Message(),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Syntax {
+    Proto2,
+    Proto3,
 }

@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::{FieldDescriptorExt, FileDescriptorExt, FileOrMessage, Syntax};
+use crate::descriptor_ext::{FieldDescriptorExt, FileDescriptorExt, FileOrMessage};
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
-use crate::error::ErrorKind;
+use crate::restructure;
+use crate::restructure::Syntax;
 use crate::utils::{Fqtn, StrExt as _};
-use crate::{restructure, Result};
+use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
@@ -36,7 +37,10 @@ pub struct Module {
     pub enums: Vec<Enum>,
 }
 impl Module {
-    pub fn try_from_package(p: &PackageContents, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_from_package<'a>(
+        p: &'a PackageContents<'a>,
+        resolver: &'a DescriptorResolver<'a>,
+    ) -> Result<Self> {
         let ident = p.package_name.as_ref().map_or_else(Default::default, |s| {
             s.to_lower_snake_case().escape_rust_keywords().into()
         });
@@ -92,9 +96,9 @@ impl Module {
         })
     }
 
-    pub fn try_from_message(
-        m: &restructure::Message,
-        resolver: &DescriptorResolver,
+    pub fn try_from_message<'a>(
+        m: &'a restructure::Message<'a>,
+        resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
@@ -133,10 +137,12 @@ pub struct Message {
     pub fields: Vec<Field>,
     pub bits_length: usize,
 }
-
 impl Message {
     #[allow(unused)]
-    pub fn try_new(m: &restructure::Message, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new<'a>(
+        m: &'a restructure::Message<'a>,
+        resolver: &'a DescriptorResolver<'a>,
+    ) -> Result<Self> {
         let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
@@ -181,16 +187,16 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn try_new(
-        f: &FieldDescriptorProto,
+    pub fn try_new<'a>(
+        f: &'a restructure::Field<'a>,
         bit_index: &mut usize,
-        resolver: &DescriptorResolver,
+        resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
 
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().into();
         let ident_lsnake = f.name().to_lower_snake_case().escape_rust_keywords().into();
-        let syntax = file.try_syntax()?;
+        let syntax = f.parent().file().try_syntax()?;
         let rule = match (syntax, f.label(), f.proto3_optional()) {
             (Syntax::Proto2, LabelOptional | LabelRequired, _) => FieldRule::Optional,
             (Syntax::Proto3, LabelOptional, false) => FieldRule::Singular,
