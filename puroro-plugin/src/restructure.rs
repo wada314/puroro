@@ -245,16 +245,28 @@ impl Deref for Enum<'_> {
 pub struct Field<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Message<'a>,
+    fqtn: OnceCell<Option<Fqtn<String>>>,
 }
 impl<'a> Field<'a> {
     pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Message<'a>) -> Self {
-        Self { proto, parent }
+        Self {
+            proto,
+            parent,
+            fqtn: OnceCell::new(),
+        }
     }
     pub fn proto(&self) -> &FieldDescriptorProto {
         &self.proto
     }
     pub fn parent(&'a self) -> &Message<'_> {
         self.parent
+    }
+    pub fn fqtn(&'a self) -> &Option<Fqtn<String>> {
+        self.fqtn.get_or_init(|| {
+            self.proto()
+                .type_name_opt()
+                .map(|tn| Fqtn::new(tn).to_owned())
+        })
     }
 }
 impl Deref for Field<'_> {

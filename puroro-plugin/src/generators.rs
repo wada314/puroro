@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::FieldDescriptorExt;
+// use crate::descriptor_ext::FieldDescriptorExt;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::restructure;
 use crate::restructure::Syntax;
@@ -208,7 +208,7 @@ impl Field {
                 ),
             })?,
         };
-        let wire_type = WireType::from_proto_type(f.r#type(), f.fqtn_opt(), syntax, resolver)?;
+        let wire_type = WireType::from_field(f, resolver)?;
         let bit_index_for_optional = {
             let index = *bit_index;
             if matches!(rule, FieldRule::Optional) {
@@ -291,11 +291,9 @@ pub enum WireType {
 }
 
 impl WireType {
-    fn from_proto_type(
-        r#type: google::protobuf::field_descriptor_proto::Type,
-        fqtn: Option<Fqtn<&str>>,
-        syntax: Syntax,
-        _resolver: &DescriptorResolver,
+    fn from_field<'a>(
+        field: &'a restructure::Field<'a>,
+        _resolver: &'a DescriptorResolver,
     ) -> Result<WireType> {
         use google::protobuf::field_descriptor_proto::Type::*;
         use Bits32Type::*;
@@ -303,7 +301,9 @@ impl WireType {
         use LengthDelimitedType::*;
         use VariantType::*;
         use WireType::*;
-        Ok(match r#type {
+        let fqtn = field.fqtn().clone();
+        let syntax = field.parent().file().try_syntax()?;
+        Ok(match field.proto().r#type() {
             TypeInt32 => Variant(Int32),
             TypeUint32 => Variant(UInt32),
             TypeSint32 => Variant(SInt32),
