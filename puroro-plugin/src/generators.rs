@@ -63,7 +63,7 @@ impl Module {
             .map(|p| Module::try_from_package(*p, resolver))
             .collect::<Result<Vec<_>>>()?;
         let mut submodules_from_messages = p
-            .input_files2
+            .input_files
             .iter()
             .flat_map(|f| {
                 f.messages()
@@ -75,13 +75,13 @@ impl Module {
         let mut submodules = submodules_from_packages;
         submodules.append(&mut submodules_from_messages);
         let messages = p
-            .input_files2
+            .input_files
             .iter()
             .flat_map(|f| f.messages().iter())
             .map(|m| Message::try_new(m, resolver))
             .collect::<Result<Vec<_>>>()?;
         let enums = p
-            .input_files2
+            .input_files
             .iter()
             .flat_map(|f| f.enums().into_iter())
             .map(|e| Enum::try_new(e, resolver))

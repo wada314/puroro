@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::{FileDescriptorExt, MessageOrEnum};
-use crate::descriptor_ext::FileOrMessage;
+use super::descriptor_ext::FileDescriptorExt;
 use crate::restructure::{File, MessageOrEnumRef};
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
-    fqtn_to_desc_map: HashMap<Fqtn<String>, &'a dyn MessageOrEnum>,
-    fqtn_to_desc_map2: HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
+    fqtn_to_desc_map: HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
     package_contents: HashMap<String, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
@@ -34,32 +32,18 @@ impl<'a> DescriptorResolver<'a> {
         I: Iterator<Item = &'a File<'a>>,
     {
         let mut fqtn_to_desc_map = HashMap::new();
-        let mut fqtn_to_desc_map2 = HashMap::new();
         let mut package_contents = HashMap::new();
         for f in input_files {
-            Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f.proto());
-            Self::generate_fqtn_to_desc_map2(&mut fqtn_to_desc_map2, f);
+            Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
             Self::generate_package_contents(&mut package_contents, f.proto());
         }
         Ok(Self {
             fqtn_to_desc_map,
-            fqtn_to_desc_map2,
             package_contents,
         })
     }
 
     fn generate_fqtn_to_desc_map(
-        fqtn_to_desc_map: &mut HashMap<Fqtn<String>, &'a dyn MessageOrEnum>,
-        file: &'a FileDescriptorProto,
-    ) {
-        visit_messages_and_enums(file, |m, path| {
-            let nested_msgs = path.into_iter().map(|m| m.name());
-            let fqtn = Fqtn::from_elements(&file.package_ext(), nested_msgs, m.name());
-            fqtn_to_desc_map.insert(fqtn, m);
-        })
-    }
-
-    fn generate_fqtn_to_desc_map2(
         fqtn_to_desc_map: &mut HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
         file: &'a File<'a>,
     ) {
@@ -83,7 +67,7 @@ impl<'a> DescriptorResolver<'a> {
                     package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
                     full_package: cur_package.to_owned(),
                     subpackages: Vec::new(),
-                    input_files2: Vec::new(),
+                    input_files: Vec::new(),
                 });
             item.subpackages.push(subpackage.to_string());
         }
@@ -97,31 +81,19 @@ impl<'a> DescriptorResolver<'a> {
             .leaf_package_name()
             .map(|s| s.to_string());
         term_item.full_package = file.package_ext().to_owned();
-        term_item.input_files2.push(File::new(file))
+        term_item.input_files.push(File::new(file))
     }
 
-    pub fn fqtn_to_desc<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<&dyn MessageOrEnum> {
-        self.fqtn_to_desc_map.get::<str>(fqtn.borrow()).map(|m| *m)
+    pub fn fqtn_to_desc<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<MessageOrEnumRef<'a>> {
+        self.fqtn_to_desc_map.get::<str>(fqtn.borrow()).cloned()
     }
 
-    pub fn fqtn_to_desc2<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<MessageOrEnumRef<'a>> {
-        self.fqtn_to_desc_map2.get::<str>(fqtn.borrow()).cloned()
-    }
-
+    #[allow(unused)]
     pub fn fqtn_to_desc_or_err<S: Borrow<str> + Debug>(
         &self,
         fqtn: &Fqtn<S>,
-    ) -> Result<&dyn MessageOrEnum> {
-        Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
-            name: format!("{:?}", fqtn),
-        })?)
-    }
-
-    pub fn fqtn_to_desc_or_err2<S: Borrow<str> + Debug>(
-        &self,
-        fqtn: &Fqtn<S>,
     ) -> Result<MessageOrEnumRef<'a>> {
-        Ok(self.fqtn_to_desc2(fqtn).ok_or(ErrorKind::UnknownTypeName {
+        Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
             name: format!("{:?}", fqtn),
         })?)
     }
@@ -149,73 +121,5 @@ pub struct PackageContents<'a> {
     pub package_name: Option<String>,
     pub full_package: Package<String>,
     pub subpackages: Vec<String>,
-    pub input_files2: Vec<File<'a>>,
-}
-
-fn visit_messages_and_enums<'a, F>(file: &'a FileDescriptorProto, mut visit: F)
-where
-    F: FnMut(&'a dyn MessageOrEnum, &[&DescriptorProto]),
-{
-    let mut path = Vec::new();
-    let mut iters_queue = Vec::new();
-    iters_queue.push(file.messages().into_iter());
-    while let Some(mut tail_iter) = iters_queue.pop() {
-        if let Some(next_leaf) = tail_iter.next() {
-            iters_queue.push(tail_iter);
-            iters_queue.push(next_leaf.messages().into_iter());
-            path.push(next_leaf);
-        } else {
-            let f_or_m: &dyn FileOrMessage = path.last().map_or(file, |m| *m);
-            for m in f_or_m.messages() {
-                visit(m as &dyn MessageOrEnum, &path);
-            }
-            for e in f_or_m.enums() {
-                visit(e as &dyn MessageOrEnum, &path);
-            }
-            path.pop();
-        }
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::DescriptorProto as DP;
-    use super::EnumDescriptorProto as EDP;
-    use super::FileDescriptorProto as FDP;
-    use super::*;
-    use ::std::collections::HashSet;
-
-    #[test]
-    fn test_visit() {
-        let mut enum1 = EDP::default();
-        *enum1.name_mut() = "e1".to_string();
-        let mut msg1 = DP::default();
-        *msg1.name_mut() = "m1".to_string();
-        let mut enum11 = EDP::default();
-        *enum11.name_mut() = "e11".to_string();
-        msg1.enum_type_mut().push(enum11);
-        let mut msg11 = DP::default();
-        *msg11.name_mut() = "m11".to_string();
-        msg1.nested_type_mut().push(msg11);
-        let mut file = FDP::default();
-        file.message_type_mut().push(msg1);
-        file.enum_type_mut().push(enum1);
-
-        let mut visited = HashSet::new();
-        visit_messages_and_enums(&file, |m, path| {
-            assert!(visited.insert(format!(
-                "{}::{}",
-                path.iter().map(|item| item.name()).join("."),
-                m.name(),
-            )))
-        });
-
-        assert_eq!(
-            ["::m1", "m1::m11", "::e1", "m1::e11"]
-                .into_iter()
-                .map(str::to_string)
-                .collect::<HashSet<_>>(),
-            visited
-        );
-    }
+    pub input_files: Vec<File<'a>>,
 }
