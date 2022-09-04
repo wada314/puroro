@@ -270,28 +270,6 @@ impl<S> Fqtn<S> {
         Self(s)
     }
 }
-impl Fqtn<String> {
-    pub fn from_elements<'a, S, I, T, U>(
-        package: &Package<S>,
-        nested_messages_iter: I,
-        name: U,
-    ) -> Self
-    where
-        S: AsRef<str>,
-        I: Iterator<Item = &'a T>,
-        T: 'a + ?Sized + AsRef<str>,
-        U: AsRef<str>,
-    {
-        let s = package
-            .as_str()
-            .is_empty()
-            .then_some(package.as_str())
-            .into_iter();
-        let t = nested_messages_iter.map(|s| s.as_ref());
-        let u = iter::once(name.as_ref());
-        Self(s.chain(t).chain(u).join(".").to_string())
-    }
-}
 impl<S: AsRef<str>> Fqtn<S> {
     pub fn to_owned(&self) -> Fqtn<String> {
         Fqtn(self.0.as_ref().to_string())

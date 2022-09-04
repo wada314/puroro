@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_ext::{FieldDescriptorExt, FileDescriptorExt, FileOrMessage};
+use crate::descriptor_ext::FieldDescriptorExt;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::restructure;
 use crate::restructure::Syntax;
@@ -22,9 +22,6 @@ use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
 use ::std::borrow::Cow;
-use google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-};
 
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
@@ -298,7 +295,7 @@ impl WireType {
         r#type: google::protobuf::field_descriptor_proto::Type,
         fqtn: Option<Fqtn<&str>>,
         syntax: Syntax,
-        resolver: &DescriptorResolver,
+        _resolver: &DescriptorResolver,
     ) -> Result<WireType> {
         use google::protobuf::field_descriptor_proto::Type::*;
         use Bits32Type::*;
