@@ -131,6 +131,7 @@ pub struct Message {
     pub ident_camel: String,
     pub ident_lsnake: String,
     pub fields: Vec<Field>,
+    pub oneofs: Vec<Oneof>,
     pub bits_length: usize,
 }
 impl Message {
@@ -147,11 +148,17 @@ impl Message {
             .into_iter()
             .map(|f| Field::try_new(f, &mut bits_index, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let oneofs = m
+            .oneofs()
+            .into_iter()
+            .map(|o| Oneof::try_new(o, resolver))
+            .collect::<Result<Vec<_>>>()?;
         let bits_length = bits_index;
         Ok(Message {
             ident_camel,
             ident_lsnake,
             fields,
+            oneofs,
             bits_length,
         })
     }
@@ -278,26 +285,25 @@ impl Field {
 pub struct Oneof {
     pub ident_camel: String,
     pub ident_lsnake: String,
-    pub fields: Vec<()>,
-    pub oneof_index: i32,
+    pub fields: Vec<OneofField>,
 }
 impl Oneof {
-    pub fn try_new<'a>(
-        o: &re::Oneof<'a>,
-        oneof_index: i32,
-        resolver: &'a DescriptorResolver,
-    ) -> Result<Self> {
+    pub fn try_new<'a>(o: &'a re::Oneof<'a>, resolver: &'a DescriptorResolver) -> Result<Self> {
         let ident_camel = o.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_lsnake = o
             .name()
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
+        let fields = o
+            .fields()
+            .into_iter()
+            .map(|f| OneofField::try_new(f, resolver))
+            .collect::<Result<Vec<_>>>()?;
         Ok(Self {
             ident_camel,
             ident_lsnake,
-            fields: todo!(),
-            oneof_index,
+            fields,
         })
     }
 }
