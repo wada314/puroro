@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
-use crate::restructure;
+use crate::restructure as re;
 use crate::restructure::Syntax;
 use crate::utils::{Fqtn, StrExt as _};
 use crate::{ErrorKind, Result};
@@ -93,7 +93,7 @@ impl Module {
     }
 
     pub fn try_from_message<'a>(
-        m: &'a restructure::Message<'a>,
+        m: &'a re::Message<'a>,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
@@ -136,7 +136,7 @@ pub struct Message {
 impl Message {
     #[allow(unused)]
     pub fn try_new<'a>(
-        m: &'a restructure::Message<'a>,
+        m: &'a re::Message<'a>,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
@@ -165,7 +165,7 @@ pub struct Enum {
 
 impl Enum {
     #[allow(unused)]
-    pub fn try_new(e: &restructure::Enum, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(e: &re::Enum, resolver: &DescriptorResolver) -> Result<Self> {
         let ident_camel = e.name().to_camel_case().escape_rust_keywords().into_owned();
         Ok(Enum { ident_camel })
     }
@@ -184,7 +184,7 @@ pub struct Field {
 
 impl Field {
     pub fn try_new<'a>(
-        f: &'a restructure::Field<'a>,
+        f: &'a re::Field<'a>,
         bit_index: &mut usize,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
@@ -274,6 +274,54 @@ impl Field {
     }
 }
 
+#[derive(Debug)]
+pub struct Oneof {
+    ident_camel: String,
+    ident_lsnake: String,
+    fields: Vec<()>,
+    oneof_index: i32,
+}
+impl Oneof {
+    pub fn try_new<'a>(
+        o: &re::Oneof<'a>,
+        oneof_index: i32,
+        resolver: &'a DescriptorResolver,
+    ) -> Result<Self> {
+        let ident_camel = o.name().to_camel_case().escape_rust_keywords().to_string();
+        let ident_lsnake = o
+            .name()
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string();
+        Ok(Self {
+            ident_camel,
+            ident_lsnake,
+            fields: todo!(),
+            oneof_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct OneofField {
+    pub ident_camel: String,
+    pub ident_lsnake: String,
+}
+impl OneofField {
+    pub fn try_new<'a>(f: &re::OneofField<'a>, resolver: &'a DescriptorResolver) -> Result<Self> {
+        let ident_camel = f.name().to_camel_case().escape_rust_keywords().to_string();
+        let ident_lsnake = f
+            .name()
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string();
+        Ok(Self {
+            ident_camel,
+            ident_lsnake,
+        })
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum FieldRule {
     Optional,
@@ -291,7 +339,7 @@ pub enum WireType {
 
 impl WireType {
     fn from_field<'a>(
-        field: &'a restructure::Field<'a>,
+        field: &'a re::Field<'a>,
         _resolver: &'a DescriptorResolver,
     ) -> Result<WireType> {
         use google::protobuf::field_descriptor_proto::Type::*;
