@@ -28,10 +28,10 @@ pub enum ErrorKind {
     GroupNotSupported,
     #[error(r#"Unknown value for proto file's syntax: "{name}"."#)]
     UnknownProtoSyntax { name: String },
-    #[error(r#"The enum type "{name}" has no values. The empty enum is not allowed."#)]
-    EmptyEnum { name: String },
-    #[error(r#"A length of some sort of array in the proto is too large."#)]
-    TooLargeLength,
+    // #[error(r#"The enum type "{name}" has no values. The empty enum is not allowed."#)]
+    // EmptyEnum { name: String },
+    // #[error(r#"A length of some sort of array in the proto is too large."#)]
+    // TooLargeLength,
     #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from ParseIntError: "{source}""#)]

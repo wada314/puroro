@@ -15,7 +15,6 @@
 use crate::restructure::{File, MessageOrEnumRef};
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
-use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;

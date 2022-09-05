@@ -13,12 +13,10 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
-use ::std::iter;
 use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy)]
