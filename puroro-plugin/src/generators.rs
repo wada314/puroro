@@ -276,10 +276,10 @@ impl Field {
 
 #[derive(Debug)]
 pub struct Oneof {
-    ident_camel: String,
-    ident_lsnake: String,
-    fields: Vec<()>,
-    oneof_index: i32,
+    pub ident_camel: String,
+    pub ident_lsnake: String,
+    pub fields: Vec<()>,
+    pub oneof_index: i32,
 }
 impl Oneof {
     pub fn try_new<'a>(
