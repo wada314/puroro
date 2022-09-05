@@ -62,7 +62,6 @@ impl self::_puroro::Message for Msg {
         Ok(())
     }
 }
-
 pub mod _msg {
 
     mod _puroro {

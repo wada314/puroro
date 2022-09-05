@@ -68,7 +68,6 @@ impl self::_puroro::Message for Test1 {
         Ok(())
     }
 }
-
 pub mod _test1 {
 
     mod _puroro {
@@ -126,7 +125,6 @@ impl self::_puroro::Message for Test2 {
         Ok(())
     }
 }
-
 pub mod _test2 {
 
     mod _puroro {
@@ -190,7 +188,6 @@ impl self::_puroro::Message for Test3 {
         Ok(())
     }
 }
-
 pub mod _test3 {
 
     mod _puroro {
@@ -256,7 +253,6 @@ impl self::_puroro::Message for Test4 {
         Ok(())
     }
 }
-
 pub mod _test4 {
 
     mod _puroro {

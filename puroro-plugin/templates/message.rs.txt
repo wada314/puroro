@@ -53,6 +53,8 @@ impl self::_puroro::Message for {{ ident_camel }} {
     }
 }
 
+{#- a submodule for the utility types needed for this message type #}
+{#- e.g. An enum for oneof items #}
 pub mod {{ ident_lsnake }} {
 
     mod _puroro {
@@ -62,5 +64,13 @@ pub mod {{ ident_lsnake }} {
         pub use super::super::_puroro_root::*;
     }
 
+    {%- for oneof in oneofs %}
+    pub(crate) union {{ oneof.ident_camel }} {
+        _None,
+        {%- for field in oneof.fields %}
+        {{ field.ident_camel }}(()),
+        {%- endfor %} {#- for field in oneof.fields #}
+    }
+    {%- endfor %} {#- for oneof in oneofs #}
 }
 

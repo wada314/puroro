@@ -100,7 +100,6 @@ impl self::_puroro::Message for Book {
         Ok(())
     }
 }
-
 pub mod _book {
 
     mod _puroro {
@@ -158,7 +157,6 @@ impl self::_puroro::Message for Author {
         Ok(())
     }
 }
-
 pub mod _author {
 
     mod _puroro {
