@@ -66,9 +66,9 @@ pub mod {{ ident_lsnake }} {
 
     {%- for oneof in oneofs %}
     pub(crate) union {{ oneof.ident_camel }} {
-        _None,
+        _none: (),
         {%- for field in oneof.fields %}
-        {{ field.ident_camel }}(()),
+        {{ field.ident_lsnake }}: (),
         {%- endfor %} {#- for field in oneof.fields #}
     }
     {%- endfor %} {#- for oneof in oneofs #}

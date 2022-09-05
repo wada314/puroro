@@ -141,7 +141,7 @@ impl<'a> Message<'a> {
             self.proto()
                 .field()
                 .into_iter()
-                .filter(|f| !f.proto3_optional())
+                .filter(|f| f.proto3_optional() || !f.has_oneof_index())
                 .map(|f| Field::new(f, self))
                 .collect::<Vec<_>>()
                 .into_boxed_slice()

@@ -3,6 +3,8 @@
 // package (root)
 pub mod official_samples2;
 pub mod official_samples3;
+pub mod oneofs2;
+pub mod oneofs3;
 pub mod self_recursive;
 
 pub mod _puroro_root {
