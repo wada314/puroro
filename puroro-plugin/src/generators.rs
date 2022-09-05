@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// use crate::descriptor_ext::FieldDescriptorExt;
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::restructure;
 use crate::restructure::Syntax;
