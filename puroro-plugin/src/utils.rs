@@ -247,6 +247,12 @@ impl<S: AsRef<str>> Package<S> {
     }
 }
 
+impl<S: AsRef<str>> Display for Package<S> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.write_str(self.0.as_ref())
+    }
+}
+
 impl<S, T> ::std::ops::Add<T> for &Package<S>
 where
     S: AsRef<str>,

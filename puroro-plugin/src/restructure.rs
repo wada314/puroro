@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::utils::Fqtn;
+use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 #[allow(unused)]
@@ -95,6 +95,9 @@ impl<'a> File<'a> {
                 name: e.to_string(),
             })?,
         })
+    }
+    pub fn package(&'a self) -> Package<&'a str> {
+        Package::new(self.proto().package())
     }
 }
 impl Deref for File<'_> {

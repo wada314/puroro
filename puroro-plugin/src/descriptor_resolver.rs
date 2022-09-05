@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::descriptor_ext::FileDescriptorExt;
 use crate::restructure::{File, MessageOrEnumRef};
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
@@ -35,7 +34,7 @@ impl<'a> DescriptorResolver<'a> {
         let mut package_contents = HashMap::new();
         for f in input_files {
             Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
-            Self::generate_package_contents(&mut package_contents, f.proto());
+            Self::generate_package_contents(&mut package_contents, f);
         }
         Ok(Self {
             fqtn_to_desc_map,
@@ -57,10 +56,10 @@ impl<'a> DescriptorResolver<'a> {
 
     fn generate_package_contents(
         package_contents: &mut HashMap<String, PackageContents<'a>>,
-        file: &'a FileDescriptorProto,
+        file: &'a File<'a>,
     ) {
         // package_contents for parent packages
-        for (cur_package, subpackage) in file.package_ext().packages_and_subpackages() {
+        for (cur_package, subpackage) in file.package().packages_and_subpackages() {
             let item = package_contents
                 .entry(cur_package.full_package_path().to_string())
                 .or_insert_with(|| PackageContents {
@@ -76,11 +75,8 @@ impl<'a> DescriptorResolver<'a> {
         let term_item = package_contents
             .entry(file.package().to_string())
             .or_default();
-        term_item.package_name = file
-            .package_ext()
-            .leaf_package_name()
-            .map(|s| s.to_string());
-        term_item.full_package = file.package_ext().to_owned();
+        term_item.package_name = file.package().leaf_package_name().map(|s| s.to_string());
+        term_item.full_package = file.package().to_owned();
         term_item.input_files.push(File::new(file))
     }
 
