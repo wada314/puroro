@@ -15,7 +15,6 @@
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-#[allow(unused)]
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
@@ -295,10 +294,10 @@ impl<'a> Oneof<'a> {
             fields: OnceCell::default(),
         }
     }
-    pub fn proto(&self) -> &OneofDescriptorProto {
+    pub fn proto(&'a self) -> &OneofDescriptorProto {
         &self.proto
     }
-    pub fn fields(&'a self) -> &[OneofField<'a>] {
+    pub fn fields(&'a self) -> &[OneofField<'_>] {
         let parent = self.parent;
         let oneof_index = self.oneof_index;
         self.fields.get_or_init(|| {
@@ -328,7 +327,7 @@ impl<'a> OneofField<'a> {
     pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Oneof<'a>) -> Self {
         Self { proto, parent }
     }
-    pub fn proto(&self) -> &FieldDescriptorProto {
+    pub fn proto(&'a self) -> &FieldDescriptorProto {
         &self.proto
     }
 }
@@ -400,8 +399,8 @@ enum FieldType {
     Int64,
     UInt64,
     SInt64,
-    Enum2(),
-    Enum3(),
+    Enum2(Fqtn<String>),
+    Enum3(Fqtn<String>),
     Fixed32,
     SFixed32,
     Fixed64,
@@ -411,7 +410,7 @@ enum FieldType {
     Bool,
     String,
     Bytes,
-    Message(),
+    Message(Fqtn<String>),
 }
 
 #[derive(Debug, Clone, Copy)]
