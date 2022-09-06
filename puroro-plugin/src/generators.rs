@@ -312,18 +312,45 @@ impl Oneof {
 pub struct OneofField {
     pub ident_camel: String,
     pub ident_lsnake: String,
+    pub rust_field_type: String,
 }
 impl OneofField {
-    pub fn try_new<'a>(f: &re::OneofField<'a>, resolver: &'a DescriptorResolver) -> Result<Self> {
+    pub fn try_new<'a>(
+        f: &'a re::OneofField<'a>,
+        resolver: &'a DescriptorResolver,
+    ) -> Result<Self> {
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_lsnake = f
             .name()
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
+        let wire_type = WireType::from_oneof_field(f, resolver)?;
+        let rust_field_type_name = {
+            use LengthDelimitedType::*;
+            use WireType::*;
+            match &wire_type {
+                Variant(_) | Bits32(_) | Bits64(_) => {
+                    format!(
+                        "SingularNumericalField<{}, {}>",
+                        wire_type.into_owned_rust_type(),
+                        wire_type.into_tag_type(),
+                    )
+                }
+                LengthDelimited(String) => {
+                    format!("SingularStringField")
+                }
+                _ => format!("Dummy"), // TODO
+            }
+        };
+        let rust_field_type = format!(
+            "self::_puroro::internal::field_types::{}",
+            rust_field_type_name
+        );
         Ok(Self {
             ident_camel,
             ident_lsnake,
+            rust_field_type,
         })
     }
 }
@@ -344,19 +371,31 @@ pub enum WireType {
 }
 
 impl WireType {
-    fn from_field<'a>(
-        field: &'a re::Field<'a>,
+    fn from_field<'a>(field: &'a re::Field<'a>, _resolver: &'a DescriptorResolver) -> Result<Self> {
+        let fqtn = field.fqtn().clone();
+        let syntax = field.parent().file().try_syntax()?;
+        Self::try_new(field.proto().r#type(), fqtn.as_ref(), syntax)
+    }
+    fn from_oneof_field<'a>(
+        field: &'a re::OneofField<'a>,
         _resolver: &'a DescriptorResolver,
-    ) -> Result<WireType> {
+    ) -> Result<Self> {
+        let fqtn = field.fqtn().clone();
+        let syntax = field.parent().parent().file().try_syntax()?;
+        Self::try_new(field.proto().r#type(), fqtn.as_ref(), syntax)
+    }
+    fn try_new(
+        r#type: google::protobuf::field_descriptor_proto::Type,
+        fqtn: Option<&Fqtn<String>>,
+        syntax: Syntax,
+    ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Type::*;
         use Bits32Type::*;
         use Bits64Type::*;
         use LengthDelimitedType::*;
         use VariantType::*;
         use WireType::*;
-        let fqtn = field.fqtn().clone();
-        let syntax = field.parent().file().try_syntax()?;
-        Ok(match field.proto().r#type() {
+        Ok(match r#type {
             TypeInt32 => Variant(Int32),
             TypeUint32 => Variant(UInt32),
             TypeSint32 => Variant(SInt32),

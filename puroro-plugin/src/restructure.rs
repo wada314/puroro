@@ -297,6 +297,9 @@ impl<'a> Oneof<'a> {
     pub fn proto(&'a self) -> &OneofDescriptorProto {
         &self.proto
     }
+    pub fn parent(&'a self) -> &Message<'_> {
+        self.parent
+    }
     pub fn fields(&'a self) -> &[OneofField<'_>] {
         let parent = self.parent;
         let oneof_index = self.oneof_index;
@@ -322,13 +325,28 @@ impl Deref for Oneof<'_> {
 pub struct OneofField<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Oneof<'a>,
+    fqtn: OnceCell<Option<Fqtn<String>>>,
 }
 impl<'a> OneofField<'a> {
     pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Oneof<'a>) -> Self {
-        Self { proto, parent }
+        Self {
+            proto,
+            parent,
+            fqtn: OnceCell::new(),
+        }
     }
     pub fn proto(&'a self) -> &FieldDescriptorProto {
         &self.proto
+    }
+    pub fn parent(&'a self) -> &Oneof<'_> {
+        self.parent
+    }
+    pub fn fqtn(&'a self) -> &Option<Fqtn<String>> {
+        self.fqtn.get_or_init(|| {
+            self.proto()
+                .type_name_opt()
+                .map(|tn| Fqtn::new(tn).to_owned())
+        })
     }
 }
 impl Deref for OneofField<'_> {
