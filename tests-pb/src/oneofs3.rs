@@ -49,26 +49,34 @@ pub mod _msg {
     }
     pub(crate) union GroupOne {
         _none: (),
-        g1_int32: self::_puroro::internal::field_types::SingularNumericalField<
-            i32,
-            self::_puroro::tags::Int32,
+        g1_int32: ::std::mem::ManuallyDrop<
+            self::_puroro::internal::field_types::SingularNumericalField<
+                i32,
+                self::_puroro::tags::Int32,
+            >,
         >,
-        g1_string: self::_puroro::internal::field_types::SingularStringField,
+        g1_string:
+            ::std::mem::ManuallyDrop<self::_puroro::internal::field_types::SingularStringField>,
     }
     pub(crate) union GroupTwo {
         _none: (),
-        g2_f32: self::_puroro::internal::field_types::SingularNumericalField<
-            f32,
-            self::_puroro::tags::Float,
+        g2_f32: ::std::mem::ManuallyDrop<
+            self::_puroro::internal::field_types::SingularNumericalField<
+                f32,
+                self::_puroro::tags::Float,
+            >,
         >,
-        g2_string: self::_puroro::internal::field_types::SingularStringField,
-        g2_submsg: self::_puroro::internal::field_types::Dummy,
+        g2_string:
+            ::std::mem::ManuallyDrop<self::_puroro::internal::field_types::SingularStringField>,
+        g2_submsg: ::std::mem::ManuallyDrop<self::_puroro::internal::field_types::Dummy>,
     }
     pub(crate) union GroupThree {
         _none: (),
-        g3_int32: self::_puroro::internal::field_types::SingularNumericalField<
-            i32,
-            self::_puroro::tags::Int32,
+        g3_int32: ::std::mem::ManuallyDrop<
+            self::_puroro::internal::field_types::SingularNumericalField<
+                i32,
+                self::_puroro::tags::Int32,
+            >,
         >,
     }
 }

@@ -15,7 +15,7 @@
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::restructure as re;
 use crate::restructure::Syntax;
-use crate::utils::{Fqtn, StrExt as _, Package};
+use crate::utils::{Fqtn, Package, StrExt as _};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -326,7 +326,7 @@ impl OneofField {
             .escape_rust_keywords()
             .to_string();
         let wire_type = WireType::from_oneof_field(f, resolver)?;
-        let rust_field_type_name = {
+        let rust_field_inner_type_name = {
             use LengthDelimitedType::*;
             use WireType::*;
             match &wire_type {
@@ -343,10 +343,11 @@ impl OneofField {
                 _ => format!("Dummy"), // TODO
             }
         };
-        let rust_field_type = format!(
+        let rust_field_inner_type = format!(
             "self::_puroro::internal::field_types::{}",
-            rust_field_type_name
+            rust_field_inner_type_name
         );
+        let rust_field_type = format!("::std::mem::ManuallyDrop<{}>", rust_field_inner_type);
         Ok(Self {
             ident_camel,
             ident_lsnake,
