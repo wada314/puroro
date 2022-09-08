@@ -24,6 +24,7 @@ mod utils;
 
 use self::generators::Module;
 use crate::descriptor_resolver::DescriptorResolver;
+use crate::utils::Package;
 use ::askama::Template as _;
 use ::itertools::Itertools;
 use ::puroro::Message;
@@ -92,7 +93,10 @@ fn main() -> Result<()> {
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let root_module = Module::try_from_package(resolver.package_contents_or_err("")?, &resolver)?;
+    let root_module = Module::try_from_package(
+        resolver.package_contents_or_err(&Package::new(""))?,
+        &resolver,
+    )?;
 
     let modules = {
         let mut queue = vec![&root_module];

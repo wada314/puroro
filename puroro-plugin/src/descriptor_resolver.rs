@@ -22,7 +22,7 @@ use ::std::fmt::Debug;
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
     fqtn_to_desc_map: HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
-    package_contents: HashMap<String, PackageContents<'a>>,
+    package_contents: HashMap<Package<String>, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
     pub fn new<I>(input_files: I) -> Result<Self>
@@ -54,13 +54,13 @@ impl<'a> DescriptorResolver<'a> {
     }
 
     fn generate_package_contents(
-        package_contents: &mut HashMap<String, PackageContents<'a>>,
+        package_contents: &mut HashMap<Package<String>, PackageContents<'a>>,
         file: &'a File<'a>,
     ) {
         // package_contents for parent packages
         for (cur_package, subpackage) in file.package().packages_and_subpackages() {
             let item = package_contents
-                .entry(cur_package.full_package_path().to_string())
+                .entry(cur_package.to_owned())
                 .or_insert_with(|| PackageContents {
                     package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
                     full_package: cur_package.to_owned(),
@@ -72,7 +72,7 @@ impl<'a> DescriptorResolver<'a> {
 
         // package_contents for the leaf package
         let term_item = package_contents
-            .entry(file.package().to_string())
+            .entry(file.package().to_owned())
             .or_default();
         term_item.package_name = file.package().leaf_package_name().map(|s| s.to_string());
         term_item.full_package = file.package().to_owned();
@@ -93,15 +93,21 @@ impl<'a> DescriptorResolver<'a> {
         })?)
     }
 
-    pub fn package_contents(&self, package: &str) -> Option<&PackageContents<'a>> {
-        self.package_contents.get(package)
+    pub fn package_contents<S: AsRef<str>>(
+        &self,
+        package: &Package<S>,
+    ) -> Option<&PackageContents<'a>> {
+        self.package_contents.get::<str>(package.as_str())
     }
 
-    pub fn package_contents_or_err(&self, package: &str) -> Result<&PackageContents<'a>> {
+    pub fn package_contents_or_err<S: AsRef<str>>(
+        &self,
+        package: &Package<S>,
+    ) -> Result<&PackageContents<'a>> {
         Ok(self
             .package_contents(package)
             .ok_or(ErrorKind::UnknownTypeName {
-                name: package.into(),
+                name: package.as_str().into(),
             })?)
     }
 

@@ -15,7 +15,7 @@
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::restructure as re;
 use crate::restructure::Syntax;
-use crate::utils::{Fqtn, StrExt as _};
+use crate::utils::{Fqtn, StrExt as _, Package};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -51,7 +51,7 @@ impl Module {
                 } else {
                     format!("{}.{}", full_path.as_str(), sp)
                 };
-                resolver.package_contents_or_err(&new_package)
+                resolver.package_contents_or_err(&Package::new(new_package))
             })
             .collect::<Result<Vec<_>>>()?;
         let submodules_from_packages = subpackages
