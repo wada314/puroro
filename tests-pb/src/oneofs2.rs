@@ -57,6 +57,12 @@ pub mod _msg {
         >,
         g1_string: ::std::mem::ManuallyDrop<self::_puroro::internal::oneof_field_type::StringField>,
     }
+    #[repr(u32)]
+    pub enum GroupOneCase {
+        G1Int32,
+        G1String,
+    }
+
     impl GroupOne {
         pub(crate) fn try_g1_int32_opt(
             &self,
@@ -69,23 +75,7 @@ pub mod _msg {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                G1Int32,
-                G1String,
-            }
-
-            Ok(if index == Items::G1Int32 as u32 {
-                Some(<self::_puroro::internal::oneof_field_type::NumericalField<
-                    i32,
-                    self::_puroro::tags::Int32,
-                > as OneofFieldType>::get_field(unsafe {
-                    &self.g1_int32
-                }))
-            } else {
-                None
-            })
+            todo!()
         }
         pub(crate) fn try_g1_string_opt(
             &self,
@@ -98,20 +88,7 @@ pub mod _msg {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                G1Int32,
-                G1String,
-            }
-
-            Ok(if index == Items::G1String as u32 {
-                Some(<self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::get_field(
-                        unsafe { &self.g1_string },
-                    ))
-            } else {
-                None
-            })
+            todo!()
         }
     }
     pub(crate) union GroupTwo {
@@ -129,6 +106,13 @@ pub mod _msg {
             >,
         >,
     }
+    #[repr(u32)]
+    pub enum GroupTwoCase {
+        G2F32,
+        G2String,
+        G2Submsg,
+    }
+
     impl GroupTwo {
         pub(crate) fn try_g2_f32_opt(
             &self,
@@ -141,24 +125,7 @@ pub mod _msg {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                G2F32,
-                G2String,
-                G2Submsg,
-            }
-
-            Ok(if index == Items::G2F32 as u32 {
-                Some(<self::_puroro::internal::oneof_field_type::NumericalField<
-                    f32,
-                    self::_puroro::tags::Float,
-                > as OneofFieldType>::get_field(unsafe {
-                    &self.g2_f32
-                }))
-            } else {
-                None
-            })
+            todo!()
         }
         pub(crate) fn try_g2_string_opt(
             &self,
@@ -171,21 +138,7 @@ pub mod _msg {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                G2F32,
-                G2String,
-                G2Submsg,
-            }
-
-            Ok(if index == Items::G2String as u32 {
-                Some(<self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::get_field(
-                        unsafe { &self.g2_string },
-                    ))
-            } else {
-                None
-            })
+            todo!()
         }
         pub(crate) fn try_g2_submsg_opt(
             &self,
@@ -198,23 +151,7 @@ pub mod _msg {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                G2F32,
-                G2String,
-                G2Submsg,
-            }
-
-            Ok(if index == Items::G2Submsg as u32 {
-                Some(
-                    <self::_puroro::internal::oneof_field_type::HeapMessageField<
-                        _puroro_root::oneofs2::Submsg,
-                    > as OneofFieldType>::get_field(unsafe { &self.g2_submsg }),
-                )
-            } else {
-                None
-            })
+            todo!()
         }
     }
     pub(crate) union GroupThree {
@@ -226,6 +163,11 @@ pub mod _msg {
             >,
         >,
     }
+    #[repr(u32)]
+    pub enum GroupThreeCase {
+        G3Int32,
+    }
+
     impl GroupThree {
         pub(crate) fn try_g3_int32_opt(
             &self,
@@ -238,22 +180,7 @@ pub mod _msg {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                G3Int32,
-            }
-
-            Ok(if index == Items::G3Int32 as u32 {
-                Some(<self::_puroro::internal::oneof_field_type::NumericalField<
-                    i32,
-                    self::_puroro::tags::Int32,
-                > as OneofFieldType>::get_field(unsafe {
-                    &self.g3_int32
-                }))
-            } else {
-                None
-            })
+            todo!()
         }
     }
 }

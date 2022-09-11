@@ -74,6 +74,13 @@ pub mod {{ ident_lsnake }} {
         {{ field.ident_lsnake }}: {{ field.rust_field_type }},
         {%- endfor %} {#- for field in oneof.fields #}
     }
+    #[repr(u32)]
+    pub enum {{ oneof.ident_case }} {
+        {%- for field in oneof.fields %}
+        {{ field.ident_enum_item }},
+        {%- endfor %} {#- for field in oneof.fields #}
+    }
+
     impl {{ oneof.ident_camel }} {
         {%- for field in oneof.fields %}
         pub(crate) fn try_{{ field.ident_lsnake }}_opt(&self, index: u32) -> _puroro::Result<{{ field.rust_opt_getter_type }}> {
@@ -84,21 +91,7 @@ pub mod {{ ident_lsnake }} {
             #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
-            #[repr(u32)]
-            enum Items {
-                _None,
-                {%- for field in oneof.fields %}
-                {{ field.ident_camel }},
-                {%- endfor %} {#- for field in oneof.fields #}
-            }
-
-            Ok(if index == Items::{{ field.ident_camel }} as u32 {
-                Some(<{{ field.rust_field_inner_type }} as OneofFieldType>::get_field(
-                        unsafe { &self.{{ field.ident_lsnake }} },
-                    ))
-            } else {
-                None
-            })
+            todo!()
         }
         {%- endfor %} {#- for field in oneof.fields #}
     }

@@ -285,6 +285,7 @@ impl Field {
 pub struct Oneof {
     pub ident_camel: String,
     pub ident_lsnake: String,
+    pub ident_case: String,
     pub fields: Vec<OneofField>,
 }
 impl Oneof {
@@ -295,6 +296,7 @@ impl Oneof {
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
+        let ident_case = format!("{}Case", o.name().to_camel_case());
         let fields = o
             .fields()
             .into_iter()
@@ -303,6 +305,7 @@ impl Oneof {
         Ok(Self {
             ident_camel,
             ident_lsnake,
+            ident_case,
             fields,
         })
     }
@@ -312,6 +315,7 @@ impl Oneof {
 pub struct OneofField {
     pub ident_camel: String,
     pub ident_lsnake: String,
+    pub ident_enum_item: String,
     pub rust_field_type: String,
     pub rust_field_inner_type: String,
     pub rust_getter_type: String,
@@ -328,6 +332,7 @@ impl OneofField {
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
+        let ident_enum_item = f.name().to_camel_case().escape_rust_keywords().to_string();
         let wire_type = WireType::from_oneof_field(f, resolver)?;
         let rust_field_inner_type_name = {
             use LengthDelimitedType::*;
@@ -360,6 +365,7 @@ impl OneofField {
         Ok(Self {
             ident_camel,
             ident_lsnake,
+            ident_enum_item,
             rust_field_type,
             rust_field_inner_type,
             rust_getter_type,
@@ -470,9 +476,7 @@ impl WireType {
             Variant(var) => var.into_owned_rust_type(),
             LengthDelimited(String) => "&str".into(),
             LengthDelimited(Bytes) => "&[u8]".into(),
-            LengthDelimited(Message(fqtn)) => {
-                format!("&{}", fqtn.to_rust_path()).into()
-            }
+            LengthDelimited(Message(fqtn)) => format!("&{}", fqtn.to_rust_path()).into(),
             Bits32(x) => x.into_owned_rust_type(),
             Bits64(x) => x.into_owned_rust_type(),
         };
