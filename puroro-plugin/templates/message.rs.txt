@@ -85,9 +85,9 @@ pub mod {{ ident_lsnake }} {
                 {%- endfor %} {#- for field in oneof.fields #}
             }
             Ok(match index {
-                x if x == Items::_None => None,
+                x if x == Items::_None as i32 => None,
                 {%- for field in oneof.fields %}
-                x if x == Items::{{ field.ident_camel }} => Some(self.{{ field.ident_lsnake }}),
+                x if x == Items::{{ field.ident_camel }} as i32 => Some(self.{{ field.ident_lsnake }}),
                 {%- endfor %} {#- for field in oneof.fields #}
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
