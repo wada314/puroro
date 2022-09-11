@@ -50,13 +50,12 @@ pub mod _msg {
     pub(crate) union GroupOne {
         _none: (),
         g1_int32: ::std::mem::ManuallyDrop<
-            self::_puroro::internal::field_types::SingularNumericalField<
+            self::_puroro::internal::oneof_field_type::NumericalField<
                 i32,
                 self::_puroro::tags::Int32,
             >,
         >,
-        g1_string:
-            ::std::mem::ManuallyDrop<self::_puroro::internal::field_types::SingularStringField>,
+        g1_string: ::std::mem::ManuallyDrop<self::_puroro::internal::oneof_field_type::StringField>,
     }
     impl GroupOne {
         pub(crate) fn try_g1_int32_opt(
@@ -64,9 +63,9 @@ pub mod _msg {
             index: u32,
         ) -> _puroro::Result<::std::option::Option<i32>> {
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
@@ -77,21 +76,15 @@ pub mod _msg {
                 G1String,
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                x if x == Items::G1Int32 as u32 => {
-                    <self::_puroro::internal::field_types::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
-                        &self.g1_int32,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G1String as u32 => {
-                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-                        &self.g1_string,
-                        todo!(),
-                    )
-                }
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+            Ok(if index == Items::G1Int32 as u32 {
+                Some(<self::_puroro::internal::oneof_field_type::NumericalField<
+                    i32,
+                    self::_puroro::tags::Int32,
+                > as OneofFieldType>::get_field(
+                    &self.g1_int32
+                ))
+            } else {
+                None
             })
         }
         pub(crate) fn try_g1_string_opt(
@@ -99,9 +92,9 @@ pub mod _msg {
             index: u32,
         ) -> _puroro::Result<::std::option::Option<&str>> {
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
@@ -112,35 +105,29 @@ pub mod _msg {
                 G1String,
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                x if x == Items::G1Int32 as u32 => {
-                    <self::_puroro::internal::field_types::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
-                        &self.g1_int32,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G1String as u32 => {
-                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            Ok(if index == Items::G1String as u32 {
+                Some(<self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::get_field(
                         &self.g1_string,
-                        todo!(),
-                    )
-                }
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+                    ))
+            } else {
+                None
             })
         }
     }
     pub(crate) union GroupTwo {
         _none: (),
         g2_f32: ::std::mem::ManuallyDrop<
-            self::_puroro::internal::field_types::SingularNumericalField<
+            self::_puroro::internal::oneof_field_type::NumericalField<
                 f32,
                 self::_puroro::tags::Float,
             >,
         >,
-        g2_string:
-            ::std::mem::ManuallyDrop<self::_puroro::internal::field_types::SingularStringField>,
-        g2_submsg: ::std::mem::ManuallyDrop<self::_puroro::internal::field_types::Dummy>,
+        g2_string: ::std::mem::ManuallyDrop<self::_puroro::internal::oneof_field_type::StringField>,
+        g2_submsg: ::std::mem::ManuallyDrop<
+            self::_puroro::internal::oneof_field_type::HeapMessageField<
+                _puroro_root::oneofs2::Submsg,
+            >,
+        >,
     }
     impl GroupTwo {
         pub(crate) fn try_g2_f32_opt(
@@ -148,9 +135,9 @@ pub mod _msg {
             index: u32,
         ) -> _puroro::Result<::std::option::Option<f32>> {
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
@@ -162,27 +149,13 @@ pub mod _msg {
                 G2Submsg,
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                x if x == Items::G2F32 as u32 => {
-                    <self::_puroro::internal::field_types::SingularNumericalField<f32, self::_puroro::tags::Float> as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_f32,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G2String as u32 => {
-                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_string,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G2Submsg as u32 => {
-                    <self::_puroro::internal::field_types::Dummy as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_submsg,
-                        todo!(),
-                    )
-                }
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+            Ok(if index == Items::G2F32 as u32 {
+                Some(<self::_puroro::internal::oneof_field_type::NumericalField<
+                    f32,
+                    self::_puroro::tags::Float,
+                > as OneofFieldType>::get_field(&self.g2_f32))
+            } else {
+                None
             })
         }
         pub(crate) fn try_g2_string_opt(
@@ -190,9 +163,9 @@ pub mod _msg {
             index: u32,
         ) -> _puroro::Result<::std::option::Option<&str>> {
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
@@ -204,37 +177,22 @@ pub mod _msg {
                 G2Submsg,
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                x if x == Items::G2F32 as u32 => {
-                    <self::_puroro::internal::field_types::SingularNumericalField<f32, self::_puroro::tags::Float> as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_f32,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G2String as u32 => {
-                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            Ok(if index == Items::G2String as u32 {
+                Some(<self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::get_field(
                         &self.g2_string,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G2Submsg as u32 => {
-                    <self::_puroro::internal::field_types::Dummy as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_submsg,
-                        todo!(),
-                    )
-                }
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+                    ))
+            } else {
+                None
             })
         }
         pub(crate) fn try_g2_submsg_opt(
             &self,
             index: u32,
-        ) -> _puroro::Result<::std::option::Option<_puroro_root::oneofs2::Submsg>> {
+        ) -> _puroro::Result<::std::option::Option<&_puroro_root::oneofs2::Submsg>> {
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
@@ -246,34 +204,21 @@ pub mod _msg {
                 G2Submsg,
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                x if x == Items::G2F32 as u32 => {
-                    <self::_puroro::internal::field_types::SingularNumericalField<f32, self::_puroro::tags::Float> as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_f32,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G2String as u32 => {
-                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_string,
-                        todo!(),
-                    )
-                }
-                x if x == Items::G2Submsg as u32 => {
-                    <self::_puroro::internal::field_types::Dummy as NonRepeatedFieldType>::get_field_opt(
-                        &self.g2_submsg,
-                        todo!(),
-                    )
-                }
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+            Ok(if index == Items::G2Submsg as u32 {
+                Some(
+                    <self::_puroro::internal::oneof_field_type::HeapMessageField<
+                        _puroro_root::oneofs2::Submsg,
+                    > as OneofFieldType>::get_field(&self.g2_submsg),
+                )
+            } else {
+                None
             })
         }
     }
     pub(crate) union GroupThree {
         _none: (),
         g3_int32: ::std::mem::ManuallyDrop<
-            self::_puroro::internal::field_types::SingularNumericalField<
+            self::_puroro::internal::oneof_field_type::NumericalField<
                 i32,
                 self::_puroro::tags::Int32,
             >,
@@ -285,9 +230,9 @@ pub mod _msg {
             index: u32,
         ) -> _puroro::Result<::std::option::Option<i32>> {
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
@@ -297,17 +242,15 @@ pub mod _msg {
                 G3Int32,
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                x if x == Items::G3Int32 as u32 => {
-                    <self::_puroro::internal::field_types::SingularNumericalField<
-                        i32,
-                        self::_puroro::tags::Int32,
-                    > as NonRepeatedFieldType>::get_field_opt(
-                        &self.g3_int32, todo!()
-                    )
-                }
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+            Ok(if index == Items::G3Int32 as u32 {
+                Some(<self::_puroro::internal::oneof_field_type::NumericalField<
+                    i32,
+                    self::_puroro::tags::Int32,
+                > as OneofFieldType>::get_field(
+                    &self.g3_int32
+                ))
+            } else {
+                None
             })
         }
     }

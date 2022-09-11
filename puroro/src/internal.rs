@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod field_types;
+pub mod oneof_field_type;
 pub mod ser;
 pub mod utils;
 pub mod variant;

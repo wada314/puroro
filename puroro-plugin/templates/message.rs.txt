@@ -80,9 +80,9 @@ pub mod {{ ident_lsnake }} {
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
             #[allow(unused)]
-            use ::std::option::Option::None;
+            use ::std::option::Option::{None, Some};
             #[allow(unused)]
-            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
             #[repr(u32)]
             enum Items {
@@ -92,17 +92,12 @@ pub mod {{ ident_lsnake }} {
                 {%- endfor %} {#- for field in oneof.fields #}
             }
 
-            Ok(match index {
-                x if x == Items::_None as u32 => None,
-                {%- for field in oneof.fields %}
-                x if x == Items::{{ field.ident_camel }} as u32 => {
-                    <{{ field.rust_field_inner_type }} as NonRepeatedFieldType>::get_field_opt(
+            Ok(if index == Items::{{ field.ident_camel }} as u32 {
+                Some(<{{ field.rust_field_inner_type }} as OneofFieldType>::get_field(
                         &self.{{ field.ident_lsnake }},
-                        todo!(),
-                    )
-                }
-                {%- endfor %} {#- for field in oneof.fields #}
-                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+                    ))
+            } else {
+                None
             })
         }
         {%- endfor %} {#- for field in oneof.fields #}

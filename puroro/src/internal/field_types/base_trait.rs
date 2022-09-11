@@ -74,6 +74,8 @@ pub trait FieldType {
     }
 }
 
+impl FieldType for Dummy {}
+
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
     RustType: PartialEq + Default + Clone,

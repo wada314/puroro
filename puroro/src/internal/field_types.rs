@@ -24,7 +24,6 @@ use ::std::marker::PhantomData;
 
 #[derive(Default, Clone)]
 pub struct Dummy;
-impl FieldType for Dummy {}
 
 #[derive(Default, Clone)]
 pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);

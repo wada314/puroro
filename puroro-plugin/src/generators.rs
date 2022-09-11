@@ -335,19 +335,22 @@ impl OneofField {
             match &wire_type {
                 Variant(_) | Bits32(_) | Bits64(_) => {
                     format!(
-                        "SingularNumericalField<{}, {}>",
+                        "NumericalField<{}, {}>",
                         wire_type.into_owned_rust_type(),
                         wire_type.into_tag_type(),
                     )
                 }
                 LengthDelimited(String) => {
-                    format!("SingularStringField")
+                    format!("StringField")
+                }
+                LengthDelimited(Message(m)) => {
+                    format!("HeapMessageField<{}>", m.to_rust_path())
                 }
                 _ => format!("Dummy"), // TODO
             }
         };
         let rust_field_inner_type = format!(
-            "self::_puroro::internal::field_types::{}",
+            "self::_puroro::internal::oneof_field_type::{}",
             rust_field_inner_type_name
         );
         let rust_field_type = format!("::std::mem::ManuallyDrop<{}>", rust_field_inner_type);
@@ -467,7 +470,9 @@ impl WireType {
             Variant(var) => var.into_owned_rust_type(),
             LengthDelimited(String) => "&str".into(),
             LengthDelimited(Bytes) => "&[u8]".into(),
-            LengthDelimited(Message(fqtn)) => fqtn.to_rust_path().into(),
+            LengthDelimited(Message(fqtn)) => {
+                format!("&{}", fqtn.to_rust_path()).into()
+            }
             Bits32(x) => x.into_owned_rust_type(),
             Bits64(x) => x.into_owned_rust_type(),
         };
