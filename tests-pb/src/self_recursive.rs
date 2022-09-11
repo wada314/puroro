@@ -22,9 +22,11 @@ pub struct Msg {
 impl Msg {
     // Singular, LengthDelimited(Message(Fqtn(".self_recursive.Msg")))
     pub fn recursive_unlabeled(&self) -> Option<&_puroro_root::self_recursive::Msg> {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::SingularHeapMessageField<
             _puroro_root::self_recursive::Msg,
-        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field(
             &self.recursive_unlabeled,
             &self._bitfield,
             ::std::default::Default::default(),

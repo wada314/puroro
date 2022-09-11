@@ -63,18 +63,34 @@ pub mod _msg {
             &self,
             index: u32,
         ) -> _puroro::Result<::std::option::Option<i32>> {
-            use ::std::option::Option::{None, Some};
+            #[allow(unused)]
+            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            #[allow(unused)]
+            use ::std::option::Option::None;
+            #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
-            #[repr(i32)]
+
+            #[repr(u32)]
             enum Items {
                 _None,
                 G1Int32,
                 G1String,
             }
+
             Ok(match index {
-                x if x == Items::_None as i32 => None,
-                x if x == Items::G1Int32 as i32 => Some(self.g1_int32),
-                x if x == Items::G1String as i32 => Some(self.g1_string),
+                x if x == Items::_None as u32 => None,
+                x if x == Items::G1Int32 as u32 => {
+                    <self::_puroro::internal::field_types::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+                        &self.g1_int32,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G1String as u32 => {
+                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+                        &self.g1_string,
+                        todo!(),
+                    )
+                }
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
         }
@@ -82,18 +98,34 @@ pub mod _msg {
             &self,
             index: u32,
         ) -> _puroro::Result<::std::option::Option<&str>> {
-            use ::std::option::Option::{None, Some};
+            #[allow(unused)]
+            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            #[allow(unused)]
+            use ::std::option::Option::None;
+            #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
-            #[repr(i32)]
+
+            #[repr(u32)]
             enum Items {
                 _None,
                 G1Int32,
                 G1String,
             }
+
             Ok(match index {
-                x if x == Items::_None as i32 => None,
-                x if x == Items::G1Int32 as i32 => Some(self.g1_int32),
-                x if x == Items::G1String as i32 => Some(self.g1_string),
+                x if x == Items::_None as u32 => None,
+                x if x == Items::G1Int32 as u32 => {
+                    <self::_puroro::internal::field_types::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+                        &self.g1_int32,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G1String as u32 => {
+                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+                        &self.g1_string,
+                        todo!(),
+                    )
+                }
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
         }
@@ -115,20 +147,41 @@ pub mod _msg {
             &self,
             index: u32,
         ) -> _puroro::Result<::std::option::Option<f32>> {
-            use ::std::option::Option::{None, Some};
+            #[allow(unused)]
+            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            #[allow(unused)]
+            use ::std::option::Option::None;
+            #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
-            #[repr(i32)]
+
+            #[repr(u32)]
             enum Items {
                 _None,
                 G2F32,
                 G2String,
                 G2Submsg,
             }
+
             Ok(match index {
-                x if x == Items::_None as i32 => None,
-                x if x == Items::G2F32 as i32 => Some(self.g2_f32),
-                x if x == Items::G2String as i32 => Some(self.g2_string),
-                x if x == Items::G2Submsg as i32 => Some(self.g2_submsg),
+                x if x == Items::_None as u32 => None,
+                x if x == Items::G2F32 as u32 => {
+                    <self::_puroro::internal::field_types::SingularNumericalField<f32, self::_puroro::tags::Float> as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_f32,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G2String as u32 => {
+                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_string,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G2Submsg as u32 => {
+                    <self::_puroro::internal::field_types::Dummy as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_submsg,
+                        todo!(),
+                    )
+                }
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
         }
@@ -136,20 +189,41 @@ pub mod _msg {
             &self,
             index: u32,
         ) -> _puroro::Result<::std::option::Option<&str>> {
-            use ::std::option::Option::{None, Some};
+            #[allow(unused)]
+            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            #[allow(unused)]
+            use ::std::option::Option::None;
+            #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
-            #[repr(i32)]
+
+            #[repr(u32)]
             enum Items {
                 _None,
                 G2F32,
                 G2String,
                 G2Submsg,
             }
+
             Ok(match index {
-                x if x == Items::_None as i32 => None,
-                x if x == Items::G2F32 as i32 => Some(self.g2_f32),
-                x if x == Items::G2String as i32 => Some(self.g2_string),
-                x if x == Items::G2Submsg as i32 => Some(self.g2_submsg),
+                x if x == Items::_None as u32 => None,
+                x if x == Items::G2F32 as u32 => {
+                    <self::_puroro::internal::field_types::SingularNumericalField<f32, self::_puroro::tags::Float> as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_f32,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G2String as u32 => {
+                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_string,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G2Submsg as u32 => {
+                    <self::_puroro::internal::field_types::Dummy as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_submsg,
+                        todo!(),
+                    )
+                }
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
         }
@@ -157,20 +231,41 @@ pub mod _msg {
             &self,
             index: u32,
         ) -> _puroro::Result<::std::option::Option<_puroro_root::oneofs2::Submsg>> {
-            use ::std::option::Option::{None, Some};
+            #[allow(unused)]
+            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            #[allow(unused)]
+            use ::std::option::Option::None;
+            #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
-            #[repr(i32)]
+
+            #[repr(u32)]
             enum Items {
                 _None,
                 G2F32,
                 G2String,
                 G2Submsg,
             }
+
             Ok(match index {
-                x if x == Items::_None as i32 => None,
-                x if x == Items::G2F32 as i32 => Some(self.g2_f32),
-                x if x == Items::G2String as i32 => Some(self.g2_string),
-                x if x == Items::G2Submsg as i32 => Some(self.g2_submsg),
+                x if x == Items::_None as u32 => None,
+                x if x == Items::G2F32 as u32 => {
+                    <self::_puroro::internal::field_types::SingularNumericalField<f32, self::_puroro::tags::Float> as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_f32,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G2String as u32 => {
+                    <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_string,
+                        todo!(),
+                    )
+                }
+                x if x == Items::G2Submsg as u32 => {
+                    <self::_puroro::internal::field_types::Dummy as NonRepeatedFieldType>::get_field_opt(
+                        &self.g2_submsg,
+                        todo!(),
+                    )
+                }
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
         }
@@ -189,16 +284,29 @@ pub mod _msg {
             &self,
             index: u32,
         ) -> _puroro::Result<::std::option::Option<i32>> {
-            use ::std::option::Option::{None, Some};
+            #[allow(unused)]
+            use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+            #[allow(unused)]
+            use ::std::option::Option::None;
+            #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
-            #[repr(i32)]
+
+            #[repr(u32)]
             enum Items {
                 _None,
                 G3Int32,
             }
+
             Ok(match index {
-                x if x == Items::_None as i32 => None,
-                x if x == Items::G3Int32 as i32 => Some(self.g3_int32),
+                x if x == Items::_None as u32 => None,
+                x if x == Items::G3Int32 as u32 => {
+                    <self::_puroro::internal::field_types::SingularNumericalField<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    > as NonRepeatedFieldType>::get_field_opt(
+                        &self.g3_int32, todo!()
+                    )
+                }
                 _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
             })
         }
@@ -220,11 +328,13 @@ pub struct Submsg {
 impl Submsg {
     // Optional, Variant(Int32)
     pub fn i32_optional(&self) -> i32 {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0,
-        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field(
             &self.i32_optional,
             &self._bitfield,
             ::std::default::Default::default(),

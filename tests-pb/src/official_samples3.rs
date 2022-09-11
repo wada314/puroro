@@ -23,10 +23,12 @@ pub struct Test1 {
 impl Test1 {
     // Singular, Variant(Int32)
     pub fn a(&self) -> i32 {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::SingularNumericalField<
             i32,
             self::_puroro::tags::Int32,
-        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field(
             &self.a,
             &self._bitfield,
             ::std::default::Default::default(),
@@ -86,7 +88,9 @@ pub struct Test2 {
 impl Test2 {
     // Singular, LengthDelimited(String)
     pub fn b(&self) -> &str {
-        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field(
             &self.b, &self._bitfield, ::std::default::Default::default(),
         )
     }
@@ -145,9 +149,11 @@ pub struct Test3 {
 impl Test3 {
     // Singular, LengthDelimited(Message(Fqtn(".official_samples3.Test1")))
     pub fn c(&self) -> Option<&_puroro_root::official_samples3::Test1> {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::SingularHeapMessageField<
             _puroro_root::official_samples3::Test1,
-        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field(
             &self.c,
             &self._bitfield,
             ::std::default::Default::default(),
@@ -209,13 +215,12 @@ pub struct Test4 {
 impl Test4 {
     // Repeated, Variant(Int32)
     pub fn d(&self) -> &[i32] {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::RepeatedNumericalField<
             i32,
             self::_puroro::tags::Int32,
-        > as self::_puroro::internal::field_types::RepeatedFieldType>::get_field(
-            &self.d,
-            &self._bitfield,
-        )
+        > as RepeatedFieldType>::get_field(&self.d, &self._bitfield)
     }
 }
 

@@ -29,16 +29,20 @@ pub struct Book {
 impl Book {
     // Singular, LengthDelimited(String)
     pub fn title(&self) -> &str {
-        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field(
             &self.title, &self._bitfield, ::std::default::Default::default(),
         )
     }
     // Singular, Variant(UInt32)
     pub fn num_pages(&self) -> u32 {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::SingularNumericalField<
             u32,
             self::_puroro::tags::UInt32,
-        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field(
             &self.num_pages,
             &self._bitfield,
             ::std::default::Default::default(),
@@ -46,9 +50,11 @@ impl Book {
     }
     // Singular, LengthDelimited(Message(Fqtn(".library.Author")))
     pub fn author(&self) -> Option<&_puroro_root::library::Author> {
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_types::SingularHeapMessageField<
             _puroro_root::library::Author,
-        > as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field(
             &self.author,
             &self._bitfield,
             ::std::default::Default::default(),
@@ -121,7 +127,9 @@ pub struct Author {
 impl Author {
     // Singular, LengthDelimited(String)
     pub fn name(&self) -> &str {
-        <self::_puroro::internal::field_types::SingularStringField as self::_puroro::internal::field_types::NonRepeatedFieldType>::get_field(
+        #[allow(unused)]
+        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_types::SingularStringField as NonRepeatedFieldType>::get_field(
             &self.name, &self._bitfield, ::std::default::Default::default(),
         )
     }

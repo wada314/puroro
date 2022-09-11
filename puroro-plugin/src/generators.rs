@@ -313,6 +313,7 @@ pub struct OneofField {
     pub ident_camel: String,
     pub ident_lsnake: String,
     pub rust_field_type: String,
+    pub rust_field_inner_type: String,
     pub rust_getter_type: String,
     pub rust_opt_getter_type: String,
 }
@@ -357,6 +358,7 @@ impl OneofField {
             ident_camel,
             ident_lsnake,
             rust_field_type,
+            rust_field_inner_type,
             rust_getter_type,
             rust_opt_getter_type,
         })
