@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub trait Oneof<Case>: Sized {
-    fn get(&self) -> ();
-}
+use crate::bitvec::BitSlice;
+use ::std::marker::PhantomData;
+use ::std::ops::Deref;
 
-pub trait OneofCase: Sized {
-    fn from_int(x: u32) -> Option<Self>;
+pub trait Oneof: Sized {
+    type CaseRef<'a>
+    where
+        Self: 'a;
+    fn get_ref<'a, B: BitSlice>(&'a self, _bitvec: &'a B) -> Option<Self::CaseRef<'a>>;
 }
