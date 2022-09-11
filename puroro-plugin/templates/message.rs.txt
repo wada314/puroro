@@ -14,7 +14,7 @@ impl {{ ident_camel }} {
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
     pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         {%- match f.rule%}
         {%- when FieldRule::Repeated %}
         <{{ f.rust_field_type }} as RepeatedFieldType>::get_field(
@@ -41,7 +41,7 @@ impl self::_puroro::Message for {{ ident_camel }} {
             match number {
                 {%- for f in fields %}
                 {{ f.number }} => <
-                    {{ f.rust_field_type }} as self::_puroro::internal::field_types::FieldType
+                    {{ f.rust_field_type }} as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.{{ f.ident_lsnake }},
                     &mut self._bitfield,

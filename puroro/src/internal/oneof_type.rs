@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod field_type;
-pub mod oneof_type;
-pub mod oneof_field_type;
-pub mod ser;
-pub mod utils;
-pub mod variant;
+pub trait Oneof<Case>: Sized {
+    fn get(&self) -> ();
+}
+
+pub trait OneofCase: Sized {
+    fn from_int(x: u32) -> Option<Self>;
+}

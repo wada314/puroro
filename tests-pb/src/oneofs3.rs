@@ -188,7 +188,7 @@ pub mod _msg {
 #[derive(Default, Clone)]
 pub struct Submsg {
     // Singular, Variant(Int32)
-    i32_unlabeled: self::_puroro::internal::field_types::SingularNumericalField<
+    i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField<
         i32,
         self::_puroro::tags::Int32,
     >,
@@ -200,14 +200,9 @@ impl Submsg {
     // Singular, Variant(Int32)
     pub fn i32_unlabeled(&self) -> i32 {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::SingularNumericalField<
-            i32,
-            self::_puroro::tags::Int32,
-        > as NonRepeatedFieldType>::get_field(
-            &self.i32_unlabeled,
-            &self._bitfield,
-            ::std::default::Default::default(),
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
+            &self.i32_unlabeled, &self._bitfield, ::std::default::Default::default(),
         )
     }
 }
@@ -229,10 +224,10 @@ impl self::_puroro::Message for Submsg {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <self::_puroro::internal::field_types::SingularNumericalField<
+                1 => <self::_puroro::internal::field_type::SingularNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.i32_unlabeled,
                     &mut self._bitfield,
                     field_data,

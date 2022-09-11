@@ -188,7 +188,7 @@ pub mod _msg {
 #[derive(Default, Clone)]
 pub struct Submsg {
     // Optional, Variant(Int32)
-    i32_optional: self::_puroro::internal::field_types::OptionalNumericalField<
+    i32_optional: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         0,
@@ -201,8 +201,8 @@ impl Submsg {
     // Optional, Variant(Int32)
     pub fn i32_optional(&self) -> i32 {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::OptionalNumericalField<
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0,
@@ -231,11 +231,11 @@ impl self::_puroro::Message for Submsg {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <self::_puroro::internal::field_types::OptionalNumericalField<
+                1 => <self::_puroro::internal::field_type::OptionalNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
                     0,
-                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.i32_optional,
                     &mut self._bitfield,
                     field_data,

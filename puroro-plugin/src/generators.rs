@@ -262,7 +262,7 @@ impl Field {
             }
         };
         let rust_field_type = format!(
-            "self::_puroro::internal::field_types::{}",
+            "self::_puroro::internal::field_type::{}",
             rust_field_type_name
         );
         let rust_getter_type = wire_type

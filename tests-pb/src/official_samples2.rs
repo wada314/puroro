@@ -12,7 +12,7 @@ pub mod _puroro {
 #[derive(Default, Clone)]
 pub struct Test1 {
     // Optional, Variant(Int32)
-    a: self::_puroro::internal::field_types::OptionalNumericalField<
+    a: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         0,
@@ -25,8 +25,8 @@ impl Test1 {
     // Optional, Variant(Int32)
     pub fn a(&self) -> i32 {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::OptionalNumericalField<
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0,
@@ -55,11 +55,11 @@ impl self::_puroro::Message for Test1 {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <self::_puroro::internal::field_types::OptionalNumericalField<
+                1 => <self::_puroro::internal::field_type::OptionalNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
                     0,
-                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.a,
                     &mut self._bitfield,
                     field_data,
@@ -83,7 +83,7 @@ pub mod _test1 {
 #[derive(Default, Clone)]
 pub struct Test2 {
     // Optional, LengthDelimited(String)
-    b: self::_puroro::internal::field_types::OptionalStringField<0>,
+    b: self::_puroro::internal::field_type::OptionalStringField<0>,
 
     _bitfield: self::_puroro::bitvec::BitArray<1>,
 }
@@ -92,8 +92,8 @@ impl Test2 {
     // Optional, LengthDelimited(String)
     pub fn b(&self) -> &str {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::OptionalStringField<0> as NonRepeatedFieldType>::get_field(
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::get_field(
             &self.b, &self._bitfield, ::std::default::Default::default(),
         )
     }
@@ -117,7 +117,7 @@ impl self::_puroro::Message for Test2 {
         {
             match number {
                 2 => <
-                    self::_puroro::internal::field_types::OptionalStringField<0> as self::_puroro::internal::field_types::FieldType
+                    self::_puroro::internal::field_type::OptionalStringField<0> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.b,
                     &mut self._bitfield,
@@ -142,7 +142,7 @@ pub mod _test2 {
 #[derive(Default, Clone)]
 pub struct Test3 {
     // Optional, LengthDelimited(Message(Fqtn(".official_samples2.Test1")))
-    c: self::_puroro::internal::field_types::SingularHeapMessageField<
+    c: self::_puroro::internal::field_type::SingularHeapMessageField<
         _puroro_root::official_samples2::Test1,
     >,
 
@@ -153,8 +153,8 @@ impl Test3 {
     // Optional, LengthDelimited(Message(Fqtn(".official_samples2.Test1")))
     pub fn c(&self) -> Option<&_puroro_root::official_samples2::Test1> {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::SingularHeapMessageField<
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::official_samples2::Test1,
         > as NonRepeatedFieldType>::get_field(
             &self.c,
@@ -181,9 +181,9 @@ impl self::_puroro::Message for Test3 {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                3 => <self::_puroro::internal::field_types::SingularHeapMessageField<
+                3 => <self::_puroro::internal::field_type::SingularHeapMessageField<
                     _puroro_root::official_samples2::Test1,
-                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.c,
                     &mut self._bitfield,
                     field_data,
@@ -207,10 +207,7 @@ pub mod _test3 {
 #[derive(Default, Clone)]
 pub struct Test4 {
     // Repeated, Variant(Int32)
-    d: self::_puroro::internal::field_types::RepeatedNumericalField<
-        i32,
-        self::_puroro::tags::Int32,
-    >,
+    d: self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32>,
 
     _bitfield: self::_puroro::bitvec::BitArray<0>,
 }
@@ -219,11 +216,10 @@ impl Test4 {
     // Repeated, Variant(Int32)
     pub fn d(&self) -> &[i32] {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::RepeatedNumericalField<
-            i32,
-            self::_puroro::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.d, &self._bitfield)
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::get_field(
+            &self.d, &self._bitfield, 
+        )
     }
 }
 
@@ -244,10 +240,10 @@ impl self::_puroro::Message for Test4 {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                4 => <self::_puroro::internal::field_types::RepeatedNumericalField<
+                4 => <self::_puroro::internal::field_type::RepeatedNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.d,
                     &mut self._bitfield,
                     field_data,

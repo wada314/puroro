@@ -12,7 +12,7 @@ pub mod _puroro {
 #[derive(Default, Clone)]
 pub struct Msg {
     // Singular, LengthDelimited(Message(Fqtn(".self_recursive.Msg")))
-    recursive_unlabeled: self::_puroro::internal::field_types::SingularHeapMessageField<
+    recursive_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField<
         _puroro_root::self_recursive::Msg,
     >,
 
@@ -23,8 +23,8 @@ impl Msg {
     // Singular, LengthDelimited(Message(Fqtn(".self_recursive.Msg")))
     pub fn recursive_unlabeled(&self) -> Option<&_puroro_root::self_recursive::Msg> {
         #[allow(unused)]
-        use self::_puroro::internal::field_types::{NonRepeatedFieldType, RepeatedFieldType};
-        <self::_puroro::internal::field_types::SingularHeapMessageField<
+        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::self_recursive::Msg,
         > as NonRepeatedFieldType>::get_field(
             &self.recursive_unlabeled,
@@ -51,9 +51,9 @@ impl self::_puroro::Message for Msg {
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <self::_puroro::internal::field_types::SingularHeapMessageField<
+                1 => <self::_puroro::internal::field_type::SingularHeapMessageField<
                     _puroro_root::self_recursive::Msg,
-                > as self::_puroro::internal::field_types::FieldType>::deser_from_iter(
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.recursive_unlabeled,
                     &mut self._bitfield,
                     field_data,
