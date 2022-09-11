@@ -66,6 +66,8 @@ pub enum ErrorKind {
     InvalidUtf8Bumpalo(),
     #[error("Group is not supported.")]
     GroupNotSupported,
+    #[error("Internal error in oneof item treatment.")]
+    InvalidOneofIndex,
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }

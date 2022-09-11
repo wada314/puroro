@@ -65,10 +65,33 @@ pub mod {{ ident_lsnake }} {
     }
 
     {%- for oneof in oneofs %}
+    {#- Oneof union #}
     pub(crate) union {{ oneof.ident_camel }} {
         _none: (),
         {%- for field in oneof.fields %}
         {{ field.ident_lsnake }}: {{ field.rust_field_type }},
+        {%- endfor %} {#- for field in oneof.fields #}
+    }
+    impl {{ oneof.ident_camel }} {
+        {%- for field in oneof.fields %}
+        pub(crate) fn try_{{ field.ident_lsnake }}_opt(&self, index: u32) -> _puroro::Result<{{ field.rust_opt_getter_type }}> {
+            use ::std::result::Result::{Err, Ok};
+            use ::std::option::Option::{None, Some};
+            #[repr(i32)]
+            enum Items {
+                _None,
+                {%- for field in oneof.fields %}
+                {{ field.ident_camel }},
+                {%- endfor %} {#- for field in oneof.fields #}
+            }
+            Ok(match index {
+                x if x == Items::_None => None,
+                {%- for field in oneof.fields %}
+                x if x == Items::{{ field.ident_camel }} => Some(self.{{ field.ident_lsnake }}),
+                {%- endfor %} {#- for field in oneof.fields #}
+                _ => Err(::puroro::ErrorKind::InvalidOneofIndex)?,
+            })
+        }
         {%- endfor %} {#- for field in oneof.fields #}
     }
     {%- endfor %} {#- for oneof in oneofs #}

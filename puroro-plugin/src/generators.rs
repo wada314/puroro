@@ -313,6 +313,8 @@ pub struct OneofField {
     pub ident_camel: String,
     pub ident_lsnake: String,
     pub rust_field_type: String,
+    pub rust_getter_type: String,
+    pub rust_opt_getter_type: String,
 }
 impl OneofField {
     pub fn try_new<'a>(
@@ -348,10 +350,15 @@ impl OneofField {
             rust_field_inner_type_name
         );
         let rust_field_type = format!("::std::mem::ManuallyDrop<{}>", rust_field_inner_type);
+
+        let rust_getter_type = wire_type.into_getter_rust_type(false).into_owned();
+        let rust_opt_getter_type = wire_type.into_opt_getter_rust_type().into_owned();
         Ok(Self {
             ident_camel,
             ident_lsnake,
             rust_field_type,
+            rust_getter_type,
+            rust_opt_getter_type,
         })
     }
 }
@@ -449,6 +456,20 @@ impl WireType {
                 Bits64(x) => x.into_owned_rust_type(),
             }
         }
+    }
+
+    pub fn into_opt_getter_rust_type(&self) -> Cow<'static, str> {
+        use LengthDelimitedType::*;
+        use WireType::*;
+        let inner_type = match self {
+            Variant(var) => var.into_owned_rust_type(),
+            LengthDelimited(String) => "&str".into(),
+            LengthDelimited(Bytes) => "&[u8]".into(),
+            LengthDelimited(Message(fqtn)) => fqtn.to_rust_path().into(),
+            Bits32(x) => x.into_owned_rust_type(),
+            Bits64(x) => x.into_owned_rust_type(),
+        };
+        format!("::std::option::Option<{}>", inner_type).into()
     }
 
     pub fn into_owned_rust_type(&self) -> Cow<'static, str> {
