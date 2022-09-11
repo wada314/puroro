@@ -286,7 +286,9 @@ pub struct Oneof {
     pub ident_camel: String,
     pub ident_lsnake: String,
     pub ident_case: String,
+    pub ident_case_ref: String,
     pub fields: Vec<OneofField>,
+    pub has_ld_type: bool,
 }
 impl Oneof {
     pub fn try_new<'a>(o: &'a re::Oneof<'a>, resolver: &'a DescriptorResolver) -> Result<Self> {
@@ -297,15 +299,19 @@ impl Oneof {
             .escape_rust_keywords()
             .to_string();
         let ident_case = format!("{}Case", o.name().to_camel_case());
+        let ident_case_ref = format!("{}CaseRef", o.name().to_camel_case());
         let fields = o
             .fields()
             .into_iter()
             .map(|f| OneofField::try_new(f, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let has_ld_type = o.fields().into_iter().any(|f|matches!(f.r#type(), ))
+
         Ok(Self {
             ident_camel,
             ident_lsnake,
             ident_case,
+            ident_case_ref,
             fields,
         })
     }

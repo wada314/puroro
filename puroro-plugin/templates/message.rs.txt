@@ -80,6 +80,12 @@ pub mod {{ ident_lsnake }} {
         {{ field.ident_enum_item }},
         {%- endfor %} {#- for field in oneof.fields #}
     }
+    #[repr(u32)]
+    pub enum {{ oneof.ident_case_ref }} {%- if  %}
+    {%- else %} {#- if  #}
+    {%- endif %} {#- if  #} {
+
+    }
 
     impl {{ oneof.ident_camel }} {
         {%- for field in oneof.fields %}
