@@ -80,9 +80,9 @@ pub mod _msg {
                 Some(<self::_puroro::internal::oneof_field_type::NumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as OneofFieldType>::get_field(
+                > as OneofFieldType>::get_field(unsafe {
                     &self.g1_int32
-                ))
+                }))
             } else {
                 None
             })
@@ -107,7 +107,7 @@ pub mod _msg {
 
             Ok(if index == Items::G1String as u32 {
                 Some(<self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::get_field(
-                        &self.g1_string,
+                        unsafe { &self.g1_string },
                     ))
             } else {
                 None
@@ -153,7 +153,9 @@ pub mod _msg {
                 Some(<self::_puroro::internal::oneof_field_type::NumericalField<
                     f32,
                     self::_puroro::tags::Float,
-                > as OneofFieldType>::get_field(&self.g2_f32))
+                > as OneofFieldType>::get_field(unsafe {
+                    &self.g2_f32
+                }))
             } else {
                 None
             })
@@ -179,7 +181,7 @@ pub mod _msg {
 
             Ok(if index == Items::G2String as u32 {
                 Some(<self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::get_field(
-                        &self.g2_string,
+                        unsafe { &self.g2_string },
                     ))
             } else {
                 None
@@ -208,7 +210,7 @@ pub mod _msg {
                 Some(
                     <self::_puroro::internal::oneof_field_type::HeapMessageField<
                         _puroro_root::oneofs2::Submsg,
-                    > as OneofFieldType>::get_field(&self.g2_submsg),
+                    > as OneofFieldType>::get_field(unsafe { &self.g2_submsg }),
                 )
             } else {
                 None
@@ -246,9 +248,9 @@ pub mod _msg {
                 Some(<self::_puroro::internal::oneof_field_type::NumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as OneofFieldType>::get_field(
+                > as OneofFieldType>::get_field(unsafe {
                     &self.g3_int32
-                ))
+                }))
             } else {
                 None
             })

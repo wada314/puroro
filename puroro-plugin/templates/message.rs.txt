@@ -94,7 +94,7 @@ pub mod {{ ident_lsnake }} {
 
             Ok(if index == Items::{{ field.ident_camel }} as u32 {
                 Some(<{{ field.rust_field_inner_type }} as OneofFieldType>::get_field(
-                        &self.{{ field.ident_lsnake }},
+                        unsafe { &self.{{ field.ident_lsnake }} },
                     ))
             } else {
                 None
