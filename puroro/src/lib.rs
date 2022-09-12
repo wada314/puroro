@@ -15,6 +15,7 @@
 #![doc = include_str!("lib.md")]
 #![feature(error_generic_member_access)]
 #![feature(generic_associated_types)]
+#![feature(provide_any)]
 #![feature(type_alias_impl_trait)]
 // Allow using GAT in document sample code.
 #![doc(test(attr(feature(generic_associated_types))))]

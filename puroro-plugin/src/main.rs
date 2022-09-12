@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![feature(backtrace)]
+#![feature(error_generic_member_access)]
+#![feature(provide_any)]
 #![feature(generic_associated_types)]
 #![feature(is_some_with)]
 
