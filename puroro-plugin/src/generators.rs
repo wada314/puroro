@@ -305,7 +305,11 @@ impl Oneof {
             .into_iter()
             .map(|f| OneofField::try_new(f, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let has_ld_type = o.fields().into_iter().any(|f|matches!(f.r#type(), ))
+        use google::protobuf::field_descriptor_proto::Type::*;
+        let has_ld_type = o
+            .fields()
+            .into_iter()
+            .any(|f| matches!(f.r#type(), TypeBytes | TypeString | TypeMessage));
 
         Ok(Self {
             ident_camel,
@@ -313,6 +317,7 @@ impl Oneof {
             ident_case,
             ident_case_ref,
             fields,
+            has_ld_type,
         })
     }
 }

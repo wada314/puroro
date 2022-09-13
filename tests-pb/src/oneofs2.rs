@@ -63,7 +63,9 @@ pub mod _msg {
         G1String,
     }
     #[repr(u32)]
-    pub enum GroupOneCase {}
+    pub enum GroupOneCaseRef<'a> {
+        TODO,
+    }
 
     impl GroupOne {
         pub(crate) fn try_g1_int32_opt(
@@ -115,7 +117,9 @@ pub mod _msg {
         G2Submsg,
     }
     #[repr(u32)]
-    pub enum GroupTwoCase {}
+    pub enum GroupTwoCaseRef<'a> {
+        TODO,
+    }
 
     impl GroupTwo {
         pub(crate) fn try_g2_f32_opt(
@@ -172,7 +176,9 @@ pub mod _msg {
         G3Int32,
     }
     #[repr(u32)]
-    pub enum GroupThreeCase {}
+    pub enum GroupThreeCaseRef {
+        TODO,
+    }
 
     impl GroupThree {
         pub(crate) fn try_g3_int32_opt(
