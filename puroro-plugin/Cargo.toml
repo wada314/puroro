@@ -16,7 +16,7 @@ puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled", version = "0.
 askama = "0.11"
 itertools = "0.10.1"
 lazy_static = "1.4.0"
-thiserror = "1.0.25"
+thiserror = "1.0.34"
 once_cell = "1.8.0"
 
 [features]
