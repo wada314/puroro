@@ -64,7 +64,8 @@ pub mod _msg {
     }
     #[repr(u32)]
     pub enum GroupOneCaseRef<'a> {
-        TODO,
+        G1Int32(i32),
+        G1String(&'a str),
     }
 
     impl GroupOne {
@@ -118,7 +119,9 @@ pub mod _msg {
     }
     #[repr(u32)]
     pub enum GroupTwoCaseRef<'a> {
-        TODO,
+        G2F32(f32),
+        G2String(&'a str),
+        G2Submsg(&'a _puroro_root::oneofs2::Submsg),
     }
 
     impl GroupTwo {
@@ -177,7 +180,7 @@ pub mod _msg {
     }
     #[repr(u32)]
     pub enum GroupThreeCaseRef {
-        TODO,
+        G3Int32(i32),
     }
 
     impl GroupThree {

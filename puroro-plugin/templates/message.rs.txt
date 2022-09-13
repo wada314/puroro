@@ -82,7 +82,9 @@ pub mod {{ ident_lsnake }} {
     }
     #[repr(u32)]
     pub enum {{ oneof.ident_case_ref }} {%- if oneof.has_ld_type %}<'a>{%- endif %} {
-        TODO,
+        {%- for field in oneof.fields %}
+        {{ field.ident_enum_item }}({{ field.rust_oneof_getter_type }}),
+        {%- endfor %} {#- for field in oneof.fields #}
     }
 
     impl {{ oneof.ident_camel }} {
