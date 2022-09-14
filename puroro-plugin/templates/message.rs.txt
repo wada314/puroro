@@ -67,13 +67,14 @@ pub mod {{ ident_lsnake }} {
     }
 
     {%- for oneof in oneofs %}
-    {#- Oneof union #}
+    {#- Oneof union. Includes None case #}
     pub(crate) union {{ oneof.ident_camel }} {
         _none: (),
         {%- for field in oneof.fields %}
         {{ field.ident_lsnake }}: {{ field.rust_field_type }},
         {%- endfor %} {#- for field in oneof.fields #}
     }
+    {#- public oneof enum without contents, not including None case #}
     #[repr(u32)]
     pub enum {{ oneof.ident_case }} {
         {%- for field in oneof.fields %}
@@ -92,6 +93,7 @@ pub mod {{ ident_lsnake }} {
             }
         }
     }
+    {#- public oneof enum with ref to its contents, not including None case #}
     #[repr(u32)]
     pub enum {{ oneof.ident_case_ref }} {%- if oneof.has_ld_type %}<'a>{%- endif %} {
         {%- for field in oneof.fields %}
