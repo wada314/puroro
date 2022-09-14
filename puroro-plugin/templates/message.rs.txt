@@ -68,7 +68,7 @@ pub mod {{ ident_lsnake }} {
 
     {%- for oneof in oneofs %}
     {#- Oneof union. Includes None case #}
-    pub(crate) union {{ oneof.ident_camel }} {
+    pub(crate) union {{ oneof.ident_union }} {
         _none: (),
         {%- for field in oneof.fields %}
         {{ field.ident_lsnake }}: {{ field.rust_field_type }},
@@ -101,7 +101,7 @@ pub mod {{ ident_lsnake }} {
         {%- endfor %} {#- for field in oneof.fields #}
     }
 
-    impl {{ oneof.ident_camel }} {
+    impl {{ oneof.ident_union }} {
         {%- for field in oneof.fields %}
         pub(crate) fn {{ field.ident_lsnake }}_opt<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_opt_getter_type }} {
             #[allow(unused)]

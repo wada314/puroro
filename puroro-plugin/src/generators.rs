@@ -283,8 +283,7 @@ impl Field {
 
 #[derive(Debug)]
 pub struct Oneof {
-    pub ident_camel: String,
-    pub ident_lsnake: String,
+    pub ident_union: String,
     pub ident_case: String,
     pub ident_case_ref: String,
     pub fields: Vec<OneofField>,
@@ -298,15 +297,9 @@ impl Oneof {
         bit_index: &mut usize,
         resolver: &'a DescriptorResolver,
     ) -> Result<Self> {
-        let ident_camel = o.name().to_camel_case().escape_rust_keywords().to_string();
-        let ident_lsnake = o
-            .name()
-            .to_lower_snake_case()
-            .escape_rust_keywords()
-            .to_string();
+        let ident_union = o.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_case = format!("{}Case", o.name().to_camel_case());
         let ident_case_ref = format!("{}CaseRef", o.name().to_camel_case());
-        let mut index = 0;
         let fields = o
             .fields()
             .into_iter()
@@ -325,8 +318,7 @@ impl Oneof {
         let bitfield_end = *bit_index;
 
         Ok(Self {
-            ident_camel,
-            ident_lsnake,
+            ident_union,
             ident_case,
             ident_case_ref,
             fields,
