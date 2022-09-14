@@ -62,6 +62,22 @@ pub mod _msg {
         G1Int32,
         G1String,
     }
+    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for GroupOneCase {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            let mut i = 0;
+            if x == i {
+                return Some(self::GroupOneCase::G1Int32);
+            }
+            i += 1;
+            if x == i {
+                return Some(self::GroupOneCase::G1String);
+            }
+            i += 1;
+            return None;
+        }
+    }
     #[repr(u32)]
     pub enum GroupOneCaseRef<'a> {
         G1Int32(i32),
@@ -116,6 +132,26 @@ pub mod _msg {
         G2F32,
         G2String,
         G2Submsg,
+    }
+    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for GroupTwoCase {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            let mut i = 0;
+            if x == i {
+                return Some(self::GroupTwoCase::G2F32);
+            }
+            i += 1;
+            if x == i {
+                return Some(self::GroupTwoCase::G2String);
+            }
+            i += 1;
+            if x == i {
+                return Some(self::GroupTwoCase::G2Submsg);
+            }
+            i += 1;
+            return None;
+        }
     }
     #[repr(u32)]
     pub enum GroupTwoCaseRef<'a> {
@@ -177,6 +213,18 @@ pub mod _msg {
     #[repr(u32)]
     pub enum GroupThreeCase {
         G3Int32,
+    }
+    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for GroupThreeCase {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            let mut i = 0;
+            if x == i {
+                return Some(self::GroupThreeCase::G3Int32);
+            }
+            i += 1;
+            return None;
+        }
     }
     #[repr(u32)]
     pub enum GroupThreeCaseRef {

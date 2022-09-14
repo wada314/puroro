@@ -13,12 +13,10 @@
 // limitations under the License.
 
 use crate::bitvec::BitSlice;
-use ::std::marker::PhantomData;
-use ::std::ops::Deref;
 
-pub trait Oneof: Sized {
-    type CaseRef<'a>
-    where
-        Self: 'a;
-    fn get_ref<'a, B: BitSlice>(&'a self, _bitvec: &'a B) -> Option<Self::CaseRef<'a>>;
+pub trait OneofCase<const BITFIELD_BEGIN: usize, const BITFIELD_END: usize>: Sized {
+    fn from_u32(x: u32) -> Option<Self>;
+    fn from_bitslice<B: BitSlice>(b: &B) -> Option<Self> {
+        Self::from_u32(b.get_range::<BITFIELD_BEGIN, BITFIELD_END>())
+    }
 }

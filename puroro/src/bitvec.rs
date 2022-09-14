@@ -14,12 +14,14 @@
 
 //! A thin wrapper over the bitvec crate.
 
+use ::bitvec::field::BitField;
 use ::std::ops::{Deref, DerefMut};
 
 pub type BitArray<const LEN32: usize> = ::bitvec::array::BitArray<[u32; LEN32]>;
 
 pub trait BitSlice {
     fn get<const INDEX: usize>(&self) -> bool;
+    fn get_range<const BEGIN: usize, const END: usize>(&self) -> u32;
     fn set<const INDEX: usize>(&mut self, value: bool);
 }
 
@@ -27,6 +29,13 @@ impl<const LEN32: usize> BitSlice for BitArray<LEN32> {
     fn get<const INDEX: usize>(&self) -> bool {
         *<::bitvec::slice::BitSlice<u32>>::get(self.deref(), INDEX).unwrap()
     }
+
+    fn get_range<const BEGIN: usize, const END: usize>(&self) -> u32 {
+        <::bitvec::slice::BitSlice<u32>>::get(self.deref(), BEGIN..END)
+            .unwrap()
+            .load::<u32>()
+    }
+
     fn set<const INDEX: usize>(&mut self, value: bool) {
         <::bitvec::slice::BitSlice<u32>>::set(self.deref_mut(), INDEX, value)
     }

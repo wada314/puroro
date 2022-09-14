@@ -80,6 +80,20 @@ pub mod {{ ident_lsnake }} {
         {{ field.ident_enum_item }},
         {%- endfor %} {#- for field in oneof.fields #}
     }
+    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for {{ oneof.ident_case }} {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            let mut i = 0;
+            {%- for field in oneof.fields %}
+            if x == i {
+                return Some(self::{{ oneof.ident_case }}::{{ field.ident_enum_item }});
+            }
+            i += 1;
+            {%- endfor %} {#- for field in oneof.fields #}
+            return None;
+        }
+    }
     #[repr(u32)]
     pub enum {{ oneof.ident_case_ref }} {%- if oneof.has_ld_type %}<'a>{%- endif %} {
         {%- for field in oneof.fields %}
