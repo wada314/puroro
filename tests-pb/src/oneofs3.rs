@@ -62,17 +62,6 @@ pub mod _msg {
         G1Int32,
         G1String,
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<0, 2> for GroupOneCase {
-        fn from_u32(x: u32) -> Option<Self> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            match x {
-                0 => Some(self::GroupOneCase::G1Int32),
-                1 => Some(self::GroupOneCase::G1String),
-                _ => None,
-            }
-        }
-    }
     #[repr(u32)]
     pub enum GroupOneCaseRef<'a> {
         G1Int32(i32),
@@ -118,6 +107,25 @@ pub mod _msg {
                 None
             }
         }
+
+        pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+            use self::_puroro::bitvec::BitSlice;
+            // TODO: take manuallydrop value
+            bits.set_range::<0, 2>(2);
+            todo!()
+        }
+    }
+
+    impl self::_puroro::internal::oneof_type::OneofCase<0, 2> for GroupOneCase {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            match x {
+                0 => Some(self::GroupOneCase::G1Int32),
+                1 => Some(self::GroupOneCase::G1String),
+                _ => None,
+            }
+        }
     }
     pub(crate) union GroupTwo {
         _none: (),
@@ -139,18 +147,6 @@ pub mod _msg {
         G2F32,
         G2String,
         G2Submsg,
-    }
-    impl self::_puroro::internal::oneof_type::OneofCase<2, 4> for GroupTwoCase {
-        fn from_u32(x: u32) -> Option<Self> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            match x {
-                0 => Some(self::GroupTwoCase::G2F32),
-                1 => Some(self::GroupTwoCase::G2String),
-                2 => Some(self::GroupTwoCase::G2Submsg),
-                _ => None,
-            }
-        }
     }
     #[repr(u32)]
     pub enum GroupTwoCaseRef<'a> {
@@ -217,6 +213,26 @@ pub mod _msg {
                 None
             }
         }
+
+        pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+            use self::_puroro::bitvec::BitSlice;
+            // TODO: take manuallydrop value
+            bits.set_range::<2, 4>(3);
+            todo!()
+        }
+    }
+
+    impl self::_puroro::internal::oneof_type::OneofCase<2, 4> for GroupTwoCase {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            match x {
+                0 => Some(self::GroupTwoCase::G2F32),
+                1 => Some(self::GroupTwoCase::G2String),
+                2 => Some(self::GroupTwoCase::G2Submsg),
+                _ => None,
+            }
+        }
     }
     pub(crate) union GroupThree {
         _none: (),
@@ -230,16 +246,6 @@ pub mod _msg {
     #[repr(u32)]
     pub enum GroupThreeCase {
         G3Int32,
-    }
-    impl self::_puroro::internal::oneof_type::OneofCase<4, 5> for GroupThreeCase {
-        fn from_u32(x: u32) -> Option<Self> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            match x {
-                0 => Some(self::GroupThreeCase::G3Int32),
-                _ => None,
-            }
-        }
     }
     #[repr(u32)]
     pub enum GroupThreeCaseRef {
@@ -264,6 +270,24 @@ pub mod _msg {
                 Some(item.get_field())
             } else {
                 None
+            }
+        }
+
+        pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+            use self::_puroro::bitvec::BitSlice;
+            // TODO: take manuallydrop value
+            bits.set_range::<4, 5>(1);
+            todo!()
+        }
+    }
+
+    impl self::_puroro::internal::oneof_type::OneofCase<4, 5> for GroupThreeCase {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            match x {
+                0 => Some(self::GroupThreeCase::G3Int32),
+                _ => None,
             }
         }
     }

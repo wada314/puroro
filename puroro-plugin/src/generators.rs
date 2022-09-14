@@ -290,6 +290,7 @@ pub struct Oneof {
     pub has_ld_type: bool,
     pub bitfield_start: usize,
     pub bitfield_end: usize,
+    pub num_fields: usize,
 }
 impl Oneof {
     pub fn try_new<'a>(
@@ -316,6 +317,7 @@ impl Oneof {
         let bitfield_start = *bit_index;
         *bit_index += num_bits as usize;
         let bitfield_end = *bit_index;
+        let num_fields = fields.len();
 
         Ok(Self {
             ident_union,
@@ -325,6 +327,7 @@ impl Oneof {
             has_ld_type,
             bitfield_start,
             bitfield_end,
+            num_fields,
         })
     }
 }

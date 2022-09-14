@@ -23,6 +23,7 @@ pub trait BitSlice {
     fn get<const INDEX: usize>(&self) -> bool;
     fn get_range<const BEGIN: usize, const END: usize>(&self) -> u32;
     fn set<const INDEX: usize>(&mut self, value: bool);
+    fn set_range<const BEGIN: usize, const END: usize>(&mut self, value: u32);
 }
 
 impl<const LEN32: usize> BitSlice for BitArray<LEN32> {
@@ -38,5 +39,11 @@ impl<const LEN32: usize> BitSlice for BitArray<LEN32> {
 
     fn set<const INDEX: usize>(&mut self, value: bool) {
         <::bitvec::slice::BitSlice<u32>>::set(self.deref_mut(), INDEX, value)
+    }
+
+    fn set_range<const BEGIN: usize, const END: usize>(&mut self, value: u32) {
+        <::bitvec::slice::BitSlice<u32>>::get_mut(self.deref_mut(), BEGIN..END)
+            .unwrap()
+            .store::<u32>(value)
     }
 }

@@ -81,18 +81,6 @@ pub mod {{ ident_lsnake }} {
         {{ field.ident_enum_item }},
         {%- endfor %} {#- for field in oneof.fields #}
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<{{ oneof.bitfield_start }}, {{ oneof.bitfield_end }}> for {{ oneof.ident_case }} {
-        fn from_u32(x: u32) -> Option<Self> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            match x {
-                {%- for field in oneof.fields %}
-                {{ field.index }} => Some(self::{{ oneof.ident_case }}::{{ field.ident_enum_item }}),
-                {%- endfor %} {#- for field in oneof.fields #}
-                _ => None,
-            }
-        }
-    }
     {#- public oneof enum with ref to its contents, not including None case #}
     #[repr(u32)]
     pub enum {{ oneof.ident_case_ref }} {%- if oneof.has_ld_type %}<'a>{%- endif %} {
@@ -122,7 +110,29 @@ pub mod {{ ident_lsnake }} {
             }
         }
         {%- endfor %} {#- for field in oneof.fields #}
+
+        pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+            use self::_puroro::bitvec::BitSlice;
+            // TODO: take manuallydrop value
+            {#- Set the bitfield value to the last value + 1, which means None. #}
+            bits.set_range::<{{ oneof.bitfield_start }}, {{ oneof.bitfield_end }}>({{ oneof.num_fields }});
+            todo!()
+        }
     }
+    
+    impl self::_puroro::internal::oneof_type::OneofCase<{{ oneof.bitfield_start }}, {{ oneof.bitfield_end }}> for {{ oneof.ident_case }} {
+        fn from_u32(x: u32) -> Option<Self> {
+            #[allow(unused)]
+            use ::std::option::Option::{None, Some};
+            match x {
+                {%- for field in oneof.fields %}
+                {{ field.index }} => Some(self::{{ oneof.ident_case }}::{{ field.ident_enum_item }}),
+                {%- endfor %} {#- for field in oneof.fields #}
+                _ => None,
+            }
+        }
+    }
+
     {%- endfor %} {#- for oneof in oneofs #}
 }
 
