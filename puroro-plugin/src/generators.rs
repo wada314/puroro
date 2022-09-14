@@ -306,10 +306,12 @@ impl Oneof {
             .to_string();
         let ident_case = format!("{}Case", o.name().to_camel_case());
         let ident_case_ref = format!("{}CaseRef", o.name().to_camel_case());
+        let mut index = 0;
         let fields = o
             .fields()
             .into_iter()
-            .map(|f| OneofField::try_new(f, resolver))
+            .enumerate()
+            .map(|(index, f)| OneofField::try_new(f, index, resolver))
             .collect::<Result<Vec<_>>>()?;
         use google::protobuf::field_descriptor_proto::Type::*;
         let has_ld_type = o
@@ -340,6 +342,7 @@ pub struct OneofField {
     pub ident_camel: String,
     pub ident_lsnake: String,
     pub ident_enum_item: String,
+    pub index: usize,
     pub rust_field_type: String,
     pub rust_field_inner_type: String,
     pub rust_getter_type: String,
@@ -349,6 +352,7 @@ pub struct OneofField {
 impl OneofField {
     pub fn try_new<'a>(
         f: &'a re::OneofField<'a>,
+        index: usize,
         resolver: &'a DescriptorResolver,
     ) -> Result<Self> {
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().to_string();
@@ -392,6 +396,7 @@ impl OneofField {
             ident_camel,
             ident_lsnake,
             ident_enum_item,
+            index,
             rust_field_type,
             rust_field_inner_type,
             rust_getter_type,

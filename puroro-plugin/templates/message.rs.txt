@@ -84,14 +84,12 @@ pub mod {{ ident_lsnake }} {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            let mut i = 0;
-            {%- for field in oneof.fields %}
-            if x == i {
-                return Some(self::{{ oneof.ident_case }}::{{ field.ident_enum_item }});
+            match x {
+                {%- for field in oneof.fields %}
+                {{ field.index }} => Some(self::{{ oneof.ident_case }}::{{ field.ident_enum_item }}),
+                {%- endfor %} {#- for field in oneof.fields #}
+                _ => None,
             }
-            i += 1;
-            {%- endfor %} {#- for field in oneof.fields #}
-            return None;
         }
     }
     #[repr(u32)]

@@ -66,16 +66,11 @@ pub mod _msg {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            let mut i = 0;
-            if x == i {
-                return Some(self::GroupOneCase::G1Int32);
+            match x {
+                0 => Some(self::GroupOneCase::G1Int32),
+                1 => Some(self::GroupOneCase::G1String),
+                _ => None,
             }
-            i += 1;
-            if x == i {
-                return Some(self::GroupOneCase::G1String);
-            }
-            i += 1;
-            return None;
         }
     }
     #[repr(u32)]
@@ -137,20 +132,12 @@ pub mod _msg {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            let mut i = 0;
-            if x == i {
-                return Some(self::GroupTwoCase::G2F32);
+            match x {
+                0 => Some(self::GroupTwoCase::G2F32),
+                1 => Some(self::GroupTwoCase::G2String),
+                2 => Some(self::GroupTwoCase::G2Submsg),
+                _ => None,
             }
-            i += 1;
-            if x == i {
-                return Some(self::GroupTwoCase::G2String);
-            }
-            i += 1;
-            if x == i {
-                return Some(self::GroupTwoCase::G2Submsg);
-            }
-            i += 1;
-            return None;
         }
     }
     #[repr(u32)]
@@ -218,12 +205,10 @@ pub mod _msg {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            let mut i = 0;
-            if x == i {
-                return Some(self::GroupThreeCase::G3Int32);
+            match x {
+                0 => Some(self::GroupThreeCase::G3Int32),
+                _ => None,
             }
-            i += 1;
-            return None;
         }
     }
     #[repr(u32)]
