@@ -106,13 +106,15 @@ pub mod {{ ident_lsnake }} {
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
             let case_opt = self::{{ oneof.ident_case }}::from_bitslice(bits);
             if let Some({{ oneof.ident_case }}::{{ field.ident_enum_item }}) = case_opt {
                 let item = unsafe {
                     &self.{{ field.ident_lsnake }}
                 };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }

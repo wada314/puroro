@@ -85,6 +85,8 @@ pub mod _msg {
             bits: &B,
         ) -> ::std::option::Option<i32> {
             #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -92,7 +94,7 @@ pub mod _msg {
             let case_opt = self::GroupOneCase::from_bitslice(bits);
             if let Some(GroupOneCase::G1Int32) = case_opt {
                 let item = unsafe { &self.g1_int32 };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }
@@ -102,6 +104,8 @@ pub mod _msg {
             bits: &B,
         ) -> ::std::option::Option<&str> {
             #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -109,7 +113,7 @@ pub mod _msg {
             let case_opt = self::GroupOneCase::from_bitslice(bits);
             if let Some(GroupOneCase::G1String) = case_opt {
                 let item = unsafe { &self.g1_string };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }
@@ -161,6 +165,8 @@ pub mod _msg {
             bits: &B,
         ) -> ::std::option::Option<f32> {
             #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -168,7 +174,7 @@ pub mod _msg {
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
             if let Some(GroupTwoCase::G2F32) = case_opt {
                 let item = unsafe { &self.g2_f32 };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }
@@ -178,6 +184,8 @@ pub mod _msg {
             bits: &B,
         ) -> ::std::option::Option<&str> {
             #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -185,7 +193,7 @@ pub mod _msg {
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
             if let Some(GroupTwoCase::G2String) = case_opt {
                 let item = unsafe { &self.g2_string };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }
@@ -195,6 +203,8 @@ pub mod _msg {
             bits: &B,
         ) -> ::std::option::Option<&_puroro_root::oneofs2::Submsg> {
             #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -202,7 +212,7 @@ pub mod _msg {
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
             if let Some(GroupTwoCase::G2Submsg) = case_opt {
                 let item = unsafe { &self.g2_submsg };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }
@@ -242,6 +252,8 @@ pub mod _msg {
             bits: &B,
         ) -> ::std::option::Option<i32> {
             #[allow(unused)]
+            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -249,7 +261,7 @@ pub mod _msg {
             let case_opt = self::GroupThreeCase::from_bitslice(bits);
             if let Some(GroupThreeCase::G3Int32) = case_opt {
                 let item = unsafe { &self.g3_int32 };
-                todo!()
+                Some(item.get_field())
             } else {
                 None
             }
