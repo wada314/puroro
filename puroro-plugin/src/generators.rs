@@ -332,7 +332,8 @@ impl Oneof {
 #[derive(Debug)]
 pub struct OneofField {
     pub ident_camel: String,
-    pub ident_lsnake: String,
+    pub ident_union_item: String,
+    pub ident_opt_getter: String,
     pub ident_enum_item: String,
     pub index: usize,
     pub rust_field_type: String,
@@ -348,11 +349,12 @@ impl OneofField {
         resolver: &'a DescriptorResolver,
     ) -> Result<Self> {
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().to_string();
-        let ident_lsnake = f
+        let ident_union_item = f
             .name()
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
+        let ident_opt_getter = format!("{}_opt", f.name().to_lower_snake_case());
         let ident_enum_item = f.name().to_camel_case().escape_rust_keywords().to_string();
         let wire_type = WireType::from_oneof_field(f, resolver)?;
         let rust_field_inner_type_name = {
@@ -386,7 +388,8 @@ impl OneofField {
         let rust_oneof_getter_type = wire_type.into_oneof_getter_rust_type("'a").into_owned();
         Ok(Self {
             ident_camel,
-            ident_lsnake,
+            ident_union_item,
+            ident_opt_getter,
             ident_enum_item,
             index,
             rust_field_type,
