@@ -8,7 +8,7 @@
 {%- endif %}
 
 {%- for submodule in submodules %}
-pub mod {{ submodule.ident }};
+pub mod {{ submodule.ident_module }};
 {%- endfor %}
 
 pub mod _puroro_root {

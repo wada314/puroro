@@ -1,35 +1,35 @@
 
 #[derive(Default, Clone)]
-pub struct {{ ident_camel }} {
+pub struct {{ ident_struct }} {
     {%- for f in fields %}
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
-    {{ f.ident_lsnake }}: {{ f.rust_field_type }},
+    {{ f.ident_struct_field }}: {{ f.rust_field_type }},
     {%- endfor %} {#- for f in fields #}
 
     _bitfield: self::_puroro::bitvec::BitArray<{{ (bits_length + 7) / 8 }}>,
 }
 
-impl {{ ident_camel }} {
+impl {{ ident_struct }} {
     {%- for f in fields %}
     // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
-    pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
+    pub fn {{ f.ident_struct_field }}(&self) -> {{ f.rust_getter_type }} {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         {%- match f.rule%}
         {%- when FieldRule::Repeated %}
         <{{ f.rust_field_type }} as RepeatedFieldType>::get_field(
-            &self.{{ f.ident_lsnake }}, &self._bitfield, 
+            &self.{{ f.ident_struct_field }}, &self._bitfield, 
         )
         {%- else %}
         <{{ f.rust_field_type }} as NonRepeatedFieldType>::get_field(
-            &self.{{ f.ident_lsnake }}, &self._bitfield, ::std::default::Default::default(),
+            &self.{{ f.ident_struct_field }}, &self._bitfield, ::std::default::Default::default(),
         )
         {%- endmatch %}
     }
     {%- endfor %} {#- for f in fields #}
 }
 
-impl self::_puroro::Message for {{ ident_camel }} {
+impl self::_puroro::Message for {{ ident_struct }} {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -43,7 +43,7 @@ impl self::_puroro::Message for {{ ident_camel }} {
                 {{ f.number }} => <
                     {{ f.rust_field_type }} as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
-                    &mut self.{{ f.ident_lsnake }},
+                    &mut self.{{ f.ident_struct_field }},
                     &mut self._bitfield,
                     field_data,
                 )?,
@@ -57,7 +57,7 @@ impl self::_puroro::Message for {{ ident_camel }} {
 
 {#- a submodule for the utility types needed for this message type #}
 {#- e.g. An enum for oneof items #}
-pub mod {{ ident_lsnake }} {
+pub mod {{ ident_module }} {
 
     mod _puroro {
         pub use super::super::_puroro::*;

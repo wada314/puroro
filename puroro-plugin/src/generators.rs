@@ -25,7 +25,7 @@ use ::std::borrow::Cow;
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
 pub struct Module {
-    pub ident: String,
+    pub ident_module: String,
     pub is_root_package: bool,
     pub fqtn: String,
     pub submodules: Vec<Module>,
@@ -37,7 +37,7 @@ impl Module {
         p: &'a PackageContents<'a>,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
-        let ident = p.package_name.as_ref().map_or_else(Default::default, |s| {
+        let ident_module = p.package_name.as_ref().map_or_else(Default::default, |s| {
             s.to_lower_snake_case().escape_rust_keywords().into()
         });
         let is_root_package = p.package_name.is_none();
@@ -83,7 +83,7 @@ impl Module {
             .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Module {
-            ident,
+            ident_module,
             is_root_package,
             fqtn: full_path,
             submodules,
@@ -115,7 +115,7 @@ impl Module {
             .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
         Ok(Module {
-            ident,
+            ident_module: ident,
             is_root_package,
             fqtn,
             submodules,
@@ -128,8 +128,8 @@ impl Module {
 #[derive(Template, Debug)]
 #[template(path = "message.rs.txt")]
 pub struct Message {
-    pub ident_camel: String,
-    pub ident_lsnake: String,
+    pub ident_struct: String,
+    pub ident_module: String,
     pub fields: Vec<Field>,
     pub oneofs: Vec<Oneof>,
     pub bits_length: usize,
@@ -140,8 +140,8 @@ impl Message {
         m: &'a re::Message<'a>,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
-        let ident_camel = m.name().to_camel_case().escape_rust_keywords().into();
-        let ident_lsnake = m.name().to_lower_snake_case().escape_rust_keywords().into();
+        let ident_struct = m.name().to_camel_case().escape_rust_keywords().into();
+        let ident_module = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
         let fields = m
             .field()
@@ -155,8 +155,8 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
         let bits_length = bits_index;
         Ok(Message {
-            ident_camel,
-            ident_lsnake,
+            ident_struct,
+            ident_module,
             fields,
             oneofs,
             bits_length,
@@ -180,8 +180,7 @@ impl Enum {
 
 #[derive(Debug)]
 pub struct Field {
-    pub ident_lsnake: String,
-    pub ident_camel: String,
+    pub ident_struct_field: String,
     pub rule: FieldRule,
     pub wire_type: WireType,
     pub rust_field_type: String,
@@ -197,8 +196,7 @@ impl Field {
     ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
 
-        let ident_camel = f.name().to_camel_case().escape_rust_keywords().into();
-        let ident_lsnake = f.name().to_lower_snake_case().escape_rust_keywords().into();
+        let ident_struct_field = f.name().to_lower_snake_case().escape_rust_keywords().into();
         let syntax = f.parent().file().try_syntax()?;
         let rule = match (syntax, f.label(), f.proto3_optional()) {
             (Syntax::Proto2, LabelOptional | LabelRequired, _) => FieldRule::Optional,
@@ -270,8 +268,7 @@ impl Field {
             .into_owned();
         let number = f.number();
         Ok(Self {
-            ident_lsnake,
-            ident_camel,
+            ident_struct_field,
             rule,
             wire_type,
             rust_field_type,
