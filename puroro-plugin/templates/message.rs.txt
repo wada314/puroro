@@ -92,11 +92,8 @@ pub mod {{ ident_module }} {
     impl {{ oneof.ident_union }} {
         {%- for field in oneof.fields %}
         pub(crate) fn {{ field.ident_opt_getter }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_opt_getter_type }} {
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
             let case_opt = self::{{ oneof.ident_case }}::from_bitslice(bits);
@@ -112,8 +109,20 @@ pub mod {{ ident_module }} {
         {%- endfor %} {#- for field in oneof.fields #}
 
         pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-            use self::_puroro::bitvec::BitSlice;
-            // TODO: take manuallydrop value
+            use ::std::option::Option::{None, Some};
+            use self::_puroro::internal::oneof_type::OneofCase;
+
+            let case_opt = self::{{ oneof.ident_case }}::from_bitslice(bits);
+            match case_opt {
+                {%- for field in oneof.fields %}
+                Some(self::{{ oneof.ident_case }}::{{ field.ident_enum_item }}) => {
+                    unsafe {
+                        ::std::mem::ManuallyDrop::drop( &mut self.{{ field.ident_union_item }} );
+                    }
+                }
+                {%- endfor %} {#- for field in oneof.fields #}
+                None => (),
+            }
             {#- Set the bitfield value to the last value + 1, which means None. #}
             bits.set_range::<{{ oneof.bitfield_start }}, {{ oneof.bitfield_end }}>({{ oneof.num_fields }});
             todo!()
