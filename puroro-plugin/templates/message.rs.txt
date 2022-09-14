@@ -101,15 +101,21 @@ pub mod {{ ident_lsnake }} {
 
     impl {{ oneof.ident_camel }} {
         {%- for field in oneof.fields %}
-        pub(crate) fn try_{{ field.ident_lsnake }}_opt(&self, index: u32) -> _puroro::Result<{{ field.rust_opt_getter_type }}> {
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
+        pub(crate) fn {{ field.ident_lsnake }}_opt<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_opt_getter_type }} {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
 
-            todo!()
+            let case_opt = self::{{ oneof.ident_case }}::from_bitslice(bits);
+            if let Some({{ oneof.ident_case }}::{{ field.ident_enum_item }}) = case_opt {
+                let item = unsafe {
+                    &self.{{ field.ident_lsnake }}
+                };
+                todo!()
+            } else {
+                None
+            }
         }
         {%- endfor %} {#- for field in oneof.fields #}
     }

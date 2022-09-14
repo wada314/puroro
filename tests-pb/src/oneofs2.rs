@@ -80,31 +80,43 @@ pub mod _msg {
     }
 
     impl GroupOne {
-        pub(crate) fn try_g1_int32_opt(
+        pub(crate) fn g1_int32_opt<B: self::_puroro::bitvec::BitSlice>(
             &self,
-            index: u32,
-        ) -> _puroro::Result<::std::option::Option<i32>> {
+            bits: &B,
+        ) -> ::std::option::Option<i32> {
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            todo!()
+            let case_opt = self::GroupOneCase::from_bitslice(bits);
+            if let Some(GroupOneCase::G1Int32) = case_opt {
+                let item = unsafe { &self.g1_int32 };
+                todo!()
+            } else {
+                None
+            }
         }
-        pub(crate) fn try_g1_string_opt(
+        pub(crate) fn g1_string_opt<B: self::_puroro::bitvec::BitSlice>(
             &self,
-            index: u32,
-        ) -> _puroro::Result<::std::option::Option<&str>> {
+            bits: &B,
+        ) -> ::std::option::Option<&str> {
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            todo!()
+            let case_opt = self::GroupOneCase::from_bitslice(bits);
+            if let Some(GroupOneCase::G1String) = case_opt {
+                let item = unsafe { &self.g1_string };
+                todo!()
+            } else {
+                None
+            }
         }
     }
     pub(crate) union GroupTwo {
@@ -148,44 +160,62 @@ pub mod _msg {
     }
 
     impl GroupTwo {
-        pub(crate) fn try_g2_f32_opt(
+        pub(crate) fn g2_f32_opt<B: self::_puroro::bitvec::BitSlice>(
             &self,
-            index: u32,
-        ) -> _puroro::Result<::std::option::Option<f32>> {
+            bits: &B,
+        ) -> ::std::option::Option<f32> {
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            todo!()
+            let case_opt = self::GroupTwoCase::from_bitslice(bits);
+            if let Some(GroupTwoCase::G2F32) = case_opt {
+                let item = unsafe { &self.g2_f32 };
+                todo!()
+            } else {
+                None
+            }
         }
-        pub(crate) fn try_g2_string_opt(
+        pub(crate) fn g2_string_opt<B: self::_puroro::bitvec::BitSlice>(
             &self,
-            index: u32,
-        ) -> _puroro::Result<::std::option::Option<&str>> {
+            bits: &B,
+        ) -> ::std::option::Option<&str> {
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            todo!()
+            let case_opt = self::GroupTwoCase::from_bitslice(bits);
+            if let Some(GroupTwoCase::G2String) = case_opt {
+                let item = unsafe { &self.g2_string };
+                todo!()
+            } else {
+                None
+            }
         }
-        pub(crate) fn try_g2_submsg_opt(
+        pub(crate) fn g2_submsg_opt<B: self::_puroro::bitvec::BitSlice>(
             &self,
-            index: u32,
-        ) -> _puroro::Result<::std::option::Option<&_puroro_root::oneofs2::Submsg>> {
+            bits: &B,
+        ) -> ::std::option::Option<&_puroro_root::oneofs2::Submsg> {
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            todo!()
+            let case_opt = self::GroupTwoCase::from_bitslice(bits);
+            if let Some(GroupTwoCase::G2Submsg) = case_opt {
+                let item = unsafe { &self.g2_submsg };
+                todo!()
+            } else {
+                None
+            }
         }
     }
     pub(crate) union GroupThree {
@@ -217,18 +247,24 @@ pub mod _msg {
     }
 
     impl GroupThree {
-        pub(crate) fn try_g3_int32_opt(
+        pub(crate) fn g3_int32_opt<B: self::_puroro::bitvec::BitSlice>(
             &self,
-            index: u32,
-        ) -> _puroro::Result<::std::option::Option<i32>> {
+            bits: &B,
+        ) -> ::std::option::Option<i32> {
             #[allow(unused)]
-            use self::_puroro::internal::oneof_field_type::OneofFieldType;
+            use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
             #[allow(unused)]
             use ::std::result::Result::{Err, Ok};
 
-            todo!()
+            let case_opt = self::GroupThreeCase::from_bitslice(bits);
+            if let Some(GroupThreeCase::G3Int32) = case_opt {
+                let item = unsafe { &self.g3_int32 };
+                todo!()
+            } else {
+                None
+            }
         }
     }
 }
