@@ -319,7 +319,7 @@ impl Oneof {
             .into_iter()
             .any(|f| matches!(f.r#type(), TypeBytes | TypeString | TypeMessage));
         let num_fields = fields.len();
-        let num_bits = usize::BITS - (num_fields + 1).leading_zeros();
+        let num_bits = usize::BITS - num_fields.leading_zeros();
         let bitfield_start = *bit_index;
         *bit_index += num_bits as usize;
         let bitfield_end = *bit_index;

@@ -128,7 +128,7 @@ pub mod _msg {
         G2String,
         G2Submsg,
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<2, 5> for GroupTwoCase {
+    impl self::_puroro::internal::oneof_type::OneofCase<2, 4> for GroupTwoCase {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -201,7 +201,7 @@ pub mod _msg {
     pub enum GroupThreeCase {
         G3Int32,
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<5, 7> for GroupThreeCase {
+    impl self::_puroro::internal::oneof_type::OneofCase<4, 5> for GroupThreeCase {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
