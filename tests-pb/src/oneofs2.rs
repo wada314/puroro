@@ -88,8 +88,6 @@ pub mod _msg {
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
 
             let case_opt = self::GroupOneCase::from_bitslice(bits);
             if let Some(GroupOneCase::G1Int32) = case_opt {
@@ -107,8 +105,6 @@ pub mod _msg {
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
 
             let case_opt = self::GroupOneCase::from_bitslice(bits);
             if let Some(GroupOneCase::G1String) = case_opt {
@@ -168,8 +164,6 @@ pub mod _msg {
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
             if let Some(GroupTwoCase::G2F32) = case_opt {
@@ -187,8 +181,6 @@ pub mod _msg {
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
             if let Some(GroupTwoCase::G2String) = case_opt {
@@ -206,8 +198,6 @@ pub mod _msg {
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
             if let Some(GroupTwoCase::G2Submsg) = case_opt {
@@ -255,8 +245,6 @@ pub mod _msg {
             use self::_puroro::internal::oneof_type::OneofCase;
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
-            use ::std::result::Result::{Err, Ok};
 
             let case_opt = self::GroupThreeCase::from_bitslice(bits);
             if let Some(GroupThreeCase::G3Int32) = case_opt {
