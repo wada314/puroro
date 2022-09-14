@@ -80,7 +80,7 @@ pub mod {{ ident_lsnake }} {
         {{ field.ident_enum_item }},
         {%- endfor %} {#- for field in oneof.fields #}
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for {{ oneof.ident_case }} {
+    impl self::_puroro::internal::oneof_type::OneofCase<{{ oneof.bitfield_start }}, {{ oneof.bitfield_end }}> for {{ oneof.ident_case }} {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};

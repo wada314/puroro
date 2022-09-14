@@ -151,7 +151,7 @@ impl Message {
         let oneofs = m
             .oneofs()
             .into_iter()
-            .map(|o| Oneof::try_new(o, resolver))
+            .map(|o| Oneof::try_new(o, &mut bits_index, resolver))
             .collect::<Result<Vec<_>>>()?;
         let bits_length = bits_index;
         Ok(Message {
@@ -289,9 +289,15 @@ pub struct Oneof {
     pub ident_case_ref: String,
     pub fields: Vec<OneofField>,
     pub has_ld_type: bool,
+    pub bitfield_start: usize,
+    pub bitfield_end: usize,
 }
 impl Oneof {
-    pub fn try_new<'a>(o: &'a re::Oneof<'a>, resolver: &'a DescriptorResolver) -> Result<Self> {
+    pub fn try_new<'a>(
+        o: &'a re::Oneof<'a>,
+        bit_index: &mut usize,
+        resolver: &'a DescriptorResolver,
+    ) -> Result<Self> {
         let ident_camel = o.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_lsnake = o
             .name()
@@ -310,6 +316,11 @@ impl Oneof {
             .fields()
             .into_iter()
             .any(|f| matches!(f.r#type(), TypeBytes | TypeString | TypeMessage));
+        let num_fields = fields.len();
+        let num_bits = usize::BITS - (num_fields + 1).leading_zeros();
+        let bitfield_start = *bit_index;
+        *bit_index += num_bits as usize;
+        let bitfield_end = *bit_index;
 
         Ok(Self {
             ident_camel,
@@ -318,6 +329,8 @@ impl Oneof {
             ident_case_ref,
             fields,
             has_ld_type,
+            bitfield_start,
+            bitfield_end,
         })
     }
 }

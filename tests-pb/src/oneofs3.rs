@@ -11,7 +11,7 @@ pub mod _puroro {
 
 #[derive(Default, Clone)]
 pub struct Msg {
-    _bitfield: self::_puroro::bitvec::BitArray<0>,
+    _bitfield: self::_puroro::bitvec::BitArray<1>,
 }
 
 impl Msg {}
@@ -62,7 +62,7 @@ pub mod _msg {
         G1Int32,
         G1String,
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for GroupOneCase {
+    impl self::_puroro::internal::oneof_type::OneofCase<0, 2> for GroupOneCase {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -133,7 +133,7 @@ pub mod _msg {
         G2String,
         G2Submsg,
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for GroupTwoCase {
+    impl self::_puroro::internal::oneof_type::OneofCase<2, 5> for GroupTwoCase {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
@@ -214,7 +214,7 @@ pub mod _msg {
     pub enum GroupThreeCase {
         G3Int32,
     }
-    impl self::_puroro::internal::oneof_type::OneofCase<10, 20> for GroupThreeCase {
+    impl self::_puroro::internal::oneof_type::OneofCase<5, 7> for GroupThreeCase {
         fn from_u32(x: u32) -> Option<Self> {
             #[allow(unused)]
             use ::std::option::Option::{None, Some};
