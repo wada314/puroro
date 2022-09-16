@@ -71,7 +71,7 @@ impl self::_puroro::Message for Book {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -80,21 +80,21 @@ impl self::_puroro::Message for Book {
                 >::deser_from_iter(
                     &mut self.title,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 2 => <
                     self::_puroro::internal::field_type::SingularNumericalField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.num_pages,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 3 => <
                     self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.author,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }
@@ -144,7 +144,7 @@ impl self::_puroro::Message for Author {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -153,7 +153,7 @@ impl self::_puroro::Message for Author {
                 >::deser_from_iter(
                     &mut self.name,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }
