@@ -29,7 +29,7 @@ impl self::_puroro::Message for Msg {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -109,10 +109,23 @@ pub mod _msg {
         }
 
         pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-            use self::_puroro::bitvec::BitSlice;
-            // TODO: take manuallydrop value
+            #[allow(unused)]
+            use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
+            use ::std::mem::ManuallyDrop;
+            #[allow(unused)]
+            use ::std::option::Option::Some;
+
+            match self::GroupOneCase::from_bitslice(bits) {
+                Some(GroupOneCase::G1Int32) => {
+                    unsafe { ManuallyDrop::take(&mut self.g1_int32) };
+                }
+                Some(GroupOneCase::G1String) => {
+                    unsafe { ManuallyDrop::take(&mut self.g1_string) };
+                }
+                _ => (),
+            }
             bits.set_range::<0, 2>(2);
-            todo!()
         }
     }
 
@@ -215,10 +228,26 @@ pub mod _msg {
         }
 
         pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-            use self::_puroro::bitvec::BitSlice;
-            // TODO: take manuallydrop value
+            #[allow(unused)]
+            use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
+            use ::std::mem::ManuallyDrop;
+            #[allow(unused)]
+            use ::std::option::Option::Some;
+
+            match self::GroupTwoCase::from_bitslice(bits) {
+                Some(GroupTwoCase::G2F32) => {
+                    unsafe { ManuallyDrop::take(&mut self.g2_f32) };
+                }
+                Some(GroupTwoCase::G2String) => {
+                    unsafe { ManuallyDrop::take(&mut self.g2_string) };
+                }
+                Some(GroupTwoCase::G2Submsg) => {
+                    unsafe { ManuallyDrop::take(&mut self.g2_submsg) };
+                }
+                _ => (),
+            }
             bits.set_range::<2, 4>(3);
-            todo!()
         }
     }
 
@@ -274,10 +303,20 @@ pub mod _msg {
         }
 
         pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-            use self::_puroro::bitvec::BitSlice;
-            // TODO: take manuallydrop value
+            #[allow(unused)]
+            use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
+            use ::std::mem::ManuallyDrop;
+            #[allow(unused)]
+            use ::std::option::Option::Some;
+
+            match self::GroupThreeCase::from_bitslice(bits) {
+                Some(GroupThreeCase::G3Int32) => {
+                    unsafe { ManuallyDrop::take(&mut self.g3_int32) };
+                }
+                _ => (),
+            }
             bits.set_range::<4, 5>(1);
-            todo!()
         }
     }
 
@@ -335,7 +374,7 @@ impl self::_puroro::Message for Submsg {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -346,7 +385,7 @@ impl self::_puroro::Message for Submsg {
                 > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.i32_optional,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }

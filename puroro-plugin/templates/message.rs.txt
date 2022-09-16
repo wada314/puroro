@@ -37,7 +37,7 @@ impl self::_puroro::Message for {{ ident_camel }} {
     }
 
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
+        while let Some((number, _field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 {%- for f in fields %}
                 {{ f.number }} => <
@@ -45,7 +45,7 @@ impl self::_puroro::Message for {{ ident_camel }} {
                 >::deser_from_iter(
                     &mut self.{{ f.ident_lsnake }},
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 {%- endfor %} {#- for f in fields #}
                 _ => todo!(),
@@ -112,11 +112,23 @@ pub mod {{ ident_lsnake }} {
         {%- endfor %} {#- for field in oneof.fields #}
 
         pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-            use self::_puroro::bitvec::BitSlice;
-            // TODO: take manuallydrop value
+            #[allow(unused)]
+            use ::std::option::Option::Some;
+            #[allow(unused)]
+            use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
+            use ::std::mem::ManuallyDrop;
+
+            match self::{{ oneof.ident_case }}::from_bitslice(bits) {
+                {%- for field in oneof.fields %}
+                Some({{ oneof.ident_case  }}::{{ field.ident_enum_item }}) => {
+                    unsafe { ManuallyDrop::take(&mut self.{{ field.ident_union_item }}) };
+                }
+                {%- endfor %} {#- for field in oneof.fields #}
+                _ => (),
+            }
             {#- Set the bitfield value to the last value + 1, which means None. #}
             bits.set_range::<{{ oneof.bitfield_start }}, {{ oneof.bitfield_end }}>({{ oneof.num_fields }});
-            todo!()
         }
     }
     

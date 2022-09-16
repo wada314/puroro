@@ -41,7 +41,7 @@ impl self::_puroro::Message for Test1 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -51,7 +51,7 @@ impl self::_puroro::Message for Test1 {
                 > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.a,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }
@@ -101,7 +101,7 @@ impl self::_puroro::Message for Test2 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -110,7 +110,7 @@ impl self::_puroro::Message for Test2 {
                 >::deser_from_iter(
                     &mut self.b,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }
@@ -166,7 +166,7 @@ impl self::_puroro::Message for Test3 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -175,7 +175,7 @@ impl self::_puroro::Message for Test3 {
                 > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.c,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }
@@ -225,7 +225,7 @@ impl self::_puroro::Message for Test4 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        while let Some((number, field_data)) =
+        while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -235,7 +235,7 @@ impl self::_puroro::Message for Test4 {
                 > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                     &mut self.d,
                     &mut self._bitfield,
-                    field_data,
+                    _field_data,
                 )?,
                 _ => todo!(),
             }
