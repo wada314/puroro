@@ -1,35 +1,35 @@
 
 #[derive(Default, Clone)]
-pub struct {{ ident_camel }} {
-    {%- for f in fields %}
-    // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
-    {{ f.ident_lsnake }}: {{ f.rust_field_type }},
-    {%- endfor %} {#- for f in fields #}
+pub struct {{ ident_struct }} {
+    {%- for field in fields %}
+    // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
+    {{ field.ident_struct_field }}: {{ field.rust_field_type }},
+    {%- endfor %} {#- for field in fields #}
 
     _bitfield: self::_puroro::bitvec::BitArray<{{ (bits_length + 7) / 8 }}>,
 }
 
-impl {{ ident_camel }} {
-    {%- for f in fields %}
-    // {{ "{:?}, {:?}"|format(f.rule,f.wire_type) }}
-    pub fn {{ f.ident_lsnake }}(&self) -> {{ f.rust_getter_type }} {
+impl {{ ident_struct }} {
+    {%- for field in fields %}
+    // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
+    pub fn {{ field.ident_struct_field }}(&self) -> {{ field.rust_getter_type }} {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
-        {%- match f.rule%}
+        {%- match field.rule%}
         {%- when FieldRule::Repeated %}
-        <{{ f.rust_field_type }} as RepeatedFieldType>::get_field(
-            &self.{{ f.ident_lsnake }}, &self._bitfield, 
+        <{{ field.rust_field_type }} as RepeatedFieldType>::get_field(
+            &self.{{ field.ident_struct_field }}, &self._bitfield, 
         )
         {%- else %}
-        <{{ f.rust_field_type }} as NonRepeatedFieldType>::get_field(
-            &self.{{ f.ident_lsnake }}, &self._bitfield, ::std::default::Default::default(),
+        <{{ field.rust_field_type }} as NonRepeatedFieldType>::get_field(
+            &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default(),
         )
         {%- endmatch %}
     }
-    {%- endfor %} {#- for f in fields #}
+    {%- endfor %} {#- for field in fields #}
 }
 
-impl self::_puroro::Message for {{ ident_camel }} {
+impl self::_puroro::Message for {{ ident_struct }} {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
@@ -39,15 +39,15 @@ impl self::_puroro::Message for {{ ident_camel }} {
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
         while let Some((number, _field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                {%- for f in fields %}
-                {{ f.number }} => <
-                    {{ f.rust_field_type }} as self::_puroro::internal::field_type::FieldType
+                {%- for field in fields %}
+                {{ field.number }} => <
+                    {{ field.rust_field_type }} as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
-                    &mut self.{{ f.ident_lsnake }},
+                    &mut self.{{ field.ident_struct_field }},
                     &mut self._bitfield,
                     _field_data,
                 )?,
-                {%- endfor %} {#- for f in fields #}
+                {%- endfor %} {#- for field in fields #}
                 _ => todo!(),
             }
         }
@@ -57,7 +57,7 @@ impl self::_puroro::Message for {{ ident_camel }} {
 
 {#- a submodule for the utility types needed for this message type #}
 {#- e.g. An enum for oneof items #}
-pub mod {{ ident_lsnake }} {
+pub mod {{ ident_module }} {
 
     mod _puroro {
         pub use super::super::_puroro::*;
@@ -92,11 +92,8 @@ pub mod {{ ident_lsnake }} {
     impl {{ oneof.ident_union }} {
         {%- for field in oneof.fields %}
         pub(crate) fn {{ field.ident_opt_getter }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_opt_getter_type }} {
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
             let case_opt = self::{{ oneof.ident_case }}::from_bitslice(bits);

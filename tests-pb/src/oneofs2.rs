@@ -73,11 +73,8 @@ pub mod _msg {
             &self,
             bits: &B,
         ) -> ::std::option::Option<i32> {
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupOneCase::from_bitslice(bits);
@@ -92,11 +89,8 @@ pub mod _msg {
             &self,
             bits: &B,
         ) -> ::std::option::Option<&str> {
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupOneCase::from_bitslice(bits);
@@ -173,11 +167,8 @@ pub mod _msg {
             &self,
             bits: &B,
         ) -> ::std::option::Option<f32> {
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
@@ -192,11 +183,8 @@ pub mod _msg {
             &self,
             bits: &B,
         ) -> ::std::option::Option<&str> {
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
@@ -211,11 +199,8 @@ pub mod _msg {
             &self,
             bits: &B,
         ) -> ::std::option::Option<&_puroro_root::oneofs2::Submsg> {
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
@@ -286,11 +271,8 @@ pub mod _msg {
             &self,
             bits: &B,
         ) -> ::std::option::Option<i32> {
-            #[allow(unused)]
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
-            #[allow(unused)]
             use self::_puroro::internal::oneof_type::OneofCase;
-            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupThreeCase::from_bitslice(bits);
