@@ -30,6 +30,7 @@ pub trait NonRepeatedFieldType: FieldType {
     where
         Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_>;
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 
 pub trait NonRepeatedNonMessageFieldType: FieldType {
@@ -37,6 +38,7 @@ pub trait NonRepeatedNonMessageFieldType: FieldType {
     where
         Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>>;
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 
 impl<T: NonRepeatedNonMessageFieldType> NonRepeatedFieldType for T {
@@ -56,6 +58,9 @@ impl<T: NonRepeatedNonMessageFieldType> NonRepeatedFieldType for T {
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::OptGetterType<'_> {
         self.get_field_opt(bitvec)
     }
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
+        <T as NonRepeatedNonMessageFieldType>::clear(self, bitvec);
+    }
 }
 
 impl<RustType, ProtoType> NonRepeatedNonMessageFieldType
@@ -74,6 +79,9 @@ where
             Some(self.0.clone())
         }
     }
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0 = RustType::default();
+    }
 }
 
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
@@ -88,6 +96,10 @@ where
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
         bitvec.get::<BITFIELD_INDEX>().then_some(self.0.clone())
     }
+
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
+        bitvec.set::<BITFIELD_INDEX>(false);
+    }
 }
 
 impl NonRepeatedNonMessageFieldType for SingularStringField {
@@ -101,6 +113,10 @@ impl NonRepeatedNonMessageFieldType for SingularStringField {
             Some(self.0.as_ref())
         }
     }
+
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear();
+    }
 }
 
 impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
@@ -111,6 +127,11 @@ impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
         Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
         bitvec.get::<BITFIELD_INDEX>().then_some(&self.0)
+    }
+
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
+        bitvec.set::<BITFIELD_INDEX>(false);
+        self.0.clear();
     }
 }
 
@@ -135,5 +156,9 @@ where
 
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::OptGetterType<'_> {
         self.0.as_deref()
+    }
+
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0 = None;
     }
 }
