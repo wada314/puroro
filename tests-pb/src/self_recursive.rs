@@ -29,7 +29,7 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field(
             &self.recursive_unlabeled,
             &self._bitfield,
-            ::std::default::Default::default(),
+            ::std::default::Default::default,
         )
     }
 }

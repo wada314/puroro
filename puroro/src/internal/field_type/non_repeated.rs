@@ -18,13 +18,16 @@ use crate::tags;
 use crate::Message;
 
 pub trait NonRepeatedFieldType: FieldType {
+    type DefaultValueType<'a>
+    where
+        Self: 'a;
     type GetterType<'a>
     where
         Self: 'a;
-    fn get_field<'a, B: BitSlice>(
+    fn get_field<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType<'a>>(
         &'a self,
         bitvec: &B,
-        default: Self::GetterType<'a>,
+        default: D,
     ) -> Self::GetterType<'a>;
     type OptGetterType<'a>
     where
@@ -51,15 +54,16 @@ pub trait NonRepeatedNonMessageFieldType: FieldType {
 }
 
 impl<T: NonRepeatedNonMessageFieldType> NonRepeatedFieldType for T {
+    type DefaultValueType<'a> = T::GetterType<'a> where Self: 'a;
     type GetterType<'a> = T::GetterType<'a>
     where
         Self: 'a;
-    fn get_field<'a, B: BitSlice>(
+    fn get_field<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType<'a>>(
         &'a self,
         bitvec: &B,
-        default: Self::GetterType<'a>,
+        default: D,
     ) -> Self::GetterType<'a> {
-        self.get_field_opt(bitvec).unwrap_or(default)
+        self.get_field_opt(bitvec).unwrap_or_else(default)
     }
     type OptGetterType<'a> = Option<T::GetterType<'a>>
     where
@@ -174,13 +178,16 @@ impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
 where
     M: Message + Default,
 {
+    type DefaultValueType<'a> = ()
+    where
+        Self: 'a;
     type GetterType<'a> = Option<&'a M>
     where
         Self: 'a;
-    fn get_field<'a, B: BitSlice>(
+    fn get_field<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType<'a>>(
         &'a self,
         bitvec: &B,
-        _default: Self::GetterType<'a>,
+        _default: D,
     ) -> Self::GetterType<'a> {
         self.get_field_opt(bitvec)
     }

@@ -22,7 +22,7 @@ impl {{ ident_struct }} {
         )
         {%- else %}
         <{{ field.rust_field_type }} as NonRepeatedFieldType>::get_field(
-            &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default(),
+            &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default,
         )
         {%- endmatch %}
     }

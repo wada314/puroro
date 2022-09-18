@@ -338,7 +338,7 @@ impl Submsg {
         > as NonRepeatedFieldType>::get_field(
             &self.i32_optional,
             &self._bitfield,
-            ::std::default::Default::default(),
+            ::std::default::Default::default,
         )
     }
 }

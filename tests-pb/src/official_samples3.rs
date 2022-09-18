@@ -23,7 +23,7 @@ impl Test1 {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
-            &self.a, &self._bitfield, ::std::default::Default::default(),
+            &self.a, &self._bitfield, ::std::default::Default::default,
         )
     }
 }
@@ -83,7 +83,7 @@ impl Test2 {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
-            &self.b, &self._bitfield, ::std::default::Default::default(),
+            &self.b, &self._bitfield, ::std::default::Default::default,
         )
     }
 }
@@ -148,7 +148,7 @@ impl Test3 {
         > as NonRepeatedFieldType>::get_field(
             &self.c,
             &self._bitfield,
-            ::std::default::Default::default(),
+            ::std::default::Default::default,
         )
     }
 }

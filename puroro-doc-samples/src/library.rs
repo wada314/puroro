@@ -32,7 +32,7 @@ impl Book {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
-            &self.title, &self._bitfield, ::std::default::Default::default(),
+            &self.title, &self._bitfield, ::std::default::Default::default,
         )
     }
     // Singular, Variant(UInt32)
@@ -45,7 +45,7 @@ impl Book {
         > as NonRepeatedFieldType>::get_field(
             &self.num_pages,
             &self._bitfield,
-            ::std::default::Default::default(),
+            ::std::default::Default::default,
         )
     }
     // Singular, LengthDelimited(Message(Fqtn(".library.Author")))
@@ -53,7 +53,7 @@ impl Book {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field(
-            &self.author, &self._bitfield, ::std::default::Default::default(),
+            &self.author, &self._bitfield, ::std::default::Default::default,
         )
     }
 }
@@ -126,7 +126,7 @@ impl Author {
         #[allow(unused)]
         use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
-            &self.name, &self._bitfield, ::std::default::Default::default(),
+            &self.name, &self._bitfield, ::std::default::Default::default,
         )
     }
 }
