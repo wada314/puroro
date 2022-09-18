@@ -45,6 +45,18 @@ impl {{ ident_struct }} {
             &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default,
         )
     }
+    pub fn {{ field.ident_getter_opt }}(&self) -> {{ field.rust_getter_opt_type }} {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <{{ field.rust_field_type }} as NonRepeatedFieldType>::get_field_opt(
+            &self.{{ field.ident_struct_field }}, &self._bitfield,
+        )
+    }
+    pub fn {{ field.ident_getter_mut }}(&mut self) -> {{ field.rust_getter_mut_type }} {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <{{ field.rust_field_type }} as NonRepeatedFieldType>::mut_field(
+            &mut self.{{ field.ident_struct_field }}, &mut self._bitfield, ::std::default::Default::default,
+        )
+    }
     pub fn {{ field.ident_clear }}(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <{{ field.rust_field_type }} as NonRepeatedFieldType>::clear(

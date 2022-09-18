@@ -340,6 +340,26 @@ impl Submsg {
             ::std::default::Default::default,
         )
     }
+    pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i32_optional, &self._bitfield)
+    }
+    pub fn i32_optional_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.i32_optional,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
     pub fn clear_i32_optional(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField<

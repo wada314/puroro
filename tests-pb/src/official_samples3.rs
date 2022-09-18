@@ -25,6 +25,18 @@ impl Test1 {
             &self.a, &self._bitfield, ::std::default::Default::default,
         )
     }
+    pub fn a_opt(&self) -> ::std::option::Option<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+            &self.a, &self._bitfield,
+        )
+    }
+    pub fn a_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
+            &mut self.a, &mut self._bitfield, ::std::default::Default::default,
+        )
+    }
     pub fn clear_a(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
@@ -88,6 +100,18 @@ impl Test2 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
             &self.b, &self._bitfield, ::std::default::Default::default,
+        )
+    }
+    pub fn b_opt(&self) -> ::std::option::Option<&str> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            &self.b, &self._bitfield,
+        )
+    }
+    pub fn b_mut(&mut self) -> &mut ::std::string::String {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::mut_field(
+            &mut self.b, &mut self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn clear_b(&mut self) {
@@ -158,6 +182,22 @@ impl Test3 {
         > as NonRepeatedFieldType>::get_field(
             &self.c,
             &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn c_opt(&self) -> ::std::option::Option<&_puroro_root::official_samples3::Test1> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::official_samples3::Test1,
+        > as NonRepeatedFieldType>::get_field_opt(&self.c, &self._bitfield)
+    }
+    pub fn c_mut(&mut self) -> &mut _puroro_root::official_samples3::Test1 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::official_samples3::Test1,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.c,
+            &mut self._bitfield,
             ::std::default::Default::default,
         )
     }
