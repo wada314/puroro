@@ -35,6 +35,14 @@ impl Test1 {
             ::std::default::Default::default,
         )
     }
+    pub fn clear_a(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as NonRepeatedFieldType>::clear(&mut self.a, &mut self._bitfield)
+    }
 }
 
 impl self::_puroro::Message for Test1 {
@@ -93,6 +101,13 @@ impl Test2 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::get_field(
             &self.b, &self._bitfield, ::std::default::Default::default,
+        )
+    }
+    pub fn clear_b(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::clear(
+            &mut self.b,
+            &mut self._bitfield,
         )
     }
 }
@@ -159,6 +174,12 @@ impl Test3 {
             ::std::default::Default::default,
         )
     }
+    pub fn clear_c(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::official_samples2::Test1,
+        > as NonRepeatedFieldType>::clear(&mut self.c, &mut self._bitfield)
+    }
 }
 
 impl self::_puroro::Message for Test3 {
@@ -215,6 +236,12 @@ impl Test4 {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::get_field(
             &self.d, &self._bitfield, 
+        )
+    }
+    pub fn clear_d(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::clear(
+            &mut self.d, &mut self._bitfield, 
         )
     }
 }

@@ -11,7 +11,6 @@ pub struct {{ ident_struct }} {
 
 impl {{ ident_struct }} {
     {%- for field in fields %}
-    
     {%- match field.rule %}
     {%- when FieldRule::Repeated %}
 
@@ -21,6 +20,12 @@ impl {{ ident_struct }} {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <{{ field.rust_field_type }} as RepeatedFieldType>::get_field(
             &self.{{ field.ident_struct_field }}, &self._bitfield, 
+        )
+    }
+    pub fn {{ field.ident_clear }}(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <{{ field.rust_field_type }} as RepeatedFieldType>::clear(
+            &mut self.{{ field.ident_struct_field }}, &mut self._bitfield, 
         )
     }
     
@@ -34,8 +39,14 @@ impl {{ ident_struct }} {
             &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default,
         )
     }
-    {%- endmatch %} {#- match field.rule #}
+    pub fn {{ field.ident_clear }}(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <{{ field.rust_field_type }} as NonRepeatedFieldType>::clear(
+            &mut self.{{ field.ident_struct_field }}, &mut self._bitfield,
+        )
+    }
 
+    {%- endmatch %} {#- match field.rule #}
     {%- endfor %} {#- for field in fields #}
 }
 

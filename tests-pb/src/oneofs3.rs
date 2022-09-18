@@ -333,6 +333,12 @@ impl Submsg {
             &self.i32_unlabeled, &self._bitfield, ::std::default::Default::default,
         )
     }
+    pub fn clear_i32_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
+            &mut self.i32_unlabeled, &mut self._bitfield,
+        )
+    }
 }
 
 impl self::_puroro::Message for Submsg {
