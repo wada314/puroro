@@ -17,7 +17,7 @@ impl {{ ident_struct }} {
 
     {#- Repeated getter #}
     // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
-    pub fn {{ field.ident_struct_field }}(&self) -> {{ field.rust_getter_type }} {
+    pub fn {{ field.ident_getter }}(&self) -> {{ field.rust_getter_type }} {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <{{ field.rust_field_type }} as RepeatedFieldType>::get_field(
             &self.{{ field.ident_struct_field }}, &self._bitfield, 
@@ -28,7 +28,7 @@ impl {{ ident_struct }} {
 
     {#- Singular getter #}
     // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
-    pub fn {{ field.ident_struct_field }}(&self) -> {{ field.rust_getter_type }} {
+    pub fn {{ field.ident_getter }}(&self) -> {{ field.rust_getter_type }} {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <{{ field.rust_field_type }} as NonRepeatedFieldType>::get_field(
             &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default,

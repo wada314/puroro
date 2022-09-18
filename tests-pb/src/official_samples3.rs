@@ -20,8 +20,7 @@ pub struct Test1 {
 impl Test1 {
     // Singular, Variant(Int32)
     pub fn a(&self) -> i32 {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
             &self.a, &self._bitfield, ::std::default::Default::default,
         )
@@ -80,8 +79,7 @@ pub struct Test2 {
 impl Test2 {
     // Singular, LengthDelimited(String)
     pub fn b(&self) -> &str {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
             &self.b, &self._bitfield, ::std::default::Default::default,
         )
@@ -141,8 +139,7 @@ pub struct Test3 {
 impl Test3 {
     // Singular, LengthDelimited(Message(Fqtn(".official_samples3.Test1")))
     pub fn c(&self) -> Option<&_puroro_root::official_samples3::Test1> {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::official_samples3::Test1,
         > as NonRepeatedFieldType>::get_field(
@@ -204,8 +201,7 @@ pub struct Test4 {
 impl Test4 {
     // Repeated, Variant(Int32)
     pub fn d(&self) -> &[i32] {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::get_field(
             &self.d, &self._bitfield, 
         )

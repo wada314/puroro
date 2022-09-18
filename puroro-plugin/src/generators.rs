@@ -181,6 +181,10 @@ impl Enum {
 #[derive(Debug)]
 pub struct Field {
     pub ident_struct_field: String,
+    pub ident_getter: String,
+    pub ident_getter_opt: String,
+    pub ident_clear: String,
+    pub ident_getter_mut: String,
     pub rule: FieldRule,
     pub wire_type: WireType,
     pub rust_field_type: String,
@@ -197,6 +201,11 @@ impl Field {
         use google::protobuf::field_descriptor_proto::Label::*;
 
         let ident_struct_field = f.name().to_lower_snake_case().escape_rust_keywords().into();
+        let ident_getter = f.name().to_lower_snake_case().escape_rust_keywords().into();
+        let ident_getter_opt = format!("{}_opt", f.name().to_lower_snake_case());
+        let ident_clear = format!("clear_{}", f.name().to_lower_snake_case());
+        let ident_getter_mut = format!("{}_mut", f.name().to_lower_snake_case());
+
         let syntax = f.parent().file().try_syntax()?;
         let rule = match (syntax, f.label(), f.proto3_optional()) {
             (Syntax::Proto2, LabelOptional | LabelRequired, _) => FieldRule::Optional,
@@ -269,6 +278,10 @@ impl Field {
         let number = f.number();
         Ok(Self {
             ident_struct_field,
+            ident_getter,
+            ident_getter_opt,
+            ident_clear,
+            ident_getter_mut,
             rule,
             wire_type,
             rust_field_type,

@@ -328,8 +328,7 @@ pub struct Submsg {
 impl Submsg {
     // Singular, Variant(Int32)
     pub fn i32_unlabeled(&self) -> i32 {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
             &self.i32_unlabeled, &self._bitfield, ::std::default::Default::default,
         )

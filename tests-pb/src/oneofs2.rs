@@ -329,8 +329,7 @@ pub struct Submsg {
 impl Submsg {
     // Optional, Variant(Int32)
     pub fn i32_optional(&self) -> i32 {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
