@@ -39,6 +39,13 @@ impl Msg {
             _puroro_root::self_recursive::Msg,
         > as NonRepeatedFieldType>::get_field_opt(&self.recursive_unlabeled, &self._bitfield)
     }
+    pub fn has_recursive_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::self_recursive::Msg,
+        > as NonRepeatedFieldType>::get_field_opt(&self.recursive_unlabeled, &self._bitfield)
+        .is_some()
+    }
     pub fn recursive_unlabeled_mut(&mut self) -> &mut _puroro_root::self_recursive::Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<

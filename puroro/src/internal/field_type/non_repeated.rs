@@ -41,7 +41,6 @@ pub trait NonRepeatedFieldType: FieldType {
         bitvec: &mut B,
         default: D,
     ) -> Self::MutGetterType<'a>;
-
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 

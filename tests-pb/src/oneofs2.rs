@@ -348,6 +348,15 @@ impl Submsg {
             0,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_optional, &self._bitfield)
     }
+    pub fn has_i32_optional(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i32_optional, &self._bitfield)
+        .is_some()
+    }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField<

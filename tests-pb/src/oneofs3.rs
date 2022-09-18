@@ -339,6 +339,12 @@ impl Submsg {
             &self.i32_unlabeled, &self._bitfield,
         )
     }
+    pub fn has_i32_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+            &self.i32_unlabeled, &self._bitfield,
+        ).is_some()
+    }
     pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(

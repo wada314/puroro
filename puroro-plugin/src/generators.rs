@@ -183,6 +183,7 @@ pub struct Field {
     pub ident_struct_field: String,
     pub ident_getter: String,
     pub ident_getter_opt: String,
+    pub ident_has: String,
     pub ident_clear: String,
     pub ident_getter_mut: String,
     pub rule: FieldRule,
@@ -205,6 +206,7 @@ impl Field {
         let ident_struct_field = f.name().to_lower_snake_case().escape_rust_keywords().into();
         let ident_getter = f.name().to_lower_snake_case().escape_rust_keywords().into();
         let ident_getter_opt = format!("{}_opt", f.name().to_lower_snake_case());
+        let ident_has = format!("has_{}", f.name().to_lower_snake_case());
         let ident_clear = format!("clear_{}", f.name().to_lower_snake_case());
         let ident_getter_mut = format!("{}_mut", f.name().to_lower_snake_case());
 
@@ -286,6 +288,7 @@ impl Field {
             ident_struct_field,
             ident_getter,
             ident_getter_opt,
+            ident_has,
             ident_clear,
             ident_getter_mut,
             rule,

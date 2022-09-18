@@ -51,6 +51,12 @@ impl {{ ident_struct }} {
             &self.{{ field.ident_struct_field }}, &self._bitfield,
         )
     }
+    pub fn {{ field.ident_has }}(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <{{ field.rust_field_type }} as NonRepeatedFieldType>::get_field_opt(
+            &self.{{ field.ident_struct_field }}, &self._bitfield,
+        ).is_some()
+    }
     pub fn {{ field.ident_getter_mut }}(&mut self) -> {{ field.rust_getter_mut_type }} {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <{{ field.rust_field_type }} as NonRepeatedFieldType>::mut_field(

@@ -31,6 +31,12 @@ impl Test1 {
             &self.a, &self._bitfield,
         )
     }
+    pub fn has_a(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+            &self.a, &self._bitfield,
+        ).is_some()
+    }
     pub fn a_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
@@ -107,6 +113,12 @@ impl Test2 {
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
             &self.b, &self._bitfield,
         )
+    }
+    pub fn has_b(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            &self.b, &self._bitfield,
+        ).is_some()
     }
     pub fn b_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -190,6 +202,13 @@ impl Test3 {
         <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::official_samples3::Test1,
         > as NonRepeatedFieldType>::get_field_opt(&self.c, &self._bitfield)
+    }
+    pub fn has_c(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::official_samples3::Test1,
+        > as NonRepeatedFieldType>::get_field_opt(&self.c, &self._bitfield)
+        .is_some()
     }
     pub fn c_mut(&mut self) -> &mut _puroro_root::official_samples3::Test1 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;

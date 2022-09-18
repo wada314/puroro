@@ -40,6 +40,12 @@ impl Book {
             &self.title, &self._bitfield,
         )
     }
+    pub fn has_title(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            &self.title, &self._bitfield,
+        ).is_some()
+    }
     pub fn title_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::mut_field(
@@ -72,6 +78,14 @@ impl Book {
             self::_puroro::tags::UInt32,
         > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
     }
+    pub fn has_num_pages(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            u32,
+            self::_puroro::tags::UInt32,
+        > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
+        .is_some()
+    }
     pub fn num_pages_mut(&mut self) -> &mut u32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField<
@@ -102,6 +116,12 @@ impl Book {
         <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field_opt(
             &self.author, &self._bitfield,
         )
+    }
+    pub fn has_author(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field_opt(
+            &self.author, &self._bitfield,
+        ).is_some()
     }
     pub fn author_mut(&mut self) -> &mut _puroro_root::library::Author {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -192,6 +212,12 @@ impl Author {
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
             &self.name, &self._bitfield,
         )
+    }
+    pub fn has_name(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            &self.name, &self._bitfield,
+        ).is_some()
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
