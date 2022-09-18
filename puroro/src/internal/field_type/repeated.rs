@@ -20,6 +20,7 @@ use crate::Message;
 pub trait RepeatedFieldType: FieldType {
     type ScalarType;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 
 impl<RustType, ProtoType> RepeatedFieldType for RepeatedNumericalField<RustType, ProtoType>
@@ -32,6 +33,10 @@ where
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
+
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear()
+    }
 }
 
 impl RepeatedFieldType for RepeatedStringField {
@@ -39,11 +44,19 @@ impl RepeatedFieldType for RepeatedStringField {
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
+
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear()
+    }
 }
 
 impl<M: Message + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
     type ScalarType = M;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
+    }
+
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear()
     }
 }
