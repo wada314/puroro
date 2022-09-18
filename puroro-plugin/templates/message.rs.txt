@@ -11,21 +11,31 @@ pub struct {{ ident_struct }} {
 
 impl {{ ident_struct }} {
     {%- for field in fields %}
+    
+    {%- match field.rule %}
+    {%- when FieldRule::Repeated %}
+
+    {#- Repeated getter #}
     // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
     pub fn {{ field.ident_struct_field }}(&self) -> {{ field.rust_getter_type }} {
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::{NonRepeatedFieldType, RepeatedFieldType};
-        {%- match field.rule%}
-        {%- when FieldRule::Repeated %}
+        use self::_puroro::internal::field_type::RepeatedFieldType;
         <{{ field.rust_field_type }} as RepeatedFieldType>::get_field(
             &self.{{ field.ident_struct_field }}, &self._bitfield, 
         )
-        {%- else %}
+    }
+    
+    {%- else %} {#- when FieldRule::Repeated #}
+
+    {#- Singular getter #}
+    // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
+    pub fn {{ field.ident_struct_field }}(&self) -> {{ field.rust_getter_type }} {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <{{ field.rust_field_type }} as NonRepeatedFieldType>::get_field(
             &self.{{ field.ident_struct_field }}, &self._bitfield, ::std::default::Default::default,
         )
-        {%- endmatch %}
     }
+    {%- endmatch %} {#- match field.rule #}
+
     {%- endfor %} {#- for field in fields #}
 }
 
