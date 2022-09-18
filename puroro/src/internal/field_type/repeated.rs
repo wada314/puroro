@@ -38,7 +38,7 @@ where
 
     type ContainerType = Vec<Self::ScalarType>;
 
-    fn mut_field<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType {
+    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
 
@@ -55,7 +55,7 @@ impl RepeatedFieldType for RepeatedStringField {
 
     type ContainerType = Vec<Self::ScalarType>;
 
-    fn mut_field<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType {
+    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
 
@@ -72,7 +72,7 @@ impl<M: Message + Default + Clone> RepeatedFieldType for RepeatedMessageField<M>
 
     type ContainerType = Vec<Self::ScalarType>;
 
-    fn mut_field<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType {
+    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
 
