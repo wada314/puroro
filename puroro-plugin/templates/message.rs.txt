@@ -22,6 +22,12 @@ impl {{ ident_struct }} {
             &self.{{ field.ident_struct_field }}, &self._bitfield, 
         )
     }
+    pub fn {{ field.ident_getter_mut }}(&mut self) -> {{ field.rust_getter_mut_type }} {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <{{ field.rust_field_type }} as RepeatedFieldType>::mut_field(
+            &mut self.{{ field.ident_struct_field }}, &mut self._bitfield, 
+        )
+    }
     pub fn {{ field.ident_clear }}(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <{{ field.rust_field_type }} as RepeatedFieldType>::clear(

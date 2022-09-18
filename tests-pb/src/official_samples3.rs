@@ -225,6 +225,12 @@ impl Test4 {
             &self.d, &self._bitfield, 
         )
     }
+    pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::mut_field(
+            &mut self.d, &mut self._bitfield, 
+        )
+    }
     pub fn clear_d(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::clear(

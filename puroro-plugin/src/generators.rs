@@ -189,6 +189,8 @@ pub struct Field {
     pub wire_type: WireType,
     pub rust_field_type: String,
     pub rust_getter_type: String,
+    pub rust_getter_opt_type: String,
+    pub rust_getter_mut_type: String,
     pub number: i32,
 }
 
@@ -275,6 +277,10 @@ impl Field {
         let rust_getter_type = wire_type
             .into_getter_rust_type(matches!(&rule, &FieldRule::Repeated))
             .into_owned();
+        let rust_getter_opt_type = wire_type.into_opt_getter_rust_type().into_owned();
+        let rust_getter_mut_type = wire_type
+            .into_mut_getter_rust_type(matches!(&rule, &FieldRule::Repeated))
+            .into_owned();
         let number = f.number();
         Ok(Self {
             ident_struct_field,
@@ -286,6 +292,8 @@ impl Field {
             wire_type,
             rust_field_type,
             rust_getter_type,
+            rust_getter_opt_type,
+            rust_getter_mut_type,
             number,
         })
     }
@@ -521,6 +529,24 @@ impl WireType {
             Bits64(x) => x.into_owned_rust_type(),
         };
         format!("::std::option::Option<{}>", inner_type).into()
+    }
+
+    pub fn into_mut_getter_rust_type(&self, is_repeated: bool) -> Cow<'static, str> {
+        use LengthDelimitedType::*;
+        use WireType::*;
+        let target_scalar_type = match self {
+            Variant(var) => var.into_owned_rust_type(),
+            LengthDelimited(String) => "::std::string::String".into(),
+            LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
+            LengthDelimited(Message(fqtn)) => fqtn.to_rust_path().into(),
+            Bits32(x) => x.into_owned_rust_type(),
+            Bits64(x) => x.into_owned_rust_type(),
+        };
+        if is_repeated {
+            format!("&mut ::std::vec::Vec<{}>", target_scalar_type).into()
+        } else {
+            format!("&mut {}", target_scalar_type).into()
+        }
     }
 
     pub fn into_oneof_getter_rust_type(&self, lt: &str) -> Cow<'static, str> {
