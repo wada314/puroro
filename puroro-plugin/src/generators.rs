@@ -168,12 +168,18 @@ impl Message {
 #[template(path = "enum.rs.txt")]
 pub struct Enum {
     pub ident_enum: String,
+    pub values: Vec<EnumValue>,
 }
 
 impl Enum {
-    pub fn try_new(e: &re::Enum, _resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new<'a>(e: &'a re::Enum<'a>, resolver: &'a DescriptorResolver<'a>) -> Result<Self> {
         let ident_enum = e.name().to_camel_case().escape_rust_keywords().into_owned();
-        Ok(Enum { ident_enum })
+        let values = e
+            .values()
+            .into_iter()
+            .map(|v| EnumValue::try_new(v, resolver))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(Enum { ident_enum, values })
     }
 }
 
@@ -182,8 +188,12 @@ pub struct EnumValue {
     pub ident_enum_value: String,
 }
 impl EnumValue {
-    pub fn try_new(_resolver: &DescriptorResolver) -> Result<Self> {
-        todo!()
+    pub fn try_new<'a>(
+        v: &'a re::EnumValue<'a>,
+        _resolver: &'a DescriptorResolver<'a>,
+    ) -> Result<Self> {
+        let ident_enum_value = v.name().to_camel_case().escape_rust_keywords().into_owned();
+        Ok(EnumValue { ident_enum_value })
     }
 }
 

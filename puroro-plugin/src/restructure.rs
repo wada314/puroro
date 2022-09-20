@@ -216,6 +216,7 @@ impl Deref for Message<'_> {
 pub struct Enum<'a> {
     proto: &'a EnumDescriptorProto,
     parent: FileOrMessageRef<'a>,
+    values: OnceCell<Box<[EnumValue<'a>]>>,
     fqtn: OnceCell<Fqtn<String>>,
 }
 impl<'a> Enum<'a> {
@@ -223,6 +224,7 @@ impl<'a> Enum<'a> {
         Self {
             proto,
             parent,
+            values: OnceCell::default(),
             fqtn: OnceCell::default(),
         }
     }
@@ -231,6 +233,16 @@ impl<'a> Enum<'a> {
     }
     pub fn parent(&'a self) -> FileOrMessageRef<'_> {
         self.parent.clone()
+    }
+    pub fn values(&'a self) -> &[EnumValue<'_>] {
+        self.values.get_or_init(|| {
+            self.proto()
+                .value()
+                .into_iter()
+                .map(|v| EnumValue::new(v, self))
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        })
     }
     pub fn fqtn(&'a self) -> Fqtn<&str> {
         <Self as MessageOrEnumExt>::fqtn(self)
