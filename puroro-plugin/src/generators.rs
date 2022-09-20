@@ -185,15 +185,20 @@ impl Enum {
 
 #[derive(Debug)]
 pub struct EnumValue {
-    pub ident_enum_value: String,
+    pub ident_enum_item: String,
+    pub number: i32,
 }
 impl EnumValue {
     pub fn try_new<'a>(
         v: &'a re::EnumValue<'a>,
         _resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
-        let ident_enum_value = v.name().to_camel_case().escape_rust_keywords().into_owned();
-        Ok(EnumValue { ident_enum_value })
+        let ident_enum_item = v.name().to_camel_case().escape_rust_keywords().into_owned();
+        let number = v.number();
+        Ok(EnumValue {
+            ident_enum_item,
+            number,
+        })
     }
 }
 

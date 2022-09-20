@@ -1,5 +1,7 @@
 
 #[derive(Default, Clone)]
 pub enum {{ ident_enum }} {
-
+    {%- for value in values %}
+    {{ value.ident_enum_item }} = {{ value.number }},
+    {%- endfor %} {#- for value in values #}
 }
