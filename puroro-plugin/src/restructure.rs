@@ -16,8 +16,8 @@ use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-    OneofDescriptorProto,
+    DescriptorProto, EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto,
+    FileDescriptorProto, OneofDescriptorProto,
 };
 use ::std::ops::Deref;
 
@@ -238,6 +238,29 @@ impl<'a> Enum<'a> {
 }
 impl Deref for Enum<'_> {
     type Target = EnumDescriptorProto;
+    fn deref(&self) -> &Self::Target {
+        &self.proto
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct EnumValue<'a> {
+    proto: &'a EnumValueDescriptorProto,
+    parent: &'a Enum<'a>,
+}
+impl<'a> EnumValue<'a> {
+    pub fn new(proto: &'a EnumValueDescriptorProto, parent: &'a Enum<'a>) -> Self {
+        Self { proto, parent }
+    }
+    pub fn proto(&'a self) -> &EnumValueDescriptorProto {
+        &self.proto
+    }
+    pub fn parent(&'a self) -> &Enum<'_> {
+        self.parent
+    }
+}
+impl Deref for EnumValue<'_> {
+    type Target = EnumValueDescriptorProto;
     fn deref(&self) -> &Self::Target {
         &self.proto
     }

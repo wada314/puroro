@@ -171,10 +171,19 @@ pub struct Enum {
 }
 
 impl Enum {
-    #[allow(unused)]
-    pub fn try_new(e: &re::Enum, resolver: &DescriptorResolver) -> Result<Self> {
+    pub fn try_new(e: &re::Enum, _resolver: &DescriptorResolver) -> Result<Self> {
         let ident_enum = e.name().to_camel_case().escape_rust_keywords().into_owned();
         Ok(Enum { ident_enum })
+    }
+}
+
+#[derive(Debug)]
+pub struct EnumValue {
+    pub ident_enum_value: String,
+}
+impl EnumValue {
+    pub fn try_new(_resolver: &DescriptorResolver) -> Result<Self> {
+        todo!()
     }
 }
 
