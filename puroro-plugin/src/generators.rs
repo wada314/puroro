@@ -167,14 +167,14 @@ impl Message {
 #[derive(Template, Debug)]
 #[template(path = "enum.rs.txt")]
 pub struct Enum {
-    pub ident_camel: String,
+    pub ident_enum: String,
 }
 
 impl Enum {
     #[allow(unused)]
     pub fn try_new(e: &re::Enum, resolver: &DescriptorResolver) -> Result<Self> {
-        let ident_camel = e.name().to_camel_case().escape_rust_keywords().into_owned();
-        Ok(Enum { ident_camel })
+        let ident_enum = e.name().to_camel_case().escape_rust_keywords().into_owned();
+        Ok(Enum { ident_enum })
     }
 }
 

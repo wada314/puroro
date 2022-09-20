@@ -1,0 +1,5 @@
+
+#[derive(Default, Clone)]
+pub enum {{ ident_enum }} {
+
+}
