@@ -14,7 +14,7 @@
 
 use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
 use crate::restructure as re;
-use crate::restructure::Syntax;
+pub use crate::restructure::Syntax;
 use crate::utils::{Fqtn, Package, StrExt as _};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
@@ -169,6 +169,7 @@ impl Message {
 pub struct Enum {
     pub ident_enum: String,
     pub values: Vec<EnumValue>,
+    pub syntax: Syntax,
 }
 
 impl Enum {
@@ -179,7 +180,12 @@ impl Enum {
             .into_iter()
             .map(|v| EnumValue::try_new(v, resolver))
             .collect::<Result<Vec<_>>>()?;
-        Ok(Enum { ident_enum, values })
+        let syntax = e.file().try_syntax()?;
+        Ok(Enum {
+            ident_enum,
+            values,
+            syntax,
+        })
     }
 }
 

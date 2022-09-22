@@ -1,11 +1,11 @@
 // A generated source code by puroro library
 #![feature(generic_associated_types)]
 // package (root)
+pub mod enum2;
 pub mod official_samples2;
 pub mod official_samples3;
 pub mod oneofs2;
 pub mod oneofs3;
-pub mod proto2_defaults;
 pub mod self_recursive;
 
 pub mod _puroro_root {

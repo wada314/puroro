@@ -218,6 +218,7 @@ pub struct Enum<'a> {
     parent: FileOrMessageRef<'a>,
     values: OnceCell<Box<[EnumValue<'a>]>>,
     fqtn: OnceCell<Fqtn<String>>,
+    file: OnceCell<&'a File<'a>>,
 }
 impl<'a> Enum<'a> {
     pub fn new(proto: &'a EnumDescriptorProto, parent: FileOrMessageRef<'a>) -> Self {
@@ -226,6 +227,7 @@ impl<'a> Enum<'a> {
             parent,
             values: OnceCell::default(),
             fqtn: OnceCell::default(),
+            file: OnceCell::default(),
         }
     }
     pub fn proto(&'a self) -> &EnumDescriptorProto {
@@ -246,6 +248,12 @@ impl<'a> Enum<'a> {
     }
     pub fn fqtn(&'a self) -> Fqtn<&str> {
         <Self as MessageOrEnumExt>::fqtn(self)
+    }
+    pub fn file(&'a self) -> &File<'_> {
+        self.file.get_or_init(|| match self.parent() {
+            FileOrMessageRef::File(f) => f,
+            FileOrMessageRef::Message(m) => m.file(),
+        })
     }
 }
 impl Deref for Enum<'_> {
@@ -441,6 +449,27 @@ impl<'a> MessageOrEnumExt<'a> for Enum<'a> {
     }
     fn parent(&'a self) -> FileOrMessageRef<'_> {
         <Enum>::parent(self)
+    }
+}
+impl<'a> MessageOrEnumExt<'a> for MessageOrEnumRef<'a> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>> {
+        match self {
+            MessageOrEnumRef::Message(m) => m.fqtn_once_cell(),
+            MessageOrEnumRef::Enum(e) => e.fqtn_once_cell(),
+        }
+    }
+    fn name(&'a self) -> &str {
+        match self {
+            MessageOrEnumRef::Message(m) => m.name(),
+            MessageOrEnumRef::Enum(e) => e.name(),
+        }
+    }
+
+    fn parent(&'a self) -> FileOrMessageRef<'_> {
+        match self {
+            MessageOrEnumRef::Message(m) => m.parent(),
+            MessageOrEnumRef::Enum(e) => e.parent(),
+        }
     }
 }
 

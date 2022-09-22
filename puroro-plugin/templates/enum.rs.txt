@@ -1,7 +1,12 @@
 
-#[derive(Default, Clone)]
+#[derive(Clone, PartialEq)]
 pub enum {{ ident_enum }} {
     {%- for value in values %}
     {{ value.ident_enum_item }} = {{ value.number }},
     {%- endfor %} {#- for value in values #}
+    {%- match syntax %}
+    {%- when Syntax::Proto3 %}
+    _None(i32),
+    {%- else %}
+    {%- endmatch %} 
 }
