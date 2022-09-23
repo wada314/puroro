@@ -14,7 +14,7 @@
 
 //! Typetags for Proto field types.
 
-use crate::{ErrorKind, Result};
+use crate::{ErrorKind, PuroroError, Result};
 use ::std::marker::PhantomData;
 
 // Variants
@@ -125,11 +125,43 @@ impl NumericalType for SInt64 {
 impl NumericalType for Bool {
     type RustType = bool;
 }
-impl<E> NumericalType for Enum2<E> {
+impl<E> NumericalType for Enum2<E>
+where
+    i32: TryInto<E, Error = PuroroError>,
+    E: Into<i32>,
+{
     type RustType = E;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let int_value: i32 = i64::from_le_bytes(bytes).try_into()?;
+        Ok(int_value.try_into()?)
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val.into() as i64))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(
+            val.into() as i64
+        )))
+    }
 }
-impl<E> NumericalType for Enum3<E> {
+impl<E> NumericalType for Enum3<E>
+where
+    i32: Into<E>,
+    E: Into<i32>,
+{
     type RustType = E;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let int_value: i32 = i64::from_le_bytes(bytes).try_into()?;
+        Ok(int_value.into())
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val.into() as i64))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(
+            val.into() as i64
+        )))
+    }
 }
 impl NumericalType for Float {
     type RustType = f32;
