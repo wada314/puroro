@@ -229,3 +229,27 @@ impl ::std::default::Default for Enum {
         Enum::ValueZero
     }
 }
+
+impl ::std::convert::From<i32> for Enum {
+    fn from(x: i32) -> Self {
+        match x {
+            0 => self::Enum::ValueZero,
+            7 => self::Enum::ValueSeven,
+            1 => self::Enum::ValueOne,
+            42 => self::Enum::ValueFourtyTwo,
+            e => self::Enum::_None(e),
+        }
+    }
+}
+
+impl ::std::convert::From<Enum> for i32 {
+    fn from(x: Enum) -> i32 {
+        match x {
+            self::Enum::ValueZero => 0,
+            self::Enum::ValueSeven => 7,
+            self::Enum::ValueOne => 1,
+            self::Enum::ValueFourtyTwo => 42,
+            self::Enum::_None(y) => y,
+        }
+    }
+}

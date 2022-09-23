@@ -45,5 +45,28 @@ impl ::std::convert::From<{{ ident_enum }}> for i32 {
 }
 
 {%- when Syntax::Proto3 %}
+
+impl ::std::convert::From<i32> for {{ ident_enum }} {
+    fn from(x: i32) -> Self {
+        match x {
+            {%- for value in values %}
+            {{ value.number }} => self::{{ ident_enum }}::{{ value.ident_enum_item }},
+            {%- endfor %} {#- for value in values #}
+            e => self::{{ ident_enum }}::_None(e),
+        }
+    }
+}
+
+impl ::std::convert::From<{{ ident_enum }}> for i32 {
+    fn from(x: {{ ident_enum }}) -> i32 {
+        match x {
+            {%- for value in values %}
+            self::{{ ident_enum }}::{{ value.ident_enum_item }} => {{ value.number }},
+            {%- endfor %} {#- for value in values #}
+            self::{{ ident_enum }}::_None(y) => y,
+        }
+    }
+}
+
 {%- else %}
 {%- endmatch %} {#- match syntax #}
