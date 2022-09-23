@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-syntax = "proto2";
-package enum2;
+syntax = "proto3";
+package enum3;
 
 message Msg {
     optional Enum enum_optional = 1;
-    repeated Enum enum_repeated = 2;
+    Enum enum_unlabeled = 2;
+    repeated Enum enum_repeated = 3;
 }
 
 enum Enum {
+    VALUE_ZERO = 0;
     VALUE_SEVEN = 7;
     VALUE_ONE = 1;
     VALUE_FOURTY_TWO = 42;
