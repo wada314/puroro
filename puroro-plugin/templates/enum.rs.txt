@@ -34,6 +34,16 @@ impl ::std::convert::TryFrom<i32> for {{ ident_enum }} {
     }
 }
 
+impl ::std::convert::From<{{ ident_enum }}> for i32 {
+    fn from(x: {{ ident_enum }}) -> i32 {
+        match x {
+            {%- for value in values %}
+            self::{{ ident_enum }}::{{ value.ident_enum_item }} => {{ value.number }},
+            {%- endfor %} {#- for value in values #}
+        }
+    }
+}
+
 {%- when Syntax::Proto3 %}
 {%- else %}
 {%- endmatch %} {#- match syntax #}

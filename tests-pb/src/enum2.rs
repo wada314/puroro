@@ -183,3 +183,13 @@ impl ::std::convert::TryFrom<i32> for Enum {
         }
     }
 }
+
+impl ::std::convert::From<Enum> for i32 {
+    fn from(x: Enum) -> i32 {
+        match x {
+            self::Enum::ValueSeven => 7,
+            self::Enum::ValueOne => 1,
+            self::Enum::ValueFourtyTwo => 42,
+        }
+    }
+}
