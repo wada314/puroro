@@ -10,3 +10,9 @@ pub enum {{ ident_enum }} {
     {%- else %}
     {%- endmatch %} 
 }
+
+impl ::std::default::Default for {{ ident_enum }} {
+    fn default() -> Self {
+        {{ ident_enum }}::{{ values[0].ident_enum_item }}
+    }
+}
