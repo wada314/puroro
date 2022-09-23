@@ -217,10 +217,10 @@ pub mod _msg {
 
 #[derive(Clone, PartialEq)]
 pub enum Enum {
-    ValueZero = 0,
-    ValueSeven = 7,
-    ValueOne = 1,
-    ValueFourtyTwo = 42,
+    ValueZero,
+    ValueSeven,
+    ValueOne,
+    ValueFourtyTwo,
     _None(i32),
 }
 

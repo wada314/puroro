@@ -2,7 +2,7 @@
 #[derive(Clone, PartialEq)]
 pub enum {{ ident_enum }} {
     {%- for value in values %}
-    {{ value.ident_enum_item }} = {{ value.number }},
+    {{ value.ident_enum_item }},
     {%- endfor %} {#- for value in values #}
     {%- match syntax %}
     {%- when Syntax::Proto3 %}

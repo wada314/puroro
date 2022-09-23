@@ -159,9 +159,9 @@ pub mod _msg {
 
 #[derive(Clone, PartialEq)]
 pub enum Enum {
-    ValueSeven = 7,
-    ValueOne = 1,
-    ValueFourtyTwo = 42,
+    ValueSeven,
+    ValueOne,
+    ValueFourtyTwo,
 }
 
 impl ::std::default::Default for Enum {
