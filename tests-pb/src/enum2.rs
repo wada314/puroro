@@ -157,9 +157,10 @@ pub mod _msg {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
     ValueSeven,
+    ValueZero,
     ValueOne,
     ValueFourtyTwo,
 }
@@ -177,6 +178,7 @@ impl ::std::convert::TryFrom<i32> for Enum {
         use ::std::result::Result::{Err, Ok};
         match x {
             7 => Ok(self::Enum::ValueSeven),
+            0 => Ok(self::Enum::ValueZero),
             1 => Ok(self::Enum::ValueOne),
             42 => Ok(self::Enum::ValueFourtyTwo),
             e => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
@@ -188,6 +190,7 @@ impl ::std::convert::From<Enum> for i32 {
     fn from(x: Enum) -> i32 {
         match x {
             self::Enum::ValueSeven => 7,
+            self::Enum::ValueZero => 0,
             self::Enum::ValueOne => 1,
             self::Enum::ValueFourtyTwo => 42,
         }

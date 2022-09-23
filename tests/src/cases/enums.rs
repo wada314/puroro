@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// mod builder;
-// mod bumpalo;
-// mod either;
-// mod empty;
-mod enums;
-// mod merged;
-mod official_samples;
-// mod oneof;
-// mod proto2_defaults;
-// mod variants_packed;
-// mod proto3_defaults;
-mod self_recursive;
-// mod simple_get_set;
-// mod simple_misc_traits;
-// mod simple_ser_tests;
+use ::std::convert::TryFrom;
+use ::tests_pb::enum2::Enum as Enum2;
+use ::tests_pb::enum3::Enum as Enum3;
+
+#[test]
+fn test_enum2_default() {
+    assert_eq!(Enum2::ValueSeven, Enum2::default());
+}
+
+#[test]
+fn test_enum2_convert() {
+    assert_eq!(Some(Enum2::ValueSeven), Enum2::try_from(7).ok());
+    assert_eq!(Some(Enum2::ValueZero), Enum2::try_from(0).ok());
+    assert_eq!(Some(Enum2::ValueFourtyTwo), Enum2::try_from(42).ok());
+    assert!(Enum2::try_from(12345).is_err());
+}

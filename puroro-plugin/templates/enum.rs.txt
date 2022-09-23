@@ -1,5 +1,5 @@
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum {{ ident_enum }} {
     {%- for value in values %}
     {{ value.ident_enum_item }},

@@ -22,6 +22,7 @@ message Msg {
 
 enum Enum {
     VALUE_SEVEN = 7;
+    VALUE_ZERO = 0;
     VALUE_ONE = 1;
     VALUE_FOURTY_TWO = 42;
 }

@@ -215,7 +215,7 @@ pub mod _msg {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
     ValueZero,
     ValueSeven,
