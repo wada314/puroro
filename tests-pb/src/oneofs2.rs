@@ -20,6 +20,8 @@ impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
@@ -29,6 +31,10 @@ impl self::_puroro::Message for Msg {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
@@ -75,6 +81,7 @@ pub mod _msg {
         ) -> ::std::option::Option<i32> {
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupOneCase::from_bitslice(bits);
@@ -91,6 +98,7 @@ pub mod _msg {
         ) -> ::std::option::Option<&str> {
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupOneCase::from_bitslice(bits);
@@ -169,6 +177,7 @@ pub mod _msg {
         ) -> ::std::option::Option<f32> {
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
@@ -185,6 +194,7 @@ pub mod _msg {
         ) -> ::std::option::Option<&str> {
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
@@ -201,6 +211,7 @@ pub mod _msg {
         ) -> ::std::option::Option<&_puroro_root::oneofs2::Submsg> {
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupTwoCase::from_bitslice(bits);
@@ -273,6 +284,7 @@ pub mod _msg {
         ) -> ::std::option::Option<i32> {
             use self::_puroro::internal::oneof_field_type::OneofFieldType;
             use self::_puroro::internal::oneof_type::OneofCase;
+            #[allow(unused)]
             use ::std::option::Option::{None, Some};
 
             let case_opt = self::GroupThreeCase::from_bitslice(bits);
@@ -383,6 +395,8 @@ impl self::_puroro::Message for Submsg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
@@ -392,6 +406,10 @@ impl self::_puroro::Message for Submsg {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {

@@ -129,7 +129,7 @@ impl<E> NumericalType for Enum2<E> {
     type RustType = E;
 }
 impl<E> NumericalType for Enum3<E> {
-    type RustType = ::std::result::Result<E, i32>;
+    type RustType = E;
 }
 impl NumericalType for Float {
     type RustType = f32;

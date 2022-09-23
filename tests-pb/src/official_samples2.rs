@@ -78,6 +78,8 @@ impl self::_puroro::Message for Test1 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
@@ -87,6 +89,10 @@ impl self::_puroro::Message for Test1 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
@@ -163,6 +169,8 @@ impl self::_puroro::Message for Test2 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
@@ -172,6 +180,10 @@ impl self::_puroro::Message for Test2 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
@@ -256,6 +268,8 @@ impl self::_puroro::Message for Test3 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
@@ -265,6 +279,10 @@ impl self::_puroro::Message for Test3 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
@@ -326,6 +344,8 @@ impl self::_puroro::Message for Test4 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         let mut msg: Self = ::std::default::Default::default();
         msg.merge_from_bytes_iter(iter)?;
         Ok(msg)
@@ -335,6 +355,10 @@ impl self::_puroro::Message for Test4 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         while let Some((number, _field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
