@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::convert::TryFrom;
+use ::std::convert::{TryFrom, TryInto};
 use ::tests_pb::enum2::Enum as Enum2;
 use ::tests_pb::enum3::Enum as Enum3;
 
@@ -23,9 +23,9 @@ fn test_enum2_default() {
 
 #[test]
 fn test_enum2_convert() {
-    assert_eq!(Some(Enum2::ValueSeven), Enum2::try_from(7).ok());
-    assert_eq!(Some(Enum2::ValueZero), Enum2::try_from(0).ok());
-    assert_eq!(Some(Enum2::ValueFourtyTwo), Enum2::try_from(42).ok());
+    assert_eq!(Some(Enum2::ValueSeven), 7i32.try_into().ok());
+    assert_eq!(Some(Enum2::ValueZero), 0i32.try_into().ok());
+    assert_eq!(Some(Enum2::ValueFourtyTwo), 42i32.try_into().ok());
     assert!(Enum2::try_from(12345).is_err());
 
     assert_eq!(7, Enum2::ValueSeven.into());
