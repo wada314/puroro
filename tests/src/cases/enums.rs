@@ -27,4 +27,25 @@ fn test_enum2_convert() {
     assert_eq!(Some(Enum2::ValueZero), Enum2::try_from(0).ok());
     assert_eq!(Some(Enum2::ValueFourtyTwo), Enum2::try_from(42).ok());
     assert!(Enum2::try_from(12345).is_err());
+
+    assert_eq!(7, Enum2::ValueSeven.into());
+    assert_eq!(0, Enum2::ValueZero.into());
+    assert_eq!(42, Enum2::ValueFourtyTwo.into());
+}
+
+#[test]
+fn test_enum3_default() {
+    assert_eq!(Enum3::ValueZero, Enum3::default());
+}
+
+#[test]
+fn test_enum3_convert() {
+    assert_eq!(Enum3::ValueSeven, 7.into());
+    assert_eq!(Enum3::ValueZero, 0.into());
+    assert_eq!(Enum3::ValueFourtyTwo, 42.into());
+    assert_eq!(Enum3::_None(12345), 12345.into());
+
+    assert_eq!(7, Enum3::ValueSeven.into());
+    assert_eq!(0, Enum3::ValueZero.into());
+    assert_eq!(42, Enum3::ValueFourtyTwo.into());
 }
