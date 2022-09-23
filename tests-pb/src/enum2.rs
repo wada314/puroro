@@ -169,3 +169,17 @@ impl ::std::default::Default for Enum {
         Enum::ValueSeven
     }
 }
+
+impl ::std::convert::TryFrom<i32> for Enum {
+    type Error = self::_puroro::PuroroError;
+    fn try_from(x: i32) -> ::std::result::Result<Self, Self::Error> {
+        #[allow(unused)]
+        use ::std::result::Result::{Err, Ok};
+        match x {
+            7 => Ok(self::Enum::ValueSeven),
+            1 => Ok(self::Enum::ValueOne),
+            42 => Ok(self::Enum::ValueFourtyTwo),
+            e => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
+        }
+    }
+}

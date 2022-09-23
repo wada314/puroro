@@ -16,3 +16,24 @@ impl ::std::default::Default for {{ ident_enum }} {
         {{ ident_enum }}::{{ values[0].ident_enum_item }}
     }
 }
+
+{%- match syntax %}
+{%- when Syntax::Proto2 %}
+
+impl ::std::convert::TryFrom<i32> for {{ ident_enum }} {
+    type Error = self::_puroro::PuroroError;
+    fn try_from(x: i32) -> ::std::result::Result<Self, Self::Error> {
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        match x {
+            {%- for value in values %}
+            {{ value.number }} => Ok(self::{{ ident_enum }}::{{ value.ident_enum_item }}),
+            {%- endfor %} {#- for value in values #}
+            e => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
+        }
+    }
+}
+
+{%- when Syntax::Proto3 %}
+{%- else %}
+{%- endmatch %} {#- match syntax #}
