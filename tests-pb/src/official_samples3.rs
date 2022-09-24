@@ -88,15 +88,6 @@ impl self::_puroro::Message for Test1 {
         Ok(())
     }
 }
-pub mod test1 {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
 
 #[derive(Default, Clone)]
 pub struct Test2 {
@@ -175,15 +166,6 @@ impl self::_puroro::Message for Test2 {
             }
         }
         Ok(())
-    }
-}
-pub mod test2 {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
     }
 }
 
@@ -276,15 +258,6 @@ impl self::_puroro::Message for Test3 {
         Ok(())
     }
 }
-pub mod test3 {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
 
 #[derive(Default, Clone)]
 pub struct Test4 {
@@ -351,14 +324,5 @@ impl self::_puroro::Message for Test4 {
             }
         }
         Ok(())
-    }
-}
-pub mod test4 {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
     }
 }

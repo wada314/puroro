@@ -34,3 +34,9 @@ pub mod _puroro {
 {%- for e in enums %}
 {{ e }}
 {%- endfor %} {#- for e in enums #}
+
+{#-################ Oneofs ################}
+
+{%- for o in oneofs %}
+{{ o }}
+{%- endfor %} {#- for o in oneofs #}

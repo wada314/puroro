@@ -187,15 +187,6 @@ impl self::_puroro::Message for Book {
         Ok(())
     }
 }
-pub mod book {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
 
 #[derive(Default, Clone)]
 pub struct Author {
@@ -274,14 +265,5 @@ impl self::_puroro::Message for Author {
             }
         }
         Ok(())
-    }
-}
-pub mod author {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
     }
 }

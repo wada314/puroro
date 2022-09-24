@@ -31,6 +31,7 @@ pub struct Module {
     pub submodules: Vec<Module>,
     pub messages: Vec<Message>,
     pub enums: Vec<Enum>,
+    pub oneofs: Vec<Oneof>,
     pub rust_file_path: String,
 }
 impl Module {
@@ -83,6 +84,7 @@ impl Module {
             .flat_map(|f| f.enums().into_iter())
             .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let oneofs = Vec::new();
         let rust_file_path = if is_root_package {
             "lib.rs".to_string()
         } else {
@@ -100,6 +102,7 @@ impl Module {
             submodules,
             messages,
             enums,
+            oneofs,
             rust_file_path,
         })
     }
@@ -116,11 +119,21 @@ impl Module {
             .into_iter()
             .map(|d| Module::try_from_message(d, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let messages = m
+        let messages_and_its_oneofs = m
             .messages()
             .into_iter()
-            .map(|d| Message::try_new(d, resolver))
+            .map(|submessage| {
+                let mut m_gen = Message::try_new(submessage, resolver)?;
+                let oneofs = submessage
+                    .oneofs()
+                    .into_iter()
+                    .map(|o| Oneof::try_new(o, &mut m_gen.bits_length, resolver))
+                    .collect::<Result<Vec<_>>>()?;
+                Ok((m_gen, oneofs))
+            })
             .collect::<Result<Vec<_>>>()?;
+        let (messages, oneof_lists): (Vec<_>, Vec<_>) = messages_and_its_oneofs.into_iter().unzip();
+        let oneofs = oneof_lists.into_iter().flatten().collect::<Vec<_>>();
         let enums = m
             .enums()
             .into_iter()
@@ -134,6 +147,7 @@ impl Module {
             submodules,
             messages,
             enums,
+            oneofs,
             rust_file_path,
         })
     }
@@ -143,9 +157,7 @@ impl Module {
 #[template(path = "message.rs.txt")]
 pub struct Message {
     pub ident_struct: String,
-    pub ident_module: String,
     pub fields: Vec<Field>,
-    pub oneofs: Vec<Oneof>,
     pub bits_length: usize,
 }
 impl Message {
@@ -155,24 +167,16 @@ impl Message {
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         let ident_struct = m.name().to_camel_case().escape_rust_keywords().into();
-        let ident_module = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let mut bits_index = 0usize;
         let fields = m
             .field()
             .into_iter()
             .map(|f| Field::try_new(f, &mut bits_index, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let oneofs = m
-            .oneofs()
-            .into_iter()
-            .map(|o| Oneof::try_new(o, &mut bits_index, resolver))
-            .collect::<Result<Vec<_>>>()?;
         let bits_length = bits_index;
         Ok(Message {
             ident_struct,
-            ident_module,
             fields,
-            oneofs,
             bits_length,
         })
     }
@@ -352,7 +356,8 @@ impl Field {
     }
 }
 
-#[derive(Debug)]
+#[derive(Template, Debug)]
+#[template(path = "oneof.rs.txt")]
 pub struct Oneof {
     pub ident_union: String,
     pub ident_case: String,

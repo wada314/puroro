@@ -92,12 +92,3 @@ impl self::_puroro::Message for Submsg {
         Ok(())
     }
 }
-pub mod submsg {
-
-    mod _puroro {
-        pub use super::super::_puroro::*;
-    }
-    mod _puroro_root {
-        pub use super::super::_puroro_root::*;
-    }
-}
