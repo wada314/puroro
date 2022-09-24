@@ -85,10 +85,7 @@ fn main() -> Result<()> {
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let root_module = Module::try_from_package(
-        resolver.package_contents_or_err(&Package::new(""))?,
-        &mut resolver,
-    )?;
+    let root_module = Module::try_from_package(&Package::new(""), &mut resolver)?;
 
     let modules = {
         let mut queue = vec![&root_module];

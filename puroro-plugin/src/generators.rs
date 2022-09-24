@@ -35,16 +35,20 @@ pub struct Module {
     pub rust_file_path: String,
 }
 impl Module {
-    pub fn try_from_package<'a>(
-        p: &'a PackageContents<'a>,
+    pub fn try_from_package<'a, S: AsRef<str>>(
+        p: &Package<S>,
         resolver: &'a mut DescriptorResolver<'a>,
     ) -> Result<Self> {
-        let ident_module = p.package_name.as_ref().map_or_else(Default::default, |s| {
-            s.to_lower_snake_case().escape_rust_keywords().into()
-        });
-        let is_root_package = p.package_name.is_none();
-        let full_path = p.full_package.as_str().to_string();
-        let subpackages = p
+        let package_contents = resolver.package_contents_or_err(p)?;
+        let ident_module = package_contents
+            .package_name
+            .as_ref()
+            .map_or_else(Default::default, |s| {
+                s.to_lower_snake_case().escape_rust_keywords().into()
+            });
+        let is_root_package = package_contents.package_name.is_none();
+        let full_path = package_contents.full_package.as_str().to_string();
+        let subpackages = package_contents
             .subpackages
             .iter()
             .map(|sp| {
@@ -58,9 +62,9 @@ impl Module {
             .collect::<Result<Vec<_>>>()?;
         let submodules_from_packages = subpackages
             .iter()
-            .map(|p| Module::try_from_package(*p, resolver))
+            .map(|sp| Module::try_from_package(&sp.full_package, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let mut submodules_from_messages = p
+        let mut submodules_from_messages = package_contents
             .input_files
             .iter()
             .flat_map(|f| {
@@ -72,13 +76,13 @@ impl Module {
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
         submodules.append(&mut submodules_from_messages);
-        let messages = p
+        let messages = package_contents
             .input_files
             .iter()
             .flat_map(|f| f.messages().iter())
             .map(|m| Message::try_new(m, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let enums = p
+        let enums = package_contents
             .input_files
             .iter()
             .flat_map(|f| f.enums().into_iter())
@@ -88,7 +92,8 @@ impl Module {
         let rust_file_path = if is_root_package {
             "lib.rs".to_string()
         } else {
-            p.full_package
+            package_contents
+                .full_package
                 .full_package_path()
                 .split('.')
                 .map(|s| s.to_lower_snake_case().into_owned())
