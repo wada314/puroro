@@ -80,14 +80,14 @@ fn main() -> Result<()> {
         .into_iter()
         .map(|f| crate::restructure::File::new(f))
         .collect::<Vec<_>>();
-    let resolver = DescriptorResolver::new(input_files.iter())?;
+    let mut resolver = DescriptorResolver::new(input_files.iter())?;
 
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
     let root_module = Module::try_from_package(
         resolver.package_contents_or_err(&Package::new(""))?,
-        &resolver,
+        &mut resolver,
     )?;
 
     let modules = {
