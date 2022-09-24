@@ -551,7 +551,7 @@ impl WireType {
                 Variant(var) => format!("&[{}]", var.into_owned_rust_type()).into(),
                 LengthDelimited(String) => "&[::std::string::String]".into(),
                 LengthDelimited(Bytes) => "&[::std::vec::Vec<u8>]".into(),
-                LengthDelimited(Message(fqtn)) => format!("&[&{}]", fqtn.to_rust_path()).into(),
+                LengthDelimited(Message(fqtn)) => format!("&[{}]", fqtn.to_rust_path()).into(),
                 Bits32(x) => format!("&[{}]", x.into_owned_rust_type()).into(),
                 Bits64(x) => format!("&[{}]", x.into_owned_rust_type()).into(),
             }

@@ -261,7 +261,7 @@ impl Msg {
         > as NonRepeatedFieldType>::clear(&mut self.submsg_unlabeled, &mut self._bitfield)
     }
     // Repeated, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
-    pub fn submsg_repeated(&self) -> &[&_puroro_root::ser_tests3::_msg::Submsg] {
+    pub fn submsg_repeated(&self) -> &[_puroro_root::ser_tests3::_msg::Submsg] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField<
             _puroro_root::ser_tests3::_msg::Submsg,
