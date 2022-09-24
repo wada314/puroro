@@ -45,7 +45,7 @@ impl self::_puroro::Message for Msg {
         Ok(())
     }
 }
-pub mod _msg {
+pub mod msg {
 
     mod _puroro {
         pub use super::super::_puroro::*;
@@ -408,7 +408,7 @@ impl self::_puroro::Message for Submsg {
         Ok(())
     }
 }
-pub mod _submsg {
+pub mod submsg {
 
     mod _puroro {
         pub use super::super::_puroro::*;

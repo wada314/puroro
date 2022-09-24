@@ -52,7 +52,7 @@ impl<T: AsRef<str>> StrExt for T {
         let src_words = {
             let mut words = Vec::new();
             let mut word = String::new();
-            let mut last_char_was_uppercase = false;
+            let mut last_char_was_uppercase = true;
             for c in self.as_ref().chars() {
                 if c == '_' {
                     words.push(word);

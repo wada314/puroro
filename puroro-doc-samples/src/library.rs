@@ -187,7 +187,7 @@ impl self::_puroro::Message for Book {
         Ok(())
     }
 }
-pub mod _book {
+pub mod book {
 
     mod _puroro {
         pub use super::super::_puroro::*;
@@ -276,7 +276,7 @@ impl self::_puroro::Message for Author {
         Ok(())
     }
 }
-pub mod _author {
+pub mod author {
 
     mod _puroro {
         pub use super::super::_puroro::*;

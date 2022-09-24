@@ -1,6 +1,6 @@
 // A generated source code by puroro library
 // package .ser_tests2.Msg
-pub mod _submsg;
+pub mod submsg;
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -113,7 +113,7 @@ impl self::_puroro::Message for Submsg {
         Ok(())
     }
 }
-pub mod _submsg {
+pub mod submsg {
 
     mod _puroro {
         pub use super::super::_puroro::*;

@@ -1,6 +1,6 @@
 // A generated source code by puroro library
 // package ser_tests3
-pub mod _msg;
+pub mod msg;
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -38,11 +38,11 @@ pub struct Msg {
     string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
     // Singular, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
     submsg_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField<
-        _puroro_root::ser_tests3::_msg::Submsg,
+        _puroro_root::ser_tests3::msg::Submsg,
     >,
     // Repeated, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
     submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField<
-        _puroro_root::ser_tests3::_msg::Submsg,
+        _puroro_root::ser_tests3::msg::Submsg,
     >,
     // Singular, Variant(Enum3(Fqtn(".ser_tests3.Enum")))
     enum_unlabeled: self::_puroro::internal::field_type::SingularNumericalField<
@@ -219,10 +219,10 @@ impl Msg {
         )
     }
     // Singular, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
-    pub fn submsg_unlabeled(&self) -> Option<&_puroro_root::ser_tests3::_msg::Submsg> {
+    pub fn submsg_unlabeled(&self) -> Option<&_puroro_root::ser_tests3::msg::Submsg> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as NonRepeatedFieldType>::get_field(
             &self.submsg_unlabeled,
             &self._bitfield,
@@ -231,23 +231,23 @@ impl Msg {
     }
     pub fn submsg_unlabeled_opt(
         &self,
-    ) -> ::std::option::Option<&_puroro_root::ser_tests3::_msg::Submsg> {
+    ) -> ::std::option::Option<&_puroro_root::ser_tests3::msg::Submsg> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(&self.submsg_unlabeled, &self._bitfield)
     }
     pub fn has_submsg_unlabeled(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(&self.submsg_unlabeled, &self._bitfield)
         .is_some()
     }
-    pub fn submsg_unlabeled_mut(&mut self) -> &mut _puroro_root::ser_tests3::_msg::Submsg {
+    pub fn submsg_unlabeled_mut(&mut self) -> &mut _puroro_root::ser_tests3::msg::Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as NonRepeatedFieldType>::mut_field(
             &mut self.submsg_unlabeled,
             &mut self._bitfield,
@@ -257,28 +257,28 @@ impl Msg {
     pub fn clear_submsg_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as NonRepeatedFieldType>::clear(&mut self.submsg_unlabeled, &mut self._bitfield)
     }
     // Repeated, LengthDelimited(Message(Fqtn(".ser_tests3.Msg.Submsg")))
-    pub fn submsg_repeated(&self) -> &[_puroro_root::ser_tests3::_msg::Submsg] {
+    pub fn submsg_repeated(&self) -> &[_puroro_root::ser_tests3::msg::Submsg] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as RepeatedFieldType>::get_field(&self.submsg_repeated, &self._bitfield)
     }
     pub fn submsg_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec<_puroro_root::ser_tests3::_msg::Submsg> {
+    ) -> &mut ::std::vec::Vec<_puroro_root::ser_tests3::msg::Submsg> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as RepeatedFieldType>::mut_field(&mut self.submsg_repeated, &mut self._bitfield)
     }
     pub fn clear_submsg_repeated(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField<
-            _puroro_root::ser_tests3::_msg::Submsg,
+            _puroro_root::ser_tests3::msg::Submsg,
         > as RepeatedFieldType>::clear(&mut self.submsg_repeated, &mut self._bitfield)
     }
     // Singular, Variant(Enum3(Fqtn(".ser_tests3.Enum")))
@@ -447,14 +447,14 @@ impl self::_puroro::Message for Msg {
                     _field_data,
                 )?,
                 7 => <
-                    self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::ser_tests3::_msg::Submsg> as self::_puroro::internal::field_type::FieldType
+                    self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::ser_tests3::msg::Submsg> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.submsg_unlabeled,
                     &mut self._bitfield,
                     _field_data,
                 )?,
                 8 => <
-                    self::_puroro::internal::field_type::RepeatedMessageField<_puroro_root::ser_tests3::_msg::Submsg> as self::_puroro::internal::field_type::FieldType
+                    self::_puroro::internal::field_type::RepeatedMessageField<_puroro_root::ser_tests3::msg::Submsg> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.submsg_repeated,
                     &mut self._bitfield,
@@ -487,7 +487,7 @@ impl self::_puroro::Message for Msg {
         Ok(())
     }
 }
-pub mod _msg {
+pub mod msg {
 
     mod _puroro {
         pub use super::super::_puroro::*;

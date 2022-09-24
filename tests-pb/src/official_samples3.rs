@@ -88,7 +88,7 @@ impl self::_puroro::Message for Test1 {
         Ok(())
     }
 }
-pub mod _test1 {
+pub mod test1 {
 
     mod _puroro {
         pub use super::super::_puroro::*;
@@ -177,7 +177,7 @@ impl self::_puroro::Message for Test2 {
         Ok(())
     }
 }
-pub mod _test2 {
+pub mod test2 {
 
     mod _puroro {
         pub use super::super::_puroro::*;
@@ -276,7 +276,7 @@ impl self::_puroro::Message for Test3 {
         Ok(())
     }
 }
-pub mod _test3 {
+pub mod test3 {
 
     mod _puroro {
         pub use super::super::_puroro::*;
@@ -353,7 +353,7 @@ impl self::_puroro::Message for Test4 {
         Ok(())
     }
 }
-pub mod _test4 {
+pub mod test4 {
 
     mod _puroro {
         pub use super::super::_puroro::*;
