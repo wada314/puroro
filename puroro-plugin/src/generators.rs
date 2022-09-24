@@ -119,21 +119,17 @@ impl Module {
             .into_iter()
             .map(|d| Module::try_from_message(d, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let messages_and_its_oneofs = m
+        let messages = m
             .messages()
             .into_iter()
-            .map(|submessage| {
-                let mut m_gen = Message::try_new(submessage, resolver)?;
-                let oneofs = submessage
-                    .oneofs()
-                    .into_iter()
-                    .map(|o| Oneof::try_new(o, &mut m_gen.bits_length, resolver))
-                    .collect::<Result<Vec<_>>>()?;
-                Ok((m_gen, oneofs))
-            })
+            .map(|submessage| Message::try_new(submessage, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let (messages, oneof_lists): (Vec<_>, Vec<_>) = messages_and_its_oneofs.into_iter().unzip();
-        let oneofs = oneof_lists.into_iter().flatten().collect::<Vec<_>>();
+        let mut todo_bits_length = 0usize; // TODO!!!!!
+        let oneofs = m
+            .oneofs()
+            .into_iter()
+            .map(|o| Oneof::try_new(o, &mut todo_bits_length, resolver))
+            .collect::<Result<Vec<_>>>()?;
         let enums = m
             .enums()
             .into_iter()
