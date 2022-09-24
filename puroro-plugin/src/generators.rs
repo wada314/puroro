@@ -83,13 +83,16 @@ impl Module {
             .flat_map(|f| f.enums().into_iter())
             .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
-        let rust_file_path = p
-            .full_package
-            .full_package_path()
-            .split('.')
-            .map(|s| s.to_lower_snake_case().into_owned())
-            .join("/")
-            + ".rs";
+        let rust_file_path = if is_root_package {
+            "lib.rs".to_string()
+        } else {
+            p.full_package
+                .full_package_path()
+                .split('.')
+                .map(|s| s.to_lower_snake_case().into_owned())
+                .join("/")
+                + ".rs"
+        };
         Ok(Module {
             ident_module,
             is_root_package,
