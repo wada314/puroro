@@ -117,6 +117,8 @@ pub mod {{ ident_module }} {
         pub use super::super::_puroro_root::*;
     }
 
+    
+
     {%- for oneof in oneofs %}
     {#- Oneof union. Includes None case #}
     pub(crate) union {{ oneof.ident_union }} {

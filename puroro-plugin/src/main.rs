@@ -47,6 +47,7 @@ fn package_to_filename(package: &str) -> String {
     if package.is_empty() {
         "lib.rs".to_string()
     } else {
+        // TODO: Needs case conversion
         package.split('.').join("/") + ".rs"
     }
 }
