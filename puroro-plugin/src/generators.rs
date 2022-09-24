@@ -296,8 +296,14 @@ impl Field {
                 (Singular, LengthDelimited(String)) => {
                     format!("SingularStringField")
                 }
+                (Repeated, LengthDelimited(String)) => {
+                    format!("RepeatedStringField")
+                }
                 (Optional | Singular, LengthDelimited(Message(fqtn))) => {
                     format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
+                }
+                (Repeated, LengthDelimited(Message(fqtn))) => {
+                    format!("RepeatedMessageField<{}>", fqtn.to_rust_path())
                 }
                 _ => format!("Dummy"), // TODO
             }
@@ -532,7 +538,9 @@ impl WireType {
         if is_repeated {
             match self {
                 Variant(var) => format!("&[{}]", var.into_owned_rust_type()).into(),
-                LengthDelimited(_) => "&[()]".into(), // TODO
+                LengthDelimited(String) => "&[::std::string::String]".into(),
+                LengthDelimited(Bytes) => "&[::std::vec::Vec<u8>]".into(),
+                LengthDelimited(Message(fqtn)) => format!("&[&{}]", fqtn.to_rust_path()).into(),
                 Bits32(x) => format!("&[{}]", x.into_owned_rust_type()).into(),
                 Bits64(x) => format!("&[{}]", x.into_owned_rust_type()).into(),
             }
