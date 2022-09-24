@@ -27,7 +27,6 @@ use self::generators::Module;
 use crate::descriptor_resolver::DescriptorResolver;
 use crate::utils::Package;
 use ::askama::Template as _;
-use ::itertools::Itertools;
 use ::puroro::Message;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::{
     Feature, File,
@@ -42,15 +41,6 @@ use ::std::process::Stdio;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
-
-fn package_to_filename(package: &str) -> String {
-    if package.is_empty() {
-        "lib.rs".to_string()
-    } else {
-        // TODO: Needs case conversion
-        package.split('.').join("/") + ".rs"
-    }
-}
 
 fn format_rust_file(input: &str) -> Option<String> {
     use ::std::io::Write as _;
@@ -111,7 +101,7 @@ fn main() -> Result<()> {
     };
 
     for module in modules {
-        let filename = package_to_filename(&module.fqtn);
+        let filename = &module.rust_file_path;
         // Do render!
         let mut contents = module.render().unwrap();
         if let Some(new_contents) = format_rust_file(&contents) {

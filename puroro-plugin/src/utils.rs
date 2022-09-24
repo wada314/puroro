@@ -13,11 +13,12 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
-use std::fmt::Display;
+use ::std::fmt::Display;
 
 #[derive(Debug, Clone, Copy)]
 #[allow(unused)]
@@ -308,6 +309,16 @@ impl<S: AsRef<str>> Fqtn<S> {
         result.push_str("::");
         result.push_str(&escaped_leaf);
         result
+    }
+
+    pub fn to_rust_module_file_path(&self) -> String {
+        assert!(self.0.as_ref().starts_with('.'));
+        let absl_path = &self.0.as_ref()[1..];
+        absl_path
+            .split('.')
+            .map(|s| s.to_lower_snake_case().into_owned())
+            .join("/")
+            + ".rs"
     }
 }
 impl<S: Display> Display for Fqtn<S> {

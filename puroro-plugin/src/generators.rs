@@ -31,6 +31,7 @@ pub struct Module {
     pub submodules: Vec<Module>,
     pub messages: Vec<Message>,
     pub enums: Vec<Enum>,
+    pub rust_file_path: String,
 }
 impl Module {
     pub fn try_from_package<'a>(
@@ -82,6 +83,13 @@ impl Module {
             .flat_map(|f| f.enums().into_iter())
             .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let rust_file_path = p
+            .full_package
+            .full_package_path()
+            .split('.')
+            .map(|s| s.to_lower_snake_case().into_owned())
+            .join("/")
+            + ".rs";
         Ok(Module {
             ident_module,
             is_root_package,
@@ -89,6 +97,7 @@ impl Module {
             submodules,
             messages,
             enums,
+            rust_file_path,
         })
     }
 
@@ -96,7 +105,7 @@ impl Module {
         m: &'a re::Message<'a>,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
-        let ident = m.name().to_lower_snake_case().escape_rust_keywords().into();
+        let ident_module = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
         let fqtn = m.fqtn().to_string();
         let submodules = m
@@ -114,13 +123,15 @@ impl Module {
             .into_iter()
             .map(|e| Enum::try_new(e, resolver))
             .collect::<Result<Vec<_>>>()?;
+        let rust_file_path = m.fqtn().to_rust_module_file_path();
         Ok(Module {
-            ident_module: ident,
+            ident_module,
             is_root_package,
             fqtn,
             submodules,
             messages,
             enums,
+            rust_file_path,
         })
     }
 }
