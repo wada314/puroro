@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor_resolver::{DescriptorResolver, PackageContents};
+pub mod state;
+pub use self::state::State;
+
+use crate::descriptor_resolver::DescriptorResolver;
 use crate::restructure as re;
 pub use crate::restructure::Syntax;
 use crate::utils::{Fqtn, Package, StrExt as _};
@@ -37,7 +40,8 @@ pub struct Module {
 impl Module {
     pub fn try_from_package<'a, S: AsRef<str>>(
         p: &Package<S>,
-        resolver: &'a mut DescriptorResolver<'a>,
+        resolver: &'a DescriptorResolver<'a>,
+        state: &mut State,
     ) -> Result<Self> {
         let package_contents = resolver.package_contents_or_err(p)?;
         let ident_module = package_contents
@@ -62,16 +66,13 @@ impl Module {
             .collect::<Result<Vec<_>>>()?;
         let submodules_from_packages = subpackages
             .iter()
-            .map(|sp| Module::try_from_package(&sp.full_package, resolver))
+            .map(|sp| Module::try_from_package(&sp.full_package, resolver, state))
             .collect::<Result<Vec<_>>>()?;
         let mut submodules_from_messages = package_contents
             .input_files
             .iter()
-            .flat_map(|f| {
-                f.messages()
-                    .iter()
-                    .map(|m| Module::try_from_message(m, resolver))
-            })
+            .flat_map(|f| f.messages().iter())
+            .map(|m| Module::try_from_message(m, resolver, state))
             .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty() || !m.oneofs.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
@@ -80,7 +81,7 @@ impl Module {
             .input_files
             .iter()
             .flat_map(|f| f.messages().iter())
-            .map(|m| Message::try_new(m, resolver))
+            .map(|m| Message::try_new(m, resolver, state))
             .collect::<Result<Vec<_>>>()?;
         let enums = package_contents
             .input_files
@@ -114,7 +115,8 @@ impl Module {
 
     pub fn try_from_message<'a>(
         m: &'a re::Message<'a>,
-        resolver: &'a mut DescriptorResolver<'a>,
+        resolver: &'a DescriptorResolver<'a>,
+        state: &mut State,
     ) -> Result<Self> {
         let ident_module = m.name().to_lower_snake_case().escape_rust_keywords().into();
         let is_root_package = false;
@@ -122,17 +124,17 @@ impl Module {
         let submodules = m
             .messages()
             .into_iter()
-            .map(|d| Module::try_from_message(d, resolver))
+            .map(|d| Module::try_from_message(d, resolver, state))
             .collect::<Result<Vec<_>>>()?;
         let messages = m
             .messages()
             .into_iter()
-            .map(|submessage| Message::try_new(submessage, resolver))
+            .map(|submessage| Message::try_new(submessage, resolver, state))
             .collect::<Result<Vec<_>>>()?;
         let oneofs = m
             .oneofs()
             .into_iter()
-            .map(|o| Oneof::try_new(o, resolver))
+            .map(|o| Oneof::try_new(o, resolver, state))
             .collect::<Result<Vec<_>>>()?;
         let enums = m
             .enums()
@@ -164,15 +166,16 @@ impl Message {
     #[allow(unused)]
     pub fn try_new<'a>(
         m: &'a re::Message<'a>,
-        resolver: &'a mut DescriptorResolver<'a>,
+        resolver: &'a DescriptorResolver<'a>,
+        state: &mut State,
     ) -> Result<Self> {
         let ident_struct = m.name().to_camel_case().escape_rust_keywords().into();
         let fields = m
             .field()
             .into_iter()
-            .map(|f| Field::try_new(f, resolver))
+            .map(|f| Field::try_new(f, resolver, state))
             .collect::<Result<Vec<_>>>()?;
-        let bits_length = resolver
+        let bits_length = state
             .fqtn_to_bit_slice_allocation_mut(&m.fqtn())
             .finalize()?;
         Ok(Message {
@@ -192,10 +195,7 @@ pub struct Enum {
 }
 
 impl Enum {
-    pub fn try_new<'a>(
-        e: &'a re::Enum<'a>,
-        resolver: &'a mut DescriptorResolver<'a>,
-    ) -> Result<Self> {
+    pub fn try_new<'a>(e: &'a re::Enum<'a>, resolver: &'a DescriptorResolver<'a>) -> Result<Self> {
         let ident_enum = e.name().to_camel_case().escape_rust_keywords().into_owned();
         let values = e
             .values()
@@ -219,7 +219,7 @@ pub struct EnumValue {
 impl EnumValue {
     pub fn try_new<'a>(
         v: &'a re::EnumValue<'a>,
-        _resolver: &'a mut DescriptorResolver<'a>,
+        _resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         let ident_enum_item = v.name().to_camel_case().escape_rust_keywords().into_owned();
         let number = v.number();
@@ -250,7 +250,8 @@ pub struct Field {
 impl Field {
     pub fn try_new<'a>(
         f: &'a re::Field<'a>,
-        resolver: &'a mut DescriptorResolver<'a>,
+        resolver: &'a DescriptorResolver<'a>,
+        state: &mut State,
     ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Label::*;
 
@@ -277,7 +278,7 @@ impl Field {
             })?,
         };
         let wire_type = WireType::from_field(f, resolver)?;
-        let bit_index = resolver
+        let bit_index = state
             .fqtn_to_bit_slice_allocation_mut(&f.parent().fqtn())
             .bit_slice_len_mut()?;
         let bit_index_for_optional = {
@@ -375,7 +376,11 @@ pub struct Oneof {
     pub num_fields: usize,
 }
 impl Oneof {
-    pub fn try_new<'a>(o: &'a re::Oneof<'a>, resolver: &'a mut DescriptorResolver) -> Result<Self> {
+    pub fn try_new<'a>(
+        o: &'a re::Oneof<'a>,
+        resolver: &'a DescriptorResolver,
+        state: &mut State,
+    ) -> Result<Self> {
         let ident_union = o.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_case = format!("{}Case", o.name().to_camel_case());
         let ident_case_ref = format!("{}CaseRef", o.name().to_camel_case());
@@ -392,7 +397,7 @@ impl Oneof {
             .any(|f| matches!(f.r#type(), TypeBytes | TypeString | TypeMessage));
         let num_fields = fields.len();
         let num_bits = usize::BITS - num_fields.leading_zeros();
-        let bit_index = resolver
+        let bit_index = state
             .fqtn_to_bit_slice_allocation_mut(&o.parent().fqtn())
             .bit_slice_len_mut()?;
         let bitfield_start = *bit_index;
@@ -430,7 +435,7 @@ impl OneofField {
     pub fn try_new<'a>(
         f: &'a re::OneofField<'a>,
         index: usize,
-        resolver: &'a mut DescriptorResolver,
+        resolver: &'a DescriptorResolver,
     ) -> Result<Self> {
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_union_item = f
@@ -501,17 +506,14 @@ pub enum WireType {
 }
 
 impl WireType {
-    fn from_field<'a>(
-        field: &'a re::Field<'a>,
-        _resolver: &'a mut DescriptorResolver,
-    ) -> Result<Self> {
+    fn from_field<'a>(field: &'a re::Field<'a>, _resolver: &'a DescriptorResolver) -> Result<Self> {
         let fqtn = field.fqtn().clone();
         let syntax = field.parent().file().try_syntax()?;
         Self::try_new(field.proto().r#type(), fqtn.as_ref(), syntax)
     }
     fn from_oneof_field<'a>(
         field: &'a re::OneofField<'a>,
-        _resolver: &'a mut DescriptorResolver,
+        _resolver: &'a DescriptorResolver,
     ) -> Result<Self> {
         let fqtn = field.fqtn().clone();
         let syntax = field.parent().parent().file().try_syntax()?;

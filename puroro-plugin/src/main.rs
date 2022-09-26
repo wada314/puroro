@@ -23,7 +23,7 @@ mod generators;
 mod restructure;
 mod utils;
 
-use self::generators::Module;
+use self::generators::{Module, State};
 use crate::descriptor_resolver::DescriptorResolver;
 use crate::utils::Package;
 use ::askama::Template as _;
@@ -80,12 +80,13 @@ fn main() -> Result<()> {
         .into_iter()
         .map(|f| crate::restructure::File::new(f))
         .collect::<Vec<_>>();
-    let mut resolver = DescriptorResolver::new(input_files.iter())?;
+    let resolver = DescriptorResolver::new(input_files.iter())?;
 
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let root_module = Module::try_from_package(&Package::new(""), &mut resolver)?;
+    let mut state = State::default();
+    let root_module = Module::try_from_package(&Package::new(""), &resolver, &mut state)?;
 
     let modules = {
         let mut queue = vec![&root_module];

@@ -12,7 +12,7 @@ pub mod _puroro {
 
 #[derive(Default, Clone)]
 pub struct Msg {
-    _bitfield: self::_puroro::bitvec::BitArray<0>,
+    _bitfield: self::_puroro::bitvec::BitArray<1>,
 }
 
 impl Msg {}

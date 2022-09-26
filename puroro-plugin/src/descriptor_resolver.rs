@@ -22,7 +22,6 @@ use ::std::fmt::Debug;
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
     fqtn_to_desc_map: HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
-    fqtn_to_bit_slice_allocation_map: HashMap<Fqtn<String>, BitSliceAllocation>,
     package_contents: HashMap<Package<String>, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
@@ -32,14 +31,12 @@ impl<'a> DescriptorResolver<'a> {
     {
         let mut fqtn_to_desc_map = HashMap::new();
         let mut package_contents = HashMap::new();
-        let fqtn_to_bit_slice_allocation_map = HashMap::new();
         for f in input_files {
             Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
             Self::generate_package_contents(&mut package_contents, f);
         }
         Ok(Self {
             fqtn_to_desc_map,
-            fqtn_to_bit_slice_allocation_map,
             package_contents,
         })
     }
@@ -96,15 +93,6 @@ impl<'a> DescriptorResolver<'a> {
         })?)
     }
 
-    pub fn fqtn_to_bit_slice_allocation_mut<S: AsRef<str>>(
-        &mut self,
-        fqtn: &Fqtn<S>,
-    ) -> &mut BitSliceAllocation {
-        self.fqtn_to_bit_slice_allocation_map
-            .entry(fqtn.to_owned())
-            .or_default()
-    }
-
     pub fn package_contents<S: AsRef<str>>(
         &self,
         package: &Package<S>,
@@ -135,30 +123,4 @@ pub struct PackageContents<'a> {
     pub full_package: Package<String>,
     pub subpackages: Vec<String>,
     pub input_files: Vec<File<'a>>,
-}
-
-#[derive(Debug, Default)]
-pub struct BitSliceAllocation {
-    bit_slice_len: usize,
-    finalized: bool,
-}
-impl BitSliceAllocation {
-    pub fn bit_slice_len_mut(&mut self) -> Result<&mut usize> {
-        if self.finalized {
-            Err(ErrorKind::InternalError {
-                detail: "Bad allocation order for bitslice.".to_string(),
-            })?
-        } else {
-            Ok(&mut self.bit_slice_len)
-        }
-    }
-    pub fn finalize(&mut self) -> Result<usize> {
-        if self.finalized {
-            Err(ErrorKind::InternalError {
-                detail: "Multiple .finalize() call for bitslice allocation".to_string(),
-            })?
-        }
-        self.finalized = true;
-        Ok(self.bit_slice_len)
-    }
 }
