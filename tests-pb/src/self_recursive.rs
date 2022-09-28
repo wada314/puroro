@@ -123,3 +123,7 @@ impl ::std::fmt::Debug for Msg {
             .finish()
     }
 }
+
+impl ::std::ops::Drop for Msg {
+    fn drop(&mut self) {}
+}

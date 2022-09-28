@@ -173,6 +173,10 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::ops::Drop for Msg {
+    fn drop(&mut self) {}
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
     ValueSeven,

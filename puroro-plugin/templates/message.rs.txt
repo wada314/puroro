@@ -139,3 +139,12 @@ impl ::std::fmt::Debug for {{ ident_struct }} {
             .finish()
     }
 }
+
+impl ::std::ops::Drop for {{ ident_struct }} {
+    fn drop(&mut self) {
+        {#- We need to explicitly clear the oneof unions. #}
+        {%- for oneof in oneofs %}
+        self.{{ oneof.ident_struct_field }}._clear(&mut self._bitfield);
+        {%- endfor %} {#- for oneof in oneofs #}
+    }
+}

@@ -77,6 +77,14 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::ops::Drop for Msg {
+    fn drop(&mut self) {
+        self.group_one._clear(&mut self._bitfield);
+        self.group_two._clear(&mut self._bitfield);
+        self.group_three._clear(&mut self._bitfield);
+    }
+}
+
 #[derive(Default)]
 pub struct Submsg {
     // Optional, Variant(Int32)
@@ -202,4 +210,8 @@ impl ::std::fmt::Debug for Submsg {
             .field("i32_optional", &self.i32_optional())
             .finish()
     }
+}
+
+impl ::std::ops::Drop for Submsg {
+    fn drop(&mut self) {}
 }

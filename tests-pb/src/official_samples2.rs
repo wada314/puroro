@@ -134,6 +134,10 @@ impl ::std::fmt::Debug for Test1 {
     }
 }
 
+impl ::std::ops::Drop for Test1 {
+    fn drop(&mut self) {}
+}
+
 #[derive(Default)]
 pub struct Test2 {
     // Optional, LengthDelimited(String)
@@ -233,6 +237,10 @@ impl ::std::fmt::Debug for Test2 {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct("Test2").field("b", &self.b()).finish()
     }
+}
+
+impl ::std::ops::Drop for Test2 {
+    fn drop(&mut self) {}
 }
 
 #[derive(Default)]
@@ -346,6 +354,10 @@ impl ::std::fmt::Debug for Test3 {
     }
 }
 
+impl ::std::ops::Drop for Test3 {
+    fn drop(&mut self) {}
+}
+
 #[derive(Default)]
 pub struct Test4 {
     // Repeated, Variant(Int32)
@@ -433,4 +445,8 @@ impl ::std::fmt::Debug for Test4 {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct("Test4").field("d", &self.d()).finish()
     }
+}
+
+impl ::std::ops::Drop for Test4 {
+    fn drop(&mut self) {}
 }

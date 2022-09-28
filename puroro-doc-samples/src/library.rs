@@ -215,6 +215,10 @@ impl ::std::fmt::Debug for Book {
     }
 }
 
+impl ::std::ops::Drop for Book {
+    fn drop(&mut self) {}
+}
+
 #[derive(Default)]
 pub struct Author {
     // Singular, LengthDelimited(String)
@@ -316,4 +320,8 @@ impl ::std::fmt::Debug for Author {
             .field("name", &self.name())
             .finish()
     }
+}
+
+impl ::std::ops::Drop for Author {
+    fn drop(&mut self) {}
 }

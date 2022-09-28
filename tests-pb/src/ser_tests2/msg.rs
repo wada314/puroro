@@ -136,3 +136,7 @@ impl ::std::fmt::Debug for Submsg {
             .finish()
     }
 }
+
+impl ::std::ops::Drop for Submsg {
+    fn drop(&mut self) {}
+}
