@@ -24,6 +24,7 @@ use ::askama::Template;
 use ::itertools::Itertools;
 use ::puroro_protobuf_compiled::google;
 use ::std::borrow::Cow;
+use ::std::rc::Rc;
 
 #[derive(Template, Debug)]
 #[template(path = "module.rs.txt")]
@@ -34,7 +35,7 @@ pub struct Module {
     pub submodules: Vec<Module>,
     pub messages: Vec<Message>,
     pub enums: Vec<Enum>,
-    pub oneofs: Vec<Oneof>,
+    pub oneofs: Vec<Rc<Oneof>>,
     pub rust_file_path: String,
 }
 impl Module {
@@ -134,7 +135,7 @@ impl Module {
         let oneofs = m
             .oneofs()
             .into_iter()
-            .map(|o| Oneof::try_new(o, resolver, state))
+            .map(|o| Oneof::try_new(o, resolver, state).map(Rc::new))
             .collect::<Result<Vec<_>>>()?;
         let enums = m
             .enums()
