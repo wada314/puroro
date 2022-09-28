@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::Message;
+use super::{Enum, Message};
 use crate::descriptor_resolver::DescriptorResolver;
-use crate::restructure::MessageOrEnumRef;
 pub use crate::restructure::Syntax;
 use crate::utils::Fqtn;
 use crate::{ErrorKind, Result};
@@ -25,6 +24,7 @@ use ::std::rc::Rc;
 #[derive(Debug, Default)]
 pub struct State {
     fqtn_to_generated_message_map: HashMap<Fqtn, Rc<Message>>,
+    fqtn_to_generated_enum_map: HashMap<Fqtn, Rc<Enum>>,
     fqtn_to_bit_slice_allocation_map: HashMap<Fqtn, BitSliceAllocation>,
 }
 impl State {
@@ -45,6 +45,22 @@ impl State {
             let message_desc = resolver.fqtn_to_message(fqtn)?;
             let generated = Rc::new(Message::try_new(&message_desc, resolver, self)?);
             self.fqtn_to_generated_message_map
+                .insert(fqtn.clone(), Rc::clone(&generated));
+            Ok(generated)
+        }
+    }
+
+    pub fn fqtn_to_generated_enum<'a>(
+        &mut self,
+        fqtn: &Fqtn,
+        resolver: &'a DescriptorResolver<'a>,
+    ) -> Result<Rc<Enum>> {
+        if let Some(found) = self.fqtn_to_generated_enum_map.get(fqtn) {
+            Ok(Rc::clone(found))
+        } else {
+            let enum_desc = resolver.fqtn_to_enum(fqtn)?;
+            let generated = Rc::new(Enum::try_new(&enum_desc, resolver)?);
+            self.fqtn_to_generated_enum_map
                 .insert(fqtn.clone(), Rc::clone(&generated));
             Ok(generated)
         }
