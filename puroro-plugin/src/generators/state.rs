@@ -18,12 +18,14 @@ use crate::restructure::MessageOrEnumRef;
 pub use crate::restructure::Syntax;
 use crate::utils::Fqtn;
 use crate::{ErrorKind, Result};
+use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
+use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 #[derive(Debug, Default)]
 pub struct State {
-    fqtn_to_generated_message_map: HashMap<Fqtn<String>, Rc<Message>>,
+    fqtn_to_generated_message_map: HashMap<String, Rc<Message>>,
     fqtn_to_bit_slice_allocation_map: HashMap<Fqtn<String>, BitSliceAllocation>,
 }
 impl State {
@@ -36,12 +38,20 @@ impl State {
             .or_default()
     }
 
-    pub fn fqtn_to_generated_message<S: AsRef<str>>(
+    pub fn fqtn_to_generated_message<'a, S: AsRef<str> + Borrow<str> + Debug>(
         &mut self,
         fqtn: &Fqtn<S>,
-        resolver: &DescriptorResolver,
+        resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Rc<Message>> {
-        todo!()
+        if let Some(found) = self.fqtn_to_generated_message_map.get(fqtn.as_str()) {
+            Ok(Rc::clone(found))
+        } else {
+            let message_desc = resolver.fqtn_to_message(fqtn)?;
+            let generated = Rc::new(Message::try_new(&message_desc, resolver, self)?);
+            self.fqtn_to_generated_message_map
+                .insert(fqtn.as_str().to_string(), Rc::clone(&generated));
+            Ok(generated)
+        }
     }
 }
 

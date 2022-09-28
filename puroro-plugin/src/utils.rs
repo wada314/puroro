@@ -290,6 +290,10 @@ impl<S: AsRef<str>> Fqtn<S> {
         Fqtn(self.0.as_ref())
     }
 
+    pub fn as_str(&self) -> &str {
+        self.0.as_ref()
+    }
+
     pub fn to_rust_path(&self) -> String {
         assert!(self.0.as_ref().starts_with('.'));
         let absl_path = &self.0.as_ref()[1..];

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::restructure::{File, MessageOrEnumRef};
+use crate::restructure::{Enum, File, Message, MessageOrEnumRef};
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::std::borrow::Borrow;
@@ -83,7 +83,6 @@ impl<'a> DescriptorResolver<'a> {
         self.fqtn_to_desc_map.get::<str>(fqtn.borrow()).cloned()
     }
 
-    #[allow(unused)]
     pub fn fqtn_to_desc_or_err<S: Borrow<str> + Debug>(
         &self,
         fqtn: &Fqtn<S>,
@@ -91,6 +90,27 @@ impl<'a> DescriptorResolver<'a> {
         Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
             name: format!("{:?}", fqtn),
         })?)
+    }
+
+    pub fn fqtn_to_message<S: Borrow<str> + Debug>(
+        &self,
+        fqtn: &Fqtn<S>,
+    ) -> Result<&'a Message<'a>> {
+        match self.fqtn_to_desc_or_err(fqtn)? {
+            MessageOrEnumRef::Message(m) => Ok(m),
+            MessageOrEnumRef::Enum(_) => Err(ErrorKind::UnknownTypeName {
+                name: format!("Message {:?}", fqtn),
+            })?,
+        }
+    }
+
+    pub fn fqtn_to_enum<S: Borrow<str> + Debug>(&self, fqtn: &Fqtn<S>) -> Result<&'a Enum<'a>> {
+        match self.fqtn_to_desc_or_err(fqtn)? {
+            MessageOrEnumRef::Enum(e) => Ok(e),
+            MessageOrEnumRef::Message(_) => Err(ErrorKind::UnknownTypeName {
+                name: format!("Enum {:?}", fqtn),
+            })?,
+        }
     }
 
     pub fn package_contents<S: AsRef<str>>(
