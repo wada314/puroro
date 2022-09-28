@@ -164,7 +164,6 @@ pub struct Message {
     pub bits_length: usize,
 }
 impl Message {
-    #[allow(unused)]
     pub fn try_new<'a>(
         m: &'a re::Message<'a>,
         resolver: &'a DescriptorResolver<'a>,
