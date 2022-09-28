@@ -22,3 +22,8 @@ pub trait OneofCase: Sized {
         Self::from_u32(b.get_range(Self::BITFIELD_BEGIN..Self::BITFIELD_END))
     }
 }
+
+pub trait OneofCaseRef {
+    type Case: OneofCase;
+    // TODO??
+}
