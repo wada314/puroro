@@ -112,3 +112,14 @@ impl ::std::clone::Clone for Msg {
         }
     }
 }
+
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Msg")
+            .field("recursive_unlabeled", &self.recursive_unlabeled())
+            .finish()
+    }
+}

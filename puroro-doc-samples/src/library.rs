@@ -202,6 +202,19 @@ impl ::std::clone::Clone for Book {
     }
 }
 
+impl ::std::fmt::Debug for Book {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Book")
+            .field("title", &self.title())
+            .field("num_pages", &self.num_pages())
+            .field("author", &self.author())
+            .finish()
+    }
+}
+
 #[derive(Default)]
 pub struct Author {
     // Singular, LengthDelimited(String)
@@ -291,5 +304,16 @@ impl ::std::clone::Clone for Author {
 
             _bitfield: Clone::clone(&self._bitfield),
         }
+    }
+}
+
+impl ::std::fmt::Debug for Author {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Author")
+            .field("name", &self.name())
+            .finish()
     }
 }

@@ -95,10 +95,10 @@ impl GroupOne {
 
         match self::GroupOneCase::from_bitslice(bits) {
             Some(GroupOneCase::G1Int32) => Self {
-                g1_int32: Clone::clone(&self.g1_int32),
+                g1_int32: Clone::clone(unsafe { &self.g1_int32 }),
             },
             Some(GroupOneCase::G1String) => Self {
-                g1_string: Clone::clone(&self.g1_string),
+                g1_string: Clone::clone(unsafe { &self.g1_string }),
             },
             _ => Self { _none: () },
         }
@@ -234,13 +234,13 @@ impl GroupTwo {
 
         match self::GroupTwoCase::from_bitslice(bits) {
             Some(GroupTwoCase::G2F32) => Self {
-                g2_f32: Clone::clone(&self.g2_f32),
+                g2_f32: Clone::clone(unsafe { &self.g2_f32 }),
             },
             Some(GroupTwoCase::G2String) => Self {
-                g2_string: Clone::clone(&self.g2_string),
+                g2_string: Clone::clone(unsafe { &self.g2_string }),
             },
             Some(GroupTwoCase::G2Submsg) => Self {
-                g2_submsg: Clone::clone(&self.g2_submsg),
+                g2_submsg: Clone::clone(unsafe { &self.g2_submsg }),
             },
             _ => Self { _none: () },
         }
@@ -329,7 +329,7 @@ impl GroupThree {
 
         match self::GroupThreeCase::from_bitslice(bits) {
             Some(GroupThreeCase::G3Int32) => Self {
-                g3_int32: Clone::clone(&self.g3_int32),
+                g3_int32: Clone::clone(unsafe { &self.g3_int32 }),
             },
             _ => Self { _none: () },
         }

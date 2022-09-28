@@ -101,6 +101,15 @@ impl ::std::clone::Clone for Test1 {
     }
 }
 
+impl ::std::fmt::Debug for Test1 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Test1").field("a", &self.a()).finish()
+    }
+}
+
 #[derive(Default)]
 pub struct Test2 {
     // Singular, LengthDelimited(String)
@@ -190,6 +199,15 @@ impl ::std::clone::Clone for Test2 {
 
             _bitfield: Clone::clone(&self._bitfield),
         }
+    }
+}
+
+impl ::std::fmt::Debug for Test2 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Test2").field("b", &self.b()).finish()
     }
 }
 
@@ -295,6 +313,15 @@ impl ::std::clone::Clone for Test3 {
     }
 }
 
+impl ::std::fmt::Debug for Test3 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Test3").field("c", &self.c()).finish()
+    }
+}
+
 #[derive(Default)]
 pub struct Test4 {
     // Repeated, Variant(Int32)
@@ -372,5 +399,14 @@ impl ::std::clone::Clone for Test4 {
 
             _bitfield: Clone::clone(&self._bitfield),
         }
+    }
+}
+
+impl ::std::fmt::Debug for Test4 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Test4").field("d", &self.d()).finish()
     }
 }

@@ -582,6 +582,27 @@ impl ::std::clone::Clone for Msg {
     }
 }
 
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Msg")
+            .field("i32_optional", &self.i32_optional())
+            .field("i32_repeated", &self.i32_repeated())
+            .field("float_optional", &self.float_optional())
+            .field("float_repeated", &self.float_repeated())
+            .field("string_optional", &self.string_optional())
+            .field("string_repeated", &self.string_repeated())
+            .field("submsg_optional", &self.submsg_optional())
+            .field("submsg_repeated", &self.submsg_repeated())
+            .field("enum_optional", &self.enum_optional())
+            .field("enum_repeated", &self.enum_repeated())
+            .field("very_large_field_number", &self.very_large_field_number())
+            .finish()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
     ZEROTH,

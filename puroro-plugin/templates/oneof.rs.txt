@@ -77,7 +77,7 @@ impl {{ ident_union }} {
             {%- for field in fields %}
             Some({{ ident_case  }}::{{ field.ident_enum_item }}) => {
                 Self {
-                    {{ field.ident_union_item }}: Clone::clone(&self.{{ field.ident_union_item }}),
+                    {{ field.ident_union_item }}: Clone::clone(unsafe { &self.{{ field.ident_union_item }} }),
                 }
             }
             {%- endfor %} {#- for field in fields #}

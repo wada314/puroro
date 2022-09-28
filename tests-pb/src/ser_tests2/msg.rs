@@ -125,3 +125,14 @@ impl ::std::clone::Clone for Submsg {
         }
     }
 }
+
+impl ::std::fmt::Debug for Submsg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Submsg")
+            .field("i32_optional", &self.i32_optional())
+            .finish()
+    }
+}

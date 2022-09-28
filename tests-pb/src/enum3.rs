@@ -220,6 +220,19 @@ impl ::std::clone::Clone for Msg {
     }
 }
 
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Msg")
+            .field("enum_optional", &self.enum_optional())
+            .field("enum_unlabeled", &self.enum_unlabeled())
+            .field("enum_repeated", &self.enum_repeated())
+            .finish()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
     ValueZero,

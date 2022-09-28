@@ -68,6 +68,15 @@ impl ::std::clone::Clone for Msg {
     }
 }
 
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Msg").finish()
+    }
+}
+
 #[derive(Default)]
 pub struct Submsg {
     // Singular, Variant(Int32)
@@ -160,5 +169,16 @@ impl ::std::clone::Clone for Submsg {
 
             _bitfield: Clone::clone(&self._bitfield),
         }
+    }
+}
+
+impl ::std::fmt::Debug for Submsg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct("Submsg")
+            .field("i32_unlabeled", &self.i32_unlabeled())
+            .finish()
     }
 }
