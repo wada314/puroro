@@ -132,13 +132,10 @@ impl Module {
             .into_iter()
             .map(|submessage| state.fqtn_to_generated_message(submessage.fqtn(), resolver))
             .collect::<Result<Vec<_>>>()?;
-        let oneofs = 
-        //state.fqtn_to_generated_message(m.fqtn(), resolver)?
-            m
-            .oneofs()
-            .into_iter()
-            .map(|o| Oneof::try_new(o, resolver, state).map(Rc::new))
-            .collect::<Result<Vec<_>>>()?;
+        let oneofs = state
+            .fqtn_to_generated_message(m.fqtn(), resolver)?
+            .oneofs
+            .clone();
         let enums = m
             .enums()
             .into_iter()
@@ -163,6 +160,7 @@ impl Module {
 pub struct Message {
     pub ident_struct: String,
     pub fields: Vec<Rc<Field>>,
+    pub oneofs: Vec<Rc<Oneof>>,
     pub bits_length: usize,
 }
 impl Message {
@@ -178,12 +176,18 @@ impl Message {
             .into_iter()
             .map(|f| Field::try_new(f, resolver, state).map(Rc::new))
             .collect::<Result<Vec<_>>>()?;
+        let oneofs = m
+            .oneofs()
+            .into_iter()
+            .map(|o| Oneof::try_new(o, resolver, state).map(Rc::new))
+            .collect::<Result<Vec<_>>>()?;
         let bits_length = state
             .fqtn_to_bit_slice_allocation_mut(&m.fqtn())
             .finalize()?;
         Ok(Message {
             ident_struct,
             fields,
+            oneofs,
             bits_length,
         })
     }
