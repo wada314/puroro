@@ -65,6 +65,18 @@ impl GroupOne {
         }
     }
 
+    pub(crate) fn _case_ref<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        _bits: &B,
+    ) -> self::GroupOneCaseRef<'_> {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+
+        todo!()
+    }
+
     pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
@@ -82,7 +94,7 @@ impl GroupOne {
             }
             _ => (),
         }
-        bits.set_range::<0, 2>(2);
+        bits.set_range(0..2, 2);
     }
 
     pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -111,7 +123,9 @@ impl ::std::default::Default for GroupOne {
     }
 }
 
-impl self::_puroro::internal::oneof_type::OneofCase<0, 2> for GroupOneCase {
+impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
+    const BITFIELD_BEGIN: usize = 0;
+    const BITFIELD_END: usize = 2;
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
@@ -201,6 +215,18 @@ impl GroupTwo {
         }
     }
 
+    pub(crate) fn _case_ref<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        _bits: &B,
+    ) -> self::GroupTwoCaseRef<'_> {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+
+        todo!()
+    }
+
     pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
@@ -221,7 +247,7 @@ impl GroupTwo {
             }
             _ => (),
         }
-        bits.set_range::<2, 4>(3);
+        bits.set_range(2..4, 3);
     }
 
     pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -253,7 +279,9 @@ impl ::std::default::Default for GroupTwo {
     }
 }
 
-impl self::_puroro::internal::oneof_type::OneofCase<2, 4> for GroupTwoCase {
+impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
+    const BITFIELD_BEGIN: usize = 2;
+    const BITFIELD_END: usize = 4;
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
@@ -302,6 +330,18 @@ impl GroupThree {
         }
     }
 
+    pub(crate) fn _case_ref<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        _bits: &B,
+    ) -> self::GroupThreeCaseRef {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+
+        todo!()
+    }
+
     pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
@@ -316,7 +356,7 @@ impl GroupThree {
             }
             _ => (),
         }
-        bits.set_range::<4, 5>(1);
+        bits.set_range(4..5, 1);
     }
 
     pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -342,7 +382,9 @@ impl ::std::default::Default for GroupThree {
     }
 }
 
-impl self::_puroro::internal::oneof_type::OneofCase<4, 5> for GroupThreeCase {
+impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
+    const BITFIELD_BEGIN: usize = 4;
+    const BITFIELD_END: usize = 5;
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};

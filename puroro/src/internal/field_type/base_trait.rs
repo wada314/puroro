@@ -124,17 +124,17 @@ where
 {
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
-        bitvec.set::<BITFIELD_INDEX>(true);
+        bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
     fn deser_from_bits32<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
         self.0 = <ProtoType as tags::NumericalType>::from_bits32(bits)?;
-        bitvec.set::<BITFIELD_INDEX>(true);
+        bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
     fn deser_from_bits64<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
         self.0 = <ProtoType as tags::NumericalType>::from_bits64(bits)?;
-        bitvec.set::<BITFIELD_INDEX>(true);
+        bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
     fn ser_to_write<W: Write, B: BitSlice>(
@@ -143,7 +143,7 @@ where
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        if !bitvec.get::<BITFIELD_INDEX>() {
+        if !bitvec.get(BITFIELD_INDEX) {
             return Ok(());
         }
         ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
@@ -242,7 +242,7 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
     ) -> Result<()> {
         let vec = iter.collect::<IoResult<Vec<u8>>>()?;
         self.0 = String::from_utf8(vec)?;
-        bitvec.set::<BITFIELD_INDEX>(true);
+        bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
 }

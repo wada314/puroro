@@ -85,7 +85,6 @@ impl {{ ident_struct }} {
     }
 
     {%- for field in oneof.fields %}
-
     {#- oneof item getter #}
     pub fn {{ field.ident_opt_getter }}(&self) -> {{ field.rust_opt_getter_type }} {
         self.{{ oneof.ident_struct_field }}.{{ field.ident_opt_getter }}(&self._bitfield)

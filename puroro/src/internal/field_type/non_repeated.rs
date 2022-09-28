@@ -131,7 +131,7 @@ where
     where
         Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
-        bitvec.get::<BITFIELD_INDEX>().then_some(self.0.clone())
+        bitvec.get(BITFIELD_INDEX).then_some(self.0.clone())
     }
     type MutGetterType<'a> = &'a mut RustType where Self: 'a;
     fn mut_field<'a, B: BitSlice, D: FnOnce() -> Self::GetterType<'a>>(
@@ -139,14 +139,14 @@ where
         bitvec: &mut B,
         default: D,
     ) -> Self::MutGetterType<'a> {
-        if !bitvec.get::<BITFIELD_INDEX>() {
+        if !bitvec.get(BITFIELD_INDEX) {
             self.0 = default();
-            bitvec.set::<BITFIELD_INDEX>(true);
+            bitvec.set(BITFIELD_INDEX, true);
         }
         &mut self.0
     }
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
-        bitvec.set::<BITFIELD_INDEX>(false);
+        bitvec.set(BITFIELD_INDEX, false);
     }
 }
 
@@ -181,7 +181,7 @@ impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
     where
         Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
-        bitvec.get::<BITFIELD_INDEX>().then_some(&self.0)
+        bitvec.get(BITFIELD_INDEX).then_some(&self.0)
     }
     type MutGetterType<'a> = &'a mut String where Self: 'a;
     fn mut_field<'a, B: BitSlice, D: FnOnce() -> Self::GetterType<'a>>(
@@ -189,14 +189,14 @@ impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
         bitvec: &mut B,
         default: D,
     ) -> Self::MutGetterType<'a> {
-        if !bitvec.get::<BITFIELD_INDEX>() {
+        if !bitvec.get(BITFIELD_INDEX) {
             self.0 = default().into();
-            bitvec.set::<BITFIELD_INDEX>(true);
+            bitvec.set(BITFIELD_INDEX, true);
         }
         &mut self.0
     }
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
-        bitvec.set::<BITFIELD_INDEX>(false);
+        bitvec.set(BITFIELD_INDEX, false);
         self.0.clear();
     }
 }

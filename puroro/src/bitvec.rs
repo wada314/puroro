@@ -15,34 +15,38 @@
 //! A thin wrapper over the bitvec crate.
 
 use ::bitvec::field::BitField;
-use ::std::ops::{Deref, DerefMut};
+use ::std::ops::{Deref, DerefMut, Range};
 
 pub type BitArray<const LEN32: usize> = ::bitvec::array::BitArray<[u32; LEN32]>;
 
 pub trait BitSlice {
-    fn get<const INDEX: usize>(&self) -> bool;
-    fn get_range<const BEGIN: usize, const END: usize>(&self) -> u32;
-    fn set<const INDEX: usize>(&mut self, value: bool);
-    fn set_range<const BEGIN: usize, const END: usize>(&mut self, value: u32);
+    fn get(&self, index: usize) -> bool;
+    fn get_range(&self, range: Range<usize>) -> u32;
+    fn set(&mut self, index: usize, value: bool);
+    fn set_range(&mut self, range: Range<usize>, value: u32);
 }
 
 impl<const LEN32: usize> BitSlice for BitArray<LEN32> {
-    fn get<const INDEX: usize>(&self) -> bool {
-        *<::bitvec::slice::BitSlice<u32>>::get(self.deref(), INDEX).unwrap()
+    #[inline]
+    fn get(&self, index: usize) -> bool {
+        *<::bitvec::slice::BitSlice<u32>>::get(self.deref(), index).unwrap()
     }
 
-    fn get_range<const BEGIN: usize, const END: usize>(&self) -> u32 {
-        <::bitvec::slice::BitSlice<u32>>::get(self.deref(), BEGIN..END)
+    #[inline]
+    fn get_range(&self, range: Range<usize>) -> u32 {
+        <::bitvec::slice::BitSlice<u32>>::get(self.deref(), range)
             .unwrap()
             .load::<u32>()
     }
 
-    fn set<const INDEX: usize>(&mut self, value: bool) {
-        <::bitvec::slice::BitSlice<u32>>::set(self.deref_mut(), INDEX, value)
+    #[inline]
+    fn set(&mut self, index: usize, value: bool) {
+        <::bitvec::slice::BitSlice<u32>>::set(self.deref_mut(), index, value)
     }
 
-    fn set_range<const BEGIN: usize, const END: usize>(&mut self, value: u32) {
-        <::bitvec::slice::BitSlice<u32>>::get_mut(self.deref_mut(), BEGIN..END)
+    #[inline]
+    fn set_range(&mut self, range: Range<usize>, value: u32) {
+        <::bitvec::slice::BitSlice<u32>>::get_mut(self.deref_mut(), range)
             .unwrap()
             .store::<u32>(value)
     }

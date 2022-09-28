@@ -45,6 +45,17 @@ impl {{ ident_union }} {
     }
     {%- endfor %} {#- for field in fields #}
 
+    pub(crate) fn _case_ref<B: self::_puroro::bitvec::BitSlice>(&self, _bits: &B) -> 
+        self::{{ ident_case_ref }}{% if has_ld_type %}<'_>{% endif %}
+    {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+
+        todo!()
+    }
+
     pub(crate) fn _clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         #[allow(unused)]
         use ::std::option::Option::Some;
@@ -62,7 +73,7 @@ impl {{ ident_union }} {
             _ => (),
         }
         {#- Set the bitfield value to the last value + 1, which means None. #}
-        bits.set_range::<{{ bitfield_start }}, {{ bitfield_end }}>({{ num_fields }});
+        bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, {{ num_fields }});
     }
 
     pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -94,7 +105,9 @@ impl ::std::default::Default for {{ ident_union }} {
     }
 }
 
-impl self::_puroro::internal::oneof_type::OneofCase<{{ bitfield_start }}, {{ bitfield_end }}> for {{ ident_case }} {
+impl self::_puroro::internal::oneof_type::OneofCase for {{ ident_case }} {
+    const BITFIELD_BEGIN: usize = {{ bitfield_start }};
+    const BITFIELD_END: usize = {{ bitfield_end }};
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
