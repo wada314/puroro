@@ -375,6 +375,8 @@ pub struct Oneof {
     pub ident_union: String,
     pub ident_case: String,
     pub ident_case_ref: String,
+    pub ident_struct_field: String,
+    pub rust_field_type: String,
     pub fields: Vec<OneofField>,
     pub has_ld_type: bool,
     pub bitfield_start: usize,
@@ -390,6 +392,16 @@ impl Oneof {
         let ident_union = o.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_case = format!("{}Case", o.name().to_camel_case());
         let ident_case_ref = format!("{}CaseRef", o.name().to_camel_case());
+        let ident_struct_field = o
+            .name()
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string();
+        let rust_field_type = format!(
+            "{}::{}",
+            o.parent().fqtn().to_rust_module_path(),
+            &ident_union
+        );
         let fields = o
             .fields()
             .into_iter()
@@ -415,6 +427,8 @@ impl Oneof {
             ident_union,
             ident_case,
             ident_case_ref,
+            ident_struct_field,
+            rust_field_type,
             fields,
             has_ld_type,
             bitfield_start,

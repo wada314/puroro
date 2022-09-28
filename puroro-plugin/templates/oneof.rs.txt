@@ -1,5 +1,6 @@
 
 {#- Oneof union. Includes None case #}
+{#- Neither Clone and Drop are implementable without the bitslice info. #}
 pub(crate) union {{ ident_union }} {
     _none: (),
     {%- for field in fields %}
@@ -9,6 +10,7 @@ pub(crate) union {{ ident_union }} {
 
 {#- public oneof enum without contents, not including None case #}
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum {{ ident_case }} {
     {%- for field in fields %}
     {{ field.ident_enum_item }},
@@ -16,6 +18,7 @@ pub enum {{ ident_case }} {
 }
 {#- public oneof enum with ref to its contents, not including None case #}
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum {{ ident_case_ref }} {%- if has_ld_type %}<'a>{%- endif %} {
     {%- for field in fields %}
     {{ field.ident_enum_item }}({{ field.rust_oneof_getter_type }}),
@@ -60,6 +63,34 @@ impl {{ ident_union }} {
         }
         {#- Set the bitfield value to the last value + 1, which means None. #}
         bits.set_range::<{{ bitfield_start }}, {{ bitfield_end }}>({{ num_fields }});
+    }
+
+    pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+
+        match self::{{ ident_case }}::from_bitslice(bits) {
+            {%- for field in fields %}
+            Some({{ ident_case  }}::{{ field.ident_enum_item }}) => {
+                Self {
+                    {{ field.ident_union_item }}: Clone::clone(&self.{{ field.ident_union_item }}),
+                }
+            }
+            {%- endfor %} {#- for field in fields #}
+            _ => Self {
+                _none: (),
+            },
+        }
+    }
+}
+
+impl ::std::default::Default for {{ ident_union }} {
+    fn default() -> Self {
+        Self { _none: () }
     }
 }
 

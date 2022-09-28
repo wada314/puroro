@@ -17,11 +17,13 @@ pub(crate) union GroupOne {
     g1_string: ::std::mem::ManuallyDrop<self::_puroro::internal::oneof_field_type::StringField>,
 }
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum GroupOneCase {
     G1Int32,
     G1String,
 }
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum GroupOneCaseRef<'a> {
     G1Int32(i32),
     G1String(&'a str),
@@ -82,6 +84,31 @@ impl GroupOne {
         }
         bits.set_range::<0, 2>(2);
     }
+
+    pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+
+        match self::GroupOneCase::from_bitslice(bits) {
+            Some(GroupOneCase::G1Int32) => Self {
+                g1_int32: Clone::clone(&self.g1_int32),
+            },
+            Some(GroupOneCase::G1String) => Self {
+                g1_string: Clone::clone(&self.g1_string),
+            },
+            _ => Self { _none: () },
+        }
+    }
+}
+
+impl ::std::default::Default for GroupOne {
+    fn default() -> Self {
+        Self { _none: () }
+    }
 }
 
 impl self::_puroro::internal::oneof_type::OneofCase<0, 2> for GroupOneCase {
@@ -107,12 +134,14 @@ pub(crate) union GroupTwo {
     >,
 }
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum GroupTwoCase {
     G2F32,
     G2String,
     G2Submsg,
 }
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum GroupTwoCaseRef<'a> {
     G2F32(f32),
     G2String(&'a str),
@@ -194,6 +223,34 @@ impl GroupTwo {
         }
         bits.set_range::<2, 4>(3);
     }
+
+    pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+
+        match self::GroupTwoCase::from_bitslice(bits) {
+            Some(GroupTwoCase::G2F32) => Self {
+                g2_f32: Clone::clone(&self.g2_f32),
+            },
+            Some(GroupTwoCase::G2String) => Self {
+                g2_string: Clone::clone(&self.g2_string),
+            },
+            Some(GroupTwoCase::G2Submsg) => Self {
+                g2_submsg: Clone::clone(&self.g2_submsg),
+            },
+            _ => Self { _none: () },
+        }
+    }
+}
+
+impl ::std::default::Default for GroupTwo {
+    fn default() -> Self {
+        Self { _none: () }
+    }
 }
 
 impl self::_puroro::internal::oneof_type::OneofCase<2, 4> for GroupTwoCase {
@@ -216,10 +273,12 @@ pub(crate) union GroupThree {
     >,
 }
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum GroupThreeCase {
     G3Int32,
 }
 #[repr(u32)]
+#[derive(Debug, Clone)]
 pub enum GroupThreeCaseRef {
     G3Int32(i32),
 }
@@ -258,6 +317,28 @@ impl GroupThree {
             _ => (),
         }
         bits.set_range::<4, 5>(1);
+    }
+
+    pub(crate) fn _clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+
+        match self::GroupThreeCase::from_bitslice(bits) {
+            Some(GroupThreeCase::G3Int32) => Self {
+                g3_int32: Clone::clone(&self.g3_int32),
+            },
+            _ => Self { _none: () },
+        }
+    }
+}
+
+impl ::std::default::Default for GroupThree {
+    fn default() -> Self {
+        Self { _none: () }
     }
 }
 

@@ -307,6 +307,21 @@ impl Fqtn {
         result
     }
 
+    pub fn to_rust_module_path(&self) -> String {
+        assert!(self.0.starts_with('.'));
+        let absl_path = &self.0[1..];
+        let path_nodes = absl_path
+            .split('.')
+            .map(|s| s.to_lower_snake_case().escape_rust_keywords().into_owned());
+        let mut result = String::new();
+        result.push_str("_puroro_root");
+        for node in path_nodes {
+            result.push_str("::");
+            result.push_str(&node);
+        }
+        result
+    }
+
     pub fn to_rust_module_file_path(&self) -> String {
         assert!(self.0.starts_with('.'));
         let absl_path = &self.0[1..];
