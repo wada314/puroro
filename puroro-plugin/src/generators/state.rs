@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::Message;
+use crate::descriptor_resolver::DescriptorResolver;
+use crate::restructure::MessageOrEnumRef;
 pub use crate::restructure::Syntax;
 use crate::utils::Fqtn;
 use crate::{ErrorKind, Result};
 use ::std::collections::HashMap;
+use ::std::rc::Rc;
 
 #[derive(Debug, Default)]
 pub struct State {
+    fqtn_to_generated_message_map: HashMap<Fqtn<String>, Rc<Message>>,
     fqtn_to_bit_slice_allocation_map: HashMap<Fqtn<String>, BitSliceAllocation>,
 }
 impl State {
@@ -29,6 +34,14 @@ impl State {
         self.fqtn_to_bit_slice_allocation_map
             .entry(fqtn.to_owned())
             .or_default()
+    }
+
+    pub fn fqtn_to_generated_message<S: AsRef<str>>(
+        &mut self,
+        fqtn: &Fqtn<S>,
+        resolver: &DescriptorResolver,
+    ) -> Result<Rc<Message>> {
+        todo!()
     }
 }
 

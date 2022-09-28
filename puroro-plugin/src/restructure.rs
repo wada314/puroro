@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! Some extensions for the descriptor protos.
+//! e.g. Pointer to its parent and ancestors,
+//! some utility functions that enumerates all indirect child messages / enums.
+
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
