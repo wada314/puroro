@@ -33,8 +33,8 @@ pub struct Module {
     pub is_root_package: bool,
     pub fqtn: String,
     pub submodules: Vec<Module>,
-    pub messages: Vec<Message>,
-    pub enums: Vec<Enum>,
+    pub messages: Vec<Rc<Message>>,
+    pub enums: Vec<Rc<Enum>>,
     pub oneofs: Vec<Rc<Oneof>>,
     pub rust_file_path: String,
 }
@@ -82,13 +82,13 @@ impl Module {
             .input_files
             .iter()
             .flat_map(|f| f.messages().iter())
-            .map(|m| Message::try_new(m, resolver, state))
+            .map(|m| state.fqtn_to_generated_message(m.fqtn(), resolver))
             .collect::<Result<Vec<_>>>()?;
         let enums = package_contents
             .input_files
             .iter()
             .flat_map(|f| f.enums().into_iter())
-            .map(|e| Enum::try_new(e, resolver))
+            .map(|e| state.fqtn_to_generated_enum(e.fqtn(), resolver))
             .collect::<Result<Vec<_>>>()?;
         let oneofs = Vec::new();
         let rust_file_path = if is_root_package {
@@ -130,9 +130,11 @@ impl Module {
         let messages = m
             .messages()
             .into_iter()
-            .map(|submessage| Message::try_new(submessage, resolver, state))
+            .map(|submessage| state.fqtn_to_generated_message(submessage.fqtn(), resolver))
             .collect::<Result<Vec<_>>>()?;
-        let oneofs = m
+        let oneofs = 
+        //state.fqtn_to_generated_message(m.fqtn(), resolver)?
+            m
             .oneofs()
             .into_iter()
             .map(|o| Oneof::try_new(o, resolver, state).map(Rc::new))
@@ -140,7 +142,7 @@ impl Module {
         let enums = m
             .enums()
             .into_iter()
-            .map(|e| Enum::try_new(e, resolver))
+            .map(|e| state.fqtn_to_generated_enum(e.fqtn(), resolver))
             .collect::<Result<Vec<_>>>()?;
         let rust_file_path = m.fqtn().to_rust_module_file_path();
         Ok(Module {
@@ -160,7 +162,7 @@ impl Module {
 #[template(path = "message.rs.txt")]
 pub struct Message {
     pub ident_struct: String,
-    pub fields: Vec<Field>,
+    pub fields: Vec<Rc<Field>>,
     pub bits_length: usize,
 }
 impl Message {
@@ -174,7 +176,7 @@ impl Message {
         let fields = m
             .field()
             .into_iter()
-            .map(|f| Field::try_new(f, resolver, state))
+            .map(|f| Field::try_new(f, resolver, state).map(Rc::new))
             .collect::<Result<Vec<_>>>()?;
         let bits_length = state
             .fqtn_to_bit_slice_allocation_mut(&m.fqtn())
