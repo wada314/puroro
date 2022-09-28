@@ -10,7 +10,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Msg {
     // Singular, Variant(Int32)
     i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField<
@@ -485,6 +485,28 @@ impl self::_puroro::Message for Msg {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            i32_unlabeled: Clone::clone(&self.i32_unlabeled),
+            i32_repeated: Clone::clone(&self.i32_repeated),
+            float_unlabeled: Clone::clone(&self.float_unlabeled),
+            float_repeated: Clone::clone(&self.float_repeated),
+            string_unlabeled: Clone::clone(&self.string_unlabeled),
+            string_repeated: Clone::clone(&self.string_repeated),
+            submsg_unlabeled: Clone::clone(&self.submsg_unlabeled),
+            submsg_repeated: Clone::clone(&self.submsg_repeated),
+            enum_unlabeled: Clone::clone(&self.enum_unlabeled),
+            enum_repeated: Clone::clone(&self.enum_repeated),
+            very_large_field_number: Clone::clone(&self.very_large_field_number),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }
 

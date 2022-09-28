@@ -9,7 +9,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Test1 {
     // Singular, Variant(Int32)
     a: self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32>,
@@ -89,7 +89,19 @@ impl self::_puroro::Message for Test1 {
     }
 }
 
-#[derive(Default, Clone)]
+impl ::std::clone::Clone for Test1 {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            a: Clone::clone(&self.a),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct Test2 {
     // Singular, LengthDelimited(String)
     b: self::_puroro::internal::field_type::SingularStringField,
@@ -169,7 +181,19 @@ impl self::_puroro::Message for Test2 {
     }
 }
 
-#[derive(Default, Clone)]
+impl ::std::clone::Clone for Test2 {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            b: Clone::clone(&self.b),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct Test3 {
     // Singular, LengthDelimited(Message(Fqtn(".official_samples3.Test1")))
     c: self::_puroro::internal::field_type::SingularHeapMessageField<
@@ -259,7 +283,19 @@ impl self::_puroro::Message for Test3 {
     }
 }
 
-#[derive(Default, Clone)]
+impl ::std::clone::Clone for Test3 {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            c: Clone::clone(&self.c),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct Test4 {
     // Repeated, Variant(Int32)
     d: self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32>,
@@ -324,5 +360,17 @@ impl self::_puroro::Message for Test4 {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Test4 {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            d: Clone::clone(&self.d),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }

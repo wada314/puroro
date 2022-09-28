@@ -1,5 +1,5 @@
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct {{ ident_struct }} {
     {%- for field in fields %}
     // {{ "{:?}, {:?}"|format(field.rule,field.wire_type) }}
@@ -108,5 +108,23 @@ impl self::_puroro::Message for {{ ident_struct }} {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for {{ ident_struct }} {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            {%- for field in fields %}
+            {{ field.ident_struct_field }}: Clone::clone(&self.{{ field.ident_struct_field }}),
+            {%- endfor %} {#- for field in fields #}
+
+            {%- for oneof in oneofs %}
+            {{ oneof.ident_struct_field }}: self.{{ oneof.ident_struct_field }}._clone(&self._bitfield),
+            {%- endfor %} {#- for oneof in oneofs #}
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }

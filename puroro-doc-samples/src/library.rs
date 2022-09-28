@@ -9,7 +9,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Book {
     // Singular, LengthDelimited(String)
     title: self::_puroro::internal::field_type::SingularStringField,
@@ -188,7 +188,21 @@ impl self::_puroro::Message for Book {
     }
 }
 
-#[derive(Default, Clone)]
+impl ::std::clone::Clone for Book {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            title: Clone::clone(&self.title),
+            num_pages: Clone::clone(&self.num_pages),
+            author: Clone::clone(&self.author),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct Author {
     // Singular, LengthDelimited(String)
     name: self::_puroro::internal::field_type::SingularStringField,
@@ -265,5 +279,17 @@ impl self::_puroro::Message for Author {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Author {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            name: Clone::clone(&self.name),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }

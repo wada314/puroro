@@ -10,7 +10,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Msg {
     // oneof GroupOne
     group_one: _puroro_root::oneofs2::msg::GroupOne,
@@ -54,7 +54,21 @@ impl self::_puroro::Message for Msg {
     }
 }
 
-#[derive(Default, Clone)]
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            group_one: self.group_one._clone(&self._bitfield),
+            group_two: self.group_two._clone(&self._bitfield),
+            group_three: self.group_three._clone(&self._bitfield),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct Submsg {
     // Optional, Variant(Int32)
     i32_optional: self::_puroro::internal::field_type::OptionalNumericalField<
@@ -155,5 +169,17 @@ impl self::_puroro::Message for Submsg {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Submsg {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            i32_optional: Clone::clone(&self.i32_optional),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }

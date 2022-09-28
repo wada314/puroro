@@ -9,7 +9,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Msg {
     // Singular, LengthDelimited(Message(Fqtn(".self_recursive.Msg")))
     recursive_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField<
@@ -98,5 +98,17 @@ impl self::_puroro::Message for Msg {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            recursive_unlabeled: Clone::clone(&self.recursive_unlabeled),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }

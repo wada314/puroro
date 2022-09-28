@@ -10,7 +10,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Msg {
     // Optional, Variant(Int32)
     i32_optional: self::_puroro::internal::field_type::OptionalNumericalField<
@@ -557,6 +557,28 @@ impl self::_puroro::Message for Msg {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            i32_optional: Clone::clone(&self.i32_optional),
+            i32_repeated: Clone::clone(&self.i32_repeated),
+            float_optional: Clone::clone(&self.float_optional),
+            float_repeated: Clone::clone(&self.float_repeated),
+            string_optional: Clone::clone(&self.string_optional),
+            string_repeated: Clone::clone(&self.string_repeated),
+            submsg_optional: Clone::clone(&self.submsg_optional),
+            submsg_repeated: Clone::clone(&self.submsg_repeated),
+            enum_optional: Clone::clone(&self.enum_optional),
+            enum_repeated: Clone::clone(&self.enum_repeated),
+            very_large_field_number: Clone::clone(&self.very_large_field_number),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }
 

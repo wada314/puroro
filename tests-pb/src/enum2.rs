@@ -9,7 +9,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Msg {
     // Optional, Variant(Enum2(Fqtn(".enum2.Enum")))
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField<
@@ -145,6 +145,19 @@ impl self::_puroro::Message for Msg {
             }
         }
         Ok(())
+    }
+}
+
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        Self {
+            enum_optional: Clone::clone(&self.enum_optional),
+            enum_repeated: Clone::clone(&self.enum_repeated),
+
+            _bitfield: Clone::clone(&self._bitfield),
+        }
     }
 }
 
