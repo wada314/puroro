@@ -28,15 +28,33 @@ impl Msg {
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupOneCaseRef<'_>> {
         todo!()
     }
+    pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
+        self.group_one.g1_int32_opt(&self._bitfield)
+    }
+    pub fn g1_string_opt(&self) -> ::std::option::Option<&str> {
+        self.group_one.g1_string_opt(&self._bitfield)
+    }
     pub fn group_two(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupTwoCaseRef<'_>> {
         todo!()
     }
+    pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
+        self.group_two.g2_f32_opt(&self._bitfield)
+    }
+    pub fn g2_string_opt(&self) -> ::std::option::Option<&str> {
+        self.group_two.g2_string_opt(&self._bitfield)
+    }
+    pub fn g2_submsg_opt(&self) -> ::std::option::Option<&_puroro_root::oneofs2::Submsg> {
+        self.group_two.g2_submsg_opt(&self._bitfield)
+    }
     pub fn group_three(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupThreeCaseRef> {
         todo!()
+    }
+    pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
+        self.group_three.g3_int32_opt(&self._bitfield)
     }
 }
 
