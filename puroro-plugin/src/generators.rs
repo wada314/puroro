@@ -376,7 +376,9 @@ pub struct Oneof {
     pub ident_case: String,
     pub ident_case_ref: String,
     pub ident_struct_field: String,
+    pub ident_getter: String,
     pub rust_field_type: String,
+    pub rust_getter_type: String,
     pub fields: Vec<OneofField>,
     pub has_ld_type: bool,
     pub bitfield_start: usize,
@@ -389,10 +391,21 @@ impl Oneof {
         resolver: &'a DescriptorResolver,
         state: &mut State,
     ) -> Result<Self> {
+        use google::protobuf::field_descriptor_proto::Type::*;
+        let has_ld_type = o
+            .fields()
+            .into_iter()
+            .any(|f| matches!(f.r#type(), TypeBytes | TypeString | TypeMessage));
+
         let ident_union = o.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_case = format!("{}Case", o.name().to_camel_case());
         let ident_case_ref = format!("{}CaseRef", o.name().to_camel_case());
         let ident_struct_field = o
+            .name()
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string();
+        let ident_getter = o
             .name()
             .to_lower_snake_case()
             .escape_rust_keywords()
@@ -402,17 +415,18 @@ impl Oneof {
             o.parent().fqtn().to_rust_module_path(),
             &ident_union
         );
+        let rust_getter_type = format!(
+            "::std::option::Option<{}::{}{}>",
+            o.parent().fqtn().to_rust_module_path(),
+            &ident_case_ref,
+            if has_ld_type { "<'_>" } else { "" },
+        );
         let fields = o
             .fields()
             .into_iter()
             .enumerate()
             .map(|(index, f)| OneofField::try_new(f, index, resolver))
             .collect::<Result<Vec<_>>>()?;
-        use google::protobuf::field_descriptor_proto::Type::*;
-        let has_ld_type = o
-            .fields()
-            .into_iter()
-            .any(|f| matches!(f.r#type(), TypeBytes | TypeString | TypeMessage));
         let num_fields = fields.len();
         let num_bits = usize::BITS - num_fields.leading_zeros();
         let bit_index = state
@@ -428,7 +442,9 @@ impl Oneof {
             ident_case,
             ident_case_ref,
             ident_struct_field,
+            ident_getter,
             rust_field_type,
+            rust_getter_type,
             fields,
             has_ld_type,
             bitfield_start,

@@ -77,6 +77,14 @@ impl {{ ident_struct }} {
 
     {%- endmatch %} {#- match field.rule #}
     {%- endfor %} {#- for field in fields #}
+
+    {%- for oneof in oneofs %}
+    {#- oneof group getter #}
+    pub fn {{ oneof.ident_getter }}(&self) -> {{ oneof.rust_getter_type }} {
+        todo!()
+    }
+
+    {%- endfor %} {#- for oneof in oneofs #}
 }
 
 impl self::_puroro::Message for {{ ident_struct }} {

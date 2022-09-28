@@ -22,7 +22,23 @@ pub struct Msg {
     _bitfield: self::_puroro::bitvec::BitArray<1>,
 }
 
-impl Msg {}
+impl Msg {
+    pub fn group_one(
+        &self,
+    ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupOneCaseRef<'_>> {
+        todo!()
+    }
+    pub fn group_two(
+        &self,
+    ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupTwoCaseRef<'_>> {
+        todo!()
+    }
+    pub fn group_three(
+        &self,
+    ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupThreeCaseRef> {
+        todo!()
+    }
+}
 
 impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
