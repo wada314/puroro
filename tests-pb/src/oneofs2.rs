@@ -12,6 +12,9 @@ pub mod _puroro {
 
 #[derive(Default, Clone)]
 pub struct Msg {
+    // oneof GroupOne
+    // oneof GroupTwo
+    // oneof GroupThree
     _bitfield: self::_puroro::bitvec::BitArray<1>,
 }
 

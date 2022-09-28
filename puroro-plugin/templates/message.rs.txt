@@ -6,6 +6,10 @@ pub struct {{ ident_struct }} {
     {{ field.ident_struct_field }}: {{ field.rust_field_type }},
     {%- endfor %} {#- for field in fields #}
 
+    {%- for oneof in oneofs %}
+    // {{ "oneof {}"|format(oneof.ident_union) }}
+    {%- endfor %} {#- for oneof in oneofs #}
+
     _bitfield: self::_puroro::bitvec::BitArray<{{ (bits_length + 7) / 8 }}>,
 }
 
