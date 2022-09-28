@@ -522,7 +522,7 @@ impl WireType {
     }
     fn try_new(
         r#type: google::protobuf::field_descriptor_proto::Type,
-        fqtn: Option<&Fqtn<String>>,
+        fqtn: Option<&Fqtn>,
         syntax: Syntax,
     ) -> Result<Self> {
         use google::protobuf::field_descriptor_proto::Type::*;
@@ -663,8 +663,8 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(Fqtn<String>),
-    Enum3(Fqtn<String>),
+    Enum2(Fqtn),
+    Enum3(Fqtn),
 }
 
 impl VariantType {
@@ -703,7 +703,7 @@ impl VariantType {
 pub enum LengthDelimitedType {
     String,
     Bytes,
-    Message(Fqtn<String>),
+    Message(Fqtn),
 }
 
 impl LengthDelimitedType {

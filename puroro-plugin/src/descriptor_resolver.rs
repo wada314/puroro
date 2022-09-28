@@ -15,13 +15,12 @@
 use crate::restructure::{Enum, File, Message, MessageOrEnumRef};
 use crate::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
-use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
-    fqtn_to_desc_map: HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
+    fqtn_to_desc_map: HashMap<Fqtn, MessageOrEnumRef<'a>>,
     package_contents: HashMap<Package<String>, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
@@ -42,7 +41,7 @@ impl<'a> DescriptorResolver<'a> {
     }
 
     fn generate_fqtn_to_desc_map(
-        fqtn_to_desc_map: &mut HashMap<Fqtn<String>, MessageOrEnumRef<'a>>,
+        fqtn_to_desc_map: &mut HashMap<Fqtn, MessageOrEnumRef<'a>>,
         file: &'a File<'a>,
     ) {
         for &m in file.all_messages() {
@@ -79,23 +78,17 @@ impl<'a> DescriptorResolver<'a> {
         term_item.input_files.push(File::new(file))
     }
 
-    pub fn fqtn_to_desc<S: Borrow<str>>(&self, fqtn: &Fqtn<S>) -> Option<MessageOrEnumRef<'a>> {
-        self.fqtn_to_desc_map.get::<str>(fqtn.borrow()).cloned()
+    pub fn fqtn_to_desc(&self, fqtn: &Fqtn) -> Option<MessageOrEnumRef<'a>> {
+        self.fqtn_to_desc_map.get(fqtn).cloned()
     }
 
-    pub fn fqtn_to_desc_or_err<S: Borrow<str> + Debug>(
-        &self,
-        fqtn: &Fqtn<S>,
-    ) -> Result<MessageOrEnumRef<'a>> {
+    pub fn fqtn_to_desc_or_err(&self, fqtn: &Fqtn) -> Result<MessageOrEnumRef<'a>> {
         Ok(self.fqtn_to_desc(fqtn).ok_or(ErrorKind::UnknownTypeName {
             name: format!("{:?}", fqtn),
         })?)
     }
 
-    pub fn fqtn_to_message<S: Borrow<str> + Debug>(
-        &self,
-        fqtn: &Fqtn<S>,
-    ) -> Result<&'a Message<'a>> {
+    pub fn fqtn_to_message(&self, fqtn: &Fqtn) -> Result<&'a Message<'a>> {
         match self.fqtn_to_desc_or_err(fqtn)? {
             MessageOrEnumRef::Message(m) => Ok(m),
             MessageOrEnumRef::Enum(_) => Err(ErrorKind::UnknownTypeName {
@@ -104,7 +97,7 @@ impl<'a> DescriptorResolver<'a> {
         }
     }
 
-    pub fn fqtn_to_enum<S: Borrow<str> + Debug>(&self, fqtn: &Fqtn<S>) -> Result<&'a Enum<'a>> {
+    pub fn fqtn_to_enum(&self, fqtn: &Fqtn) -> Result<&'a Enum<'a>> {
         match self.fqtn_to_desc_or_err(fqtn)? {
             MessageOrEnumRef::Enum(e) => Ok(e),
             MessageOrEnumRef::Message(_) => Err(ErrorKind::UnknownTypeName {

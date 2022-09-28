@@ -275,28 +275,20 @@ where
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub struct Fqtn<S>(S);
-impl<S> Fqtn<S> {
-    pub fn new(s: S) -> Self {
-        Self(s)
+pub struct Fqtn(String);
+impl Fqtn {
+    pub fn new<S: ToString>(s: S) -> Self {
+        Self(s.to_string())
     }
 }
-impl<S: AsRef<str>> Fqtn<S> {
-    pub fn to_owned(&self) -> Fqtn<String> {
-        Fqtn(self.0.as_ref().to_string())
-    }
-
-    pub fn as_ref(&self) -> Fqtn<&str> {
-        Fqtn(self.0.as_ref())
-    }
-
+impl Fqtn {
     pub fn as_str(&self) -> &str {
         self.0.as_ref()
     }
 
     pub fn to_rust_path(&self) -> String {
-        assert!(self.0.as_ref().starts_with('.'));
-        let absl_path = &self.0.as_ref()[1..];
+        assert!(self.0.starts_with('.'));
+        let absl_path = &self.0[1..];
         let (path_nodes, leaf) = match absl_path.rsplit_once('.') {
             Some((path, leaf)) => (Some(path.split('.')).into_iter().flatten(), leaf),
             None => (None.into_iter().flatten(), self.0.as_ref()),
@@ -316,8 +308,8 @@ impl<S: AsRef<str>> Fqtn<S> {
     }
 
     pub fn to_rust_module_file_path(&self) -> String {
-        assert!(self.0.as_ref().starts_with('.'));
-        let absl_path = &self.0.as_ref()[1..];
+        assert!(self.0.starts_with('.'));
+        let absl_path = &self.0[1..];
         absl_path
             .split('.')
             .map(|s| s.to_lower_snake_case().into_owned())
@@ -325,14 +317,9 @@ impl<S: AsRef<str>> Fqtn<S> {
             + ".rs"
     }
 }
-impl<S: Display> Display for Fqtn<S> {
+impl Display for Fqtn {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        S::fmt(&self.0, f)
-    }
-}
-impl<S: Borrow<str>> Borrow<str> for Fqtn<S> {
-    fn borrow(&self) -> &str {
-        self.0.borrow()
+        String::fmt(&self.0, f)
     }
 }
 

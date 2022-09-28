@@ -18,38 +18,34 @@ use crate::restructure::MessageOrEnumRef;
 pub use crate::restructure::Syntax;
 use crate::utils::Fqtn;
 use crate::{ErrorKind, Result};
-use ::std::borrow::Borrow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 #[derive(Debug, Default)]
 pub struct State {
-    fqtn_to_generated_message_map: HashMap<String, Rc<Message>>,
-    fqtn_to_bit_slice_allocation_map: HashMap<Fqtn<String>, BitSliceAllocation>,
+    fqtn_to_generated_message_map: HashMap<Fqtn, Rc<Message>>,
+    fqtn_to_bit_slice_allocation_map: HashMap<Fqtn, BitSliceAllocation>,
 }
 impl State {
-    pub fn fqtn_to_bit_slice_allocation_mut<S: AsRef<str>>(
-        &mut self,
-        fqtn: &Fqtn<S>,
-    ) -> &mut BitSliceAllocation {
+    pub fn fqtn_to_bit_slice_allocation_mut(&mut self, fqtn: &Fqtn) -> &mut BitSliceAllocation {
         self.fqtn_to_bit_slice_allocation_map
             .entry(fqtn.to_owned())
             .or_default()
     }
 
-    pub fn fqtn_to_generated_message<'a, S: AsRef<str> + Borrow<str> + Debug>(
+    pub fn fqtn_to_generated_message<'a>(
         &mut self,
-        fqtn: &Fqtn<S>,
+        fqtn: &Fqtn,
         resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Rc<Message>> {
-        if let Some(found) = self.fqtn_to_generated_message_map.get(fqtn.as_str()) {
+        if let Some(found) = self.fqtn_to_generated_message_map.get(fqtn) {
             Ok(Rc::clone(found))
         } else {
             let message_desc = resolver.fqtn_to_message(fqtn)?;
             let generated = Rc::new(Message::try_new(&message_desc, resolver, self)?);
             self.fqtn_to_generated_message_map
-                .insert(fqtn.as_str().to_string(), Rc::clone(&generated));
+                .insert(fqtn.clone(), Rc::clone(&generated));
             Ok(generated)
         }
     }

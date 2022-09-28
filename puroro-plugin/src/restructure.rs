@@ -118,7 +118,7 @@ pub struct Message<'a> {
     oneofs: OnceCell<Box<[Oneof<'a>]>>,
     messages: OnceCell<Box<[Message<'a>]>>,
     enums: OnceCell<Box<[Enum<'a>]>>,
-    fqtn: OnceCell<Fqtn<String>>,
+    fqtn: OnceCell<Fqtn>,
     file: OnceCell<&'a File<'a>>,
 }
 impl<'a> Message<'a> {
@@ -194,7 +194,7 @@ impl<'a> Message<'a> {
                 .into_boxed_slice()
         })
     }
-    pub fn fqtn(&'a self) -> Fqtn<&str> {
+    pub fn fqtn(&'a self) -> &Fqtn {
         <Self as MessageOrEnumExt>::fqtn(self)
     }
     pub fn file(&'a self) -> &File<'_> {
@@ -221,7 +221,7 @@ pub struct Enum<'a> {
     proto: &'a EnumDescriptorProto,
     parent: FileOrMessageRef<'a>,
     values: OnceCell<Box<[EnumValue<'a>]>>,
-    fqtn: OnceCell<Fqtn<String>>,
+    fqtn: OnceCell<Fqtn>,
     file: OnceCell<&'a File<'a>>,
 }
 impl<'a> Enum<'a> {
@@ -250,7 +250,7 @@ impl<'a> Enum<'a> {
                 .into_boxed_slice()
         })
     }
-    pub fn fqtn(&'a self) -> Fqtn<&str> {
+    pub fn fqtn(&'a self) -> &Fqtn {
         <Self as MessageOrEnumExt>::fqtn(self)
     }
     pub fn file(&'a self) -> &File<'_> {
@@ -294,7 +294,7 @@ impl Deref for EnumValue<'_> {
 pub struct Field<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Message<'a>,
-    fqtn: OnceCell<Option<Fqtn<String>>>,
+    fqtn: OnceCell<Option<Fqtn>>,
 }
 impl<'a> Field<'a> {
     pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Message<'a>) -> Self {
@@ -310,7 +310,7 @@ impl<'a> Field<'a> {
     pub fn parent(&'a self) -> &Message<'_> {
         self.parent
     }
-    pub fn fqtn(&'a self) -> &Option<Fqtn<String>> {
+    pub fn fqtn(&'a self) -> &Option<Fqtn> {
         self.fqtn.get_or_init(|| {
             self.proto()
                 .type_name_opt()
@@ -372,7 +372,7 @@ impl Deref for Oneof<'_> {
 pub struct OneofField<'a> {
     proto: &'a FieldDescriptorProto,
     parent: &'a Oneof<'a>,
-    fqtn: OnceCell<Option<Fqtn<String>>>,
+    fqtn: OnceCell<Option<Fqtn>>,
 }
 impl<'a> OneofField<'a> {
     pub fn new(proto: &'a FieldDescriptorProto, parent: &'a Oneof<'a>) -> Self {
@@ -388,7 +388,7 @@ impl<'a> OneofField<'a> {
     pub fn parent(&'a self) -> &Oneof<'_> {
         self.parent
     }
-    pub fn fqtn(&'a self) -> &Option<Fqtn<String>> {
+    pub fn fqtn(&'a self) -> &Option<Fqtn> {
         self.fqtn.get_or_init(|| {
             self.proto()
                 .type_name_opt()
@@ -416,25 +416,23 @@ pub enum MessageOrEnumRef<'a> {
 }
 
 trait MessageOrEnumExt<'a> {
-    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>>;
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn>;
     fn name(&'a self) -> &str;
     fn parent(&'a self) -> FileOrMessageRef<'_>;
 
-    fn fqtn(&'a self) -> Fqtn<&str> {
-        self.fqtn_once_cell()
-            .get_or_init(|| {
-                Fqtn::new(match self.parent() {
-                    FileOrMessageRef::File(f) => format!(".{}.{}", f.package(), self.name()),
-                    FileOrMessageRef::Message(m) => {
-                        format!(".{}.{}", m.fqtn(), self.name())
-                    }
-                })
+    fn fqtn(&'a self) -> &Fqtn {
+        self.fqtn_once_cell().get_or_init(|| {
+            Fqtn::new(match self.parent() {
+                FileOrMessageRef::File(f) => format!(".{}.{}", f.package(), self.name()),
+                FileOrMessageRef::Message(m) => {
+                    format!(".{}.{}", m.fqtn(), self.name())
+                }
             })
-            .as_ref()
+        })
     }
 }
 impl<'a> MessageOrEnumExt<'a> for Message<'a> {
-    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn> {
         &self.fqtn
     }
     fn name(&'a self) -> &str {
@@ -445,7 +443,7 @@ impl<'a> MessageOrEnumExt<'a> for Message<'a> {
     }
 }
 impl<'a> MessageOrEnumExt<'a> for Enum<'a> {
-    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn> {
         &self.fqtn
     }
     fn name(&'a self) -> &str {
@@ -456,7 +454,7 @@ impl<'a> MessageOrEnumExt<'a> for Enum<'a> {
     }
 }
 impl<'a> MessageOrEnumExt<'a> for MessageOrEnumRef<'a> {
-    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn<String>> {
+    fn fqtn_once_cell(&'a self) -> &OnceCell<Fqtn> {
         match self {
             MessageOrEnumRef::Message(m) => m.fqtn_once_cell(),
             MessageOrEnumRef::Enum(e) => e.fqtn_once_cell(),
@@ -485,8 +483,8 @@ enum FieldType {
     Int64,
     UInt64,
     SInt64,
-    Enum2(Fqtn<String>),
-    Enum3(Fqtn<String>),
+    Enum2(Fqtn),
+    Enum3(Fqtn),
     Fixed32,
     SFixed32,
     Fixed64,
@@ -496,7 +494,7 @@ enum FieldType {
     Bool,
     String,
     Bytes,
-    Message(Fqtn<String>),
+    Message(Fqtn),
 }
 
 #[derive(Debug, Clone, Copy)]
