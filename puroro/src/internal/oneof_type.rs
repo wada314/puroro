@@ -23,7 +23,8 @@ pub trait OneofCase: Sized {
     }
 }
 
-pub trait OneofCaseRef {
+pub trait OneofCaseRef<'a>: Sized {
     type Case: OneofCase;
-    // TODO??
+    type Union;
+    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self;
 }

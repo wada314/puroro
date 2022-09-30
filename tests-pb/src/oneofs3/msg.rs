@@ -9,7 +9,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 
-pub(crate) union GroupOne {
+pub union GroupOne {
     _none: (),
     g1_int32: ::std::mem::ManuallyDrop<
         self::_puroro::internal::oneof_field_type::NumericalField<i32, self::_puroro::tags::Int32>,
@@ -137,7 +137,23 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     }
 }
 
-pub(crate) union GroupTwo {
+impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for GroupOneCaseRef<'a> {
+    type Case = self::GroupOneCase;
+    type Union = self::GroupOne;
+    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match case {
+            self::GroupOneCase::G1Int32 => {
+                self::GroupOneCaseRef::G1Int32(unsafe { &u.g1_int32 }.get_field())
+            }
+            self::GroupOneCase::G1String => {
+                self::GroupOneCaseRef::G1String(unsafe { &u.g1_string }.get_field())
+            }
+        }
+    }
+}
+
+pub union GroupTwo {
     _none: (),
     g2_f32: ::std::mem::ManuallyDrop<
         self::_puroro::internal::oneof_field_type::NumericalField<f32, self::_puroro::tags::Float>,
@@ -294,7 +310,26 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     }
 }
 
-pub(crate) union GroupThree {
+impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for GroupTwoCaseRef<'a> {
+    type Case = self::GroupTwoCase;
+    type Union = self::GroupTwo;
+    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match case {
+            self::GroupTwoCase::G2F32 => {
+                self::GroupTwoCaseRef::G2F32(unsafe { &u.g2_f32 }.get_field())
+            }
+            self::GroupTwoCase::G2String => {
+                self::GroupTwoCaseRef::G2String(unsafe { &u.g2_string }.get_field())
+            }
+            self::GroupTwoCase::G2Submsg => {
+                self::GroupTwoCaseRef::G2Submsg(unsafe { &u.g2_submsg }.get_field())
+            }
+        }
+    }
+}
+
+pub union GroupThree {
     _none: (),
     g3_int32: ::std::mem::ManuallyDrop<
         self::_puroro::internal::oneof_field_type::NumericalField<i32, self::_puroro::tags::Int32>,
@@ -391,6 +426,19 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
         match x {
             0 => Some(self::GroupThreeCase::G3Int32),
             _ => None,
+        }
+    }
+}
+
+impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for GroupThreeCaseRef {
+    type Case = self::GroupThreeCase;
+    type Union = self::GroupThree;
+    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match case {
+            self::GroupThreeCase::G3Int32 => {
+                self::GroupThreeCaseRef::G3Int32(unsafe { &u.g3_int32 }.get_field())
+            }
         }
     }
 }

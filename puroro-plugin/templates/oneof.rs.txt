@@ -1,7 +1,7 @@
 
 {#- Oneof union. Includes None case #}
 {#- Neither Clone and Drop are implementable without the bitslice info. #}
-pub(crate) union {{ ident_union }} {
+pub union {{ ident_union }} {
     _none: (),
     {%- for field in fields %}
     {{ field.ident_union_item }}: {{ field.rust_field_type }},
@@ -116,6 +116,22 @@ impl self::_puroro::internal::oneof_type::OneofCase for {{ ident_case }} {
             {{ field.index }} => Some(self::{{ ident_case }}::{{ field.ident_enum_item }}),
             {%- endfor %} {#- for field in fields #}
             _ => None,
+        }
+    }
+}
+
+impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for {{ ident_case_ref }} {%- if has_ld_type %}<'a>{%- endif %} {
+    type Case = self::{{ ident_case }};
+    type Union = self::{{ ident_union }};
+    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match case {
+            {%- for field in fields %}
+            self::{{ ident_case }}::{{ field.ident_enum_item }} => 
+                self::{{ ident_case_ref }}::{{ field.ident_enum_item }}(
+                    unsafe { &u.{{ field.ident_union_item }} }.get_field()
+                ),
+            {%- endfor %} {#- for field in fields #}
         }
     }
 }
