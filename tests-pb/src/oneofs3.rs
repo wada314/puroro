@@ -31,6 +31,10 @@ impl Msg {
             <_puroro_root::oneofs3::msg::GroupOneCase as OneofCase>::from_bitslice(&self._bitfield);
         case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_one, case))
     }
+
+    pub fn clear_group_one(&mut self) {
+        self.group_one._clear(&mut self._bitfield);
+    }
     pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_one.g1_int32_opt(&self._bitfield)
     }
@@ -44,6 +48,10 @@ impl Msg {
         let case_opt =
             <_puroro_root::oneofs3::msg::GroupTwoCase as OneofCase>::from_bitslice(&self._bitfield);
         case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_two, case))
+    }
+
+    pub fn clear_group_two(&mut self) {
+        self.group_two._clear(&mut self._bitfield);
     }
     pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
         self.group_two.g2_f32_opt(&self._bitfield)
@@ -62,6 +70,10 @@ impl Msg {
             &self._bitfield,
         );
         case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_three, case))
+    }
+
+    pub fn clear_group_three(&mut self) {
+        self.group_three._clear(&mut self._bitfield);
     }
     pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_three.g3_int32_opt(&self._bitfield)

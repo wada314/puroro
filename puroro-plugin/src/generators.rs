@@ -377,6 +377,7 @@ pub struct Oneof {
     pub ident_case_ref: String,
     pub ident_struct_field: String,
     pub ident_getter: String,
+    pub ident_clear: String,
     pub rust_field_type: String,
     pub rust_case_type: String,
     pub rust_getter_type: String,
@@ -411,6 +412,7 @@ impl Oneof {
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
+        let ident_clear = format!("clear_{}", o.name().to_lower_snake_case());
         let rust_field_type = format!(
             "{}::{}",
             o.parent().fqtn().to_rust_module_path(),
@@ -449,6 +451,7 @@ impl Oneof {
             ident_case_ref,
             ident_struct_field,
             ident_getter,
+            ident_clear,
             rust_field_type,
             rust_case_type,
             rust_getter_type,

@@ -86,6 +86,10 @@ impl {{ ident_struct }} {
         case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.{{ oneof.ident_struct_field }}, case))
     }
 
+    pub fn {{ oneof.ident_clear }}(&mut self) {
+        self.{{ oneof.ident_struct_field }}._clear(&mut self._bitfield);
+    }
+
     {%- for field in oneof.fields %}
     {#- oneof item getter #}
     pub fn {{ field.ident_opt_getter }}(&self) -> {{ field.rust_opt_getter_type }} {
