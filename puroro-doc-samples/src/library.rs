@@ -105,7 +105,7 @@ impl Book {
         > as NonRepeatedFieldType>::clear(&mut self.num_pages, &mut self._bitfield)
     }
     // Singular, LengthDelimited(Message(Fqtn(".library.Author")))
-    pub fn author(&self) -> Option<&_puroro_root::library::Author> {
+    pub fn author(&self) -> ::std::option::Option<&_puroro_root::library::Author> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field(
             &self.author, &self._bitfield, ::std::default::Default::default,

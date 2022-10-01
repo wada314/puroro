@@ -241,7 +241,7 @@ pub struct Test3 {
 
 impl Test3 {
     // Singular, LengthDelimited(Message(Fqtn(".official_samples3.Test1")))
-    pub fn c(&self) -> Option<&_puroro_root::official_samples3::Test1> {
+    pub fn c(&self) -> ::std::option::Option<&_puroro_root::official_samples3::Test1> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::official_samples3::Test1,

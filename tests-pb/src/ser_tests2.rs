@@ -261,7 +261,7 @@ impl Msg {
         )
     }
     // Optional, LengthDelimited(Message(Fqtn(".ser_tests2.Msg.Submsg")))
-    pub fn submsg_optional(&self) -> Option<&_puroro_root::ser_tests2::msg::Submsg> {
+    pub fn submsg_optional(&self) -> ::std::option::Option<&_puroro_root::ser_tests2::msg::Submsg> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::ser_tests2::msg::Submsg,

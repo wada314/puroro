@@ -21,6 +21,9 @@ pub struct Dummy;
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
+pub struct BytesField(Vec<u8>);
+
+#[derive(Default, Clone)]
 pub struct StringField(String);
 
 #[derive(Default, Clone)]
@@ -64,6 +67,21 @@ where
         self.0.clone()
     }
     type MutGetterType<'a> = &'a mut RustType
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
+        &mut self.0
+    }
+}
+
+impl OneofFieldType for BytesField {
+    type GetterType<'a> = &'a [u8]
+    where
+        Self: 'a;
+    fn get_field(&self) -> Self::GetterType<'_> {
+        self.0.as_ref()
+    }
+    type MutGetterType<'a> = &'a mut Vec<u8>
     where
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {

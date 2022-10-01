@@ -330,6 +330,15 @@ impl Field {
                 (Repeated, LengthDelimited(String)) => {
                     format!("RepeatedStringField")
                 }
+                (Optional, LengthDelimited(Bytes)) => {
+                    format!("OptionalBytesField<{}>", bit_index_for_optional)
+                }
+                (Singular, LengthDelimited(Bytes)) => {
+                    format!("SingularBytesField")
+                }
+                (Repeated, LengthDelimited(Bytes)) => {
+                    format!("RepeatedBytesField")
+                }
                 (Optional | Singular, LengthDelimited(Message(fqtn))) => {
                     format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
                 }
@@ -514,6 +523,9 @@ impl OneofField {
                         wire_type.into_tag_type(),
                     )
                 }
+                LengthDelimited(Bytes) => {
+                    format!("BytesField")
+                }
                 LengthDelimited(String) => {
                     format!("StringField")
                 }
@@ -638,7 +650,7 @@ impl WireType {
                 LengthDelimited(String) => "&str".into(),
                 LengthDelimited(Bytes) => "&[u8]".into(),
                 LengthDelimited(Message(fqtn)) => {
-                    format!("Option<&{}>", fqtn.to_rust_path()).into()
+                    format!("::std::option::Option<&{}>", fqtn.to_rust_path()).into()
                 }
                 Bits32(x) => x.into_owned_rust_type(),
                 Bits64(x) => x.into_owned_rust_type(),
