@@ -100,6 +100,15 @@ impl NumericalType for Int32 {
 }
 impl NumericalType for Int64 {
     type RustType = i64;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(i64::from_le_bytes(bytes))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(val)))
+    }
 }
 impl NumericalType for UInt32 {
     type RustType = u32;
@@ -115,9 +124,30 @@ impl NumericalType for UInt32 {
 }
 impl NumericalType for UInt64 {
     type RustType = u64;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(val))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(val)))
+    }
 }
 impl NumericalType for SInt32 {
     type RustType = i32;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
+        Ok(decode_sint32(val_u32))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(encode_sint32(val).into()))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(
+            encode_sint32(val).into(),
+        )))
+    }
 }
 impl NumericalType for SInt64 {
     type RustType = i64;
@@ -186,4 +216,35 @@ impl NumericalType for Fixed64 {
 }
 impl NumericalType for SFixed64 {
     type RustType = i64;
+}
+
+fn encode_sint32(s: i32) -> u32 {
+    u32::from_le_bytes(((s << 1) ^ (s >> 31)).to_le_bytes())
+}
+fn encode_sint64(s: i64) -> u64 {
+    u64::from_le_bytes(((s << 1) ^ (s >> 63)).to_le_bytes())
+}
+fn decode_sint32(i: u32) -> i32 {
+    i32::from_le_bytes(((i >> 1) ^ (0u32.wrapping_sub(i & 1))).to_le_bytes())
+}
+fn decode_sint64(i: u64) -> i64 {
+    i64::from_le_bytes(((i >> 1) ^ (0u64.wrapping_sub(i & 1))).to_le_bytes())
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_sint32() {
+        fn check(s: i32) {
+            assert_eq!(s, decode_sint32(encode_sint32(s)))
+        }
+        check(0);
+        check(1);
+        check(2);
+        check(3);
+        check(i32::MIN);
+        check(i32::MIN + 1);
+        check(i32::MAX);
+        check(i32::MAX - 1);
+    }
 }
