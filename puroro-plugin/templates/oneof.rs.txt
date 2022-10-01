@@ -27,7 +27,7 @@ pub enum {{ ident_case_ref }} {%- if has_ld_type %}<'a>{%- endif %} {
 
 impl {{ ident_union }} {
     {%- for field in fields %}
-    pub(crate) fn {{ field.ident_opt_getter }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_opt_getter_type }} {
+    pub(crate) fn {{ field.ident_getter_opt }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_opt_getter_type }} {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_type::OneofCase;

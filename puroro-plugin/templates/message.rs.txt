@@ -94,9 +94,26 @@ impl {{ ident_struct }} {
     }
 
     {%- for field in oneof.fields %}
-    {#- oneof item getter #}
-    pub fn {{ field.ident_opt_getter }}(&self) -> {{ field.rust_opt_getter_type }} {
-        self.{{ oneof.ident_struct_field }}.{{ field.ident_opt_getter }}(&self._bitfield)
+    {#- oneof item getter / setters #}
+    pub fn {{ field.ident_getter_opt }}(&self) -> {{ field.rust_opt_getter_type }} {
+        self.{{ oneof.ident_struct_field }}.{{ field.ident_getter_opt }}(&self._bitfield)
+    }
+
+    pub fn {{ field.ident_has }}(&self) -> bool {
+        self.{{ field.ident_getter_opt }}.is_some()
+    }
+
+    pub fn {{ field.ident_clear }}(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofCase;
+        match <{{ oneof.rust_case_type }} as OneofCase>::from_bitslice(&self._bitfield) {
+            Some({{ oneof.rust_union_type  }}::{{ field.ident_enum_item }}) => {
+                self.{{ oneof.ident_clear }}();
+            }
+            _ => ()
+        }
     }
 
     {%- endfor %} {#- for field in oneof.fields #}

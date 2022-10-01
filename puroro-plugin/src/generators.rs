@@ -379,6 +379,7 @@ pub struct Oneof {
     pub ident_getter: String,
     pub ident_clear: String,
     pub rust_field_type: String,
+    pub rust_union_type: String,
     pub rust_case_type: String,
     pub rust_getter_type: String,
     pub fields: Vec<OneofField>,
@@ -418,6 +419,11 @@ impl Oneof {
             o.parent().fqtn().to_rust_module_path(),
             &ident_union
         );
+        let rust_union_type = format!(
+            "{}::{}",
+            o.parent().fqtn().to_rust_module_path(),
+            &ident_union
+        );
         let rust_case_type = format!(
             "{}::{}",
             o.parent().fqtn().to_rust_module_path(),
@@ -453,6 +459,7 @@ impl Oneof {
             ident_getter,
             ident_clear,
             rust_field_type,
+            rust_union_type,
             rust_case_type,
             rust_getter_type,
             fields,
@@ -468,8 +475,10 @@ impl Oneof {
 pub struct OneofField {
     pub ident_camel: String,
     pub ident_union_item: String,
-    pub ident_opt_getter: String,
+    pub ident_getter_opt: String,
     pub ident_enum_item: String,
+    pub ident_has: String,
+    pub ident_clear: String,
     pub index: usize,
     pub rust_field_type: String,
     pub rust_field_inner_type: String,
@@ -489,7 +498,9 @@ impl OneofField {
             .to_lower_snake_case()
             .escape_rust_keywords()
             .to_string();
-        let ident_opt_getter = format!("{}_opt", f.name().to_lower_snake_case());
+        let ident_getter_opt = format!("{}_opt", f.name().to_lower_snake_case());
+        let ident_has = format!("has_{}", f.name().to_lower_snake_case());
+        let ident_clear = format!("clear_{}", f.name().to_lower_snake_case());
         let ident_enum_item = f.name().to_camel_case().escape_rust_keywords().to_string();
         let wire_type = WireType::from_oneof_field(f, resolver)?;
         let rust_field_inner_type_name = {
@@ -524,7 +535,9 @@ impl OneofField {
         Ok(Self {
             ident_camel,
             ident_union_item,
-            ident_opt_getter,
+            ident_getter_opt,
+            ident_has,
+            ident_clear,
             ident_enum_item,
             index,
             rust_field_type,
