@@ -87,7 +87,10 @@ impl {{ ident_struct }} {
     }
 
     pub fn {{ oneof.ident_clear }}(&mut self) {
-        self.{{ oneof.ident_struct_field }}._clear(&mut self._bitfield);
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <{{ oneof.rust_field_type}} as OneofUnion>::clear(
+            &mut self.{{ oneof.ident_struct_field }}, &mut self._bitfield
+        );
     }
 
     {%- for field in oneof.fields %}
@@ -137,13 +140,18 @@ impl ::std::clone::Clone for {{ ident_struct }} {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::clone::Clone;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
         Self {
             {%- for field in fields %}
             {{ field.ident_struct_field }}: Clone::clone(&self.{{ field.ident_struct_field }}),
             {%- endfor %} {#- for field in fields #}
 
             {%- for oneof in oneofs %}
-            {{ oneof.ident_struct_field }}: self.{{ oneof.ident_struct_field }}._clone(&self._bitfield),
+            {{ oneof.ident_struct_field }}: 
+                <{{ oneof.rust_field_type}} as OneofUnion>::clone(
+                    &self.{{ oneof.ident_struct_field }}, 
+                    &self._bitfield),
             {%- endfor %} {#- for oneof in oneofs #}
 
             _bitfield: Clone::clone(&self._bitfield),
@@ -164,9 +172,15 @@ impl ::std::fmt::Debug for {{ ident_struct }} {
 
 impl ::std::ops::Drop for {{ ident_struct }} {
     fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
         {#- We need to explicitly clear the oneof unions. #}
         {%- for oneof in oneofs %}
-        self.{{ oneof.ident_struct_field }}._clear(&mut self._bitfield);
+        <{{ oneof.rust_field_type}} as OneofUnion>::clear(
+            &mut self.{{ oneof.ident_struct_field }}, 
+            &mut self._bitfield
+        );
         {%- endfor %} {#- for oneof in oneofs #}
     }
 }

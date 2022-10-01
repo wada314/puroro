@@ -104,6 +104,8 @@ impl self::_puroro::Message for Msg {
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             recursive_unlabeled: Clone::clone(&self.recursive_unlabeled),
@@ -125,5 +127,8 @@ impl ::std::fmt::Debug for Msg {
 }
 
 impl ::std::ops::Drop for Msg {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }

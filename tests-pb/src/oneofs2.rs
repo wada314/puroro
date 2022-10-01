@@ -33,7 +33,11 @@ impl Msg {
     }
 
     pub fn clear_group_one(&mut self) {
-        self.group_one._clear(&mut self._bitfield);
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupOne as OneofUnion>::clear(
+            &mut self.group_one,
+            &mut self._bitfield,
+        );
     }
     pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_one.g1_int32_opt(&self._bitfield)
@@ -51,7 +55,11 @@ impl Msg {
     }
 
     pub fn clear_group_two(&mut self) {
-        self.group_two._clear(&mut self._bitfield);
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupTwo as OneofUnion>::clear(
+            &mut self.group_two,
+            &mut self._bitfield,
+        );
     }
     pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
         self.group_two.g2_f32_opt(&self._bitfield)
@@ -73,7 +81,11 @@ impl Msg {
     }
 
     pub fn clear_group_three(&mut self) {
-        self.group_three._clear(&mut self._bitfield);
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupThree as OneofUnion>::clear(
+            &mut self.group_three,
+            &mut self._bitfield,
+        );
     }
     pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_three.g3_int32_opt(&self._bitfield)
@@ -113,11 +125,22 @@ impl self::_puroro::Message for Msg {
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
-            group_one: self.group_one._clone(&self._bitfield),
-            group_two: self.group_two._clone(&self._bitfield),
-            group_three: self.group_three._clone(&self._bitfield),
+            group_one: <_puroro_root::oneofs2::msg::GroupOne as OneofUnion>::clone(
+                &self.group_one,
+                &self._bitfield,
+            ),
+            group_two: <_puroro_root::oneofs2::msg::GroupTwo as OneofUnion>::clone(
+                &self.group_two,
+                &self._bitfield,
+            ),
+            group_three: <_puroro_root::oneofs2::msg::GroupThree as OneofUnion>::clone(
+                &self.group_three,
+                &self._bitfield,
+            ),
 
             _bitfield: Clone::clone(&self._bitfield),
         }
@@ -135,9 +158,20 @@ impl ::std::fmt::Debug for Msg {
 
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
-        self.group_one._clear(&mut self._bitfield);
-        self.group_two._clear(&mut self._bitfield);
-        self.group_three._clear(&mut self._bitfield);
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupOne as OneofUnion>::clear(
+            &mut self.group_one,
+            &mut self._bitfield,
+        );
+        <_puroro_root::oneofs2::msg::GroupTwo as OneofUnion>::clear(
+            &mut self.group_two,
+            &mut self._bitfield,
+        );
+        <_puroro_root::oneofs2::msg::GroupThree as OneofUnion>::clear(
+            &mut self.group_three,
+            &mut self._bitfield,
+        );
     }
 }
 
@@ -248,6 +282,8 @@ impl self::_puroro::Message for Submsg {
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             i32_optional: Clone::clone(&self.i32_optional),
@@ -269,5 +305,8 @@ impl ::std::fmt::Debug for Submsg {
 }
 
 impl ::std::ops::Drop for Submsg {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }

@@ -14,6 +14,15 @@
 
 use crate::bitvec::BitSlice;
 
+pub trait OneofUnion {
+    type CaseRef<'a>: OneofCaseRef<'a, Union = Self>
+    where
+        Self: 'a;
+    fn case_ref<B: BitSlice>(&self, bits: &B) -> Self::CaseRef<'_>;
+    fn clear<B: BitSlice>(&mut self, bits: &mut B);
+    fn clone<B: BitSlice>(&self, bits: &B) -> Self;
+}
+
 pub trait OneofCase: Sized {
     const BITFIELD_BEGIN: usize;
     const BITFIELD_END: usize;

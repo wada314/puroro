@@ -191,6 +191,8 @@ impl self::_puroro::Message for Book {
 impl ::std::clone::Clone for Book {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             title: Clone::clone(&self.title),
@@ -216,7 +218,10 @@ impl ::std::fmt::Debug for Book {
 }
 
 impl ::std::ops::Drop for Book {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }
 
 #[derive(Default)]
@@ -302,6 +307,8 @@ impl self::_puroro::Message for Author {
 impl ::std::clone::Clone for Author {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             name: Clone::clone(&self.name),
@@ -323,5 +330,8 @@ impl ::std::fmt::Debug for Author {
 }
 
 impl ::std::ops::Drop for Author {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }

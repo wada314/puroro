@@ -117,6 +117,8 @@ impl self::_puroro::Message for Submsg {
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             i32_optional: Clone::clone(&self.i32_optional),
@@ -138,5 +140,8 @@ impl ::std::fmt::Debug for Submsg {
 }
 
 impl ::std::ops::Drop for Submsg {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }

@@ -92,6 +92,8 @@ impl self::_puroro::Message for Test1 {
 impl ::std::clone::Clone for Test1 {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             a: Clone::clone(&self.a),
@@ -111,7 +113,10 @@ impl ::std::fmt::Debug for Test1 {
 }
 
 impl ::std::ops::Drop for Test1 {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }
 
 #[derive(Default)]
@@ -197,6 +202,8 @@ impl self::_puroro::Message for Test2 {
 impl ::std::clone::Clone for Test2 {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             b: Clone::clone(&self.b),
@@ -216,7 +223,10 @@ impl ::std::fmt::Debug for Test2 {
 }
 
 impl ::std::ops::Drop for Test2 {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }
 
 #[derive(Default)]
@@ -312,6 +322,8 @@ impl self::_puroro::Message for Test3 {
 impl ::std::clone::Clone for Test3 {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             c: Clone::clone(&self.c),
@@ -331,7 +343,10 @@ impl ::std::fmt::Debug for Test3 {
 }
 
 impl ::std::ops::Drop for Test3 {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }
 
 #[derive(Default)]
@@ -405,6 +420,8 @@ impl self::_puroro::Message for Test4 {
 impl ::std::clone::Clone for Test4 {
     fn clone(&self) -> Self {
         #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::clone::Clone;
         Self {
             d: Clone::clone(&self.d),
@@ -424,5 +441,8 @@ impl ::std::fmt::Debug for Test4 {
 }
 
 impl ::std::ops::Drop for Test4 {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+    }
 }
