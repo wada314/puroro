@@ -52,13 +52,24 @@ impl RepeatedFieldType for RepeatedStringField {
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
-
     type ContainerType = Vec<Self::ScalarType>;
-
     fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear()
+    }
+}
 
+impl RepeatedFieldType for RepeatedBytesField {
+    type ScalarType = Vec<u8>;
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
+        self.0.as_slice()
+    }
+    type ContainerType = Vec<Self::ScalarType>;
+    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+        &mut self.0
+    }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
         self.0.clear()
     }

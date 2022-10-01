@@ -201,6 +201,53 @@ impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
     }
 }
 
+impl NonRepeatedNonMessageFieldType for SingularBytesField {
+    type GetterType<'a> = &'a [u8]
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Option<Self::GetterType<'_>> {
+        (!self.0.is_empty()).then(|| self.0.as_ref())
+    }
+    type MutGetterType<'a> = &'a mut Vec<u8> where Self: 'a;
+    fn mut_field<'a, B: BitSlice, D: FnOnce() -> Self::GetterType<'a>>(
+        &'a mut self,
+        _bitvec: &mut B,
+        _default: D,
+    ) -> Self::MutGetterType<'a> {
+        &mut self.0
+    }
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear();
+    }
+}
+
+impl<const BITFIELD_INDEX: usize> NonRepeatedNonMessageFieldType
+    for OptionalBytesField<BITFIELD_INDEX>
+{
+    type GetterType<'a> = &'a[u8]
+    where
+        Self: 'a;
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Option<Self::GetterType<'_>> {
+        bitvec.get(BITFIELD_INDEX).then(|| self.0.as_ref())
+    }
+    type MutGetterType<'a> = &'a mut Vec<u8> where Self: 'a;
+    fn mut_field<'a, B: BitSlice, D: FnOnce() -> Self::GetterType<'a>>(
+        &'a mut self,
+        bitvec: &mut B,
+        default: D,
+    ) -> Self::MutGetterType<'a> {
+        if !bitvec.get(BITFIELD_INDEX) {
+            self.0 = default().into();
+            bitvec.set(BITFIELD_INDEX, true);
+        }
+        &mut self.0
+    }
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
+        bitvec.set(BITFIELD_INDEX, false);
+        self.0.clear();
+    }
+}
+
 impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
 where
     M: Message + Default,
