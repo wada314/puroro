@@ -194,7 +194,7 @@ impl ::std::ops::Drop for {{ ident_struct }} {
 
         {#- We need to explicitly clear the oneof unions. #}
         {%- for oneof in oneofs %}
-        <{{ oneof.rust_field_type}} as OneofUnion>::clear(
+        <{{ oneof.rust_union_type}} as OneofUnion>::clear(
             &mut self.{{ oneof.ident_struct_field }}, 
             &mut self._bitfield
         );
