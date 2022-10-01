@@ -31,6 +31,10 @@ pub trait OneofFieldType {
     where
         Self: 'a;
     fn get_field(&self) -> Self::GetterType<'_>;
+    type MutGetterType<'a>
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_>;
 }
 
 impl OneofFieldType for Dummy {
@@ -39,6 +43,12 @@ impl OneofFieldType for Dummy {
         Self: 'a;
 
     fn get_field(&self) -> Self::GetterType<'_> {
+        ()
+    }
+    type MutGetterType<'a> = ()
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         ()
     }
 }
@@ -53,6 +63,12 @@ where
     fn get_field(&self) -> Self::GetterType<'_> {
         self.0.clone()
     }
+    type MutGetterType<'a> = &'a mut RustType
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
+        &mut self.0
+    }
 }
 
 impl OneofFieldType for StringField {
@@ -62,14 +78,25 @@ impl OneofFieldType for StringField {
     fn get_field(&self) -> Self::GetterType<'_> {
         self.0.as_str()
     }
+    type MutGetterType<'a> = &'a mut String
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
+        &mut self.0
+    }
 }
 
 impl<M> OneofFieldType for HeapMessageField<M> {
     type GetterType<'a> = &'a M
     where
         Self: 'a;
-
     fn get_field(&self) -> Self::GetterType<'_> {
         &self.0
+    }
+    type MutGetterType<'a> = &'a mut M
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
+        &mut self.0
     }
 }
