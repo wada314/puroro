@@ -26,7 +26,10 @@ impl Msg {
     pub fn group_one(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupOneCaseRef<'_>> {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt =
+            <_puroro_root::oneofs2::msg::GroupOneCase as OneofCase>::from_bitslice(&self._bitfield);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_one, case))
     }
     pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_one.g1_int32_opt(&self._bitfield)
@@ -37,7 +40,10 @@ impl Msg {
     pub fn group_two(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupTwoCaseRef<'_>> {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt =
+            <_puroro_root::oneofs2::msg::GroupTwoCase as OneofCase>::from_bitslice(&self._bitfield);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_two, case))
     }
     pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
         self.group_two.g2_f32_opt(&self._bitfield)
@@ -51,7 +57,11 @@ impl Msg {
     pub fn group_three(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupThreeCaseRef> {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt = <_puroro_root::oneofs2::msg::GroupThreeCase as OneofCase>::from_bitslice(
+            &self._bitfield,
+        );
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_three, case))
     }
     pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_three.g3_int32_opt(&self._bitfield)

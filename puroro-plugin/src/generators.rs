@@ -378,6 +378,7 @@ pub struct Oneof {
     pub ident_struct_field: String,
     pub ident_getter: String,
     pub rust_field_type: String,
+    pub rust_case_type: String,
     pub rust_getter_type: String,
     pub fields: Vec<OneofField>,
     pub has_ld_type: bool,
@@ -415,6 +416,11 @@ impl Oneof {
             o.parent().fqtn().to_rust_module_path(),
             &ident_union
         );
+        let rust_case_type = format!(
+            "{}::{}",
+            o.parent().fqtn().to_rust_module_path(),
+            &ident_case
+        );
         let rust_getter_type = format!(
             "::std::option::Option<{}::{}{}>",
             o.parent().fqtn().to_rust_module_path(),
@@ -444,6 +450,7 @@ impl Oneof {
             ident_struct_field,
             ident_getter,
             rust_field_type,
+            rust_case_type,
             rust_getter_type,
             fields,
             has_ld_type,

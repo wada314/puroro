@@ -81,7 +81,9 @@ impl {{ ident_struct }} {
     {%- for oneof in oneofs %}
     {#- oneof group getter #}
     pub fn {{ oneof.ident_getter }}(&self) -> {{ oneof.rust_getter_type }} {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt = <{{ oneof.rust_case_type }} as OneofCase>::from_bitslice(&self._bitfield);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.{{ oneof.ident_struct_field }}, case))
     }
 
     {%- for field in oneof.fields %}
