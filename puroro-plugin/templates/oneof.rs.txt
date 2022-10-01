@@ -34,7 +34,7 @@ impl {{ ident_union }} {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
         let case_opt = self::{{ ident_case }}::from_bitslice(bits);
-        if let Some({{ ident_case }}::{{ field.ident_enum_item }}) = case_opt {
+        if let Some(self::{{ ident_case }}::{{ field.ident_enum_item }}) = case_opt {
             let item = unsafe {
                 &self.{{ field.ident_union_item }}
             };
@@ -50,13 +50,12 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
     type CaseRef<'a> = self::{{ ident_case_ref }}{% if has_ld_type %}<'a>{% endif %}
         where Self: 'a;
 
-    fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, _bits: &B) -> Self::CaseRef<'_> {
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-        use self::_puroro::internal::oneof_type::OneofCase;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType;
-
-        todo!()
+    fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B)
+        -> ::std::option::Option<Self::CaseRef<'_>>
+    {
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt = <{{ rust_case_type }} as OneofCase>::from_bitslice(bits);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(self, case))
     }
 
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
@@ -69,7 +68,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
 
         match self::{{ ident_case }}::from_bitslice(bits) {
             {%- for field in fields %}
-            Some({{ ident_case  }}::{{ field.ident_enum_item }}) => {
+            Some(self::{{ ident_case  }}::{{ field.ident_enum_item }}) => {
                 unsafe { ManuallyDrop::take(&mut self.{{ field.ident_union_item }}) };
             }
             {%- endfor %} {#- for field in fields #}

@@ -81,9 +81,10 @@ impl {{ ident_struct }} {
     {%- for oneof in oneofs %}
     {#- oneof group getter #}
     pub fn {{ oneof.ident_getter }}(&self) -> {{ oneof.rust_getter_type }} {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        let case_opt = <{{ oneof.rust_case_type }} as OneofCase>::from_bitslice(&self._bitfield);
-        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.{{ oneof.ident_struct_field }}, case))
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <{{ oneof.rust_union_type }} as OneofUnion>::case_ref(
+            &self.{{ oneof.ident_struct_field }}, &self._bitfield
+        )
     }
 
     pub fn {{ oneof.ident_clear }}(&mut self) {
@@ -100,7 +101,7 @@ impl {{ ident_struct }} {
     }
 
     pub fn {{ field.ident_has }}(&self) -> bool {
-        self.{{ field.ident_getter_opt }}.is_some()
+        self.{{ field.ident_getter_opt }}().is_some()
     }
 
     pub fn {{ field.ident_clear }}(&mut self) {
@@ -109,7 +110,7 @@ impl {{ ident_struct }} {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
         match <{{ oneof.rust_case_type }} as OneofCase>::from_bitslice(&self._bitfield) {
-            Some({{ oneof.rust_union_type  }}::{{ field.ident_enum_item }}) => {
+            Some({{ oneof.rust_case_type  }}::{{ field.ident_enum_item }}) => {
                 self.{{ oneof.ident_clear }}();
             }
             _ => ()

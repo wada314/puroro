@@ -40,7 +40,7 @@ impl GroupOne {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        if let Some(GroupOneCase::G1Int32) = case_opt {
+        if let Some(self::GroupOneCase::G1Int32) = case_opt {
             let item = unsafe { &self.g1_int32 };
             Some(item.get_field())
         } else {
@@ -57,7 +57,7 @@ impl GroupOne {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        if let Some(GroupOneCase::G1String) = case_opt {
+        if let Some(self::GroupOneCase::G1String) = case_opt {
             let item = unsafe { &self.g1_string };
             Some(item.get_field())
         } else {
@@ -70,13 +70,13 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
     type CaseRef<'a> = self::GroupOneCaseRef<'a>
         where Self: 'a;
 
-    fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, _bits: &B) -> Self::CaseRef<'_> {
-        use self::_puroro::internal::oneof_field_type::OneofFieldType;
-        use self::_puroro::internal::oneof_type::OneofCase;
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-
-        todo!()
+    fn case_ref<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option<Self::CaseRef<'_>> {
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt = <_puroro_root::oneofs3::msg::GroupOneCase as OneofCase>::from_bitslice(bits);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(self, case))
     }
 
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
@@ -88,10 +88,10 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         use ::std::option::Option::Some;
 
         match self::GroupOneCase::from_bitslice(bits) {
-            Some(GroupOneCase::G1Int32) => {
+            Some(self::GroupOneCase::G1Int32) => {
                 unsafe { ManuallyDrop::take(&mut self.g1_int32) };
             }
-            Some(GroupOneCase::G1String) => {
+            Some(self::GroupOneCase::G1String) => {
                 unsafe { ManuallyDrop::take(&mut self.g1_string) };
             }
             _ => (),
@@ -191,7 +191,7 @@ impl GroupTwo {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        if let Some(GroupTwoCase::G2F32) = case_opt {
+        if let Some(self::GroupTwoCase::G2F32) = case_opt {
             let item = unsafe { &self.g2_f32 };
             Some(item.get_field())
         } else {
@@ -208,7 +208,7 @@ impl GroupTwo {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        if let Some(GroupTwoCase::G2String) = case_opt {
+        if let Some(self::GroupTwoCase::G2String) = case_opt {
             let item = unsafe { &self.g2_string };
             Some(item.get_field())
         } else {
@@ -225,7 +225,7 @@ impl GroupTwo {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        if let Some(GroupTwoCase::G2Submsg) = case_opt {
+        if let Some(self::GroupTwoCase::G2Submsg) = case_opt {
             let item = unsafe { &self.g2_submsg };
             Some(item.get_field())
         } else {
@@ -238,13 +238,13 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
     type CaseRef<'a> = self::GroupTwoCaseRef<'a>
         where Self: 'a;
 
-    fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, _bits: &B) -> Self::CaseRef<'_> {
-        use self::_puroro::internal::oneof_field_type::OneofFieldType;
-        use self::_puroro::internal::oneof_type::OneofCase;
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-
-        todo!()
+    fn case_ref<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option<Self::CaseRef<'_>> {
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt = <_puroro_root::oneofs3::msg::GroupTwoCase as OneofCase>::from_bitslice(bits);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(self, case))
     }
 
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
@@ -256,13 +256,13 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         use ::std::option::Option::Some;
 
         match self::GroupTwoCase::from_bitslice(bits) {
-            Some(GroupTwoCase::G2F32) => {
+            Some(self::GroupTwoCase::G2F32) => {
                 unsafe { ManuallyDrop::take(&mut self.g2_f32) };
             }
-            Some(GroupTwoCase::G2String) => {
+            Some(self::GroupTwoCase::G2String) => {
                 unsafe { ManuallyDrop::take(&mut self.g2_string) };
             }
-            Some(GroupTwoCase::G2Submsg) => {
+            Some(self::GroupTwoCase::G2Submsg) => {
                 unsafe { ManuallyDrop::take(&mut self.g2_submsg) };
             }
             _ => (),
@@ -361,7 +361,7 @@ impl GroupThree {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupThreeCase::from_bitslice(bits);
-        if let Some(GroupThreeCase::G3Int32) = case_opt {
+        if let Some(self::GroupThreeCase::G3Int32) = case_opt {
             let item = unsafe { &self.g3_int32 };
             Some(item.get_field())
         } else {
@@ -374,13 +374,14 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
     type CaseRef<'a> = self::GroupThreeCaseRef
         where Self: 'a;
 
-    fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, _bits: &B) -> Self::CaseRef<'_> {
-        use self::_puroro::internal::oneof_field_type::OneofFieldType;
-        use self::_puroro::internal::oneof_type::OneofCase;
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-
-        todo!()
+    fn case_ref<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option<Self::CaseRef<'_>> {
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt =
+            <_puroro_root::oneofs3::msg::GroupThreeCase as OneofCase>::from_bitslice(bits);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(self, case))
     }
 
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
@@ -392,7 +393,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         use ::std::option::Option::Some;
 
         match self::GroupThreeCase::from_bitslice(bits) {
-            Some(GroupThreeCase::G3Int32) => {
+            Some(self::GroupThreeCase::G3Int32) => {
                 unsafe { ManuallyDrop::take(&mut self.g3_int32) };
             }
             _ => (),

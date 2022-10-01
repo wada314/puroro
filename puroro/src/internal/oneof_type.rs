@@ -18,7 +18,7 @@ pub trait OneofUnion {
     type CaseRef<'a>: OneofCaseRef<'a, Union = Self>
     where
         Self: 'a;
-    fn case_ref<B: BitSlice>(&self, bits: &B) -> Self::CaseRef<'_>;
+    fn case_ref<B: BitSlice>(&self, bits: &B) -> Option<Self::CaseRef<'_>>;
     fn clear<B: BitSlice>(&mut self, bits: &mut B);
     fn clone<B: BitSlice>(&self, bits: &B) -> Self;
 }

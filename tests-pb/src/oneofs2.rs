@@ -26,10 +26,11 @@ impl Msg {
     pub fn group_one(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupOneCaseRef<'_>> {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        let case_opt =
-            <_puroro_root::oneofs2::msg::GroupOneCase as OneofCase>::from_bitslice(&self._bitfield);
-        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_one, case))
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupOne as OneofUnion>::case_ref(
+            &self.group_one,
+            &self._bitfield,
+        )
     }
 
     pub fn clear_group_one(&mut self) {
@@ -44,7 +45,7 @@ impl Msg {
     }
 
     pub fn has_g1_int32(&self) -> bool {
-        self.g1_int32_opt.is_some()
+        self.g1_int32_opt().is_some()
     }
 
     pub fn clear_g1_int32(&mut self) {
@@ -55,7 +56,7 @@ impl Msg {
         match <_puroro_root::oneofs2::msg::GroupOneCase as OneofCase>::from_bitslice(
             &self._bitfield,
         ) {
-            Some(_puroro_root::oneofs2::msg::GroupOne::G1Int32) => {
+            Some(_puroro_root::oneofs2::msg::GroupOneCase::G1Int32) => {
                 self.clear_group_one();
             }
             _ => (),
@@ -66,7 +67,7 @@ impl Msg {
     }
 
     pub fn has_g1_string(&self) -> bool {
-        self.g1_string_opt.is_some()
+        self.g1_string_opt().is_some()
     }
 
     pub fn clear_g1_string(&mut self) {
@@ -77,7 +78,7 @@ impl Msg {
         match <_puroro_root::oneofs2::msg::GroupOneCase as OneofCase>::from_bitslice(
             &self._bitfield,
         ) {
-            Some(_puroro_root::oneofs2::msg::GroupOne::G1String) => {
+            Some(_puroro_root::oneofs2::msg::GroupOneCase::G1String) => {
                 self.clear_group_one();
             }
             _ => (),
@@ -86,10 +87,11 @@ impl Msg {
     pub fn group_two(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupTwoCaseRef<'_>> {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        let case_opt =
-            <_puroro_root::oneofs2::msg::GroupTwoCase as OneofCase>::from_bitslice(&self._bitfield);
-        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_two, case))
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupTwo as OneofUnion>::case_ref(
+            &self.group_two,
+            &self._bitfield,
+        )
     }
 
     pub fn clear_group_two(&mut self) {
@@ -104,7 +106,7 @@ impl Msg {
     }
 
     pub fn has_g2_f32(&self) -> bool {
-        self.g2_f32_opt.is_some()
+        self.g2_f32_opt().is_some()
     }
 
     pub fn clear_g2_f32(&mut self) {
@@ -115,7 +117,7 @@ impl Msg {
         match <_puroro_root::oneofs2::msg::GroupTwoCase as OneofCase>::from_bitslice(
             &self._bitfield,
         ) {
-            Some(_puroro_root::oneofs2::msg::GroupTwo::G2F32) => {
+            Some(_puroro_root::oneofs2::msg::GroupTwoCase::G2F32) => {
                 self.clear_group_two();
             }
             _ => (),
@@ -126,7 +128,7 @@ impl Msg {
     }
 
     pub fn has_g2_string(&self) -> bool {
-        self.g2_string_opt.is_some()
+        self.g2_string_opt().is_some()
     }
 
     pub fn clear_g2_string(&mut self) {
@@ -137,7 +139,7 @@ impl Msg {
         match <_puroro_root::oneofs2::msg::GroupTwoCase as OneofCase>::from_bitslice(
             &self._bitfield,
         ) {
-            Some(_puroro_root::oneofs2::msg::GroupTwo::G2String) => {
+            Some(_puroro_root::oneofs2::msg::GroupTwoCase::G2String) => {
                 self.clear_group_two();
             }
             _ => (),
@@ -148,7 +150,7 @@ impl Msg {
     }
 
     pub fn has_g2_submsg(&self) -> bool {
-        self.g2_submsg_opt.is_some()
+        self.g2_submsg_opt().is_some()
     }
 
     pub fn clear_g2_submsg(&mut self) {
@@ -159,7 +161,7 @@ impl Msg {
         match <_puroro_root::oneofs2::msg::GroupTwoCase as OneofCase>::from_bitslice(
             &self._bitfield,
         ) {
-            Some(_puroro_root::oneofs2::msg::GroupTwo::G2Submsg) => {
+            Some(_puroro_root::oneofs2::msg::GroupTwoCase::G2Submsg) => {
                 self.clear_group_two();
             }
             _ => (),
@@ -168,11 +170,11 @@ impl Msg {
     pub fn group_three(
         &self,
     ) -> ::std::option::Option<_puroro_root::oneofs2::msg::GroupThreeCaseRef> {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        let case_opt = <_puroro_root::oneofs2::msg::GroupThreeCase as OneofCase>::from_bitslice(
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        <_puroro_root::oneofs2::msg::GroupThree as OneofUnion>::case_ref(
+            &self.group_three,
             &self._bitfield,
-        );
-        case_opt.map(|case| OneofCaseRef::from_union_and_case(&self.group_three, case))
+        )
     }
 
     pub fn clear_group_three(&mut self) {
@@ -187,7 +189,7 @@ impl Msg {
     }
 
     pub fn has_g3_int32(&self) -> bool {
-        self.g3_int32_opt.is_some()
+        self.g3_int32_opt().is_some()
     }
 
     pub fn clear_g3_int32(&mut self) {
@@ -198,7 +200,7 @@ impl Msg {
         match <_puroro_root::oneofs2::msg::GroupThreeCase as OneofCase>::from_bitslice(
             &self._bitfield,
         ) {
-            Some(_puroro_root::oneofs2::msg::GroupThree::G3Int32) => {
+            Some(_puroro_root::oneofs2::msg::GroupThreeCase::G3Int32) => {
                 self.clear_group_three();
             }
             _ => (),
