@@ -259,6 +259,44 @@ impl FieldType for RepeatedStringField {
     }
 }
 
+impl FieldType for SingularBytesField {
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        _bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
+        if !vec.is_empty() {
+            self.0 = vec
+        }
+        Ok(())
+    }
+}
+
+impl<const BITFIELD_INDEX: usize> FieldType for OptionalBytesField<BITFIELD_INDEX> {
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        self.0 = iter.collect::<IoResult<Vec<u8>>>()?;
+        bitvec.set(BITFIELD_INDEX, true);
+        Ok(())
+    }
+}
+
+impl FieldType for RepeatedBytesField {
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        _bitvec: &mut B,
+        iter: I,
+    ) -> Result<()> {
+        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
+        self.0.push(vec);
+        Ok(())
+    }
+}
+
 impl<M> FieldType for SingularHeapMessageField<M>
 where
     M: Message + Default,
