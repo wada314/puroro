@@ -233,6 +233,7 @@ fn decode_sint64(i: u64) -> i64 {
 #[cfg(test)]
 mod test {
     use super::*;
+
     #[test]
     fn test_sint32() {
         fn check(s: i32) {
@@ -246,5 +247,20 @@ mod test {
         check(i32::MIN + 1);
         check(i32::MAX);
         check(i32::MAX - 1);
+    }
+
+    #[test]
+    fn test_sint64() {
+        fn check(s: i64) {
+            assert_eq!(s, decode_sint64(encode_sint64(s)))
+        }
+        check(0);
+        check(1);
+        check(2);
+        check(3);
+        check(i64::MIN);
+        check(i64::MIN + 1);
+        check(i64::MAX);
+        check(i64::MAX - 1);
     }
 }
