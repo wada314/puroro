@@ -151,6 +151,17 @@ impl NumericalType for SInt32 {
 }
 impl NumericalType for SInt64 {
     type RustType = i64;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(decode_sint64(u64::from_le_bytes(bytes)))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(encode_sint64(val)))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(encode_sint64(
+            val,
+        ))))
+    }
 }
 impl NumericalType for Bool {
     type RustType = bool;
