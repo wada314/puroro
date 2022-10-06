@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use ::std::marker::PhantomData;
+use ::std::mem::ManuallyDrop;
 
 #[derive(Default, Clone)]
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -35,6 +36,7 @@ pub trait OneofFieldType {
     where
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_>;
+    fn clear(&mut self);
 }
 
 impl<RustType, ProtoType> OneofFieldType for NumericalField<RustType, ProtoType>
@@ -53,6 +55,7 @@ where
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
     }
+    fn clear(&mut self) {}
 }
 
 impl OneofFieldType for BytesField {
@@ -67,6 +70,9 @@ impl OneofFieldType for BytesField {
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
+    }
+    fn clear(&mut self) {
+        self.0.clear()
     }
 }
 
@@ -83,9 +89,12 @@ impl OneofFieldType for StringField {
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
     }
+    fn clear(&mut self) {
+        self.0.clear()
+    }
 }
 
-impl<M> OneofFieldType for HeapMessageField<M> {
+impl<M: Default> OneofFieldType for HeapMessageField<M> {
     type GetterType<'a> = &'a M
     where
         Self: 'a;
@@ -97,5 +106,26 @@ impl<M> OneofFieldType for HeapMessageField<M> {
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
+    }
+    fn clear(&mut self) {
+        *self.0 = M::default();
+    }
+}
+
+impl<T: OneofFieldType> OneofFieldType for ManuallyDrop<T> {
+    type GetterType<'a> = T::GetterType<'a>
+    where
+        Self: 'a;
+    fn get_field(&self) -> Self::GetterType<'_> {
+        T::get_field(self)
+    }
+    type MutGetterType<'a> = T::MutGetterType<'a>
+    where
+        Self: 'a;
+    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
+        T::mut_field(self)
+    }
+    fn clear(&mut self) {
+        T::clear(self)
     }
 }

@@ -484,6 +484,7 @@ pub struct OneofField {
     pub ident_camel: String,
     pub ident_union_item: String,
     pub ident_getter_opt: String,
+    pub ident_getter_mut: String,
     pub ident_enum_item: String,
     pub ident_has: String,
     pub ident_clear: String,
@@ -491,7 +492,8 @@ pub struct OneofField {
     pub rust_field_type: String,
     pub rust_field_inner_type: String,
     pub rust_getter_type: String,
-    pub rust_opt_getter_type: String,
+    pub rust_getter_opt_type: String,
+    pub rust_getter_mut_type: String,
     pub rust_oneof_getter_type: String,
 }
 impl OneofField {
@@ -507,6 +509,7 @@ impl OneofField {
             .escape_rust_keywords()
             .to_string();
         let ident_getter_opt = format!("{}_opt", f.name().to_lower_snake_case());
+        let ident_getter_mut = format!("{}_mut", f.name().to_lower_snake_case());
         let ident_has = format!("has_{}", f.name().to_lower_snake_case());
         let ident_clear = format!("clear_{}", f.name().to_lower_snake_case());
         let ident_enum_item = f.name().to_camel_case().escape_rust_keywords().to_string();
@@ -540,12 +543,14 @@ impl OneofField {
         let rust_field_type = format!("::std::mem::ManuallyDrop<{}>", rust_field_inner_type);
 
         let rust_getter_type = wire_type.into_getter_rust_type(false).into_owned();
-        let rust_opt_getter_type = wire_type.into_opt_getter_rust_type().into_owned();
+        let rust_getter_opt_type = wire_type.into_opt_getter_rust_type().into_owned();
+        let rust_getter_mut_type = wire_type.into_mut_getter_rust_type(false).into_owned();
         let rust_oneof_getter_type = wire_type.into_oneof_getter_rust_type("'a").into_owned();
         Ok(Self {
             ident_camel,
             ident_union_item,
             ident_getter_opt,
+            ident_getter_mut,
             ident_has,
             ident_clear,
             ident_enum_item,
@@ -553,7 +558,8 @@ impl OneofField {
             rust_field_type,
             rust_field_inner_type,
             rust_getter_type,
-            rust_opt_getter_type,
+            rust_getter_opt_type,
+            rust_getter_mut_type,
             rust_oneof_getter_type,
         })
     }

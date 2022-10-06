@@ -30,6 +30,7 @@ pub trait OneofCase: Sized {
     fn from_bitslice<B: BitSlice>(b: &B) -> Option<Self> {
         Self::from_u32(b.get_range(Self::BITFIELD_BEGIN..Self::BITFIELD_END))
     }
+    fn into_u32(self) -> u32;
 }
 
 pub trait OneofCaseRef<'a>: Sized {

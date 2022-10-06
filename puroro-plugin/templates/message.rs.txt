@@ -79,6 +79,7 @@ impl {{ ident_struct }} {
     {%- endfor %} {#- for field in fields #}
 
     {%- for oneof in oneofs %}
+
     {#- oneof group getter #}
     pub fn {{ oneof.ident_getter }}(&self) -> {{ oneof.rust_getter_type }} {
         use self::_puroro::internal::oneof_type::OneofUnion;
@@ -95,8 +96,9 @@ impl {{ ident_struct }} {
     }
 
     {%- for field in oneof.fields %}
+    
     {#- oneof item getter / setters #}
-    pub fn {{ field.ident_getter_opt }}(&self) -> {{ field.rust_opt_getter_type }} {
+    pub fn {{ field.ident_getter_opt }}(&self) -> {{ field.rust_getter_opt_type }} {
         self.{{ oneof.ident_struct_field }}.{{ field.ident_getter_opt }}(&self._bitfield)
     }
 
