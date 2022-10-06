@@ -215,18 +215,48 @@ impl NumericalType for Float {
 }
 impl NumericalType for Fixed32 {
     type RustType = u32;
+    fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
+        Ok(u32::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits32(u32::to_le_bytes(val)))
+    }
 }
 impl NumericalType for SFixed32 {
     type RustType = i32;
+    fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
+        Ok(i32::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits32(i32::to_le_bytes(val)))
+    }
 }
 impl NumericalType for Double {
     type RustType = f64;
+    fn from_bits64(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(f64::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits64(f64::to_le_bytes(val)))
+    }
 }
 impl NumericalType for Fixed64 {
     type RustType = u64;
+    fn from_bits64(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits64(u64::to_le_bytes(val)))
+    }
 }
 impl NumericalType for SFixed64 {
     type RustType = i64;
+    fn from_bits64(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(i64::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits64(i64::to_le_bytes(val)))
+    }
 }
 
 fn encode_sint32(s: i32) -> u32 {
