@@ -21,7 +21,6 @@ use ::std::collections::HashSet;
 use ::std::fmt::Display;
 
 #[derive(Debug, Clone, Copy)]
-#[allow(unused)]
 pub enum WordCase {
     CamelCase,
     LowerSnakeCase,
@@ -124,6 +123,8 @@ impl<T: AsRef<str>> StrExt for T {
     fn escape_rust_keywords(&self) -> Cow<str> {
         if KEYWORDS.contains(self.as_ref()) {
             Cow::Owned(format!("r#{}", self.as_ref()))
+        } else if KEYWORDS_NO_RAW.contains(self.as_ref()) {
+            Cow::Owned(format!("_{}", self.as_ref()))
         } else {
             Cow::Borrowed(self.as_ref())
         }
@@ -132,16 +133,21 @@ impl<T: AsRef<str>> StrExt for T {
 
 lazy_static! {
     static ref KEYWORDS: HashSet<&'static str> = [
-        "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn",
-        "for", "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref",
-        "return", "self", "Self", "static", "struct", "super", "trait", "true", "type", "unsafe",
-        "use", "where", "while", "async", "await", "dyn", "abstract", "become", "box", "do",
-        "final", "macro", "override", "priv", "typeof", "unsized", "virtual", "yield", "try",
-        "union", "'static",
+        "as", "break", "const", "continue", "else", "enum", "extern", "false", "fn", "for", "if",
+        "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+        "static", "struct", "trait", "true", "type", "unsafe", "use", "where", "while", "async",
+        "await", "dyn", "abstract", "become", "box", "do", "final", "macro", "override", "priv",
+        "typeof", "unsized", "virtual", "yield", "try", "union", "'static", "async", "await",
+        "dyn", "abstract", "become", "box", "do", "final", "macro", "override", "priv", "typeof",
+        "unsized", "virtual", "yield", "try",
     ]
     .iter()
     .copied()
     .collect::<HashSet<&'static str>>();
+    static ref KEYWORDS_NO_RAW: HashSet<&'static str> = ["crate", "self", "Self", "super",]
+        .iter()
+        .copied()
+        .collect::<HashSet<&'static str>>();
 }
 
 #[allow(unused)]
