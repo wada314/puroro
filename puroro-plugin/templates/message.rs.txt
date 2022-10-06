@@ -96,10 +96,14 @@ impl {{ ident_struct }} {
     }
 
     {%- for field in oneof.fields %}
-    
+
     {#- oneof item getter / setters #}
     pub fn {{ field.ident_getter_opt }}(&self) -> {{ field.rust_getter_opt_type }} {
         self.{{ oneof.ident_struct_field }}.{{ field.ident_getter_opt }}(&self._bitfield)
+    }
+
+    pub fn {{ field.ident_getter_mut }}(&mut self) -> {{ field.rust_getter_mut_type}} {
+        self.{{ oneof.ident_struct_field }}.{{ field.ident_getter_mut }}(&mut self._bitfield)
     }
 
     pub fn {{ field.ident_has }}(&self) -> bool {
