@@ -483,6 +483,7 @@ impl Oneof {
 pub struct OneofField {
     pub ident_camel: String,
     pub ident_union_item: String,
+    pub ident_getter: String,
     pub ident_getter_opt: String,
     pub ident_getter_mut: String,
     pub ident_enum_item: String,
@@ -504,6 +505,11 @@ impl OneofField {
     ) -> Result<Self> {
         let ident_camel = f.name().to_camel_case().escape_rust_keywords().to_string();
         let ident_union_item = f
+            .name()
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string();
+        let ident_getter = f
             .name()
             .to_lower_snake_case()
             .escape_rust_keywords()
@@ -549,6 +555,7 @@ impl OneofField {
         Ok(Self {
             ident_camel,
             ident_union_item,
+            ident_getter,
             ident_getter_opt,
             ident_getter_mut,
             ident_has,
