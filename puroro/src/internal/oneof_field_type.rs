@@ -15,9 +15,6 @@
 use ::std::marker::PhantomData;
 
 #[derive(Default, Clone, PartialEq)]
-pub struct Dummy;
-
-#[derive(Default, Clone, PartialEq)]
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
 #[derive(Default, Clone, PartialEq)]
@@ -38,22 +35,6 @@ pub trait OneofFieldType {
     where
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_>;
-}
-
-impl OneofFieldType for Dummy {
-    type GetterType<'a> = ()
-    where
-        Self: 'a;
-
-    fn get_field(&self) -> Self::GetterType<'_> {
-        ()
-    }
-    type MutGetterType<'a> = ()
-    where
-        Self: 'a;
-    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
-        ()
-    }
 }
 
 impl<RustType, ProtoType> OneofFieldType for NumericalField<RustType, ProtoType>

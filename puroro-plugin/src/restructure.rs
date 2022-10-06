@@ -475,28 +475,6 @@ impl<'a> MessageOrEnumExt<'a> for MessageOrEnumRef<'a> {
     }
 }
 
-#[derive(Debug, Clone)]
-enum FieldType {
-    Int32,
-    UInt32,
-    SInt32,
-    Int64,
-    UInt64,
-    SInt64,
-    Enum2(Fqtn),
-    Enum3(Fqtn),
-    Fixed32,
-    SFixed32,
-    Fixed64,
-    SFixed64,
-    Float,
-    Double,
-    Bool,
-    String,
-    Bytes,
-    Message(Fqtn),
-}
-
 #[derive(Debug, Clone, Copy)]
 pub enum Syntax {
     Proto2,

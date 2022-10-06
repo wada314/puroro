@@ -23,9 +23,6 @@ pub use repeated::RepeatedFieldType;
 use ::std::marker::PhantomData;
 
 #[derive(Default, Clone)]
-pub struct Dummy;
-
-#[derive(Default, Clone)]
 pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
 pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(

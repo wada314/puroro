@@ -345,7 +345,6 @@ impl Field {
                 (Repeated, LengthDelimited(Message(fqtn))) => {
                     format!("RepeatedMessageField<{}>", fqtn.to_rust_path())
                 }
-                _ => format!("Dummy"), // TODO
             }
         };
         let rust_field_type = format!(
@@ -532,7 +531,6 @@ impl OneofField {
                 LengthDelimited(Message(m)) => {
                     format!("HeapMessageField<{}>", m.to_rust_path())
                 }
-                _ => format!("Dummy"), // TODO
             }
         };
         let rust_field_inner_type = format!(

@@ -24,6 +24,7 @@ use ::std::fmt::Display;
 pub enum WordCase {
     CamelCase,
     LowerSnakeCase,
+    #[allow(unused)]
     UpperSnakeCase,
 }
 
@@ -288,6 +289,7 @@ impl Fqtn {
     }
 }
 impl Fqtn {
+    #[allow(unused)]
     pub fn as_str(&self) -> &str {
         self.0.as_ref()
     }
