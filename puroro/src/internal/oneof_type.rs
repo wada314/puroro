@@ -79,3 +79,60 @@ where
         <Self as OneofUnionView<INDEX>>::get_field_opt(self).unwrap_or_else(default)
     }
 }
+
+impl<const INDEX: u32> OneofUnionView<INDEX> for Option<&BytesField> {
+    type FieldType = BytesField;
+    fn get_field_opt(&self) -> Option<<Self::FieldType as OneofFieldType>::GetterType<'_>> {
+        self.map(|f| f.get_field())
+    }
+    type GetterType<'a> = &'a [u8]
+    where
+        Self: 'a;
+    type DefaultValueType<'a> = &'a [u8]
+    where
+        Self: 'a;
+    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
+        &'a self,
+        default: D,
+    ) -> Self::GetterType<'_> {
+        <Self as OneofUnionView<INDEX>>::get_field_opt(self).unwrap_or_else(default)
+    }
+}
+
+impl<const INDEX: u32> OneofUnionView<INDEX> for Option<&StringField> {
+    type FieldType = StringField;
+    fn get_field_opt(&self) -> Option<<Self::FieldType as OneofFieldType>::GetterType<'_>> {
+        self.map(|f| f.get_field())
+    }
+    type GetterType<'a> = &'a str
+    where
+        Self: 'a;
+    type DefaultValueType<'a> = &'a str
+    where
+        Self: 'a;
+    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
+        &'a self,
+        default: D,
+    ) -> Self::GetterType<'_> {
+        <Self as OneofUnionView<INDEX>>::get_field_opt(self).unwrap_or_else(default)
+    }
+}
+
+impl<M: Default, const INDEX: u32> OneofUnionView<INDEX> for Option<&HeapMessageField<M>> {
+    type FieldType = HeapMessageField<M>;
+    fn get_field_opt(&self) -> Option<<Self::FieldType as OneofFieldType>::GetterType<'_>> {
+        self.map(|f| f.get_field())
+    }
+    type GetterType<'a> = Option<&'a M>
+    where
+        Self: 'a;
+    type DefaultValueType<'a> = ()
+    where
+        Self: 'a;
+    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
+        &'a self,
+        _default: D,
+    ) -> Self::GetterType<'_> {
+        <Self as OneofUnionView<INDEX>>::get_field_opt(self)
+    }
+}
