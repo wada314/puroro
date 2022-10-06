@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::oneof_field_type::{
+    BytesField, HeapMessageField, NumericalField, OneofFieldType, StringField,
+};
 use crate::bitvec::BitSlice;
 
 pub trait OneofUnion {
@@ -37,4 +40,42 @@ pub trait OneofCaseRef<'a>: Sized {
     type Case: OneofCase;
     type Union;
     fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self;
+}
+
+pub trait OneofUnionView<const INDEX: u32> {
+    type FieldType: OneofFieldType;
+    fn get_field_opt(&self) -> Option<<Self::FieldType as OneofFieldType>::GetterType<'_>>;
+    type GetterType<'a>
+    where
+        Self: 'a;
+    type DefaultValueType<'a>
+    where
+        Self: 'a;
+    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
+        &'a self,
+        default: D,
+    ) -> Self::GetterType<'_>;
+}
+
+impl<RustType, ProtoType, const INDEX: u32> OneofUnionView<INDEX>
+    for Option<&NumericalField<RustType, ProtoType>>
+where
+    RustType: Clone,
+{
+    type FieldType = NumericalField<RustType, ProtoType>;
+    fn get_field_opt(&self) -> Option<<Self::FieldType as OneofFieldType>::GetterType<'_>> {
+        self.map(|f| f.get_field())
+    }
+    type GetterType<'a> = RustType
+    where
+        Self: 'a;
+    type DefaultValueType<'a> = RustType
+    where
+        Self: 'a;
+    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
+        &'a self,
+        default: D,
+    ) -> Self::GetterType<'_> {
+        <Self as OneofUnionView<INDEX>>::get_field_opt(self).unwrap_or_else(default)
+    }
 }

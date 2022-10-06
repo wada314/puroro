@@ -111,21 +111,3 @@ impl<M: Default> OneofFieldType for HeapMessageField<M> {
         *self.0 = M::default();
     }
 }
-
-impl<T: OneofFieldType> OneofFieldType for ManuallyDrop<T> {
-    type GetterType<'a> = T::GetterType<'a>
-    where
-        Self: 'a;
-    fn get_field(&self) -> Self::GetterType<'_> {
-        T::get_field(self)
-    }
-    type MutGetterType<'a> = T::MutGetterType<'a>
-    where
-        Self: 'a;
-    fn mut_field(&mut self) -> Self::MutGetterType<'_> {
-        T::mut_field(self)
-    }
-    fn clear(&mut self) {
-        T::clear(self)
-    }
-}
