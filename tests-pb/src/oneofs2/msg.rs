@@ -17,13 +17,13 @@ pub union GroupOne {
     g1_string: ::std::mem::ManuallyDrop<self::_puroro::internal::oneof_field_type::StringField>,
 }
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GroupOneCase {
     G1Int32,
     G1String,
 }
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GroupOneCaseRef<'a> {
     G1Int32(i32),
     G1String(&'a str),
@@ -117,27 +117,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
             _ => Self { _none: () },
         }
     }
-
-    fn eq<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B, rhs: &Self, rhs_bits: &B) -> bool {
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofCase;
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-
-        match (
-            self::GroupOneCase::from_bitslice(bits),
-            self::GroupOneCase::from_bitslice(rhs_bits),
-        ) {
-            (Some(GroupOneCase::G1Int32), Some(GroupOneCase::G1Int32)) => {
-                (unsafe { &self.g1_int32 }) == (unsafe { &rhs.g1_int32 })
-            }
-            (Some(GroupOneCase::G1String), Some(GroupOneCase::G1String)) => {
-                (unsafe { &self.g1_string }) == (unsafe { &rhs.g1_string })
-            }
-            (None, None) => true,
-            _ => false,
-        }
-    }
 }
 
 impl ::std::default::Default for GroupOne {
@@ -187,14 +166,14 @@ pub union GroupTwo {
     >,
 }
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GroupTwoCase {
     G2F32,
     G2String,
     G2Submsg,
 }
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GroupTwoCaseRef<'a> {
     G2F32(f32),
     G2String(&'a str),
@@ -312,30 +291,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
             _ => Self { _none: () },
         }
     }
-
-    fn eq<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B, rhs: &Self, rhs_bits: &B) -> bool {
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofCase;
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-
-        match (
-            self::GroupTwoCase::from_bitslice(bits),
-            self::GroupTwoCase::from_bitslice(rhs_bits),
-        ) {
-            (Some(GroupTwoCase::G2F32), Some(GroupTwoCase::G2F32)) => {
-                (unsafe { &self.g2_f32 }) == (unsafe { &rhs.g2_f32 })
-            }
-            (Some(GroupTwoCase::G2String), Some(GroupTwoCase::G2String)) => {
-                (unsafe { &self.g2_string }) == (unsafe { &rhs.g2_string })
-            }
-            (Some(GroupTwoCase::G2Submsg), Some(GroupTwoCase::G2Submsg)) => {
-                (unsafe { &self.g2_submsg }) == (unsafe { &rhs.g2_submsg })
-            }
-            (None, None) => true,
-            _ => false,
-        }
-    }
 }
 
 impl ::std::default::Default for GroupTwo {
@@ -385,12 +340,12 @@ pub union GroupThree {
     >,
 }
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GroupThreeCase {
     G3Int32,
 }
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GroupThreeCaseRef {
     G3Int32(i32),
 }
@@ -459,24 +414,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
                 g3_int32: Clone::clone(unsafe { &self.g3_int32 }),
             },
             _ => Self { _none: () },
-        }
-    }
-
-    fn eq<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B, rhs: &Self, rhs_bits: &B) -> bool {
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofCase;
-        #[allow(unused)]
-        use ::std::option::Option::{None, Some};
-
-        match (
-            self::GroupThreeCase::from_bitslice(bits),
-            self::GroupThreeCase::from_bitslice(rhs_bits),
-        ) {
-            (Some(GroupThreeCase::G3Int32), Some(GroupThreeCase::G3Int32)) => {
-                (unsafe { &self.g3_int32 }) == (unsafe { &rhs.g3_int32 })
-            }
-            (None, None) => true,
-            _ => false,
         }
     }
 }

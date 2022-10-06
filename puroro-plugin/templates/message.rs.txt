@@ -204,9 +204,11 @@ impl ::std::cmp::PartialEq for {{ ident_struct }} {
             {%- endfor %} {#- for field in fields #}
 
             {%- for oneof in oneofs %}
-            && <{{ oneof.rust_union_type }} as OneofUnion>::eq(
-                &self.{{ oneof.ident_struct_field }}, &self._bitfield,
-                &rhs.{{ oneof.ident_struct_field }}, &rhs._bitfield)
+            && <{{ oneof.rust_union_type }} as OneofUnion>::case_ref(
+                &self.{{ oneof.ident_struct_field }}, &self._bitfield
+            ) == <{{ oneof.rust_union_type }} as OneofUnion>::case_ref(
+                &rhs.{{ oneof.ident_struct_field }}, &rhs._bitfield
+            )
             {%- endfor %} {#- for oneof in oneofs #}
     }
 }

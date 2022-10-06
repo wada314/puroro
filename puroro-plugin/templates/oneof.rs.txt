@@ -10,7 +10,7 @@ pub union {{ ident_union }} {
 
 {#- public oneof enum without contents, not including None case #}
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum {{ ident_case }} {
     {%- for field in fields %}
     {{ field.ident_enum_item }},
@@ -18,7 +18,7 @@ pub enum {{ ident_case }} {
 }
 {#- public oneof enum with ref to its contents, not including None case #}
 #[repr(u32)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum {{ ident_case_ref }} {%- if has_ld_type %}<'a>{%- endif %} {
     {%- for field in fields %}
     {{ field.ident_enum_item }}({{ field.rust_oneof_getter_type }}),
@@ -97,26 +97,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
             _ => Self {
                 _none: (),
             },
-        }
-    }
-
-    fn eq<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B, rhs: &Self, rhs_bits: &B) -> bool {
-        #[allow(unused)]
-        use ::std::option::Option::{Some, None};
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofCase;
-
-        match (self::{{ ident_case }}::from_bitslice(bits), self::{{ ident_case }}::from_bitslice(rhs_bits)) {
-            {%- for field in fields %}
-            (
-                Some({{ ident_case  }}::{{ field.ident_enum_item }}),
-                Some({{ ident_case  }}::{{ field.ident_enum_item }})
-            ) => {
-                (unsafe { &self.{{ field.ident_union_item }} }) == (unsafe { &rhs.{{ field.ident_union_item }} })
-            }
-            {%- endfor %} {#- for field in fields #}
-            (None, None) => true,
-            _ => false,
         }
     }
 }

@@ -277,19 +277,22 @@ impl ::std::cmp::PartialEq for Msg {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion;
 
-        true && <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::eq(
+        true && <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::case_ref(
             &self.group_one,
             &self._bitfield,
+        ) == <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::case_ref(
             &rhs.group_one,
             &rhs._bitfield,
-        ) && <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::eq(
+        ) && <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::case_ref(
             &self.group_two,
             &self._bitfield,
+        ) == <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::case_ref(
             &rhs.group_two,
             &rhs._bitfield,
-        ) && <_puroro_root::oneofs3::msg::GroupThree as OneofUnion>::eq(
+        ) && <_puroro_root::oneofs3::msg::GroupThree as OneofUnion>::case_ref(
             &self.group_three,
             &self._bitfield,
+        ) == <_puroro_root::oneofs3::msg::GroupThree as OneofUnion>::case_ref(
             &rhs.group_three,
             &rhs._bitfield,
         )
