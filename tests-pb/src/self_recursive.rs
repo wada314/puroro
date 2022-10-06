@@ -126,6 +126,15 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.recursive_unlabeled_opt() == rhs.recursive_unlabeled_opt()
+    }
+}
+
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]

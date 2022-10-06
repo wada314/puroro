@@ -272,6 +272,30 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::eq(
+            &self.group_one,
+            &self._bitfield,
+            &rhs.group_one,
+            &rhs._bitfield,
+        ) && <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::eq(
+            &self.group_two,
+            &self._bitfield,
+            &rhs.group_two,
+            &rhs._bitfield,
+        ) && <_puroro_root::oneofs3::msg::GroupThree as OneofUnion>::eq(
+            &self.group_three,
+            &self._bitfield,
+            &rhs.group_three,
+            &rhs._bitfield,
+        )
+    }
+}
+
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]
@@ -396,6 +420,15 @@ impl ::std::fmt::Debug for Submsg {
         fmt.debug_struct("Submsg")
             .field("i32_unlabeled", &self.i32_unlabeled())
             .finish()
+    }
+}
+
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
     }
 }
 

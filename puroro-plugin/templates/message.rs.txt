@@ -188,6 +188,29 @@ impl ::std::fmt::Debug for {{ ident_struct }} {
     }
 }
 
+impl ::std::cmp::PartialEq for {{ ident_struct }} {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true
+            {%- for field in fields %}
+            {%- match field.rule %}
+            {%- when FieldRule::Repeated %}
+            && self.{{ field.ident_getter }}() == rhs.{{ field.ident_getter }}()
+            {%- else %}
+            && self.{{ field.ident_getter_opt }}() == rhs.{{ field.ident_getter_opt }}()
+            {%- endmatch %} {#- match field.rule #}
+            {%- endfor %} {#- for field in fields #}
+
+            {%- for oneof in oneofs %}
+            && <{{ oneof.rust_union_type }} as OneofUnion>::eq(
+                &self.{{ oneof.ident_struct_field }}, &self._bitfield,
+                &rhs.{{ oneof.ident_struct_field }}, &rhs._bitfield)
+            {%- endfor %} {#- for oneof in oneofs #}
+    }
+}
+
 impl ::std::ops::Drop for {{ ident_struct }} {
     fn drop(&mut self) {
         #[allow(unused)]

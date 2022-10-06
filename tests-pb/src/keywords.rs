@@ -138,6 +138,15 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.type_opt() == rhs.type_opt()
+    }
+}
+
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]
@@ -271,6 +280,15 @@ impl ::std::fmt::Debug for _Self {
         fmt.debug_struct("_Self")
             .field("r#type", &self.r#type())
             .finish()
+    }
+}
+
+impl ::std::cmp::PartialEq for _Self {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.type_opt() == rhs.type_opt()
     }
 }
 

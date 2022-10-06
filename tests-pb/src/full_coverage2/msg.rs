@@ -206,6 +206,16 @@ impl ::std::fmt::Debug for Submsg {
     }
 }
 
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.i32_required_opt() == rhs.i32_required_opt()
+            && self.i64_required_opt() == rhs.i64_required_opt()
+    }
+}
+
 impl ::std::ops::Drop for Submsg {
     fn drop(&mut self) {
         #[allow(unused)]

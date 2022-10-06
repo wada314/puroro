@@ -2493,6 +2493,62 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
+            && self.i32_optional_opt() == rhs.i32_optional_opt()
+            && self.i32_repeated() == rhs.i32_repeated()
+            && self.float_unlabeled_opt() == rhs.float_unlabeled_opt()
+            && self.float_optional_opt() == rhs.float_optional_opt()
+            && self.float_repeated() == rhs.float_repeated()
+            && self.bytes_unlabeled_opt() == rhs.bytes_unlabeled_opt()
+            && self.bytes_optional_opt() == rhs.bytes_optional_opt()
+            && self.bytes_repeated() == rhs.bytes_repeated()
+            && self.string_unlabeled_opt() == rhs.string_unlabeled_opt()
+            && self.string_optional_opt() == rhs.string_optional_opt()
+            && self.string_repeated() == rhs.string_repeated()
+            && self.enum_unlabeled_opt() == rhs.enum_unlabeled_opt()
+            && self.enum_optional_opt() == rhs.enum_optional_opt()
+            && self.enum_repeated() == rhs.enum_repeated()
+            && self.submsg_unlabeled_opt() == rhs.submsg_unlabeled_opt()
+            && self.submsg_optional_opt() == rhs.submsg_optional_opt()
+            && self.submsg_repeated() == rhs.submsg_repeated()
+            && self.i64_unlabeled_opt() == rhs.i64_unlabeled_opt()
+            && self.i64_optional_opt() == rhs.i64_optional_opt()
+            && self.i64_repeated() == rhs.i64_repeated()
+            && self.u32_unlabeled_opt() == rhs.u32_unlabeled_opt()
+            && self.u32_optional_opt() == rhs.u32_optional_opt()
+            && self.u32_repeated() == rhs.u32_repeated()
+            && self.u64_unlabeled_opt() == rhs.u64_unlabeled_opt()
+            && self.u64_optional_opt() == rhs.u64_optional_opt()
+            && self.u64_repeated() == rhs.u64_repeated()
+            && self.s32_unlabeled_opt() == rhs.s32_unlabeled_opt()
+            && self.s32_optional_opt() == rhs.s32_optional_opt()
+            && self.s32_repeated() == rhs.s32_repeated()
+            && self.s64_unlabeled_opt() == rhs.s64_unlabeled_opt()
+            && self.s64_optional_opt() == rhs.s64_optional_opt()
+            && self.s64_repeated() == rhs.s64_repeated()
+            && self.fixed32_unlabeled_opt() == rhs.fixed32_unlabeled_opt()
+            && self.fixed32_optional_opt() == rhs.fixed32_optional_opt()
+            && self.fixed32_repeated() == rhs.fixed32_repeated()
+            && self.fixed64_unlabeled_opt() == rhs.fixed64_unlabeled_opt()
+            && self.fixed64_optional_opt() == rhs.fixed64_optional_opt()
+            && self.fixed64_repeated() == rhs.fixed64_repeated()
+            && self.sfixed32_unlabeled_opt() == rhs.sfixed32_unlabeled_opt()
+            && self.sfixed32_optional_opt() == rhs.sfixed32_optional_opt()
+            && self.sfixed32_repeated() == rhs.sfixed32_repeated()
+            && self.sfixed64_unlabeled_opt() == rhs.sfixed64_unlabeled_opt()
+            && self.sfixed64_optional_opt() == rhs.sfixed64_optional_opt()
+            && self.sfixed64_repeated() == rhs.sfixed64_repeated()
+            && self.f64_unlabeled_opt() == rhs.f64_unlabeled_opt()
+            && self.f64_optional_opt() == rhs.f64_optional_opt()
+            && self.f64_repeated() == rhs.f64_repeated()
+    }
+}
+
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]

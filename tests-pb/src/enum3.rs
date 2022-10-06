@@ -235,6 +235,17 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.enum_optional_opt() == rhs.enum_optional_opt()
+            && self.enum_unlabeled_opt() == rhs.enum_unlabeled_opt()
+            && self.enum_repeated() == rhs.enum_repeated()
+    }
+}
+
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]

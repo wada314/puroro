@@ -136,6 +136,15 @@ impl ::std::fmt::Debug for Test1 {
     }
 }
 
+impl ::std::cmp::PartialEq for Test1 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.a_opt() == rhs.a_opt()
+    }
+}
+
 impl ::std::ops::Drop for Test1 {
     fn drop(&mut self) {
         #[allow(unused)]
@@ -243,6 +252,15 @@ impl ::std::fmt::Debug for Test2 {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct("Test2").field("b", &self.b()).finish()
+    }
+}
+
+impl ::std::cmp::PartialEq for Test2 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.b_opt() == rhs.b_opt()
     }
 }
 
@@ -366,6 +384,15 @@ impl ::std::fmt::Debug for Test3 {
     }
 }
 
+impl ::std::cmp::PartialEq for Test3 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.c_opt() == rhs.c_opt()
+    }
+}
+
 impl ::std::ops::Drop for Test3 {
     fn drop(&mut self) {
         #[allow(unused)]
@@ -461,6 +488,15 @@ impl ::std::fmt::Debug for Test4 {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct("Test4").field("d", &self.d()).finish()
+    }
+}
+
+impl ::std::cmp::PartialEq for Test4 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.d() == rhs.d()
     }
 }
 

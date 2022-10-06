@@ -217,6 +217,17 @@ impl ::std::fmt::Debug for Book {
     }
 }
 
+impl ::std::cmp::PartialEq for Book {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.title_opt() == rhs.title_opt()
+            && self.num_pages_opt() == rhs.num_pages_opt()
+            && self.author_opt() == rhs.author_opt()
+    }
+}
+
 impl ::std::ops::Drop for Book {
     fn drop(&mut self) {
         #[allow(unused)]
@@ -326,6 +337,15 @@ impl ::std::fmt::Debug for Author {
         fmt.debug_struct("Author")
             .field("name", &self.name())
             .finish()
+    }
+}
+
+impl ::std::cmp::PartialEq for Author {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.name_opt() == rhs.name_opt()
     }
 }
 

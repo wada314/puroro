@@ -18,45 +18,45 @@ use crate::{ErrorKind, PuroroError, Result};
 use ::std::marker::PhantomData;
 
 // Variants
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Int32;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Int64;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct UInt32;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct UInt64;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct SInt32;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct SInt64;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Bool;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Enum2<E>(PhantomData<E>);
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Enum3<E>(PhantomData<E>);
 
 // Length delimited types
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Bytes;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct String;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Message<M>(PhantomData<M>);
 
 // Fixed 32 / 64 bit types
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Float;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Fixed32;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct SFixed32;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Double;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Fixed64;
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct SFixed64;
 
 // Traits

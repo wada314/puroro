@@ -605,6 +605,25 @@ impl ::std::fmt::Debug for Msg {
     }
 }
 
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
+        true && self.i32_optional_opt() == rhs.i32_optional_opt()
+            && self.i32_repeated() == rhs.i32_repeated()
+            && self.float_optional_opt() == rhs.float_optional_opt()
+            && self.float_repeated() == rhs.float_repeated()
+            && self.string_optional_opt() == rhs.string_optional_opt()
+            && self.string_repeated() == rhs.string_repeated()
+            && self.submsg_optional_opt() == rhs.submsg_optional_opt()
+            && self.submsg_repeated() == rhs.submsg_repeated()
+            && self.enum_optional_opt() == rhs.enum_optional_opt()
+            && self.enum_repeated() == rhs.enum_repeated()
+            && self.very_large_field_number_opt() == rhs.very_large_field_number_opt()
+    }
+}
+
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]
