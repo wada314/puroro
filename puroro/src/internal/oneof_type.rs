@@ -24,6 +24,7 @@ pub trait OneofUnion {
     fn case_ref<B: BitSlice>(&self, bits: &B) -> Option<Self::CaseRef<'_>>;
     fn clear<B: BitSlice>(&mut self, bits: &mut B);
     fn clone<B: BitSlice>(&self, bits: &B) -> Self;
+    fn get_view<B: BitSlice, INDEX: u32>(&self, bits: &B) -> ????
 }
 
 pub trait OneofCase: Sized {
