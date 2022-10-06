@@ -14,19 +14,19 @@
 
 use ::std::marker::PhantomData;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct Dummy;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct BytesField(Vec<u8>);
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct StringField(String);
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq)]
 pub struct HeapMessageField<M>(Box<M>);
 
 pub trait OneofFieldType {
