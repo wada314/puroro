@@ -301,7 +301,7 @@ impl Field {
             match (&rule, &wire_type) {
                 (Optional, Variant(_) | Bits32(_) | Bits64(_)) => {
                     format!(
-                        "OptionalNumericalField<{}, {}, {}>",
+                        "OptionalNumericalField::<{}, {}, {}>",
                         wire_type.into_owned_rust_type(),
                         wire_type.into_tag_type(),
                         bit_index_for_optional
@@ -309,20 +309,20 @@ impl Field {
                 }
                 (Singular, Variant(_) | Bits32(_) | Bits64(_)) => {
                     format!(
-                        "SingularNumericalField<{}, {}>",
+                        "SingularNumericalField::<{}, {}>",
                         wire_type.into_owned_rust_type(),
                         wire_type.into_tag_type(),
                     )
                 }
                 (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => {
                     format!(
-                        "RepeatedNumericalField<{}, {}>",
+                        "RepeatedNumericalField::<{}, {}>",
                         wire_type.into_owned_rust_type(),
                         wire_type.into_tag_type(),
                     )
                 }
                 (Optional, LengthDelimited(String)) => {
-                    format!("OptionalStringField<{}>", bit_index_for_optional)
+                    format!("OptionalStringField::<{}>", bit_index_for_optional)
                 }
                 (Singular, LengthDelimited(String)) => {
                     format!("SingularStringField")
@@ -340,10 +340,10 @@ impl Field {
                     format!("RepeatedBytesField")
                 }
                 (Optional | Singular, LengthDelimited(Message(fqtn))) => {
-                    format!("SingularHeapMessageField<{}>", fqtn.to_rust_path())
+                    format!("SingularHeapMessageField::<{}>", fqtn.to_rust_path())
                 }
                 (Repeated, LengthDelimited(Message(fqtn))) => {
-                    format!("RepeatedMessageField<{}>", fqtn.to_rust_path())
+                    format!("RepeatedMessageField::<{}>", fqtn.to_rust_path())
                 }
             }
         };
@@ -526,7 +526,7 @@ impl OneofField {
             match &wire_type {
                 Variant(_) | Bits32(_) | Bits64(_) => {
                     format!(
-                        "NumericalField<{}, {}>",
+                        "NumericalField::<{}, {}>",
                         wire_type.into_owned_rust_type(),
                         wire_type.into_tag_type(),
                     )
@@ -538,7 +538,7 @@ impl OneofField {
                     format!("StringField")
                 }
                 LengthDelimited(Message(m)) => {
-                    format!("HeapMessageField<{}>", m.to_rust_path())
+                    format!("HeapMessageField::<{}>", m.to_rust_path())
                 }
             }
         };
@@ -546,7 +546,7 @@ impl OneofField {
             "self::_puroro::internal::oneof_field_type::{}",
             rust_field_inner_type_name
         );
-        let rust_field_type = format!("::std::mem::ManuallyDrop<{}>", rust_field_inner_type);
+        let rust_field_type = format!("::std::mem::ManuallyDrop::<{}>", rust_field_inner_type);
 
         let rust_getter_type = wire_type.into_getter_rust_type(false).into_owned();
         let rust_getter_opt_type = wire_type.into_opt_getter_rust_type().into_owned();

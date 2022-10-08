@@ -164,25 +164,25 @@ impl Test2 {
     // Optional, LengthDelimited(String)
     pub fn b(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::OptionalStringField::<0> as NonRepeatedFieldType>::get_field(
             &self.b, &self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn b_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::OptionalStringField::<0> as NonRepeatedFieldType>::get_field_opt(
             &self.b, &self._bitfield,
         )
     }
     pub fn has_b(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::OptionalStringField::<0> as NonRepeatedFieldType>::get_field_opt(
             &self.b, &self._bitfield,
         ).is_some()
     }
     pub fn b_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField<0> as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::OptionalStringField::<0> as NonRepeatedFieldType>::mut_field(
             &mut self.b, &mut self._bitfield, ::std::default::Default::default,
         )
     }
@@ -219,7 +219,7 @@ impl self::_puroro::Message for Test2 {
         {
             match number {
                 2 => <
-                    self::_puroro::internal::field_type::OptionalStringField<0> as self::_puroro::internal::field_type::FieldType
+                    self::_puroro::internal::field_type::OptionalStringField::<0> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.b,
                     &mut self._bitfield,
@@ -412,19 +412,19 @@ impl Test4 {
     // Repeated, Variant(Int32)
     pub fn d(&self) -> &[i32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::get_field(
             &self.d, &self._bitfield, 
         )
     }
     pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::mut_field(
             &mut self.d, &mut self._bitfield, 
         )
     }
     pub fn clear_d(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedNumericalField<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::clear(
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::Int32> as RepeatedFieldType>::clear(
             &mut self.d, &mut self._bitfield, 
         )
     }

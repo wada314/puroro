@@ -35,93 +35,93 @@ impl Submsg {
     // Singular, Variant(Int32)
     pub fn i32_unlabeled(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
             &self.i32_unlabeled, &self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
             &self.i32_unlabeled, &self._bitfield,
         )
     }
     pub fn has_i32_unlabeled(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
             &self.i32_unlabeled, &self._bitfield,
         ).is_some()
     }
     pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
             &mut self.i32_unlabeled, &mut self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn clear_i32_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
             &mut self.i32_unlabeled, &mut self._bitfield,
         )
     }
     // Singular, Variant(Int32)
     pub fn i32_optional(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
             &self.i32_optional, &self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
             &self.i32_optional, &self._bitfield,
         )
     }
     pub fn has_i32_optional(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
             &self.i32_optional, &self._bitfield,
         ).is_some()
     }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
             &mut self.i32_optional, &mut self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn clear_i32_optional(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
             &mut self.i32_optional, &mut self._bitfield,
         )
     }
     // Singular, Variant(Int64)
     pub fn i64_unlabeled(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::get_field(
             &self.i64_unlabeled, &self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::get_field_opt(
             &self.i64_unlabeled, &self._bitfield,
         )
     }
     pub fn has_i64_unlabeled(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::get_field_opt(
             &self.i64_unlabeled, &self._bitfield,
         ).is_some()
     }
     pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::mut_field(
             &mut self.i64_unlabeled, &mut self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn clear_i64_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularNumericalField<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::clear(
+        <self::_puroro::internal::field_type::SingularNumericalField::<i64, self::_puroro::tags::Int64> as NonRepeatedFieldType>::clear(
             &mut self.i64_unlabeled, &mut self._bitfield,
         )
     }

@@ -63,6 +63,7 @@ impl {{ ident_union }} {
     pub(crate) fn {{ field.ident_getter_mut }}<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> {{ field.rust_getter_mut_type }} {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
+        use ::std::mem::ManuallyDrop;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
@@ -73,7 +74,9 @@ impl {{ ident_union }} {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::{{ ident_case }} as OneofCase>::into_u32(self::{{ ident_case }}::{{ field.ident_enum_item }});
             bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, index);
-            <{{ field.rust_field_inner_type }} as OneofFieldType>::clear(unsafe { &mut self.{{ field.ident_union_item}} });
+            *self = {{ ident_union }} {
+                {{ field.ident_union_item }}: ManuallyDrop::new({{ field.rust_field_inner_type }}::default())
+            };
         }
         unsafe {
             &mut self.{{ field.ident_union_item }}

@@ -65,6 +65,7 @@ impl GroupOne {
     ) -> &mut i32 {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
 
@@ -75,10 +76,14 @@ impl GroupOne {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::GroupOneCase as OneofCase>::into_u32(self::GroupOneCase::G1Int32);
             bits.set_range(0..2, index);
-            <self::_puroro::internal::oneof_field_type::NumericalField<
-                i32,
-                self::_puroro::tags::Int32,
-            > as OneofFieldType>::clear(unsafe { &mut self.g1_int32 });
+            *self = GroupOne {
+                g1_int32: ManuallyDrop::new(
+                    self::_puroro::internal::oneof_field_type::NumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    >::default(),
+                ),
+            };
         }
         unsafe { &mut self.g1_int32 }.mut_field()
     }
@@ -117,6 +122,7 @@ impl GroupOne {
     ) -> &mut ::std::string::String {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
 
@@ -127,9 +133,11 @@ impl GroupOne {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::GroupOneCase as OneofCase>::into_u32(self::GroupOneCase::G1String);
             bits.set_range(0..2, index);
-            <self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::clear(
-                unsafe { &mut self.g1_string },
-            );
+            *self = GroupOne {
+                g1_string: ManuallyDrop::new(
+                    self::_puroro::internal::oneof_field_type::StringField::default(),
+                ),
+            };
         }
         unsafe { &mut self.g1_string }.mut_field()
     }
@@ -294,6 +302,7 @@ impl GroupTwo {
     ) -> &mut f32 {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
 
@@ -304,10 +313,14 @@ impl GroupTwo {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::GroupTwoCase as OneofCase>::into_u32(self::GroupTwoCase::G2F32);
             bits.set_range(2..4, index);
-            <self::_puroro::internal::oneof_field_type::NumericalField<
-                f32,
-                self::_puroro::tags::Float,
-            > as OneofFieldType>::clear(unsafe { &mut self.g2_f32 });
+            *self = GroupTwo {
+                g2_f32: ManuallyDrop::new(
+                    self::_puroro::internal::oneof_field_type::NumericalField::<
+                        f32,
+                        self::_puroro::tags::Float,
+                    >::default(),
+                ),
+            };
         }
         unsafe { &mut self.g2_f32 }.mut_field()
     }
@@ -346,6 +359,7 @@ impl GroupTwo {
     ) -> &mut ::std::string::String {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
 
@@ -356,9 +370,11 @@ impl GroupTwo {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::GroupTwoCase as OneofCase>::into_u32(self::GroupTwoCase::G2String);
             bits.set_range(2..4, index);
-            <self::_puroro::internal::oneof_field_type::StringField as OneofFieldType>::clear(
-                unsafe { &mut self.g2_string },
-            );
+            *self = GroupTwo {
+                g2_string: ManuallyDrop::new(
+                    self::_puroro::internal::oneof_field_type::StringField::default(),
+                ),
+            };
         }
         unsafe { &mut self.g2_string }.mut_field()
     }
@@ -400,6 +416,7 @@ impl GroupTwo {
     ) -> &mut _puroro_root::oneofs2::Submsg {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
 
@@ -410,9 +427,13 @@ impl GroupTwo {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::GroupTwoCase as OneofCase>::into_u32(self::GroupTwoCase::G2Submsg);
             bits.set_range(2..4, index);
-            <self::_puroro::internal::oneof_field_type::HeapMessageField<
-                _puroro_root::oneofs2::Submsg,
-            > as OneofFieldType>::clear(unsafe { &mut self.g2_submsg });
+            *self = GroupTwo {
+                g2_submsg: ManuallyDrop::new(
+                    self::_puroro::internal::oneof_field_type::HeapMessageField::<
+                        _puroro_root::oneofs2::Submsg,
+                    >::default(),
+                ),
+            };
         }
         unsafe { &mut self.g2_submsg }.mut_field()
     }
@@ -580,6 +601,7 @@ impl GroupThree {
     ) -> &mut i32 {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
 
@@ -591,10 +613,14 @@ impl GroupThree {
             let index =
                 <self::GroupThreeCase as OneofCase>::into_u32(self::GroupThreeCase::G3Int32);
             bits.set_range(4..5, index);
-            <self::_puroro::internal::oneof_field_type::NumericalField<
-                i32,
-                self::_puroro::tags::Int32,
-            > as OneofFieldType>::clear(unsafe { &mut self.g3_int32 });
+            *self = GroupThree {
+                g3_int32: ManuallyDrop::new(
+                    self::_puroro::internal::oneof_field_type::NumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    >::default(),
+                ),
+            };
         }
         unsafe { &mut self.g3_int32 }.mut_field()
     }

@@ -107,31 +107,31 @@ impl Book {
     // Singular, LengthDelimited(Message(Fqtn(".library.Author")))
     pub fn author(&self) -> ::std::option::Option<&_puroro_root::library::Author> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field(
             &self.author, &self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn author_opt(&self) -> ::std::option::Option<&_puroro_root::library::Author> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field_opt(
             &self.author, &self._bitfield,
         )
     }
     pub fn has_author(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field_opt(
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as NonRepeatedFieldType>::get_field_opt(
             &self.author, &self._bitfield,
         ).is_some()
     }
     pub fn author_mut(&mut self) -> &mut _puroro_root::library::Author {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as NonRepeatedFieldType>::mut_field(
             &mut self.author, &mut self._bitfield, ::std::default::Default::default,
         )
     }
     pub fn clear_author(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as NonRepeatedFieldType>::clear(
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as NonRepeatedFieldType>::clear(
             &mut self.author, &mut self._bitfield,
         )
     }
@@ -168,14 +168,14 @@ impl self::_puroro::Message for Book {
                     _field_data,
                 )?,
                 2 => <
-                    self::_puroro::internal::field_type::SingularNumericalField<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_type::FieldType
+                    self::_puroro::internal::field_type::SingularNumericalField::<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.num_pages,
                     &mut self._bitfield,
                     _field_data,
                 )?,
                 3 => <
-                    self::_puroro::internal::field_type::SingularHeapMessageField<_puroro_root::library::Author> as self::_puroro::internal::field_type::FieldType
+                    self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as self::_puroro::internal::field_type::FieldType
                 >::deser_from_iter(
                     &mut self.author,
                     &mut self._bitfield,

@@ -35,7 +35,6 @@ pub trait OneofFieldType {
     where
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_>;
-    fn clear(&mut self);
 }
 
 pub trait OneofFieldTypeOpt<'a> {
@@ -62,7 +61,6 @@ where
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
     }
-    fn clear(&mut self) {}
 }
 
 impl OneofFieldType for BytesField {
@@ -77,9 +75,6 @@ impl OneofFieldType for BytesField {
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
-    }
-    fn clear(&mut self) {
-        self.0.clear()
     }
 }
 
@@ -96,9 +91,6 @@ impl OneofFieldType for StringField {
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
     }
-    fn clear(&mut self) {
-        self.0.clear()
-    }
 }
 
 impl<M: Default> OneofFieldType for HeapMessageField<M> {
@@ -113,9 +105,6 @@ impl<M: Default> OneofFieldType for HeapMessageField<M> {
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
-    }
-    fn clear(&mut self) {
-        *self.0 = M::default();
     }
 }
 
