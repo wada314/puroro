@@ -31,18 +31,19 @@ impl {{ ident_union }} {
     pub(crate) fn {{ field.ident_getter_opt }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_getter_opt_type }} {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
+        use ::std::ops::Deref;
         use self::_puroro::internal::oneof_type::OneofCase;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
 
         let case_opt = self::{{ ident_case }}::from_bitslice(bits);
-        if let Some(self::{{ ident_case }}::{{ field.ident_enum_item }}) = case_opt {
-            let item = unsafe {
-                &self.{{ field.ident_union_item }}
-            };
-            Some(item.get_field())
+        let item_opt = if let Some(self::{{ ident_case }}::{{ field.ident_enum_item }}) = case_opt {
+            Some(unsafe {
+                self.{{ field.ident_union_item }}.deref()
+            })
         } else {
             None
-        }
+        };
+        OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
     pub(crate) fn {{ field.ident_getter_mut }}<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> {{ field.rust_getter_mut_type }} {
@@ -58,7 +59,7 @@ impl {{ ident_union }} {
             <Self as OneofUnion>::clear(self, bits);
             let index = <self::{{ ident_case }} as OneofCase>::into_u32(self::{{ ident_case }}::{{ field.ident_enum_item }});
             bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, index);
-            <{{ field.rust_field_type }} as OneofFieldType>::clear(unsafe { &mut self.{{ field.ident_union_item}} });
+            <{{ field.rust_field_inner_type }} as OneofFieldType>::clear(unsafe { &mut self.{{ field.ident_union_item}} });
         }
         unsafe {
             &mut self.{{ field.ident_union_item }}

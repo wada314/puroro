@@ -39,21 +39,12 @@ pub trait OneofFieldType {
     fn clear(&mut self);
 }
 
-pub trait OneofFieldTypeOpt {
-    type OptGetterType<'a>
-    where
-        Self: 'a;
-    type GetterType<'a>
-    where
-        Self: 'a;
-    type DefaultValueType<'a>
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Self::OptGetterType<'_>;
-    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
-        &'a self,
-        default: D,
-    ) -> Self::GetterType<'_>;
+pub trait OneofFieldTypeOpt<'a> {
+    type OptGetterType;
+    type GetterType;
+    type DefaultValueType;
+    fn get_field_opt(self) -> Self::OptGetterType;
+    fn get_field<D: FnOnce() -> Self::DefaultValueType>(self, default: D) -> Self::GetterType;
 }
 
 impl<RustType, ProtoType> OneofFieldType for NumericalField<RustType, ProtoType>
@@ -130,81 +121,55 @@ impl<M: Default> OneofFieldType for HeapMessageField<M> {
 }
 
 pub trait OneofFieldTypeOptForNonMessageType {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Option<Self::GetterType<'_>>;
+    type GetterType;
+    fn get_field_opt(self) -> Option<Self::GetterType>;
 }
 
-impl<T: OneofFieldTypeOptForNonMessageType> OneofFieldTypeOpt for T {
-    type OptGetterType<'a> = Option<<T as OneofFieldTypeOptForNonMessageType>::GetterType<'a>>
-    where
-        Self: 'a;
-    type GetterType<'a> = <T as OneofFieldTypeOptForNonMessageType>::GetterType<'a>
-    where
-        Self: 'a;
-    type DefaultValueType<'a> = <T as OneofFieldTypeOptForNonMessageType>::GetterType<'a>
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Self::OptGetterType<'_> {
+impl<'a, T: OneofFieldTypeOptForNonMessageType> OneofFieldTypeOpt<'a> for T {
+    type OptGetterType = Option<<T as OneofFieldTypeOptForNonMessageType>::GetterType>;
+    type GetterType = <T as OneofFieldTypeOptForNonMessageType>::GetterType;
+    type DefaultValueType = <T as OneofFieldTypeOptForNonMessageType>::GetterType;
+    fn get_field_opt(self) -> Self::OptGetterType {
         <T as OneofFieldTypeOptForNonMessageType>::get_field_opt(self)
     }
-    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
-        &'a self,
-        default: D,
-    ) -> Self::GetterType<'_> {
+    fn get_field<D: FnOnce() -> Self::DefaultValueType>(self, default: D) -> Self::GetterType {
         <T as OneofFieldTypeOptForNonMessageType>::get_field_opt(self).unwrap_or_else(default)
     }
 }
 
-impl<RustType, ProtoType> OneofFieldTypeOptForNonMessageType
-    for Option<&NumericalField<RustType, ProtoType>>
+impl<'a, RustType, ProtoType> OneofFieldTypeOptForNonMessageType
+    for Option<&'a NumericalField<RustType, ProtoType>>
 where
     RustType: Clone,
 {
-    type GetterType<'a> = RustType
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Option<Self::GetterType<'_>> {
+    type GetterType = RustType;
+    fn get_field_opt(self) -> Option<Self::GetterType> {
         self.map(|f| f.get_field())
     }
 }
 
-impl OneofFieldTypeOptForNonMessageType for Option<&BytesField> {
-    type GetterType<'a> = &'a [u8]
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Option<Self::GetterType<'_>> {
+impl<'a> OneofFieldTypeOptForNonMessageType for Option<&'a BytesField> {
+    type GetterType = &'a [u8];
+    fn get_field_opt(self) -> Option<Self::GetterType> {
         self.map(|f| f.get_field())
     }
 }
 
-impl OneofFieldTypeOptForNonMessageType for Option<&StringField> {
-    type GetterType<'a> = &'a str
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Option<Self::GetterType<'_>> {
+impl<'a> OneofFieldTypeOptForNonMessageType for Option<&'a StringField> {
+    type GetterType = &'a str;
+    fn get_field_opt(self) -> Option<Self::GetterType> {
         self.map(|f| f.get_field())
     }
 }
 
-impl<M: Default> OneofFieldTypeOpt for Option<&HeapMessageField<M>> {
-    type OptGetterType<'a> = Option<&'a M>
-    where
-        Self: 'a;
-    type GetterType<'a> = Option<&'a M>
-    where
-        Self: 'a;
-    type DefaultValueType<'a> = ()
-    where
-        Self: 'a;
-    fn get_field_opt(&self) -> Self::OptGetterType<'_> {
+impl<'a, M: Default> OneofFieldTypeOpt<'a> for Option<&'a HeapMessageField<M>> {
+    type OptGetterType = Option<&'a M>;
+    type GetterType = Option<&'a M>;
+    type DefaultValueType = ();
+    fn get_field_opt(self) -> Self::OptGetterType {
         self.map(|f| f.get_field())
     }
-    fn get_field<'a, D: FnOnce() -> Self::DefaultValueType<'a>>(
-        &'a self,
-        _default: D,
-    ) -> Self::GetterType<'_> {
+    fn get_field<D: FnOnce() -> Self::DefaultValueType>(self, _default: D) -> Self::GetterType {
         self.get_field_opt()
     }
 }
