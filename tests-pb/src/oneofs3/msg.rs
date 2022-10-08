@@ -41,11 +41,8 @@ impl GroupOne {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        let item_opt = if let Some(self::GroupOneCase::G1Int32) = case_opt {
-            Some(unsafe { self.g1_int32.deref() })
-        } else {
-            None
-        };
+        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32))
+            .then(|| unsafe { self.g1_int32.deref() });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
@@ -83,11 +80,8 @@ impl GroupOne {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        let item_opt = if let Some(self::GroupOneCase::G1String) = case_opt {
-            Some(unsafe { self.g1_string.deref() })
-        } else {
-            None
-        };
+        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1String))
+            .then(|| unsafe { self.g1_string.deref() });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
@@ -247,11 +241,8 @@ impl GroupTwo {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = if let Some(self::GroupTwoCase::G2F32) = case_opt {
-            Some(unsafe { self.g2_f32.deref() })
-        } else {
-            None
-        };
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32))
+            .then(|| unsafe { self.g2_f32.deref() });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
@@ -289,11 +280,8 @@ impl GroupTwo {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = if let Some(self::GroupTwoCase::G2String) = case_opt {
-            Some(unsafe { self.g2_string.deref() })
-        } else {
-            None
-        };
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String))
+            .then(|| unsafe { self.g2_string.deref() });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
@@ -330,11 +318,8 @@ impl GroupTwo {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = if let Some(self::GroupTwoCase::G2Submsg) = case_opt {
-            Some(unsafe { self.g2_submsg.deref() })
-        } else {
-            None
-        };
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg))
+            .then(|| unsafe { self.g2_submsg.deref() });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
@@ -497,11 +482,8 @@ impl GroupThree {
         use ::std::option::Option::{None, Some};
 
         let case_opt = self::GroupThreeCase::from_bitslice(bits);
-        let item_opt = if let Some(self::GroupThreeCase::G3Int32) = case_opt {
-            Some(unsafe { self.g3_int32.deref() })
-        } else {
-            None
-        };
+        let item_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32))
+            .then(|| unsafe { self.g3_int32.deref() });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 

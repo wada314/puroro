@@ -36,13 +36,11 @@ impl {{ ident_union }} {
         use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
 
         let case_opt = self::{{ ident_case }}::from_bitslice(bits);
-        let item_opt = if let Some(self::{{ ident_case }}::{{ field.ident_enum_item }}) = case_opt {
-            Some(unsafe {
+        let item_opt = matches!(case_opt, Some(self::{{ ident_case }}::{{ field.ident_enum_item }})).then(|| {
+            unsafe {
                 self.{{ field.ident_union_item }}.deref()
-            })
-        } else {
-            None
-        };
+            }
+        });
         OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 
