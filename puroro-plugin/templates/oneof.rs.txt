@@ -32,7 +32,6 @@ impl {{ ident_union }} {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use ::std::ops::Deref;
-        use ::std::default::Default;
         use self::_puroro::internal::oneof_type::OneofCase;
         use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
 
@@ -42,7 +41,7 @@ impl {{ ident_union }} {
                 self.{{ field.ident_union_item }}.deref()
             }
         });
-        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+        OneofFieldTypeOpt::get_field(item_opt, ::std::default::Default::default)
     }
 
     pub(crate) fn {{ field.ident_getter_opt }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_getter_opt_type }} {

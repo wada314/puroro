@@ -40,6 +40,10 @@ impl Msg {
             &mut self._bitfield,
         );
     }
+    pub fn g1_int32(&self) -> i32 {
+        self.group_one.g1_int32(&self._bitfield)
+    }
+
     pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_one.g1_int32_opt(&self._bitfield)
     }
@@ -66,6 +70,10 @@ impl Msg {
             _ => (),
         }
     }
+    pub fn g1_string(&self) -> &str {
+        self.group_one.g1_string(&self._bitfield)
+    }
+
     pub fn g1_string_opt(&self) -> ::std::option::Option<&str> {
         self.group_one.g1_string_opt(&self._bitfield)
     }
@@ -109,6 +117,10 @@ impl Msg {
             &mut self._bitfield,
         );
     }
+    pub fn g2_f32(&self) -> f32 {
+        self.group_two.g2_f32(&self._bitfield)
+    }
+
     pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
         self.group_two.g2_f32_opt(&self._bitfield)
     }
@@ -135,6 +147,10 @@ impl Msg {
             _ => (),
         }
     }
+    pub fn g2_string(&self) -> &str {
+        self.group_two.g2_string(&self._bitfield)
+    }
+
     pub fn g2_string_opt(&self) -> ::std::option::Option<&str> {
         self.group_two.g2_string_opt(&self._bitfield)
     }
@@ -161,6 +177,10 @@ impl Msg {
             _ => (),
         }
     }
+    pub fn g2_submsg(&self) -> ::std::option::Option<&_puroro_root::oneofs3::Submsg> {
+        self.group_two.g2_submsg(&self._bitfield)
+    }
+
     pub fn g2_submsg_opt(&self) -> ::std::option::Option<&_puroro_root::oneofs3::Submsg> {
         self.group_two.g2_submsg_opt(&self._bitfield)
     }
@@ -204,6 +224,10 @@ impl Msg {
             &mut self._bitfield,
         );
     }
+    pub fn g3_int32(&self) -> i32 {
+        self.group_three.g3_int32(&self._bitfield)
+    }
+
     pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
         self.group_three.g3_int32_opt(&self._bitfield)
     }

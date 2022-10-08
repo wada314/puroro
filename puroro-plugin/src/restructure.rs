@@ -270,15 +270,18 @@ impl Deref for Enum<'_> {
 #[derive(Debug, Clone)]
 pub struct EnumValue<'a> {
     proto: &'a EnumValueDescriptorProto,
+    #[allow(unused)]
     parent: &'a Enum<'a>,
 }
 impl<'a> EnumValue<'a> {
     pub fn new(proto: &'a EnumValueDescriptorProto, parent: &'a Enum<'a>) -> Self {
         Self { proto, parent }
     }
+    #[allow(unused)]
     pub fn proto(&'a self) -> &EnumValueDescriptorProto {
         &self.proto
     }
+    #[allow(unused)]
     pub fn parent(&'a self) -> &Enum<'_> {
         self.parent
     }
@@ -341,6 +344,7 @@ impl<'a> Oneof<'a> {
             fields: OnceCell::default(),
         }
     }
+    #[allow(unused)]
     pub fn proto(&'a self) -> &OneofDescriptorProto {
         &self.proto
     }

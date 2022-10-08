@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::oneof_field_type::{
-    BytesField, HeapMessageField, NumericalField, OneofFieldType, StringField,
-};
 use crate::bitvec::BitSlice;
 
 pub trait OneofUnion {

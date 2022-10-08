@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use ::std::marker::PhantomData;
-use ::std::mem::ManuallyDrop;
 
 #[derive(Default, Clone)]
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
