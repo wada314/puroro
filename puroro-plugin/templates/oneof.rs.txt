@@ -110,8 +110,8 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
             {%- endfor %} {#- for field in fields #}
             _ => (),
         }
-        {#- Set the bitfield value to the last value + 1, which means None. #}
-        bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, {{ num_fields }});
+        {#- Set the bitfield value to the 0, which means None. #}
+        bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, 0);
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -149,17 +149,20 @@ impl self::_puroro::internal::oneof_type::OneofCase for {{ ident_case }} {
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
-        match x {
+        if x == 0 {
+            return None;
+        }
+        match x - 1 {
             {%- for field in fields %}
             {{ field.index }} => Some(self::{{ ident_case }}::{{ field.ident_enum_item }}),
             {%- endfor %} {#- for field in fields #}
-            _ => None,
+            _ => None, {#- It's an error value... #}
         }
     }
     fn into_u32(self) -> u32 {
         match self {
             {%- for field in fields %}
-            self::{{ ident_case }}::{{ field.ident_enum_item }} => {{ field.index }},
+            self::{{ ident_case }}::{{ field.ident_enum_item }} => {{ field.index }} + 1,
             {%- endfor %} {#- for field in fields #}
         }
     }

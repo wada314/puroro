@@ -165,7 +165,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
             }
             _ => (),
         }
-        bits.set_range(0..2, 2);
+        bits.set_range(0..2, 0);
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -200,7 +200,10 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
-        match x {
+        if x == 0 {
+            return None;
+        }
+        match x - 1 {
             0 => Some(self::GroupOneCase::G1Int32),
             1 => Some(self::GroupOneCase::G1String),
             _ => None,
@@ -208,8 +211,8 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     }
     fn into_u32(self) -> u32 {
         match self {
-            self::GroupOneCase::G1Int32 => 0,
-            self::GroupOneCase::G1String => 1,
+            self::GroupOneCase::G1Int32 => 0 + 1,
+            self::GroupOneCase::G1String => 1 + 1,
         }
     }
 }
@@ -448,7 +451,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
             }
             _ => (),
         }
-        bits.set_range(2..4, 3);
+        bits.set_range(2..4, 0);
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -486,7 +489,10 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
-        match x {
+        if x == 0 {
+            return None;
+        }
+        match x - 1 {
             0 => Some(self::GroupTwoCase::G2F32),
             1 => Some(self::GroupTwoCase::G2String),
             2 => Some(self::GroupTwoCase::G2Submsg),
@@ -495,9 +501,9 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     }
     fn into_u32(self) -> u32 {
         match self {
-            self::GroupTwoCase::G2F32 => 0,
-            self::GroupTwoCase::G2String => 1,
-            self::GroupTwoCase::G2Submsg => 2,
+            self::GroupTwoCase::G2F32 => 0 + 1,
+            self::GroupTwoCase::G2String => 1 + 1,
+            self::GroupTwoCase::G2Submsg => 2 + 1,
         }
     }
 }
@@ -622,7 +628,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
             }
             _ => (),
         }
-        bits.set_range(4..5, 1);
+        bits.set_range(4..5, 0);
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
@@ -654,14 +660,17 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
     fn from_u32(x: u32) -> Option<Self> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
-        match x {
+        if x == 0 {
+            return None;
+        }
+        match x - 1 {
             0 => Some(self::GroupThreeCase::G3Int32),
             _ => None,
         }
     }
     fn into_u32(self) -> u32 {
         match self {
-            self::GroupThreeCase::G3Int32 => 0,
+            self::GroupThreeCase::G3Int32 => 0 + 1,
         }
     }
 }

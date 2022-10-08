@@ -16,7 +16,7 @@
 // mod bumpalo;
 mod enums;
 mod official_samples;
-// mod oneof;
+mod oneof;
 // mod proto2_defaults;
 // mod variants_packed;
 // mod proto3_defaults;
