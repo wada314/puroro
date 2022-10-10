@@ -19,8 +19,7 @@ use crate::internal::variant::Variant;
 use crate::tags;
 use crate::Message;
 use crate::{ErrorKind, Result};
-use ::std::io::Result as IoResult;
-use ::std::io::Write;
+use ::std::io::{Result as IoResult, Write};
 
 pub trait FieldType {
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -69,9 +68,7 @@ pub trait FieldType {
         #[allow(unused)] bitvec: &B,
         #[allow(unused)] number: i32,
         #[allow(unused)] out: &mut W,
-    ) -> Result<()> {
-        unimplemented!()
-    }
+    ) -> Result<()>;
 }
 
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
@@ -230,6 +227,18 @@ impl FieldType for SingularStringField {
         }
         Ok(())
     }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        _bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        if !self.0.is_empty() {
+            ser_bytes_shared(self.0.as_bytes(), number, out)?;
+        }
+        Ok(())
+    }
 }
 
 impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_INDEX> {
@@ -243,6 +252,18 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
         bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        if bitvec.get(BITFIELD_INDEX) {
+            ser_bytes_shared(self.0.as_bytes(), number, out)?;
+        }
+        Ok(())
+    }
 }
 
 impl FieldType for RepeatedStringField {
@@ -253,6 +274,18 @@ impl FieldType for RepeatedStringField {
     ) -> Result<()> {
         let vec = iter.collect::<IoResult<Vec<u8>>>()?;
         self.0.push(String::from_utf8(vec)?);
+        Ok(())
+    }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        _bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        for s in &self.0 {
+            ser_bytes_shared(s.as_bytes(), number, out)?;
+        }
         Ok(())
     }
 }
@@ -269,6 +302,18 @@ impl FieldType for SingularBytesField {
         }
         Ok(())
     }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        _bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        if !self.0.is_empty() {
+            ser_bytes_shared(self.0.as_slice(), number, out)?;
+        }
+        Ok(())
+    }
 }
 
 impl<const BITFIELD_INDEX: usize> FieldType for OptionalBytesField<BITFIELD_INDEX> {
@@ -281,6 +326,18 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalBytesField<BITFIELD_INDE
         bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        if bitvec.get(BITFIELD_INDEX) {
+            ser_bytes_shared(self.0.as_slice(), number, out)?;
+        }
+        Ok(())
+    }
 }
 
 impl FieldType for RepeatedBytesField {
@@ -291,6 +348,18 @@ impl FieldType for RepeatedBytesField {
     ) -> Result<()> {
         let vec = iter.collect::<IoResult<Vec<u8>>>()?;
         self.0.push(vec);
+        Ok(())
+    }
+
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        _bitvec: &B,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()> {
+        for v in &self.0 {
+            ser_bytes_shared(v.as_slice(), number, out)?;
+        }
         Ok(())
     }
 }
@@ -362,5 +431,12 @@ where
             out.write_all(&bits)?;
         }
     }
+    Ok(())
+}
+
+fn ser_bytes_shared<W: Write>(bytes: &[u8], number: i32, out: &mut W) -> Result<()> {
+    ser_wire_and_number(WireType::LengthDelimited, number, out)?;
+    Variant::from_i32(bytes.len().try_into()?).encode_bytes(out)?;
+    out.write_all(bytes)?;
     Ok(())
 }

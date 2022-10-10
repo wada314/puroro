@@ -187,7 +187,10 @@ impl self::_puroro::Message for Book {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -213,6 +216,7 @@ impl self::_puroro::Message for Book {
             3,
             out,
         )?;
+
         Ok(())
     }
 }
@@ -343,7 +347,10 @@ impl self::_puroro::Message for Author {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -352,6 +359,7 @@ impl self::_puroro::Message for Author {
             1,
             out
         )?;
+
         Ok(())
     }
 }

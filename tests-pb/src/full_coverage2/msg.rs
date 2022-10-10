@@ -177,7 +177,10 @@ impl self::_puroro::Message for Submsg {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::OptionalNumericalField<
@@ -200,6 +203,7 @@ impl self::_puroro::Message for Submsg {
             101,
             out,
         )?;
+
         Ok(())
     }
 }

@@ -112,7 +112,10 @@ impl self::_puroro::Message for Test1 {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::OptionalNumericalField<
@@ -125,6 +128,7 @@ impl self::_puroro::Message for Test1 {
             1,
             out,
         )?;
+
         Ok(())
     }
 }
@@ -247,7 +251,10 @@ impl self::_puroro::Message for Test2 {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::OptionalStringField::<0> as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -256,6 +263,7 @@ impl self::_puroro::Message for Test2 {
             2,
             out
         )?;
+
         Ok(())
     }
 }
@@ -388,7 +396,10 @@ impl self::_puroro::Message for Test3 {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
@@ -399,6 +410,7 @@ impl self::_puroro::Message for Test3 {
             3,
             out,
         )?;
+
         Ok(())
     }
 }
@@ -509,7 +521,10 @@ impl self::_puroro::Message for Test4 {
         Ok(())
     }
 
-    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)] out: &mut W,
+    ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::RepeatedNumericalField<
@@ -521,6 +536,7 @@ impl self::_puroro::Message for Test4 {
             4,
             out,
         )?;
+
         Ok(())
     }
 }
