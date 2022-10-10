@@ -10,10 +10,6 @@ Please check [the `readme` of this repository](https://github.com/wada314/puroro
 # Table of contents
 
 1. Basic usage (this page)
-1. [Generated struct](internal::impls::simple)
-1. [Generated trait](internal::impls::traits)
-1. [Builders](internal::impls::builder)
-1. [Bumpalo struct (Super experimental)](internal::impls::bumpalo)
 
 # Simple example
 
@@ -101,7 +97,7 @@ assert!(!book.has_num_pages());
 
 # Deserializing
 
-You can use [`Message::from_bytes()`] method or [`Message::merge_from_bytes()`]
+You can use [`Message::from_bytes_iter()`] method or [`Message::merge_from_bytes_iter()`]
 method to deserialize a message from [`std::io::Read`] bytes stream.
 
 ```rust
@@ -114,12 +110,12 @@ let input2 = vec![0x0a, 0x02, 0x59, 0x6f]; // encoded `title: "Yo"`
 
 // You can use `from_bytes()` method to deserialize a message
 // from an input buffer.
-let mut book = Book::from_bytes(input1.bytes()).unwrap();
+let mut book = Book::from_bytes_iter(input1.bytes()).unwrap();
 assert_eq!(130, book.num_pages());
 
-// Or, you can use `merge_from_bytes(&mut self)` method to deserialize
+// Or, you can use `merge_from_bytes_iter(&mut self)` method to deserialize
 // and merge from an input buffer to an existing message instance.
-book.merge_from_bytes(input2.bytes()).unwrap();
+book.merge_from_bytes_iter(input2.bytes()).unwrap();
 assert_eq!("Yo", book.title());
 assert_eq!(130, book.num_pages());
 ```
@@ -140,188 +136,3 @@ book.ser(&mut output).unwrap();
 
 assert_eq!(vec![0x0a, 0x02, 0x59, 0x6f], output);
 ```
-
-# Trait
-
-[Detailed document here](internal::impls::traits)
-
-The input proto message generates not only a struct, but also a trait.
-The trait name is *MessageName*Trait (e.g. `BookTrait` for `message Book`).
-The trait only has immutable methods.
-
-```rust
-pub trait BookTrait {
-    fn title(&self) -> &str;
-    fn has_title(&self) -> bool;
-    fn title_opt(&self) -> Option<&str>;
-    fn num_pages(&self) -> u32;
-    fn has_num_pages(&self) -> bool;
-    fn num_pages_opt(&self) -> Option<u32>;
-}
-```
-
-Of course, the `struct Book` we described at above implements this trait.
-Please note that for some kind of fields the `struct Book`'s interface and
-`trait BookTrait`'s interface are slightly different (e.g. `repeated` fields).
-
-The trait is not only implemented for the `struct Book`,
-but also for some other types:
-
-```rust
-# trait BookTrait {}
-// Returns default value for all fields
-impl BookTrait for () {}
-
-// If the value is present then behaves like the internal value.
-// If the value is not present then returns default value for all fields.
-impl<T: BookTrait> BookTrait for Option<T> {}
-
-// Behaves as as the either of the types present.
-impl<T: BookTrait, U: BookTrait> BookTrait for puroro::Either<T, U> {}
-
-// Behaves like a merged message. Behaves like `U` is merged into `T`.
-impl<T: BookTrait, U: BookTrait> BookTrait for (T, U) {}
-
-// Trivial impls
-impl<'a, T: BookTrait> BookTrait for &'a T {}
-impl<'a, T: BookTrait> BookTrait for &'a mut T {}
-impl<T: BookTrait> BookTrait for Box<T> {}
-```
-
-# Builders
-
-[Detailed document here](internal::impls::builder)
-
-puroro also generates a builder type for each message.
-The name of builder is *MessageName*Builder (e.g. `BookBuilder` for `message Book`).
-
-```rust
-# use puroro_doc_samples::library::{
-#     BookTrait, BookSingleField1, BookSingleField2
-# };
-pub struct BookBuilder<T>(T);
-
-impl BookBuilder<()> {
-    pub fn new() -> Self {
-        // ...
-#       todo!()
-    }
-}
-
-impl<T> BookBuilder<T>
-where
-    T: BookTrait,
-{
-    pub fn build(self) -> T {
-        // ...
-#       todo!()
-    }
-
-    pub fn append_title<ScalarType>(
-        self,
-        value: ScalarType,
-    ) -> BookBuilder<(T, BookSingleField1<ScalarType>)>
-    where ScalarType: AsRef<str>,
-    {
-        // ...
-#       todo!()
-    }
-
-    pub fn append_num_pages<ScalarType>(
-        self,
-        value: ScalarType,
-    ) -> BookBuilder<(T, BookSingleField2<ScalarType>)>
-    where ScalarType: Into<u32> + Clone,
-    {
-        // ...
-#       todo!()
-    }
-}
-```
-
-This might look like little complicated, but the usage is very simple:
-
-```rust
-use puroro_doc_samples::library::{BookBuilder, BookTrait};
-
-let book = BookBuilder::new()
-    .append_title("The C Programming Language")
-    .build();
-
-assert_eq!("The C Programming Language", book.title());
-assert!(!book.has_num_pages());
-```
-
-You need to call `new()` method of builder first, then call `append_***()` methods
-as many as you like, then terminate with `build()` method.
-Then you can get a generated type which is implementing `BookTrait` trait,
-and of course it can be serialized.
-
-# Experimental and incomplete feature: Using [`bumpalo`](https://github.com/fitzgen/bumpalo) allocator
-
-[Detailed document here](internal::impls::bumpalo)
-
-puroro has an experimental implementation using [`bumpalo`](https://github.com/fitzgen/bumpalo)
-allocator instead of the default global allocator.
-
-```rust
-# use std::ops::DerefMut;
-pub struct BookBumpalo<'bump> {
-#   phantom: std::marker::PhantomData<&'bump ()>,
-    // ...
-}
-impl<'bump> BookBumpalo<'bump> {
-    pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-#       todo!()
-        // ...
-    }
-
-    pub fn title(&self) -> &str {
-#       todo!()
-        // ...
-    }
-    pub fn title_opt(&self) -> Option<&str> {
-#       todo!()
-        // ...
-    }
-    pub fn has_title(&self) -> bool {
-#       todo!()
-        // ...
-    }
-    pub fn title_mut(&mut self) -> impl '_ + DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>> {
-#       todo!(); unsafe { std::ptr::NonNull::dangling().as_mut() }
-        // ...
-    }
-    pub fn clear_title(&mut self) {
-#       todo!()
-        // ...
-    }
-
-    pub fn num_pages(&self) -> u32 {
-#       todo!()
-        // ...
-    }
-    pub fn num_pages_opt(&self) -> Option<u32> {
-#       todo!()
-        // ...
-    }
-    pub fn has_num_pages(&self) -> bool {
-#       todo!()
-        // ...
-    }
-    pub fn num_pages_mut(&mut self) -> &mut u32 {
-#       todo!()
-        // ...
-    }
-    pub fn clear_num_pages(&mut self) {
-#       todo!()
-        // ...
-    }
-}
-```
-
-This behaves almost as same as the normal `struct Book` impl,
-though the interface of `repeated` fields or `string` / `bytes` / `message`
-fields are different with the normal one.
-Especially, for `repated` field's mutable interface is not very useful yet
-so please make sure about that before using this implementation.
