@@ -23,7 +23,7 @@ mod rustfmt;
 
 use ::puroro::Message;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorRequest;
-use ::std::io::{stdin, stdout, Read, Write};
+use ::std::io::{Read, Write};
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;

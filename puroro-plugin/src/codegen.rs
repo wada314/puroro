@@ -31,7 +31,7 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::{
 };
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
 
-pub fn generate(request: CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
+pub fn generate(mut request: CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
     let mut response: CodeGeneratorResponse = Default::default();
     *response.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
@@ -65,7 +65,7 @@ pub fn generate(request: CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
 }
 
 pub fn generate_single_file(
-    request: CodeGeneratorRequest,
+    mut request: CodeGeneratorRequest,
     file_name: &str,
 ) -> Result<CodeGeneratorResponse> {
     let mut response: CodeGeneratorResponse = Default::default();

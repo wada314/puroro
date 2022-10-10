@@ -30,7 +30,7 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 
 fn main() -> Result<()> {
     let request = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
-    let response = codegen::generate(&request)?;
+    let response = codegen::generate(request)?;
     response.ser(&mut stdout())?;
     Ok(())
 }
