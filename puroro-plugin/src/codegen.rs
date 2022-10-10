@@ -31,6 +31,9 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::{
 };
 
 pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
+    let mut cgres: CodeGeneratorResponse = Default::default();
+    *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
+
     let root_module = get_root_module(request)?;
 
     let modules = {
@@ -43,24 +46,39 @@ pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse>
         found_modules
     };
 
+    for module in modules {
+        let file_name = &module.rust_file_path;
+        // Do render!
+        let unformatted_content = module.render().unwrap();
+        let content = format(&unformatted_content)?;
+
+        let mut output_file = <File as Default>::default();
+        *output_file.name_mut() = file_name.into();
+        *output_file.content_mut() = content.into();
+        cgres.file_mut().push(output_file);
+    }
+
+    Ok(cgres)
+}
+
+pub fn generate_single_file(
+    request: &CodeGeneratorRequest,
+    file_name: &str,
+) -> Result<CodeGeneratorResponse> {
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    for module in modules {
-        let filename = &module.rust_file_path;
-        // Do render!
-        let mut contents = module.render().unwrap();
-        if let Some(new_contents) = format(&contents).ok() {
-            contents = new_contents;
-        } else {
-            dbg!("failed to run rustfmt");
-        }
+    let mut root_module = get_root_module(request)?;
+    root_module.output_all_in_one_file = true;
 
-        let mut output_file = <File as Default>::default();
-        *output_file.name_mut() = filename.into();
-        *output_file.content_mut() = contents.into();
-        cgres.file_mut().push(output_file);
-    }
+    // Do render!
+    let unformatted_content = root_module.render().unwrap();
+    let content = format(&unformatted_content)?;
+
+    let mut output_file = <File as Default>::default();
+    *output_file.name_mut() = file_name.into();
+    *output_file.content_mut() = content.into();
+    cgres.file_mut().push(output_file);
 
     Ok(cgres)
 }
