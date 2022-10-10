@@ -21,26 +21,11 @@ mod codegen;
 mod error;
 mod rustfmt;
 
-use ::puroro::Message;
-use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorRequest;
-use ::std::io::{Read, Write};
-
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
-#[derive(Default)]
-pub struct Config {
-    pub all_in_one_file: bool,
-    pub all_in_one_file_name: String,
-}
+pub use crate::codegen::Config;
+pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
+pub use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
-pub fn run_plugin<R: Read, W: Write>(input: &mut R, config: &Config, output: &mut W) -> Result<()> {
-    let request = CodeGeneratorRequest::from_bytes(input.bytes()).unwrap();
-    let response = if config.all_in_one_file {
-        codegen::generate_single_file(request, &config.all_in_one_file_name)?
-    } else {
-        codegen::generate(request)?
-    };
-    response.ser(output)?;
-    Ok(())
-}
+pub use crate::codegen::generate_output_files_from_file_descriptors;

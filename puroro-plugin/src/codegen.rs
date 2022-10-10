@@ -29,15 +29,39 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_respo
 use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
-use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
-pub fn generate(mut request: CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
+#[derive(Default)]
+pub struct Config {
+    pub single_output_file: bool,
+    pub root_file_name: Option<String>,
+}
+
+#[allow(unused)]
+pub fn generate_response_from_request(
+    request: CodeGeneratorRequest,
+    config: &Config,
+) -> Result<CodeGeneratorResponse> {
     let mut response: CodeGeneratorResponse = Default::default();
     *response.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let mut file_set = FileDescriptorSet::default();
-    file_set.file_mut().append(request.proto_file_mut());
-    let root_module = get_root_module(&file_set)?;
+    let output_files = generate_output_files_from_file_descriptors(request.proto_file(), config)?;
+    response.file_mut().extend(output_files);
+
+    Ok(response)
+}
+
+pub fn generate_output_files_from_file_descriptors<'a>(
+    files: impl IntoIterator<Item = &'a FileDescriptorProto>,
+    config: &Config,
+) -> Result<impl IntoIterator<Item = File>> {
+    let mut root_module = get_root_module(files)?;
+    if config.single_output_file {
+        root_module.output_all_in_one_file = true;
+    }
+    if let Some(ref root_file_name) = &config.root_file_name {
+        root_module.rust_file_path = root_file_name.clone();
+    }
 
     let modules = {
         let mut queue = vec![&root_module];
@@ -49,48 +73,26 @@ pub fn generate(mut request: CodeGeneratorRequest) -> Result<CodeGeneratorRespon
         found_modules
     };
 
-    for module in modules {
-        let file_name = &module.rust_file_path;
-        // Do render!
-        let unformatted_content = module.render().unwrap();
-        let content = format(&unformatted_content)?;
+    let output_files = modules
+        .into_iter()
+        .map(|module| {
+            let file_name = &module.rust_file_path;
+            // Do render!
+            let unformatted_content = module.render().unwrap();
+            let content = format(&unformatted_content)?;
 
-        let mut output_file = <File as Default>::default();
-        *output_file.name_mut() = file_name.into();
-        *output_file.content_mut() = content.into();
-        response.file_mut().push(output_file);
-    }
+            let mut output_file = <File as Default>::default();
+            *output_file.name_mut() = file_name.into();
+            *output_file.content_mut() = content.into();
+            Ok(output_file)
+        })
+        .collect::<Result<Vec<_>>>()?;
 
-    Ok(response)
+    Ok(output_files)
 }
 
-pub fn generate_single_file(
-    mut request: CodeGeneratorRequest,
-    file_name: &str,
-) -> Result<CodeGeneratorResponse> {
-    let mut response: CodeGeneratorResponse = Default::default();
-    *response.supported_features_mut() = Feature::FeatureProto3Optional as u64;
-
-    let mut file_set = FileDescriptorSet::default();
-    file_set.file_mut().append(request.proto_file_mut());
-    let mut root_module = get_root_module(&file_set)?;
-    root_module.output_all_in_one_file = true;
-
-    // Do render!
-    let unformatted_content = root_module.render().unwrap();
-    let content = format(&unformatted_content)?;
-
-    let mut output_file = <File as Default>::default();
-    *output_file.name_mut() = file_name.into();
-    *output_file.content_mut() = content.into();
-    response.file_mut().push(output_file);
-
-    Ok(response)
-}
-
-fn get_root_module(file_set: &FileDescriptorSet) -> Result<Module> {
-    let input_files = file_set
-        .file()
+fn get_root_module<'a>(files: impl IntoIterator<Item = &'a FileDescriptorProto>) -> Result<Module> {
+    let input_files = files
         .into_iter()
         .map(|f| crate::codegen::restructure::File::new(f))
         .collect::<Vec<_>>();
