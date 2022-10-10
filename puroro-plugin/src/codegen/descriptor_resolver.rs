@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::restructure::{Enum, File, Message, MessageOrEnumRef};
-use crate::utils::{Fqtn, Package};
+use super::restructure::{Enum, File, Message, MessageOrEnumRef};
+use super::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;

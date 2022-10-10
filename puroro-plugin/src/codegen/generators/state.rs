@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::super::descriptor_resolver::DescriptorResolver;
+pub use super::super::restructure::Syntax;
+use super::super::utils::Fqtn;
 use super::{Enum, Message};
-use crate::descriptor_resolver::DescriptorResolver;
-pub use crate::restructure::Syntax;
-use crate::utils::Fqtn;
 use crate::{ErrorKind, Result};
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;

@@ -17,15 +17,12 @@
 #![feature(generic_associated_types)]
 #![feature(is_some_with)]
 
-mod descriptor_resolver;
+mod codegen;
 mod error;
-mod generators;
-mod restructure;
-mod utils;
 
-use self::generators::{Module, State};
-use crate::descriptor_resolver::DescriptorResolver;
-use crate::utils::Package;
+use crate::codegen::descriptor_resolver::DescriptorResolver;
+use crate::codegen::generators::{Module, State};
+use crate::codegen::utils::Package;
 use ::askama::Template as _;
 use ::puroro::Message;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::{
@@ -78,7 +75,7 @@ fn main() -> Result<()> {
     let input_files = cgreq
         .proto_file()
         .into_iter()
-        .map(|f| crate::restructure::File::new(f))
+        .map(|f| crate::codegen::restructure::File::new(f))
         .collect::<Vec<_>>();
     let resolver = DescriptorResolver::new(input_files.iter())?;
 

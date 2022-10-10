@@ -15,10 +15,10 @@
 pub mod state;
 pub use self::state::State;
 
-use crate::descriptor_resolver::DescriptorResolver;
-use crate::restructure as re;
-pub use crate::restructure::Syntax;
-use crate::utils::{Fqtn, Package, StrExt as _};
+use super::descriptor_resolver::DescriptorResolver;
+use super::restructure as re;
+pub use super::restructure::Syntax;
+use super::utils::{Fqtn, Package, StrExt as _};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;

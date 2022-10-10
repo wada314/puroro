@@ -16,7 +16,7 @@
 //! e.g. Pointer to its parent and ancestors,
 //! some utility functions that enumerates all indirect child messages / enums.
 
-use crate::utils::{Fqtn, Package};
+use super::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
