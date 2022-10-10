@@ -14,14 +14,15 @@
 
 use crate::{ErrorKind, Result};
 use ::std::env;
-use ::std::io::{Read, Write};
+use ::std::io::Write;
 use ::std::process::Command;
 use ::std::process::Stdio;
 
 pub fn format(input: &str) -> Result<String> {
     if input.is_empty() {
         return Ok("".to_string());
-    }dbg!(input);
+    }
+    dbg!(input);
 
     let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
     let mut rustfmt = Command::new(&rustfmt_exe)
@@ -35,15 +36,8 @@ pub fn format(input: &str) -> Result<String> {
     stdin.write_all(input.as_bytes())?;
     drop(stdin);
 
-    // let stdout = rustfmt.stdout.as_mut().ok_or(ErrorKind::InternalError {
-    //     detail: "no stdout bound for rustfmt child process".to_string(),
-    // })?;
-    // let mut out = String::new();dbg!("reading");
-    // stdout.read_to_string(&mut out)?;dbg!("read");
     let output = rustfmt.wait_with_output()?;
     let out = String::from_utf8(output.stdout).unwrap();
-
-    // rustfmt.kill()?;
 
     return Ok(out);
 }
