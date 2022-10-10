@@ -25,18 +25,18 @@ pub trait OneofUnion {
     fn clear<B: BitSlice>(&mut self, bits: &mut B);
     fn clone<B: BitSlice>(&self, bits: &B) -> Self;
 
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        field_data: FieldData<I>,
-        field_number: i32,
-    ) -> Result<()>;
+    // fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    //     &mut self,
+    //     bitvec: &mut B,
+    //     field_data: FieldData<I>,
+    //     field_number: i32,
+    // ) -> Result<()>;
 
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        #[allow(unused)] bitvec: &B,
-        #[allow(unused)] out: &mut W,
-    ) -> Result<()>;
+    // fn ser_to_write<W: Write, B: BitSlice>(
+    //     &self,
+    //     #[allow(unused)] bitvec: &B,
+    //     #[allow(unused)] out: &mut W,
+    // ) -> Result<()>;
 }
 
 pub trait OneofCase: Sized {
