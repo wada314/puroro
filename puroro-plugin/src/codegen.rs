@@ -36,7 +36,7 @@ pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse>
         .into_iter()
         .map(|f| crate::codegen::restructure::File::new(f))
         .collect::<Vec<_>>();
-    let resolver = DescriptorResolver::new(input_files.iter())?;
+    let resolver = DescriptorResolver::new(&input_files)?;
 
     let mut cgres: CodeGeneratorResponse = Default::default();
     *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;

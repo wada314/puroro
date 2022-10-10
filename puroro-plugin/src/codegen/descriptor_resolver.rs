@@ -26,7 +26,7 @@ pub struct DescriptorResolver<'a> {
 impl<'a> DescriptorResolver<'a> {
     pub fn new<I>(input_files: I) -> Result<Self>
     where
-        I: Iterator<Item = &'a File<'a>>,
+        I: IntoIterator<Item = &'a File<'a>>,
     {
         let mut fqtn_to_desc_map = HashMap::new();
         let mut package_contents = HashMap::new();
