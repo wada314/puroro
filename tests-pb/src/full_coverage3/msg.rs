@@ -1,6 +1,5 @@
 // A generated source code by puroro library
 // package .full_coverage3.Msg
-pub mod submsg;
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -227,3 +226,4 @@ impl ::std::ops::Drop for Submsg {
         use self::_puroro::internal::oneof_type::OneofUnion;
     }
 }
+pub mod submsg;

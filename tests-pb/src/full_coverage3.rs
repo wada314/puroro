@@ -1,6 +1,5 @@
 // A generated source code by puroro library
 // package full_coverage3
-pub mod msg;
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -2591,3 +2590,4 @@ impl ::std::convert::From<Enum> for i32 {
         }
     }
 }
+pub mod msg;

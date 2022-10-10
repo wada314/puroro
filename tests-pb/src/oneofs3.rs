@@ -1,6 +1,5 @@
 // A generated source code by puroro library
 // package oneofs3
-pub mod msg;
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -489,3 +488,4 @@ impl ::std::ops::Drop for Submsg {
         use self::_puroro::internal::oneof_type::OneofUnion;
     }
 }
+pub mod msg;

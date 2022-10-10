@@ -7,10 +7,6 @@
 // package {{ fqtn }}
 {%- endif %}
 
-{%- for submodule in submodules %}
-pub mod {{ submodule.ident_module }};
-{%- endfor %}
-
 pub mod _puroro_root {
     {%- if is_root_package %}
     pub use super::*;
@@ -40,3 +36,21 @@ pub mod _puroro {
 {%- for o in oneofs %}
 {{ o }}
 {%- endfor %} {#- for o in oneofs #}
+
+{#-################ Submodules ################}
+
+{%- if output_all_in_one_file %}
+
+{%- for submodule in submodules %}
+pub mod {{ submodule.ident_module }} {
+    {{ submodule }}
+}
+{%- endfor %}
+
+{%- else %} {#- if output_all_in_one_file #}
+
+{%- for submodule in submodules %}
+pub mod {{ submodule.ident_module }};
+{%- endfor %}
+
+{%- endif %} {#- if output_all_in_one_file #}

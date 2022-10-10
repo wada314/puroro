@@ -37,6 +37,7 @@ pub struct Module {
     pub enums: Vec<Rc<Enum>>,
     pub oneofs: Vec<Rc<Oneof>>,
     pub rust_file_path: String,
+    pub output_all_in_one_file: bool,
 }
 impl Module {
     pub fn try_from_package<'a, S: AsRef<str>>(
@@ -111,6 +112,7 @@ impl Module {
             enums,
             oneofs,
             rust_file_path,
+            output_all_in_one_file: false,
         })
     }
 
@@ -151,6 +153,7 @@ impl Module {
             enums,
             oneofs,
             rust_file_path,
+            output_all_in_one_file: false,
         })
     }
 }

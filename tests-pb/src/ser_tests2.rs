@@ -1,6 +1,5 @@
 // A generated source code by puroro library
 // package ser_tests2
-pub mod msg;
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -667,3 +666,4 @@ impl ::std::convert::From<Enum> for i32 {
         }
     }
 }
+pub mod msg;

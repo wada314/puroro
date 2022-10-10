@@ -31,18 +31,7 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::{
 };
 
 pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
-    let input_files = request
-        .proto_file()
-        .into_iter()
-        .map(|f| crate::codegen::restructure::File::new(f))
-        .collect::<Vec<_>>();
-    let resolver = DescriptorResolver::new(&input_files)?;
-
-    let mut cgres: CodeGeneratorResponse = Default::default();
-    *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
-
-    let mut state = State::default();
-    let root_module = Module::try_from_package(&Package::new(""), &resolver, &mut state)?;
+    let root_module = get_root_module(request)?;
 
     let modules = {
         let mut queue = vec![&root_module];
@@ -53,6 +42,9 @@ pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse>
         }
         found_modules
     };
+
+    let mut cgres: CodeGeneratorResponse = Default::default();
+    *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
     for module in modules {
         let filename = &module.rust_file_path;
@@ -71,4 +63,20 @@ pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse>
     }
 
     Ok(cgres)
+}
+
+fn get_root_module(request: &CodeGeneratorRequest) -> Result<Module> {
+    let input_files = request
+        .proto_file()
+        .into_iter()
+        .map(|f| crate::codegen::restructure::File::new(f))
+        .collect::<Vec<_>>();
+    let resolver = DescriptorResolver::new(&input_files)?;
+
+    let mut state = State::default();
+    Ok(Module::try_from_package(
+        &Package::new(""),
+        &resolver,
+        &mut state,
+    )?)
 }
