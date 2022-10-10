@@ -19,6 +19,7 @@
 
 mod codegen;
 mod error;
+mod rustfmt;
 
 use crate::codegen::descriptor_resolver::DescriptorResolver;
 use crate::codegen::generators::{Module, State};
@@ -31,43 +32,10 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_respo
 use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
-use ::std::env;
 use ::std::io::{stdin, stdout, Read};
-use ::std::process::Command;
-use ::std::process::Stdio;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
-
-fn format_rust_file(input: &str) -> Option<String> {
-    use ::std::io::Write as _;
-    if input.is_empty() {
-        return None;
-    }
-
-    let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
-    let mut rustfmt = Command::new(&rustfmt_exe)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
-
-    if let Some(mut stdin) = rustfmt.stdin {
-        //let input_string = input.to_string();
-        //::std::thread::spawn(move || stdin.write_all(input_string.as_bytes()));
-        stdin.write_all(input.as_bytes()).ok()?;
-    }
-
-    if let Some(ref mut stdout) = rustfmt.stdout {
-        let mut out = String::new();
-        stdout.read_to_string(&mut out).ok()?;
-        if !out.is_empty() {
-            return Some(out);
-        }
-    }
-
-    return None;
-}
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
@@ -99,7 +67,7 @@ fn main() -> Result<()> {
         let filename = &module.rust_file_path;
         // Do render!
         let mut contents = module.render().unwrap();
-        if let Some(new_contents) = format_rust_file(&contents) {
+        if let Some(new_contents) = rustfmt::format(&contents).ok() {
             contents = new_contents;
         } else {
             dbg!("failed to run rustfmt");

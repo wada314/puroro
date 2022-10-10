@@ -36,6 +36,8 @@ pub enum ErrorKind {
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from ParseIntError: "{source}""#)]
     ParseIntError { source: std::num::ParseIntError },
+    #[error(r#"Ar error from std::io::Error: "{source}""#)]
+    IoError { source: ::std::io::Error },
     #[error(r#"Bad format string: "{string}""#)]
     InvalidString { string: String },
     #[error(r#"An error from puroro: "{source}""#)]
@@ -45,10 +47,18 @@ pub enum ErrorKind {
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
 }
-impl From<std::fmt::Error> for GeneratorError {
-    fn from(e: std::fmt::Error) -> Self {
+impl From<::std::fmt::Error> for GeneratorError {
+    fn from(e: ::std::fmt::Error) -> Self {
         Self {
             kind: ErrorKind::WriteError { source: e },
+            backtrace: std::backtrace::Backtrace::capture(),
+        }
+    }
+}
+impl From<::std::io::Error> for GeneratorError {
+    fn from(e: ::std::io::Error) -> Self {
+        Self {
+            kind: ErrorKind::IoError { source: e },
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }
