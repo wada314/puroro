@@ -64,9 +64,7 @@ fn main() {
 
     // Output the File proto structs into the actual filesystem.
     for output_file in output_files {
-        dbg!(output_file.name());
         let file_path = output_rust_path.join(output_file.name());
-        dbg!(&file_path);
         let mut file = File::create(&file_path).unwrap();
         write!(&mut file, "{}", output_file.content()).unwrap();
     }
