@@ -1,5 +1,5 @@
 // A generated source code by puroro library
-// package ..full_coverage3.Msg.Submsg
+// package .full_coverage3.Msg.Submsg
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;

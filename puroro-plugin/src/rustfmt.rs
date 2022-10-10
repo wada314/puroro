@@ -22,7 +22,6 @@ pub fn format(input: &str) -> Result<String> {
     if input.is_empty() {
         return Ok("".to_string());
     }
-    dbg!(input);
 
     let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
     let mut rustfmt = Command::new(&rustfmt_exe)

@@ -26,6 +26,6 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 
 pub use crate::codegen::Config;
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
-pub use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+pub use ::puroro_protobuf_compiled::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
 
 pub use crate::codegen::generate_output_files_from_file_descriptors;

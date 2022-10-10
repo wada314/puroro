@@ -428,8 +428,9 @@ trait MessageOrEnumExt<'a> {
         self.fqtn_once_cell().get_or_init(|| {
             Fqtn::new(match self.parent() {
                 FileOrMessageRef::File(f) => format!(".{}.{}", f.package(), self.name()),
+
                 FileOrMessageRef::Message(m) => {
-                    format!(".{}.{}", m.fqtn(), self.name())
+                    format!("{}.{}", m.fqtn(), self.name())
                 }
             })
         })
