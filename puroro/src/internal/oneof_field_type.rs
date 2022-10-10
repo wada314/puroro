@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::ser::{
+    ser_bytes_shared, ser_numerical_shared, ser_wire_and_number, FieldData, WireType,
+};
+use crate::{tags, Message};
+use crate::{ErrorKind, Result};
+use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 
 #[derive(Default, Clone)]
@@ -35,6 +41,12 @@ pub trait OneofFieldType {
     where
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_>;
+
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        field_data: FieldData<I>,
+    ) -> Result<()>;
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()>;
 }
 
 pub trait OneofFieldTypeOpt<'a> {
@@ -48,6 +60,7 @@ pub trait OneofFieldTypeOpt<'a> {
 impl<RustType, ProtoType> OneofFieldType for NumericalField<RustType, ProtoType>
 where
     RustType: Clone,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type GetterType<'a> = RustType
     where
@@ -60,6 +73,32 @@ where
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
+    }
+
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        match field_data {
+            FieldData::Variant(variant) => {
+                self.0 = variant.get::<ProtoType>()?;
+            }
+            FieldData::LengthDelimited(_) => {
+                Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as i32))?
+            }
+            FieldData::Bits32(bits) => {
+                self.0 = <ProtoType as tags::NumericalType>::from_bits32(bits)?;
+            }
+            FieldData::Bits64(bits) => {
+                self.0 = <ProtoType as tags::NumericalType>::from_bits64(bits)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
+        ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
+        Ok(())
     }
 }
 
@@ -76,6 +115,22 @@ impl OneofFieldType for BytesField {
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
     }
+
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(iter) = field_data {
+            self.0 = iter.collect::<IoResult<Vec<u8>>>()?;
+            Ok(())
+        } else {
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+        }
+    }
+
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
+        ser_bytes_shared(self.0.as_slice(), number, out)
+    }
 }
 
 impl OneofFieldType for StringField {
@@ -91,9 +146,25 @@ impl OneofFieldType for StringField {
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
     }
+
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(iter) = field_data {
+            self.0 = String::from_utf8(iter.collect::<IoResult<Vec<u8>>>()?)?;
+            Ok(())
+        } else {
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+        }
+    }
+
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
+        ser_bytes_shared(self.0.as_bytes(), number, out)
+    }
 }
 
-impl<M: Default> OneofFieldType for HeapMessageField<M> {
+impl<M: Message + Default> OneofFieldType for HeapMessageField<M> {
     type GetterType<'a> = &'a M
     where
         Self: 'a;
@@ -105,6 +176,26 @@ impl<M: Default> OneofFieldType for HeapMessageField<M> {
         Self: 'a;
     fn mut_field(&mut self) -> Self::MutGetterType<'_> {
         &mut self.0
+    }
+
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(iter) = field_data {
+            let msg = self.0.as_mut();
+            msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
+            Ok(())
+        } else {
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+        }
+    }
+
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
+        let mut vec = Vec::new();
+        self.0.to_bytes(&mut vec)?;
+        ser_bytes_shared(vec.as_slice(), number, out)?;
+        Ok(())
     }
 }
 
@@ -129,6 +220,7 @@ impl<'a, RustType, ProtoType> OneofFieldTypeOptForNonMessageType
     for Option<&'a NumericalField<RustType, ProtoType>>
 where
     RustType: Clone,
+    ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type GetterType = RustType;
     fn get_field_opt(self) -> Option<Self::GetterType> {
@@ -150,7 +242,7 @@ impl<'a> OneofFieldTypeOptForNonMessageType for Option<&'a StringField> {
     }
 }
 
-impl<'a, M: Default> OneofFieldTypeOpt<'a> for Option<&'a HeapMessageField<M>> {
+impl<'a, M: Message + Default> OneofFieldTypeOpt<'a> for Option<&'a HeapMessageField<M>> {
     type OptGetterType = Option<&'a M>;
     type GetterType = Option<&'a M>;
     type DefaultValueType = ();

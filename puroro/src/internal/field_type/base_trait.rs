@@ -14,7 +14,9 @@
 
 use super::*;
 use crate::bitvec::BitSlice;
-use crate::internal::ser::{FieldData, WireType};
+use crate::internal::ser::{
+    ser_bytes_shared, ser_numerical_shared, ser_wire_and_number, FieldData, WireType,
+};
 use crate::internal::variant::Variant;
 use crate::tags;
 use crate::Message;
@@ -419,52 +421,4 @@ where
         }
         Ok(())
     }
-}
-
-fn ser_wire_and_number<W: Write>(wire: WireType, number: i32, out: &mut W) -> Result<()> {
-    let var = Variant::from_i32((number << 3) | (wire as i32));
-    var.encode_bytes(out)?;
-    Ok(())
-}
-
-fn ser_numerical_shared<RustType, ProtoType, W>(
-    val: RustType,
-    number: i32,
-    out: &mut W,
-) -> Result<()>
-where
-    ProtoType: tags::NumericalType<RustType = RustType>,
-    W: Write,
-{
-    let wire = <ProtoType as tags::NumericalType>::to_wire_type(val)?;
-    ser_wire_and_number(
-        match wire {
-            tags::NumericalWireType::Variant(_) => WireType::Variant,
-            tags::NumericalWireType::Bits32(_) => WireType::Bits32,
-            tags::NumericalWireType::Bits64(_) => WireType::Bits64,
-        },
-        number,
-        out,
-    )?;
-
-    match wire {
-        tags::NumericalWireType::Variant(bits) => {
-            let var = Variant::new(bits);
-            var.encode_bytes(out)?;
-        }
-        tags::NumericalWireType::Bits32(bits) => {
-            out.write_all(&bits)?;
-        }
-        tags::NumericalWireType::Bits64(bits) => {
-            out.write_all(&bits)?;
-        }
-    }
-    Ok(())
-}
-
-fn ser_bytes_shared<W: Write>(bytes: &[u8], number: i32, out: &mut W) -> Result<()> {
-    ser_wire_and_number(WireType::LengthDelimited, number, out)?;
-    Variant::from_i32(bytes.len().try_into()?).encode_bytes(out)?;
-    out.write_all(bytes)?;
-    Ok(())
 }
