@@ -186,6 +186,35 @@ impl self::_puroro::Message for Book {
         }
         Ok(())
     }
+
+    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.title,
+            &self._bitfield,
+            1,
+            out
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            u32,
+            self::_puroro::tags::UInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.num_pages,
+            &self._bitfield,
+            2,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::library::Author,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.author,
+            &self._bitfield,
+            3,
+            out,
+        )?;
+        Ok(())
+    }
 }
 
 impl ::std::clone::Clone for Book {
@@ -311,6 +340,18 @@ impl self::_puroro::Message for Author {
                 _ => todo!(),
             }
         }
+        Ok(())
+    }
+
+    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.name,
+            &self._bitfield,
+            1,
+            out
+        )?;
         Ok(())
     }
 }

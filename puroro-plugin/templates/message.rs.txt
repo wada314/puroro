@@ -157,9 +157,26 @@ impl self::_puroro::Message for {{ ident_struct }} {
                     _field_data,
                 )?,
                 {%- endfor %} {#- for field in fields #}
+                {#- TODO: oneof #}
                 _ => todo!(),
             }
         }
+        Ok(())
+    }
+
+    fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] out: &mut W) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        {%- for field in fields %}
+        <{{ field.rust_field_type }} as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.{{ field.ident_struct_field }},
+            &self._bitfield,
+            {{ field.number }},
+            out
+        )?;
+        {%- endfor %} {#- for field in fields #}
+        {#- TODO: oneof #}
+
         Ok(())
     }
 }

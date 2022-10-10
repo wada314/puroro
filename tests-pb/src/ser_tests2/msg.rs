@@ -111,6 +111,22 @@ impl self::_puroro::Message for Submsg {
         }
         Ok(())
     }
+
+    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_optional,
+            &self._bitfield,
+            1,
+            out,
+        )?;
+        Ok(())
+    }
 }
 
 impl ::std::clone::Clone for Submsg {

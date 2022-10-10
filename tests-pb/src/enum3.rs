@@ -204,6 +204,40 @@ impl self::_puroro::Message for Msg {
         }
         Ok(())
     }
+
+    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            _puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::enum3::Enum>,
+            0,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_optional,
+            &self._bitfield,
+            1,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            _puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::enum3::Enum>,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_unlabeled,
+            &self._bitfield,
+            2,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            _puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::enum3::Enum>,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_repeated,
+            &self._bitfield,
+            3,
+            out,
+        )?;
+        Ok(())
+    }
 }
 
 impl ::std::clone::Clone for Msg {

@@ -2371,6 +2371,436 @@ impl self::_puroro::Message for Msg {
         }
         Ok(())
     }
+
+    fn to_bytes<W: ::std::io::Write>(&self, out: &mut W) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_unlabeled,
+            &self._bitfield,
+            1,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+            0,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_optional,
+            &self._bitfield,
+            2,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            i32,
+            self::_puroro::tags::Int32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_repeated,
+            &self._bitfield,
+            3,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            f32,
+            self::_puroro::tags::Float,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_unlabeled,
+            &self._bitfield,
+            11,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            f32,
+            self::_puroro::tags::Float,
+            1,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_optional,
+            &self._bitfield,
+            12,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            f32,
+            self::_puroro::tags::Float,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_repeated,
+            &self._bitfield,
+            13,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularBytesField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.bytes_unlabeled,
+            &self._bitfield,
+            21,
+            out
+        )?;
+        <self::_puroro::internal::field_type::OptionalBytesField<2> as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.bytes_optional,
+            &self._bitfield,
+            22,
+            out
+        )?;
+        <self::_puroro::internal::field_type::RepeatedBytesField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.bytes_repeated,
+            &self._bitfield,
+            23,
+            out
+        )?;
+        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_unlabeled,
+            &self._bitfield,
+            31,
+            out
+        )?;
+        <self::_puroro::internal::field_type::OptionalStringField::<3> as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_optional,
+            &self._bitfield,
+            32,
+            out
+        )?;
+        <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_repeated,
+            &self._bitfield,
+            33,
+            out
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            _puroro_root::full_coverage3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::full_coverage3::Enum>,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_unlabeled,
+            &self._bitfield,
+            41,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            _puroro_root::full_coverage3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::full_coverage3::Enum>,
+            4,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_optional,
+            &self._bitfield,
+            42,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            _puroro_root::full_coverage3::Enum,
+            self::_puroro::tags::Enum3<_puroro_root::full_coverage3::Enum>,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_repeated,
+            &self._bitfield,
+            43,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::full_coverage3::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_unlabeled,
+            &self._bitfield,
+            51,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
+            _puroro_root::full_coverage3::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_optional,
+            &self._bitfield,
+            52,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedMessageField<
+            _puroro_root::full_coverage3::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_repeated,
+            &self._bitfield,
+            53,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            i64,
+            self::_puroro::tags::Int64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i64_unlabeled,
+            &self._bitfield,
+            101,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i64,
+            self::_puroro::tags::Int64,
+            6,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i64_optional,
+            &self._bitfield,
+            102,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            i64,
+            self::_puroro::tags::Int64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i64_repeated,
+            &self._bitfield,
+            103,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            u32,
+            self::_puroro::tags::UInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u32_unlabeled,
+            &self._bitfield,
+            111,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            u32,
+            self::_puroro::tags::UInt32,
+            7,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u32_optional,
+            &self._bitfield,
+            112,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            u32,
+            self::_puroro::tags::UInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u32_repeated,
+            &self._bitfield,
+            113,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            u64,
+            self::_puroro::tags::UInt64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u64_unlabeled,
+            &self._bitfield,
+            121,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            u64,
+            self::_puroro::tags::UInt64,
+            8,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u64_optional,
+            &self._bitfield,
+            122,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            u64,
+            self::_puroro::tags::UInt64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u64_repeated,
+            &self._bitfield,
+            123,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            i32,
+            self::_puroro::tags::SInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s32_unlabeled,
+            &self._bitfield,
+            131,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::SInt32,
+            9,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s32_optional,
+            &self._bitfield,
+            132,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            i32,
+            self::_puroro::tags::SInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s32_repeated,
+            &self._bitfield,
+            133,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            i64,
+            self::_puroro::tags::SInt64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s64_unlabeled,
+            &self._bitfield,
+            141,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i64,
+            self::_puroro::tags::SInt64,
+            10,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s64_optional,
+            &self._bitfield,
+            142,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            i64,
+            self::_puroro::tags::SInt64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s64_repeated,
+            &self._bitfield,
+            143,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            u32,
+            self::_puroro::tags::Fixed32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed32_unlabeled,
+            &self._bitfield,
+            151,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            u32,
+            self::_puroro::tags::Fixed32,
+            11,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed32_optional,
+            &self._bitfield,
+            152,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            u32,
+            self::_puroro::tags::Fixed32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed32_repeated,
+            &self._bitfield,
+            153,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            u64,
+            self::_puroro::tags::Fixed64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed64_unlabeled,
+            &self._bitfield,
+            161,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            u64,
+            self::_puroro::tags::Fixed64,
+            12,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed64_optional,
+            &self._bitfield,
+            162,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            u64,
+            self::_puroro::tags::Fixed64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed64_repeated,
+            &self._bitfield,
+            163,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            i32,
+            self::_puroro::tags::SFixed32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed32_unlabeled,
+            &self._bitfield,
+            171,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i32,
+            self::_puroro::tags::SFixed32,
+            13,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed32_optional,
+            &self._bitfield,
+            172,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            i32,
+            self::_puroro::tags::SFixed32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed32_repeated,
+            &self._bitfield,
+            173,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            i64,
+            self::_puroro::tags::SFixed64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed64_unlabeled,
+            &self._bitfield,
+            181,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            i64,
+            self::_puroro::tags::SFixed64,
+            14,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed64_optional,
+            &self._bitfield,
+            182,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            i64,
+            self::_puroro::tags::SFixed64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed64_repeated,
+            &self._bitfield,
+            183,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularNumericalField<
+            f64,
+            self::_puroro::tags::Double,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.f64_unlabeled,
+            &self._bitfield,
+            191,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField<
+            f64,
+            self::_puroro::tags::Double,
+            15,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.f64_optional,
+            &self._bitfield,
+            192,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
+            f64,
+            self::_puroro::tags::Double,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.f64_repeated,
+            &self._bitfield,
+            193,
+            out,
+        )?;
+        Ok(())
+    }
 }
 
 impl ::std::clone::Clone for Msg {
