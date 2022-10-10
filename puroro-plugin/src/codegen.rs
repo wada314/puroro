@@ -29,12 +29,15 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_respo
 use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
 
-pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
-    let mut cgres: CodeGeneratorResponse = Default::default();
-    *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
+pub fn generate(request: CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
+    let mut response: CodeGeneratorResponse = Default::default();
+    *response.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let root_module = get_root_module(request)?;
+    let mut file_set = FileDescriptorSet::default();
+    file_set.file_mut().append(request.proto_file_mut());
+    let root_module = get_root_module(&file_set)?;
 
     let modules = {
         let mut queue = vec![&root_module];
@@ -55,20 +58,22 @@ pub fn generate(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse>
         let mut output_file = <File as Default>::default();
         *output_file.name_mut() = file_name.into();
         *output_file.content_mut() = content.into();
-        cgres.file_mut().push(output_file);
+        response.file_mut().push(output_file);
     }
 
-    Ok(cgres)
+    Ok(response)
 }
 
 pub fn generate_single_file(
-    request: &CodeGeneratorRequest,
+    request: CodeGeneratorRequest,
     file_name: &str,
 ) -> Result<CodeGeneratorResponse> {
-    let mut cgres: CodeGeneratorResponse = Default::default();
-    *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
+    let mut response: CodeGeneratorResponse = Default::default();
+    *response.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let mut root_module = get_root_module(request)?;
+    let mut file_set = FileDescriptorSet::default();
+    file_set.file_mut().append(request.proto_file_mut());
+    let mut root_module = get_root_module(&file_set)?;
     root_module.output_all_in_one_file = true;
 
     // Do render!
@@ -78,14 +83,14 @@ pub fn generate_single_file(
     let mut output_file = <File as Default>::default();
     *output_file.name_mut() = file_name.into();
     *output_file.content_mut() = content.into();
-    cgres.file_mut().push(output_file);
+    response.file_mut().push(output_file);
 
-    Ok(cgres)
+    Ok(response)
 }
 
-fn get_root_module(request: &CodeGeneratorRequest) -> Result<Module> {
-    let input_files = request
-        .proto_file()
+fn get_root_module(file_set: &FileDescriptorSet) -> Result<Module> {
+    let input_files = file_set
+        .file()
         .into_iter()
         .map(|f| crate::codegen::restructure::File::new(f))
         .collect::<Vec<_>>();

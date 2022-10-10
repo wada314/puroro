@@ -37,9 +37,9 @@ pub struct Config {
 pub fn run_plugin<R: Read, W: Write>(input: &mut R, config: &Config, output: &mut W) -> Result<()> {
     let request = CodeGeneratorRequest::from_bytes(input.bytes()).unwrap();
     let response = if config.all_in_one_file {
-        codegen::generate_single_file(&request, &config.all_in_one_file_name)?
+        codegen::generate_single_file(request, &config.all_in_one_file_name)?
     } else {
-        codegen::generate(&request)?
+        codegen::generate(request)?
     };
     response.ser(output)?;
     Ok(())
