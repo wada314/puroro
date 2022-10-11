@@ -196,15 +196,16 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         }
     }
 
-    fn deser_from_iter<
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        B: self::_puroro::bitvec::BitSlice,
-    >(
+    fn deser_from_iter<I, B>(
         &mut self,
         bitvec: &mut B,
         field_data: self::_puroro::internal::ser::FieldData<I>,
         case: Self::Case,
-    ) -> self::_puroro::Result<()> {
+    ) -> self::_puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        B: self::_puroro::bitvec::BitSlice,
+    {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         #[allow(unused)]
         use ::std::result::Result::Ok;
@@ -227,6 +228,14 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
             }
         }
         Ok(())
+    }
+
+    fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
+    where
+        W: ::std::io::Write,
+        B: self::_puroro::bitvec::BitSlice,
+    {
+        todo!()
     }
 }
 
@@ -532,15 +541,16 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         }
     }
 
-    fn deser_from_iter<
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        B: self::_puroro::bitvec::BitSlice,
-    >(
+    fn deser_from_iter<I, B>(
         &mut self,
         bitvec: &mut B,
         field_data: self::_puroro::internal::ser::FieldData<I>,
         case: Self::Case,
-    ) -> self::_puroro::Result<()> {
+    ) -> self::_puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        B: self::_puroro::bitvec::BitSlice,
+    {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         #[allow(unused)]
         use ::std::result::Result::Ok;
@@ -571,6 +581,14 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
             }
         }
         Ok(())
+    }
+
+    fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
+    where
+        W: ::std::io::Write,
+        B: self::_puroro::bitvec::BitSlice,
+    {
+        todo!()
     }
 }
 
@@ -750,15 +768,16 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         }
     }
 
-    fn deser_from_iter<
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        B: self::_puroro::bitvec::BitSlice,
-    >(
+    fn deser_from_iter<I, B>(
         &mut self,
         bitvec: &mut B,
         field_data: self::_puroro::internal::ser::FieldData<I>,
         case: Self::Case,
-    ) -> self::_puroro::Result<()> {
+    ) -> self::_puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        B: self::_puroro::bitvec::BitSlice,
+    {
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
         #[allow(unused)]
         use ::std::result::Result::Ok;
@@ -774,6 +793,14 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
             }
         }
         Ok(())
+    }
+
+    fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
+    where
+        W: ::std::io::Write,
+        B: self::_puroro::bitvec::BitSlice,
+    {
+        todo!()
     }
 }
 

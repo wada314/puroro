@@ -15,7 +15,7 @@
 use crate::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
 use crate::Result;
-use ::std::io::Result as IoResult;
+use ::std::io::{Result as IoResult, Write};
 
 pub trait OneofUnion {
     type Case: OneofCase;
@@ -33,11 +33,7 @@ pub trait OneofUnion {
         case: Self::Case,
     ) -> Result<()>;
 
-    // fn ser_to_write<W: Write, B: BitSlice>(
-    //     &self,
-    //     #[allow(unused)] bitvec: &B,
-    //     #[allow(unused)] out: &mut W,
-    // ) -> Result<()>;
+    fn ser_to_write<W: Write, B: BitSlice>(&self, bitvec: &B, out: &mut W) -> Result<()>;
 }
 
 pub trait OneofCase: Sized {
