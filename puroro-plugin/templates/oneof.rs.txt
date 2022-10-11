@@ -121,7 +121,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
         #[allow(unused)]
         use ::std::option::Option::Some;
-        #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
         #[allow(unused)]
         use ::std::clone::Clone;
@@ -172,7 +171,25 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice
     {
-        todo!()
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match self::{{ ident_case }}::from_bitslice(bitvec) {
+            {%- for field in fields %}
+            Some({{ ident_case  }}::{{ field.ident_enum_item }}) => {
+                unsafe { &self.{{ field.ident_union_item }} }.ser_to_write(
+                    {{ field.number }}, out,
+                )?;
+            }
+            {%- endfor %} {#- for field in fields #}
+            _ => (),
+        }
+        Ok(())
     }
 }
 

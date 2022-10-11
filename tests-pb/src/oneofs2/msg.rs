@@ -178,7 +178,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-        #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
         #[allow(unused)]
         use ::std::clone::Clone;
@@ -235,7 +234,24 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice,
     {
-        todo!()
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        match self::GroupOneCase::from_bitslice(bitvec) {
+            Some(GroupOneCase::G1Int32) => {
+                unsafe { &self.g1_int32 }.ser_to_write(1, out)?;
+            }
+            Some(GroupOneCase::G1String) => {
+                unsafe { &self.g1_string }.ser_to_write(2, out)?;
+            }
+            _ => (),
+        }
+        Ok(())
     }
 }
 
@@ -520,7 +536,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-        #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
         #[allow(unused)]
         use ::std::clone::Clone;
@@ -588,7 +603,27 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice,
     {
-        todo!()
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        match self::GroupTwoCase::from_bitslice(bitvec) {
+            Some(GroupTwoCase::G2F32) => {
+                unsafe { &self.g2_f32 }.ser_to_write(3, out)?;
+            }
+            Some(GroupTwoCase::G2String) => {
+                unsafe { &self.g2_string }.ser_to_write(4, out)?;
+            }
+            Some(GroupTwoCase::G2Submsg) => {
+                unsafe { &self.g2_submsg }.ser_to_write(5, out)?;
+            }
+            _ => (),
+        }
+        Ok(())
     }
 }
 
@@ -753,7 +788,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
     }
 
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-        #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofCase;
         #[allow(unused)]
         use ::std::clone::Clone;
@@ -800,7 +834,21 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice,
     {
-        todo!()
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        match self::GroupThreeCase::from_bitslice(bitvec) {
+            Some(GroupThreeCase::G3Int32) => {
+                unsafe { &self.g3_int32 }.ser_to_write(6, out)?;
+            }
+            _ => (),
+        }
+        Ok(())
     }
 }
 
