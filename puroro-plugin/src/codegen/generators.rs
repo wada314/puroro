@@ -499,6 +499,7 @@ pub struct OneofField {
     pub rust_getter_opt_type: String,
     pub rust_getter_mut_type: String,
     pub rust_oneof_getter_type: String,
+    pub number: i32,
 }
 impl OneofField {
     pub fn try_new<'a>(
@@ -555,6 +556,7 @@ impl OneofField {
         let rust_getter_opt_type = wire_type.into_opt_getter_rust_type().into_owned();
         let rust_getter_mut_type = wire_type.into_mut_getter_rust_type(false).into_owned();
         let rust_oneof_getter_type = wire_type.into_oneof_getter_rust_type("'a").into_owned();
+        let number = f.number();
         Ok(Self {
             ident_camel,
             ident_union_item,
@@ -571,6 +573,7 @@ impl OneofField {
             rust_getter_opt_type,
             rust_getter_mut_type,
             rust_oneof_getter_type,
+            number,
         })
     }
 }

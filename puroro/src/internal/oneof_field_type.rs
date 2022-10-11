@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::ser::{
-    ser_bytes_shared, ser_numerical_shared, ser_wire_and_number, FieldData, WireType,
-};
+use crate::internal::ser::{ser_bytes_shared, ser_numerical_shared, FieldData, WireType};
 use crate::{tags, Message};
 use crate::{ErrorKind, Result};
 use ::std::io::{Result as IoResult, Write};
