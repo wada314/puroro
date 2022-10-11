@@ -67,22 +67,24 @@ impl self::_puroro::Message for Test1 {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
                 1 => <self::_puroro::internal::field_type::SingularNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                    &mut self.a,
-                    &mut self._bitfield,
-                    _field_data,
+                > as FieldType>::deser_from_iter(
+                    &mut self.a, &mut self._bitfield, field_data
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())
@@ -206,21 +208,23 @@ impl self::_puroro::Message for Test2 {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                2 => <
-                    self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                2 => <self::_puroro::internal::field_type::SingularStringField as FieldType>::deser_from_iter(
                     &mut self.b,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())
@@ -351,21 +355,23 @@ impl self::_puroro::Message for Test3 {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
                 3 => <self::_puroro::internal::field_type::SingularHeapMessageField<
                     _puroro_root::official_samples3::Test1,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                    &mut self.c,
-                    &mut self._bitfield,
-                    _field_data,
+                > as FieldType>::deser_from_iter(
+                    &mut self.c, &mut self._bitfield, field_data
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())
@@ -475,22 +481,24 @@ impl self::_puroro::Message for Test4 {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
                 4 => <self::_puroro::internal::field_type::RepeatedNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                    &mut self.d,
-                    &mut self._bitfield,
-                    _field_data,
+                > as FieldType>::deser_from_iter(
+                    &mut self.d, &mut self._bitfield, field_data
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())

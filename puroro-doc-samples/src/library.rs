@@ -152,36 +152,32 @@ impl self::_puroro::Message for Book {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        use self::_puroro::internal::field_type::FieldType;
+        use self::_puroro::internal::oneof_type::OneofUnion;
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <
-                    self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                1 => <self::_puroro::internal::field_type::SingularStringField as FieldType>::deser_from_iter(
                     &mut self.title,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                2 => <
-                    self::_puroro::internal::field_type::SingularNumericalField::<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                2 => <self::_puroro::internal::field_type::SingularNumericalField::<u32, self::_puroro::tags::UInt32> as FieldType>::deser_from_iter(
                     &mut self.num_pages,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                3 => <
-                    self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                3 => <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::library::Author> as FieldType>::deser_from_iter(
                     &mut self.author,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())
@@ -326,22 +322,22 @@ impl self::_puroro::Message for Author {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        use self::_puroro::internal::field_type::FieldType;
+        use self::_puroro::internal::oneof_type::OneofUnion;
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <
-                    self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                1 => <self::_puroro::internal::field_type::SingularStringField as FieldType>::deser_from_iter(
                     &mut self.name,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())

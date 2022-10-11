@@ -146,19 +146,30 @@ impl self::_puroro::Message for {{ ident_struct }} {
         use ::std::result::Result::Ok;
         #[allow(unused)]
         use ::std::option::Option::Some;
-        while let Some((number, _field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
+        #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        while let Some((number, field_data)) = self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 {%- for field in fields %}
-                {{ field.number }} => <
-                    {{ field.rust_field_type }} as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                {{ field.number }} => <{{ field.rust_field_type }} as FieldType>::deser_from_iter(
                     &mut self.{{ field.ident_struct_field }},
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
                 {%- endfor %} {#- for field in fields #}
-                {#- TODO: oneof #}
-                _ => todo!(),
+                {%- for oneof in oneofs %}
+                {%- for field in oneof.fields %}
+                {{ field.number }} => <{{ oneof.rust_field_type }} as OneofUnion>::deser_from_iter(
+                    &mut self.{{ oneof.ident_struct_field }},
+                    &mut self._bitfield,
+                    field_data,
+                    {{ oneof.rust_case_type }}::{{ field.ident_enum_item }},
+                )?,
+                {%- endfor %} {#- for field in oneof.fields #}
+                {%- endfor %} {#- for oneof in oneofs #}
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())

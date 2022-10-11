@@ -271,14 +271,54 @@ impl self::_puroro::Message for Msg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                _ => todo!(),
+                1 => <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::deser_from_iter(
+                    &mut self.group_one,
+                    &mut self._bitfield,
+                    field_data,
+                    _puroro_root::oneofs3::msg::GroupOneCase::G1Int32,
+                )?,
+                2 => <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::deser_from_iter(
+                    &mut self.group_one,
+                    &mut self._bitfield,
+                    field_data,
+                    _puroro_root::oneofs3::msg::GroupOneCase::G1String,
+                )?,
+                3 => <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::deser_from_iter(
+                    &mut self.group_two,
+                    &mut self._bitfield,
+                    field_data,
+                    _puroro_root::oneofs3::msg::GroupTwoCase::G2F32,
+                )?,
+                4 => <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::deser_from_iter(
+                    &mut self.group_two,
+                    &mut self._bitfield,
+                    field_data,
+                    _puroro_root::oneofs3::msg::GroupTwoCase::G2String,
+                )?,
+                5 => <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::deser_from_iter(
+                    &mut self.group_two,
+                    &mut self._bitfield,
+                    field_data,
+                    _puroro_root::oneofs3::msg::GroupTwoCase::G2Submsg,
+                )?,
+                6 => <_puroro_root::oneofs3::msg::GroupThree as OneofUnion>::deser_from_iter(
+                    &mut self.group_three,
+                    &mut self._bitfield,
+                    field_data,
+                    _puroro_root::oneofs3::msg::GroupThreeCase::G3Int32,
+                )?,
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())
@@ -436,22 +476,26 @@ impl self::_puroro::Message for Submsg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
                 1 => <self::_puroro::internal::field_type::SingularNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                > as FieldType>::deser_from_iter(
                     &mut self.i32_unlabeled,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())

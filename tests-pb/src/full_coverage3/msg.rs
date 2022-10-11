@@ -142,38 +142,42 @@ impl self::_puroro::Message for Submsg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
                 1 => <self::_puroro::internal::field_type::SingularNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                > as FieldType>::deser_from_iter(
                     &mut self.i32_unlabeled,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
                 2 => <self::_puroro::internal::field_type::SingularNumericalField<
                     i32,
                     self::_puroro::tags::Int32,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                > as FieldType>::deser_from_iter(
                     &mut self.i32_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
                 101 => <self::_puroro::internal::field_type::SingularNumericalField<
                     i64,
                     self::_puroro::tags::Int64,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                > as FieldType>::deser_from_iter(
                     &mut self.i64_unlabeled,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())

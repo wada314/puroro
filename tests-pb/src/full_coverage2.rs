@@ -2139,350 +2139,258 @@ impl self::_puroro::Message for Msg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
-                1 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::Int32, 0> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                1 => <self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::Int32, 0> as FieldType>::deser_from_iter(
                     &mut self.i32_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                2 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::Int32, 1> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                2 => <self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::Int32, 1> as FieldType>::deser_from_iter(
                     &mut self.i32_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                3 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::Int32> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                3 => <self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::Int32> as FieldType>::deser_from_iter(
                     &mut self.i32_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                11 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<f32, self::_puroro::tags::Float, 2> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                11 => <self::_puroro::internal::field_type::OptionalNumericalField::<f32, self::_puroro::tags::Float, 2> as FieldType>::deser_from_iter(
                     &mut self.float_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                12 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<f32, self::_puroro::tags::Float, 3> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                12 => <self::_puroro::internal::field_type::OptionalNumericalField::<f32, self::_puroro::tags::Float, 3> as FieldType>::deser_from_iter(
                     &mut self.float_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                13 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<f32, self::_puroro::tags::Float> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                13 => <self::_puroro::internal::field_type::RepeatedNumericalField::<f32, self::_puroro::tags::Float> as FieldType>::deser_from_iter(
                     &mut self.float_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                21 => <
-                    self::_puroro::internal::field_type::OptionalBytesField<4> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                21 => <self::_puroro::internal::field_type::OptionalBytesField<4> as FieldType>::deser_from_iter(
                     &mut self.bytes_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                22 => <
-                    self::_puroro::internal::field_type::OptionalBytesField<5> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                22 => <self::_puroro::internal::field_type::OptionalBytesField<5> as FieldType>::deser_from_iter(
                     &mut self.bytes_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                23 => <
-                    self::_puroro::internal::field_type::RepeatedBytesField as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                23 => <self::_puroro::internal::field_type::RepeatedBytesField as FieldType>::deser_from_iter(
                     &mut self.bytes_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                31 => <
-                    self::_puroro::internal::field_type::OptionalStringField::<6> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                31 => <self::_puroro::internal::field_type::OptionalStringField::<6> as FieldType>::deser_from_iter(
                     &mut self.string_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                32 => <
-                    self::_puroro::internal::field_type::OptionalStringField::<7> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                32 => <self::_puroro::internal::field_type::OptionalStringField::<7> as FieldType>::deser_from_iter(
                     &mut self.string_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                33 => <
-                    self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                33 => <self::_puroro::internal::field_type::RepeatedStringField as FieldType>::deser_from_iter(
                     &mut self.string_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                41 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<_puroro_root::full_coverage2::Enum, self::_puroro::tags::Enum2<_puroro_root::full_coverage2::Enum>, 8> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                41 => <self::_puroro::internal::field_type::OptionalNumericalField::<_puroro_root::full_coverage2::Enum, self::_puroro::tags::Enum2<_puroro_root::full_coverage2::Enum>, 8> as FieldType>::deser_from_iter(
                     &mut self.enum_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                42 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<_puroro_root::full_coverage2::Enum, self::_puroro::tags::Enum2<_puroro_root::full_coverage2::Enum>, 9> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                42 => <self::_puroro::internal::field_type::OptionalNumericalField::<_puroro_root::full_coverage2::Enum, self::_puroro::tags::Enum2<_puroro_root::full_coverage2::Enum>, 9> as FieldType>::deser_from_iter(
                     &mut self.enum_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                43 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<_puroro_root::full_coverage2::Enum, self::_puroro::tags::Enum2<_puroro_root::full_coverage2::Enum>> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                43 => <self::_puroro::internal::field_type::RepeatedNumericalField::<_puroro_root::full_coverage2::Enum, self::_puroro::tags::Enum2<_puroro_root::full_coverage2::Enum>> as FieldType>::deser_from_iter(
                     &mut self.enum_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                51 => <
-                    self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::full_coverage2::msg::Submsg> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                51 => <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::full_coverage2::msg::Submsg> as FieldType>::deser_from_iter(
                     &mut self.submsg_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                52 => <
-                    self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::full_coverage2::msg::Submsg> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                52 => <self::_puroro::internal::field_type::SingularHeapMessageField::<_puroro_root::full_coverage2::msg::Submsg> as FieldType>::deser_from_iter(
                     &mut self.submsg_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                53 => <
-                    self::_puroro::internal::field_type::RepeatedMessageField::<_puroro_root::full_coverage2::msg::Submsg> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                53 => <self::_puroro::internal::field_type::RepeatedMessageField::<_puroro_root::full_coverage2::msg::Submsg> as FieldType>::deser_from_iter(
                     &mut self.submsg_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                101 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::Int64, 12> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                101 => <self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::Int64, 12> as FieldType>::deser_from_iter(
                     &mut self.i64_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                102 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::Int64, 13> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                102 => <self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::Int64, 13> as FieldType>::deser_from_iter(
                     &mut self.i64_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                103 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<i64, self::_puroro::tags::Int64> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                103 => <self::_puroro::internal::field_type::RepeatedNumericalField::<i64, self::_puroro::tags::Int64> as FieldType>::deser_from_iter(
                     &mut self.i64_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                111 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::UInt32, 14> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                111 => <self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::UInt32, 14> as FieldType>::deser_from_iter(
                     &mut self.u32_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                112 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::UInt32, 15> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                112 => <self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::UInt32, 15> as FieldType>::deser_from_iter(
                     &mut self.u32_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                113 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<u32, self::_puroro::tags::UInt32> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                113 => <self::_puroro::internal::field_type::RepeatedNumericalField::<u32, self::_puroro::tags::UInt32> as FieldType>::deser_from_iter(
                     &mut self.u32_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                121 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::UInt64, 16> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                121 => <self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::UInt64, 16> as FieldType>::deser_from_iter(
                     &mut self.u64_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                122 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::UInt64, 17> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                122 => <self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::UInt64, 17> as FieldType>::deser_from_iter(
                     &mut self.u64_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                123 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<u64, self::_puroro::tags::UInt64> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                123 => <self::_puroro::internal::field_type::RepeatedNumericalField::<u64, self::_puroro::tags::UInt64> as FieldType>::deser_from_iter(
                     &mut self.u64_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                131 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SInt32, 18> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                131 => <self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SInt32, 18> as FieldType>::deser_from_iter(
                     &mut self.s32_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                132 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SInt32, 19> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                132 => <self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SInt32, 19> as FieldType>::deser_from_iter(
                     &mut self.s32_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                133 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::SInt32> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                133 => <self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::SInt32> as FieldType>::deser_from_iter(
                     &mut self.s32_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                141 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SInt64, 20> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                141 => <self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SInt64, 20> as FieldType>::deser_from_iter(
                     &mut self.s64_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                142 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SInt64, 21> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                142 => <self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SInt64, 21> as FieldType>::deser_from_iter(
                     &mut self.s64_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                143 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<i64, self::_puroro::tags::SInt64> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                143 => <self::_puroro::internal::field_type::RepeatedNumericalField::<i64, self::_puroro::tags::SInt64> as FieldType>::deser_from_iter(
                     &mut self.s64_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                151 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::Fixed32, 22> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                151 => <self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::Fixed32, 22> as FieldType>::deser_from_iter(
                     &mut self.fixed32_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                152 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::Fixed32, 23> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                152 => <self::_puroro::internal::field_type::OptionalNumericalField::<u32, self::_puroro::tags::Fixed32, 23> as FieldType>::deser_from_iter(
                     &mut self.fixed32_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                153 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<u32, self::_puroro::tags::Fixed32> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                153 => <self::_puroro::internal::field_type::RepeatedNumericalField::<u32, self::_puroro::tags::Fixed32> as FieldType>::deser_from_iter(
                     &mut self.fixed32_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                161 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::Fixed64, 24> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                161 => <self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::Fixed64, 24> as FieldType>::deser_from_iter(
                     &mut self.fixed64_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                162 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::Fixed64, 25> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                162 => <self::_puroro::internal::field_type::OptionalNumericalField::<u64, self::_puroro::tags::Fixed64, 25> as FieldType>::deser_from_iter(
                     &mut self.fixed64_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                163 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<u64, self::_puroro::tags::Fixed64> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                163 => <self::_puroro::internal::field_type::RepeatedNumericalField::<u64, self::_puroro::tags::Fixed64> as FieldType>::deser_from_iter(
                     &mut self.fixed64_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                171 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SFixed32, 26> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                171 => <self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SFixed32, 26> as FieldType>::deser_from_iter(
                     &mut self.sfixed32_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                172 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SFixed32, 27> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                172 => <self::_puroro::internal::field_type::OptionalNumericalField::<i32, self::_puroro::tags::SFixed32, 27> as FieldType>::deser_from_iter(
                     &mut self.sfixed32_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                173 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::SFixed32> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                173 => <self::_puroro::internal::field_type::RepeatedNumericalField::<i32, self::_puroro::tags::SFixed32> as FieldType>::deser_from_iter(
                     &mut self.sfixed32_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                181 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SFixed64, 28> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                181 => <self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SFixed64, 28> as FieldType>::deser_from_iter(
                     &mut self.sfixed64_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                182 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SFixed64, 29> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                182 => <self::_puroro::internal::field_type::OptionalNumericalField::<i64, self::_puroro::tags::SFixed64, 29> as FieldType>::deser_from_iter(
                     &mut self.sfixed64_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                183 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<i64, self::_puroro::tags::SFixed64> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                183 => <self::_puroro::internal::field_type::RepeatedNumericalField::<i64, self::_puroro::tags::SFixed64> as FieldType>::deser_from_iter(
                     &mut self.sfixed64_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                191 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<f64, self::_puroro::tags::Double, 30> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                191 => <self::_puroro::internal::field_type::OptionalNumericalField::<f64, self::_puroro::tags::Double, 30> as FieldType>::deser_from_iter(
                     &mut self.f64_required,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                192 => <
-                    self::_puroro::internal::field_type::OptionalNumericalField::<f64, self::_puroro::tags::Double, 31> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                192 => <self::_puroro::internal::field_type::OptionalNumericalField::<f64, self::_puroro::tags::Double, 31> as FieldType>::deser_from_iter(
                     &mut self.f64_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                193 => <
-                    self::_puroro::internal::field_type::RepeatedNumericalField::<f64, self::_puroro::tags::Double> as self::_puroro::internal::field_type::FieldType
-                >::deser_from_iter(
+                193 => <self::_puroro::internal::field_type::RepeatedNumericalField::<f64, self::_puroro::tags::Double> as FieldType>::deser_from_iter(
                     &mut self.f64_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())

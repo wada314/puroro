@@ -117,10 +117,14 @@ impl self::_puroro::Message for Msg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        while let Some((number, _field_data)) =
+        while let Some((number, field_data)) =
             self::_puroro::internal::ser::FieldData::from_bytes_iter(iter.by_ref())?
         {
             match number {
@@ -128,20 +132,20 @@ impl self::_puroro::Message for Msg {
                     _puroro_root::enum2::Enum,
                     self::_puroro::tags::Enum2<_puroro_root::enum2::Enum>,
                     0,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                > as FieldType>::deser_from_iter(
                     &mut self.enum_optional,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
                 2 => <self::_puroro::internal::field_type::RepeatedNumericalField<
                     _puroro_root::enum2::Enum,
                     self::_puroro::tags::Enum2<_puroro_root::enum2::Enum>,
-                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                > as FieldType>::deser_from_iter(
                     &mut self.enum_repeated,
                     &mut self._bitfield,
-                    _field_data,
+                    field_data,
                 )?,
-                _ => todo!(),
+                _ => todo!(), // Unknown field...
             }
         }
         Ok(())
