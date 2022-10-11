@@ -86,6 +86,7 @@ impl {{ ident_union }} {
 }
 
 impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
+    type Case = self::{{ ident_case }};
     type CaseRef<'a> = self::{{ ident_case_ref }}{% if has_ld_type %}<'a>{% endif %}
         where Self: 'a;
 
@@ -137,6 +138,29 @@ impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
                 _none: (),
             },
         }
+    }
+
+    fn deser_from_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>, B: self::_puroro::bitvec::BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: self::_puroro::internal::ser::FieldData<I>,
+        case: Self::Case,
+    ) -> self::_puroro::Result<()> {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        match case {
+            {%- for field in fields %}
+            Self::Case::{{ field.ident_enum_item }} => {
+                let _ = <Self>::{{ field.ident_getter_mut }}(self, bitvec);
+                <{{ field.rust_field_inner_type }} as OneofFieldType>::deser_from_iter(
+                    unsafe { &mut self.{{ field.ident_union_item }} },
+                    field_data,
+                )?;
+            }
+            {%- endfor %} {#- for field in fields #}
+        }
+        Ok(())
     }
 }
 

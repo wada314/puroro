@@ -15,9 +15,10 @@
 use crate::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
 use crate::Result;
-use ::std::io::{Result as IoResult, Write};
+use ::std::io::Result as IoResult;
 
 pub trait OneofUnion {
+    type Case: OneofCase;
     type CaseRef<'a>: OneofCaseRef<'a, Union = Self>
     where
         Self: 'a;
@@ -25,12 +26,12 @@ pub trait OneofUnion {
     fn clear<B: BitSlice>(&mut self, bits: &mut B);
     fn clone<B: BitSlice>(&self, bits: &B) -> Self;
 
-    // fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-    //     &mut self,
-    //     bitvec: &mut B,
-    //     field_data: FieldData<I>,
-    //     field_number: i32,
-    // ) -> Result<()>;
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: FieldData<I>,
+        case: Self::Case,
+    ) -> Result<()>;
 
     // fn ser_to_write<W: Write, B: BitSlice>(
     //     &self,
