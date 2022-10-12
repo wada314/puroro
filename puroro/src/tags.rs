@@ -88,8 +88,7 @@ pub enum NumericalWireType {
 impl NumericalType for Int32 {
     type RustType = i32;
     fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
-        let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
-        Ok(i32::from_le_bytes(val_u32.to_le_bytes()))
+        Ok(i64::from_le_bytes(bytes).try_into()?)
     }
     fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
         Ok(i64::to_le_bytes(val.into()))
