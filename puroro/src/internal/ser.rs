@@ -70,11 +70,11 @@ impl<T> FieldData<T> {
 }
 
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
-    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
+    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(u32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
-            let var_i32 = var.get_i32()?;
-            let wire_type: WireType = (var_i32 & 0x7).try_into()?;
-            let number = var_i32 >> 3;
+            let var_u32 = var.get_u32()?;
+            let wire_type: WireType = (var_u32 & 0x7).try_into()?;
+            let number = var_u32 >> 3;
 
             let field_data = match wire_type {
                 WireType::Variant => FieldData::Variant(
@@ -120,10 +120,10 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
     }
 }
 
-impl TryFrom<i32> for WireType {
+impl TryFrom<u32> for WireType {
     type Error = PuroroError;
 
-    fn try_from(value: i32) -> ::std::result::Result<Self, Self::Error> {
+    fn try_from(value: u32) -> ::std::result::Result<Self, Self::Error> {
         Ok(match value {
             0 => WireType::Variant,
             1 => WireType::Bits64,

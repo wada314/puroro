@@ -41,28 +41,28 @@ pub trait FieldType {
         #[allow(unused)] bitvec: &mut B,
         #[allow(unused)] variant: Variant,
     ) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::Variant as i32))?
+        Err(ErrorKind::InvalidWireType(WireType::Variant as u32))?
     }
     fn deser_from_bits32<B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
         #[allow(unused)] bits: [u8; 4],
     ) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::Bits32 as i32))?
+        Err(ErrorKind::InvalidWireType(WireType::Bits32 as u32))?
     }
     fn deser_from_bits64<B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
         #[allow(unused)] bits: [u8; 8],
     ) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::Bits64 as i32))?
+        Err(ErrorKind::InvalidWireType(WireType::Bits64 as u32))?
     }
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
         #[allow(unused)] iter: I,
     ) -> Result<()> {
-        Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as i32))?
+        Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as u32))?
     }
 
     fn ser_to_write<W: Write, B: BitSlice>(

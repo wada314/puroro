@@ -37,7 +37,7 @@ pub enum ErrorKind {
     #[error("The serialized message is too long. The upper limit is 2^31 - 1 bytes.")]
     TooLongToSerialize,
     #[error("Invalid wire type value: {0}.")]
-    InvalidWireType(i32),
+    InvalidWireType(u32),
     #[error("Unexpected wire type. e.g. Expected int32, but found a message field.")]
     UnexpectedWireType,
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]

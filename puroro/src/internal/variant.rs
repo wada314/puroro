@@ -96,6 +96,9 @@ impl Variant {
     pub fn get_i32(&self) -> Result<i32> {
         Ok(self.get::<tags::Int32>()?)
     }
+    pub fn get_u32(&self) -> Result<u32> {
+        Ok(self.get::<tags::UInt32>()?)
+    }
 
     pub fn from_i32(val: i32) -> Self {
         Self::new(i64::to_le_bytes(val.into()))

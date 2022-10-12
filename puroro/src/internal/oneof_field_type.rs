@@ -82,7 +82,7 @@ where
                 self.0 = variant.get::<ProtoType>()?;
             }
             FieldData::LengthDelimited(_) => {
-                Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as i32))?
+                Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as u32))?
             }
             FieldData::Bits32(bits) => {
                 self.0 = <ProtoType as tags::NumericalType>::from_bits32(bits)?;
@@ -122,7 +122,7 @@ impl OneofFieldType for BytesField {
             self.0 = iter.collect::<IoResult<Vec<u8>>>()?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 
@@ -153,7 +153,7 @@ impl OneofFieldType for StringField {
             self.0 = String::from_utf8(iter.collect::<IoResult<Vec<u8>>>()?)?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 
@@ -185,7 +185,7 @@ impl<M: Message + Default> OneofFieldType for HeapMessageField<M> {
             msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as i32))?
+            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 
