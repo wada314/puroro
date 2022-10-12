@@ -152,7 +152,9 @@ impl self::_puroro::Message for Book {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
         use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion;
         #[allow(unused)]
         use ::std::option::Option::Some;
@@ -188,30 +190,24 @@ impl self::_puroro::Message for Book {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
-        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_puroro::internal::field_type::SingularStringField as FieldType>::ser_to_write(
             &self.title,
             &self._bitfield,
             1,
-            out
+            out,
         )?;
         <self::_puroro::internal::field_type::SingularNumericalField<
             u32,
             self::_puroro::tags::UInt32,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.num_pages,
-            &self._bitfield,
-            2,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.num_pages, &self._bitfield, 2, out)?;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::library::Author,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.author,
-            &self._bitfield,
-            3,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.author, &self._bitfield, 3, out)?;
 
         Ok(())
     }
@@ -322,7 +318,9 @@ impl self::_puroro::Message for Author {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
         use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion;
         #[allow(unused)]
         use ::std::option::Option::Some;
@@ -348,12 +346,16 @@ impl self::_puroro::Message for Author {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
-        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_puroro::internal::field_type::SingularStringField as FieldType>::ser_to_write(
             &self.name,
             &self._bitfield,
             1,
-            out
+            out,
         )?;
 
         Ok(())

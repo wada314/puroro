@@ -156,26 +156,20 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::OptionalNumericalField<
             _puroro_root::enum2::Enum,
             self::_puroro::tags::Enum2<_puroro_root::enum2::Enum>,
             0,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.enum_optional,
-            &self._bitfield,
-            1,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.enum_optional, &self._bitfield, 1, out)?;
         <self::_puroro::internal::field_type::RepeatedNumericalField<
             _puroro_root::enum2::Enum,
             self::_puroro::tags::Enum2<_puroro_root::enum2::Enum>,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.enum_repeated,
-            &self._bitfield,
-            2,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.enum_repeated, &self._bitfield, 2, out)?;
 
         Ok(())
     }

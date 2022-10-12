@@ -329,7 +329,26 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
+        <_puroro_root::oneofs3::msg::GroupOne as OneofUnion>::ser_to_write(
+            &self.group_one,
+            &self._bitfield,
+            out,
+        )?;
+        <_puroro_root::oneofs3::msg::GroupTwo as OneofUnion>::ser_to_write(
+            &self.group_two,
+            &self._bitfield,
+            out,
+        )?;
+        <_puroro_root::oneofs3::msg::GroupThree as OneofUnion>::ser_to_write(
+            &self.group_three,
+            &self._bitfield,
+            out,
+        )?;
 
         Ok(())
     }
@@ -506,16 +525,15 @@ impl self::_puroro::Message for Submsg {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::SingularNumericalField<
             i32,
             self::_puroro::tags::Int32,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.i32_unlabeled,
-            &self._bitfield,
-            1,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.i32_unlabeled, &self._bitfield, 1, out)?;
 
         Ok(())
     }

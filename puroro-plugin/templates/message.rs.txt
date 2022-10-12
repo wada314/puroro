@@ -178,15 +178,26 @@ impl self::_puroro::Message for {{ ident_struct }} {
     fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] out: &mut W) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use ::std::result::Result::Ok;
+        #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+
         {%- for field in fields %}
-        <{{ field.rust_field_type }} as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <{{ field.rust_field_type }} as FieldType>::ser_to_write(
             &self.{{ field.ident_struct_field }},
             &self._bitfield,
             {{ field.number }},
             out
         )?;
         {%- endfor %} {#- for field in fields #}
-        {#- TODO: oneof #}
+        {%- for oneof in oneofs %}
+        <{{ oneof.rust_field_type }} as OneofUnion>::ser_to_write(
+            &self.{{ oneof.ident_struct_field }},
+            &self._bitfield,
+            out
+        )?;
+        {%- endfor %} {#- for oneof in oneofs #}
 
         Ok(())
     }

@@ -119,17 +119,16 @@ impl self::_puroro::Message for Test1 {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.a,
-            &self._bitfield,
-            1,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.a, &self._bitfield, 1, out)?;
 
         Ok(())
     }
@@ -260,12 +259,16 @@ impl self::_puroro::Message for Test2 {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
-        <self::_puroro::internal::field_type::OptionalStringField::<0> as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_puroro::internal::field_type::OptionalStringField<0> as FieldType>::ser_to_write(
             &self.b,
             &self._bitfield,
             2,
-            out
+            out,
         )?;
 
         Ok(())
@@ -407,15 +410,14 @@ impl self::_puroro::Message for Test3 {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::SingularHeapMessageField<
             _puroro_root::official_samples2::Test1,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.c,
-            &self._bitfield,
-            3,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.c, &self._bitfield, 3, out)?;
 
         Ok(())
     }
@@ -534,16 +536,15 @@ impl self::_puroro::Message for Test4 {
         #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
+        use self::_puroro::internal::field_type::FieldType;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        #[allow(unused)]
         use ::std::result::Result::Ok;
         <self::_puroro::internal::field_type::RepeatedNumericalField<
             i32,
             self::_puroro::tags::Int32,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
-            &self.d,
-            &self._bitfield,
-            4,
-            out,
-        )?;
+        > as FieldType>::ser_to_write(&self.d, &self._bitfield, 4, out)?;
 
         Ok(())
     }
