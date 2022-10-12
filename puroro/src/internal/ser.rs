@@ -89,8 +89,28 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
                 }
                 WireType::StartGroup => todo!(),
                 WireType::EndGroup => todo!(),
-                WireType::Bits32 => todo!(),
-                WireType::Bits64 => todo!(),
+                WireType::Bits32 => {
+                    let bits32 = [
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                    ];
+                    FieldData::Bits32(bits32)
+                }
+                WireType::Bits64 => {
+                    let bits64 = [
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                        read_byte(bytes.by_ref())?,
+                    ];
+                    FieldData::Bits64(bits64)
+                }
             };
 
             Ok(Some((number, field_data)))
@@ -166,4 +186,10 @@ pub(crate) fn ser_bytes_shared<W: Write>(bytes: &[u8], number: i32, out: &mut W)
     Variant::from_i32(bytes.len().try_into()?).encode_bytes(out)?;
     out.write_all(bytes)?;
     Ok(())
+}
+
+fn read_byte<I: Iterator<Item = IoResult<u8>>>(bytes: &mut I) -> Result<u8> {
+    Ok(bytes
+        .next()
+        .ok_or(ErrorKind::UnexpectedInputTermination)??)
 }

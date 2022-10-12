@@ -69,11 +69,12 @@ impl Variant {
         }
         let mut length = 0;
         let mut buf: [u8; 10] = Default::default();
-        for i in 0..10 {
+        for i in 0..11 {
             if x == 0 {
                 length = i;
                 break;
             }
+            debug_assert!(i != 10);
             buf[i] = ((x as u8) & 0x7F) | 0x80;
             x = x >> 7;
         }
