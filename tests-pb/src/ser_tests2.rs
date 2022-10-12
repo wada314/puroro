@@ -683,14 +683,14 @@ impl ::std::ops::Drop for Msg {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
-    ZEROTH,
-    FIRST,
-    TENTH,
+    Zeroth,
+    First,
+    Tenth,
 }
 
 impl ::std::default::Default for Enum {
     fn default() -> Self {
-        Enum::ZEROTH
+        Enum::Zeroth
     }
 }
 
@@ -700,9 +700,9 @@ impl ::std::convert::TryFrom<i32> for Enum {
         #[allow(unused)]
         use ::std::result::Result::{Err, Ok};
         match x {
-            0 => Ok(self::Enum::ZEROTH),
-            1 => Ok(self::Enum::FIRST),
-            10 => Ok(self::Enum::TENTH),
+            0 => Ok(self::Enum::Zeroth),
+            1 => Ok(self::Enum::First),
+            10 => Ok(self::Enum::Tenth),
             e => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
         }
     }
@@ -711,9 +711,9 @@ impl ::std::convert::TryFrom<i32> for Enum {
 impl ::std::convert::From<Enum> for i32 {
     fn from(x: Enum) -> i32 {
         match x {
-            self::Enum::ZEROTH => 0,
-            self::Enum::FIRST => 1,
-            self::Enum::TENTH => 10,
+            self::Enum::Zeroth => 0,
+            self::Enum::First => 1,
+            self::Enum::Tenth => 10,
         }
     }
 }

@@ -609,24 +609,24 @@ impl ::std::ops::Drop for Msg {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Enum {
-    ZEROTH,
-    FIRST,
-    TENTH,
+    Zeroth,
+    First,
+    Tenth,
     _None(i32),
 }
 
 impl ::std::default::Default for Enum {
     fn default() -> Self {
-        Enum::ZEROTH
+        Enum::Zeroth
     }
 }
 
 impl ::std::convert::From<i32> for Enum {
     fn from(x: i32) -> Self {
         match x {
-            0 => self::Enum::ZEROTH,
-            1 => self::Enum::FIRST,
-            10 => self::Enum::TENTH,
+            0 => self::Enum::Zeroth,
+            1 => self::Enum::First,
+            10 => self::Enum::Tenth,
             e => self::Enum::_None(e),
         }
     }
@@ -635,9 +635,9 @@ impl ::std::convert::From<i32> for Enum {
 impl ::std::convert::From<Enum> for i32 {
     fn from(x: Enum) -> i32 {
         match x {
-            self::Enum::ZEROTH => 0,
-            self::Enum::FIRST => 1,
-            self::Enum::TENTH => 10,
+            self::Enum::Zeroth => 0,
+            self::Enum::First => 1,
+            self::Enum::Tenth => 10,
             self::Enum::_None(y) => y,
         }
     }

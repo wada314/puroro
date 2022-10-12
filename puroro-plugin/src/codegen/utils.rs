@@ -49,6 +49,9 @@ impl<T: AsRef<str>> StrExt for T {
         if self.word_case_matches(case) {
             return Cow::Borrowed(self.as_ref());
         }
+        let assume_input_is_camel_case = !self.as_ref().contains('_')
+            && (self.as_ref().contains(|c: char| c.is_lowercase())
+                && self.as_ref().contains(|c: char| c.is_uppercase()));
         let src_words = {
             let mut words = Vec::new();
             let mut word = String::new();
@@ -59,7 +62,7 @@ impl<T: AsRef<str>> StrExt for T {
                     word = String::new();
                     last_char_was_uppercase = false;
                 } else if c.is_ascii_uppercase() {
-                    if !last_char_was_uppercase {
+                    if !last_char_was_uppercase || assume_input_is_camel_case {
                         words.push(word);
                         word = String::new();
                     }
@@ -71,6 +74,10 @@ impl<T: AsRef<str>> StrExt for T {
                 }
             }
             words.push(word);
+            words = words
+                .into_iter()
+                .filter(|word| !word.is_empty())
+                .collect::<Vec<_>>();
             words
         };
         let words = src_words
@@ -103,6 +110,7 @@ impl<T: AsRef<str>> StrExt for T {
             WordCase::CamelCase => {
                 s.chars().all(|c| c.is_ascii_alphanumeric())
                     && s.chars().next().is_some_and(|c| c.is_ascii_uppercase())
+                    && s.chars().any(|c| c.is_ascii_lowercase())
             }
             WordCase::LowerSnakeCase => {
                 s.chars().next().is_some_and(|c| c.is_ascii_lowercase())
@@ -365,6 +373,38 @@ mod test {
         assert_eq!(false, STR3.word_case_matches(CamelCase));
         assert_eq!(false, STR3.word_case_matches(LowerSnakeCase));
         assert_eq!(true, STR3.word_case_matches(UpperSnakeCase));
+    }
+
+    #[test]
+    fn test_case_convert() {
+        const STR_CAMEL: &'static str = "ThisIsAPen";
+        const STR_LSNAKE: &'static str = "this_is_a_pen";
+        const STR_USNAKE: &'static str = "THIS_IS_A_PEN";
+        assert_eq!(STR_CAMEL, STR_CAMEL.to_camel_case());
+        assert_eq!(STR_CAMEL, STR_LSNAKE.to_camel_case());
+        assert_eq!(STR_CAMEL, STR_USNAKE.to_camel_case());
+        assert_eq!(STR_LSNAKE, STR_CAMEL.to_lower_snake_case());
+        assert_eq!(STR_LSNAKE, STR_LSNAKE.to_lower_snake_case());
+        assert_eq!(STR_LSNAKE, STR_USNAKE.to_lower_snake_case());
+        assert_eq!(STR_USNAKE, STR_CAMEL.to_upper_snake_case());
+        assert_eq!(STR_USNAKE, STR_LSNAKE.to_upper_snake_case());
+        assert_eq!(STR_USNAKE, STR_USNAKE.to_upper_snake_case());
+    }
+
+    #[test]
+    fn test_case_convert_short() {
+        const STR_CAMEL: &'static str = "This";
+        const STR_LSNAKE: &'static str = "this";
+        const STR_USNAKE: &'static str = "THIS";
+        assert_eq!(STR_CAMEL, STR_CAMEL.to_camel_case());
+        assert_eq!(STR_CAMEL, STR_LSNAKE.to_camel_case());
+        assert_eq!(STR_CAMEL, STR_USNAKE.to_camel_case());
+        assert_eq!(STR_LSNAKE, STR_CAMEL.to_lower_snake_case());
+        assert_eq!(STR_LSNAKE, STR_LSNAKE.to_lower_snake_case());
+        assert_eq!(STR_LSNAKE, STR_USNAKE.to_lower_snake_case());
+        assert_eq!(STR_USNAKE, STR_CAMEL.to_upper_snake_case());
+        assert_eq!(STR_USNAKE, STR_LSNAKE.to_upper_snake_case());
+        assert_eq!(STR_USNAKE, STR_USNAKE.to_upper_snake_case());
     }
 
     #[test]

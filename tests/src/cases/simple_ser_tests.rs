@@ -22,7 +22,7 @@ use ::puroro::Message;
 fn test_empty2() {
     let msg: Msg2 = Msg2::default();
     let mut buf: Vec<u8> = Vec::new();
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert!(buf.is_empty());
 }
 
@@ -30,7 +30,7 @@ fn test_empty2() {
 fn test_empty3() {
     let msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert!(buf.is_empty());
 }
 
@@ -39,7 +39,7 @@ fn test_i32_optional2() {
     let mut msg: Msg2 = Msg2::default();
     let mut buf: Vec<u8> = Vec::new();
     *msg.i32_optional_mut() = 10;
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(1 << 3) | 0, 10], buf.as_slice());
 }
 
@@ -48,7 +48,7 @@ fn test_i32_unlabeled3() {
     let mut msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
     *msg.i32_unlabeled_mut() = 10;
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(1 << 3) | 0, 10], buf.as_slice());
 }
 
@@ -57,7 +57,7 @@ fn test_submsg_optional_empty2() {
     let mut msg: Msg2 = Msg2::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.submsg_optional_mut();
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(7 << 3) | 2, 0], buf.as_slice());
 }
 
@@ -66,7 +66,7 @@ fn test_submsg_unlabeled_empty3() {
     let mut msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.submsg_unlabeled_mut();
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(7 << 3) | 2, 0], buf.as_slice());
 }
 
@@ -75,7 +75,7 @@ fn test_submsg_optional_filled2() {
     let mut msg: Msg2 = Msg2::default();
     let mut buf: Vec<u8> = Vec::new();
     *msg.submsg_optional_mut().i32_optional_mut() = 10;
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(7 << 3) | 2, 2, (1 << 3) | 0, 10], buf.as_slice());
 }
 
@@ -84,7 +84,7 @@ fn test_submsg_unlabeled_filled3() {
     let mut msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
     *msg.submsg_unlabeled_mut().i32_unlabeled_mut() = 10;
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(7 << 3) | 2, 2, (1 << 3) | 0, 10], buf.as_slice());
 }
 
@@ -112,10 +112,10 @@ fn test_ser_and_then_deser() {
         .extend(vec![Enum3::Zeroth, Enum3::Tenth]);
     *msg.very_large_field_number_mut() = ((1i64 << 31) - 1) as i32;
 
-    msg.ser(&mut buf).unwrap();
+    msg.to_bytes(&mut buf).unwrap();
     use ::std::io::Read as _;
     let mut new_msg: Msg3 = Msg3::default();
-    new_msg.merge_from_bytes(buf.bytes()).unwrap();
+    new_msg.merge_from_bytes_iter(buf.bytes()).unwrap();
 
     assert_eq!(msg, new_msg);
 }
