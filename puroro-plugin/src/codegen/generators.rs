@@ -223,7 +223,7 @@ impl Enum {
 #[derive(Debug)]
 pub struct EnumValue {
     pub ident_enum_item: String,
-    pub number: i32,
+    pub number: u32,
 }
 impl EnumValue {
     pub fn try_new<'a>(
@@ -231,7 +231,7 @@ impl EnumValue {
         _resolver: &'a DescriptorResolver<'a>,
     ) -> Result<Self> {
         let ident_enum_item = v.name().to_camel_case().escape_rust_keywords().into_owned();
-        let number = v.number();
+        let number = v.number().try_into().expect("TODO");
         Ok(EnumValue {
             ident_enum_item,
             number,
@@ -253,7 +253,7 @@ pub struct Field {
     pub rust_getter_type: String,
     pub rust_getter_opt_type: String,
     pub rust_getter_mut_type: String,
-    pub number: i32,
+    pub number: u32,
 }
 
 impl Field {
@@ -361,7 +361,7 @@ impl Field {
         let rust_getter_mut_type = wire_type
             .into_mut_getter_rust_type(matches!(&rule, &FieldRule::Repeated))
             .into_owned();
-        let number = f.number();
+        let number = f.number().try_into().expect("TODO");
         Ok(Self {
             ident_struct_field,
             ident_getter,
@@ -499,7 +499,7 @@ pub struct OneofField {
     pub rust_getter_opt_type: String,
     pub rust_getter_mut_type: String,
     pub rust_oneof_getter_type: String,
-    pub number: i32,
+    pub number: u32,
 }
 impl OneofField {
     pub fn try_new<'a>(
@@ -556,7 +556,7 @@ impl OneofField {
         let rust_getter_opt_type = wire_type.into_opt_getter_rust_type().into_owned();
         let rust_getter_mut_type = wire_type.into_mut_getter_rust_type(false).into_owned();
         let rust_oneof_getter_type = wire_type.into_oneof_getter_rust_type("'a").into_owned();
-        let number = f.number();
+        let number = f.number().try_into().expect("TODO");
         Ok(Self {
             ident_camel,
             ident_union_item,

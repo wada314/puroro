@@ -138,17 +138,17 @@ impl TryFrom<u32> for WireType {
 
 pub(crate) fn ser_wire_and_number<W: Write>(
     wire: WireType,
-    number: i32,
+    number: u32,
     out: &mut W,
 ) -> Result<()> {
-    let var = Variant::from_i32((number << 3) | (wire as i32));
+    let var = Variant::from_u32((number << 3) | (wire as u32));
     var.encode_bytes(out)?;
     Ok(())
 }
 
 pub(crate) fn ser_numerical_shared<RustType, ProtoType, W>(
     val: RustType,
-    number: i32,
+    number: u32,
     out: &mut W,
 ) -> Result<()>
 where
@@ -181,7 +181,7 @@ where
     Ok(())
 }
 
-pub(crate) fn ser_bytes_shared<W: Write>(bytes: &[u8], number: i32, out: &mut W) -> Result<()> {
+pub(crate) fn ser_bytes_shared<W: Write>(bytes: &[u8], number: u32, out: &mut W) -> Result<()> {
     ser_wire_and_number(WireType::LengthDelimited, number, out)?;
     Variant::from_i32(bytes.len().try_into()?).encode_bytes(out)?;
     out.write_all(bytes)?;

@@ -103,4 +103,7 @@ impl Variant {
     pub fn from_i32(val: i32) -> Self {
         Self::new(i64::to_le_bytes(val.into()))
     }
+    pub fn from_u32(val: u32) -> Self {
+        Self::new(u64::to_le_bytes(val.into()))
+    }
 }
