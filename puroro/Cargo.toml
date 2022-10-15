@@ -1,6 +1,6 @@
 [package]
 name = "puroro"
-version = "0.4.3"
+version = "0.5.0"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2021"
 license = "Apache-2.0"
@@ -11,9 +11,9 @@ readme = "../readme.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "1.0.34"
-either = "1.6.1"
-bitvec = "1.0.0"
+thiserror = "1.0"
+either = "1.8"
+bitvec = "1.0"
 
 [dev-dependencies]
 puroro-doc-samples = { path = "../puroro-doc-samples" }

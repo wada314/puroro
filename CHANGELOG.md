@@ -1,4 +1,9 @@
 
+# v 0.5.0
+- Restarted again from the scratch.
+- Regression. No message traits and builders anymore.
+  - Planned to be implemented again, maybe...
+
 # v 0.4.1
 - Fixed the bug that [packed=...] option was ignored.
 
