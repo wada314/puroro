@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use tests_pb::full_coverage3::MsgTrait;
-
 use crate::tests_pb::full_coverage2::msg::Submsg as Submsg2;
 use crate::tests_pb::full_coverage2::{Enum as Enum2, Msg as Msg2};
 use crate::tests_pb::full_coverage3::msg::Submsg as Submsg3;
@@ -21,7 +19,7 @@ use crate::tests_pb::full_coverage3::{Enum as Enum3, Msg as Msg3};
 
 #[test]
 fn simple2_get_set_int32() {
-    let mut msg = Msg2::new();
+    let mut msg = Msg2::default();
     assert_eq!(0, msg.i32_optional());
     assert_eq!(0, msg.i32_repeated().len());
     assert!(!msg.has_i32_optional());
@@ -43,7 +41,7 @@ fn simple2_get_set_int32() {
 
 #[test]
 fn simple3_get_set_int32() {
-    let mut msg = Msg3::new();
+    let mut msg = Msg3::default();
     assert_eq!(0, msg.i32_optional());
     assert_eq!(0, msg.i32_unlabeled());
     assert_eq!(0, msg.i32_repeated().len());
@@ -76,7 +74,7 @@ fn simple3_get_set_int32() {
 
 #[test]
 fn simple2_get_set_string() {
-    let mut msg = Msg3::new();
+    let mut msg = Msg3::default();
     assert_eq!("", msg.string_optional());
     assert_eq!(0, msg.string_repeated().len());
     assert!(!msg.has_string_optional());
@@ -96,7 +94,7 @@ fn simple2_get_set_string() {
 
 #[test]
 fn simple3_get_set_string() {
-    let mut msg = Msg3::new();
+    let mut msg = Msg3::default();
     assert_eq!("", msg.string_optional());
     assert_eq!("", msg.string_unlabeled());
     assert_eq!(0, msg.string_repeated().len());

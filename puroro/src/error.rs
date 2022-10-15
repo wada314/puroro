@@ -37,7 +37,7 @@ pub enum ErrorKind {
     #[error("The serialized message is too long. The upper limit is 2^31 - 1 bytes.")]
     TooLongToSerialize,
     #[error("Invalid wire type value: {0}.")]
-    InvalidWireType(i32),
+    InvalidWireType(u32),
     #[error("Unexpected wire type. e.g. Expected int32, but found a message field.")]
     UnexpectedWireType,
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]
@@ -66,6 +66,8 @@ pub enum ErrorKind {
     InvalidUtf8Bumpalo(),
     #[error("Group is not supported.")]
     GroupNotSupported,
+    #[error("Internal error in oneof item treatment.")]
+    InvalidOneofIndex,
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }
@@ -82,6 +84,11 @@ impl From<std::fmt::Error> for PuroroError {
 }
 impl From<std::num::TryFromIntError> for PuroroError {
     fn from(input: std::num::TryFromIntError) -> Self {
+        PuroroError::from(ErrorKind::from(input))
+    }
+}
+impl From<std::string::FromUtf8Error> for PuroroError {
+    fn from(input: std::string::FromUtf8Error) -> Self {
         PuroroError::from(ErrorKind::from(input))
     }
 }

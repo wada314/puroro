@@ -1,0 +1,56 @@
+{#-################ Module-level code ################}
+// A generated source code by puroro library
+{%- if is_root_package %}
+#![feature(generic_associated_types)]
+// package (root)
+{%- else %}
+// package {{ fqtn }}
+{%- endif %}
+
+pub mod _puroro_root {
+    {%- if is_root_package %}
+    pub use super::*;
+    {%- else %}
+    pub use super::super::_puroro_root::*;
+    {%- endif %}
+}
+
+pub mod _puroro {
+    pub use ::puroro::*;
+}
+
+{#-################ Message structs ################}
+
+{%- for m in messages %}
+{{ m }}
+{%- endfor %} {#- for m in messages #}
+
+{#-################ Enums ################}
+
+{%- for e in enums %}
+{{ e }}
+{%- endfor %} {#- for e in enums #}
+
+{#-################ Oneofs ################}
+
+{%- for o in oneofs %}
+{{ o }}
+{%- endfor %} {#- for o in oneofs #}
+
+{#-################ Submodules ################}
+
+{%- if output_all_in_one_file %}
+
+{%- for submodule in submodules %}
+pub mod {{ submodule.ident_module }} {
+    {{ submodule }}
+}
+{%- endfor %}
+
+{%- else %} {#- if output_all_in_one_file #}
+
+{%- for submodule in submodules %}
+pub mod {{ submodule.ident_module }};
+{%- endfor %}
+
+{%- endif %} {#- if output_all_in_one_file #}

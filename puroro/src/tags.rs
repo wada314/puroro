@@ -12,166 +12,295 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::bool::{False, True};
+//! Typetags for Proto field types.
+
+use crate::{ErrorKind, PuroroError, Result};
 use ::std::marker::PhantomData;
 
-/// A tag trait for types corresponding to the field's type.
-/// e.g. Int32, Float, String, Message<M>
-/// This type actually consist of two tags for generics specialization:
-/// `wire_tag<value::value_tag>`.
-pub trait FieldTypeTag {}
+// Variants
+#[derive(Default, Clone)]
+pub struct Int32;
+#[derive(Default, Clone)]
+pub struct Int64;
+#[derive(Default, Clone)]
+pub struct UInt32;
+#[derive(Default, Clone)]
+pub struct UInt64;
+#[derive(Default, Clone)]
+pub struct SInt32;
+#[derive(Default, Clone)]
+pub struct SInt64;
+#[derive(Default, Clone)]
+pub struct Bool;
+#[derive(Default, Clone)]
+pub struct Enum2<E>(PhantomData<E>);
+#[derive(Default, Clone)]
+pub struct Enum3<E>(PhantomData<E>);
 
-/// A `FieldTypeTag` which has wire type one of Variant (except enum), Bits32 or Bits64.
-pub trait NumericalTypeTag {
-    type NativeType: 'static + Default + PartialEq + Clone;
-}
+// Length delimited types
+#[derive(Default, Clone)]
+pub struct Bytes;
+#[derive(Default, Clone)]
+pub struct String;
+#[derive(Default, Clone)]
+pub struct Message<M>(PhantomData<M>);
 
-/// A tag trait for types corresponding to the field label.
-/// e.g. Optional, Repeated, Required
-pub trait FieldLabelTag {
-    const DO_DEFAULT_CHECK: bool;
-}
+// Fixed 32 / 64 bit types
+#[derive(Default, Clone)]
+pub struct Float;
+#[derive(Default, Clone)]
+pub struct Fixed32;
+#[derive(Default, Clone)]
+pub struct SFixed32;
+#[derive(Default, Clone)]
+pub struct Double;
+#[derive(Default, Clone)]
+pub struct Fixed64;
+#[derive(Default, Clone)]
+pub struct SFixed64;
 
-mod value {
-    use ::std::marker::PhantomData;
-    pub struct Int32;
-    pub struct UInt32;
-    pub struct SInt32;
-    pub struct Int64;
-    pub struct UInt64;
-    pub struct SInt64;
-    pub struct Bool;
-    pub struct Bytes;
-    pub struct String;
-    pub struct Enum2<E>(PhantomData<E>);
-    pub struct Enum3<E>(PhantomData<E>);
-    pub struct Message<M>(PhantomData<M>);
-    pub struct Float;
-    pub struct Double;
-    pub struct SFixed32;
-    pub struct SFixed64;
-    pub struct Fixed32;
-    pub struct Fixed64;
+// Traits
+pub trait NumericalType {
+    type RustType;
+    fn from_variant(_bytes: [u8; 8]) -> Result<Self::RustType> {
+        Err(ErrorKind::UnexpectedWireType)?
+    }
+    fn from_bits32(_bytes: [u8; 4]) -> Result<Self::RustType> {
+        Err(ErrorKind::UnexpectedWireType)?
+    }
+    fn from_bits64(_bytes: [u8; 8]) -> Result<Self::RustType> {
+        Err(ErrorKind::UnexpectedWireType)?
+    }
+    fn to_variant(_val: Self::RustType) -> Result<[u8; 8]> {
+        Err(ErrorKind::UnexpectedWireType)?
+    }
+    fn to_wire_type(_val: Self::RustType) -> Result<NumericalWireType> {
+        unimplemented!()
+    }
 }
-
-pub type Variant<V> = (PhantomData<V>, (True, False), (False, False));
-pub type LengthDelimited<V> = (PhantomData<V>, (False, True), (False, False));
-pub type Bits32<V> = (PhantomData<V>, (False, False), (True, False));
-pub type Bits64<V> = (PhantomData<V>, (False, False), (False, True));
-
-pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
-
-pub type Int32 = Variant<value::Int32>;
-pub type SInt32 = Variant<value::SInt32>;
-pub type UInt32 = Variant<value::UInt32>;
-pub type Int64 = Variant<value::Int64>;
-pub type SInt64 = Variant<value::SInt64>;
-pub type UInt64 = Variant<value::UInt64>;
-pub type Bool = Variant<value::Bool>;
-pub type String = LengthDelimited<value::String>;
-pub type Bytes = LengthDelimited<value::Bytes>;
-pub type Float = Bits32<value::Float>;
-pub type Fixed32 = Bits32<value::Fixed32>;
-pub type SFixed32 = Bits32<value::SFixed32>;
-pub type Double = Bits64<value::Double>;
-pub type Fixed64 = Bits64<value::Fixed64>;
-pub type SFixed64 = Bits64<value::SFixed64>;
-pub type Enum2<E> = Variant<value::Enum2<E>>;
-pub type Enum3<E> = Variant<value::Enum3<E>>;
-pub type Message<M> = LengthDelimited<value::Message<M>>;
-
-/// A repeated field, which is available in both proto2 and proto3.
-pub type Repeated = (True, False, False, False, False);
-/// Proto2 optional field || Proto3 explicitly optional marked field.
-pub type Optional = (False, (True, False), False, False, False);
-/// Only available in proto2.
-pub type Required = (False, (False, True), False, False, False);
-/// Proto3 unlabeled field.
-pub type Unlabeled = (False, False, True, False, False);
-/// An item of oneof.
-pub type OneofField = (False, False, False, True, False);
-/// Reserved for future use...
-pub type MapEntry = (False, False, False, False, True);
-
-pub type LabelNonRepeated<_1, _2, _3> = (False, _1, _2, _3, False);
-
-impl FieldTypeTag for Int32 {}
-impl FieldTypeTag for Int64 {}
-impl FieldTypeTag for UInt32 {}
-impl FieldTypeTag for UInt64 {}
-impl FieldTypeTag for SInt32 {}
-impl FieldTypeTag for SInt64 {}
-impl FieldTypeTag for Bool {}
-impl FieldTypeTag for Bytes {}
-impl FieldTypeTag for String {}
-impl<E> FieldTypeTag for Enum2<E> {}
-impl<E> FieldTypeTag for Enum3<E> {}
-impl<M> FieldTypeTag for Message<M> {}
-impl FieldTypeTag for Float {}
-impl FieldTypeTag for Double {}
-impl FieldTypeTag for Fixed32 {}
-impl FieldTypeTag for Fixed64 {}
-impl FieldTypeTag for SFixed32 {}
-impl FieldTypeTag for SFixed64 {}
-
-impl NumericalTypeTag for Int32 {
-    type NativeType = i32;
-}
-impl NumericalTypeTag for UInt32 {
-    type NativeType = u32;
-}
-impl NumericalTypeTag for SInt32 {
-    type NativeType = i32;
-}
-impl NumericalTypeTag for Fixed32 {
-    type NativeType = u32;
-}
-impl NumericalTypeTag for SFixed32 {
-    type NativeType = i32;
-}
-impl NumericalTypeTag for Float {
-    type NativeType = f32;
-}
-impl NumericalTypeTag for Int64 {
-    type NativeType = i64;
-}
-impl NumericalTypeTag for UInt64 {
-    type NativeType = u64;
-}
-impl NumericalTypeTag for SInt64 {
-    type NativeType = i64;
-}
-impl NumericalTypeTag for Fixed64 {
-    type NativeType = u64;
-}
-impl NumericalTypeTag for SFixed64 {
-    type NativeType = i64;
-}
-impl NumericalTypeTag for Double {
-    type NativeType = f64;
-}
-impl NumericalTypeTag for Bool {
-    type NativeType = bool;
-}
-impl<E: crate::Enum2> NumericalTypeTag for Enum2<E> {
-    type NativeType = E;
-}
-impl<E: crate::Enum3> NumericalTypeTag for Enum3<E> {
-    type NativeType = E;
+pub enum NumericalWireType {
+    Variant([u8; 8]),
+    Bits32([u8; 4]),
+    Bits64([u8; 8]),
 }
 
-impl FieldLabelTag for Repeated {
-    const DO_DEFAULT_CHECK: bool = false;
+// Trait impls
+impl NumericalType for Int32 {
+    type RustType = i32;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(i64::from_le_bytes(bytes).try_into()?)
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val.into()))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(val.into())))
+    }
 }
-impl FieldLabelTag for Optional {
-    const DO_DEFAULT_CHECK: bool = false;
+impl NumericalType for Int64 {
+    type RustType = i64;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(i64::from_le_bytes(bytes))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(val)))
+    }
 }
-impl FieldLabelTag for Unlabeled {
-    const DO_DEFAULT_CHECK: bool = true;
+impl NumericalType for UInt32 {
+    type RustType = u32;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes).try_into()?)
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(val.into()))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(val.into())))
+    }
 }
-impl FieldLabelTag for Required {
-    const DO_DEFAULT_CHECK: bool = false;
+impl NumericalType for UInt64 {
+    type RustType = u64;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(val))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(val)))
+    }
 }
-impl FieldLabelTag for OneofField {
-    const DO_DEFAULT_CHECK: bool = false;
+impl NumericalType for SInt32 {
+    type RustType = i32;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let val_u32: u32 = u64::from_le_bytes(bytes).try_into()?;
+        Ok(decode_sint32(val_u32))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(encode_sint32(val).into()))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(
+            encode_sint32(val).into(),
+        )))
+    }
+}
+impl NumericalType for SInt64 {
+    type RustType = i64;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(decode_sint64(u64::from_le_bytes(bytes)))
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(encode_sint64(val)))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(encode_sint64(
+            val,
+        ))))
+    }
+}
+impl NumericalType for Bool {
+    type RustType = bool;
+}
+impl<E> NumericalType for Enum2<E>
+where
+    i32: TryInto<E, Error = PuroroError>,
+    E: Into<i32>,
+{
+    type RustType = E;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let int_value: i32 = i64::from_le_bytes(bytes).try_into()?;
+        Ok(int_value.try_into()?)
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val.into() as i64))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(
+            val.into() as i64
+        )))
+    }
+}
+impl<E> NumericalType for Enum3<E>
+where
+    i32: Into<E>,
+    E: Into<i32>,
+{
+    type RustType = E;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        let int_value: i32 = i64::from_le_bytes(bytes).try_into()?;
+        Ok(int_value.into())
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(i64::to_le_bytes(val.into() as i64))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(i64::to_le_bytes(
+            val.into() as i64
+        )))
+    }
+}
+impl NumericalType for Float {
+    type RustType = f32;
+    fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
+        Ok(f32::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits32(f32::to_le_bytes(val)))
+    }
+}
+impl NumericalType for Fixed32 {
+    type RustType = u32;
+    fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
+        Ok(u32::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits32(u32::to_le_bytes(val)))
+    }
+}
+impl NumericalType for SFixed32 {
+    type RustType = i32;
+    fn from_bits32(bytes: [u8; 4]) -> Result<Self::RustType> {
+        Ok(i32::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits32(i32::to_le_bytes(val)))
+    }
+}
+impl NumericalType for Double {
+    type RustType = f64;
+    fn from_bits64(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(f64::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits64(f64::to_le_bytes(val)))
+    }
+}
+impl NumericalType for Fixed64 {
+    type RustType = u64;
+    fn from_bits64(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits64(u64::to_le_bytes(val)))
+    }
+}
+impl NumericalType for SFixed64 {
+    type RustType = i64;
+    fn from_bits64(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(i64::from_le_bytes(bytes))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Bits64(i64::to_le_bytes(val)))
+    }
+}
+
+fn encode_sint32(s: i32) -> u32 {
+    u32::from_le_bytes(((s << 1) ^ (s >> 31)).to_le_bytes())
+}
+fn encode_sint64(s: i64) -> u64 {
+    u64::from_le_bytes(((s << 1) ^ (s >> 63)).to_le_bytes())
+}
+fn decode_sint32(i: u32) -> i32 {
+    i32::from_le_bytes(((i >> 1) ^ (0u32.wrapping_sub(i & 1))).to_le_bytes())
+}
+fn decode_sint64(i: u64) -> i64 {
+    i64::from_le_bytes(((i >> 1) ^ (0u64.wrapping_sub(i & 1))).to_le_bytes())
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_sint32() {
+        fn check(s: i32) {
+            assert_eq!(s, decode_sint32(encode_sint32(s)))
+        }
+        check(0);
+        check(1);
+        check(2);
+        check(3);
+        check(i32::MIN);
+        check(i32::MIN + 1);
+        check(i32::MAX);
+        check(i32::MAX - 1);
+    }
+
+    #[test]
+    fn test_sint64() {
+        fn check(s: i64) {
+            assert_eq!(s, decode_sint64(encode_sint64(s)))
+        }
+        check(0);
+        check(1);
+        check(2);
+        check(3);
+        check(i64::MIN);
+        check(i64::MIN + 1);
+        check(i64::MAX);
+        check(i64::MAX - 1);
+    }
 }

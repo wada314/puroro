@@ -18,4 +18,9 @@ package library;
 message Book {    
     string title = 1;
     uint32 num_pages = 2;
+    Author author = 3;
+}
+
+message Author {
+    string name = 1;
 }

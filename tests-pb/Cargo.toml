@@ -11,6 +11,7 @@ puroro = { path = "../puroro" }
 
 [build-dependencies]
 puroro-plugin = { path = "../puroro-plugin" }
+puroro_old = { package = "puroro", version = "0.4.3" }
 
 [features]
 default = []

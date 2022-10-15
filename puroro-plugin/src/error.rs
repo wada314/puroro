@@ -28,25 +28,37 @@ pub enum ErrorKind {
     GroupNotSupported,
     #[error(r#"Unknown value for proto file's syntax: "{name}"."#)]
     UnknownProtoSyntax { name: String },
-    #[error(r#"The enum type "{name}" has no values. The empty enum is not allowed."#)]
-    EmptyEnum { name: String },
-    #[error(r#"A length of some sort of array in the proto is too large."#)]
-    TooLargeLength,
+    // #[error(r#"The enum type "{name}" has no values. The empty enum is not allowed."#)]
+    // EmptyEnum { name: String },
+    // #[error(r#"A length of some sort of array in the proto is too large."#)]
+    // TooLargeLength,
     #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from ParseIntError: "{source}""#)]
     ParseIntError { source: std::num::ParseIntError },
+    #[error(r#"Ar error from std::io::Error: "{source}""#)]
+    IoError { source: ::std::io::Error },
     #[error(r#"Bad format string: "{string}""#)]
     InvalidString { string: String },
     #[error(r#"An error from puroro: "{source}""#)]
     PuroroError { source: ::puroro::PuroroError },
+    #[error(r#"Expected the field descriptor's type_name field is filled, but is not"#)]
+    MissingTypeName,
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
 }
-impl From<std::fmt::Error> for GeneratorError {
-    fn from(e: std::fmt::Error) -> Self {
+impl From<::std::fmt::Error> for GeneratorError {
+    fn from(e: ::std::fmt::Error) -> Self {
         Self {
             kind: ErrorKind::WriteError { source: e },
+            backtrace: std::backtrace::Backtrace::capture(),
+        }
+    }
+}
+impl From<::std::io::Error> for GeneratorError {
+    fn from(e: ::std::io::Error) -> Self {
+        Self {
+            kind: ErrorKind::IoError { source: e },
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }

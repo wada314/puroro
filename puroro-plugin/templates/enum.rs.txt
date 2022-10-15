@@ -1,67 +1,72 @@
-#[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
-pub enum {{ ident }} {
-    {%- for value in values %}
-    {{ value.ident }},
-    {%- endfor %}
 
-    {%- if is_proto3 %}
-    _Unknown(i32)
-    {%- endif %}
+#[derive(Debug, Clone, PartialEq)]
+pub enum {{ ident_enum }} {
+    {%- for value in values %}
+    {{ value.ident_enum_item }},
+    {%- endfor %} {#- for value in values #}
+    {%- match syntax %}
+    {%- when Syntax::Proto3 %}
+    _None(i32),
+    {%- else %}
+    {%- endmatch %} 
 }
 
-{%- if is_proto3 %}
+impl ::std::default::Default for {{ ident_enum }} {
+    fn default() -> Self {
+        {{ ident_enum }}::{{ values[0].ident_enum_item }}
+    }
+}
 
-impl ::puroro::Enum3 for {{ ident }} {}
-impl ::std::convert::From<i32> for {{ ident }} {
-    fn from(value: i32) -> Self {
-        match value {
+{%- match syntax %}
+{%- when Syntax::Proto2 %}
+
+impl ::std::convert::TryFrom<i32> for {{ ident_enum }} {
+    type Error = self::_puroro::PuroroError;
+    fn try_from(x: i32) -> ::std::result::Result<Self, Self::Error> {
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        match x {
             {%- for value in values %}
-            {{ value.number }} => {{ ident }}::{{ value.ident }},
-            {%- endfor %}
-            _ => {{ ident }}::_Unknown(value),
+            {{ value.number }} => Ok(self::{{ ident_enum }}::{{ value.ident_enum_item }}),
+            {%- endfor %} {#- for value in values #}
+            e => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
+        }
+    }
+}
+
+impl ::std::convert::From<{{ ident_enum }}> for i32 {
+    fn from(x: {{ ident_enum }}) -> i32 {
+        match x {
+            {%- for value in values %}
+            self::{{ ident_enum }}::{{ value.ident_enum_item }} => {{ value.number }},
+            {%- endfor %} {#- for value in values #}
+        }
+    }
+}
+
+{%- when Syntax::Proto3 %}
+
+impl ::std::convert::From<i32> for {{ ident_enum }} {
+    fn from(x: i32) -> Self {
+        match x {
+            {%- for value in values %}
+            {{ value.number }} => self::{{ ident_enum }}::{{ value.ident_enum_item }},
+            {%- endfor %} {#- for value in values #}
+            e => self::{{ ident_enum }}::_None(e),
+        }
+    }
+}
+
+impl ::std::convert::From<{{ ident_enum }}> for i32 {
+    fn from(x: {{ ident_enum }}) -> i32 {
+        match x {
+            {%- for value in values %}
+            self::{{ ident_enum }}::{{ value.ident_enum_item }} => {{ value.number }},
+            {%- endfor %} {#- for value in values #}
+            self::{{ ident_enum }}::_None(y) => y,
         }
     }
 }
 
 {%- else %}
-
-impl ::puroro::Enum2 for {{ ident }} {}
-impl ::std::convert::TryFrom<i32> for {{ ident }} {
-    type Error = i32;
-    fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
-        ::std::result::Result::Ok(match value {
-            {%- for value in values %}
-            {{ value.number }} => {{ ident }}::{{ value.ident }},
-            {%- endfor %}
-            _ => Err(value)?,
-        })
-    }
-}
-
-{%- endif %}
-
-impl ::std::convert::From<{{ ident }}> for i32 {
-    fn from(value: {{ ident }}) -> i32 {
-        match value {
-            {%- for value in values %}
-            {{ ident }}::{{ value.ident }} => {{ value.number }},
-            {%- endfor %}
-
-            {%- if is_proto3 %}
-            {{ ident }}::_Unknown(ivalue) => ivalue,
-            {%- endif %}
-        }
-    }
-}
-
-impl ::std::default::Default for {{ ident }} {
-    fn default() -> Self {
-        {{ ident }}::{{ first_value_ident }}
-    }
-}
-
-impl<'bump> ::puroro::internal::BumpDefault<'bump> for {{ ident }} {
-    fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
-        ::std::default::Default::default()
-    }
-}
+{%- endmatch %} {#- match syntax #}

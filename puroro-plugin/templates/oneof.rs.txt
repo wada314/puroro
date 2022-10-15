@@ -1,75 +1,241 @@
 
-pub enum {{ enum_ident }}{{ enum_generic_params }} {
+{#- Oneof union. Includes None case #}
+{#- Neither Clone and Drop are implementable without the bitslice info. #}
+pub union {{ ident_union }} {
+    _none: (),
     {%- for field in fields %}
-    {{ field.ident }}({{ field.field_type }}),
-    {%- endfor %}
+    {{ field.ident_union_item }}: {{ field.rust_field_type }},
+    {%- endfor %} {#- for field in fields #}
 }
 
-{#- Enum getters. #}
-{#- Note: It is guaranteed that the oneof's name and the oneof's items names are #}
-{#- not conflicting. It's not explicitly written in the spec, though the official #}
-{#- C++ code generator will fail to generate a valid code if the names are conflicting. #}
-impl{{ enum_generic_params }} {{ enum_ident }}{{ enum_generic_params }} {
+{#- public oneof enum without contents, not including None case #}
+#[repr(u32)]
+#[derive(Debug, Clone, PartialEq)]
+pub enum {{ ident_case }} {
     {%- for field in fields %}
-    pub fn {{ field.getter_ident }}(self) -> ::std::option::Option<{{ field.field_type }}> {
-        match self {
-            Self::{{ field.ident }}(v) => ::std::option::Option::Some(v),
-            #[allow(unreachable_patterns)]
-            _ => None,
+    {{ field.ident_enum_item }},
+    {%- endfor %} {#- for field in fields #}
+}
+
+{#- public oneof enum with ref to its contents, not including None case #}
+#[repr(u32)]
+#[derive(Debug, Clone, PartialEq)]
+pub enum {{ ident_case_ref }} {%- if has_ld_type %}<'a>{%- endif %} {
+    {%- for field in fields %}
+    {{ field.ident_enum_item }}({{ field.rust_oneof_getter_type }}),
+    {%- endfor %} {#- for field in fields #}
+}
+
+impl {{ ident_union }} {
+    {%- for field in fields %}
+    pub(crate) fn {{ field.ident_getter }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_getter_type }} {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use ::std::ops::Deref;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+
+        let case_opt = self::{{ ident_case }}::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::{{ ident_case }}::{{ field.ident_enum_item }})).then(|| {
+            unsafe {
+                self.{{ field.ident_union_item }}.deref()
+            }
+        });
+        OneofFieldTypeOpt::get_field(item_opt, ::std::default::Default::default)
+    }
+
+    pub(crate) fn {{ field.ident_getter_opt }}<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> {{ field.rust_getter_opt_type }} {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use ::std::ops::Deref;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+
+        let case_opt = self::{{ ident_case }}::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::{{ ident_case }}::{{ field.ident_enum_item }})).then(|| {
+            unsafe {
+                self.{{ field.ident_union_item }}.deref()
+            }
+        });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
+    }
+
+    pub(crate) fn {{ field.ident_getter_mut }}<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> {{ field.rust_getter_mut_type }} {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use ::std::mem::ManuallyDrop;
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofUnion};
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+
+        let case_opt = self::{{ ident_case }}::from_bitslice(bits);
+        if let Some(self::{{ ident_case }}::{{ field.ident_enum_item }}) = case_opt {
+            // Do nothing
+        } else {
+            <Self as OneofUnion>::clear(self, bits);
+            let index = <self::{{ ident_case }} as OneofCase>::into_u32(self::{{ ident_case }}::{{ field.ident_enum_item }});
+            bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, index);
+            *self = {{ ident_union }} {
+                {{ field.ident_union_item }}: ManuallyDrop::new({{ field.rust_field_inner_type }}::default())
+            };
+        }
+        unsafe {
+            &mut self.{{ field.ident_union_item }}
+        }.mut_field()
+    }
+    {%- endfor %} {#- for field in fields #}
+}
+
+impl self::_puroro::internal::oneof_type::OneofUnion for {{ ident_union }} {
+    type Case = self::{{ ident_case }};
+    type CaseRef<'a> = self::{{ ident_case_ref }}{% if has_ld_type %}<'a>{% endif %}
+        where Self: 'a;
+
+    fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B)
+        -> ::std::option::Option<Self::CaseRef<'_>>
+    {
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        let case_opt = <{{ rust_case_type }} as OneofCase>::from_bitslice(bits);
+        case_opt.map(|case| OneofCaseRef::from_union_and_case(self, case))
+    }
+
+    fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::mem::ManuallyDrop;
+
+        match self::{{ ident_case }}::from_bitslice(bits) {
+            {%- for field in fields %}
+            Some(self::{{ ident_case  }}::{{ field.ident_enum_item }}) => {
+                unsafe { ManuallyDrop::take(&mut self.{{ field.ident_union_item }}) };
+            }
+            {%- endfor %} {#- for field in fields #}
+            _ => (),
+        }
+        {#- Set the bitfield value to the 0, which means None. #}
+        bits.set_range({{ bitfield_start }}..{{ bitfield_end }}, 0);
+    }
+
+    fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+
+        match self::{{ ident_case }}::from_bitslice(bits) {
+            {%- for field in fields %}
+            Some({{ ident_case  }}::{{ field.ident_enum_item }}) => {
+                Self {
+                    {{ field.ident_union_item }}: Clone::clone(unsafe { &self.{{ field.ident_union_item }} }),
+                }
+            }
+            {%- endfor %} {#- for field in fields #}
+            _ => Self {
+                _none: (),
+            },
         }
     }
-    {%- endfor %}
+
+    fn deser_from_iter<I, B>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: self::_puroro::internal::ser::FieldData<I>,
+        case: Self::Case,
+    ) -> self::_puroro::Result<()> 
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        B: self::_puroro::bitvec::BitSlice,
+    {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        match case {
+            {%- for field in fields %}
+            Self::Case::{{ field.ident_enum_item }} => {
+                let _ = <Self>::{{ field.ident_getter_mut }}(self, bitvec);
+                <{{ field.rust_field_inner_type }} as OneofFieldType>::deser_from_iter(
+                    unsafe { &mut self.{{ field.ident_union_item }} },
+                    field_data,
+                )?;
+            }
+            {%- endfor %} {#- for field in fields #}
+        }
+        Ok(())
+    }
+
+    fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
+    where
+        W: ::std::io::Write,
+        B: self::_puroro::bitvec::BitSlice
+    {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match self::{{ ident_case }}::from_bitslice(bitvec) {
+            {%- for field in fields %}
+            Some({{ ident_case  }}::{{ field.ident_enum_item }}) => {
+                unsafe { &self.{{ field.ident_union_item }} }.ser_to_write(
+                    {{ field.number }}, out,
+                )?;
+            }
+            {%- endfor %} {#- for field in fields #}
+            _ => (),
+        }
+        Ok(())
+    }
 }
 
+impl ::std::default::Default for {{ ident_union }} {
+    fn default() -> Self {
+        Self { _none: () }
+    }
+}
 
-impl{{ enum_generic_params }} ::std::fmt::Debug for {{ enum_ident }}{{ enum_generic_params }}
-where
-    {%- for field in fields %}
-    {{ field.field_type }}: ::std::fmt::Debug,
-    {%- endfor %} {#- for field in fields #}
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+impl self::_puroro::internal::oneof_type::OneofCase for {{ ident_case }} {
+    const BITFIELD_BEGIN: usize = {{ bitfield_start }};
+    const BITFIELD_END: usize = {{ bitfield_end }};
+    fn from_u32(x: u32) -> Option<Self> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        if x == 0 {
+            return None;
+        }
+        match x - 1 {
+            {%- for field in fields %}
+            {{ field.index }} => Some(self::{{ ident_case }}::{{ field.ident_enum_item }}),
+            {%- endfor %} {#- for field in fields #}
+            _ => None, {#- It's an error value... #}
+        }
+    }
+    fn into_u32(self) -> u32 {
         match self {
             {%- for field in fields %}
-            Self::{{ field.ident }}(v) => f
-                .debug_tuple("{{ enum_ident }}::{{ field.ident }}")
-                .field(&v)
-                .finish(),
+            self::{{ ident_case }}::{{ field.ident_enum_item }} => {{ field.index }} + 1,
             {%- endfor %} {#- for field in fields #}
         }
     }
 }
 
-impl{{ enum_generic_params }} ::std::clone::Clone for {{ enum_ident }}{{ enum_generic_params }}
-where
-    {%- for field in fields %}
-    {{ field.field_type }}: ::std::clone::Clone,
-    {%- endfor %} {#- for field in fields #}
-{
-    fn clone(&self) -> Self {
-        match self {
+impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for {{ ident_case_ref }} {%- if has_ld_type %}<'a>{%- endif %} {
+    type Case = self::{{ ident_case }};
+    type Union = self::{{ ident_union }};
+    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
+        match case {
             {%- for field in fields %}
-            Self::{{ field.ident }}(ref v) => Self::{{ field.ident }}(
-                <{{ field.field_type }} as ::std::clone::Clone>::clone(v)
-            ),
+            self::{{ ident_case }}::{{ field.ident_enum_item }} => 
+                self::{{ ident_case_ref }}::{{ field.ident_enum_item }}(
+                    unsafe { &u.{{ field.ident_union_item }} }.get_field()
+                ),
             {%- endfor %} {#- for field in fields #}
-        }
-    }
-}
-
-impl{{ enum_generic_params }} ::std::cmp::PartialEq for {{ enum_ident }}{{ enum_generic_params }}
-where
-    {%- for field in fields %}
-    {{ field.field_type }}: ::std::cmp::PartialEq,
-    {%- endfor %} {#- for field in fields #}
-{
-    fn eq(&self, rhs: &Self) -> bool {
-        match (self, rhs) {
-            {%- for field in fields %}
-            (Self::{{ field.ident }}(left), Self::{{ field.ident }}(right)) => left == right,
-            {%- endfor %} {#- for field in fields #}
-            #[allow(unreachable_patterns)]
-            _ => false,
         }
     }
 }
