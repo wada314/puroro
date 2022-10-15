@@ -13,12 +13,9 @@ readme = "../readme.md"
 [dependencies]
 thiserror = "1.0.34"
 either = "1.6.1"
-bumpalo = { version = "3.8.0", optional = true, features = ["collections", "boxed"] }
 bitvec = "1.0.0"
 
 [dev-dependencies]
 puroro-doc-samples = { path = "../puroro-doc-samples" }
 
 [features]
-default = ["puroro-bumpalo"]
-puroro-bumpalo = ["bumpalo"]
