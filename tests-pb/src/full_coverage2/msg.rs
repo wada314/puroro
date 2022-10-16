@@ -249,4 +249,3 @@ impl ::std::ops::Drop for Submsg {
         use self::_puroro::internal::oneof_type::OneofUnion;
     }
 }
-pub mod submsg;

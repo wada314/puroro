@@ -128,6 +128,7 @@ impl Module {
             .messages()
             .into_iter()
             .map(|d| Module::try_from_message(d, resolver, state))
+            .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty() || !m.oneofs.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let messages = m
             .messages()
