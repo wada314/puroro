@@ -57,7 +57,7 @@ fn main() {
 
     // Decode the FileDescriptorSet output by the above code.
     let fds_file = File::open(&file_descriptor_set_file_path).unwrap();
-    let file_descriptor_set = FileDescriptorSet::from_bytes(fds_file.bytes()).unwrap();
+    let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
     let output_files =
@@ -107,7 +107,7 @@ fn build_protobuf_plugin() {
 
     // Decode the FileDescriptorSet output by the above code.
     let fds_file = File::open(&file_descriptor_set_file_path).unwrap();
-    let file_descriptor_set = FileDescriptorSet::from_bytes(fds_file.bytes()).unwrap();
+    let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
     let output_files =

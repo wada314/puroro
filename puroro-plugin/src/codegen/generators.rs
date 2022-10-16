@@ -46,7 +46,6 @@ impl Module {
         state: &mut State,
     ) -> Result<Self> {
         let package_contents = resolver.package_contents_or_err(p)?;
-        dbg!(&package_contents.subpackages);
         let ident_module = package_contents
             .package_name
             .as_ref()

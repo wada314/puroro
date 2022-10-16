@@ -101,7 +101,7 @@ You can use [`Message::from_bytes_iter()`] method or [`Message::merge_from_bytes
 method to deserialize a message from [`std::io::Read`] bytes stream.
 
 ```rust
-use puroro::Message; // For from_bytes(), merge_from_bytes() methods
+use puroro::Message; // For from_bytes_iter(), merge_from_bytes_iter() methods
 use std::io::Read; // For bytes() method
 use puroro_doc_samples::library::Book;
 
@@ -122,10 +122,10 @@ assert_eq!(130, book.num_pages());
 
 # Serializing
 
-You can serialize the message into [`std::io::Write`] using [`Message::ser()`] method.
+You can serialize the message into [`std::io::Write`] using [`Message::to_bytes()`] method.
 
 ```rust
-use puroro::Message; // For ser() method
+use puroro::Message; // For to_bytes() method
 use puroro_doc_samples::library::Book;
 
 let mut output = vec![];
