@@ -15,7 +15,7 @@
 use super::restructure::{Enum, File, Message, MessageOrEnumRef};
 use super::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
-use ::std::collections::HashMap;
+use ::std::collections::{HashMap, HashSet};
 use ::std::fmt::Debug;
 
 #[derive(Debug)]
@@ -63,10 +63,10 @@ impl<'a> DescriptorResolver<'a> {
                 .or_insert_with(|| PackageContents {
                     package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
                     full_package: cur_package.to_owned(),
-                    subpackages: Vec::new(),
+                    subpackages: HashSet::new(),
                     input_files: Vec::new(),
                 });
-            item.subpackages.push(subpackage.to_string());
+            item.subpackages.insert(subpackage.to_string());
         }
 
         // package_contents for the leaf package
@@ -134,6 +134,6 @@ impl<'a> DescriptorResolver<'a> {
 pub struct PackageContents<'a> {
     pub package_name: Option<String>,
     pub full_package: Package<String>,
-    pub subpackages: Vec<String>,
+    pub subpackages: HashSet<String>,
     pub input_files: Vec<File<'a>>,
 }

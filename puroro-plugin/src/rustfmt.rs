@@ -36,7 +36,7 @@ pub fn format(input: &str) -> Result<String> {
     drop(stdin);
 
     let output = rustfmt.wait_with_output()?;
-    let out = String::from_utf8(output.stdout).unwrap();
+    let out = String::from_utf8(output.stdout)?;
 
     return Ok(out);
 }

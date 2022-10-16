@@ -1,5 +1,5 @@
 // A generated source code by puroro library
-// package .ser_tests3.Msg
+// package .nested.Msg
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -12,7 +12,7 @@ pub mod _puroro {
 #[derive(Default)]
 pub struct Submsg {
     // Singular, Variant(Int32)
-    i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField<
+    item_inner: self::_puroro::internal::field_type::SingularNumericalField<
         i32,
         self::_puroro::tags::Int32,
     >,
@@ -22,34 +22,34 @@ pub struct Submsg {
 
 impl Submsg {
     // Singular, Variant(Int32)
-    pub fn i32_unlabeled(&self) -> i32 {
+    pub fn item_inner(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field(
-            &self.i32_unlabeled, &self._bitfield, ::std::default::Default::default,
+            &self.item_inner, &self._bitfield, ::std::default::Default::default,
         )
     }
-    pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+    pub fn item_inner_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
-            &self.i32_unlabeled, &self._bitfield,
+            &self.item_inner, &self._bitfield,
         )
     }
-    pub fn has_i32_unlabeled(&self) -> bool {
+    pub fn has_item_inner(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::get_field_opt(
-            &self.i32_unlabeled, &self._bitfield,
+            &self.item_inner, &self._bitfield,
         ).is_some()
     }
-    pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+    pub fn item_inner_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::mut_field(
-            &mut self.i32_unlabeled, &mut self._bitfield, ::std::default::Default::default,
+            &mut self.item_inner, &mut self._bitfield, ::std::default::Default::default,
         )
     }
-    pub fn clear_i32_unlabeled(&mut self) {
+    pub fn clear_item_inner(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<i32, self::_puroro::tags::Int32> as NonRepeatedFieldType>::clear(
-            &mut self.i32_unlabeled, &mut self._bitfield,
+            &mut self.item_inner, &mut self._bitfield,
         )
     }
 }
@@ -85,7 +85,7 @@ impl self::_puroro::Message for Submsg {
                     i32,
                     self::_puroro::tags::Int32,
                 > as FieldType>::deser_from_iter(
-                    &mut self.i32_unlabeled,
+                    &mut self.item_inner,
                     &mut self._bitfield,
                     field_data,
                 )?,
@@ -108,7 +108,7 @@ impl self::_puroro::Message for Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField<
             i32,
             self::_puroro::tags::Int32,
-        > as FieldType>::ser_to_write(&self.i32_unlabeled, &self._bitfield, 1, out)?;
+        > as FieldType>::ser_to_write(&self.item_inner, &self._bitfield, 1, out)?;
 
         Ok(())
     }
@@ -121,7 +121,7 @@ impl ::std::clone::Clone for Submsg {
         #[allow(unused)]
         use ::std::clone::Clone;
         Self {
-            i32_unlabeled: Clone::clone(&self.i32_unlabeled),
+            item_inner: Clone::clone(&self.item_inner),
 
             _bitfield: Clone::clone(&self._bitfield),
         }
@@ -134,7 +134,7 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct("Submsg")
-            .field("i32_unlabeled", &self.i32_unlabeled())
+            .field("item_inner", &self.item_inner())
             .finish()
     }
 }
@@ -144,7 +144,7 @@ impl ::std::cmp::PartialEq for Submsg {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion;
 
-        true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
+        true && self.item_inner_opt() == rhs.item_inner_opt()
     }
 }
 
@@ -152,5 +152,35 @@ impl ::std::ops::Drop for Submsg {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion;
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Enum {
+    MyValue,
+    _None(i32),
+}
+
+impl ::std::default::Default for Enum {
+    fn default() -> Self {
+        Enum::MyValue
+    }
+}
+
+impl ::std::convert::From<i32> for Enum {
+    fn from(x: i32) -> Self {
+        match x {
+            0 => self::Enum::MyValue,
+            e => self::Enum::_None(e),
+        }
+    }
+}
+
+impl ::std::convert::From<Enum> for i32 {
+    fn from(x: Enum) -> i32 {
+        match x {
+            self::Enum::MyValue => 0,
+            self::Enum::_None(y) => y,
+        }
     }
 }

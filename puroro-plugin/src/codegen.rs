@@ -79,7 +79,8 @@ pub fn generate_output_files_from_file_descriptors<'a>(
             let file_name = &module.rust_file_path;
             // Do render!
             let unformatted_content = module.render().unwrap();
-            let content = format(&unformatted_content)?;
+            let content =
+                format(&unformatted_content).unwrap_or_else(|_| unformatted_content.clone());
 
             let mut output_file = <File as Default>::default();
             *output_file.name_mut() = file_name.into();
