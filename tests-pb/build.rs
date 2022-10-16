@@ -109,7 +109,6 @@ fn build_protobuf_plugin() {
     let fds_file = File::open(&file_descriptor_set_file_path).unwrap();
     let file_descriptor_set = FileDescriptorSet::from_bytes(fds_file.bytes()).unwrap();
 
-    dbg!("Generate!");
     // Generate the code, returned by File proto structs.
     let output_files =
         generate_output_files_from_file_descriptors(file_descriptor_set.file(), &Config::default())
