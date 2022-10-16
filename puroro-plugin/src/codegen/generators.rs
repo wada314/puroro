@@ -46,6 +46,7 @@ impl Module {
         state: &mut State,
     ) -> Result<Self> {
         let package_contents = resolver.package_contents_or_err(p)?;
+        dbg!(&package_contents.subpackages);
         let ident_module = package_contents
             .package_name
             .as_ref()
@@ -74,8 +75,8 @@ impl Module {
             .input_files
             .iter()
             .flat_map(|f| f.messages().iter())
+            .filter(|m| !m.messages().is_empty() || !m.enums().is_empty() || !m.oneofs().is_empty())
             .map(|m| Module::try_from_message(m, resolver, state))
-            .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty() || !m.oneofs.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let mut submodules = submodules_from_packages;
         submodules.append(&mut submodules_from_messages);
@@ -127,8 +128,8 @@ impl Module {
         let submodules = m
             .messages()
             .into_iter()
+            .filter(|m| !m.messages().is_empty() || !m.enums().is_empty() || !m.oneofs().is_empty())
             .map(|d| Module::try_from_message(d, resolver, state))
-            .filter_ok(|m| !m.messages.is_empty() || !m.enums.is_empty() || !m.oneofs.is_empty())
             .collect::<Result<Vec<_>>>()?;
         let messages = m
             .messages()
