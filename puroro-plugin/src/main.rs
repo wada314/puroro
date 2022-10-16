@@ -29,9 +29,9 @@ use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
 fn main() -> Result<()> {
-    let request = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
+    let request = CodeGeneratorRequest::from_bytes_iter(&mut stdin().bytes()).unwrap();
     let config = codegen::Config::default();
     let response = codegen::generate_response_from_request(request, &config)?;
-    response.ser(&mut stdout())?;
+    response.to_bytes(&mut stdout())?;
     Ok(())
 }
