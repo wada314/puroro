@@ -164,6 +164,15 @@ impl NumericalType for SInt64 {
 }
 impl NumericalType for Bool {
     type RustType = bool;
+    fn from_variant(bytes: [u8; 8]) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(bytes) != 0)
+    }
+    fn to_variant(val: Self::RustType) -> Result<[u8; 8]> {
+        Ok(u64::to_le_bytes(val.into()))
+    }
+    fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
+        Ok(NumericalWireType::Variant(u64::to_le_bytes(val.into())))
+    }
 }
 impl<E> NumericalType for Enum2<E>
 where
