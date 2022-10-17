@@ -1,4 +1,7 @@
 
+# v 0.6.0
+- Re-worked the internal dependencies. I messed up a lot so starting a new version number...
+
 # v 0.5.0
 - Restarted again from the scratch.
 - Regression. No message traits and builders anymore.
