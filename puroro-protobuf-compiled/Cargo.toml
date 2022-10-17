@@ -1,6 +1,6 @@
 [package]
 name = "puroro-protobuf-compiled"
-version = "0.5.3"
+version = "0.5.4"
 edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/wada314/puroro"
@@ -12,7 +12,3 @@ description = "A compiled Google Protocol Buffer's interface proto. Normal user 
 puroro = { version = "0.5.1" }
 
 [lib]
-
-[features]
-default = []
-compile_proto = []
