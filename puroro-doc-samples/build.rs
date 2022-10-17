@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use puroro_old::Message;
+use puroro_plugin::puroro::Message;
 use puroro_plugin::{generate_output_files_from_file_descriptors, Config, FileDescriptorSet};
 use std::env;
 use std::fs::File;
