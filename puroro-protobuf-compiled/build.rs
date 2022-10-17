@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use puroro_plugin::{
-    generate_output_files_from_file_descriptors, Config, FileDescriptorSet, Message,
-};
+use puroro::Message;
+use puroro_plugin::{generate_output_files_from_file_descriptors, Config, FileDescriptorSet};
 use std::env;
 use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
@@ -22,6 +21,10 @@ use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
+    if !cfg!(compile_proto) {
+        return;
+    }
+
     println!("cargo:rerun-if-changed=../puroro");
     println!("cargo:rerun-if-changed=../puroro-internal");
     println!("cargo:rerun-if-changed=../puroro-plugin");
