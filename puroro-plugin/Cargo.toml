@@ -11,7 +11,7 @@ documentation = "https://docs.rs/puroro/"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro = { path = "../puroro", version = "0.5.1" }
+puroro = { path = "../puroro", version = "0.5.2" }
 puroro-protobuf-compiled = "0.5.1"
 # Use the same version as the puroro-protobuf-compiled
 puroro_old = { package = "puroro", version = "0.5.1" }
