@@ -15,7 +15,7 @@
 use puroro_plugin::puroro::Message;
 use puroro_plugin::{generate_output_files_from_file_descriptors, Config, FileDescriptorSet};
 use std::env;
-use std::fs::{create_dir_all, remove_dir_all, File};
+use std::fs::{create_dir_all, remove_dir_all, rename, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::Command;
@@ -29,16 +29,15 @@ fn main() {
     let output_rust_path = ["../puroro-protobuf-compiled/src"]
         .iter()
         .collect::<PathBuf>();
+    let temp_output_rust_path = [env::var("OUT_DIR").unwrap(), "tmp-src".to_string()]
+        .iter()
+        .collect::<PathBuf>();
     let file_descriptor_set_file_path = [
         env::var("OUT_DIR").unwrap(),
         "file_descriptor_set.pb".to_string(),
     ]
     .iter()
     .collect::<PathBuf>();
-
-    // Delete the all contents of the output dir.
-    remove_dir_all(&output_rust_path).unwrap();
-    create_dir_all(&output_rust_path).unwrap();
 
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
@@ -66,11 +65,25 @@ fn main() {
     let output_files =
         generate_output_files_from_file_descriptors(file_descriptor_set.file(), &Config::default())
             .unwrap();
-    // Output the File proto structs into the actual filesystem.
+
+    // Delete the all contents of the temp dir, so that we can output into clean dir.
+    if temp_output_rust_path.is_dir() {
+        remove_dir_all(&temp_output_rust_path).unwrap();
+    }
+    create_dir_all(&temp_output_rust_path).unwrap();
+
+    // Output the File proto structs into the temp dir.
     for output_file in output_files {
-        let file_path = output_rust_path.join(output_file.name());
+        let file_path = temp_output_rust_path.join(output_file.name());
         create_dir_all(file_path.parent().unwrap()).unwrap();
         let mut file = File::create(&file_path).unwrap();
         write!(&mut file, "{}", output_file.content()).unwrap();
     }
+
+    // If we survive (not panic!ed) until here, then the temp output dir should be well-formed.
+    // Move it into the actual output directory.
+    if output_rust_path.is_dir() {
+        remove_dir_all(&output_rust_path).unwrap();
+    }
+    rename(&temp_output_rust_path, &output_rust_path).unwrap();
 }
