@@ -21,7 +21,7 @@ mod codegen;
 mod error;
 mod rustfmt;
 
-use ::puroro::Message;
+use ::puroro_old::Message;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorRequest;
 use ::std::io::{stdin, stdout, Read};
 
