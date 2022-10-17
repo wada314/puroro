@@ -79,8 +79,9 @@ your own crate. Congraturations!
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
 - protobuf -- A git submodule of Google's official protobuf repository
-- puroro-protobuf-compiled -- Compiled .rs files in protobuf crate so that puroro-plugin crate can use it
-    - update-plugin-protos.bat -- A batch file to generate the compiled .rs files
+  - When you cloned & checkout the puroro repository, remember to run `git submodule init` and
+   `git submodule update` to download this directory.
+- puroro-protobuf-compiled -- Compiled .rs files from protobuf crate so that puroro-plugin crate can use it
 
 # TODOs
 - proto2
