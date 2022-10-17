@@ -26,13 +26,13 @@ fn main() {
     }
 
     println!("cargo:rerun-if-changed=../puroro");
-    println!("cargo:rerun-if-changed=../puroro-internal");
     println!("cargo:rerun-if-changed=../puroro-plugin");
     println!("cargo:rerun-if-changed=../protobuf");
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=protos/*.proto");
 
-    let output_rust_path = ["src"].iter().collect::<PathBuf>();
+    let output_rust_path = ["../puroro-protobuf-compiled/src"]
+        .iter()
+        .collect::<PathBuf>();
     let file_descriptor_set_file_path = [
         env::var("OUT_DIR").unwrap(),
         "file_descriptor_set.pb".to_string(),

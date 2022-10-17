@@ -13,10 +13,6 @@ puroro = { version = "0.5.1" }
 
 [lib]
 
-[build-dependencies]
-puroro = { version = "0.5.1" }
-puroro-plugin = { version = "0.5.1" }
-
 [features]
 default = []
 compile_proto = []

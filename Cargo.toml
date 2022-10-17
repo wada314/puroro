@@ -3,6 +3,7 @@ members = [
     "puroro",
     "puroro-plugin",
     "puroro-protobuf-compiled",
+    "puroro-protobuf-compiler",
     "puroro-doc-samples",
     "tests",
     "tests-pb",
