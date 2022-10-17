@@ -41,7 +41,7 @@ pub enum ErrorKind {
     #[error(r#"Bad format string: "{string}""#)]
     InvalidString { string: String },
     #[error(r#"An error from puroro: "{source}""#)]
-    PuroroError { source: ::puroro_old::PuroroError },
+    PuroroError { source: crate::puroro::PuroroError },
     #[error(r#"Expected the field descriptor's type_name field is filled, but is not"#)]
     MissingTypeName,
     #[error(r#"Utf8 error."#)]
@@ -67,8 +67,8 @@ impl From<::std::io::Error> for GeneratorError {
         }
     }
 }
-impl From<::puroro_old::PuroroError> for GeneratorError {
-    fn from(e: ::puroro_old::PuroroError) -> Self {
+impl From<crate::puroro::PuroroError> for GeneratorError {
+    fn from(e: crate::puroro::PuroroError) -> Self {
         Self {
             kind: ErrorKind::PuroroError { source: e },
             backtrace: std::backtrace::Backtrace::capture(),
