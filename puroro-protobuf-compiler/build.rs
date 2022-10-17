@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use puroro::Message;
-use puroro_plugin::{generate_output_files_from_file_descriptors, Config, FileDescriptorSet};
+use puroro_plugin::{
+    generate_output_files_from_file_descriptors, Config, FileDescriptorSet, Message,
+};
 use std::env;
-use std::fs::{create_dir_all, File};
+use std::fs::{create_dir_all, remove_dir_all, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
-    if !cfg!(compile_proto) {
-        return;
-    }
-
     println!("cargo:rerun-if-changed=../puroro");
     println!("cargo:rerun-if-changed=../puroro-plugin");
     println!("cargo:rerun-if-changed=../protobuf");
@@ -39,6 +36,10 @@ fn main() {
     ]
     .iter()
     .collect::<PathBuf>();
+
+    // Delete the all contents of the output dir.
+    remove_dir_all(&output_rust_path).unwrap();
+    create_dir_all(&output_rust_path).unwrap();
 
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());

@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 
 [build-dependencies]
-puroro = { version = "0.5.1" }
-puroro-plugin = { version = "0.5.1" }
+puroro = { path = "../puroro" }
+puroro-plugin = { path = "../puroro-plugin" }
