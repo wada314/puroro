@@ -22,8 +22,6 @@ use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
-    build_protobuf_plugin();
-
     println!("cargo:rerun-if-changed=../puroro");
     println!("cargo:rerun-if-changed=../puroro-internal");
     println!("cargo:rerun-if-changed=../puroro-plugin");
@@ -45,6 +43,7 @@ fn main() {
         .arg("protos/*.proto")
         .arg(format!("--proto_path={}", "./protos/"))
         .arg("--experimental_allow_proto3_optional")
+        .arg("--include_imports")
         .arg(format!(
             "--descriptor_set_out={}",
             file_descriptor_set_file_path.to_string_lossy()
@@ -64,57 +63,6 @@ fn main() {
     let output_files =
         generate_output_files_from_file_descriptors(file_descriptor_set.file(), &Config::default())
             .unwrap();
-    // Output the File proto structs into the actual filesystem.
-    for output_file in output_files {
-        let file_path = output_rust_path.join(output_file.name());
-        create_dir_all(file_path.parent().unwrap()).unwrap();
-        let mut file = File::create(&file_path).unwrap();
-        write!(&mut file, "{}", output_file.content()).unwrap();
-    }
-}
-
-fn build_protobuf_plugin() {
-    println!("cargo:rerun-if-changed=../puroro");
-    println!("cargo:rerun-if-changed=../puroro-internal");
-    println!("cargo:rerun-if-changed=../puroro-plugin");
-    println!("cargo:rerun-if-changed=../purotobuf");
-    println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=protos/*.proto");
-
-    let output_rust_path = ["src-protobuf"].iter().collect::<PathBuf>();
-    let file_descriptor_set_file_path = [
-        env::var("OUT_DIR").unwrap(),
-        "file_descriptor_set.pb".to_string(),
-    ]
-    .iter()
-    .collect::<PathBuf>();
-
-    // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
-    let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
-    let protoc_status = Command::new(&protoc_exe)
-        .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
-        .arg(format!("--proto_path={}", "../protobuf/src/"))
-        .arg("--experimental_allow_proto3_optional")
-        .arg(format!(
-            "--descriptor_set_out={}",
-            file_descriptor_set_file_path.to_string_lossy()
-        ))
-        .status()
-        .unwrap();
-    if !protoc_status.success() {
-        println!("cargo:warning=Failed to run `protoc` command.");
-        panic!("Failed to run `protoc` command.")
-    }
-
-    // Decode the FileDescriptorSet output by the above code.
-    let fds_file = File::open(&file_descriptor_set_file_path).unwrap();
-    let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
-
-    // Generate the code, returned by File proto structs.
-    let output_files =
-        generate_output_files_from_file_descriptors(file_descriptor_set.file(), &Config::default())
-            .unwrap();
-
     // Output the File proto structs into the actual filesystem.
     for output_file in output_files {
         let file_path = output_rust_path.join(output_file.name());

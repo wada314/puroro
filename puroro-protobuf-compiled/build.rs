@@ -42,6 +42,7 @@ fn main() {
     let protoc_status = Command::new(&protoc_exe)
         .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
         .arg(format!("--proto_path={}", "../protobuf/src/"))
+        .arg("--include_imports")
         .arg("--experimental_allow_proto3_optional")
         .arg(format!(
             "--descriptor_set_out={}",
