@@ -25,7 +25,7 @@ fn main() {
     println!("cargo:rerun-if-changed=../puroro");
     println!("cargo:rerun-if-changed=../puroro-internal");
     println!("cargo:rerun-if-changed=../puroro-plugin");
-    println!("cargo:rerun-if-changed=../purotobuf");
+    println!("cargo:rerun-if-changed=../protobuf");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=protos/*.proto");
 
@@ -40,10 +40,10 @@ fn main() {
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
     let protoc_status = Command::new(&protoc_exe)
-        .arg("protos/*.proto")
-        .arg(format!("--proto_path={}", "./protos/"))
-        .arg("--experimental_allow_proto3_optional")
+        .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
+        .arg(format!("--proto_path={}", "../protobuf/src/"))
         .arg("--include_imports")
+        .arg("--experimental_allow_proto3_optional")
         .arg(format!(
             "--descriptor_set_out={}",
             file_descriptor_set_file_path.to_string_lossy()

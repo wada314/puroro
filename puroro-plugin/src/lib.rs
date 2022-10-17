@@ -25,6 +25,7 @@ use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
 pub use crate::codegen::Config;
+pub use ::puroro_old::Message;
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 pub use ::puroro_protobuf_compiled::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
 

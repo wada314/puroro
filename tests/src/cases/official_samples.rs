@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// The sample cases documented in the Protobuf official encoding document:
-/// https://developers.google.com/protocol-buffers/docs/encoding
-use ::puroro::Message;
 use ::std::borrow::Cow;
 use ::std::default::Default;
 use ::tests_pb::official_samples2 as s2;
 use ::tests_pb::official_samples3 as s3;
+/// The sample cases documented in the Protobuf official encoding document:
+/// https://developers.google.com/protocol-buffers/docs/encoding
+use ::tests_pb::Message;
 
 const TEST1_INPUT: &[u8] = &[0x08, 0x96, 0x01];
 const TEST2_INPUT: &[u8] = &[0x12, 0x07, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67];
