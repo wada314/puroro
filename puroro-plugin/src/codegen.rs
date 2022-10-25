@@ -14,6 +14,7 @@
 
 pub mod descriptor_resolver;
 pub mod generators;
+pub mod generators2;
 pub mod restructure;
 pub mod utils;
 
