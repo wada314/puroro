@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use puroro_plugin::puroro::Message;
-use puroro_plugin::{generate_output_files_from_file_descriptors, Config, FileDescriptorSet};
+use puroro_plugin::{generate_output_files_from_file_descriptors2, FileDescriptorSet};
 use std::env;
 use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
@@ -60,8 +60,7 @@ fn main() {
 
     // Generate the code, returned by File proto structs.
     let output_files =
-        generate_output_files_from_file_descriptors(file_descriptor_set.file(), &Config::default())
-            .unwrap();
+        generate_output_files_from_file_descriptors2(file_descriptor_set.file()).unwrap();
     // Output the File proto structs into the actual filesystem.
     for output_file in output_files {
         let file_path = output_rust_path.join(output_file.name());

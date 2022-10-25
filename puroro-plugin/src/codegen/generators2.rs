@@ -12,22 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::codegen::utils::StrExt;
 use crate::Result;
+use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
-use ::quote::quote;
+use ::quote::{format_ident, quote};
 use ::syn;
 
-use super::{descriptor_resolver::DescriptorResolver, utils::Package};
+use crate::codegen::descriptor_resolver::{DescriptorResolver, PackageContents};
+use crate::codegen::restructure::Message;
 
-pub struct ModuleGen {}
+pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<TokenStream> {
+    let messages = pc
+        .input_files
+        .iter()
+        .flat_map(|f| f.messages().into_iter())
+        .collect_vec();
 
-impl ModuleGen {
-    pub fn try_from_package<'a, S: AsRef<str>>(
-        p: Package<S>,
-        resolver: &'a DescriptorResolver,
-    ) -> Result<TokenStream> {
-        Ok(quote! {
-            mod foo {}
+    let structs = messages
+        .iter()
+        .map(|m| gen_struct_from_message(m))
+        .collect::<Result<Vec<_>>>()?;
+
+    let submodules = pc
+        .subpackages
+        .iter()
+        .map(|sp| {
+            let ident = format_ident!("{}", sp.to_lower_snake_case().escape_rust_keywords());
+            quote! {
+                pub mod #ident;
+            }
         })
-    }
+        .collect_vec();
+
+    Ok(quote! {
+        #(#submodules)*
+        #(#structs)*
+    })
+}
+
+pub fn gen_struct_from_message(m: &Message) -> Result<TokenStream> {
+    let ident = format_ident!("{}", m.name().to_upper_snake_case().escape_rust_keywords());
+    Ok(quote! {
+        pub struct #ident {
+            fields: (),
+        }
+    })
 }

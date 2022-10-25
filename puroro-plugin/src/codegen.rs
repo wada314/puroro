@@ -32,6 +32,9 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::{
 };
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
+use ::prettyplease;
+use ::syn;
+
 #[derive(Default)]
 pub struct Config {
     pub single_output_file: bool,
@@ -106,4 +109,26 @@ fn get_root_module<'a>(files: impl IntoIterator<Item = &'a FileDescriptorProto>)
         &resolver,
         &mut state,
     )?)
+}
+
+pub fn generate_output_files_from_file_descriptors2<'a>(
+    files: impl IntoIterator<Item = &'a FileDescriptorProto>,
+) -> Result<impl IntoIterator<Item = File>> {
+    let input_files = files
+        .into_iter()
+        .map(|f| crate::codegen::restructure::File::new(f))
+        .collect::<Vec<_>>();
+    let resolver = DescriptorResolver::new(&input_files)?;
+    let root_pc = resolver.package_contents_or_err(&Package::new(""))?;
+
+    let ts = generators2::gen_module_from_package(&root_pc)?;
+
+    let syn_file = syn::parse2::<syn::File>(ts).unwrap();
+    let formatted = prettyplease::unparse(&syn_file);
+
+    let mut output_file = File::default();
+    *output_file.name_mut() = "lib.rs".to_string();
+    *output_file.content_mut() = formatted;
+
+    Ok(vec![output_file])
 }
