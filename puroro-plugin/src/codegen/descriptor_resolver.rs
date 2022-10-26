@@ -18,7 +18,6 @@ use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::collections::{HashMap, HashSet};
 use ::std::fmt::Debug;
-use ::std::iter;
 
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {

@@ -18,6 +18,7 @@
 #![feature(is_some_with)]
 
 mod codegen;
+mod codegen2;
 mod error;
 mod rustfmt;
 
