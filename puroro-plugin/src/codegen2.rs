@@ -12,35 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[derive(Debug)]
-struct Context<'a> {
-    packages: Vec<&'a Package>,
-    files: Vec<&'a File>,
-    messages: Vec<&'a Message>,
+mod package;
+use ::std::rc::Rc;
+use package::Package;
+
+#[derive(Debug, Default)]
+struct Context {
+    packages: Vec<Rc<Package>>,
+    files: Vec<Rc<File>>,
+    messages: Vec<Rc<Message>>,
 }
-impl<'a> Context<'a> {
-    fn packages(&self) -> &[&'a Package] {
+impl Context {
+    fn packages(&self) -> &[Rc<Package>] {
         &self.packages
     }
-    fn files(&self) -> &[&'a File] {
+    fn files(&self) -> &[Rc<File>] {
         &self.files
     }
-    fn messages(&self) -> &[&'a Message] {
+    fn messages(&self) -> &[Rc<Message>] {
         &&self.messages
     }
-    fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: &'a Package, f: F) -> R {
+    fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: Rc<Package>, f: F) -> R {
         self.packages.push(package);
         let r = f(self);
         self.packages.pop();
         r
     }
-    fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: &'a File, f: F) -> R {
+    fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: Rc<File>, f: F) -> R {
         self.files.push(file);
         let r = f(self);
         self.files.pop();
         r
     }
-    fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: &'a Message, f: F) -> R {
+    fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: Rc<Message>, f: F) -> R {
         self.messages.push(message);
         let r = f(self);
         self.messages.pop();
@@ -49,10 +53,10 @@ impl<'a> Context<'a> {
 }
 
 #[derive(Debug)]
-pub struct Package {}
-
-#[derive(Debug)]
 pub struct File {}
 
 #[derive(Debug)]
 pub struct Message {}
+
+#[derive(Debug)]
+pub struct Enum {}
