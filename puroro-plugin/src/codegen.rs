@@ -20,7 +20,7 @@ pub mod utils;
 
 use crate::codegen::descriptor_resolver::DescriptorResolver;
 use crate::codegen::generators::{Module, State};
-use crate::codegen::utils::Package;
+use crate::codegen::utils::PackageName;
 use crate::rustfmt::format;
 use crate::Result;
 use ::askama::Template as _;
@@ -104,7 +104,7 @@ fn get_root_module<'a>(files: impl IntoIterator<Item = &'a FileDescriptorProto>)
 
     let mut state = State::default();
     Ok(Module::try_from_package(
-        &Package::new(""),
+        &PackageName::new(""),
         &resolver,
         &mut state,
     )?)
@@ -118,7 +118,7 @@ pub fn generate_output_files_from_file_descriptors2<'a>(
         .map(|f| crate::codegen::restructure::File::new(f))
         .collect::<Vec<_>>();
     let resolver = DescriptorResolver::new(&input_files)?;
-    let root_pc = resolver.package_contents_or_err(&Package::new(""))?;
+    let root_pc = resolver.package_contents_or_err(&PackageName::new(""))?;
 
     let packages = {
         let mut packages = Vec::new();
@@ -133,7 +133,7 @@ pub fn generate_output_files_from_file_descriptors2<'a>(
                     } else {
                         format!("{}.{}", pc.full_package, sub)
                     };
-                    resolver.package_contents_or_err(&Package::new(new_package_name))
+                    resolver.package_contents_or_err(&PackageName::new(new_package_name))
                 })
                 .collect::<Result<Vec<_>>>()?;
             remaining.append(&mut subpackages);

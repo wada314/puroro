@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::restructure::{Enum, File, Message, MessageOrEnumRef};
-use super::utils::{Fqtn, Package};
+use super::utils::{Fqtn, PackageName};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::collections::{HashMap, HashSet};
@@ -23,7 +23,7 @@ use ::std::iter;
 #[derive(Debug)]
 pub struct DescriptorResolver<'a> {
     fqtn_to_desc_map: HashMap<Fqtn, MessageOrEnumRef<'a>>,
-    package_contents: HashMap<Package<String>, PackageContents<'a>>,
+    package_contents: HashMap<PackageName<String>, PackageContents<'a>>,
 }
 impl<'a> DescriptorResolver<'a> {
     pub fn new<I>(input_files: I) -> Result<Self>
@@ -120,14 +120,14 @@ impl<'a> DescriptorResolver<'a> {
 
     pub fn package_contents<S: AsRef<str>>(
         &self,
-        package: &Package<S>,
+        package: &PackageName<S>,
     ) -> Option<&PackageContents<'a>> {
         self.package_contents.get::<str>(package.as_str())
     }
 
     pub fn package_contents_or_err<S: AsRef<str>>(
         &self,
-        package: &Package<S>,
+        package: &PackageName<S>,
     ) -> Result<&PackageContents<'a>> {
         Ok(self
             .package_contents(package)
@@ -145,7 +145,7 @@ impl<'a> DescriptorResolver<'a> {
 #[derive(Debug, Default)]
 pub struct PackageContents<'a> {
     pub package_name: Option<String>,
-    pub full_package: Package<String>,
+    pub full_package: PackageName<String>,
     pub subpackages: HashSet<String>,
     pub input_files: Vec<File<'a>>,
 }

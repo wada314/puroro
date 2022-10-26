@@ -16,7 +16,7 @@
 //! e.g. Pointer to its parent and ancestors,
 //! some utility functions that enumerates all indirect child messages / enums.
 
-use super::utils::{Fqtn, Package};
+use super::utils::{Fqtn, PackageName};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -99,8 +99,8 @@ impl<'a> File<'a> {
             })?,
         })
     }
-    pub fn package(&'a self) -> Package<&'a str> {
-        Package::new(self.proto().package())
+    pub fn package(&'a self) -> PackageName<&'a str> {
+        PackageName::new(self.proto().package())
     }
 }
 impl Deref for File<'_> {

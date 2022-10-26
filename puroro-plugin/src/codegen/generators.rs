@@ -18,7 +18,7 @@ pub use self::state::State;
 use super::descriptor_resolver::DescriptorResolver;
 use super::restructure as re;
 pub use super::restructure::Syntax;
-use super::utils::{Fqtn, Package, StrExt as _};
+use super::utils::{Fqtn, PackageName, StrExt as _};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -41,7 +41,7 @@ pub struct Module {
 }
 impl Module {
     pub fn try_from_package<'a, S: AsRef<str>>(
-        p: &Package<S>,
+        p: &PackageName<S>,
         resolver: &'a DescriptorResolver<'a>,
         state: &mut State,
     ) -> Result<Self> {
@@ -63,7 +63,7 @@ impl Module {
                 } else {
                     format!("{}.{}", full_path.as_str(), sp)
                 };
-                resolver.package_contents_or_err(&Package::new(new_package))
+                resolver.package_contents_or_err(&PackageName::new(new_package))
             })
             .collect::<Result<Vec<_>>>()?;
         let submodules_from_packages = subpackages

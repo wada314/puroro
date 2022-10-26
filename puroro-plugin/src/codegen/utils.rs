@@ -217,16 +217,16 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub struct Package<S>(S);
+pub struct PackageName<S>(S);
 
-impl<S> Package<S> {
+impl<S> PackageName<S> {
     pub fn new(package_str: S) -> Self {
         Self(package_str)
     }
 }
 
-impl<S: AsRef<str>> Package<S> {
-    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (Package<&str>, &str)> {
+impl<S: AsRef<str>> PackageName<S> {
+    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (PackageName<&str>, &str)> {
         self.0.as_ref().split('.').scan(0, |path_end, package| {
             let path = &self.0.as_ref()[0..*path_end];
 
@@ -235,7 +235,7 @@ impl<S: AsRef<str>> Package<S> {
             }
             *path_end += package.len();
 
-            Some((Package::new(path), package))
+            Some((PackageName::new(path), package))
         })
     }
 
@@ -252,8 +252,8 @@ impl<S: AsRef<str>> Package<S> {
         self.0.as_ref()
     }
 
-    pub fn to_owned(&self) -> Package<String> {
-        Package::new(self.0.as_ref().to_string())
+    pub fn to_owned(&self) -> PackageName<String> {
+        PackageName::new(self.0.as_ref().to_string())
     }
 
     pub fn as_str(&self) -> &str {
@@ -261,31 +261,31 @@ impl<S: AsRef<str>> Package<S> {
     }
 }
 
-impl<S: Borrow<str>> Borrow<str> for Package<S> {
+impl<S: Borrow<str>> Borrow<str> for PackageName<S> {
     fn borrow(&self) -> &str {
         self.0.borrow()
     }
 }
 
-impl<S: AsRef<str>> Display for Package<S> {
+impl<S: AsRef<str>> Display for PackageName<S> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.write_str(self.0.as_ref())
     }
 }
 
-impl<S, T> ::std::ops::Add<T> for &Package<S>
+impl<S, T> ::std::ops::Add<T> for &PackageName<S>
 where
     S: AsRef<str>,
     T: AsRef<str>,
 {
-    type Output = Package<String>;
+    type Output = PackageName<String>;
     fn add(self, rhs: T) -> Self::Output {
         let mut new_string = self.0.as_ref().to_string();
         if !new_string.is_empty() {
             new_string.push('.');
         }
         new_string.push_str(rhs.as_ref());
-        Package::new(new_string)
+        PackageName::new(new_string)
     }
 }
 
@@ -356,7 +356,7 @@ impl Display for Fqtn {
 
 #[cfg(test)]
 mod test {
-    use super::{Package, StrExt, WordCase};
+    use super::{PackageName, StrExt, WordCase};
 
     #[test]
     fn test_case_check() {
@@ -409,11 +409,11 @@ mod test {
 
     #[test]
     fn test_subpackages() {
-        let package = Package::new("foo.bar.baz");
+        let package = PackageName::new("foo.bar.baz");
         let mut iter = package.packages_and_subpackages();
-        assert_eq!(Some((Package::new(""), "foo")), iter.next());
-        assert_eq!(Some((Package::new("foo"), "bar")), iter.next());
-        assert_eq!(Some((Package::new("foo.bar"), "baz")), iter.next());
+        assert_eq!(Some((PackageName::new(""), "foo")), iter.next());
+        assert_eq!(Some((PackageName::new("foo"), "bar")), iter.next());
+        assert_eq!(Some((PackageName::new("foo.bar"), "baz")), iter.next());
         assert_eq!(None, iter.next());
     }
 }
