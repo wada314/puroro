@@ -95,7 +95,7 @@ pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<(Strin
 }
 
 pub fn gen_struct_from_message(m: &Message) -> Result<TokenStream> {
-    let ident = format_ident!("{}", m.name().to_upper_snake_case().escape_rust_keywords());
+    let ident = format_ident!("{}", m.name().to_camel_case().escape_rust_keywords());
     Ok(quote! {
         pub struct #ident {
             fields: (),

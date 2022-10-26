@@ -24,6 +24,7 @@ use crate::codegen::utils::Package;
 use crate::rustfmt::format;
 use crate::Result;
 use ::askama::Template as _;
+use ::prettyplease;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::{
     Feature, File,
 };
@@ -31,9 +32,10 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-
-use ::prettyplease;
+use ::std::collections::HashSet;
 use ::syn;
+
+use self::utils::StrExt;
 
 #[derive(Default)]
 pub struct Config {
@@ -121,14 +123,42 @@ pub fn generate_output_files_from_file_descriptors2<'a>(
     let resolver = DescriptorResolver::new(&input_files)?;
     let root_pc = resolver.package_contents_or_err(&Package::new(""))?;
 
-    let (file_name, ts) = generators2::gen_module_from_package(&root_pc)?;
+    let packages = {
+        let mut packages = Vec::new();
+        let mut remaining = vec![root_pc];
+        while let Some(pc) = remaining.pop() {
+            let mut subpackages = pc
+                .subpackages
+                .iter()
+                .map(|sub| {
+                    let new_package_name = if pc.full_package.as_str().is_empty() {
+                        sub.clone()
+                    } else {
+                        format!("{}.{}", pc.full_package, sub)
+                    };
+                    resolver.package_contents_or_err(&Package::new(new_package_name))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            remaining.append(&mut subpackages);
+            packages.push(pc);
+        }
+        packages
+    };
 
-    let syn_file = syn::parse2::<syn::File>(ts).unwrap();
-    let formatted = prettyplease::unparse(&syn_file);
+    let output_files = packages
+        .into_iter()
+        .map(|pc| {
+            let (file_name, ts) = generators2::gen_module_from_package(pc)?;
 
-    let mut output_file = File::default();
-    *output_file.name_mut() = file_name;
-    *output_file.content_mut() = formatted;
+            let syn_file = syn::parse2::<syn::File>(ts).unwrap();
+            let formatted = prettyplease::unparse(&syn_file);
 
-    Ok(vec![output_file])
+            let mut output_file = File::default();
+            *output_file.name_mut() = file_name;
+            *output_file.content_mut() = formatted;
+            Ok(output_file)
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(output_files)
 }
