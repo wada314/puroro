@@ -18,8 +18,8 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 #[derive(Debug)]
 pub struct Package {
     name: Option<String>,
-    subpackages: Vec<Rc<Package>>,
-    files: Vec<Rc<File>>,
+    subpackages: Vec<Package>,
+    files: Vec<File>,
 }
 
 impl Package {
@@ -29,6 +29,7 @@ impl Package {
             subpackages: Vec::new(),
             files: Vec::new(),
         });
+        let mut context = Context::default();
 
         root
     }

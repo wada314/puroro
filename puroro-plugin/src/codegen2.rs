@@ -17,34 +17,34 @@ use ::std::rc::Rc;
 use package::Package;
 
 #[derive(Debug, Default)]
-struct Context {
-    packages: Vec<Rc<Package>>,
-    files: Vec<Rc<File>>,
-    messages: Vec<Rc<Message>>,
+struct Context<'a> {
+    packages: Vec<&'a Package>,
+    files: Vec<&'a File>,
+    messages: Vec<&'a Message>,
 }
-impl Context {
-    fn packages(&self) -> &[Rc<Package>] {
+impl<'a> Context<'a> {
+    fn packages(&self) -> &[&'a Package] {
         &self.packages
     }
-    fn files(&self) -> &[Rc<File>] {
+    fn files(&self) -> &[&'a File] {
         &self.files
     }
-    fn messages(&self) -> &[Rc<Message>] {
+    fn messages(&self) -> &[&'a Message] {
         &&self.messages
     }
-    fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: Rc<Package>, f: F) -> R {
+    fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: &'a Package, f: F) -> R {
         self.packages.push(package);
         let r = f(self);
         self.packages.pop();
         r
     }
-    fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: Rc<File>, f: F) -> R {
+    fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: &'a File, f: F) -> R {
         self.files.push(file);
         let r = f(self);
         self.files.pop();
         r
     }
-    fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: Rc<Message>, f: F) -> R {
+    fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: &'a Message, f: F) -> R {
         self.messages.push(message);
         let r = f(self);
         self.messages.pop();
