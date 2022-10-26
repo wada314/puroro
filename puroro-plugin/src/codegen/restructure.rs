@@ -27,7 +27,6 @@ use ::std::ops::Deref;
 
 #[derive(Debug, Clone)]
 pub struct Package<'a> {
-    parent: Option<&'a Package<'a>>,
     name: Option<String>,
     subpackages: Vec<Package<'a>>,
     files: Vec<File<'a>>,
@@ -37,7 +36,6 @@ impl<'a> Package<'a> {
     pub fn new(file_proto: &'a FileDescriptorProto) -> Self {
         if file_proto.package().is_empty() {
             Package {
-                parent: None,
                 name: None,
                 subpackages: Vec::new(),
                 files: vec![File::new(file_proto)],
@@ -45,7 +43,6 @@ impl<'a> Package<'a> {
         } else {
             let package_nodes = file_proto.package().split('.');
             let root_package = Package {
-                parent: None,
                 name: None,
                 subpackages: Vec::new(),
                 files: Vec::new(),
