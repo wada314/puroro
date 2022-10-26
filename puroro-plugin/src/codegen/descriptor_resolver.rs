@@ -15,6 +15,7 @@
 use super::restructure::{Enum, File, Message, MessageOrEnumRef};
 use super::utils::{Fqtn, Package};
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::std::collections::{HashMap, HashSet};
 use ::std::fmt::Debug;
 use ::std::iter;
@@ -35,12 +36,15 @@ impl<'a> DescriptorResolver<'a> {
             Self::generate_fqtn_to_desc_map(&mut fqtn_to_desc_map, f);
             package_contents_vec.extend(Self::generate_package_contents(f));
         }
-        package_contents_vec.sort_unstable_by_key(|p| p.full_package.as_str());
-        package_contents_vec.dedup_by_key(|p| p.full_package.as_str());
-        let package_contents = package_contents_vec
-            .into_iter()
-            .map(|p| (p.full_package.clone(), p))
-            .collect::<HashMap<_, _>>();
+        let mut package_contents = HashMap::<_, PackageContents>::new();
+        for pc in package_contents_vec {
+            if let Some(existing_pc) = package_contents.get_mut(&pc.full_package) {
+                existing_pc.merge(pc)?;
+            } else {
+                package_contents.insert(pc.full_package.clone(), pc);
+            }
+        }
+
         Ok(Self {
             fqtn_to_desc_map,
             package_contents,
@@ -61,17 +65,18 @@ impl<'a> DescriptorResolver<'a> {
 
     fn generate_package_contents(
         file: &'a File<'a>,
-    ) -> impl 'a + Iterator<Item = PackageContents<'a>> {
+    ) -> impl 'a + IntoIterator<Item = PackageContents<'a>> {
         // package_contents for parent packages
-        let branches =
-            file.package()
-                .packages_and_subpackages()
-                .map(|(cur_package, subpackage)| PackageContents {
-                    package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
-                    full_package: cur_package.to_owned(),
-                    subpackages: HashSet::from_iter([subpackage.to_string()].into_iter()),
-                    input_files: Vec::new(),
-                });
+        let mut branches = file
+            .package()
+            .packages_and_subpackages()
+            .map(|(cur_package, subpackage)| PackageContents {
+                package_name: cur_package.leaf_package_name().map(|s| s.to_string()),
+                full_package: cur_package.to_owned(),
+                subpackages: HashSet::from_iter([subpackage.to_string()].into_iter()),
+                input_files: Vec::new(),
+            })
+            .collect_vec();
 
         // package_contents for the leaf package
         let term_item = PackageContents {
@@ -81,7 +86,8 @@ impl<'a> DescriptorResolver<'a> {
             subpackages: HashSet::new(),
         };
 
-        branches.chain(iter::once(term_item))
+        branches.push(term_item);
+        branches
     }
 
     pub fn fqtn_to_desc(&self, fqtn: &Fqtn) -> Option<MessageOrEnumRef<'a>> {
