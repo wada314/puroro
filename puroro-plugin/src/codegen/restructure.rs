@@ -73,6 +73,7 @@ impl<'a> File<'a> {
     pub fn proto(&'a self) -> &FileDescriptorProto {
         &self.proto
     }
+    // TODO: Need to make self Pinned because it's constructing a self-referetial struct!
     pub fn messages(&'a self) -> &[Message<'_>] {
         self.messages.get_or_init(|| {
             self.proto()
