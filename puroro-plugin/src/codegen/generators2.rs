@@ -17,12 +17,11 @@ use crate::Result;
 use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
-use ::syn;
 
-use crate::codegen::descriptor_resolver::{DescriptorResolver, PackageContents};
+use crate::codegen::descriptor_resolver::PackageContents;
 use crate::codegen::restructure::Message;
 
-pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<TokenStream> {
+pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<(String, TokenStream)> {
     let messages = pc
         .input_files
         .iter()
@@ -40,15 +39,59 @@ pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<TokenS
         .map(|sp| {
             let ident = format_ident!("{}", sp.to_lower_snake_case().escape_rust_keywords());
             quote! {
-                pub mod #ident;
+                // pub mod #ident;
             }
         })
         .collect_vec();
 
-    Ok(quote! {
+    let module_header = if let Some(package_name) = &pc.package_name {
+        let comment = format!("Generated from package \"{}\"", package_name);
+        quote! {
+            #![doc = #comment]
+            pub mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+        }
+    } else {
+        quote! {
+            //! "Generated from root package"
+            #![feature(generic_associated_types)]
+            /// re-export puroro.
+            pub use ::puroro;
+            /// re-export the primitive types in puroro namespace.
+            /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
+            pub use ::puroro::*;
+            pub mod _puroro_root {
+                pub use super::*;
+            }
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+        }
+    };
+
+    let rust_file_path = if pc.package_name.is_none() {
+        "lib.rs".to_string()
+    } else {
+        pc.full_package
+            .full_package_path()
+            .split('.')
+            .map(|s| s.to_lower_snake_case().into_owned())
+            .join("/")
+            + ".rs"
+    };
+
+    let output_tokens = quote! {
+        #module_header
+
         #(#submodules)*
         #(#structs)*
-    })
+    };
+
+    Ok((rust_file_path, output_tokens))
 }
 
 pub fn gen_struct_from_message(m: &Message) -> Result<TokenStream> {
