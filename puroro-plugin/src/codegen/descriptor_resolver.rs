@@ -137,3 +137,16 @@ pub struct PackageContents<'a> {
     pub subpackages: HashSet<String>,
     pub input_files: Vec<File<'a>>,
 }
+
+impl PackageContents<'_> {
+    fn merge(&mut self, mut rhs: Self) -> Result<()> {
+        if self.package_name != rhs.package_name || self.full_package != rhs.full_package {
+            Err(ErrorKind::InternalError {
+                detail: "Tried to merge different name PackageContents".to_string(),
+            })?
+        }
+        self.subpackages.extend(rhs.subpackages.drain());
+        self.input_files.append(&mut rhs.input_files);
+        Ok(())
+    }
+}
