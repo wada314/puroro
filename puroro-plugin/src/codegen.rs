@@ -32,10 +32,7 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-use ::std::collections::HashSet;
 use ::syn;
-
-use self::utils::StrExt;
 
 #[derive(Default)]
 pub struct Config {
