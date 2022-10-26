@@ -23,12 +23,12 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(iter: I) -> Self {
-        let mut root = Package {
+    pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(iter: I) -> Rc<Self> {
+        let mut root = Rc::new(Package {
             name: None,
             subpackages: Vec::new(),
             files: Vec::new(),
-        };
+        });
 
         root
     }
