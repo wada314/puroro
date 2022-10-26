@@ -6,5 +6,15 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    fields: (),
+    i32_optional: (),
+    i32_repeated: (),
+    float_optional: (),
+    float_repeated: (),
+    string_optional: (),
+    string_repeated: (),
+    submsg_optional: (),
+    submsg_repeated: (),
+    enum_optional: (),
+    enum_repeated: (),
+    very_large_field_number: (),
 }

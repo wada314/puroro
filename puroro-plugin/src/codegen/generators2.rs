@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::codegen::descriptor_resolver::PackageContents;
+use crate::codegen::restructure::Message;
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
-
-use crate::codegen::descriptor_resolver::PackageContents;
-use crate::codegen::restructure::Message;
 
 pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<(String, TokenStream)> {
     let messages = pc
@@ -94,11 +93,24 @@ pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<(Strin
     Ok((rust_file_path, output_tokens))
 }
 
-pub fn gen_struct_from_message(m: &Message) -> Result<TokenStream> {
+pub fn gen_struct_from_message<'a>(m: &'a Message<'a>) -> Result<TokenStream> {
     let ident = format_ident!("{}", m.name().to_camel_case().escape_rust_keywords());
+
+    let struct_fields = m
+        .fields()
+        .iter()
+        .map(|f| {
+            let ident_struct_field =
+                format_ident!("{}", f.name().to_lower_snake_case().escape_rust_keywords());
+            Ok(quote! {
+                #ident_struct_field: (),
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+
     Ok(quote! {
         pub struct #ident {
-            fields: (),
+            #(#struct_fields)*
         }
     })
 }

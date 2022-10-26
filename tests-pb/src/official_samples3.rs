@@ -6,14 +6,14 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Test1 {
-    fields: (),
+    a: (),
 }
 pub struct Test2 {
-    fields: (),
+    b: (),
 }
 pub struct Test3 {
-    fields: (),
+    c: (),
 }
 pub struct Test4 {
-    fields: (),
+    d: (),
 }

@@ -6,5 +6,5 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    fields: (),
+    recursive_unlabeled: (),
 }

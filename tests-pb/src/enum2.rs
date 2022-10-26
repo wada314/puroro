@@ -6,5 +6,6 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    fields: (),
+    enum_optional: (),
+    enum_repeated: (),
 }

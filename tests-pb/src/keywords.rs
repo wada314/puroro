@@ -6,8 +6,8 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    fields: (),
+    r#type: (),
 }
 pub struct _Self {
-    fields: (),
+    r#type: (),
 }

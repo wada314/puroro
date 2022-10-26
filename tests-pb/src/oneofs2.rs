@@ -5,9 +5,7 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-pub struct Msg {
-    fields: (),
-}
+pub struct Msg {}
 pub struct Submsg {
-    fields: (),
+    i32_optional: (),
 }
