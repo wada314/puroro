@@ -12,59 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[derive(Debug, Clone)]
-enum ContextItem<'a> {
-    Package(&'a Package),
-    File(&'a File),
-    Message(&'a Message),
-}
+#[derive(Debug)]
 struct Context<'a> {
-    items: Vec<ContextItem<'a>>,
+    packages: Vec<&'a Package>,
+    files: Vec<&'a File>,
+    messages: Vec<&'a Message>,
 }
 impl<'a> Context<'a> {
-    fn packages(&self) -> impl '_ + Iterator<Item = &'a Package> {
-        self.items.iter().cloned().filter_map(|ci| {
-            if let ContextItem::Package(p) = ci {
-                Some(p)
-            } else {
-                None
-            }
-        })
+    fn packages(&self) -> &[&'a Package] {
+        &self.packages
     }
-    fn files(&self) -> impl '_ + Iterator<Item = &'a File> {
-        self.items.iter().cloned().filter_map(|ci| {
-            if let ContextItem::File(f) = ci {
-                Some(f)
-            } else {
-                None
-            }
-        })
+    fn files(&self) -> &[&'a File] {
+        &self.files
     }
-    fn messages(&self) -> impl '_ + Iterator<Item = &'a Message> {
-        self.items.iter().cloned().filter_map(|ci| {
-            if let ContextItem::Message(m) = ci {
-                Some(m)
-            } else {
-                None
-            }
-        })
+    fn messages(&self) -> &[&'a Message] {
+        &&self.messages
     }
     fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: &'a Package, f: F) -> R {
-        self.items.push(ContextItem::Package(package));
+        self.packages.push(package);
         let r = f(self);
-        self.items.pop();
+        self.packages.pop();
         r
     }
     fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: &'a File, f: F) -> R {
-        self.items.push(ContextItem::File(file));
+        self.files.push(file);
         let r = f(self);
-        self.items.pop();
+        self.files.pop();
         r
     }
     fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: &'a Message, f: F) -> R {
-        self.items.push(ContextItem::Message(message));
+        self.messages.push(message);
         let r = f(self);
-        self.items.pop();
+        self.messages.pop();
         r
     }
 }
