@@ -13,44 +13,7 @@
 // limitations under the License.
 
 mod package;
-use ::std::rc::Rc;
 use package::Package;
-
-#[derive(Debug, Default)]
-struct Context<'a> {
-    packages: Vec<&'a Package>,
-    file: Option<&'a File>,
-    messages: Vec<&'a Message>,
-}
-impl<'a> Context<'a> {
-    fn packages(&self) -> &[&'a Package] {
-        &self.packages
-    }
-    fn file(&self) -> Option<&'a File> {
-        self.file
-    }
-    fn messages(&self) -> &[&'a Message] {
-        &self.messages
-    }
-    fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: &'a Package, f: F) -> R {
-        self.packages.push(package);
-        let r = f(self);
-        self.packages.pop();
-        r
-    }
-    fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: &'a File, f: F) -> R {
-        self.file = Some(file);
-        let r = f(self);
-        self.file = None;
-        r
-    }
-    fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: &'a Message, f: F) -> R {
-        self.messages.push(message);
-        let r = f(self);
-        self.messages.pop();
-        r
-    }
-}
 
 #[derive(Debug)]
 pub struct File {}
