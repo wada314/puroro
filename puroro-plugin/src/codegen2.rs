@@ -19,18 +19,18 @@ use package::Package;
 #[derive(Debug, Default)]
 struct Context<'a> {
     packages: Vec<&'a Package>,
-    files: Vec<&'a File>,
+    file: Option<&'a File>,
     messages: Vec<&'a Message>,
 }
 impl<'a> Context<'a> {
     fn packages(&self) -> &[&'a Package] {
         &self.packages
     }
-    fn files(&self) -> &[&'a File] {
-        &self.files
+    fn file(&self) -> Option<&'a File> {
+        self.file
     }
     fn messages(&self) -> &[&'a Message] {
-        &&self.messages
+        &self.messages
     }
     fn push_package_then<F: FnOnce(&mut Self) -> R, R>(&mut self, package: &'a Package, f: F) -> R {
         self.packages.push(package);
@@ -39,9 +39,9 @@ impl<'a> Context<'a> {
         r
     }
     fn push_file_then<F: FnOnce(&mut Self) -> R, R>(&mut self, file: &'a File, f: F) -> R {
-        self.files.push(file);
+        self.file = Some(file);
         let r = f(self);
-        self.files.pop();
+        self.file = None;
         r
     }
     fn push_message_then<F: FnOnce(&mut Self) -> R, R>(&mut self, message: &'a Message, f: F) -> R {
