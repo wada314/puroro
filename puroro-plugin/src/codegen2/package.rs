@@ -20,8 +20,8 @@ use ::std::pin::Pin;
 #[derive(Debug)]
 pub struct Package {
     name: Option<String>,
-    subpackages: Vec<Package>,
-    files: Vec<File>,
+    subpackages: Vec<Pin<Box<Package>>>,
+    files: Vec<Pin<Box<File>>>,
 }
 
 impl Package {
@@ -40,6 +40,7 @@ impl Package {
     }
 
     fn add_file(self: Pin<&mut Self>, file: &FileDescriptorProto) -> Result<()> {
+        let package_name = file.package();
         todo!()
     }
 }
