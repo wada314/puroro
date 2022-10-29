@@ -13,11 +13,13 @@
 // limitations under the License.
 
 mod r#enum;
+mod field;
 mod file;
 mod message;
 mod oneof;
 mod package;
 use r#enum::Enum;
+use field::Field;
 use file::File;
 use message::Message;
 use oneof::Oneof;

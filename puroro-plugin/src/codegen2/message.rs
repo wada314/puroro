@@ -14,13 +14,16 @@
 
 use super::*;
 use crate::Result;
-use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
+use ::once_cell::unsync::OnceCell;
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 
 #[derive(Debug)]
 pub struct Message {
     submessages: Vec<Message>,
     enums: Vec<Enum>,
     oneofs: Vec<Oneof>,
+    fields_proto: Box<[FieldDescriptorProto]>,
+    fields: OnceCell<Vec<Field>>,
 }
 
 impl Message {
@@ -41,6 +44,8 @@ impl Message {
                 .into_iter()
                 .map(|o| Oneof::try_new(o))
                 .collect::<Result<Vec<_>>>()?,
+            fields_proto: proto.field().to_vec().into_boxed_slice(),
+            fields: OnceCell::new(),
         })
     }
 }
