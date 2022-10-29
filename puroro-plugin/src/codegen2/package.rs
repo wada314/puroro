@@ -44,9 +44,17 @@ impl Package {
             .package()
             .split('.')
             .try_fold(self, |package, name| -> Result<_> {
-                let subpackage = package.subpackages.get_mut(name).unwrap();
+                let subpackage = package
+                    .subpackages
+                    .entry(name.to_string())
+                    .or_insert_with(|| Package {
+                        name: Some(name.to_string()),
+                        subpackages: HashMap::new(),
+                        files: Vec::new(),
+                    });
                 Ok(subpackage)
             })?;
-        todo!()
+        // leaf.files.push(/* file */);
+        todo!();
     }
 }
