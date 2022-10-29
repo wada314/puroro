@@ -25,6 +25,22 @@ pub struct Message {
 
 impl Message {
     pub fn try_new(proto: &DescriptorProto) -> Result<Self> {
-        todo!()
+        Ok(Message {
+            submessages: proto
+                .nested_type()
+                .into_iter()
+                .map(|m| Message::try_new(m))
+                .collect::<Result<Vec<_>>>()?,
+            enums: proto
+                .enum_type()
+                .into_iter()
+                .map(|e| Enum::try_new(e))
+                .collect::<Result<Vec<_>>>()?,
+            oneofs: proto
+                .oneof_decl()
+                .into_iter()
+                .map(|o| Oneof::try_new(o))
+                .collect::<Result<Vec<_>>>()?,
+        })
     }
 }
