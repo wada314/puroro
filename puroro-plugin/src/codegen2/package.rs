@@ -15,13 +15,14 @@
 use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::std::collections::HashMap;
 use ::std::pin::Pin;
 
 #[derive(Debug)]
 pub struct Package<'a> {
     parent: Option<&'a Package<'a>>,
     name: Option<String>,
-    subpackages: Vec<Pin<Box<Package<'a>>>>,
+    subpackages: HashMap<String, Pin<Box<Package<'a>>>>,
     files: Vec<Pin<Box<File>>>,
 }
 
@@ -32,7 +33,7 @@ impl<'a> Package<'a> {
         let mut root = Box::pin(Package {
             parent: None,
             name: None,
-            subpackages: Vec::new(),
+            subpackages: HashMap::new(),
             files: Vec::new(),
         });
         for file in iter {
@@ -42,7 +43,13 @@ impl<'a> Package<'a> {
     }
 
     fn add_file(self: Pin<&mut Self>, file: &FileDescriptorProto) -> Result<()> {
-        let package_name = file.package();
+        let leaf = file
+            .package()
+            .split('.')
+            .try_fold(self, |package, name| -> Result<_> {
+                let subpackage = package.subpackages.get(name).unwrap().as_mut();
+                Ok(subpackage)
+            })?;
         todo!()
     }
 }
