@@ -39,4 +39,11 @@ impl File {
                 .collect::<Result<Vec<_>>>()?,
         })
     }
+
+    pub fn messages(&self) -> Result<&[Message]> {
+        Ok(&self.messages)
+    }
+    pub fn enums(&self) -> Result<&[Enum]> {
+        Ok(&self.enums)
+    }
 }

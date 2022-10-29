@@ -23,7 +23,7 @@ pub struct Message {
     enums: Vec<Enum>,
     oneofs: Vec<Oneof>,
     fields_proto: Box<[FieldDescriptorProto]>,
-    fields: OnceCell<Vec<Field>>,
+    fields: OnceCell<Box<[Field]>>,
 }
 
 impl Message {
@@ -47,5 +47,25 @@ impl Message {
             fields_proto: proto.field().to_vec().into_boxed_slice(),
             fields: OnceCell::new(),
         })
+    }
+
+    pub fn submessages(&self) -> Result<&[Message]> {
+        Ok(&self.submessages)
+    }
+    pub fn enums(&self) -> Result<&[Enum]> {
+        Ok(&self.enums)
+    }
+    pub fn oneofs(&self) -> Result<&[Oneof]> {
+        Ok(&self.oneofs)
+    }
+    pub fn fields(&self) -> Result<&[Field]> {
+        Ok(self.fields.get_or_try_init(|| -> Result<_> {
+            Ok(self
+                .fields_proto
+                .into_iter()
+                .map(|f| Field::try_new(f))
+                .collect::<Result<Vec<_>>>()?
+                .into_boxed_slice())
+        })?)
     }
 }
