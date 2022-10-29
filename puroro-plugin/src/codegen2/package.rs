@@ -25,7 +25,7 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
     ) -> Result<Self> {
         let mut root = Package {
@@ -34,12 +34,12 @@ impl Package {
             files: Vec::new(),
         };
         for file in iter {
-            root.add_file(file)?;
+            root.try_add_file(file)?;
         }
         Ok(root)
     }
 
-    fn add_file(&mut self, file: &FileDescriptorProto) -> Result<()> {
+    fn try_add_file(&mut self, file: &FileDescriptorProto) -> Result<()> {
         let leaf = file
             .package()
             .split('.')
@@ -54,7 +54,7 @@ impl Package {
                     });
                 Ok(subpackage)
             })?;
-        // leaf.files.push(/* file */);
-        todo!();
+        leaf.files.push(File::try_new(file)?);
+        Ok(())
     }
 }

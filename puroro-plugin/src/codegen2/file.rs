@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod package;
-mod file;
-use package::Package;
-use file::File;
+use crate::Result;
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
 #[derive(Debug)]
-pub struct Message {}
+pub struct File {}
 
-#[derive(Debug)]
-pub struct Enum {}
+impl File {
+    pub fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
+        todo!()
+    }
+}
