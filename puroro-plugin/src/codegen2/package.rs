@@ -19,19 +19,17 @@ use ::std::collections::HashMap;
 use ::std::pin::Pin;
 
 #[derive(Debug)]
-pub struct Package<'a> {
-    parent: Option<&'a Package<'a>>,
+pub struct Package {
     name: Option<String>,
-    subpackages: HashMap<String, Pin<Box<Package<'a>>>>,
+    subpackages: HashMap<String, Box<Package>>,
     files: Vec<Pin<Box<File>>>,
 }
 
-impl<'a> Package<'a> {
-    pub fn new_from_files<I: Iterator<Item = &'a FileDescriptorProto>>(
+impl Package {
+    pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
     ) -> Result<Pin<Box<Self>>> {
-        let mut root = Box::pin(Package {
-            parent: None,
+        let mut root = Box::new(Package {
             name: None,
             subpackages: HashMap::new(),
             files: Vec::new(),
@@ -42,11 +40,11 @@ impl<'a> Package<'a> {
         Ok(root)
     }
 
-    fn add_file(self: Pin<&mut Self>, file: &FileDescriptorProto) -> Result<()> {
+    fn add_file(&mut self, file: &FileDescriptorProto) -> Result<()> {
         let leaf = file
             .package()
             .split('.')
-            .try_fold(self, |package, name| -> Result<_> {
+            .try_fold(self, |mut package, name| -> Result<_> {
                 let subpackage = package.subpackages.get(name).unwrap().as_mut();
                 Ok(subpackage)
             })?;
