@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
 #[derive(Debug)]
-pub struct File {}
+pub struct File {
+    syntax: Syntax,
+}
 
 impl File {
     pub fn try_new(proto: &FileDescriptorProto) -> Result<Self> {

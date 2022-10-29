@@ -22,3 +22,23 @@ use file::File;
 use message::Message;
 use oneof::Oneof;
 use package::Package;
+
+use crate::{ErrorKind, GeneratorError, Result};
+
+#[derive(Debug, Clone, Copy)]
+enum Syntax {
+    Proto2,
+    Proto3,
+}
+impl TryFrom<&str> for Syntax {
+    type Error = GeneratorError;
+    fn try_from(value: &str) -> Result<Self> {
+        Ok(match value {
+            "" | "proto2" => Syntax::Proto2,
+            "proto3" => Syntax::Proto3,
+            _ => Err(ErrorKind::UnknownProtoSyntax {
+                name: value.to_string(),
+            })?,
+        })
+    }
+}
