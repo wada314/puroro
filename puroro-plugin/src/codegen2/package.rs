@@ -18,17 +18,19 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::pin::Pin;
 
 #[derive(Debug)]
-pub struct Package {
+pub struct Package<'a> {
+    parent: Option<&'a Package<'a>>,
     name: Option<String>,
-    subpackages: Vec<Pin<Box<Package>>>,
+    subpackages: Vec<Pin<Box<Package<'a>>>>,
     files: Vec<Pin<Box<File>>>,
 }
 
-impl Package {
-    pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+impl<'a> Package<'a> {
+    pub fn new_from_files<I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
     ) -> Result<Pin<Box<Self>>> {
         let mut root = Box::pin(Package {
+            parent: None,
             name: None,
             subpackages: Vec::new(),
             files: Vec::new(),
