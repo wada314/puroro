@@ -21,8 +21,8 @@ use ::std::pin::Pin;
 #[derive(Debug)]
 pub struct Package {
     name: Option<String>,
-    subpackages: HashMap<String, Box<Package>>,
-    files: Vec<Pin<Box<File>>>,
+    subpackages: HashMap<String, Package>,
+    files: Vec<File>,
 }
 
 impl Package {
@@ -45,7 +45,7 @@ impl Package {
             .package()
             .split('.')
             .try_fold(self, |mut package, name| -> Result<_> {
-                let subpackage = package.subpackages.get(name).unwrap().as_mut();
+                let subpackage = package.subpackages.get_mut(name).unwrap();
                 Ok(subpackage)
             })?;
         todo!()
