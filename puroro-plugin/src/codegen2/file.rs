@@ -19,10 +19,24 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 #[derive(Debug)]
 pub struct File {
     syntax: Syntax,
+    messages: Vec<Message>,
+    enums: Vec<Enum>,
 }
 
 impl File {
     pub fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
-        todo!()
+        Ok(Self {
+            syntax: proto.syntax().try_into()?,
+            messages: proto
+                .message_type()
+                .into_iter()
+                .map(|m| Message::try_new(m))
+                .collect::<Result<Vec<_>>>()?,
+            enums: proto
+                .enum_type()
+                .into_iter()
+                .map(|e| Enum::try_new(e))
+                .collect::<Result<Vec<_>>>()?,
+        })
     }
 }

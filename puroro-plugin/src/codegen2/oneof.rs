@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
 

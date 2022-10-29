@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
 
 #[derive(Debug)]
-pub struct Message {}
+pub struct Message {
+    submessages: Vec<Message>,
+    enums: Vec<Enum>,
+    oneofs: Vec<Oneof>,
+}
 
 impl Message {
     pub fn try_new(proto: &DescriptorProto) -> Result<Self> {
