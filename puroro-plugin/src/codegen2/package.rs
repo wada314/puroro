@@ -16,7 +16,6 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
-use ::std::pin::Pin;
 
 #[derive(Debug)]
 pub struct Package {
@@ -28,14 +27,14 @@ pub struct Package {
 impl Package {
     pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
-    ) -> Result<Pin<Box<Self>>> {
-        let mut root = Box::new(Package {
+    ) -> Result<Self> {
+        let mut root = Package {
             name: None,
             subpackages: HashMap::new(),
             files: Vec::new(),
-        });
+        };
         for file in iter {
-            root.as_mut().add_file(file)?;
+            root.add_file(file)?;
         }
         Ok(root)
     }
@@ -44,7 +43,7 @@ impl Package {
         let leaf = file
             .package()
             .split('.')
-            .try_fold(self, |mut package, name| -> Result<_> {
+            .try_fold(self, |package, name| -> Result<_> {
                 let subpackage = package.subpackages.get_mut(name).unwrap();
                 Ok(subpackage)
             })?;
