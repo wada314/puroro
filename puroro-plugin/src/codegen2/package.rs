@@ -16,6 +16,7 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
+use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
 pub struct Package {
@@ -27,16 +28,18 @@ pub struct Package {
 impl Package {
     pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
-    ) -> Result<Self> {
-        let mut root = Package {
-            name: None,
-            subpackages: HashMap::new(),
-            files: Vec::new(),
-        };
-        for file in iter {
-            root.try_add_file(file)?;
-        }
-        Ok(root)
+    ) -> Rc<Result<Self>> {
+        Rc::new_cyclic(|weak_root| -> Result<_> {
+            let mut root = Package {
+                name: None,
+                subpackages: HashMap::new(),
+                files: Vec::new(),
+            };
+            for file in iter {
+                root.try_add_file(file)?;
+            }
+            Ok(root)
+        })
     }
 
     fn try_add_file(&mut self, file: &FileDescriptorProto) -> Result<()> {
