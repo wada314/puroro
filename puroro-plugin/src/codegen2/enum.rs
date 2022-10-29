@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod r#enum;
-mod file;
-mod message;
-mod oneof;
-mod package;
-use r#enum::Enum;
-use file::File;
-use message::Message;
-use oneof::Oneof;
-use package::Package;
+use crate::Result;
+use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
+
+#[derive(Debug)]
+pub struct Enum {}
+
+impl Enum {
+    pub fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
+        todo!()
+    }
+}
