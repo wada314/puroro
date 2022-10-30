@@ -16,6 +16,7 @@
 #![feature(provide_any)]
 #![feature(generic_associated_types)]
 #![feature(is_some_with)]
+#![feature(slice_group_by)]
 
 mod codegen;
 mod error;
