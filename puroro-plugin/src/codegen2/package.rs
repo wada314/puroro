@@ -36,15 +36,15 @@ impl Package {
     fn try_make_package(
         name: &str,
         full_name: &str,
-        files: &[&FileDescriptorProto],
+        sorted_files: &[&FileDescriptorProto],
         root: Weak<Package>,
     ) -> Result<Package> {
-        if let (Some(first_file), Some(last_file)) = (files.first(), files.last()) {
-            if first_file.package() == full_name && last_file.package() == full_name {
+        if let Some(first_file) = sorted_files.first() {
+            if first_file.package() == full_name {
                 return Ok(Package {
                     name: Some(name.to_string()),
                     subpackages: HashMap::new(),
-                    files: files
+                    files: sorted_files
                         .into_iter()
                         .map(|f| File::try_new(f))
                         .collect::<Result<Vec<_>>>()?,
@@ -65,7 +65,7 @@ impl Package {
                 .split_once('.')
                 .map(|(subp, _)| subp)
         };
-        let grouped = files.group_by(|f1, f2| {
+        let grouped = sorted_files.group_by(|f1, f2| {
             get_subpackage_name(f1, prefix_len) == get_subpackage_name(f2, prefix_len)
         });
         todo!()
