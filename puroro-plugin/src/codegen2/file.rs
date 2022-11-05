@@ -22,7 +22,7 @@ pub trait File: Sized {
 
 #[cfg(test)]
 pub struct FileFake {
-    proto: FileDescriptorProto,
+    pub proto: FileDescriptorProto,
 }
 
 #[cfg(test)]

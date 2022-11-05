@@ -112,5 +112,7 @@ mod tests {
         let files = [Lazy::force(&FD_ROOT)];
         let root_package = Package::new_from_files(files.into_iter());
         assert_eq!(None, root_package.name);
+        assert_eq!(1, root_package.files.len());
+        assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
     }
 }
