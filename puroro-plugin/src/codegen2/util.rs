@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
-
 pub trait SliceExt<T> {
     fn split_until<F>(&self, pred: F) -> (&[T], &[T])
     where
@@ -30,11 +28,12 @@ impl<T> SliceExt<T> for [T] {
     where
         F: FnMut(&T) -> bool,
     {
-        let i = 0;
+        let mut i = 0;
         while i < self.len() {
             if !pred(&self[i]) {
                 break;
             }
+            i = i + 1;
         }
         self.split_at(i)
     }

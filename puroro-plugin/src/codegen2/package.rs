@@ -86,7 +86,7 @@ impl<FileType: File> Package<FileType> {
             .collect::<Result<HashMap<_, _>>>()?;
 
         Ok(Package {
-            name: Some(name.to_string()),
+            name: (!name.is_empty()).then(|| name.to_string()),
             subpackages,
             files: self_files,
             root,
@@ -101,7 +101,7 @@ mod tests {
     use ::once_cell::sync::Lazy;
     type Package = super::Package<FileFake>;
 
-    static root_file_descriptor: Lazy<FileDescriptorProto> = Lazy::new(|| {
+    static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
         *fd.name_mut() = "root_file".to_string();
         fd
@@ -109,7 +109,7 @@ mod tests {
 
     #[test]
     fn test_make_package_empty() {
-        let files = [Lazy::force(&root_file_descriptor)];
+        let files = [Lazy::force(&FD_ROOT)];
         let root_package = Package::new_from_files(files.into_iter());
         assert_eq!(None, root_package.name);
     }
