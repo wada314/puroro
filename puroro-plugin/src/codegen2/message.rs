@@ -17,7 +17,7 @@ use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 
-pub trait Message: Sized {
+pub trait MessageTrait: Sized {
     fn try_new(proto: &DescriptorProto) -> Result<Self>;
 }
 
@@ -30,7 +30,7 @@ pub struct MessageImpl<EnumType, OneofType> {
     fields: OnceCell<Box<[Field]>>,
 }
 
-impl<EnumType: Enum, OneofType: Oneof> Message for MessageImpl<EnumType, OneofType> {
+impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<EnumType, OneofType> {
     fn try_new(proto: &DescriptorProto) -> Result<Self> {
         Ok(MessageImpl {
             submessages: proto

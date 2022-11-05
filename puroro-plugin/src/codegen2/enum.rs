@@ -16,7 +16,7 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 
-pub trait Enum: Sized {
+pub trait EnumTrait: Sized {
     fn try_new(proto: &EnumDescriptorProto) -> Result<Self>;
 }
 

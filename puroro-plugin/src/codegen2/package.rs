@@ -27,7 +27,7 @@ pub struct Package<FileType> {
     root: Weak<Package<FileType>>,
 }
 
-impl<FileType: File> Package<FileType> {
+impl<FileType: FileTrait> Package<FileType> {
     pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(iter: I) -> Rc<Self> {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
@@ -42,15 +42,6 @@ impl<FileType: File> Package<FileType> {
         sorted_fds: &[&FileDescriptorProto],
         root: Weak<Package<FileType>>,
     ) -> Result<Self> {
-        let (self_files, child_fds) = {
-            let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package() == full_name);
-            let self_files = self_fds
-                .into_iter()
-                .map(|fd| FileType::try_new(fd))
-                .collect::<Result<Vec<_>>>()?;
-            (self_files, child_fds)
-        };
-
         fn get_package_name<'a>(fd: &'a FileDescriptorProto, full_name: &str) -> &'a str {
             let striped_path = if full_name.is_empty() {
                 fd.package()
@@ -62,7 +53,16 @@ impl<FileType: File> Package<FileType> {
             } else {
                 striped_path
             }
-        };
+        }
+
+        // The first few FDs might be FDs which are directly belonging to the current package.
+        // The remaining FDs are belonging to the child packages.
+        let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package() == full_name);
+
+        let self_files = self_fds
+            .into_iter()
+            .map(|fd| FileType::try_new(fd))
+            .collect::<Result<Vec<_>>>()?;
 
         let subpackages = child_fds
             .group_by_key(|fd| get_package_name(fd, full_name))
