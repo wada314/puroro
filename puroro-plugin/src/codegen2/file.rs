@@ -16,15 +16,33 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
+pub trait File: Sized {
+    fn try_new(proto: &FileDescriptorProto) -> Result<Self>;
+}
+
+#[cfg(test)]
+pub struct FileFake {
+    proto: FileDescriptorProto,
+}
+
+#[cfg(test)]
+impl File for FileFake {
+    fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
+        Ok(FileFake {
+            proto: proto.clone(),
+        })
+    }
+}
+
 #[derive(Debug)]
-pub struct File {
+pub struct FileImpl {
     syntax: Syntax,
     messages: Vec<Message>,
     enums: Vec<Enum>,
 }
 
-impl File {
-    pub fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
+impl File for FileImpl {
+    fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
         Ok(Self {
             syntax: proto.syntax().try_into()?,
             messages: proto
@@ -39,7 +57,9 @@ impl File {
                 .collect::<Result<Vec<_>>>()?,
         })
     }
+}
 
+impl FileImpl {
     pub fn messages(&self) -> Result<&[Message]> {
         Ok(&self.messages)
     }

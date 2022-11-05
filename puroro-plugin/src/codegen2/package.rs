@@ -20,31 +20,33 @@ use ::std::rc::{Rc, Weak};
 use std::borrow::Cow;
 
 #[derive(Debug)]
-pub struct Package {
+pub struct Package<FileType> {
     name: Option<String>,
-    subpackages: HashMap<String, Package>,
-    files: Vec<File>,
-    root: Weak<Package>,
+    subpackages: HashMap<String, Package<FileType>>,
+    files: Vec<FileType>,
+    root: Weak<Package<FileType>>,
 }
 
-impl Package {
+impl<FileType: File> Package<FileType> {
     pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(iter: I) -> Rc<Self> {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
-        Rc::new_cyclic(|weak_root| todo!())
+        Rc::new_cyclic(|weak_root| {
+            Package::try_make_package("", "", &files, weak_root.clone()).unwrap()
+        })
     }
 
     fn try_make_package(
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<Package>,
-    ) -> Result<Package> {
+        root: Weak<Package<FileType>>,
+    ) -> Result<Self> {
         let (self_files, child_fds) = {
             let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package() == full_name);
             let self_files = self_fds
                 .into_iter()
-                .map(|fd| File::try_new(fd))
+                .map(|fd| FileType::try_new(fd))
                 .collect::<Result<Vec<_>>>()?;
             (self_files, child_fds)
         };
@@ -89,5 +91,26 @@ impl Package {
             files: self_files,
             root,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::file::FileFake;
+    use super::FileDescriptorProto;
+    use ::once_cell::sync::Lazy;
+    type Package = super::Package<FileFake>;
+
+    static root_file_descriptor: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
+        *fd.name_mut() = "root_file".to_string();
+        fd
+    });
+
+    #[test]
+    fn test_make_package_empty() {
+        let files = [Lazy::force(&root_file_descriptor)];
+        let root_package = Package::new_from_files(files.into_iter());
+        assert_eq!(None, root_package.name);
     }
 }
