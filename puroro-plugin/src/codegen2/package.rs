@@ -17,6 +17,7 @@ use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
 use ::std::rc::{Rc, Weak};
+use std::borrow::Cow;
 
 #[derive(Debug)]
 pub struct Package {
@@ -61,13 +62,32 @@ impl Package {
             }
         };
 
-        let subpackages = child_fds.group_by_key(|fd| get_package_name(fd, full_name));
+        let subpackages = child_fds
+            .group_by_key(|fd| get_package_name(fd, full_name))
+            .map(|subpackage_fds| -> Result<_> {
+                let subpackage_name = get_package_name(subpackage_fds.first().unwrap(), full_name);
+                let subpackage_full_name: Cow<str> = if full_name.is_empty() {
+                    subpackage_name.into()
+                } else {
+                    format!("{}.{}", full_name, subpackage_name).into()
+                };
+                Ok((
+                    subpackage_name.to_string(),
+                    Package::try_make_package(
+                        subpackage_name,
+                        &subpackage_full_name,
+                        subpackage_fds,
+                        root.clone(),
+                    )?,
+                ))
+            })
+            .collect::<Result<HashMap<_, _>>>()?;
 
-        let mut package = Package {
+        Ok(Package {
             name: Some(name.to_string()),
-            subpackages: todo!(),
+            subpackages,
             files: self_files,
             root,
-        };
+        })
     }
 }
