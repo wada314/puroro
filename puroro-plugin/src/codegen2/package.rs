@@ -36,38 +36,38 @@ impl Package {
     fn try_make_package(
         name: &str,
         full_name: &str,
-        sorted_files: &[&FileDescriptorProto],
+        sorted_fds: &[&FileDescriptorProto],
         root: Weak<Package>,
     ) -> Result<Package> {
-        if let Some(first_file) = sorted_files.first() {
-            if first_file.package() == full_name {
-                return Ok(Package {
-                    name: Some(name.to_string()),
-                    subpackages: HashMap::new(),
-                    files: sorted_files
-                        .into_iter()
-                        .map(|f| File::try_new(f))
-                        .collect::<Result<Vec<_>>>()?,
-                    root: root.clone(),
-                });
-            }
-        }
+        let (self_files, child_fds) = {
+            let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package() == full_name);
+            let self_files = self_fds
+                .into_iter()
+                .map(|fd| File::try_new(fd))
+                .collect::<Result<Vec<_>>>()?;
+            (self_files, child_fds)
+        };
 
-        let prefix_len = if full_name.is_empty() {
-            0
-        } else {
-            full_name.len() + 1
+        let get_package_name = |fd| {
+            let striped_path = if full_name.is_empty() {
+                fd.package()
+            } else {
+                fd.package()[full_name.len() + 1..]
+            };
+            if let Some((name, _)) = striped_path.split_once('.') {
+                name
+            } else {
+                striped_path
+            }
         };
-        fn get_subpackage_name(f: &FileDescriptorProto, prefix_len: usize) -> Option<&str> {
-            f.package()
-                .split_at(prefix_len)
-                .1
-                .split_once('.')
-                .map(|(subp, _)| subp)
+
+        let subpackages = child_fds.group_by_key(get_package_name);
+
+        let mut package = Package {
+            name: Some(name.to_string()),
+            subpackages: todo!(),
+            files: self_files,
+            root,
         };
-        let grouped = sorted_files.group_by(|f1, f2| {
-            get_subpackage_name(f1, prefix_len) == get_subpackage_name(f2, prefix_len)
-        });
-        todo!()
     }
 }

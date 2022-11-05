@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::marker::PhantomData;
+
 pub trait SliceExt<T> {
     fn split_until<F>(&self, pred: F) -> (&[T], &[T])
     where
         F: FnMut(&T) -> bool;
+
+    fn group_by_key<F, K>(&self, pred: F) -> GroupByKey<'_, T, F, K>
+    where
+        F: Fn(&T) -> K,
+        K: PartialEq;
 }
 
 impl<T> SliceExt<T> for [T] {
@@ -30,5 +37,66 @@ impl<T> SliceExt<T> for [T] {
             }
         }
         self.split_at(i)
+    }
+
+    fn group_by_key<F, K>(&self, pred: F) -> GroupByKey<'_, T, F, K>
+    where
+        F: Fn(&T) -> K,
+        K: PartialEq,
+    {
+        GroupByKey::new(self, pred)
+    }
+}
+
+pub struct GroupByKey<'a, T, F, K>
+where
+    F: Fn(&T) -> K,
+    K: PartialEq,
+{
+    v: &'a [T],
+    pred: F,
+    finished: bool,
+}
+
+impl<'a, T, F, K> GroupByKey<'a, T, F, K>
+where
+    F: Fn(&T) -> K,
+    K: PartialEq,
+{
+    pub fn new(slice: &'a [T], pred: F) -> Self {
+        Self {
+            v: slice,
+            pred,
+            finished: false,
+        }
+    }
+}
+
+impl<'a, T, F, K> Iterator for GroupByKey<'a, T, F, K>
+where
+    F: Fn(&T) -> K,
+    K: PartialEq,
+{
+    type Item = &'a [T];
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.finished {
+            return None;
+        }
+
+        if let Some((first, rest)) = self.v.split_first() {
+            let key = (self.pred)(first);
+            if let Some(pos) = rest.iter().position(|x| (self.pred)(x) != key) {
+                let ret = Some(&self.v[..pos + 1]);
+                self.v = &self.v[pos + 1..];
+                ret
+            } else {
+                self.finished = true;
+                Some(self.v)
+            }
+        } else {
+            self.finished = true;
+            None
+        }
     }
 }
