@@ -14,8 +14,7 @@
 
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
-#![feature(generic_associated_types)]
-#![feature(is_some_with)]
+#![feature(is_some_and)]
 #![feature(slice_group_by)]
 
 mod codegen;
