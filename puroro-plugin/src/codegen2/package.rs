@@ -158,4 +158,39 @@ mod tests {
         assert_eq!(Lazy::force(&FD_G_P_DESC), &package_g_p.files[0].proto);
         assert_eq!(0, package_g_p.subpackages.len());
     }
+
+    #[test]
+    fn test_make_package_many() {
+        let files = [
+            Lazy::force(&FD_G_P_DESC),
+            Lazy::force(&FD_ROOT),
+            Lazy::force(&FD_G_P_EMPTY),
+            Lazy::force(&FD_G_P_C_PLUGIN),
+        ];
+
+        let root_package = Package::new_from_files(files.into_iter());
+        assert_eq!(None, root_package.name);
+        assert_eq!(1, root_package.files.len());
+        assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
+        assert_eq!(1, root_package.subpackages.len());
+        assert!(root_package.subpackages.contains_key("google"));
+
+        let package_g = &root_package.subpackages["google"];
+        assert_eq!(Some("google".to_string()), package_g.name);
+        assert_eq!(0, package_g.files.len());
+        assert_eq!(1, package_g.subpackages.len());
+        assert!(package_g.subpackages.contains_key("protobuf"));
+
+        let package_g_p = &package_g.subpackages["protobuf"];
+        assert_eq!(Some("protobuf".to_string()), package_g_p.name);
+        assert_eq!(2, package_g_p.files.len());
+        assert_eq!(1, package_g_p.subpackages.len());
+        assert!(package_g_p.subpackages.contains_key("compiler"));
+
+        let package_g_p_c = &package_g_p.subpackages["compiler"];
+        assert_eq!(Some("compiler".to_string()), package_g_p_c.name);
+        assert_eq!(1, package_g_p_c.files.len());
+        assert_eq!(Lazy::force(&FD_G_P_C_PLUGIN), &package_g_p_c.files[0].proto);
+        assert_eq!(0, package_g_p_c.subpackages.len());
+    }
 }
