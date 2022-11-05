@@ -107,6 +107,27 @@ mod tests {
         fd
     });
 
+    static FD_G_P_DESC: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
+        *fd.name_mut() = "descriptor.proto".to_string();
+        *fd.package_mut() = "google.protobuf".to_string();
+        fd
+    });
+
+    static FD_G_P_EMPTY: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
+        *fd.name_mut() = "empty.proto".to_string();
+        *fd.package_mut() = "google.protobuf".to_string();
+        fd
+    });
+
+    static FD_G_P_C_PLUGIN: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
+        *fd.name_mut() = "plugin.proto".to_string();
+        *fd.package_mut() = "google.protobuf.compiler".to_string();
+        fd
+    });
+
     #[test]
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
@@ -114,5 +135,27 @@ mod tests {
         assert_eq!(None, root_package.name);
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
+    }
+
+    #[test]
+    fn test_make_package_single() {
+        let files = [Lazy::force(&FD_G_P_DESC)];
+        let root_package = Package::new_from_files(files.into_iter());
+        assert_eq!(None, root_package.name);
+        assert_eq!(0, root_package.files.len());
+        assert_eq!(1, root_package.subpackages.len());
+        assert!(root_package.subpackages.contains_key("google"));
+
+        let package_g = &root_package.subpackages["google"];
+        assert_eq!(Some("google".to_string()), package_g.name);
+        assert_eq!(0, package_g.files.len());
+        assert_eq!(1, package_g.subpackages.len());
+        assert!(package_g.subpackages.contains_key("protobuf"));
+
+        let package_g_p = &package_g.subpackages["protobuf"];
+        assert_eq!(Some("protobuf".to_string()), package_g_p.name);
+        assert_eq!(1, package_g_p.files.len());
+        assert_eq!(Lazy::force(&FD_G_P_DESC), &package_g_p.files[0].proto);
+        assert_eq!(0, package_g_p.subpackages.len());
     }
 }
