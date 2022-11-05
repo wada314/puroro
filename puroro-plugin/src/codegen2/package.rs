@@ -48,11 +48,11 @@ impl Package {
             (self_files, child_fds)
         };
 
-        let get_package_name = |fd| {
+        fn get_package_name<'a>(fd: &'a FileDescriptorProto, full_name: &str) -> &'a str {
             let striped_path = if full_name.is_empty() {
                 fd.package()
             } else {
-                fd.package()[full_name.len() + 1..]
+                &fd.package()[full_name.len() + 1..]
             };
             if let Some((name, _)) = striped_path.split_once('.') {
                 name
@@ -61,7 +61,7 @@ impl Package {
             }
         };
 
-        let subpackages = child_fds.group_by_key(get_package_name);
+        let subpackages = child_fds.group_by_key(|fd| get_package_name(fd, full_name));
 
         let mut package = Package {
             name: Some(name.to_string()),
