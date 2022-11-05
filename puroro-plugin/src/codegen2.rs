@@ -18,12 +18,14 @@ mod file;
 mod message;
 mod oneof;
 mod package;
+mod util;
 use r#enum::Enum;
 use field::Field;
 use file::File;
 use message::Message;
 use oneof::Oneof;
 use package::Package;
+use util::*;
 
 use crate::{ErrorKind, GeneratorError, Result};
 
