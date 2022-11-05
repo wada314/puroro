@@ -30,6 +30,8 @@ pub struct MessageImpl<EnumType, OneofType> {
     fields: OnceCell<Box<[Field]>>,
 }
 
+pub type Message = MessageImpl<Enum, Oneof>;
+
 impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<EnumType, OneofType> {
     fn try_new(proto: &DescriptorProto) -> Result<Self> {
         Ok(MessageImpl {

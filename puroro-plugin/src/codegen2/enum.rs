@@ -23,6 +23,8 @@ pub trait EnumTrait: Sized {
 #[derive(Debug)]
 pub struct EnumImpl {}
 
+pub type Enum = EnumImpl;
+
 impl EnumImpl {
     pub fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
         todo!()

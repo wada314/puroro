@@ -41,6 +41,8 @@ pub struct FileImpl<MessageType, EnumType> {
     enums: Vec<EnumType>,
 }
 
+pub type File = FileImpl<Message, Enum>;
+
 impl<MessageType: MessageTrait, EnumType: EnumTrait> FileTrait for FileImpl<MessageType, EnumType> {
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
         Ok(Self {

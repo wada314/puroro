@@ -23,6 +23,8 @@ pub trait OneofTrait: Sized {
 #[derive(Debug)]
 pub struct OneofImpl {}
 
+pub type Oneof = OneofImpl;
+
 impl OneofTrait for OneofImpl {
     fn try_new(proto: &OneofDescriptorProto) -> Result<Self> {
         todo!()
