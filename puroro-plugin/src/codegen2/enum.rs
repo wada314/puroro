@@ -16,10 +16,14 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 
-#[derive(Debug)]
-pub struct Enum {}
+pub trait Enum: Sized {
+    fn try_new(proto: &EnumDescriptorProto) -> Result<Self>;
+}
 
-impl Enum {
+#[derive(Debug)]
+pub struct EnumImpl {}
+
+impl EnumImpl {
     pub fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
         todo!()
     }

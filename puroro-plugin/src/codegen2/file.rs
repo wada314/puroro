@@ -35,35 +35,35 @@ impl File for FileFake {
 }
 
 #[derive(Debug)]
-pub struct FileImpl {
+pub struct FileImpl<MessageType, EnumType> {
     syntax: Syntax,
-    messages: Vec<Message>,
-    enums: Vec<Enum>,
+    messages: Vec<MessageType>,
+    enums: Vec<EnumType>,
 }
 
-impl File for FileImpl {
+impl<MessageType: Message, EnumType: Enum> File for FileImpl<MessageType, EnumType> {
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
         Ok(Self {
             syntax: proto.syntax().try_into()?,
             messages: proto
                 .message_type()
                 .into_iter()
-                .map(|m| Message::try_new(m))
+                .map(|m| MessageType::try_new(m))
                 .collect::<Result<Vec<_>>>()?,
             enums: proto
                 .enum_type()
                 .into_iter()
-                .map(|e| Enum::try_new(e))
+                .map(|e| EnumType::try_new(e))
                 .collect::<Result<Vec<_>>>()?,
         })
     }
 }
 
-impl FileImpl {
-    pub fn messages(&self) -> Result<&[Message]> {
+impl<MessageType, EnumType> FileImpl<MessageType, EnumType> {
+    pub fn messages(&self) -> Result<&[MessageType]> {
         Ok(&self.messages)
     }
-    pub fn enums(&self) -> Result<&[Enum]> {
+    pub fn enums(&self) -> Result<&[EnumType]> {
         Ok(&self.enums)
     }
 }
