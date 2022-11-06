@@ -19,7 +19,7 @@ use ::std::collections::HashMap;
 use ::std::rc::{Rc, Weak};
 use std::borrow::Cow;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RootPackage<FileType> {
     subpackages: HashMap<String, NonRootPackage<FileType>>,
     files: Vec<FileType>,
