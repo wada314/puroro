@@ -17,9 +17,8 @@ use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
 use ::std::rc::{Rc, Weak};
-use std::borrow::Cow;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct RootPackage<FileType> {
     subpackages: HashMap<String, NonRootPackage<FileType>>,
     files: Vec<FileType>,
@@ -39,24 +38,7 @@ impl<FileType: FileTrait> RootPackage<FileType> {
     ) -> Result<Rc<Self>> {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
-        let mut maybe_error = None;
-        let maybe_root_package = Rc::new_cyclic(|weak_root| {
-            match RootPackage::try_make_package(&files, weak_root.clone()) {
-                Ok(root_package) => root_package,
-                Err(error) => {
-                    maybe_error = Some(error);
-                    // Fortunately, a dummy `RootPackage` can be safely constructible.
-                    RootPackage {
-                        subpackages: HashMap::new(),
-                        files: Vec::new(),
-                    }
-                }
-            }
-        });
-        match maybe_error {
-            Some(error) => Err(error)?,
-            None => Ok(maybe_root_package),
-        }
+        Rc::try_new_cyclic(|weak_root| RootPackage::try_make_package(&files, weak_root.clone()))
     }
 
     fn try_make_package(
@@ -99,6 +81,15 @@ impl<FileType: FileTrait> RootPackage<FileType> {
             subpackages,
             files: self_files,
         })
+    }
+}
+
+impl<FileType> Default for RootPackage<FileType> {
+    fn default() -> Self {
+        Self {
+            subpackages: Default::default(),
+            files: Default::default(),
+        }
     }
 }
 

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::rc::{Rc, Weak};
+
 pub trait SliceExt<T> {
     fn split_until<F>(&self, pred: F) -> (&[T], &[T])
     where
@@ -96,6 +98,32 @@ where
         } else {
             self.finished = true;
             None
+        }
+    }
+}
+
+pub trait RcExt<T> {
+    fn try_new_cyclic<F, E>(data_fn: F) -> Result<Rc<T>, E>
+    where
+        F: FnOnce(&Weak<T>) -> Result<T, E>;
+}
+
+impl<T: Default> RcExt<T> for Rc<T> {
+    fn try_new_cyclic<F, E>(data_fn: F) -> Result<Rc<T>, E>
+    where
+        F: FnOnce(&Weak<T>) -> Result<T, E>,
+    {
+        let mut maybe_error = None;
+        let rc = Rc::new_cyclic(|weak| match (data_fn)(weak) {
+            Ok(data) => data,
+            Err(err) => {
+                maybe_error = Some(err);
+                T::default()
+            }
+        });
+        match maybe_error {
+            Some(err) => Err(err),
+            None => Ok(rc),
         }
     }
 }
