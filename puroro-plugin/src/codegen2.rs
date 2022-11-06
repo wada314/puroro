@@ -19,15 +19,16 @@ mod message;
 mod oneof;
 mod package;
 mod util;
-use r#enum::*;
-use field::*;
-use file::*;
-use message::*;
-use oneof::*;
-use package::*;
-use util::*;
-
+use self::r#enum::*;
+use self::field::*;
+use self::file::*;
+use self::message::*;
+use self::oneof::*;
+use self::package::*;
+use self::util::*;
 use crate::{ErrorKind, GeneratorError, Result};
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -45,4 +46,10 @@ impl TryFrom<&str> for Syntax {
             })?,
         })
     }
+}
+
+pub fn generate_root_package<'a>(
+    files: impl Iterator<Item = &'a FileDescriptorProto>,
+) -> Result<Rc<RootPackage<File>>> {
+    RootPackage::try_new_from_files(files)
 }

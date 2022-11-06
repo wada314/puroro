@@ -30,3 +30,9 @@ impl EnumImpl {
         todo!()
     }
 }
+
+impl EnumTrait for EnumImpl {
+    fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
+        todo!()
+    }
+}

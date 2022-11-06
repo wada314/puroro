@@ -15,9 +15,11 @@
 use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
+use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::quote::{format_ident, quote};
+use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::rc::{Rc, Weak};
 
@@ -36,7 +38,7 @@ pub struct NonRootPackage<FileType> {
     root: Weak<RootPackage<FileType>>,
 }
 
-pub trait Package<FileType> {
+pub trait PackageTrait<FileType> {
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>>;
     fn files(&self) -> &[FileType];
 
@@ -57,6 +59,8 @@ pub trait Package<FileType> {
             )*
         })
     }
+
+    fn module_file_name(&self) -> Cow<'_, str>;
 }
 
 impl<FileType: FileTrait> RootPackage<FileType> {
@@ -168,6 +172,69 @@ impl<FileType: FileTrait> NonRootPackage<FileType> {
             files: self_files,
             root,
         })
+    }
+}
+
+impl<FileType> PackageTrait<FileType> for RootPackage<FileType> {
+    fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>> {
+        &self.subpackages
+    }
+    fn files(&self) -> &[FileType] {
+        &self.files
+    }
+    fn gen_module_file_header(&self) -> Result<TokenStream> {
+        Ok(quote! {
+            //! "Generated from root package"
+
+            /// re-export puroro.
+            pub use ::puroro;
+            /// re-export the primitive types in puroro namespace.
+            /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
+            pub use ::puroro::*;
+            pub mod _puroro_root {
+                pub use super::*;
+            }
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+        })
+    }
+    fn module_file_name(&self) -> Cow<'_, str> {
+        "lib.rs".into()
+    }
+}
+
+impl<FileType> PackageTrait<FileType> for NonRootPackage<FileType> {
+    fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>> {
+        &self.subpackages
+    }
+    fn files(&self) -> &[FileType] {
+        &self.files
+    }
+    fn gen_module_file_header(&self) -> Result<TokenStream> {
+        let comment = format!("Generated from package \"{}\"", &self.full_name);
+        Ok(quote! {
+            #![doc = #comment]
+            pub mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+        })
+    }
+    fn module_file_name(&self) -> Cow<'_, str> {
+        format!(
+            "{}.rs",
+            self.full_name
+                .split('.')
+                .map(|package| package
+                    .to_lower_snake_case()
+                    .escape_rust_keywords()
+                    .to_string())
+                .join("/")
+        )
+        .into()
     }
 }
 
