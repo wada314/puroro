@@ -173,6 +173,13 @@ impl<FileType: FileTrait> NonRootPackage<FileType> {
             root,
         })
     }
+
+    fn get_all_packages<'a>(&'a self, packages: &mut Vec<&'a dyn PackageTrait<FileType>>) {
+        packages.push(self as &dyn PackageTrait<FileType>);
+        for subpackage in self.subpackages.values() {
+            subpackage.get_all_packages(packages);
+        }
+    }
 }
 
 impl<FileType> PackageTrait<FileType> for RootPackage<FileType> {
