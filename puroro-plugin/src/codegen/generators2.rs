@@ -57,7 +57,7 @@ pub fn gen_module_from_package<'a>(pc: &'a PackageContents<'a>) -> Result<(Strin
     } else {
         quote! {
             //! "Generated from root package"
-            #![feature(generic_associated_types)]
+
             /// re-export puroro.
             pub use ::puroro;
             /// re-export the primitive types in puroro namespace.
