@@ -20,38 +20,83 @@ use ::std::rc::{Rc, Weak};
 use std::borrow::Cow;
 
 #[derive(Debug)]
-pub struct Package<FileType> {
-    name: Option<String>,
-    subpackages: HashMap<String, Package<FileType>>,
+pub struct RootPackage<FileType> {
+    subpackages: HashMap<String, NonRootPackage<FileType>>,
     files: Vec<FileType>,
-    root: Weak<Package<FileType>>,
 }
 
-impl<FileType: FileTrait> Package<FileType> {
-    pub fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(iter: I) -> Rc<Self> {
+#[derive(Debug)]
+pub struct NonRootPackage<FileType> {
+    name: String,
+    subpackages: HashMap<String, NonRootPackage<FileType>>,
+    files: Vec<FileType>,
+    root: Weak<Result<RootPackage<FileType>>>,
+}
+
+impl<FileType: FileTrait> RootPackage<FileType> {
+    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+        iter: I,
+    ) -> Rc<Result<Self>> {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
-        Rc::new_cyclic(|weak_root| {
-            Package::try_make_package("", "", &files, weak_root.clone()).unwrap()
-        })
+        Rc::new_cyclic(|weak_root| RootPackage::try_make_package(&files, weak_root.clone()))
     }
 
+    fn try_make_package(
+        sorted_fds: &[&FileDescriptorProto],
+        root: Weak<Result<RootPackage<FileType>>>,
+    ) -> Result<Self> {
+        fn get_package_name<'a>(fd: &'a FileDescriptorProto) -> &'a str {
+            match fd.package().split_once('.') {
+                Some((name, _)) => name,
+                None => fd.package(),
+            }
+        }
+
+        // The first few FDs might be FDs which are directly belonging to the current package.
+        // The remaining FDs are belonging to the child packages.
+        let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package().is_empty());
+
+        let self_files = self_fds
+            .into_iter()
+            .map(|fd| FileType::try_new(fd))
+            .collect::<Result<Vec<_>>>()?;
+
+        let subpackages = child_fds
+            .group_by_key(|fd| get_package_name(fd))
+            .map(|subpackage_fds| -> Result<_> {
+                let subpackage_name = get_package_name(subpackage_fds.first().unwrap());
+                Ok((
+                    subpackage_name.to_string(),
+                    NonRootPackage::try_make_package(
+                        subpackage_name,
+                        subpackage_name,
+                        subpackage_fds,
+                        root.clone(),
+                    )?,
+                ))
+            })
+            .collect::<Result<HashMap<_, _>>>()?;
+
+        Ok(RootPackage {
+            subpackages,
+            files: self_files,
+        })
+    }
+}
+
+impl<FileType: FileTrait> NonRootPackage<FileType> {
     fn try_make_package(
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<Package<FileType>>,
+        root: Weak<Result<RootPackage<FileType>>>,
     ) -> Result<Self> {
         fn get_package_name<'a>(fd: &'a FileDescriptorProto, full_name: &str) -> &'a str {
-            let striped_path = if full_name.is_empty() {
-                fd.package()
-            } else {
-                &fd.package()[full_name.len() + 1..]
-            };
-            if let Some((name, _)) = striped_path.split_once('.') {
-                name
-            } else {
-                striped_path
+            let striped_path = &fd.package()[full_name.len() + 1..];
+            match striped_path.split_once('.') {
+                Some((name, _)) => name,
+                None => striped_path,
             }
         }
 
@@ -68,14 +113,10 @@ impl<FileType: FileTrait> Package<FileType> {
             .group_by_key(|fd| get_package_name(fd, full_name))
             .map(|subpackage_fds| -> Result<_> {
                 let subpackage_name = get_package_name(subpackage_fds.first().unwrap(), full_name);
-                let subpackage_full_name: Cow<str> = if full_name.is_empty() {
-                    subpackage_name.into()
-                } else {
-                    format!("{}.{}", full_name, subpackage_name).into()
-                };
+                let subpackage_full_name = format!("{}.{}", full_name, subpackage_name);
                 Ok((
                     subpackage_name.to_string(),
-                    Package::try_make_package(
+                    NonRootPackage::try_make_package(
                         subpackage_name,
                         &subpackage_full_name,
                         subpackage_fds,
@@ -85,8 +126,8 @@ impl<FileType: FileTrait> Package<FileType> {
             })
             .collect::<Result<HashMap<_, _>>>()?;
 
-        Ok(Package {
-            name: (!name.is_empty()).then(|| name.to_string()),
+        Ok(NonRootPackage {
+            name: name.to_string(),
             subpackages,
             files: self_files,
             root,
@@ -99,7 +140,8 @@ mod tests {
     use super::super::file::FileFake;
     use super::FileDescriptorProto;
     use ::once_cell::sync::Lazy;
-    type Package = super::Package<FileFake>;
+    use ::std::ops::Deref;
+    type RootPackage = super::RootPackage<FileFake>;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
@@ -131,8 +173,10 @@ mod tests {
     #[test]
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = Package::new_from_files(files.into_iter());
-        assert_eq!(None, root_package.name);
+        let root_package = RootPackage::try_new_from_files(files.into_iter())
+            .deref()
+            .as_ref()
+            .unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
     }
@@ -140,20 +184,22 @@ mod tests {
     #[test]
     fn test_make_package_single() {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = Package::new_from_files(files.into_iter());
-        assert_eq!(None, root_package.name);
+        let root_package = RootPackage::try_new_from_files(files.into_iter())
+            .deref()
+            .as_ref()
+            .unwrap();
         assert_eq!(0, root_package.files.len());
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
 
         let package_g = &root_package.subpackages["google"];
-        assert_eq!(Some("google".to_string()), package_g.name);
+        assert_eq!("google", package_g.name);
         assert_eq!(0, package_g.files.len());
         assert_eq!(1, package_g.subpackages.len());
         assert!(package_g.subpackages.contains_key("protobuf"));
 
         let package_g_p = &package_g.subpackages["protobuf"];
-        assert_eq!(Some("protobuf".to_string()), package_g_p.name);
+        assert_eq!("protobuf", package_g_p.name);
         assert_eq!(1, package_g_p.files.len());
         assert_eq!(Lazy::force(&FD_G_P_DESC), &package_g_p.files[0].proto);
         assert_eq!(0, package_g_p.subpackages.len());
@@ -168,27 +214,29 @@ mod tests {
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
 
-        let root_package = Package::new_from_files(files.into_iter());
-        assert_eq!(None, root_package.name);
+        let root_package = RootPackage::try_new_from_files(files.into_iter())
+            .deref()
+            .as_ref()
+            .unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
 
         let package_g = &root_package.subpackages["google"];
-        assert_eq!(Some("google".to_string()), package_g.name);
+        assert_eq!("google", package_g.name);
         assert_eq!(0, package_g.files.len());
         assert_eq!(1, package_g.subpackages.len());
         assert!(package_g.subpackages.contains_key("protobuf"));
 
         let package_g_p = &package_g.subpackages["protobuf"];
-        assert_eq!(Some("protobuf".to_string()), package_g_p.name);
+        assert_eq!("protobuf", package_g_p.name);
         assert_eq!(2, package_g_p.files.len());
         assert_eq!(1, package_g_p.subpackages.len());
         assert!(package_g_p.subpackages.contains_key("compiler"));
 
         let package_g_p_c = &package_g_p.subpackages["compiler"];
-        assert_eq!(Some("compiler".to_string()), package_g_p_c.name);
+        assert_eq!("compiler", package_g_p_c.name);
         assert_eq!(1, package_g_p_c.files.len());
         assert_eq!(Lazy::force(&FD_G_P_C_PLUGIN), &package_g_p_c.files[0].proto);
         assert_eq!(0, package_g_p_c.subpackages.len());
