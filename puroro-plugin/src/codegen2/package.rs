@@ -13,8 +13,11 @@
 // limitations under the License.
 
 use super::*;
+use crate::codegen::utils::StrExt;
 use crate::Result;
+use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::quote::{format_ident, quote};
 use ::std::collections::HashMap;
 use ::std::rc::{Rc, Weak};
 
@@ -30,6 +33,29 @@ pub struct NonRootPackage<FileType> {
     subpackages: HashMap<String, NonRootPackage<FileType>>,
     files: Vec<FileType>,
     root: Weak<RootPackage<FileType>>,
+}
+
+pub trait Package<FileType> {
+    fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>>;
+    fn files(&self) -> &[FileType];
+
+    fn gen_module_file_header(&self) -> Result<TokenStream>;
+    fn gen_module_file(&self) -> Result<TokenStream> {
+        let header = self.gen_module_file_header()?;
+        let submodules_from_packages = self
+            .subpackages()
+            .into_iter()
+            .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
+            .collect::<Vec<_>>();
+
+        Ok(quote! {
+            #header
+
+            #(
+                pub mod #submodules_from_packages
+            )*
+        })
+    }
 }
 
 impl<FileType: FileTrait> RootPackage<FileType> {
