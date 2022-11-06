@@ -30,6 +30,7 @@ pub struct RootPackage<FileType> {
 #[derive(Debug)]
 pub struct NonRootPackage<FileType> {
     name: String,
+    full_name: String,
     subpackages: HashMap<String, NonRootPackage<FileType>>,
     files: Vec<FileType>,
     root: Weak<RootPackage<FileType>>,
@@ -162,6 +163,7 @@ impl<FileType: FileTrait> NonRootPackage<FileType> {
 
         Ok(NonRootPackage {
             name: name.to_string(),
+            full_name: full_name.to_string(),
             subpackages,
             files: self_files,
             root,
@@ -222,12 +224,14 @@ mod tests {
 
         let package_g = &root_package.subpackages["google"];
         assert_eq!("google", package_g.name);
+        assert_eq!("google", package_g.full_name);
         assert_eq!(0, package_g.files.len());
         assert_eq!(1, package_g.subpackages.len());
         assert!(package_g.subpackages.contains_key("protobuf"));
 
         let package_g_p = &package_g.subpackages["protobuf"];
         assert_eq!("protobuf", package_g_p.name);
+        assert_eq!("google.protobuf", package_g_p.full_name);
         assert_eq!(1, package_g_p.files.len());
         assert_eq!(Lazy::force(&FD_G_P_DESC), &package_g_p.files[0].proto);
         assert_eq!(0, package_g_p.subpackages.len());
@@ -250,18 +254,21 @@ mod tests {
 
         let package_g = &root_package.subpackages["google"];
         assert_eq!("google", package_g.name);
+        assert_eq!("google", package_g.full_name);
         assert_eq!(0, package_g.files.len());
         assert_eq!(1, package_g.subpackages.len());
         assert!(package_g.subpackages.contains_key("protobuf"));
 
         let package_g_p = &package_g.subpackages["protobuf"];
         assert_eq!("protobuf", package_g_p.name);
+        assert_eq!("google.protobuf", package_g_p.full_name);
         assert_eq!(2, package_g_p.files.len());
         assert_eq!(1, package_g_p.subpackages.len());
         assert!(package_g_p.subpackages.contains_key("compiler"));
 
         let package_g_p_c = &package_g_p.subpackages["compiler"];
         assert_eq!("compiler", package_g_p_c.name);
+        assert_eq!("google.protobuf.compiler", package_g_p_c.full_name);
         assert_eq!(1, package_g_p_c.files.len());
         assert_eq!(Lazy::force(&FD_G_P_C_PLUGIN), &package_g_p_c.files[0].proto);
         assert_eq!(0, package_g_p_c.subpackages.len());
