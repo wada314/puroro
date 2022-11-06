@@ -30,21 +30,38 @@ pub struct NonRootPackage<FileType> {
     name: String,
     subpackages: HashMap<String, NonRootPackage<FileType>>,
     files: Vec<FileType>,
-    root: Weak<Result<RootPackage<FileType>>>,
+    root: Weak<RootPackage<FileType>>,
 }
 
 impl<FileType: FileTrait> RootPackage<FileType> {
     pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
-    ) -> Rc<Result<Self>> {
+    ) -> Result<Rc<Self>> {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
-        Rc::new_cyclic(|weak_root| RootPackage::try_make_package(&files, weak_root.clone()))
+        let mut maybe_error = None;
+        let maybe_root_package = Rc::new_cyclic(|weak_root| {
+            match RootPackage::try_make_package(&files, weak_root.clone()) {
+                Ok(root_package) => root_package,
+                Err(error) => {
+                    maybe_error = Some(error);
+                    // Fortunately, a dummy `RootPackage` can be safely constructible.
+                    RootPackage {
+                        subpackages: HashMap::new(),
+                        files: Vec::new(),
+                    }
+                }
+            }
+        });
+        match maybe_error {
+            Some(error) => Err(error)?,
+            None => Ok(maybe_root_package),
+        }
     }
 
     fn try_make_package(
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<Result<RootPackage<FileType>>>,
+        root: Weak<RootPackage<FileType>>,
     ) -> Result<Self> {
         fn get_package_name<'a>(fd: &'a FileDescriptorProto) -> &'a str {
             match fd.package().split_once('.') {
@@ -90,7 +107,7 @@ impl<FileType: FileTrait> NonRootPackage<FileType> {
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<Result<RootPackage<FileType>>>,
+        root: Weak<RootPackage<FileType>>,
     ) -> Result<Self> {
         fn get_package_name<'a>(fd: &'a FileDescriptorProto, full_name: &str) -> &'a str {
             let striped_path = &fd.package()[full_name.len() + 1..];
@@ -173,10 +190,7 @@ mod tests {
     #[test]
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::try_new_from_files(files.into_iter())
-            .deref()
-            .as_ref()
-            .unwrap();
+        let root_package = RootPackage::try_new_from_files(files.into_iter()).unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
     }
@@ -184,10 +198,7 @@ mod tests {
     #[test]
     fn test_make_package_single() {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = RootPackage::try_new_from_files(files.into_iter())
-            .deref()
-            .as_ref()
-            .unwrap();
+        let root_package = RootPackage::try_new_from_files(files.into_iter()).unwrap();
         assert_eq!(0, root_package.files.len());
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
@@ -214,10 +225,7 @@ mod tests {
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
 
-        let root_package = RootPackage::try_new_from_files(files.into_iter())
-            .deref()
-            .as_ref()
-            .unwrap();
+        let root_package = RootPackage::try_new_from_files(files.into_iter()).unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
         assert_eq!(1, root_package.subpackages.len());
