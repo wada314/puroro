@@ -55,7 +55,7 @@ pub trait PackageTrait<FileType> {
             #header
 
             #(
-                pub mod #submodules_from_packages
+                pub mod #submodules_from_packages;
             )*
         })
     }

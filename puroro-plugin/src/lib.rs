@@ -32,3 +32,4 @@ pub use ::puroro_protobuf_compiled::puroro;
 
 pub use crate::codegen::generate_output_files_from_file_descriptors;
 pub use crate::codegen::generate_output_files_from_file_descriptors2;
+pub use crate::codegen2::generate_output_file_protos;

@@ -21,6 +21,6 @@ pub struct Field {}
 
 impl Field {
     pub fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
-        todo!()
+        Ok(Field {})
     }
 }

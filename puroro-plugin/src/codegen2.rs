@@ -27,9 +27,10 @@ use self::oneof::*;
 use self::package::*;
 use self::util::*;
 use crate::{ErrorKind, GeneratorError, Result};
+use ::proc_macro2::TokenStream;
+use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
+use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-use ::std::rc::Rc;
-use proc_macro2::TokenStream;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -49,13 +50,33 @@ impl TryFrom<&str> for Syntax {
     }
 }
 
-pub fn generate_files<'a>(
+pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
-    let root_package = RootPackage::<File>::try_new_from_files(files)?;
+    let root_package = RootPackage::<self::file::File>::try_new_from_files(files)?;
     Ok(root_package
         .get_all_subpackages()
         .into_iter()
         .map(|p| -> Result<_> { Ok((p.module_file_name().to_string(), p.gen_module_file()?)) })
         .collect::<Result<Vec<_>>>()?)
+}
+
+pub fn generate_output_file_protos<'a>(
+    files: impl Iterator<Item = &'a FileDescriptorProto>,
+) -> Result<CodeGeneratorResponse> {
+    let mut cgr = CodeGeneratorResponse::default();
+    *cgr.file_mut() = generate_file_names_and_tokens(files)?
+        .into_iter()
+        .map(|(file_name, ts)| {
+            let syn_file = syn::parse2::<syn::File>(ts).unwrap();
+            let formatted = prettyplease::unparse(&syn_file);
+
+            let mut output_file = File::default();
+            *output_file.name_mut() = file_name;
+            *output_file.content_mut() = formatted;
+            Ok(output_file)
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(cgr)
 }

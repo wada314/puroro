@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use puroro_plugin::puroro::Message;
-use puroro_plugin::{generate_output_files_from_file_descriptors2, FileDescriptorSet};
+use puroro_plugin::{generate_output_file_protos, FileDescriptorSet};
 use std::env;
 use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
@@ -59,10 +59,9 @@ fn main() {
     let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
-    let output_files =
-        generate_output_files_from_file_descriptors2(file_descriptor_set.file()).unwrap();
+    let cgr = generate_output_file_protos(file_descriptor_set.file().iter()).unwrap();
     // Output the File proto structs into the actual filesystem.
-    for output_file in output_files {
+    for output_file in cgr.file() {
         let file_path = output_rust_path.join(output_file.name());
         create_dir_all(file_path.parent().unwrap()).unwrap();
         let mut file = File::create(&file_path).unwrap();

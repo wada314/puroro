@@ -27,6 +27,6 @@ pub type Oneof = OneofImpl;
 
 impl OneofTrait for OneofImpl {
     fn try_new(proto: &OneofDescriptorProto) -> Result<Self> {
-        todo!()
+        Ok(OneofImpl {})
     }
 }

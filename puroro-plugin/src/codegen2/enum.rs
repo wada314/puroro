@@ -25,14 +25,8 @@ pub struct EnumImpl {}
 
 pub type Enum = EnumImpl;
 
-impl EnumImpl {
-    pub fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
-        todo!()
-    }
-}
-
 impl EnumTrait for EnumImpl {
     fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
-        todo!()
+        Ok(EnumImpl {})
     }
 }
