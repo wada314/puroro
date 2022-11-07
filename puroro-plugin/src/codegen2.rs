@@ -29,6 +29,7 @@ use self::util::*;
 use crate::{ErrorKind, GeneratorError, Result};
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::rc::Rc;
+use proc_macro2::TokenStream;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -48,8 +49,13 @@ impl TryFrom<&str> for Syntax {
     }
 }
 
-pub fn generate_root_package<'a>(
+pub fn generate_files<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
-) -> Result<Rc<RootPackage<File>>> {
-    RootPackage::try_new_from_files(files)
+) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
+    let root_package = RootPackage::<File>::try_new_from_files(files)?;
+    Ok(root_package
+        .get_all_subpackages()
+        .into_iter()
+        .map(|p| -> Result<_> { Ok((p.module_file_name().to_string(), p.gen_module_file()?)) })
+        .collect::<Result<Vec<_>>>()?)
 }
