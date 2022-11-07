@@ -113,6 +113,15 @@ impl<FileType: FileTrait> RootPackage<FileType> {
             files: self_files,
         })
     }
+
+    fn get_all_subpackages(&self) -> impl IntoIterator<Item = &dyn PackageTrait<FileType>> {
+        let mut ret = Vec::new();
+        ret.push(self as &dyn PackageTrait<FileType>);
+        for subpackage in self.subpackages.values() {
+            subpackage.get_all_packages(&mut ret);
+        }
+        ret
+    }
 }
 
 impl<FileType> Default for RootPackage<FileType> {
