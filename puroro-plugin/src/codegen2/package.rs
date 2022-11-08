@@ -44,35 +44,6 @@ pub trait PackageTrait {
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<Self::InputFileType>>;
     fn files(&self) -> &[Self::InputFileType];
 
-    fn gen_module_file_header(&self) -> Result<TokenStream>;
-    fn gen_module_file(&self) -> Result<TokenStream> {
-        let header = self.gen_module_file_header()?;
-        let submodules_from_packages = self
-            .subpackages()
-            .into_iter()
-            .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
-            .collect::<Vec<_>>();
-        let messages = self
-            .files()
-            .iter()
-            .flat_map(|f| f.messages().iter())
-            .collect::<Vec<_>>();
-        let message_structs = messages
-            .iter()
-            .map(|m| m.gen_struct())
-            .collect::<Result<Vec<_>>>()?;
-
-        Ok(quote! {
-            #header
-
-            #(
-                pub mod #submodules_from_packages;
-            )*
-
-            #(#message_structs)*
-        })
-    }
-
     fn module_file_name(&self) -> Cow<'_, str>;
 }
 
@@ -127,12 +98,8 @@ impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
         })
     }
 
-    pub fn get_all_subpackages(
-        &self,
-    ) -> impl IntoIterator<Item = &dyn PackageTrait<InputFileType = <Self as PackageTrait>::InputFileType>>
-    {
+    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &NonRootPackage<InputFileType>> {
         let mut ret = Vec::new();
-        ret.push(self as &dyn PackageTrait<InputFileType = <Self as PackageTrait>::InputFileType>);
         for subpackage in self.subpackages.values() {
             subpackage.get_all_packages(&mut ret);
         }
@@ -199,11 +166,8 @@ impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
         })
     }
 
-    fn get_all_packages<'a>(
-        &'a self,
-        packages: &mut Vec<&'a dyn PackageTrait<InputFileType = <Self as PackageTrait>::InputFileType>>,
-    ) {
-        packages.push(self as &dyn PackageTrait<InputFileType = <Self as PackageTrait>::InputFileType>);
+    fn get_all_packages<'a>(&'a self, packages: &mut Vec<&'a NonRootPackage<InputFileType>>) {
+        packages.push(self);
         for subpackage in self.subpackages.values() {
             subpackage.get_all_packages(packages);
         }
@@ -218,6 +182,39 @@ impl<InputFileType: InputFileTrait> PackageTrait for RootPackage<InputFileType> 
     }
     fn files(&self) -> &[InputFileType] {
         &self.files
+    }
+    fn module_file_name(&self) -> Cow<'_, str> {
+        "lib.rs".into()
+    }
+}
+
+impl<InputFileType: InputFileTrait> PackageTrait for NonRootPackage<InputFileType> {
+    type InputFileType = InputFileType;
+
+    fn subpackages(&self) -> &HashMap<String, NonRootPackage<InputFileType>> {
+        &self.subpackages
+    }
+    fn files(&self) -> &[InputFileType] {
+        &self.files
+    }
+    fn module_file_name(&self) -> Cow<'_, str> {
+        format!(
+            "{}.rs",
+            self.full_name
+                .split('.')
+                .map(|package| package
+                    .to_lower_snake_case()
+                    .escape_rust_keywords()
+                    .to_string())
+                .join("/")
+        )
+        .into()
+    }
+}
+
+impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
+    pub fn gen_module_file(&self) -> Result<TokenStream> {
+        self::gen_module_file_impl(self, self.gen_module_file_header()?)
     }
     fn gen_module_file_header(&self) -> Result<TokenStream> {
         Ok(quote! {
@@ -236,19 +233,11 @@ impl<InputFileType: InputFileTrait> PackageTrait for RootPackage<InputFileType> 
             }
         })
     }
-    fn module_file_name(&self) -> Cow<'_, str> {
-        "lib.rs".into()
-    }
 }
 
-impl<InputFileType: InputFileTrait> PackageTrait for NonRootPackage<InputFileType> {
-    type InputFileType = InputFileType;
-
-    fn subpackages(&self) -> &HashMap<String, NonRootPackage<InputFileType>> {
-        &self.subpackages
-    }
-    fn files(&self) -> &[InputFileType] {
-        &self.files
+impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
+    pub fn gen_module_file(&self) -> Result<TokenStream> {
+        self::gen_module_file_impl(self, self.gen_module_file_header()?)
     }
     fn gen_module_file_header(&self) -> Result<TokenStream> {
         let comment = format!("Generated from package \"{}\"", &self.full_name);
@@ -262,19 +251,33 @@ impl<InputFileType: InputFileTrait> PackageTrait for NonRootPackage<InputFileTyp
             }
         })
     }
-    fn module_file_name(&self) -> Cow<'_, str> {
-        format!(
-            "{}.rs",
-            self.full_name
-                .split('.')
-                .map(|package| package
-                    .to_lower_snake_case()
-                    .escape_rust_keywords()
-                    .to_string())
-                .join("/")
-        )
-        .into()
-    }
+}
+
+fn gen_module_file_impl(package: &impl PackageTrait, header: TokenStream) -> Result<TokenStream> {
+    let submodules_from_packages = package
+        .subpackages()
+        .into_iter()
+        .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
+        .collect::<Vec<_>>();
+    let messages = package
+        .files()
+        .iter()
+        .flat_map(|f| f.messages().iter())
+        .collect::<Vec<_>>();
+    let message_structs = messages
+        .iter()
+        .map(|m| m.gen_struct())
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(quote! {
+        #header
+
+        #(
+            pub mod #submodules_from_packages;
+        )*
+
+        #(#message_structs)*
+    })
 }
 
 #[cfg(test)]

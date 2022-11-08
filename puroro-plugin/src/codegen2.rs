@@ -31,6 +31,7 @@ use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::std::iter;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -58,6 +59,10 @@ pub fn generate_file_names_and_tokens<'a>(
         .get_all_subpackages()
         .into_iter()
         .map(|p| -> Result<_> { Ok((p.module_file_name().to_string(), p.gen_module_file()?)) })
+        .chain(iter::once(Ok((
+            root_package.module_file_name().to_string(),
+            root_package.gen_module_file()?,
+        ))))
         .collect::<Result<Vec<_>>>()?)
 }
 
