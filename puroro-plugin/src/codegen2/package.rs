@@ -39,7 +39,7 @@ pub struct NonRootPackage<FileType> {
 }
 
 pub trait PackageTrait {
-    type FileType;
+    type FileType: FileTrait;
 
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<Self::FileType>>;
     fn files(&self) -> &[Self::FileType];
@@ -199,7 +199,7 @@ impl<FileType: FileTrait> NonRootPackage<FileType> {
     }
 }
 
-impl<FileType> PackageTrait for RootPackage<FileType> {
+impl<FileType: FileTrait> PackageTrait for RootPackage<FileType> {
     type FileType = FileType;
 
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>> {
@@ -230,7 +230,7 @@ impl<FileType> PackageTrait for RootPackage<FileType> {
     }
 }
 
-impl<FileType> PackageTrait for NonRootPackage<FileType> {
+impl<FileType: FileTrait> PackageTrait for NonRootPackage<FileType> {
     type FileType = FileType;
 
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>> {

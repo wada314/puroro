@@ -15,8 +15,8 @@
 use super::*;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 use ::proc_macro2::TokenStream;
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 use ::quote::{format_ident, quote};
 
 pub trait MessageTrait: Sized {
@@ -80,5 +80,15 @@ impl<EnumType, OneofType> MessageImpl<EnumType, OneofType> {
                 .collect::<Result<Vec<_>>>()?
                 .into_boxed_slice())
         })?)
+    }
+}
+
+#[cfg(test)]
+pub struct MessageFake;
+
+#[cfg(test)]
+impl MessageTrait for MessageFake {
+    fn try_new(proto: &DescriptorProto) -> Result<Self> {
+        Ok(MessageFake)
     }
 }

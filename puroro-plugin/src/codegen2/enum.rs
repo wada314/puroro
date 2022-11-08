@@ -30,3 +30,13 @@ impl EnumTrait for EnumImpl {
         Ok(EnumImpl {})
     }
 }
+
+#[cfg(test)]
+pub struct EnumFake;
+
+#[cfg(test)]
+impl EnumTrait for EnumFake {
+    fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
+        Ok(EnumFake)
+    }
+}
