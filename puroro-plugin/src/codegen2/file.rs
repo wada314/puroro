@@ -18,6 +18,7 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
 pub trait FileTrait: Sized {
     fn try_new(proto: &FileDescriptorProto) -> Result<Self>;
+    
 }
 
 #[cfg(test)]
@@ -31,6 +32,9 @@ impl FileTrait for FileFake {
         Ok(FileFake {
             proto: proto.clone(),
         })
+    }
+    fn gen(&self) -> Result<TokenStream> {
+        Ok(quote!{})
     }
 }
 

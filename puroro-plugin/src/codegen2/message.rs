@@ -16,6 +16,8 @@ use super::*;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
+use ::proc_macro2::TokenStream;
+use ::quote::{format_ident, quote};
 
 pub trait MessageTrait: Sized {
     fn try_new(proto: &DescriptorProto) -> Result<Self>;
@@ -23,6 +25,7 @@ pub trait MessageTrait: Sized {
 
 #[derive(Debug)]
 pub struct MessageImpl<EnumType, OneofType> {
+    name: String,
     submessages: Vec<Self>,
     enums: Vec<EnumType>,
     oneofs: Vec<OneofType>,
@@ -34,7 +37,9 @@ pub type Message = MessageImpl<Enum, Oneof>;
 
 impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<EnumType, OneofType> {
     fn try_new(proto: &DescriptorProto) -> Result<Self> {
+        let name = proto.name().to_string();
         Ok(MessageImpl {
+            name,
             submessages: proto
                 .nested_type()
                 .into_iter()
