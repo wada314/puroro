@@ -16,7 +16,7 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
-pub trait FileTrait: Sized {
+pub trait InputFileTrait: Sized {
     type MessageType: MessageTrait;
     type EnumType: EnumTrait;
 
@@ -26,17 +26,17 @@ pub trait FileTrait: Sized {
 }
 
 #[cfg(test)]
-pub struct FileFake {
+pub struct InputFileFake {
     pub proto: FileDescriptorProto,
 }
 
 #[cfg(test)]
-impl FileTrait for FileFake {
+impl InputFileTrait for InputFileFake {
     type MessageType = MessageFake;
     type EnumType = EnumFake;
 
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
-        Ok(FileFake {
+        Ok(InputFileFake {
             proto: proto.clone(),
         })
     }
@@ -49,15 +49,17 @@ impl FileTrait for FileFake {
 }
 
 #[derive(Debug)]
-pub struct FileImpl<MessageType, EnumType> {
+pub struct InputFileImpl<MessageType, EnumType> {
     syntax: Syntax,
     messages: Vec<MessageType>,
     enums: Vec<EnumType>,
 }
 
-pub type File = FileImpl<Message, Enum>;
+pub type File = InputFileImpl<Message, Enum>;
 
-impl<MessageType: MessageTrait, EnumType: EnumTrait> FileTrait for FileImpl<MessageType, EnumType> {
+impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
+    for InputFileImpl<MessageType, EnumType>
+{
     type MessageType = MessageType;
     type EnumType = EnumType;
 

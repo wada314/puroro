@@ -14,14 +14,14 @@
 
 mod r#enum;
 mod field;
-mod file;
+mod input_file;
 mod message;
 mod oneof;
 mod package;
 mod util;
 use self::r#enum::*;
 use self::field::*;
-use self::file::*;
+use self::input_file::*;
 use self::message::*;
 use self::oneof::*;
 use self::package::*;
@@ -53,7 +53,7 @@ impl TryFrom<&str> for Syntax {
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
-    let root_package = RootPackage::<self::file::File>::try_new_from_files(files)?;
+    let root_package = RootPackage::<self::input_file::File>::try_new_from_files(files)?;
     Ok(root_package
         .get_all_subpackages()
         .into_iter()
