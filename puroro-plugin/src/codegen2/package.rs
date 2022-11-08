@@ -38,9 +38,11 @@ pub struct NonRootPackage<FileType> {
     root: Weak<RootPackage<FileType>>,
 }
 
-pub trait PackageTrait<FileType> {
-    fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>>;
-    fn files(&self) -> &[FileType];
+pub trait PackageTrait {
+    type FileType;
+
+    fn subpackages(&self) -> &HashMap<String, NonRootPackage<Self::FileType>>;
+    fn files(&self) -> &[Self::FileType];
 
     fn gen_module_file_header(&self) -> Result<TokenStream>;
     fn gen_module_file(&self) -> Result<TokenStream> {
@@ -114,9 +116,12 @@ impl<FileType: FileTrait> RootPackage<FileType> {
         })
     }
 
-    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &dyn PackageTrait<FileType>> {
+    pub fn get_all_subpackages(
+        &self,
+    ) -> impl IntoIterator<Item = &dyn PackageTrait<FileType = <Self as PackageTrait>::FileType>>
+    {
         let mut ret = Vec::new();
-        ret.push(self as &dyn PackageTrait<FileType>);
+        ret.push(self as &dyn PackageTrait<FileType = <Self as PackageTrait>::FileType>);
         for subpackage in self.subpackages.values() {
             subpackage.get_all_packages(&mut ret);
         }
@@ -183,15 +188,20 @@ impl<FileType: FileTrait> NonRootPackage<FileType> {
         })
     }
 
-    fn get_all_packages<'a>(&'a self, packages: &mut Vec<&'a dyn PackageTrait<FileType>>) {
-        packages.push(self as &dyn PackageTrait<FileType>);
+    fn get_all_packages<'a>(
+        &'a self,
+        packages: &mut Vec<&'a dyn PackageTrait<FileType = <Self as PackageTrait>::FileType>>,
+    ) {
+        packages.push(self as &dyn PackageTrait<FileType = <Self as PackageTrait>::FileType>);
         for subpackage in self.subpackages.values() {
             subpackage.get_all_packages(packages);
         }
     }
 }
 
-impl<FileType> PackageTrait<FileType> for RootPackage<FileType> {
+impl<FileType> PackageTrait for RootPackage<FileType> {
+    type FileType = FileType;
+
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>> {
         &self.subpackages
     }
@@ -220,7 +230,9 @@ impl<FileType> PackageTrait<FileType> for RootPackage<FileType> {
     }
 }
 
-impl<FileType> PackageTrait<FileType> for NonRootPackage<FileType> {
+impl<FileType> PackageTrait for NonRootPackage<FileType> {
+    type FileType = FileType;
+
     fn subpackages(&self) -> &HashMap<String, NonRootPackage<FileType>> {
         &self.subpackages
     }
