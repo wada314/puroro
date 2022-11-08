@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::*;
+use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -21,6 +22,7 @@ use ::quote::{format_ident, quote};
 
 pub trait MessageTrait: Sized {
     fn try_new(proto: &DescriptorProto) -> Result<Self>;
+    fn gen_struct(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
@@ -59,6 +61,18 @@ impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<En
             fields: OnceCell::new(),
         })
     }
+
+    fn gen_struct(&self) -> Result<TokenStream> {
+        let ident = format_ident!(
+            "{}",
+            self.name.to_camel_case().escape_rust_keywords().to_string()
+        );
+        Ok(quote! {
+            pub struct #ident {
+
+            }
+        })
+    }
 }
 
 impl<EnumType, OneofType> MessageImpl<EnumType, OneofType> {
@@ -90,5 +104,9 @@ pub struct MessageFake;
 impl MessageTrait for MessageFake {
     fn try_new(proto: &DescriptorProto) -> Result<Self> {
         Ok(MessageFake)
+    }
+
+    fn gen_struct(&self) -> Result<TokenStream> {
+        Ok(quote! {})
     }
 }

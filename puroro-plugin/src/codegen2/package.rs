@@ -52,6 +52,15 @@ pub trait PackageTrait {
             .into_iter()
             .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
             .collect::<Vec<_>>();
+        let messages = self
+            .files()
+            .iter()
+            .flat_map(|f| f.messages().iter())
+            .collect::<Vec<_>>();
+        let message_structs = messages
+            .iter()
+            .map(|m| m.gen_struct())
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(quote! {
             #header
@@ -59,6 +68,8 @@ pub trait PackageTrait {
             #(
                 pub mod #submodules_from_packages;
             )*
+
+            #(#message_structs)*
         })
     }
 

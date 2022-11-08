@@ -21,6 +21,8 @@ pub trait FileTrait: Sized {
     type EnumType: EnumTrait;
 
     fn try_new(proto: &FileDescriptorProto) -> Result<Self>;
+    fn messages(&self) -> &[Self::MessageType];
+    fn enums(&self) -> &[Self::EnumType];
 }
 
 #[cfg(test)]
@@ -37,6 +39,12 @@ impl FileTrait for FileFake {
         Ok(FileFake {
             proto: proto.clone(),
         })
+    }
+    fn messages(&self) -> &[MessageType] {
+        &[]
+    }
+    fn enums(&self) -> &[EnumType] {
+        &[]
     }
 }
 
@@ -68,13 +76,11 @@ impl<MessageType: MessageTrait, EnumType: EnumTrait> FileTrait for FileImpl<Mess
                 .collect::<Result<Vec<_>>>()?,
         })
     }
-}
 
-impl<MessageType, EnumType> FileImpl<MessageType, EnumType> {
-    pub fn messages(&self) -> Result<&[MessageType]> {
-        Ok(&self.messages)
+    fn messages(&self) -> &[MessageType] {
+        &self.messages
     }
-    pub fn enums(&self) -> Result<&[EnumType]> {
-        Ok(&self.enums)
+    fn enums(&self) -> &[EnumType] {
+        &self.enums
     }
 }
