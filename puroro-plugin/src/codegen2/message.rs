@@ -15,9 +15,8 @@
 use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
-use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
+use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
 use ::quote::{format_ident, quote};
 
 pub trait MessageTrait: Sized {
@@ -58,7 +57,12 @@ impl<EnumType: EnumTrait, OneofType: OneofTrait, FieldType: FieldTrait> MessageT
                 .into_iter()
                 .map(|o| OneofType::try_new(o))
                 .collect::<Result<Vec<_>>>()?,
-            fields: Vec::new(), // TODO
+            fields: proto
+                .field()
+                .into_iter()
+                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
+                .map(|f| FieldType::try_new(f))
+                .collect::<Result<Vec<_>>>()?,
         })
     }
 
