@@ -21,12 +21,12 @@ pub trait FieldTrait: Sized {
 }
 
 #[derive(Debug)]
-pub struct FieldType {}
+pub struct FieldImpl {}
 
-pub type Field = FieldType;
+pub type Field = FieldImpl;
 
-impl FieldTrait for FieldType {
+impl FieldTrait for FieldImpl {
     fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
-        Ok(FieldType {})
+        Ok(FieldImpl {})
     }
 }
