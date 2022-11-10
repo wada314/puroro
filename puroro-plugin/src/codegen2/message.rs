@@ -26,18 +26,19 @@ pub trait MessageTrait: Sized {
 }
 
 #[derive(Debug)]
-pub struct MessageImpl<EnumType, OneofType> {
+pub struct MessageImpl<EnumType, OneofType, FieldType> {
     name: String,
     submessages: Vec<Self>,
     enums: Vec<EnumType>,
     oneofs: Vec<OneofType>,
-    fields_proto: Box<[FieldDescriptorProto]>,
-    fields: OnceCell<Box<[Field]>>,
+    fields: Vec<FieldType>,
 }
 
-pub type Message = MessageImpl<Enum, Oneof>;
+pub type Message = MessageImpl<Enum, Oneof, Field>;
 
-impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<EnumType, OneofType> {
+impl<EnumType: EnumTrait, OneofType: OneofTrait, FieldType: FieldTrait> MessageTrait
+    for MessageImpl<EnumType, OneofType, FieldType>
+{
     fn try_new(proto: &DescriptorProto) -> Result<Self> {
         let name = proto.name().to_string();
         Ok(MessageImpl {
@@ -57,8 +58,7 @@ impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<En
                 .into_iter()
                 .map(|o| OneofType::try_new(o))
                 .collect::<Result<Vec<_>>>()?,
-            fields_proto: proto.field().to_vec().into_boxed_slice(),
-            fields: OnceCell::new(),
+            fields: Vec::new(), // TODO
         })
     }
 
@@ -75,7 +75,7 @@ impl<EnumType: EnumTrait, OneofType: OneofTrait> MessageTrait for MessageImpl<En
     }
 }
 
-impl<EnumType, OneofType> MessageImpl<EnumType, OneofType> {
+impl<EnumType, OneofType, FieldType> MessageImpl<EnumType, OneofType, FieldType> {
     pub fn submessages(&self) -> Result<&[Self]> {
         Ok(&self.submessages)
     }
@@ -85,15 +85,8 @@ impl<EnumType, OneofType> MessageImpl<EnumType, OneofType> {
     pub fn oneofs(&self) -> Result<&[OneofType]> {
         Ok(&self.oneofs)
     }
-    pub fn fields(&self) -> Result<&[Field]> {
-        Ok(self.fields.get_or_try_init(|| -> Result<_> {
-            Ok(self
-                .fields_proto
-                .into_iter()
-                .map(|f| Field::try_new(f))
-                .collect::<Result<Vec<_>>>()?
-                .into_boxed_slice())
-        })?)
+    pub fn fields(&self) -> Result<&[FieldType]> {
+        Ok(&self.fields)
     }
 }
 

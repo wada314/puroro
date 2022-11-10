@@ -16,11 +16,17 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
 
-#[derive(Debug)]
-pub struct Field {}
+pub trait FieldTrait: Sized {
+    fn try_new(proto: &FieldDescriptorProto) -> Result<Self>;
+}
 
-impl Field {
-    pub fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
-        Ok(Field {})
+#[derive(Debug)]
+pub struct FieldType {}
+
+pub type Field = FieldType;
+
+impl FieldTrait for FieldType {
+    fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
+        Ok(FieldType {})
     }
 }
