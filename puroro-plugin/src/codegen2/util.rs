@@ -16,7 +16,7 @@ use ::std::mem;
 use ::std::rc::{Rc, Weak};
 
 pub trait SliceExt<T> {
-    fn split_until<F>(&self, pred: F) -> (&[T], &[T])
+    fn split_while<F>(&self, pred: F) -> (&[T], &[T])
     where
         F: FnMut(&T) -> bool;
 
@@ -27,7 +27,7 @@ pub trait SliceExt<T> {
 }
 
 impl<T> SliceExt<T> for [T] {
-    fn split_until<F>(&self, mut pred: F) -> (&[T], &[T])
+    fn split_while<F>(&self, mut pred: F) -> (&[T], &[T])
     where
         F: FnMut(&T) -> bool,
     {

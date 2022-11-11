@@ -24,44 +24,61 @@ use ::std::collections::HashMap;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
-pub struct RootPackage<FileType> {
-    subpackages: HashMap<String, NonRootPackage<FileType>>,
-    files: Vec<FileType>,
+pub struct PackageCommon {
+    subpackages: HashMap<String, NonRootPackage>,
+    files: Vec<Rc<Box<dyn InputFileTrait>>>,
 }
 
 #[derive(Debug)]
-pub struct NonRootPackage<FileType> {
+pub struct NonRootPackage {
+    common: PackageCommon,
     name: String,
     full_name: String,
-    subpackages: HashMap<String, NonRootPackage<FileType>>,
-    files: Vec<FileType>,
-    root: Weak<RootPackage<FileType>>,
+    root: Weak<PackageCommon>,
 }
 
 pub trait PackageTrait {
-    type InputFileType: InputFileTrait;
-
-    fn subpackages(&self) -> &HashMap<String, NonRootPackage<Self::InputFileType>>;
-    fn files(&self) -> &[Self::InputFileType];
-
-    fn module_file_name(&self) -> Cow<'_, str>;
+    // fn subpackages(&self) -> &HashMap<String, NonRootPackage>;
+    // fn module_file_name(&self) -> Cow<'_, str>;
 }
 
-impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
-    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+impl PackageCommon {
+    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
-    ) -> Result<Rc<Self>> {
+        ff: FF,
+    ) -> Result<Rc<Box<dyn PackageTrait>>>
+    where
+        FF: FnMut(
+            &FileDescriptorProto,
+            Weak<Box<dyn PackageTrait>>,
+        ) -> Result<Box<dyn InputFileTrait>>,
+    {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
-        Rc::try_new_cyclic(|weak_root| RootPackage::try_make_package(&files, weak_root.clone()))
+        Rc::try_new_boxed_cyclic(|weak_root| {
+            PackageCommon::try_make_package(0, &files, Weak::clone(weak_root), ff)
+        })
     }
 
-    fn try_make_package(
+    fn try_make_package<FF>(
+        full_name_len: usize,
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<RootPackage<InputFileType>>,
-    ) -> Result<Self> {
-        fn get_package_name<'a>(fd: &'a FileDescriptorProto) -> &'a str {
-            match fd.package().split_once('.') {
+        root: Weak<Box<dyn PackageTrait>>,
+        ff: FF,
+    ) -> Result<Box<dyn PackageTrait>>
+    where
+        FF: FnMut(
+            &FileDescriptorProto,
+            Weak<Box<dyn PackageTrait>>,
+        ) -> Result<Box<dyn InputFileTrait>>,
+    {
+        fn get_package_name<'a>(fd: &'a FileDescriptorProto, full_name_len: usize) -> &'a str {
+            let prefix_len = if full_name_len == 0 {
+                0
+            } else {
+                full_name_len + 1
+            };
+            match fd.package()[prefix_len..].split_once('.') {
                 Some((name, _)) => name,
                 None => fd.package(),
             }
@@ -69,22 +86,24 @@ impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
 
         // The first few FDs might be FDs which are directly belonging to the current package.
         // The remaining FDs are belonging to the child packages.
-        let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package().is_empty());
+        let (self_fds, child_fds) =
+            sorted_fds.split_while(|fd| fd.package().len() == full_name_len);
 
         let self_files = self_fds
             .into_iter()
-            .map(|fd| InputFileType::try_new(fd))
+            .map(|fd| ff(fd, Weak::clone(&root)))
             .collect::<Result<Vec<_>>>()?;
 
         let subpackages = child_fds
-            .group_by_key(|fd| get_package_name(fd))
+            .group_by_key(|fd| get_package_name(fd, full_name_len))
             .map(|subpackage_fds| -> Result<_> {
-                let subpackage_name = get_package_name(subpackage_fds.first().unwrap());
+                let subpackage_name =
+                    get_package_name(subpackage_fds.first().unwrap(), full_name_len);
                 Ok((
                     subpackage_name.to_string(),
                     NonRootPackage::try_make_package(
                         subpackage_name,
-                        subpackage_name,
+                        subpackage_full_name,
                         subpackage_fds,
                         root.clone(),
                     )?,
@@ -92,13 +111,13 @@ impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
             })
             .collect::<Result<HashMap<_, _>>>()?;
 
-        Ok(RootPackage {
+        Ok(PackageCommon {
             subpackages,
             files: self_files,
         })
     }
 
-    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &NonRootPackage<InputFileType>> {
+    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &NonRootPackage> {
         let mut ret = Vec::new();
         for subpackage in self.subpackages.values() {
             subpackage.get_all_packages(&mut ret);
@@ -107,21 +126,12 @@ impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
     }
 }
 
-impl<InputFileType> Default for RootPackage<InputFileType> {
-    fn default() -> Self {
-        Self {
-            subpackages: Default::default(),
-            files: Default::default(),
-        }
-    }
-}
-
-impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
+impl NonRootPackage {
     fn try_make_package(
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<RootPackage<InputFileType>>,
+        root: Weak<PackageCommon>,
     ) -> Result<Self> {
         fn get_package_name<'a>(fd: &'a FileDescriptorProto, full_name: &str) -> &'a str {
             let striped_path = &fd.package()[full_name.len() + 1..];
@@ -133,7 +143,7 @@ impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
 
         // The first few FDs might be FDs which are directly belonging to the current package.
         // The remaining FDs are belonging to the child packages.
-        let (self_fds, child_fds) = sorted_fds.split_until(|fd| fd.package() == full_name);
+        let (self_fds, child_fds) = sorted_fds.split_while(|fd| fd.package() == full_name);
 
         let self_files = self_fds
             .into_iter()
@@ -166,7 +176,7 @@ impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
         })
     }
 
-    fn get_all_packages<'a>(&'a self, packages: &mut Vec<&'a NonRootPackage<InputFileType>>) {
+    fn get_all_packages<'a>(&'a self, packages: &mut Vec<&'a NonRootPackage>) {
         packages.push(self);
         for subpackage in self.subpackages.values() {
             subpackage.get_all_packages(packages);
@@ -174,45 +184,35 @@ impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
     }
 }
 
-impl<InputFileType: InputFileTrait> PackageTrait for RootPackage<InputFileType> {
-    type InputFileType = InputFileType;
-
-    fn subpackages(&self) -> &HashMap<String, NonRootPackage<InputFileType>> {
-        &self.subpackages
-    }
-    fn files(&self) -> &[InputFileType] {
-        &self.files
-    }
-    fn module_file_name(&self) -> Cow<'_, str> {
-        "lib.rs".into()
-    }
+impl PackageTrait for PackageCommon {
+    // fn subpackages(&self) -> &HashMap<String, NonRootPackage> {
+    //     &self.subpackages
+    // }
+    // fn module_file_name(&self) -> Cow<'_, str> {
+    //     "lib.rs".into()
+    // }
 }
 
-impl<InputFileType: InputFileTrait> PackageTrait for NonRootPackage<InputFileType> {
-    type InputFileType = InputFileType;
-
-    fn subpackages(&self) -> &HashMap<String, NonRootPackage<InputFileType>> {
-        &self.subpackages
-    }
-    fn files(&self) -> &[InputFileType] {
-        &self.files
-    }
-    fn module_file_name(&self) -> Cow<'_, str> {
-        format!(
-            "{}.rs",
-            self.full_name
-                .split('.')
-                .map(|package| package
-                    .to_lower_snake_case()
-                    .escape_rust_keywords()
-                    .to_string())
-                .join("/")
-        )
-        .into()
-    }
+impl PackageTrait for NonRootPackage {
+    // fn subpackages(&self) -> &HashMap<String, NonRootPackage> {
+    //     &self.subpackages
+    // }
+    // fn module_file_name(&self) -> Cow<'_, str> {
+    //     format!(
+    //         "{}.rs",
+    //         self.full_name
+    //             .split('.')
+    //             .map(|package| package
+    //                 .to_lower_snake_case()
+    //                 .escape_rust_keywords()
+    //                 .to_string())
+    //             .join("/")
+    //     )
+    //     .into()
+    // }
 }
 
-impl RootPackage<InputFile> {
+impl PackageCommon {
     pub fn gen_module_file(&self) -> Result<TokenStream> {
         self::gen_module_file_impl(self, self.gen_module_file_header()?)
     }
@@ -235,7 +235,7 @@ impl RootPackage<InputFile> {
     }
 }
 
-impl NonRootPackage<InputFile> {
+impl NonRootPackage {
     pub fn gen_module_file(&self) -> Result<TokenStream> {
         self::gen_module_file_impl(self, self.gen_module_file_header()?)
     }
@@ -253,10 +253,7 @@ impl NonRootPackage<InputFile> {
     }
 }
 
-fn gen_module_file_impl(
-    package: &impl PackageTrait<InputFileType = InputFile>,
-    header: TokenStream,
-) -> Result<TokenStream> {
+fn gen_module_file_impl(package: &impl PackageTrait, header: TokenStream) -> Result<TokenStream> {
     let submodules_from_packages = package
         .subpackages()
         .into_iter()
@@ -285,7 +282,7 @@ mod tests {
     use super::FileDescriptorProto;
     use ::once_cell::sync::Lazy;
     use ::std::ops::Deref;
-    type RootPackage = super::RootPackage<InputFileFake>;
+    type RootPackage = super::PackageCommon<InputFileFake>;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
