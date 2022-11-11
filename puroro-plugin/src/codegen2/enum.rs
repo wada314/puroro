@@ -15,17 +15,16 @@
 use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
+use ::std::fmt::Debug;
 
-pub trait EnumTrait: Sized {
-    fn try_new(proto: &EnumDescriptorProto) -> Result<Self>;
-}
+pub trait EnumTrait: Debug {}
 
 #[derive(Debug)]
 pub struct EnumImpl {}
 
 pub type Enum = EnumImpl;
 
-impl EnumTrait for EnumImpl {
+impl EnumImpl {
     fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
         Ok(EnumImpl {})
     }
@@ -35,7 +34,7 @@ impl EnumTrait for EnumImpl {
 pub struct EnumFake;
 
 #[cfg(test)]
-impl EnumTrait for EnumFake {
+impl EnumFake {
     fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
         Ok(EnumFake)
     }

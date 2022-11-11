@@ -18,10 +18,11 @@ use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 use ::quote::{format_ident, quote};
+use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait FieldTrait: Sized {
-    fn try_new(proto: &FieldDescriptorProto) -> Result<Self>;
+pub trait FieldTrait: Debug {
+    fn gen_struct_field_decl(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
@@ -32,18 +33,18 @@ pub struct FieldImpl {
 pub type Field = FieldImpl;
 
 impl FieldTrait for FieldImpl {
-    fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
-        Ok(FieldImpl {
-            name: proto.name().to_string(),
+    fn gen_struct_field_decl(&self) -> Result<TokenStream> {
+        let name = format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
+        Ok(quote! {
+            #name: (),
         })
     }
 }
 
 impl FieldImpl {
-    pub fn gen_struct_field_decl(&self) -> Result<TokenStream> {
-        let name = format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
-        Ok(quote! {
-            #name: (),
+    pub fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
+        Ok(FieldImpl {
+            name: proto.name().to_string(),
         })
     }
 }

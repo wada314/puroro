@@ -15,17 +15,16 @@
 use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
+use ::std::fmt::Debug;
 
-pub trait OneofTrait: Sized {
-    fn try_new(proto: &OneofDescriptorProto) -> Result<Self>;
-}
+pub trait OneofTrait: Debug {}
 
 #[derive(Debug)]
 pub struct OneofImpl {}
 
 pub type Oneof = OneofImpl;
 
-impl OneofTrait for OneofImpl {
+impl OneofImpl {
     fn try_new(proto: &OneofDescriptorProto) -> Result<Self> {
         Ok(OneofImpl {})
     }

@@ -18,27 +18,44 @@ use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::quote::{format_ident, quote};
+use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
+use puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 
-pub trait MessageTrait: Sized {
-    fn try_new(proto: &DescriptorProto) -> Result<Self>;
+pub trait MessageTrait: Debug {
+    fn gen_struct(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
-pub struct MessageImpl<EnumType, OneofType, FieldType> {
+pub struct MessageImpl {
     name: String,
     submessages: Vec<Self>,
-    enums: Vec<EnumType>,
-    oneofs: Vec<OneofType>,
-    fields: Vec<FieldType>,
+    enums: Vec<Rc<dyn EnumTrait>>,
+    oneofs: Vec<Rc<dyn OneofTrait>>,
+    fields: Vec<Rc<dyn FieldTrait>>,
 }
 
-pub type Message = MessageImpl<Enum, Oneof, Field>;
+impl MessageTrait for MessageImpl {
+    fn gen_struct(&self) -> Result<TokenStream> {
+        let ident = format_ident!(
+            "{}",
+            self.name.to_camel_case().escape_rust_keywords().to_string()
+        );
+        let fields = self
+            .fields()?
+            .into_iter()
+            .map(|f| f.gen_struct_field_decl())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            pub struct #ident {
+                #(#fields)*
+            }
+        })
+    }
+}
 
-impl<EnumType: EnumTrait, OneofType: OneofTrait, FieldType: FieldTrait> MessageTrait
-    for MessageImpl<EnumType, OneofType, FieldType>
-{
-    fn try_new(proto: &DescriptorProto) -> Result<Self> {
+impl MessageImpl {
+    fn try_new<FE, FO, FF>(proto: &DescriptorProto) -> Result<Self> {
         let name = proto.name().to_string();
         Ok(MessageImpl {
             name,
@@ -63,40 +80,6 @@ impl<EnumType: EnumTrait, OneofType: OneofTrait, FieldType: FieldTrait> MessageT
                 .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
                 .map(|f| FieldType::try_new(f))
                 .collect::<Result<Vec<_>>>()?,
-        })
-    }
-}
-
-impl<EnumType, OneofType, FieldType> MessageImpl<EnumType, OneofType, FieldType> {
-    pub fn submessages(&self) -> Result<&[Self]> {
-        Ok(&self.submessages)
-    }
-    pub fn enums(&self) -> Result<&[EnumType]> {
-        Ok(&self.enums)
-    }
-    pub fn oneofs(&self) -> Result<&[OneofType]> {
-        Ok(&self.oneofs)
-    }
-    pub fn fields(&self) -> Result<&[FieldType]> {
-        Ok(&self.fields)
-    }
-}
-
-impl MessageImpl<Enum, Oneof, Field> {
-    pub fn gen_struct(&self) -> Result<TokenStream> {
-        let ident = format_ident!(
-            "{}",
-            self.name.to_camel_case().escape_rust_keywords().to_string()
-        );
-        let fields = self
-            .fields()?
-            .into_iter()
-            .map(|f| f.gen_struct_field_decl())
-            .collect::<Result<Vec<_>>>()?;
-        Ok(quote! {
-            pub struct #ident {
-                #(#fields)*
-            }
         })
     }
 }

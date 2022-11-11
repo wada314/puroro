@@ -16,11 +16,10 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::quote::quote;
+use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait InputFileTrait: Sized {
-    fn try_new(proto: &FileDescriptorProto) -> Result<Self>;
-}
+pub trait InputFileTrait: Debug {}
 
 #[cfg(test)]
 pub struct InputFileFake {
@@ -28,35 +27,24 @@ pub struct InputFileFake {
 }
 
 #[cfg(test)]
-impl InputFileTrait for InputFileFake {
-    type MessageType = MessageFake;
-    type EnumType = EnumFake;
-
+impl InputFileFake {
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
         Ok(InputFileFake {
             proto: proto.clone(),
         })
     }
-    fn messages(&self) -> &[MessageType] {
-        &[]
-    }
-    fn enums(&self) -> &[EnumType] {
-        &[]
-    }
 }
 
 #[derive(Debug)]
-pub struct InputFileImpl<MessageType, EnumType> {
+pub struct InputFileImpl {
     syntax: Syntax,
-    messages: Vec<MessageType>,
-    enums: Vec<EnumType>,
+    messages: Vec<Rc<dyn MessageTrait>>,
+    enums: Vec<Rc<dyn EnumTrait>>,
 }
 
-pub type InputFile = InputFileImpl<Message, Enum>;
+pub type InputFile = InputFileImpl;
 
-impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
-    for InputFileImpl<MessageType, EnumType>
-{
+impl InputFileTrait for InputFileImpl {
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
         Ok(Self {
             syntax: proto.syntax().try_into()?,
@@ -74,7 +62,7 @@ impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
     }
 }
 
-impl InputFileImpl<Message, Enum> {
+impl InputFileImpl {
     pub fn gen_structs_for_messages(&self) -> Result<TokenStream> {
         let message_structs = self
             .messages
