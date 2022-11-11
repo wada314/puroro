@@ -79,7 +79,7 @@ where
     F: Fn(&T) -> K,
     K: PartialEq,
 {
-    type Item = &'a [T];
+    type Item = (K, &'a [T]);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.finished {
@@ -89,12 +89,12 @@ where
         if let Some((first, rest)) = self.v.split_first() {
             let key = (self.pred)(first);
             if let Some(pos) = rest.iter().position(|x| (self.pred)(x) != key) {
-                let ret = Some(&self.v[..pos + 1]);
+                let ret = Some((key, &self.v[..pos + 1]));
                 self.v = &self.v[pos + 1..];
                 ret
             } else {
                 self.finished = true;
-                Some(self.v)
+                Some((key, self.v))
             }
         } else {
             self.finished = true;
