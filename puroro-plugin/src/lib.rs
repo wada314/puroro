@@ -16,6 +16,7 @@
 #![feature(provide_any)]
 #![feature(is_some_and)]
 #![feature(slice_group_by)]
+#![feature(new_uninit)]
 
 mod codegen;
 mod codegen2;

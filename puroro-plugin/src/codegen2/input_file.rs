@@ -14,12 +14,14 @@
 
 use super::*;
 use crate::Result;
-use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::quote::quote;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait InputFileTrait: Debug {}
+pub trait InputFileTrait: Debug {
+    fn gen_structs_for_messages(&self) -> Result<TokenStream>;
+}
 
 #[cfg(test)]
 pub struct InputFileFake {
@@ -38,32 +40,34 @@ impl InputFileFake {
 #[derive(Debug)]
 pub struct InputFileImpl {
     syntax: Syntax,
-    messages: Vec<Rc<dyn MessageTrait>>,
-    enums: Vec<Rc<dyn EnumTrait>>,
+    messages: Vec<Rc<Box<dyn MessageTrait>>>,
 }
 
 pub type InputFile = InputFileImpl;
 
-impl InputFileTrait for InputFileImpl {
-    fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
-        Ok(Self {
-            syntax: proto.syntax().try_into()?,
-            messages: proto
-                .message_type()
-                .into_iter()
-                .map(|m| MessageType::try_new(m))
-                .collect::<Result<Vec<_>>>()?,
-            enums: proto
-                .enum_type()
-                .into_iter()
-                .map(|e| EnumType::try_new(e))
-                .collect::<Result<Vec<_>>>()?,
+impl InputFileImpl {
+    pub fn try_new<FM>(proto: &FileDescriptorProto, fm: FM) -> Result<Rc<Box<dyn InputFileTrait>>>
+    where
+        FM: FnMut(
+            &DescriptorProto,
+            Weak<Box<dyn InputFileTrait>>,
+        ) -> Result<Rc<Box<dyn MessageTrait>>>,
+    {
+        Rc::try_new_boxed_cyclic(|weak| -> Result<Box<dyn InputFileTrait>> {
+            Ok(Box::new(Self {
+                syntax: proto.syntax().try_into()?,
+                messages: proto
+                    .message_type()
+                    .into_iter()
+                    .map(|m| fm(m, Weak::clone(weak)))
+                    .collect::<Result<Vec<_>>>()?,
+            }))
         })
     }
 }
 
-impl InputFileImpl {
-    pub fn gen_structs_for_messages(&self) -> Result<TokenStream> {
+impl InputFileTrait for InputFileImpl {
+    fn gen_structs_for_messages(&self) -> Result<TokenStream> {
         let message_structs = self
             .messages
             .iter()

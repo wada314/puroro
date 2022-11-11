@@ -12,22 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![feature(error_generic_member_access)]
-#![feature(provide_any)]
-#![feature(is_some_and)]
-#![feature(slice_group_by)]
-
-mod codegen;
-mod error;
-mod rustfmt;
-
-use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorRequest;
-use ::puroro_protobuf_compiled::puroro;
-use ::puroro_protobuf_compiled::puroro::Message;
-use ::std::io::{stdin, stdout, Read};
-
-use error::{ErrorKind, GeneratorError};
-type Result<T> = std::result::Result<T, GeneratorError>;
+include!("lib.rs");
 
 fn main() -> Result<()> {
     let request = CodeGeneratorRequest::from_bytes_iter(&mut stdin().bytes()).unwrap();

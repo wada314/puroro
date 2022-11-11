@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::mem;
 use ::std::rc::{Rc, Weak};
 
 pub trait SliceExt<T> {
@@ -105,25 +106,70 @@ where
 pub trait RcExt<T> {
     fn try_new_cyclic<F, E>(data_fn: F) -> Result<Rc<T>, E>
     where
-        F: FnOnce(&Weak<T>) -> Result<T, E>;
-}
-
-impl<T: Default> RcExt<T> for Rc<T> {
-    fn try_new_cyclic<F, E>(data_fn: F) -> Result<Rc<T>, E>
+        T: Default,
+        F: FnOnce(&Weak<T>) -> Result<T, E>,
+    {
+        Self::try_new_cyclic_with_default(data_fn, T::default)
+    }
+    fn try_new_cyclic_with_default<F, D, E>(data_fn: F, default: D) -> Result<Rc<T>, E>
     where
         F: FnOnce(&Weak<T>) -> Result<T, E>,
+        D: FnOnce() -> T;
+}
+
+impl<T> RcExt<T> for Rc<T> {
+    fn try_new_cyclic_with_default<F, D, E>(data_fn: F, default: D) -> Result<Rc<T>, E>
+    where
+        F: FnOnce(&Weak<T>) -> Result<T, E>,
+        D: FnOnce() -> T,
     {
         let mut maybe_error = None;
         let rc = Rc::new_cyclic(|weak| match (data_fn)(weak) {
             Ok(data) => data,
             Err(err) => {
                 maybe_error = Some(err);
-                T::default()
+                (default)()
             }
         });
         match maybe_error {
             Some(err) => Err(err),
             None => Ok(rc),
+        }
+    }
+}
+
+pub trait RcBoxExt<T: ?Sized> {
+    fn try_new_boxed_cyclic<F, E>(data_fn: F) -> Result<Rc<Box<T>>, E>
+    where
+        F: FnOnce(&Weak<Box<T>>) -> Result<Box<T>, E>;
+}
+impl<T: ?Sized> RcBoxExt<T> for Rc<Box<T>> {
+    fn try_new_boxed_cyclic<F, E>(data_fn: F) -> Result<Rc<Box<T>>, E>
+    where
+        F: FnOnce(&Weak<Box<T>>) -> Result<Box<T>, E>,
+    {
+        let mut maybe_error = None;
+        let rc_opt = Rc::new_cyclic(|weak_opt| {
+            let weak: Weak<Box<T>> = unsafe {
+                Weak::from_raw(mem::transmute::<*const Option<Box<T>>, *const Box<T>>(
+                    Weak::clone(weak_opt).into_raw(),
+                ))
+            };
+            match (data_fn)(&weak) {
+                Ok(data) => Some(data),
+                Err(err) => {
+                    maybe_error = Some(err);
+                    None
+                }
+            }
+        });
+        match maybe_error {
+            Some(err) => Err(err),
+            None => Ok(unsafe {
+                Rc::from_raw(mem::transmute::<*const Option<Box<T>>, *const Box<T>>(
+                    Rc::into_raw(rc_opt),
+                ))
+            }),
         }
     }
 }

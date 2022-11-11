@@ -31,10 +31,7 @@ pub trait MessageTrait: Debug {
 #[derive(Debug)]
 pub struct MessageImpl {
     name: String,
-    submessages: Vec<Rc<dyn MessageTrait>>,
-    enums: Vec<Rc<dyn EnumTrait>>,
-    oneofs: Vec<Rc<dyn OneofTrait>>,
-    fields: Vec<Rc<dyn FieldTrait>>,
+    fields: Vec<Rc<Box<dyn FieldTrait>>>,
 }
 
 impl MessageTrait for MessageImpl {
@@ -44,8 +41,8 @@ impl MessageTrait for MessageImpl {
             self.name.to_camel_case().escape_rust_keywords().to_string()
         );
         let fields = self
-            .fields()?
-            .into_iter()
+            .fields
+            .iter()
             .map(|f| f.gen_struct_field_decl())
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
@@ -57,66 +54,25 @@ impl MessageTrait for MessageImpl {
 }
 
 impl MessageImpl {
-    fn try_new<FM, FE, FO, FF>(
-        proto: &DescriptorProto,
-        fm: FM,
-        fe: FE,
-        fo: FO,
-        ff: FF,
-    ) -> Result<Rc<dyn MessageTrait>>
+    pub fn try_new<FF>(proto: &DescriptorProto, ff: FF) -> Result<Rc<Box<dyn MessageTrait>>>
     where
-        FM: FnMut(&DescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn MessageTrait>>,
-        FE: FnMut(&EnumDescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn EnumTrait>>,
-        FO: FnMut(&OneofDescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn OneofTrait>>,
-        FF: FnMut(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn FieldTrait>>,
+        FF: FnMut(
+            &FieldDescriptorProto,
+            Weak<Box<dyn MessageTrait>>,
+        ) -> Result<Rc<Box<dyn FieldTrait>>>,
     {
         let name = proto.name().to_string();
-        let mut maybe_error = None;
-        let maybe_message = Rc::new_cyclic(|weak| {
-            let res_message: Result<MessageImpl> = (|| {
-                Ok(MessageImpl {
-                    name,
-                    submessages: proto
-                        .nested_type()
-                        .into_iter()
-                        .map(|m| fm(m, Weak::clone(weak)))
-                        .collect::<Result<Vec<_>>>()?,
-                    enums: proto
-                        .enum_type()
-                        .into_iter()
-                        .map(|e| fe(e, Weak::clone(weak)))
-                        .collect::<Result<Vec<_>>>()?,
-                    oneofs: proto
-                        .oneof_decl()
-                        .into_iter()
-                        .map(|o| fo(o, Weak::clone(weak)))
-                        .collect::<Result<Vec<_>>>()?,
-                    fields: proto
-                        .field()
-                        .into_iter()
-                        .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                        .map(|f| ff(f, Weak::clone(weak)))
-                        .collect::<Result<Vec<_>>>()?,
-                })
-            })();
-            match res_message {
-                Ok(m) => m,
-                Err(e) => {
-                    maybe_error = Some(e);
-                    MessageImpl {
-                        name,
-                        submessages: Vec::new(),
-                        enums: Vec::new(),
-                        oneofs: Vec::new(),
-                        fields: Vec::new(),
-                    }
-                }
-            }
-        });
-        match maybe_error {
-            Some(e) => Err(e),
-            None => Ok(maybe_message),
-        }
+        Rc::try_new_boxed_cyclic(|weak| -> Result<Box<dyn MessageTrait>> {
+            Ok(Box::new(MessageImpl {
+                name,
+                fields: proto
+                    .field()
+                    .into_iter()
+                    .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
+                    .map(|f| ff(f, Weak::clone(weak)))
+                    .collect::<Result<Vec<_>>>()?,
+            }))
+        })
     }
 }
 
