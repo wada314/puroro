@@ -51,6 +51,12 @@ impl TryFrom<&str> for Syntax {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+enum MessageOrInputFile<M, F> {
+    Message(M),
+    InputFile(F),
+}
+
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {

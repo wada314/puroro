@@ -16,11 +16,28 @@ use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::quote::{format_ident, quote};
 
+pub struct ContextForMessage<'a> {
+    pub(super) input_file_proto: &'a FileDescriptorProto,
+    pub(super) parent_context:
+        MessageOrInputFile<&'a ContextForMessage<'a>, &'a ContextForInputFile>,
+}
+impl<'a> ContextForMessage<'a> {
+    pub fn input_file_proto(&'a self) -> &'a FileDescriptorProto {
+        self.input_file_proto
+    }
+    pub fn make_context_for_field(&'a self, message: &'a DescriptorProto) -> ContextForField<'a> {
+        ContextForField {
+            parent_context: self,
+            parent_message_proto: message,
+        }
+    }
+}
+
 pub trait MessageTrait: Sized {
-    fn try_new(proto: &DescriptorProto) -> Result<Self>;
+    fn try_new(proto: &DescriptorProto, context: &ContextForMessage) -> Result<Self>;
 }
 
 #[derive(Debug)]
@@ -37,14 +54,14 @@ pub type Message = MessageImpl<Enum, Oneof, Field>;
 impl<EnumType: EnumTrait, OneofType: OneofTrait, FieldType: FieldTrait> MessageTrait
     for MessageImpl<EnumType, OneofType, FieldType>
 {
-    fn try_new(proto: &DescriptorProto) -> Result<Self> {
+    fn try_new(proto: &DescriptorProto, context: &ContextForMessage) -> Result<Self> {
         let name = proto.name().to_string();
         Ok(MessageImpl {
             name,
             submessages: proto
                 .nested_type()
                 .into_iter()
-                .map(|m| Self::try_new(m))
+                .map(|m| Self::try_new(m, todo!()))
                 .collect::<Result<Vec<_>>>()?,
             enums: proto
                 .enum_type()
@@ -105,7 +122,7 @@ pub struct MessageFake;
 
 #[cfg(test)]
 impl MessageTrait for MessageFake {
-    fn try_new(proto: &DescriptorProto) -> Result<Self> {
+    fn try_new(proto: &DescriptorProto, _context: &ContextForMessage) -> Result<Self> {
         Ok(MessageFake)
     }
 }

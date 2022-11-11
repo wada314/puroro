@@ -16,8 +16,25 @@ use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 use ::quote::{format_ident, quote};
+use ::std::ops::Deref;
+
+pub struct ContextForField<'a> {
+    pub(super) parent_context: &'a ContextForMessage<'a>,
+    pub(super) parent_message_proto: &'a DescriptorProto,
+}
+impl ContextForField<'_> {
+    pub fn parent_message_proto(&self) -> &DescriptorProto {
+        self.parent_message_proto
+    }
+}
+impl<'a> Deref for ContextForField<'a> {
+    type Target = ContextForMessage<'a>;
+    fn deref(&self) -> &Self::Target {
+        self.parent_context
+    }
+}
 
 pub trait FieldTrait: Sized {
     fn try_new(proto: &FieldDescriptorProto) -> Result<Self>;
@@ -44,5 +61,19 @@ impl FieldImpl {
         Ok(quote! {
             #name: (),
         })
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum FieldRule {
+    Optional,
+    Singular,
+    Repeated,
+}
+
+impl FieldRule {
+    pub fn try_from_field_descriptor(fd: &FieldDescriptorProto) -> Result<Self> {
+        // requires syntax!
+        todo!()
     }
 }

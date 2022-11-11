@@ -16,6 +16,22 @@ use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
+pub struct ContextForInputFile {}
+impl ContextForInputFile {
+    pub fn new() -> Self {
+        Self {}
+    }
+    pub fn make_context_for_message<'a>(
+        &'a self,
+        input_file: &'a FileDescriptorProto,
+    ) -> ContextForMessage<'a> {
+        ContextForMessage {
+            input_file_proto: input_file,
+            parent_context: MessageOrInputFile::InputFile(self),
+        }
+    }
+}
+
 pub trait InputFileTrait: Sized {
     type MessageType: MessageTrait;
     type EnumType: EnumTrait;
@@ -64,12 +80,14 @@ impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
     type EnumType = EnumType;
 
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
+        let context = ContextForInputFile::new();
+        let context_for_message = context.make_context_for_message(proto);
         Ok(Self {
             syntax: proto.syntax().try_into()?,
             messages: proto
                 .message_type()
                 .into_iter()
-                .map(|m| MessageType::try_new(m))
+                .map(|m| MessageType::try_new(m, &context_for_message))
                 .collect::<Result<Vec<_>>>()?,
             enums: proto
                 .enum_type()
