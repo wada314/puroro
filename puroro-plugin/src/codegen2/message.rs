@@ -16,11 +16,13 @@ use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
+use ::puroro_protobuf_compiled::google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
+};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
-use puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 
 pub trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
@@ -29,7 +31,7 @@ pub trait MessageTrait: Debug {
 #[derive(Debug)]
 pub struct MessageImpl {
     name: String,
-    submessages: Vec<Self>,
+    submessages: Vec<Rc<dyn MessageTrait>>,
     enums: Vec<Rc<dyn EnumTrait>>,
     oneofs: Vec<Rc<dyn OneofTrait>>,
     fields: Vec<Rc<dyn FieldTrait>>,
@@ -55,32 +57,66 @@ impl MessageTrait for MessageImpl {
 }
 
 impl MessageImpl {
-    fn try_new<FE, FO, FF>(proto: &DescriptorProto) -> Result<Self> {
+    fn try_new<FM, FE, FO, FF>(
+        proto: &DescriptorProto,
+        fm: FM,
+        fe: FE,
+        fo: FO,
+        ff: FF,
+    ) -> Result<Rc<dyn MessageTrait>>
+    where
+        FM: FnMut(&DescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn MessageTrait>>,
+        FE: FnMut(&EnumDescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn EnumTrait>>,
+        FO: FnMut(&OneofDescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn OneofTrait>>,
+        FF: FnMut(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Result<Rc<dyn FieldTrait>>,
+    {
         let name = proto.name().to_string();
-        Ok(MessageImpl {
-            name,
-            submessages: proto
-                .nested_type()
-                .into_iter()
-                .map(|m| Self::try_new(m))
-                .collect::<Result<Vec<_>>>()?,
-            enums: proto
-                .enum_type()
-                .into_iter()
-                .map(|e| EnumType::try_new(e))
-                .collect::<Result<Vec<_>>>()?,
-            oneofs: proto
-                .oneof_decl()
-                .into_iter()
-                .map(|o| OneofType::try_new(o))
-                .collect::<Result<Vec<_>>>()?,
-            fields: proto
-                .field()
-                .into_iter()
-                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| FieldType::try_new(f))
-                .collect::<Result<Vec<_>>>()?,
-        })
+        let mut maybe_error = None;
+        let maybe_message = Rc::new_cyclic(|weak| {
+            let res_message: Result<MessageImpl> = (|| {
+                Ok(MessageImpl {
+                    name,
+                    submessages: proto
+                        .nested_type()
+                        .into_iter()
+                        .map(|m| fm(m, Weak::clone(weak)))
+                        .collect::<Result<Vec<_>>>()?,
+                    enums: proto
+                        .enum_type()
+                        .into_iter()
+                        .map(|e| fe(e, Weak::clone(weak)))
+                        .collect::<Result<Vec<_>>>()?,
+                    oneofs: proto
+                        .oneof_decl()
+                        .into_iter()
+                        .map(|o| fo(o, Weak::clone(weak)))
+                        .collect::<Result<Vec<_>>>()?,
+                    fields: proto
+                        .field()
+                        .into_iter()
+                        .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
+                        .map(|f| ff(f, Weak::clone(weak)))
+                        .collect::<Result<Vec<_>>>()?,
+                })
+            })();
+            match res_message {
+                Ok(m) => m,
+                Err(e) => {
+                    maybe_error = Some(e);
+                    MessageImpl {
+                        name,
+                        submessages: Vec::new(),
+                        enums: Vec::new(),
+                        oneofs: Vec::new(),
+                        fields: Vec::new(),
+                    }
+                }
+            }
+        });
+        match maybe_error {
+            Some(e) => Err(e),
+            None => Ok(maybe_message),
+        }
     }
 }
 
