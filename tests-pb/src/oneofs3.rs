@@ -6,4 +6,6 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {}
-pub struct Submsg {}
+pub struct Submsg {
+    i32_unlabeled: (),
+}

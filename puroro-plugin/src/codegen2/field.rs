@@ -13,20 +13,36 @@
 // limitations under the License.
 
 use super::*;
+use crate::codegen::utils::StrExt;
 use crate::Result;
+use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
+use ::quote::{format_ident, quote};
 
 pub trait FieldTrait: Sized {
     fn try_new(proto: &FieldDescriptorProto) -> Result<Self>;
 }
 
 #[derive(Debug)]
-pub struct FieldImpl {}
+pub struct FieldImpl {
+    name: String,
+}
 
 pub type Field = FieldImpl;
 
 impl FieldTrait for FieldImpl {
     fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
-        Ok(FieldImpl {})
+        Ok(FieldImpl {
+            name: proto.name().to_string(),
+        })
+    }
+}
+
+impl FieldImpl {
+    pub fn gen_struct_field_decl(&self) -> Result<TokenStream> {
+        let name = format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
+        Ok(quote! {
+            #name: (),
+        })
     }
 }

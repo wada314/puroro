@@ -212,7 +212,7 @@ impl<InputFileType: InputFileTrait> PackageTrait for NonRootPackage<InputFileTyp
     }
 }
 
-impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
+impl RootPackage<InputFile> {
     pub fn gen_module_file(&self) -> Result<TokenStream> {
         self::gen_module_file_impl(self, self.gen_module_file_header()?)
     }
@@ -235,7 +235,7 @@ impl<InputFileType: InputFileTrait> RootPackage<InputFileType> {
     }
 }
 
-impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
+impl NonRootPackage<InputFile> {
     pub fn gen_module_file(&self) -> Result<TokenStream> {
         self::gen_module_file_impl(self, self.gen_module_file_header()?)
     }
@@ -253,7 +253,10 @@ impl<InputFileType: InputFileTrait> NonRootPackage<InputFileType> {
     }
 }
 
-fn gen_module_file_impl(package: &impl PackageTrait, header: TokenStream) -> Result<TokenStream> {
+fn gen_module_file_impl(
+    package: &impl PackageTrait<InputFileType = InputFile>,
+    header: TokenStream,
+) -> Result<TokenStream> {
     let submodules_from_packages = package
         .subpackages()
         .into_iter()

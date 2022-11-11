@@ -5,5 +5,9 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-pub struct Msg {}
-pub struct _Self {}
+pub struct Msg {
+    r#type: (),
+}
+pub struct _Self {
+    r#type: (),
+}

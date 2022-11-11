@@ -5,7 +5,15 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-pub struct Test1 {}
-pub struct Test2 {}
-pub struct Test3 {}
-pub struct Test4 {}
+pub struct Test1 {
+    a: (),
+}
+pub struct Test2 {
+    b: (),
+}
+pub struct Test3 {
+    c: (),
+}
+pub struct Test4 {
+    d: (),
+}

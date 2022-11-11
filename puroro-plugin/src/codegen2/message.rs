@@ -21,7 +21,6 @@ use ::quote::{format_ident, quote};
 
 pub trait MessageTrait: Sized {
     fn try_new(proto: &DescriptorProto) -> Result<Self>;
-    fn gen_struct(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
@@ -65,18 +64,6 @@ impl<EnumType: EnumTrait, OneofType: OneofTrait, FieldType: FieldTrait> MessageT
                 .collect::<Result<Vec<_>>>()?,
         })
     }
-
-    fn gen_struct(&self) -> Result<TokenStream> {
-        let ident = format_ident!(
-            "{}",
-            self.name.to_camel_case().escape_rust_keywords().to_string()
-        );
-        Ok(quote! {
-            pub struct #ident {
-
-            }
-        })
-    }
 }
 
 impl<EnumType, OneofType, FieldType> MessageImpl<EnumType, OneofType, FieldType> {
@@ -94,6 +81,25 @@ impl<EnumType, OneofType, FieldType> MessageImpl<EnumType, OneofType, FieldType>
     }
 }
 
+impl MessageImpl<Enum, Oneof, Field> {
+    pub fn gen_struct(&self) -> Result<TokenStream> {
+        let ident = format_ident!(
+            "{}",
+            self.name.to_camel_case().escape_rust_keywords().to_string()
+        );
+        let fields = self
+            .fields()?
+            .into_iter()
+            .map(|f| f.gen_struct_field_decl())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            pub struct #ident {
+                #(#fields)*
+            }
+        })
+    }
+}
+
 #[cfg(test)]
 pub struct MessageFake;
 
@@ -101,9 +107,5 @@ pub struct MessageFake;
 impl MessageTrait for MessageFake {
     fn try_new(proto: &DescriptorProto) -> Result<Self> {
         Ok(MessageFake)
-    }
-
-    fn gen_struct(&self) -> Result<TokenStream> {
-        Ok(quote! {})
     }
 }

@@ -55,7 +55,7 @@ pub struct InputFileImpl<MessageType, EnumType> {
     enums: Vec<EnumType>,
 }
 
-pub type File = InputFileImpl<Message, Enum>;
+pub type InputFile = InputFileImpl<Message, Enum>;
 
 impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
     for InputFileImpl<MessageType, EnumType>
