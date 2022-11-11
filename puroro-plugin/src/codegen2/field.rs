@@ -18,23 +18,7 @@ use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 use ::quote::{format_ident, quote};
-use ::std::ops::Deref;
-
-pub struct ContextForField<'a> {
-    pub(super) parent_context: &'a ContextForMessage<'a>,
-    pub(super) parent_message_proto: &'a DescriptorProto,
-}
-impl ContextForField<'_> {
-    pub fn parent_message_proto(&self) -> &DescriptorProto {
-        self.parent_message_proto
-    }
-}
-impl<'a> Deref for ContextForField<'a> {
-    type Target = ContextForMessage<'a>;
-    fn deref(&self) -> &Self::Target {
-        self.parent_context
-    }
-}
+use ::std::rc::{Rc, Weak};
 
 pub trait FieldTrait: Sized {
     fn try_new(proto: &FieldDescriptorProto) -> Result<Self>;

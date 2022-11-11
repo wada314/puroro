@@ -15,30 +15,11 @@
 use super::*;
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-
-pub struct ContextForInputFile {}
-impl ContextForInputFile {
-    pub fn new() -> Self {
-        Self {}
-    }
-    pub fn make_context_for_message<'a>(
-        &'a self,
-        input_file: &'a FileDescriptorProto,
-    ) -> ContextForMessage<'a> {
-        ContextForMessage {
-            input_file_proto: input_file,
-            parent_context: MessageOrInputFile::InputFile(self),
-        }
-    }
-}
+use ::quote::quote;
+use ::std::rc::{Rc, Weak};
 
 pub trait InputFileTrait: Sized {
-    type MessageType: MessageTrait;
-    type EnumType: EnumTrait;
-
     fn try_new(proto: &FileDescriptorProto) -> Result<Self>;
-    fn messages(&self) -> &[Self::MessageType];
-    fn enums(&self) -> &[Self::EnumType];
 }
 
 #[cfg(test)]
@@ -76,18 +57,13 @@ pub type InputFile = InputFileImpl<Message, Enum>;
 impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
     for InputFileImpl<MessageType, EnumType>
 {
-    type MessageType = MessageType;
-    type EnumType = EnumType;
-
     fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
-        let context = ContextForInputFile::new();
-        let context_for_message = context.make_context_for_message(proto);
         Ok(Self {
             syntax: proto.syntax().try_into()?,
             messages: proto
                 .message_type()
                 .into_iter()
-                .map(|m| MessageType::try_new(m, &context_for_message))
+                .map(|m| MessageType::try_new(m))
                 .collect::<Result<Vec<_>>>()?,
             enums: proto
                 .enum_type()
@@ -96,11 +72,17 @@ impl<MessageType: MessageTrait, EnumType: EnumTrait> InputFileTrait
                 .collect::<Result<Vec<_>>>()?,
         })
     }
+}
 
-    fn messages(&self) -> &[MessageType] {
-        &self.messages
-    }
-    fn enums(&self) -> &[EnumType] {
-        &self.enums
+impl InputFileImpl<Message, Enum> {
+    pub fn gen_structs_for_messages(&self) -> Result<TokenStream> {
+        let message_structs = self
+            .messages
+            .iter()
+            .map(|m| m.gen_struct())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            #(#message_structs)*
+        })
     }
 }

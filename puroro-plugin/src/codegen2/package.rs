@@ -262,14 +262,10 @@ fn gen_module_file_impl(
         .into_iter()
         .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
         .collect::<Vec<_>>();
-    let messages = package
+    let message_structs = package
         .files()
-        .iter()
-        .flat_map(|f| f.messages().iter())
-        .collect::<Vec<_>>();
-    let message_structs = messages
-        .iter()
-        .map(|m| m.gen_struct())
+        .into_iter()
+        .map(|f| f.gen_structs_for_messages())
         .collect::<Result<Vec<_>>>()?;
 
     Ok(quote! {
