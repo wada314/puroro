@@ -26,232 +26,173 @@ use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Default)]
-pub struct PackageCommon {
-    subpackages: HashMap<String, NonRootPackage>,
-    files: Vec<Rc<Box<dyn InputFileTrait>>>,
-}
-
-#[derive(Debug)]
-pub struct NonRootPackage {
-    common: PackageCommon,
+pub struct Package {
     name: String,
     full_name: String,
-    root: Weak<PackageCommon>,
+    subpackages: HashMap<String, Rc<Package>>,
+    files: Vec<Rc<Box<dyn InputFileTrait>>>,
+    root: Option<Weak<Package>>,
 }
 
-pub trait PackageTrait: Debug {
-    // fn subpackages(&self) -> &HashMap<String, NonRootPackage>;
-    // fn module_file_name(&self) -> Cow<'_, str>;
-}
-
-impl PackageCommon {
+impl Package {
     pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
         ff: FF,
-    ) -> Result<Rc<PackageCommon>>
+    ) -> Result<Rc<Package>>
     where
-        FF: FnMut(&FileDescriptorProto, Weak<PackageCommon>) -> Result<Rc<Box<dyn InputFileTrait>>>,
+        FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
     {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
-        Rc::try_new_cyclic(|weak_root| -> Result<PackageCommon> {
-            Ok(PackageCommon::try_make_package(
-                "",
-                &files,
-                Weak::clone(weak_root),
-                ff,
-            )?)
-        })
+
+        Package::try_make_package("", "", &files, None, ff)
     }
 
-    fn try_make_package<FF>(
-        full_name: &str,
-        sorted_fds: &[&FileDescriptorProto],
-        root: Weak<PackageCommon>,
-        ff: FF,
-    ) -> Result<PackageCommon>
-    where
-        FF: FnMut(&FileDescriptorProto, Weak<PackageCommon>) -> Result<Rc<Box<dyn InputFileTrait>>>,
-    {
-        // The first few FDs might be FDs which are directly belonging to the current package.
-        // The remaining FDs are belonging to the child packages.
-        let (self_fds, child_fds) = sorted_fds.split_while(|fd| fd.package() == full_name);
-
-        let self_files = self_fds
-            .into_iter()
-            .map(|fd| ff(fd, Weak::clone(&root)))
-            .collect::<Result<Vec<_>>>()?;
-
-        let subpackages = child_fds
-            .group_by_key(|fd| {
-                let prefix_len = if full_name.is_empty() {
-                    0
-                } else {
-                    full_name.len() + 1
-                };
-                match fd.package()[prefix_len..].split_once('.') {
-                    Some((name, _)) => name,
-                    None => fd.package(),
-                }
-            })
-            .map(|(subpackage_name, subpackage_fds)| -> Result<_> {
-                let subpackage_full_name = if full_name.is_empty() {
-                    subpackage_name.to_string()
-                } else {
-                    format!("{}.{}", full_name, subpackage_name)
-                };
-                Ok((
-                    subpackage_name.to_string(),
-                    NonRootPackage::try_make_package(
-                        subpackage_name,
-                        &subpackage_full_name,
-                        subpackage_fds,
-                        Weak::clone(&root),
-                        ff,
-                    )?,
-                ))
-            })
-            .collect::<Result<HashMap<_, _>>>()?;
-
-        Ok(PackageCommon {
-            subpackages,
-            files: self_files,
-        })
-    }
-
-    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &NonRootPackage> {
-        let mut ret = Vec::new();
-        for subpackage in self.subpackages.values() {
-            subpackage.get_all_packages(&mut ret);
-        }
-        ret
-    }
-}
-
-impl Deref for NonRootPackage {
-    type Target = PackageCommon;
-    fn deref(&self) -> &Self::Target {
-        &self.common
-    }
-}
-
-impl NonRootPackage {
     fn try_make_package<FF>(
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Weak<PackageCommon>,
+        root: Option<Weak<Package>>,
         ff: FF,
-    ) -> Result<Self>
+    ) -> Result<Rc<Package>>
     where
-        FF: FnMut(&FileDescriptorProto, Weak<PackageCommon>) -> Result<Rc<Box<dyn InputFileTrait>>>,
+        FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
     {
-        Ok(NonRootPackage {
-            common: PackageCommon::try_make_package(full_name, sorted_fds, root, ff)?,
-            name: name.to_string(),
-            full_name: full_name.to_string(),
-            root,
+        Rc::try_new_cyclic(|weak| {
+            // The first few FDs might be FDs which are directly belonging to the current package.
+            // The remaining FDs are belonging to the child packages.
+            let (self_fds, child_fds) = sorted_fds.split_while(|fd| fd.package() == full_name);
+
+            let self_files = self_fds
+                .into_iter()
+                .map(|fd| ff(fd, Weak::clone(&weak)))
+                .collect::<Result<Vec<_>>>()?;
+
+            let subpackages = child_fds
+                .group_by_key(|fd| {
+                    let prefix_len = if full_name.is_empty() {
+                        0
+                    } else {
+                        full_name.len() + 1
+                    };
+                    match fd.package()[prefix_len..].split_once('.') {
+                        Some((name, _)) => name,
+                        None => fd.package(),
+                    }
+                })
+                .map(|(subpackage_name, subpackage_fds)| -> Result<_> {
+                    let subpackage_full_name = if full_name.is_empty() {
+                        subpackage_name.to_string()
+                    } else {
+                        format!("{}.{}", full_name, subpackage_name)
+                    };
+                    Ok((
+                        subpackage_name.to_string(),
+                        Package::try_make_package(
+                            subpackage_name,
+                            &subpackage_full_name,
+                            subpackage_fds,
+                            Some(Weak::clone(&root.as_ref().unwrap_or(&weak))),
+                            ff,
+                        )?,
+                    ))
+                })
+                .collect::<Result<HashMap<_, _>>>()?;
+
+            Ok(Package {
+                name: name.to_string(),
+                full_name: full_name.to_string(),
+                subpackages,
+                files: self_files,
+                root,
+            })
         })
     }
 
-    fn get_all_packages<'a>(&'a self, packages: &mut Vec<&'a NonRootPackage>) {
-        packages.push(self);
+    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &Package> {
+        let mut ret = Vec::new();
+        ret.push(self);
         for subpackage in self.subpackages.values() {
-            subpackage.get_all_packages(packages);
+            subpackage.push_all_subpackages(&mut ret);
+        }
+        ret
+    }
+    fn push_all_subpackages(&self, vec: &mut Vec<&Package>) {
+        vec.push(self);
+        for subpackage in self.subpackages.values() {
+            subpackage.push_all_subpackages(vec);
         }
     }
-}
 
-impl PackageTrait for PackageCommon {
-    // fn subpackages(&self) -> &HashMap<String, NonRootPackage> {
-    //     &self.subpackages
-    // }
-    // fn module_file_name(&self) -> Cow<'_, str> {
-    //     "lib.rs".into()
-    // }
-}
-
-impl PackageTrait for NonRootPackage {
-    // fn subpackages(&self) -> &HashMap<String, NonRootPackage> {
-    //     &self.subpackages
-    // }
-    // fn module_file_name(&self) -> Cow<'_, str> {
-    //     format!(
-    //         "{}.rs",
-    //         self.full_name
-    //             .split('.')
-    //             .map(|package| package
-    //                 .to_lower_snake_case()
-    //                 .escape_rust_keywords()
-    //                 .to_string())
-    //             .join("/")
-    //     )
-    //     .into()
-    // }
-}
-
-impl PackageCommon {
-    pub fn gen_module_file(&self) -> Result<TokenStream> {
-        self::gen_module_file_impl(self, self.gen_module_file_header()?)
+    pub fn module_file_name(&self) -> Cow<'_, str> {
+        if self.full_name.is_empty() {
+            "lib.rs".into()
+        } else {
+            format!(
+                "{}.rs",
+                self.full_name
+                    .split('.')
+                    .map(|package| package
+                        .to_lower_snake_case()
+                        .escape_rust_keywords()
+                        .to_string())
+                    .join("/")
+            )
+            .into()
+        }
     }
-    fn gen_module_file_header(&self) -> Result<TokenStream> {
-        Ok(quote! {
-            //! "Generated from root package"
 
-            /// re-export puroro.
-            pub use ::puroro;
-            /// re-export the primitive types in puroro namespace.
-            /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
-            pub use ::puroro::*;
-            pub mod _puroro_root {
-                pub use super::*;
-            }
-            pub mod _puroro {
+    pub fn gen_module_file(&self) -> Result<TokenStream> {
+        let submodules_from_packages = self
+            .subpackages
+            .iter()
+            .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
+            .collect::<Vec<_>>();
+        let message_structs = self
+            .files
+            .iter()
+            .map(|f| f.gen_structs_for_messages())
+            .collect::<Result<Vec<_>>>()?;
+
+        let header = if self.full_name.is_empty() {
+            quote! {
+                //! "Generated from root package"
+
+                /// re-export puroro.
+                pub use ::puroro;
+                /// re-export the primitive types in puroro namespace.
+                /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
                 pub use ::puroro::*;
+                pub mod _puroro_root {
+                    pub use super::*;
+                }
+                pub mod _puroro {
+                    pub use ::puroro::*;
+                }
             }
+        } else {
+            let comment = format!("Generated from package \"{}\"", &self.full_name);
+            quote! {
+                #![doc = #comment]
+                pub mod _puroro_root {
+                    pub use super::super::_puroro_root::*;
+                }
+                pub mod _puroro {
+                    pub use ::puroro::*;
+                }
+            }
+        };
+
+        Ok(quote! {
+            #header
+
+            #(
+                pub mod #submodules_from_packages;
+            )*
+
+            #(#message_structs)*
         })
     }
-}
-
-impl NonRootPackage {
-    pub fn gen_module_file(&self) -> Result<TokenStream> {
-        self::gen_module_file_impl(self, self.gen_module_file_header()?)
-    }
-    fn gen_module_file_header(&self) -> Result<TokenStream> {
-        let comment = format!("Generated from package \"{}\"", &self.full_name);
-        Ok(quote! {
-            #![doc = #comment]
-            pub mod _puroro_root {
-                pub use super::super::_puroro_root::*;
-            }
-            pub mod _puroro {
-                pub use ::puroro::*;
-            }
-        })
-    }
-}
-
-fn gen_module_file_impl(package: &impl PackageTrait, header: TokenStream) -> Result<TokenStream> {
-    let submodules_from_packages = package
-        .subpackages()
-        .into_iter()
-        .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
-        .collect::<Vec<_>>();
-    let message_structs = package
-        .files()
-        .into_iter()
-        .map(|f| f.gen_structs_for_messages())
-        .collect::<Result<Vec<_>>>()?;
-
-    Ok(quote! {
-        #header
-
-        #(
-            pub mod #submodules_from_packages;
-        )*
-
-        #(#message_structs)*
-    })
 }
 
 #[cfg(test)]
@@ -260,7 +201,7 @@ mod tests {
     use super::FileDescriptorProto;
     use ::once_cell::sync::Lazy;
     use ::std::ops::Deref;
-    type RootPackage = super::PackageCommon<InputFileFake>;
+    type RootPackage = super::Package<InputFileFake>;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
