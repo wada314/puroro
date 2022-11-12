@@ -42,10 +42,10 @@ impl FieldTrait for FieldImpl {
 }
 
 impl FieldImpl {
-    pub fn try_new(proto: &FieldDescriptorProto) -> Result<Self> {
-        Ok(FieldImpl {
+    pub fn try_new(proto: &FieldDescriptorProto) -> Result<Rc<Box<dyn FieldTrait>>> {
+        Ok(Rc::new(Box::new(FieldImpl {
             name: proto.name().to_string(),
-        })
+        })))
     }
 }
 

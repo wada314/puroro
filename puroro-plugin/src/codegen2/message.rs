@@ -54,7 +54,14 @@ impl MessageTrait for MessageImpl {
 }
 
 impl MessageImpl {
-    pub fn try_new<FF>(proto: &DescriptorProto, ff: FF) -> Result<Rc<Box<dyn MessageTrait>>>
+    pub fn try_new(proto: &DescriptorProto) -> Result<Rc<Box<dyn MessageTrait>>> {
+        Self::try_new_with(proto, |fd, _weak| FieldImpl::try_new(fd))
+    }
+
+    pub fn try_new_with<FF>(
+        proto: &DescriptorProto,
+        mut ff: FF,
+    ) -> Result<Rc<Box<dyn MessageTrait>>>
     where
         FF: FnMut(
             &FieldDescriptorProto,

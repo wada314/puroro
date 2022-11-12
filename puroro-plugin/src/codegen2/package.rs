@@ -35,7 +35,13 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
+    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+        iter: I,
+    ) -> Result<Rc<Package>> {
+        Self::try_new_from_files_with(iter, |fd, _weak| InputFileImpl::try_new(fd))
+    }
+
+    pub fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
         ff: FF,
     ) -> Result<Rc<Package>>
@@ -53,7 +59,7 @@ impl Package {
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
         root: Option<Weak<Package>>,
-        ff: FF,
+        mut ff: FF,
     ) -> Result<Rc<Package>>
     where
         FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
@@ -93,7 +99,7 @@ impl Package {
                             &subpackage_full_name,
                             subpackage_fds,
                             Some(Weak::clone(&root.as_ref().unwrap_or(&weak))),
-                            ff,
+                            &mut ff,
                         )?,
                     ))
                 })
@@ -109,16 +115,16 @@ impl Package {
         })
     }
 
-    pub fn get_all_subpackages(&self) -> impl IntoIterator<Item = &Package> {
+    pub fn get_all_subpackages(self: &Rc<Self>) -> impl IntoIterator<Item = Rc<Package>> {
         let mut ret = Vec::new();
-        ret.push(self);
+        ret.push(Rc::clone(self));
         for subpackage in self.subpackages.values() {
             subpackage.push_all_subpackages(&mut ret);
         }
         ret
     }
-    fn push_all_subpackages(&self, vec: &mut Vec<&Package>) {
-        vec.push(self);
+    fn push_all_subpackages(self: &Rc<Self>, vec: &mut Vec<Rc<Package>>) {
+        vec.push(Rc::clone(self));
         for subpackage in self.subpackages.values() {
             subpackage.push_all_subpackages(vec);
         }

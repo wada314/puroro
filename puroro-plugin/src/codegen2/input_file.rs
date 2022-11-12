@@ -46,7 +46,13 @@ pub struct InputFileImpl {
 pub type InputFile = InputFileImpl;
 
 impl InputFileImpl {
-    pub fn try_new<FM>(proto: &FileDescriptorProto, fm: FM) -> Result<Rc<Box<dyn InputFileTrait>>>
+    pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
+        Self::try_new_with(proto, |m, _weak| MessageImpl::try_new(m))
+    }
+    pub fn try_new_with<FM>(
+        proto: &FileDescriptorProto,
+        mut fm: FM,
+    ) -> Result<Rc<Box<dyn InputFileTrait>>>
     where
         FM: FnMut(
             &DescriptorProto,
