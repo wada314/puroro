@@ -60,7 +60,7 @@ enum MessageOrInputFile<M, F> {
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
-    let root_package = Package::try_new_from_files(files, |f, _weak| InputFile::try_new(f))?;
+    let root_package = Package::try_new_from_files(files)?;
     Ok(root_package
         .get_all_subpackages()
         .into_iter()

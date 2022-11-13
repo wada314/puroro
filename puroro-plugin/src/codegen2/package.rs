@@ -43,7 +43,7 @@ impl Package {
 
     pub fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
-        ff: FF,
+        mut ff: FF,
     ) -> Result<Rc<Package>>
     where
         FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
@@ -51,7 +51,7 @@ impl Package {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
 
-        Package::try_make_package("", "", &files, None, ff)
+        Package::try_make_package("", "", &files, None, &mut ff)
     }
 
     fn try_make_package<FF>(
@@ -59,7 +59,7 @@ impl Package {
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
         root: Option<Weak<Package>>,
-        mut ff: FF,
+        ff: &mut FF,
     ) -> Result<Rc<Package>>
     where
         FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
@@ -99,7 +99,7 @@ impl Package {
                             &subpackage_full_name,
                             subpackage_fds,
                             Some(Weak::clone(&root.as_ref().unwrap_or(&weak))),
-                            &mut ff,
+                            ff,
                         )?,
                     ))
                 })
