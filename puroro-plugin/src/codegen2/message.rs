@@ -84,11 +84,12 @@ impl MessageImpl {
 }
 
 #[cfg(test)]
+#[derive(Debug)]
 pub struct MessageFake;
 
 #[cfg(test)]
-impl MessageTrait for MessageFake {
-    fn try_new(proto: &DescriptorProto, _context: &ContextForMessage) -> Result<Self> {
-        Ok(MessageFake)
+impl MessageFake {
+    pub fn try_new(proto: &DescriptorProto) -> Result<Rc<Box<Self>>> {
+        Ok(Rc::new(Box::new(MessageFake)))
     }
 }

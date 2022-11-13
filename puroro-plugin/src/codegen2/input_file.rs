@@ -24,13 +24,14 @@ pub trait InputFileTrait: Debug {
 }
 
 #[cfg(test)]
+#[derive(Debug)]
 pub struct InputFileFake {
     pub proto: FileDescriptorProto,
 }
 
 #[cfg(test)]
 impl InputFileFake {
-    fn try_new(proto: &FileDescriptorProto) -> Result<Self> {
+    pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
         Ok(InputFileFake {
             proto: proto.clone(),
         })
@@ -49,7 +50,7 @@ impl InputFileImpl {
     pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
         Self::try_new_with(proto, |m, _weak| MessageImpl::try_new(m))
     }
-    pub fn try_new_with<FM>(
+    fn try_new_with<FM>(
         proto: &FileDescriptorProto,
         mut fm: FM,
     ) -> Result<Rc<Box<dyn InputFileTrait>>>

@@ -207,7 +207,7 @@ mod tests {
     use super::FileDescriptorProto;
     use ::once_cell::sync::Lazy;
     use ::std::ops::Deref;
-    type RootPackage = super::Package<InputFileFake>;
+    type RootPackage = super::Package;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
@@ -239,7 +239,7 @@ mod tests {
     #[test]
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::try_new_from_files(files.into_iter()).unwrap();
+        let root_package = RootPackage::try_new_from_files_with(files.into_iter(), |f, _| InputFileFake::try_new(f)).unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
     }
