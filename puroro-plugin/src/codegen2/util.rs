@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::{ErrorKind, Result};
 use ::std::mem;
 use ::std::rc::{Rc, Weak};
 
@@ -104,23 +105,29 @@ where
 }
 
 pub trait RcExt<T> {
-    fn try_new_cyclic<F, E>(data_fn: F) -> Result<Rc<T>, E>
+    fn try_new_cyclic<F, E>(data_fn: F) -> ::std::result::Result<Rc<T>, E>
     where
         T: Default,
-        F: FnOnce(&Weak<T>) -> Result<T, E>,
+        F: FnOnce(&Weak<T>) -> ::std::result::Result<T, E>,
     {
         Self::try_new_cyclic_with_default(data_fn, T::default)
     }
-    fn try_new_cyclic_with_default<F, D, E>(data_fn: F, default: D) -> Result<Rc<T>, E>
+    fn try_new_cyclic_with_default<F, D, E>(
+        data_fn: F,
+        default: D,
+    ) -> ::std::result::Result<Rc<T>, E>
     where
-        F: FnOnce(&Weak<T>) -> Result<T, E>,
+        F: FnOnce(&Weak<T>) -> ::std::result::Result<T, E>,
         D: FnOnce() -> T;
 }
 
 impl<T> RcExt<T> for Rc<T> {
-    fn try_new_cyclic_with_default<F, D, E>(data_fn: F, default: D) -> Result<Rc<T>, E>
+    fn try_new_cyclic_with_default<F, D, E>(
+        data_fn: F,
+        default: D,
+    ) -> ::std::result::Result<Rc<T>, E>
     where
-        F: FnOnce(&Weak<T>) -> Result<T, E>,
+        F: FnOnce(&Weak<T>) -> ::std::result::Result<T, E>,
         D: FnOnce() -> T,
     {
         let mut maybe_error = None;
@@ -139,14 +146,14 @@ impl<T> RcExt<T> for Rc<T> {
 }
 
 pub trait RcBoxExt<T: ?Sized> {
-    fn try_new_boxed_cyclic<F, E>(data_fn: F) -> Result<Rc<Box<T>>, E>
+    fn try_new_boxed_cyclic<F, E>(data_fn: F) -> ::std::result::Result<Rc<Box<T>>, E>
     where
-        F: FnOnce(&Weak<Box<T>>) -> Result<Box<T>, E>;
+        F: FnOnce(&Weak<Box<T>>) -> ::std::result::Result<Box<T>, E>;
 }
 impl<T: ?Sized> RcBoxExt<T> for Rc<Box<T>> {
-    fn try_new_boxed_cyclic<F, E>(data_fn: F) -> Result<Rc<Box<T>>, E>
+    fn try_new_boxed_cyclic<F, E>(data_fn: F) -> ::std::result::Result<Rc<Box<T>>, E>
     where
-        F: FnOnce(&Weak<Box<T>>) -> Result<Box<T>, E>,
+        F: FnOnce(&Weak<Box<T>>) -> ::std::result::Result<Box<T>, E>,
     {
         let mut maybe_error = None;
         let rc_opt = Rc::new_cyclic(|weak_opt| {
@@ -171,5 +178,16 @@ impl<T: ?Sized> RcBoxExt<T> for Rc<Box<T>> {
                 ))
             }),
         }
+    }
+}
+
+trait WeakExt<T> {
+    fn try_upgrade(&self) -> Result<Rc<T>>;
+}
+impl<T> WeakExt<T> for Weak<T> {
+    fn try_upgrade(&self) -> Result<Rc<T>> {
+        Ok(Weak::upgrade(self).ok_or(ErrorKind::InternalError {
+            detail: "Weak ptr upgrade failed".to_string(),
+        })?)
     }
 }
