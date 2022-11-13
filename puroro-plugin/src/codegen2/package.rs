@@ -203,10 +203,13 @@ impl Package {
 
 #[cfg(test)]
 mod tests {
-    use super::super::input_file::InputFileFake;
+    use super::super::input_file::InputFileTrait;
     use super::FileDescriptorProto;
+    use crate::Result;
     use ::once_cell::sync::Lazy;
+    use ::proc_macro2::TokenStream;
     use ::std::ops::Deref;
+    use ::std::rc::Rc;
     type RootPackage = super::Package;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
@@ -236,18 +239,50 @@ mod tests {
         fd
     });
 
+    #[derive(Debug)]
+    pub struct InputFileFake {
+        pub proto: Rc<FileDescriptorProto>,
+    }
+    impl InputFileTrait for InputFileFake {
+        fn gen_structs_for_messages(&self) -> Result<TokenStream> {
+            Ok(TokenStream::new())
+        }
+    }
+    #[derive(Default, Debug)]
+    pub struct InputFileFakeFactory {
+        given_protos: Vec<Rc<FileDescriptorProto>>,
+        generated_fakes: Vec<Rc<Box<dyn InputFileTrait>>>,
+    }
+    impl InputFileFakeFactory {
+        pub fn add(&mut self, proto: &FileDescriptorProto) -> Rc<Box<dyn InputFileTrait>> {
+            let rc_proto = Rc::new(proto.clone());
+            let fake: Rc<Box<dyn InputFileTrait>> = Rc::new(Box::new(InputFileFake {
+                proto: Rc::clone(&rc_proto),
+            }));
+            self.given_protos.push(rc_proto);
+            self.generated_fakes.push(Rc::clone(&fake));
+            fake
+        }
+    }
+
     #[test]
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::try_new_from_files_with(files.into_iter(), |f, _| InputFileFake::try_new(f)).unwrap();
+        let mut factory = InputFileFakeFactory::default();
+        let root_package =
+            RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
+                .unwrap();
         assert_eq!(1, root_package.files.len());
-        assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
+        assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
     }
 
     #[test]
     fn test_make_package_single() {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = RootPackage::try_new_from_files(files.into_iter()).unwrap();
+        let mut factory = InputFileFakeFactory::default();
+        let root_package =
+            RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
+                .unwrap();
         assert_eq!(0, root_package.files.len());
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
@@ -263,7 +298,7 @@ mod tests {
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!("google.protobuf", package_g_p.full_name);
         assert_eq!(1, package_g_p.files.len());
-        assert_eq!(Lazy::force(&FD_G_P_DESC), &package_g_p.files[0].proto);
+        assert_eq!(Lazy::force(&FD_G_P_DESC), factory.given_protos[0].as_ref());
         assert_eq!(0, package_g_p.subpackages.len());
     }
 
@@ -275,10 +310,13 @@ mod tests {
             Lazy::force(&FD_G_P_EMPTY),
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
+        let mut factory = InputFileFakeFactory::default();
 
-        let root_package = RootPackage::try_new_from_files(files.into_iter()).unwrap();
+        let root_package =
+            RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
+                .unwrap();
         assert_eq!(1, root_package.files.len());
-        assert_eq!(Lazy::force(&FD_ROOT), &root_package.files[0].proto);
+        assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
 
@@ -300,7 +338,10 @@ mod tests {
         assert_eq!("compiler", package_g_p_c.name);
         assert_eq!("google.protobuf.compiler", package_g_p_c.full_name);
         assert_eq!(1, package_g_p_c.files.len());
-        assert_eq!(Lazy::force(&FD_G_P_C_PLUGIN), &package_g_p_c.files[0].proto);
+        assert_eq!(
+            Lazy::force(&FD_G_P_C_PLUGIN),
+            factory.given_protos[0].as_ref()
+        );
         assert_eq!(0, package_g_p_c.subpackages.len());
     }
 }

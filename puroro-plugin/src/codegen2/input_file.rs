@@ -23,21 +23,6 @@ pub trait InputFileTrait: Debug {
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
 }
 
-#[cfg(test)]
-#[derive(Debug)]
-pub struct InputFileFake {
-    pub proto: FileDescriptorProto,
-}
-
-#[cfg(test)]
-impl InputFileFake {
-    pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
-        Ok(InputFileFake {
-            proto: proto.clone(),
-        })
-    }
-}
-
 #[derive(Debug)]
 pub struct InputFileImpl {
     syntax: Syntax,
