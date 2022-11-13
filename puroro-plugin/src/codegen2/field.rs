@@ -35,6 +35,9 @@ pub(super) struct Field {
     rule: OnceCell<FieldRule>,
     proto3_optional: bool,
     label: field_descriptor_proto::Label,
+    r#type: field_descriptor_proto::Type,
+    number: i32,
+    type_name: String,
 }
 
 impl FieldTrait for Field {
@@ -60,6 +63,9 @@ impl Field {
             rule: OnceCell::new(),
             label: proto.label(),
             proto3_optional: proto.proto3_optional(),
+            r#type: proto.r#type(),
+            number: proto.number(),
+            type_name: proto.type_name().to_string(),
         })))
     }
 
