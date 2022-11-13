@@ -15,6 +15,7 @@
 mod r#enum;
 mod field;
 mod field_rule;
+mod field_type;
 mod input_file;
 mod message;
 mod oneof;
@@ -23,6 +24,7 @@ mod util;
 use self::r#enum::*;
 use self::field::*;
 use self::field_rule::*;
+use self::field_type::*;
 use self::input_file::*;
 use self::message::*;
 use self::oneof::*;

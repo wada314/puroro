@@ -14,8 +14,7 @@
 
 use super::Syntax;
 use crate::{ErrorKind, Result};
-use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label;
-use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
+use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 
 #[derive(Debug, Clone, Copy)]
 pub(super) enum FieldRule {
@@ -25,9 +24,13 @@ pub(super) enum FieldRule {
 }
 
 impl FieldRule {
-    pub(super) fn try_new(label: Label, syntax: Syntax, proto3_optional: bool) -> Result<Self> {
+    pub(super) fn try_new(
+        label: field_descriptor_proto::Label,
+        syntax: Syntax,
+        proto3_optional: bool,
+    ) -> Result<Self> {
+        use field_descriptor_proto::Label::*;
         use FieldRule::*;
-        use Label::*;
         Ok(match (label, proto3_optional, syntax) {
             (LabelOptional | LabelRequired, false, Syntax::Proto2) => Optional,
             (LabelRepeated, false, Syntax::Proto2) => Repeated,
