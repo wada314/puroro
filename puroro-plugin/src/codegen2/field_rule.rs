@@ -25,12 +25,16 @@ pub(super) enum FieldRule {
 
 impl FieldRule {
     pub(super) fn try_new(
-        label: field_descriptor_proto::Label,
+        label_opt: Option<field_descriptor_proto::Label>,
         syntax: Syntax,
         proto3_optional: bool,
     ) -> Result<Self> {
         use field_descriptor_proto::Label::*;
         use FieldRule::*;
+
+        let Some(label) = label_opt else {
+            Err(ErrorKind::InvalidLabel { label: "No label!".to_string(), syntax: format!("{:?}", syntax), proto3_optional })?
+        };
         Ok(match (label, proto3_optional, syntax) {
             (LabelOptional | LabelRequired, false, Syntax::Proto2) => Optional,
             (LabelRepeated, false, Syntax::Proto2) => Repeated,

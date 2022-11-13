@@ -35,7 +35,7 @@ pub(super) struct Field {
     rule: OnceCell<FieldRule>,
     r#type: OnceCell<FieldType>,
     proto3_optional: bool,
-    label: field_descriptor_proto::Label,
+    label_opt: Option<field_descriptor_proto::Label>,
     type_opt: Option<field_descriptor_proto::Type>,
     number: i32,
     type_name: String,
@@ -63,7 +63,7 @@ impl Field {
             message: Weak::clone(message),
             rule: OnceCell::new(),
             r#type: OnceCell::new(),
-            label: proto.label(),
+            label_opt: proto.label_opt(),
             proto3_optional: proto.proto3_optional(),
             type_opt: proto.type_opt(),
             number: proto.number(),
@@ -76,7 +76,7 @@ impl Field {
             .get_or_try_init(|| {
                 let syntax = self.message()?.input_file()?.syntax();
                 Ok(FieldRule::try_new(
-                    self.label.clone(),
+                    self.label_opt.clone(),
                     syntax,
                     self.proto3_optional,
                 )?)
