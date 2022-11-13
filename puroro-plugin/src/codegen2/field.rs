@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::util::WeakExt;
 use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
+use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait FieldTrait: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
+    fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>>;
 }
 
 #[derive(Debug)]
@@ -31,6 +33,8 @@ pub(super) struct Field {
     name: String,
     message: Weak<Box<dyn MessageTrait>>,
     rule: OnceCell<FieldRule>,
+    proto3_optional: bool,
+    label: field_descriptor_proto::Label,
 }
 
 impl FieldTrait for Field {
@@ -39,6 +43,9 @@ impl FieldTrait for Field {
         Ok(quote! {
             #name: (),
         })
+    }
+    fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>> {
+        Ok(self.message.try_upgrade()?)
     }
 }
 
@@ -51,10 +58,21 @@ impl Field {
             name: proto.name().to_string(),
             message: Weak::clone(message),
             rule: OnceCell::new(),
+            label: proto.label(),
+            proto3_optional: proto.proto3_optional(),
         })))
     }
 
     fn rule(&self) -> Result<FieldRule> {
-        todo!()
+        self.rule
+            .get_or_try_init(|| {
+                let syntax = self.message()?.input_file()?.syntax();
+                Ok(FieldRule::try_new(
+                    self.label.clone(),
+                    syntax,
+                    self.proto3_optional,
+                )?)
+            })
+            .cloned()
     }
 }

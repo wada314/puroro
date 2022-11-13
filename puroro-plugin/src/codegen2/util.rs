@@ -181,7 +181,7 @@ impl<T: ?Sized> RcBoxExt<T> for Rc<Box<T>> {
     }
 }
 
-trait WeakExt<T> {
+pub trait WeakExt<T> {
     fn try_upgrade(&self) -> Result<Rc<T>>;
 }
 impl<T> WeakExt<T> for Weak<T> {

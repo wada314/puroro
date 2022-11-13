@@ -26,6 +26,7 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
+    fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>>;
 }
 
 #[derive(Debug)]
@@ -51,6 +52,9 @@ impl MessageTrait for Message {
                 #(#fields)*
             }
         })
+    }
+    fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>> {
+        Ok(self.input_file.try_upgrade()?)
     }
 }
 

@@ -25,18 +25,15 @@ pub(super) enum FieldRule {
 }
 
 impl FieldRule {
-    pub(super) fn try_from_field_descriptor(
-        fd: &FieldDescriptorProto,
-        syntax: Syntax,
-    ) -> Result<Self> {
+    pub(super) fn try_new(label: Label, syntax: Syntax, proto3_optional: bool) -> Result<Self> {
         use FieldRule::*;
         use Label::*;
-        Ok(match (fd.label_opt(), fd.proto3_optional(), syntax) {
-            (Some(LabelOptional | LabelRequired), false, Syntax::Proto2) => Optional,
-            (Some(LabelRepeated), false, Syntax::Proto2) => Repeated,
-            (Some(LabelOptional), false, Syntax::Proto3) => Singular,
-            (Some(LabelOptional), true, Syntax::Proto3) => Optional,
-            (Some(LabelRepeated), false, Syntax::Proto3) => Repeated,
+        Ok(match (label, proto3_optional, syntax) {
+            (LabelOptional | LabelRequired, false, Syntax::Proto2) => Optional,
+            (LabelRepeated, false, Syntax::Proto2) => Repeated,
+            (LabelOptional, false, Syntax::Proto3) => Singular,
+            (LabelOptional, true, Syntax::Proto3) => Optional,
+            (LabelRepeated, false, Syntax::Proto3) => Repeated,
             (label, proto3_optional, syntax) => Err(ErrorKind::InvalidLabel {
                 label: format!("{:?}", label),
                 syntax: format!("{:?}", syntax),
