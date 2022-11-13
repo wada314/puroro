@@ -24,12 +24,12 @@ use ::std::fmt::Debug;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
-pub trait MessageTrait: Debug {
+pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
-pub struct Message {
+pub(super) struct Message {
     name: String,
     fields: Vec<Rc<Box<dyn FieldTrait>>>,
     input_file: Weak<Box<dyn InputFileTrait>>,
@@ -55,14 +55,14 @@ impl MessageTrait for Message {
 }
 
 impl Message {
-    pub fn try_new(
+    pub(super) fn try_new(
         proto: &DescriptorProto,
         input_file: &Weak<Box<dyn InputFileTrait>>,
     ) -> Result<Rc<Box<dyn MessageTrait>>> {
         Self::try_new_with(proto, input_file, |fd, weak| Field::try_new(fd, &weak))
     }
 
-    pub fn try_new_with<FF>(
+    pub(super) fn try_new_with<FF>(
         proto: &DescriptorProto,
         input_file: &Weak<Box<dyn InputFileTrait>>,
         mut ff: FF,

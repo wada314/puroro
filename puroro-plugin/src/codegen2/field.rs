@@ -21,12 +21,12 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait FieldTrait: Debug {
+pub(super) trait FieldTrait: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
-pub struct Field {
+pub(super) struct Field {
     name: String,
     message: Weak<Box<dyn MessageTrait>>,
 }
@@ -41,24 +41,13 @@ impl FieldTrait for Field {
 }
 
 impl Field {
-    pub fn try_new(proto: &FieldDescriptorProto, message: &Weak<Box<dyn MessageTrait>>) -> Result<Rc<Box<dyn FieldTrait>>> {
+    pub(super) fn try_new(
+        proto: &FieldDescriptorProto,
+        message: &Weak<Box<dyn MessageTrait>>,
+    ) -> Result<Rc<Box<dyn FieldTrait>>> {
         Ok(Rc::new(Box::new(Field {
             name: proto.name().to_string(),
             message: Weak::clone(message),
         })))
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum FieldRule {
-    Optional,
-    Singular,
-    Repeated,
-}
-
-impl FieldRule {
-    pub fn try_from_field_descriptor(fd: &FieldDescriptorProto) -> Result<Self> {
-        // requires syntax!
-        todo!()
     }
 }

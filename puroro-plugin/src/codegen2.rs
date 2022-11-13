@@ -14,6 +14,7 @@
 
 mod r#enum;
 mod field;
+mod field_rule;
 mod input_file;
 mod message;
 mod oneof;

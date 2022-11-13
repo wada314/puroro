@@ -19,19 +19,19 @@ use ::quote::quote;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait InputFileTrait: Debug {
+pub(super) trait InputFileTrait: Debug {
     fn syntax(&self) -> Syntax;
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
-pub struct InputFile {
+pub(super) struct InputFile {
     syntax: Syntax,
     messages: Vec<Rc<Box<dyn MessageTrait>>>,
 }
 
 impl InputFile {
-    pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
+    pub(super) fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
         Self::try_new_with(proto, |m, weak| Message::try_new(m, &weak))
     }
     fn try_new_with<FM>(

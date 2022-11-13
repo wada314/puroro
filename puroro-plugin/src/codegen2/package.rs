@@ -26,7 +26,7 @@ use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Default)]
-pub struct Package {
+pub(super) struct Package {
     name: String,
     full_name: String,
     subpackages: HashMap<String, Rc<Package>>,
@@ -35,13 +35,13 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+    pub(super) fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
     ) -> Result<Rc<Package>> {
         Self::try_new_from_files_with(iter, |fd, _weak| InputFile::try_new(fd))
     }
 
-    pub fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
+    pub(super) fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
         mut ff: FF,
     ) -> Result<Rc<Package>>
@@ -115,7 +115,7 @@ impl Package {
         })
     }
 
-    pub fn get_all_subpackages(self: &Rc<Self>) -> impl IntoIterator<Item = Rc<Package>> {
+    pub(super) fn get_all_subpackages(self: &Rc<Self>) -> impl IntoIterator<Item = Rc<Package>> {
         let mut ret = Vec::new();
         ret.push(Rc::clone(self));
         for subpackage in self.subpackages.values() {
@@ -130,7 +130,7 @@ impl Package {
         }
     }
 
-    pub fn module_file_name(&self) -> Cow<'_, str> {
+    pub(super) fn module_file_name(&self) -> Cow<'_, str> {
         if self.full_name.is_empty() {
             "lib.rs".into()
         } else {
@@ -148,7 +148,7 @@ impl Package {
         }
     }
 
-    pub fn gen_module_file(&self) -> Result<TokenStream> {
+    pub(super) fn gen_module_file(&self) -> Result<TokenStream> {
         let submodules_from_packages = self
             .subpackages
             .iter()
@@ -240,21 +240,24 @@ mod tests {
     });
 
     #[derive(Debug)]
-    pub struct InputFileFake {
+    struct InputFileFake {
         pub proto: Rc<FileDescriptorProto>,
     }
     impl InputFileTrait for InputFileFake {
         fn gen_structs_for_messages(&self) -> Result<TokenStream> {
             Ok(TokenStream::new())
         }
+        fn syntax(&self) -> crate::codegen2::Syntax {
+            unimplemented!()
+        }
     }
     #[derive(Default, Debug)]
-    pub struct InputFileFakeFactory {
+    struct InputFileFakeFactory {
         given_protos: Vec<Rc<FileDescriptorProto>>,
         generated_fakes: Vec<Rc<Box<dyn InputFileTrait>>>,
     }
     impl InputFileFakeFactory {
-        pub fn add(&mut self, proto: &FileDescriptorProto) -> Rc<Box<dyn InputFileTrait>> {
+        fn add(&mut self, proto: &FileDescriptorProto) -> Rc<Box<dyn InputFileTrait>> {
             let rc_proto = Rc::new(proto.clone());
             let fake: Rc<Box<dyn InputFileTrait>> = Rc::new(Box::new(InputFileFake {
                 proto: Rc::clone(&rc_proto),
