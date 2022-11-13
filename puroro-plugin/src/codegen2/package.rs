@@ -83,7 +83,7 @@ impl Package {
                     };
                     match fd.package()[prefix_len..].split_once('.') {
                         Some((name, _)) => name,
-                        None => fd.package(),
+                        None => &fd.package()[prefix_len..],
                     }
                 })
                 .map(|(subpackage_name, subpackage_fds)| -> Result<_> {
@@ -340,7 +340,7 @@ mod tests {
         assert_eq!(1, package_g_p_c.files.len());
         assert_eq!(
             Lazy::force(&FD_G_P_C_PLUGIN),
-            factory.given_protos[0].as_ref()
+            factory.given_protos[3].as_ref()
         );
         assert_eq!(0, package_g_p_c.subpackages.len());
     }
