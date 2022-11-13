@@ -28,6 +28,7 @@ pub trait FieldTrait: Debug {
 #[derive(Debug)]
 pub struct Field {
     name: String,
+    message: Weak<Box<dyn MessageTrait>>,
 }
 
 impl FieldTrait for Field {
@@ -40,9 +41,10 @@ impl FieldTrait for Field {
 }
 
 impl Field {
-    pub fn try_new(proto: &FieldDescriptorProto) -> Result<Rc<Box<dyn FieldTrait>>> {
+    pub fn try_new(proto: &FieldDescriptorProto, message: &Weak<Box<dyn MessageTrait>>) -> Result<Rc<Box<dyn FieldTrait>>> {
         Ok(Rc::new(Box::new(Field {
             name: proto.name().to_string(),
+            message: Weak::clone(message),
         })))
     }
 }

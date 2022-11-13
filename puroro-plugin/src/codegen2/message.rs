@@ -32,6 +32,7 @@ pub trait MessageTrait: Debug {
 pub struct Message {
     name: String,
     fields: Vec<Rc<Box<dyn FieldTrait>>>,
+    input_file: Weak<Box<dyn InputFileTrait>>,
 }
 
 impl MessageTrait for Message {
@@ -54,12 +55,16 @@ impl MessageTrait for Message {
 }
 
 impl Message {
-    pub fn try_new(proto: &DescriptorProto) -> Result<Rc<Box<dyn MessageTrait>>> {
-        Self::try_new_with(proto, |fd, _weak| Field::try_new(fd))
+    pub fn try_new(
+        proto: &DescriptorProto,
+        input_file: &Weak<Box<dyn InputFileTrait>>,
+    ) -> Result<Rc<Box<dyn MessageTrait>>> {
+        Self::try_new_with(proto, input_file, |fd, weak| Field::try_new(fd, &weak))
     }
 
     pub fn try_new_with<FF>(
         proto: &DescriptorProto,
+        input_file: &Weak<Box<dyn InputFileTrait>>,
         mut ff: FF,
     ) -> Result<Rc<Box<dyn MessageTrait>>>
     where
@@ -72,6 +77,7 @@ impl Message {
         Rc::try_new_boxed_cyclic(|weak| -> Result<Box<dyn MessageTrait>> {
             Ok(Box::new(Message {
                 name,
+                input_file: Weak::clone(input_file),
                 fields: proto
                     .field()
                     .into_iter()

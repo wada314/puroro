@@ -20,6 +20,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub trait InputFileTrait: Debug {
+    fn syntax(&self) -> Syntax;
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
 }
 
@@ -31,7 +32,7 @@ pub struct InputFile {
 
 impl InputFile {
     pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
-        Self::try_new_with(proto, |m, _weak| Message::try_new(m))
+        Self::try_new_with(proto, |m, weak| Message::try_new(m, &weak))
     }
     fn try_new_with<FM>(
         proto: &FileDescriptorProto,
@@ -57,6 +58,10 @@ impl InputFile {
 }
 
 impl InputFileTrait for InputFile {
+    fn syntax(&self) -> Syntax {
+        self.syntax
+    }
+
     fn gen_structs_for_messages(&self) -> Result<TokenStream> {
         let message_structs = self
             .messages
