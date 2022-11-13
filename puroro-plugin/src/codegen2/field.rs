@@ -15,8 +15,9 @@
 use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
+use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
+use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
@@ -29,6 +30,7 @@ pub(super) trait FieldTrait: Debug {
 pub(super) struct Field {
     name: String,
     message: Weak<Box<dyn MessageTrait>>,
+    rule: OnceCell<FieldRule>,
 }
 
 impl FieldTrait for Field {
@@ -48,6 +50,11 @@ impl Field {
         Ok(Rc::new(Box::new(Field {
             name: proto.name().to_string(),
             message: Weak::clone(message),
+            rule: OnceCell::new(),
         })))
+    }
+
+    fn rule(&self) -> Result<FieldRule> {
+        todo!()
     }
 }

@@ -22,6 +22,7 @@ mod package;
 mod util;
 use self::r#enum::*;
 use self::field::*;
+use self::field_rule::*;
 use self::input_file::*;
 use self::message::*;
 use self::oneof::*;
