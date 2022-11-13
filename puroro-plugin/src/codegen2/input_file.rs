@@ -24,16 +24,14 @@ pub trait InputFileTrait: Debug {
 }
 
 #[derive(Debug)]
-pub struct InputFileImpl {
+pub struct InputFile {
     syntax: Syntax,
     messages: Vec<Rc<Box<dyn MessageTrait>>>,
 }
 
-pub type InputFile = InputFileImpl;
-
-impl InputFileImpl {
+impl InputFile {
     pub fn try_new(proto: &FileDescriptorProto) -> Result<Rc<Box<dyn InputFileTrait>>> {
-        Self::try_new_with(proto, |m, _weak| MessageImpl::try_new(m))
+        Self::try_new_with(proto, |m, _weak| Message::try_new(m))
     }
     fn try_new_with<FM>(
         proto: &FileDescriptorProto,
@@ -58,7 +56,7 @@ impl InputFileImpl {
     }
 }
 
-impl InputFileTrait for InputFileImpl {
+impl InputFileTrait for InputFile {
     fn gen_structs_for_messages(&self) -> Result<TokenStream> {
         let message_structs = self
             .messages

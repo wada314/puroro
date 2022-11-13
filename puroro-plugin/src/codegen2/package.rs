@@ -38,7 +38,7 @@ impl Package {
     pub fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
     ) -> Result<Rc<Package>> {
-        Self::try_new_from_files_with(iter, |fd, _weak| InputFileImpl::try_new(fd))
+        Self::try_new_from_files_with(iter, |fd, _weak| InputFile::try_new(fd))
     }
 
     pub fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(

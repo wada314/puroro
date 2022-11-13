@@ -20,12 +20,10 @@ use ::std::fmt::Debug;
 pub trait OneofTrait: Debug {}
 
 #[derive(Debug)]
-pub struct OneofImpl {}
+pub struct Oneof {}
 
-pub type Oneof = OneofImpl;
-
-impl OneofImpl {
+impl Oneof {
     fn try_new(proto: &OneofDescriptorProto) -> Result<Self> {
-        Ok(OneofImpl {})
+        Ok(Oneof {})
     }
 }

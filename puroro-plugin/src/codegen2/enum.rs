@@ -20,13 +20,11 @@ use ::std::fmt::Debug;
 pub trait EnumTrait: Debug {}
 
 #[derive(Debug)]
-pub struct EnumImpl {}
+pub struct Enum {}
 
-pub type Enum = EnumImpl;
-
-impl EnumImpl {
+impl Enum {
     fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
-        Ok(EnumImpl {})
+        Ok(Enum {})
     }
 }
 

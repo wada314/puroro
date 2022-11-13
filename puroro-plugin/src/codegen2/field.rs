@@ -26,13 +26,11 @@ pub trait FieldTrait: Debug {
 }
 
 #[derive(Debug)]
-pub struct FieldImpl {
+pub struct Field {
     name: String,
 }
 
-pub type Field = FieldImpl;
-
-impl FieldTrait for FieldImpl {
+impl FieldTrait for Field {
     fn gen_struct_field_decl(&self) -> Result<TokenStream> {
         let name = format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
         Ok(quote! {
@@ -41,9 +39,9 @@ impl FieldTrait for FieldImpl {
     }
 }
 
-impl FieldImpl {
+impl Field {
     pub fn try_new(proto: &FieldDescriptorProto) -> Result<Rc<Box<dyn FieldTrait>>> {
-        Ok(Rc::new(Box::new(FieldImpl {
+        Ok(Rc::new(Box::new(Field {
             name: proto.name().to_string(),
         })))
     }

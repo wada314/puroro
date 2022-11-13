@@ -29,12 +29,12 @@ pub trait MessageTrait: Debug {
 }
 
 #[derive(Debug)]
-pub struct MessageImpl {
+pub struct Message {
     name: String,
     fields: Vec<Rc<Box<dyn FieldTrait>>>,
 }
 
-impl MessageTrait for MessageImpl {
+impl MessageTrait for Message {
     fn gen_struct(&self) -> Result<TokenStream> {
         let ident = format_ident!(
             "{}",
@@ -53,9 +53,9 @@ impl MessageTrait for MessageImpl {
     }
 }
 
-impl MessageImpl {
+impl Message {
     pub fn try_new(proto: &DescriptorProto) -> Result<Rc<Box<dyn MessageTrait>>> {
-        Self::try_new_with(proto, |fd, _weak| FieldImpl::try_new(fd))
+        Self::try_new_with(proto, |fd, _weak| Field::try_new(fd))
     }
 
     pub fn try_new_with<FF>(
@@ -70,7 +70,7 @@ impl MessageImpl {
     {
         let name = proto.name().to_string();
         Rc::try_new_boxed_cyclic(|weak| -> Result<Box<dyn MessageTrait>> {
-            Ok(Box::new(MessageImpl {
+            Ok(Box::new(Message {
                 name,
                 fields: proto
                     .field()
