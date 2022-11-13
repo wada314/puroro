@@ -33,9 +33,10 @@ pub(super) struct Field {
     name: String,
     message: Weak<Box<dyn MessageTrait>>,
     rule: OnceCell<FieldRule>,
+    r#type: OnceCell<FieldType>,
     proto3_optional: bool,
     label: field_descriptor_proto::Label,
-    r#type: field_descriptor_proto::Type,
+    type_opt: Option<field_descriptor_proto::Type>,
     number: i32,
     type_name: String,
 }
@@ -61,9 +62,10 @@ impl Field {
             name: proto.name().to_string(),
             message: Weak::clone(message),
             rule: OnceCell::new(),
+            r#type: OnceCell::new(),
             label: proto.label(),
             proto3_optional: proto.proto3_optional(),
-            r#type: proto.r#type(),
+            type_opt: proto.type_opt(),
             number: proto.number(),
             type_name: proto.type_name().to_string(),
         })))
@@ -80,5 +82,16 @@ impl Field {
                 )?)
             })
             .cloned()
+    }
+
+    fn r#type(&self) -> Result<&FieldType> {
+        self.r#type.get_or_try_init(|| {
+            let syntax = self.message()?.input_file()?.syntax();
+            Ok(FieldType::try_new(
+                self.type_opt.clone(),
+                &self.type_name,
+                syntax,
+            )?)
+        })
     }
 }
