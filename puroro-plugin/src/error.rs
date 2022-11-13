@@ -48,6 +48,15 @@ pub enum ErrorKind {
     FromUtf8Error {
         source: ::std::string::FromUtf8Error,
     },
+    #[error(
+        r#"Invalid combination of the field's label and proto syntax.
+     label: {label}, syntax: {syntax}, proto3_optional: {proto3_optional}"#
+    )]
+    InvalidLabel {
+        label: String,
+        syntax: String,
+        proto3_optional: bool,
+    },
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
 }

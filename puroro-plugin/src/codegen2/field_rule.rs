@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::Syntax;
-use crate::Result;
+use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto::Label;
 use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
 
@@ -29,15 +29,19 @@ impl FieldRule {
         fd: &FieldDescriptorProto,
         syntax: Syntax,
     ) -> Result<Self> {
+        use FieldRule::*;
         use Label::*;
-        match (fd.label_opt(), fd.proto3_optional(), syntax) {
-            (None, _, _) => todo!(),
-            (Some(LabelOptional | LabelRequired), _, Syntax::Proto2) => todo!(),
-            (Some(LabelRepeated), _, Syntax::Proto2) => todo!(),
-            (Some(LabelOptional), false, Syntax::Proto3) => todo!(),
-            (Some(LabelOptional), true, Syntax::Proto3) => todo!(),
-            (Some(LabelRequired), _, Syntax::Proto3) => todo!(),
-            (Some(LabelRepeated), _, Syntax::Proto3) => todo!(),
-        }
+        Ok(match (fd.label_opt(), fd.proto3_optional(), syntax) {
+            (Some(LabelOptional | LabelRequired), false, Syntax::Proto2) => Optional,
+            (Some(LabelRepeated), false, Syntax::Proto2) => Repeated,
+            (Some(LabelOptional), false, Syntax::Proto3) => Singular,
+            (Some(LabelOptional), true, Syntax::Proto3) => Optional,
+            (Some(LabelRepeated), false, Syntax::Proto3) => Repeated,
+            (label, proto3_optional, syntax) => Err(ErrorKind::InvalidLabel {
+                label: format!("{:?}", label),
+                syntax: format!("{:?}", syntax),
+                proto3_optional,
+            })?,
+        })
     }
 }
