@@ -94,4 +94,8 @@ impl Field {
             )?)
         })
     }
+
+    fn gen_struct_field_type(&self) -> Result<::syn::Type> {
+        todo!()
+    }
 }
