@@ -14,7 +14,9 @@
 
 use super::Syntax;
 use crate::{ErrorKind, Result};
+use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
+use ::quote::quote;
 
 #[derive(Debug, Clone)]
 pub(super) enum FieldType {
@@ -96,6 +98,60 @@ impl FieldType {
             TypeBytes => LengthDelimited(Bytes),
             TypeGroup => Err(ErrorKind::GroupNotSupported)?,
             TypeMessage => LengthDelimited(Message(type_name.to_string())),
+        })
+    }
+
+    pub(super) fn rust_type(&self) -> Result<TokenStream> {
+        match self {
+            FieldType::Variant(v) => v.rust_type(),
+            FieldType::LengthDelimited(ld) => ld.rust_type(),
+            FieldType::Bits32(b) => b.rust_type(),
+            FieldType::Bits64(b) => b.rust_type(),
+        }
+    }
+}
+
+impl VariantType {
+    fn rust_type(&self) -> Result<TokenStream> {
+        use VariantType::*;
+        Ok(match self {
+            Int32 | SInt32 => quote! { i32 },
+            UInt32 => quote! {u32},
+            Int64 | SInt64 => quote! {i64},
+            UInt64 => quote! {u64},
+            Bool => quote! {bool},
+            Enum2(_) => todo!(),
+            Enum3(_) => todo!(),
+        })
+    }
+}
+impl LengthDelimitedType {
+    fn rust_type(&self) -> Result<TokenStream> {
+        use LengthDelimitedType::*;
+        Ok(match self {
+            String => quote! { ::std::string::String },
+            Bytes => quote! { ::std::vec::Vec<u8> },
+            Message(_) => todo!(),
+        })
+    }
+}
+impl Bits32Type {
+    fn rust_type(&self) -> Result<TokenStream> {
+        use Bits32Type::*;
+        Ok(match self {
+            Fixed32 => quote! {u32},
+            SFixed32 => quote! {i32},
+            Float => quote! {f32},
+        })
+    }
+}
+impl Bits64Type {
+    fn rust_type(&self) -> Result<TokenStream> {
+        use Bits64Type::*;
+        Ok(match self {
+            Fixed64 => quote! {u64},
+            SFixed64 => quote! {i64},
+            Double => quote! {f64},
         })
     }
 }
