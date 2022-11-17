@@ -6,5 +6,8 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    item_outer: (),
+    item_outer: self::_puroro::internal::field_type::SingularNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+    >,
 }

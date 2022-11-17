@@ -7,5 +7,9 @@ pub mod _puroro {
 }
 pub struct Msg {}
 pub struct Submsg {
-    i32_optional: (),
+    i32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+        0usize,
+    >,
 }

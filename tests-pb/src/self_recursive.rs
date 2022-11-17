@@ -6,5 +6,7 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    recursive_unlabeled: (),
+    recursive_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField::<
+        (),
+    >,
 }

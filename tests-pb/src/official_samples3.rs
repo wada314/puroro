@@ -6,14 +6,20 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Test1 {
-    a: (),
+    a: self::_puroro::internal::field_type::SingularNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+    >,
 }
 pub struct Test2 {
-    b: (),
+    b: self::_puroro::internal::field_type::SingularStringField,
 }
 pub struct Test3 {
-    c: (),
+    c: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
 }
 pub struct Test4 {
-    d: (),
+    d: self::_puroro::internal::field_type::RepeatedNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+    >,
 }

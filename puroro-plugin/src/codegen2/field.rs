@@ -44,8 +44,9 @@ pub(super) struct Field {
 impl FieldTrait for Field {
     fn gen_struct_field_decl(&self) -> Result<TokenStream> {
         let name = format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
+        let r#type = self.gen_struct_field_type()?;
         Ok(quote! {
-            #name: (),
+            #name: #r#type,
         })
     }
     fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>> {

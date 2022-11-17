@@ -6,7 +6,17 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    enum_optional: (),
-    enum_unlabeled: (),
-    enum_repeated: (),
+    enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+        (),
+        self::_puroro::tags::Enum3<()>,
+        0usize,
+    >,
+    enum_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
+        (),
+        self::_puroro::tags::Enum3<()>,
+    >,
+    enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
+        (),
+        self::_puroro::tags::Enum3<()>,
+    >,
 }

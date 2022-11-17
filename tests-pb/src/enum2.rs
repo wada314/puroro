@@ -6,6 +6,13 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    enum_optional: (),
-    enum_repeated: (),
+    enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+        (),
+        self::_puroro::tags::Enum2<()>,
+        0usize,
+    >,
+    enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
+        (),
+        self::_puroro::tags::Enum2<()>,
+    >,
 }

@@ -6,8 +6,16 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    r#type: (),
+    r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+        0usize,
+    >,
 }
 pub struct _Self {
-    r#type: (),
+    r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+        0usize,
+    >,
 }

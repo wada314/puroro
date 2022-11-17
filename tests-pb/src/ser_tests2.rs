@@ -6,15 +6,40 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub struct Msg {
-    i32_optional: (),
-    i32_repeated: (),
-    float_optional: (),
-    float_repeated: (),
-    string_optional: (),
-    string_repeated: (),
-    submsg_optional: (),
-    submsg_repeated: (),
-    enum_optional: (),
-    enum_repeated: (),
-    very_large_field_number: (),
+    i32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+        0usize,
+    >,
+    i32_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+    >,
+    float_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+        f32,
+        self::_puroro::tags::Float,
+        0usize,
+    >,
+    float_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
+        f32,
+        self::_puroro::tags::Float,
+    >,
+    string_optional: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
+    string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
+    submsg_optional: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
+    submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<()>,
+    enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+        (),
+        self::_puroro::tags::Enum2<()>,
+        0usize,
+    >,
+    enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
+        (),
+        self::_puroro::tags::Enum2<()>,
+    >,
+    very_large_field_number: self::_puroro::internal::field_type::OptionalNumericalField::<
+        i32,
+        self::_puroro::tags::Int32,
+        0usize,
+    >,
 }
