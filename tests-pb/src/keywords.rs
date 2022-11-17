@@ -11,6 +11,7 @@ pub struct Msg {
         self::_puroro::tags::Int32,
         0usize,
     >,
+    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 pub struct _Self {
     r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -18,4 +19,5 @@ pub struct _Self {
         self::_puroro::tags::Int32,
         0usize,
     >,
+    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }

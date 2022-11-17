@@ -42,4 +42,5 @@ pub struct Msg {
         self::_puroro::tags::Int32,
         4usize,
     >,
+    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }

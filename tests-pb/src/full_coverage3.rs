@@ -186,4 +186,5 @@ pub struct Msg {
         f64,
         self::_puroro::tags::Double,
     >,
+    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }

@@ -51,9 +51,11 @@ impl MessageTrait for Message {
             .iter()
             .map(|f| f.gen_struct_field_decl())
             .collect::<Result<Vec<_>>>()?;
+        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         Ok(quote! {
             pub struct #ident {
                 #(#fields)*
+                _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
             }
         })
     }

@@ -19,4 +19,5 @@ pub struct Msg {
         (),
         self::_puroro::tags::Enum3<()>,
     >,
+    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
