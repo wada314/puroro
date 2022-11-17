@@ -27,6 +27,8 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
     fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>>;
+
+    fn get_bitfield_head_for_field(&self, number: i32) -> Result<usize>;
 }
 
 #[derive(Debug)]
@@ -55,6 +57,10 @@ impl MessageTrait for Message {
     }
     fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>> {
         Ok(self.input_file.try_upgrade()?)
+    }
+
+    fn get_bitfield_head_for_field(&self, number: i32) -> Result<usize> {
+        todo!()
     }
 }
 
