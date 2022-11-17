@@ -26,6 +26,10 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait FieldTrait: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>>;
+
+    // Message's bitfield allocation
+    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
+    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 }
 
 #[derive(Debug)]
@@ -39,6 +43,16 @@ pub(super) struct Field {
     type_opt: Option<field_descriptor_proto::Type>,
     number: i32,
     type_name: String,
+
+    // Message's bitfield allocation
+    allocated_bitfield: OnceCell<FieldBitfieldAllocation>,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct FieldBitfieldAllocation {
+    // Bit used by optional field.
+    maybe_optional: Option<usize>,
+    tail: usize,
 }
 
 impl FieldTrait for Field {
@@ -51,6 +65,35 @@ impl FieldTrait for Field {
     }
     fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>> {
         Ok(self.message.try_upgrade()?)
+    }
+
+    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
+        Ok(self.allocated_bitfield.get().map(|a| a.tail))
+    }
+
+    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
+        Ok(self
+            .allocated_bitfield
+            .get_or_try_init(|| -> Result<FieldBitfieldAllocation> {
+                let mut alloc = FieldBitfieldAllocation {
+                    maybe_optional: None,
+                    tail: head,
+                };
+                match (self.rule()?, self.r#type()?) {
+                    (_, FieldType::LengthDelimited(LengthDelimitedType::Message(_))) => {
+                        // Do nothing
+                    }
+                    (FieldRule::Optional, _) => {
+                        alloc.maybe_optional = Some(alloc.tail);
+                        alloc.tail += 1;
+                    }
+                    _ => {
+                        // Do nothing
+                    }
+                }
+                alloc
+            })?
+            .tail)
     }
 }
 
@@ -69,7 +112,7 @@ impl Field {
             type_opt: proto.type_opt(),
             number: proto.number(),
             type_name: proto.type_name().to_string(),
-            bitfield_index_for_optional: OnceCell::new(),
+            allocated_bitfield: OnceCell::new(),
         })))
     }
 
