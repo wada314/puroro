@@ -15,6 +15,7 @@
 use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
+use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
@@ -27,8 +28,7 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
     fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>>;
-
-    fn get_bitfield_head_for_field(&self, number: i32) -> Result<usize>;
+    fn bitfield_size(&self) -> Result<usize>;
 }
 
 #[derive(Debug)]
@@ -36,6 +36,8 @@ pub(super) struct Message {
     name: String,
     fields: Vec<Rc<Box<dyn FieldTrait>>>,
     input_file: Weak<Box<dyn InputFileTrait>>,
+
+    bitfield_size: OnceCell<usize>,
 }
 
 impl MessageTrait for Message {
@@ -59,8 +61,20 @@ impl MessageTrait for Message {
         Ok(self.input_file.try_upgrade()?)
     }
 
-    fn get_bitfield_head_for_field(&self, number: i32) -> Result<usize> {
-        todo!()
+    fn bitfield_size(&self) -> Result<usize> {
+        self.bitfield_size
+            .get_or_try_init(|| {
+                let mut tail = 0;
+                for field in &self.fields {
+                    if let Some(next_tail) = field.maybe_allocated_bitfield_tail()? {
+                        tail = next_tail;
+                    } else {
+                        tail = field.assign_and_get_bitfield_tail(tail)?;
+                    }
+                }
+                Ok(tail)
+            })
+            .cloned()
     }
 }
 
@@ -94,6 +108,7 @@ impl Message {
                     .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
                     .map(|f| ff(f, Weak::clone(weak)))
                     .collect::<Result<Vec<_>>>()?,
+                bitfield_size: OnceCell::new(),
             }))
         })
     }

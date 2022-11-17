@@ -26,6 +26,7 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait FieldTrait: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>>;
+    fn number(&self) -> i32;
 
     // Message's bitfield allocation
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
@@ -66,34 +67,37 @@ impl FieldTrait for Field {
     fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>> {
         Ok(self.message.try_upgrade()?)
     }
+    fn number(&self) -> i32 {
+        self.number
+    }
 
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
         Ok(self.allocated_bitfield.get().map(|a| a.tail))
     }
 
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
-        Ok(self
-            .allocated_bitfield
-            .get_or_try_init(|| -> Result<FieldBitfieldAllocation> {
-                let mut alloc = FieldBitfieldAllocation {
-                    maybe_optional: None,
-                    tail: head,
-                };
-                match (self.rule()?, self.r#type()?) {
-                    (_, FieldType::LengthDelimited(LengthDelimitedType::Message(_))) => {
-                        // Do nothing
-                    }
-                    (FieldRule::Optional, _) => {
-                        alloc.maybe_optional = Some(alloc.tail);
-                        alloc.tail += 1;
-                    }
-                    _ => {
-                        // Do nothing
-                    }
-                }
-                Ok(alloc)
-            })?
-            .tail)
+        let mut alloc = FieldBitfieldAllocation {
+            maybe_optional: None,
+            tail: head,
+        };
+        match (self.rule()?, self.r#type()?) {
+            (_, FieldType::LengthDelimited(LengthDelimitedType::Message(_))) => {
+                // Do nothing
+            }
+            (FieldRule::Optional, _) => {
+                alloc.maybe_optional = Some(alloc.tail);
+                alloc.tail += 1;
+            }
+            _ => {
+                // Do nothing
+            }
+        }
+        match self.allocated_bitfield.try_insert(alloc) {
+            Ok(alloc) => Ok(alloc.tail),
+            Err(_) => Err(ErrorKind::InternalError {
+                detail: "Tried to assign the field's bitfield twice.".to_string(),
+            })?,
+        }
     }
 }
 
@@ -140,15 +144,29 @@ impl Field {
         })
     }
 
+    fn bitfield_index_for_optional(&self) -> Result<Option<usize>> {
+        let alloc = if let Some(alloc) = self.allocated_bitfield.get() {
+            alloc
+        } else {
+            let _ = self.message()?.bitfield_size()?;
+            let Some(alloc) = self.allocated_bitfield.get() else {
+                Err(ErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
+            };
+            alloc
+        };
+        Ok(alloc.maybe_optional)
+    }
+
     fn gen_struct_field_type(&self) -> Result<TokenStream> {
         use FieldRule::*;
         use FieldType::*;
         use LengthDelimitedType::*;
         let primitive_type = self.r#type()?.rust_type()?;
         let tag_type = self.r#type()?.tag_type()?;
+        let bitfield_index = self.bitfield_index_for_optional()?.unwrap_or(usize::MAX);
         let type_name = match (self.rule()?, self.r#type()?) {
             (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                OptionalNumericalField::<#primitive_type, #tag_type, 0usize>
+                OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
             },
             (Singular, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
                 SingularNumericalField::<#primitive_type, #tag_type>
@@ -157,7 +175,7 @@ impl Field {
                 RepeatedNumericalField::<#primitive_type, #tag_type>
             },
             (Optional, LengthDelimited(String)) => quote! {
-                OptionalStringField::<0usize>
+                OptionalStringField::<#bitfield_index>
             },
             (Singular, LengthDelimited(String)) => quote! {
                 SingularStringField
@@ -166,7 +184,7 @@ impl Field {
                 RepeatedStringField
             },
             (Optional, LengthDelimited(Bytes)) => quote! {
-                OptionalBytesField::<0usize>
+                OptionalBytesField::<#bitfield_index>
             },
             (Singular, LengthDelimited(Bytes)) => quote! {
                 SingularBytesField

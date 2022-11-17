@@ -26,17 +26,17 @@ pub struct Msg {
     float_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         f32,
         self::_puroro::tags::Float,
-        0usize,
+        1usize,
     >,
     float_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         f32,
         self::_puroro::tags::Float,
     >,
     bytes_unlabeled: self::_puroro::internal::field_type::SingularBytesField,
-    bytes_optional: self::_puroro::internal::field_type::OptionalBytesField::<0usize>,
+    bytes_optional: self::_puroro::internal::field_type::OptionalBytesField::<2usize>,
     bytes_repeated: self::_puroro::internal::field_type::RepeatedBytesField,
     string_unlabeled: self::_puroro::internal::field_type::SingularStringField,
-    string_optional: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
+    string_optional: self::_puroro::internal::field_type::OptionalStringField::<3usize>,
     string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
     enum_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
         (),
@@ -45,7 +45,7 @@ pub struct Msg {
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         (),
         self::_puroro::tags::Enum3<()>,
-        0usize,
+        4usize,
     >,
     enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         (),
@@ -63,7 +63,7 @@ pub struct Msg {
     i64_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         i64,
         self::_puroro::tags::Int64,
-        0usize,
+        5usize,
     >,
     i64_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i64,
@@ -76,7 +76,7 @@ pub struct Msg {
     u32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         u32,
         self::_puroro::tags::UInt32,
-        0usize,
+        6usize,
     >,
     u32_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         u32,
@@ -89,7 +89,7 @@ pub struct Msg {
     u64_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         u64,
         self::_puroro::tags::UInt64,
-        0usize,
+        7usize,
     >,
     u64_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         u64,
@@ -102,7 +102,7 @@ pub struct Msg {
     s32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
         self::_puroro::tags::SInt32,
-        0usize,
+        8usize,
     >,
     s32_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i32,
@@ -115,7 +115,7 @@ pub struct Msg {
     s64_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         i64,
         self::_puroro::tags::SInt64,
-        0usize,
+        9usize,
     >,
     s64_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i64,
@@ -128,7 +128,7 @@ pub struct Msg {
     fixed32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         u32,
         self::_puroro::tags::Fixed32,
-        0usize,
+        10usize,
     >,
     fixed32_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         u32,
@@ -141,7 +141,7 @@ pub struct Msg {
     fixed64_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         u64,
         self::_puroro::tags::Fixed64,
-        0usize,
+        11usize,
     >,
     fixed64_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         u64,
@@ -154,7 +154,7 @@ pub struct Msg {
     sfixed32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
         self::_puroro::tags::SFixed32,
-        0usize,
+        12usize,
     >,
     sfixed32_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i32,
@@ -167,7 +167,7 @@ pub struct Msg {
     sfixed64_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         i64,
         self::_puroro::tags::SFixed64,
-        0usize,
+        13usize,
     >,
     sfixed64_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i64,
@@ -180,7 +180,7 @@ pub struct Msg {
     f64_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         f64,
         self::_puroro::tags::Double,
-        0usize,
+        14usize,
     >,
     f64_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         f64,

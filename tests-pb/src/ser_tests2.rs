@@ -18,20 +18,20 @@ pub struct Msg {
     float_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         f32,
         self::_puroro::tags::Float,
-        0usize,
+        1usize,
     >,
     float_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         f32,
         self::_puroro::tags::Float,
     >,
-    string_optional: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
+    string_optional: self::_puroro::internal::field_type::OptionalStringField::<2usize>,
     string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
     submsg_optional: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
     submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<()>,
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         (),
         self::_puroro::tags::Enum2<()>,
-        0usize,
+        3usize,
     >,
     enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         (),
@@ -40,6 +40,6 @@ pub struct Msg {
     very_large_field_number: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
         self::_puroro::tags::Int32,
-        0usize,
+        4usize,
     >,
 }
