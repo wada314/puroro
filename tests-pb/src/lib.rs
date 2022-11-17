@@ -11,15 +11,15 @@ pub mod _puroro {
     pub use ::puroro::*;
 }
 pub mod self_recursive;
-pub mod full_coverage3;
-pub mod nested;
-pub mod ser_tests2;
-pub mod ser_tests3;
-pub mod keywords;
-pub mod oneofs2;
-pub mod full_coverage2;
-pub mod official_samples2;
-pub mod official_samples3;
 pub mod enum2;
-pub mod oneofs3;
+pub mod nested;
+pub mod oneofs2;
+pub mod ser_tests2;
+pub mod keywords;
+pub mod official_samples2;
+pub mod ser_tests3;
+pub mod official_samples3;
+pub mod full_coverage2;
+pub mod full_coverage3;
 pub mod enum3;
+pub mod oneofs3;

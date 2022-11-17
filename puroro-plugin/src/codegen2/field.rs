@@ -91,7 +91,7 @@ impl FieldTrait for Field {
                         // Do nothing
                     }
                 }
-                alloc
+                Ok(alloc)
             })?
             .tail)
     }
