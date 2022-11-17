@@ -69,6 +69,7 @@ impl Field {
             type_opt: proto.type_opt(),
             number: proto.number(),
             type_name: proto.type_name().to_string(),
+            bitfield_index_for_optional: OnceCell::new(),
         })))
     }
 
