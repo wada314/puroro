@@ -102,11 +102,21 @@ impl FieldType {
     }
 
     pub(super) fn rust_type(&self) -> Result<TokenStream> {
+        use FieldType::*;
         match self {
-            FieldType::Variant(v) => v.rust_type(),
-            FieldType::LengthDelimited(ld) => ld.rust_type(),
-            FieldType::Bits32(b) => b.rust_type(),
-            FieldType::Bits64(b) => b.rust_type(),
+            Variant(v) => v.rust_type(),
+            LengthDelimited(ld) => ld.rust_type(),
+            Bits32(b) => b.rust_type(),
+            Bits64(b) => b.rust_type(),
+        }
+    }
+    pub(super) fn tag_type(&self) -> Result<TokenStream> {
+        use FieldType::*;
+        match self {
+            Variant(v) => v.tag_type(),
+            LengthDelimited(ld) => ld.tag_type(),
+            Bits32(b) => b.tag_type(),
+            Bits64(b) => b.tag_type(),
         }
     }
 }
@@ -116,12 +126,29 @@ impl VariantType {
         use VariantType::*;
         Ok(match self {
             Int32 | SInt32 => quote! { i32 },
-            UInt32 => quote! {u32},
-            Int64 | SInt64 => quote! {i64},
-            UInt64 => quote! {u64},
-            Bool => quote! {bool},
-            Enum2(_) => todo!(),
-            Enum3(_) => todo!(),
+            UInt32 => quote! { u32 },
+            Int64 | SInt64 => quote! { i64 },
+            UInt64 => quote! { u64 },
+            Bool => quote! { bool },
+            Enum2(_) => quote! { () },
+            Enum3(_) => quote! { () },
+        })
+    }
+    fn tag_type(&self) -> Result<TokenStream> {
+        use VariantType::*;
+        let tag_name = match self {
+            Int32 => quote! { Int32 },
+            SInt32 => quote! { SInt32 },
+            UInt32 => quote! { UInt32 },
+            Int64 => quote! { Int64 },
+            SInt64 => quote! { SInt64 },
+            UInt64 => quote! { UInt64 },
+            Bool => quote! { Bool },
+            Enum2(_) => quote! { Enum2<()> },
+            Enum3(_) => quote! { Enum3<()> },
+        };
+        Ok(quote! {
+            self::_puroro::tags::#tag_name
         })
     }
 }
@@ -131,7 +158,18 @@ impl LengthDelimitedType {
         Ok(match self {
             String => quote! { ::std::string::String },
             Bytes => quote! { ::std::vec::Vec<u8> },
-            Message(_) => todo!(),
+            Message(_) => quote! { () },
+        })
+    }
+    fn tag_type(&self) -> Result<TokenStream> {
+        use LengthDelimitedType::*;
+        let tag_name = match self {
+            String => quote! { String },
+            Bytes => quote! { Bytes },
+            Message(_) => quote! { Message<()> },
+        };
+        Ok(quote! {
+            self::_puroro::tags::#tag_name
         })
     }
 }
@@ -139,9 +177,20 @@ impl Bits32Type {
     fn rust_type(&self) -> Result<TokenStream> {
         use Bits32Type::*;
         Ok(match self {
-            Fixed32 => quote! {u32},
-            SFixed32 => quote! {i32},
-            Float => quote! {f32},
+            Fixed32 => quote! { u32 },
+            SFixed32 => quote! { i32 },
+            Float => quote! { f32 },
+        })
+    }
+    fn tag_type(&self) -> Result<TokenStream> {
+        use Bits32Type::*;
+        let tag_name = match self {
+            Fixed32 => quote! { Fixed32 },
+            SFixed32 => quote! { SFixed32 },
+            Float => quote! { Float },
+        };
+        Ok(quote! {
+            self::_puroro::tags::#tag_name
         })
     }
 }
@@ -149,9 +198,20 @@ impl Bits64Type {
     fn rust_type(&self) -> Result<TokenStream> {
         use Bits64Type::*;
         Ok(match self {
-            Fixed64 => quote! {u64},
-            SFixed64 => quote! {i64},
-            Double => quote! {f64},
+            Fixed64 => quote! { u64 },
+            SFixed64 => quote! { i64 },
+            Double => quote! { f64 },
+        })
+    }
+    fn tag_type(&self) -> Result<TokenStream> {
+        use Bits64Type::*;
+        let tag_name = match self {
+            Fixed64 => quote! { Fixed64 },
+            SFixed64 => quote! { SFixed64 },
+            Double => quote! { Double },
+        };
+        Ok(quote! {
+            self::_puroro::tags::#tag_name
         })
     }
 }

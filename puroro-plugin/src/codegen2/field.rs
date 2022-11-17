@@ -96,6 +96,70 @@ impl Field {
     }
 
     fn gen_struct_field_type(&self) -> Result<::syn::Type> {
+        use FieldRule::*;
+        use FieldType::*;
+        let primitive_type = self.r#type()?.rust_type()?;
+        /*
+        (Optional, Variant(_) | Bits32(_) | Bits64(_)) => {
+            format!(
+                "OptionalNumericalField::<{}, {}, {}>",
+                wire_type.into_owned_rust_type(),
+                wire_type.into_tag_type(),
+                bit_index_for_optional
+            )
+        }
+        (Singular, Variant(_) | Bits32(_) | Bits64(_)) => {
+            format!(
+                "SingularNumericalField::<{}, {}>",
+                wire_type.into_owned_rust_type(),
+                wire_type.into_tag_type(),
+            )
+        }
+        (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => {
+            format!(
+                "RepeatedNumericalField::<{}, {}>",
+                wire_type.into_owned_rust_type(),
+                wire_type.into_tag_type(),
+            )
+        }
+        (Optional, LengthDelimited(String)) => {
+            format!("OptionalStringField::<{}>", bit_index_for_optional)
+        }
+        (Singular, LengthDelimited(String)) => {
+            format!("SingularStringField")
+        }
+        (Repeated, LengthDelimited(String)) => {
+            format!("RepeatedStringField")
+        }
+        (Optional, LengthDelimited(Bytes)) => {
+            format!("OptionalBytesField<{}>", bit_index_for_optional)
+        }
+        (Singular, LengthDelimited(Bytes)) => {
+            format!("SingularBytesField")
+        }
+        (Repeated, LengthDelimited(Bytes)) => {
+            format!("RepeatedBytesField")
+        }
+        (Optional | Singular, LengthDelimited(Message(fqtn))) => {
+            format!("SingularHeapMessageField::<{}>", fqtn.to_rust_path())
+        }
+        (Repeated, LengthDelimited(Message(fqtn))) => {
+            format!("RepeatedMessageField::<{}>", fqtn.to_rust_path())
+        } */
+        match (self.rule()?, self.r#type()?) {
+            (Optional, Variant(_)) => todo!(),
+            (Optional, Bits32(_)) => todo!(),
+            (Optional, Bits64(_)) => todo!(),
+            (Optional, LengthDelimited(_)) => todo!(),
+            (Singular, Variant(_)) => todo!(),
+            (Singular, LengthDelimited(_)) => todo!(),
+            (Singular, Bits32(_)) => todo!(),
+            (Singular, Bits64(_)) => todo!(),
+            (Repeated, Variant(_)) => todo!(),
+            (Repeated, LengthDelimited(_)) => todo!(),
+            (Repeated, Bits32(_)) => todo!(),
+            (Repeated, Bits64(_)) => todo!(),
+        }
         todo!()
     }
 }
