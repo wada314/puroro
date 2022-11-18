@@ -27,15 +27,6 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug {
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
-    fn all_packages(&self) -> Vec<&dyn PackageTrait> {
-        let mut ret = Vec::new();
-        let mut stack = vec![self as &dyn PackageTrait];
-        while let Some(p) = stack.pop() {
-            stack.extend(p.subpackages());
-            ret.push(p);
-        }
-        ret
-    }
 }
 
 #[derive(Debug, Default)]

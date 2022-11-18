@@ -36,6 +36,8 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_respo
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::iter;
+use ::std::ops::Deref;
+use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -61,12 +63,21 @@ enum MessageOrInputFile<M, F> {
     InputFile(F),
 }
 
+fn all_packages(root: &dyn PackageTrait) -> Vec<&dyn PackageTrait> {
+    let mut ret = Vec::new();
+    let mut stack = vec![root];
+    while let Some(p) = stack.pop() {
+        stack.extend(p.subpackages());
+        ret.push(p);
+    }
+    ret
+}
+
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = Package::try_new_from_files(files)?;
-    Ok(root_package
-        .get_all_subpackages()
+    Ok(all_packages(Box::deref(Rc::deref(&root_package)))
         .into_iter()
         .map(|p| -> Result<_> { Ok((p.module_file_name().to_string(), p.gen_module_file()?)) })
         .chain(iter::once(Ok((
