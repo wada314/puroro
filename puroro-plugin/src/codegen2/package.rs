@@ -151,8 +151,9 @@ impl Package {
     pub(super) fn gen_module_file(&self) -> Result<TokenStream> {
         let submodules_from_packages = self
             .subpackages
-            .iter()
-            .map(|(name, _)| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
+            .keys()
+            .sorted()
+            .map(|name| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
             .collect::<Vec<_>>();
         let message_structs = self
             .files
