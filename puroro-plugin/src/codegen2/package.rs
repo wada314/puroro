@@ -25,28 +25,54 @@ use ::std::fmt::Debug;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
+pub(super) trait PackageTrait: Debug {
+    fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
+    fn all_packages(&self) -> Vec<&dyn PackageTrait> {
+        let mut ret = Vec::new();
+        let mut stack = vec![self as &dyn PackageTrait];
+        while let Some(p) = stack.pop() {
+            stack.extend(p.subpackages());
+            ret.push(p);
+        }
+        ret
+    }
+}
+
 #[derive(Debug, Default)]
 pub(super) struct Package {
     name: String,
     full_name: String,
-    subpackages: HashMap<String, Rc<Package>>,
+    subpackages: HashMap<String, Rc<Box<dyn PackageTrait>>>,
     files: Vec<Rc<Box<dyn InputFileTrait>>>,
-    root: Option<Weak<Package>>,
+    root: Option<Weak<Box<dyn PackageTrait>>>,
+}
+
+impl PackageTrait for Package {
+    fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>> {
+        Box::new(
+            self.subpackages
+                .iter()
+                .map(|(_, p)| (Box::deref(Rc::deref(p))) as &dyn PackageTrait),
+        )
+    }
 }
 
 impl Package {
     pub(super) fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
-    ) -> Result<Rc<Package>> {
+    ) -> Result<Rc<Box<dyn PackageTrait>>> {
         Self::try_new_from_files_with(iter, |fd, _weak| InputFile::try_new(fd))
     }
 
     pub(super) fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
         mut ff: FF,
-    ) -> Result<Rc<Package>>
+    ) -> Result<Rc<Box<dyn PackageTrait>>>
     where
-        FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
+        FF: FnMut(
+            &FileDescriptorProto,
+            Weak<Box<dyn PackageTrait>>,
+        ) -> Result<Rc<Box<dyn InputFileTrait>>>,
     {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
@@ -58,13 +84,16 @@ impl Package {
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Option<Weak<Package>>,
+        root: Option<Weak<Box<dyn PackageTrait>>>,
         ff: &mut FF,
-    ) -> Result<Rc<Package>>
+    ) -> Result<Rc<Box<dyn PackageTrait>>>
     where
-        FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Result<Rc<Box<dyn InputFileTrait>>>,
+        FF: FnMut(
+            &FileDescriptorProto,
+            Weak<Box<dyn PackageTrait>>,
+        ) -> Result<Rc<Box<dyn InputFileTrait>>>,
     {
-        Rc::try_new_cyclic(|weak| {
+        Rc::try_new_boxed_cyclic(|weak| {
             // The first few FDs might be FDs which are directly belonging to the current package.
             // The remaining FDs are belonging to the child packages.
             let (self_fds, child_fds) = sorted_fds.split_while(|fd| fd.package() == full_name);
@@ -105,29 +134,14 @@ impl Package {
                 })
                 .collect::<Result<HashMap<_, _>>>()?;
 
-            Ok(Package {
+            Ok(Box::new(Package {
                 name: name.to_string(),
                 full_name: full_name.to_string(),
                 subpackages,
                 files: self_files,
                 root,
-            })
+            }))
         })
-    }
-
-    pub(super) fn get_all_subpackages(self: &Rc<Self>) -> impl IntoIterator<Item = Rc<Package>> {
-        let mut ret = Vec::new();
-        ret.push(Rc::clone(self));
-        for subpackage in self.subpackages.values() {
-            subpackage.push_all_subpackages(&mut ret);
-        }
-        ret
-    }
-    fn push_all_subpackages(self: &Rc<Self>, vec: &mut Vec<Rc<Package>>) {
-        vec.push(Rc::clone(self));
-        for subpackage in self.subpackages.values() {
-            subpackage.push_all_subpackages(vec);
-        }
     }
 
     pub(super) fn module_file_name(&self) -> Cow<'_, str> {
