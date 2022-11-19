@@ -19,7 +19,6 @@ use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::quote::{format_ident, quote};
-use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;

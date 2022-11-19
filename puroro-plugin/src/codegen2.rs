@@ -63,6 +63,12 @@ enum MessageOrInputFile<M, F> {
     InputFile(F),
 }
 
+#[derive(Debug, Clone, Copy)]
+enum MessageOrEnum<M, E> {
+    Message(M),
+    Enum(E),
+}
+
 fn all_packages(root: &dyn PackageTrait) -> Vec<&dyn PackageTrait> {
     let mut ret = Vec::new();
     let mut stack = vec![root];
