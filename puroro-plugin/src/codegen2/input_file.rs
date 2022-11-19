@@ -23,7 +23,8 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait InputFileTrait: Debug {
     fn syntax(&self) -> Syntax;
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = &dyn MessageTrait>>;
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>>;
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>>;
 }
 
 #[derive(Debug)]
@@ -75,7 +76,11 @@ impl InputFileTrait for InputFile {
         })
     }
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = &dyn MessageTrait>> {
-        Box::new(self.messages.iter().map(|m| Box::deref(Rc::deref(m))))
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>> {
+        Box::new(self.messages.iter().map(|m| Rc::downgrade(m)))
+    }
+
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>> {
+        Box::new(::std::iter::empty())
     }
 }

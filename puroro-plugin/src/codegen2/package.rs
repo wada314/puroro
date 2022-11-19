@@ -158,13 +158,26 @@ impl PackageTrait for Package {
 
         // Case 3, the next component of the path is a message.
         // The message can still have a submessage, so just delegate to the message.
-        if let Some(message) = self.messages()?.find(|m| m.name() == subitem_name) {
+        if let Some(message) = self
+            .messages()?
+            .try_find(|m| -> Result<_> { Ok(m.try_upgrade()?.name() == subitem_name) })?
+        {
             return todo!();
         }
 
         // Case 4, the next component is an enum.
         // Enum cannot have a subitem so just return the found enum immediately.
-
+        if let Some(enume) = self
+            .enums()?
+            .try_find(|e| -> Result<_> { Ok(e.try_upgrade()?.name() == subitem_name) })?
+        {
+            // In this case, there should not be the remaining path component.
+            if !rest.is_empty() {
+                Err(ErrorKind::UnknownTypeName {
+                    name: type_name.to_string(),
+                })?;
+            }
+        }
         todo!()
     }
 }
@@ -256,8 +269,12 @@ impl Package {
         })
     }
 
-    fn messages(&self) -> Result<impl Iterator<Item = &dyn MessageTrait>> {
+    fn messages(&self) -> Result<impl '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>> {
         Ok(self.files.iter().flat_map(|f| f.messages()))
+    }
+
+    fn enums(&self) -> Result<impl '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>> {
+        Ok(self.files.iter().flat_map(|f| f.enums()))
     }
 }
 

@@ -17,7 +17,9 @@ use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 use ::std::fmt::Debug;
 
-pub trait EnumTrait: Debug {}
+pub(super) trait EnumTrait: Debug {
+    fn name(&self) -> &str;
+}
 
 #[derive(Debug)]
 pub struct Enum {}
@@ -25,6 +27,12 @@ pub struct Enum {}
 impl Enum {
     fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
         Ok(Enum {})
+    }
+}
+
+impl EnumTrait for Enum {
+    fn name(&self) -> &str {
+        ""
     }
 }
 
