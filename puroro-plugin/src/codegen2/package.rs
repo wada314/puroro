@@ -27,6 +27,8 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug {
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
+    fn module_file_name(&self) -> Result<String>;
+    fn gen_module_file(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -45,6 +47,77 @@ impl PackageTrait for Package {
                 .iter()
                 .map(|(_, p)| (Box::deref(Rc::deref(p))) as &dyn PackageTrait),
         )
+    }
+
+    fn module_file_name(&self) -> Result<String> {
+        Ok(if self.full_name.is_empty() {
+            "lib.rs".into()
+        } else {
+            format!(
+                "{}.rs",
+                self.full_name
+                    .split('.')
+                    .map(|package| package
+                        .to_lower_snake_case()
+                        .escape_rust_keywords()
+                        .to_string())
+                    .join("/")
+            )
+            .into()
+        })
+    }
+
+    fn gen_module_file(&self) -> Result<TokenStream> {
+        let submodules_from_packages = self
+            .subpackages
+            .keys()
+            .sorted()
+            .map(|name| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
+            .collect::<Vec<_>>();
+        let message_structs = self
+            .files
+            .iter()
+            .map(|f| f.gen_structs_for_messages())
+            .collect::<Result<Vec<_>>>()?;
+
+        let header = if self.full_name.is_empty() {
+            quote! {
+                //! "Generated from root package"
+
+                /// re-export puroro.
+                pub use ::puroro;
+                /// re-export the primitive types in puroro namespace.
+                /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
+                pub use ::puroro::*;
+                pub mod _puroro_root {
+                    pub use super::*;
+                }
+                pub mod _puroro {
+                    pub use ::puroro::*;
+                }
+            }
+        } else {
+            let comment = format!("Generated from package \"{}\"", &self.full_name);
+            quote! {
+                #![doc = #comment]
+                pub mod _puroro_root {
+                    pub use super::super::_puroro_root::*;
+                }
+                pub mod _puroro {
+                    pub use ::puroro::*;
+                }
+            }
+        };
+
+        Ok(quote! {
+            #header
+
+            #(
+                pub mod #submodules_from_packages;
+            )*
+
+            #(#message_structs)*
+        })
     }
 }
 
@@ -132,77 +205,6 @@ impl Package {
                 files: self_files,
                 root,
             }))
-        })
-    }
-
-    pub(super) fn module_file_name(&self) -> Cow<'_, str> {
-        if self.full_name.is_empty() {
-            "lib.rs".into()
-        } else {
-            format!(
-                "{}.rs",
-                self.full_name
-                    .split('.')
-                    .map(|package| package
-                        .to_lower_snake_case()
-                        .escape_rust_keywords()
-                        .to_string())
-                    .join("/")
-            )
-            .into()
-        }
-    }
-
-    pub(super) fn gen_module_file(&self) -> Result<TokenStream> {
-        let submodules_from_packages = self
-            .subpackages
-            .keys()
-            .sorted()
-            .map(|name| format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords()))
-            .collect::<Vec<_>>();
-        let message_structs = self
-            .files
-            .iter()
-            .map(|f| f.gen_structs_for_messages())
-            .collect::<Result<Vec<_>>>()?;
-
-        let header = if self.full_name.is_empty() {
-            quote! {
-                //! "Generated from root package"
-
-                /// re-export puroro.
-                pub use ::puroro;
-                /// re-export the primitive types in puroro namespace.
-                /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
-                pub use ::puroro::*;
-                pub mod _puroro_root {
-                    pub use super::*;
-                }
-                pub mod _puroro {
-                    pub use ::puroro::*;
-                }
-            }
-        } else {
-            let comment = format!("Generated from package \"{}\"", &self.full_name);
-            quote! {
-                #![doc = #comment]
-                pub mod _puroro_root {
-                    pub use super::super::_puroro_root::*;
-                }
-                pub mod _puroro {
-                    pub use ::puroro::*;
-                }
-            }
-        };
-
-        Ok(quote! {
-            #header
-
-            #(
-                pub mod #submodules_from_packages;
-            )*
-
-            #(#message_structs)*
         })
     }
 }
