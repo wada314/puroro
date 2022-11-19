@@ -32,7 +32,10 @@ pub(super) trait PackageTrait: Debug {
     fn module_file_name(&self) -> Result<String>;
     fn gen_module_file(&self) -> Result<TokenStream>;
 
-    // fn resolve_type_name(&self, type_name: &str) -> Result<MessageOrEnum<>>;
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<Box<dyn EnumTrait>>>>;
 }
 
 #[derive(Debug, Default)]
@@ -123,6 +126,20 @@ impl PackageTrait for Package {
             #(pub mod #submodules_from_packages;)*
             #(#message_structs)*
         })
+    }
+
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<Box<dyn EnumTrait>>>> {
+        // If the type_name starts with '.', then redirect it to the root package.
+        if let Some(abs_type_name) = type_name.strip_prefix('.') {
+            let Some(weak_root) = &self.root else {
+                Err(ErrorKind::UnknownTypeName { name: type_name.to_string() })?
+            };
+            return weak_root.try_upgrade()?.resolve_type_name(abs_type_name);
+        }
+        todo!()
     }
 }
 
