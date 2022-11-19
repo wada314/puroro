@@ -177,8 +177,14 @@ impl PackageTrait for Package {
                     name: type_name.to_string(),
                 })?;
             }
+
+            return Ok(MessageOrEnum::Enum(enume));
         }
-        todo!()
+
+        // Case 5, Type not found case.
+        Err(ErrorKind::UnknownTypeName {
+            name: type_name.to_string(),
+        })?
     }
 }
 
