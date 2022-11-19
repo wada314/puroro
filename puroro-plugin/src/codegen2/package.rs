@@ -32,6 +32,7 @@ pub(super) trait PackageTrait: Debug {
     fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>>;
 
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
+    fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait>;
     fn module_file_name(&self) -> Result<String>;
     fn gen_module_file(&self) -> Result<TokenStream>;
 
@@ -144,6 +145,17 @@ impl PackageTrait for Package {
             return weak_root.try_upgrade()?.resolve_type_name(abs_type_name);
         }
 
+        let rest = type_name;
+        let mut cur = MessageOrPackage::<&dyn MessageTrait, &dyn PackageTrait>::Package(self);
+        while let Some((subcomponent_name, rest)) = rest.split_once('.') {
+            // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
+            if let MessageOrPackage::Package(p) = cur {
+                if let Some(subsub) = p.subpackage(subcomponent_name) {
+                    
+                }
+            }
+        }
+
         // Case 2, the next component of the path is a subpackage.
         // Extract the next component of the path. It must be non-empty, and must have another child.
         if let Some((subpackage_name, rest)) = type_name.split_once('.') {
@@ -155,11 +167,6 @@ impl PackageTrait for Package {
                 // Do nothing, go to the next section.
             }
         }
-
-        // Then the next component is either Message or Enum.
-        let rest = type_name;
-
-        let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
 
         // Case 3, the next component of the path is a message.
         // The message can still have a submessage, so go deeper.
@@ -190,6 +197,10 @@ impl PackageTrait for Package {
         Err(ErrorKind::UnknownTypeName {
             name: type_name.to_string(),
         })?
+    }
+
+    fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait> {
+        self.subpackages.get(name).map(|p| Box::deref(Rc::deref(p)))
     }
 
     fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>> {
