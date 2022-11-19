@@ -17,11 +17,13 @@ use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::quote::quote;
 use ::std::fmt::Debug;
+use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait InputFileTrait: Debug {
     fn syntax(&self) -> Syntax;
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = &dyn MessageTrait>>;
 }
 
 #[derive(Debug)]
@@ -71,5 +73,9 @@ impl InputFileTrait for InputFile {
         Ok(quote! {
             #(#message_structs)*
         })
+    }
+
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = &dyn MessageTrait>> {
+        Box::new(self.messages.iter().map(|m| Box::deref(Rc::deref(m))))
     }
 }

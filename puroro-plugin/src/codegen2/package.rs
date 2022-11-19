@@ -132,6 +132,7 @@ impl PackageTrait for Package {
         &self,
         type_name: &str,
     ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<Box<dyn EnumTrait>>>> {
+        // Case 1, the given type name is an absolute path.
         // If the type_name starts with '.', then redirect it to the root package.
         if let Some(abs_type_name) = type_name.strip_prefix('.') {
             let Some(weak_root) = &self.root else {
@@ -139,6 +140,31 @@ impl PackageTrait for Package {
             };
             return weak_root.try_upgrade()?.resolve_type_name(abs_type_name);
         }
+
+        // Case 2, the next component of the path is a subpackage.
+        // Extract the next component of the path. It must be non-empty, and must have another child.
+        if let Some((subpackage_name, rest)) = type_name.split_once('.') {
+            if let Some(subpackage) = self.subpackages.get(subpackage_name) {
+                // Can dig into a subpackage. Go ahead.
+                return subpackage.resolve_type_name(rest);
+            } else {
+                // When the target item is a nested message or enum in a message, then this can happen.
+                // Do nothing, go to the next section.
+            }
+        }
+
+        // Then the next component is either Message or Enum.
+        let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
+
+        // Case 3, the next component of the path is a message.
+        // The message can still have a submessage, so just delegate to the message.
+        if let Some(message) = self.messages()?.find(|m| m.name() == subitem_name) {
+            return todo!();
+        }
+
+        // Case 4, the next component is an enum.
+        // Enum cannot have a subitem so just return the found enum immediately.
+
         todo!()
     }
 }
@@ -228,6 +254,10 @@ impl Package {
                 root,
             }))
         })
+    }
+
+    fn messages(&self) -> Result<impl Iterator<Item = &dyn MessageTrait>> {
+        Ok(self.files.iter().flat_map(|f| f.messages()))
     }
 }
 

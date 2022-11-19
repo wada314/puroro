@@ -29,6 +29,7 @@ pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
     fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>>;
     fn bitfield_size(&self) -> Result<usize>;
+    fn name(&self) -> &str;
 }
 
 #[derive(Debug)]
@@ -41,6 +42,10 @@ pub(super) struct Message {
 }
 
 impl MessageTrait for Message {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
     fn gen_struct(&self) -> Result<TokenStream> {
         let ident = format_ident!(
             "{}",
