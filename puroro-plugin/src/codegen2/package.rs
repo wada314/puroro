@@ -118,11 +118,7 @@ impl PackageTrait for Package {
 
         Ok(quote! {
             #header
-
-            #(
-                pub mod #submodules_from_packages;
-            )*
-
+            #(pub mod #submodules_from_packages;)*
             #(#message_structs)*
         })
     }
