@@ -30,6 +30,9 @@ pub(super) trait MessageTrait: Debug {
     fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> &str;
+
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>>;
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>>;
 }
 
 #[derive(Debug)]
@@ -82,6 +85,14 @@ impl MessageTrait for Message {
                 Ok(tail)
             })
             .cloned()
+    }
+
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>> {
+        Box::new(::std::iter::empty())
+    }
+
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>> {
+        Box::new(::std::iter::empty())
     }
 }
 
