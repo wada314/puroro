@@ -293,13 +293,14 @@ impl Package {
 #[cfg(test)]
 mod tests {
     use super::super::input_file::InputFileTrait;
+    use super::super::Syntax;
     use super::FileDescriptorProto;
+    use super::Package;
     use crate::Result;
     use ::once_cell::sync::Lazy;
     use ::proc_macro2::TokenStream;
     use ::std::ops::Deref;
     use ::std::rc::Rc;
-    type RootPackage = super::Package;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
@@ -336,8 +337,21 @@ mod tests {
         fn gen_structs_for_messages(&self) -> Result<TokenStream> {
             Ok(TokenStream::new())
         }
-        fn syntax(&self) -> crate::codegen2::Syntax {
+        fn syntax(&self) -> Result<Syntax> {
             unimplemented!()
+        }
+        fn messages(
+            &self,
+        ) -> Box<dyn '_ + Iterator<Item = std::rc::Weak<dyn crate::codegen2::message::MessageTrait>>>
+        {
+            todo!()
+        }
+
+        fn enums(
+            &self,
+        ) -> Box<dyn '_ + Iterator<Item = std::rc::Weak<dyn crate::codegen2::r#enum::EnumTrait>>>
+        {
+            todo!()
         }
     }
     #[derive(Default, Debug)]
@@ -348,9 +362,9 @@ mod tests {
     impl InputFileFakeFactory {
         fn add(&mut self, proto: &FileDescriptorProto) -> Rc<dyn InputFileTrait> {
             let rc_proto = Rc::new(proto.clone());
-            let fake: Rc<dyn InputFileTrait> = Rc::new(Box::new(InputFileFake {
+            let fake: Rc<dyn InputFileTrait> = Rc::new(InputFileFake {
                 proto: Rc::clone(&rc_proto),
-            }));
+            });
             self.given_protos.push(rc_proto);
             self.generated_fakes.push(Rc::clone(&fake));
             fake
@@ -362,8 +376,7 @@ mod tests {
         let files = [Lazy::force(&FD_ROOT)];
         let mut factory = InputFileFakeFactory::default();
         let dyn_root_package =
-            RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
-                .unwrap();
+            Package::new_from_files_with(files.into_iter(), |f, _| factory.add(f));
         let root_package = dyn_root_package.as_package().unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
@@ -374,8 +387,7 @@ mod tests {
         let files = [Lazy::force(&FD_G_P_DESC)];
         let mut factory = InputFileFakeFactory::default();
         let dyn_root_package =
-            RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
-                .unwrap();
+            Package::new_from_files_with(files.into_iter(), |f, _| factory.add(f));
         let root_package = dyn_root_package.as_package().unwrap();
         assert_eq!(0, root_package.files.len());
         assert_eq!(1, root_package.subpackages.len());
@@ -407,8 +419,7 @@ mod tests {
         let mut factory = InputFileFakeFactory::default();
 
         let dyn_root_package =
-            RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
-                .unwrap();
+            Package::new_from_files_with(files.into_iter(), |f, _| factory.add(f));
         let root_package = dyn_root_package.as_package().unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
