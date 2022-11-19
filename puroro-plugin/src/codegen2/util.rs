@@ -181,10 +181,10 @@ impl<T: ?Sized> RcBoxExt<T> for Rc<Box<T>> {
     }
 }
 
-pub trait WeakExt<T> {
+pub trait WeakExt<T: ?Sized> {
     fn try_upgrade(&self) -> Result<Rc<T>>;
 }
-impl<T> WeakExt<T> for Weak<T> {
+impl<T: ?Sized> WeakExt<T> for Weak<T> {
     fn try_upgrade(&self) -> Result<Rc<T>> {
         Ok(Weak::upgrade(self).ok_or(ErrorKind::InternalError {
             detail: "Weak ptr upgrade failed".to_string(),

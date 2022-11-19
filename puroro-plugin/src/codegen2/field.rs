@@ -25,7 +25,7 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait FieldTrait: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
-    fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>>;
+    fn message(&self) -> Result<Rc<dyn MessageTrait>>;
     fn number(&self) -> i32;
 
     // Message's bitfield allocation
@@ -36,7 +36,7 @@ pub(super) trait FieldTrait: Debug {
 #[derive(Debug)]
 pub(super) struct Field {
     name: String,
-    message: Weak<Box<dyn MessageTrait>>,
+    message: Weak<dyn MessageTrait>,
     rule: OnceCell<FieldRule>,
     r#type: OnceCell<FieldType>,
     proto3_optional: bool,
@@ -64,7 +64,7 @@ impl FieldTrait for Field {
             #name: #r#type,
         })
     }
-    fn message(&self) -> Result<Rc<Box<dyn MessageTrait>>> {
+    fn message(&self) -> Result<Rc<dyn MessageTrait>> {
         Ok(self.message.try_upgrade()?)
     }
     fn number(&self) -> i32 {
@@ -102,13 +102,13 @@ impl FieldTrait for Field {
 }
 
 impl Field {
-    pub(super) fn try_new(
+    pub(super) fn new<M: MessageTrait>(
         proto: &FieldDescriptorProto,
-        message: &Weak<Box<dyn MessageTrait>>,
-    ) -> Result<Rc<Box<dyn FieldTrait>>> {
-        Ok(Rc::new(Box::new(Field {
+        message: &Weak<M>,
+    ) -> Rc<dyn FieldTrait> {
+        Rc::new(Field {
             name: proto.name().to_string(),
-            message: Weak::clone(message),
+            message: Weak::clone(message) as Weak<dyn MessageTrait>,
             rule: OnceCell::new(),
             r#type: OnceCell::new(),
             label_opt: proto.label_opt(),
@@ -117,13 +117,13 @@ impl Field {
             number: proto.number(),
             type_name: proto.type_name().to_string(),
             allocated_bitfield: OnceCell::new(),
-        })))
+        })
     }
 
     fn rule(&self) -> Result<FieldRule> {
         self.rule
             .get_or_try_init(|| {
-                let syntax = self.message()?.input_file()?.syntax();
+                let syntax = self.message()?.input_file()?.syntax()?;
                 Ok(FieldRule::try_new(
                     self.label_opt.clone(),
                     syntax,
@@ -135,7 +135,7 @@ impl Field {
 
     fn r#type(&self) -> Result<&FieldType> {
         self.r#type.get_or_try_init(|| {
-            let syntax = self.message()?.input_file()?.syntax();
+            let syntax = self.message()?.input_file()?.syntax()?;
             Ok(FieldType::try_new(
                 self.type_opt.clone(),
                 &self.type_name,

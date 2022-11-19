@@ -27,19 +27,19 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
-    fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>>;
+    fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> &str;
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>>;
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>>;
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>>;
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>>;
 }
 
 #[derive(Debug)]
 pub(super) struct Message {
     name: String,
-    fields: Vec<Rc<Box<dyn FieldTrait>>>,
-    input_file: Weak<Box<dyn InputFileTrait>>,
+    fields: Vec<Rc<dyn FieldTrait>>,
+    input_file: Weak<dyn InputFileTrait>,
 
     bitfield_size: OnceCell<usize>,
 }
@@ -67,7 +67,7 @@ impl MessageTrait for Message {
             }
         })
     }
-    fn input_file(&self) -> Result<Rc<Box<dyn InputFileTrait>>> {
+    fn input_file(&self) -> Result<Rc<dyn InputFileTrait>> {
         Ok(self.input_file.try_upgrade()?)
     }
 
@@ -87,48 +87,44 @@ impl MessageTrait for Message {
             .cloned()
     }
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>> {
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>> {
         Box::new(::std::iter::empty())
     }
 
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>> {
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>> {
         Box::new(::std::iter::empty())
     }
 }
 
 impl Message {
-    pub(super) fn try_new(
-        proto: &DescriptorProto,
-        input_file: &Weak<Box<dyn InputFileTrait>>,
-    ) -> Result<Rc<Box<dyn MessageTrait>>> {
-        Self::try_new_with(proto, input_file, |fd, weak| Field::try_new(fd, &weak))
+    pub(super) fn new<F>(proto: &DescriptorProto, input_file: &Weak<F>) -> Rc<dyn MessageTrait>
+    where
+        F: InputFileTrait,
+    {
+        Self::new_with(proto, input_file, |fd, weak| Field::new(fd, &weak))
     }
 
-    pub(super) fn try_new_with<FF>(
+    pub(super) fn new_with<F, FF>(
         proto: &DescriptorProto,
-        input_file: &Weak<Box<dyn InputFileTrait>>,
+        input_file: &Weak<F>,
         mut ff: FF,
-    ) -> Result<Rc<Box<dyn MessageTrait>>>
+    ) -> Rc<dyn MessageTrait>
     where
-        FF: FnMut(
-            &FieldDescriptorProto,
-            Weak<Box<dyn MessageTrait>>,
-        ) -> Result<Rc<Box<dyn FieldTrait>>>,
+        F: InputFileTrait,
+        FF: FnMut(&FieldDescriptorProto, Weak<Message>) -> Rc<dyn FieldTrait>,
     {
         let name = proto.name().to_string();
-        Rc::try_new_boxed_cyclic(|weak| -> Result<Box<dyn MessageTrait>> {
-            Ok(Box::new(Message {
-                name,
-                input_file: Weak::clone(input_file),
-                fields: proto
-                    .field()
-                    .into_iter()
-                    .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                    .map(|f| ff(f, Weak::clone(weak)))
-                    .collect::<Result<Vec<_>>>()?,
-                bitfield_size: OnceCell::new(),
-            }))
-        })
+        Rc::new_cyclic(|weak| Message {
+            name,
+            input_file: Weak::clone(input_file) as Weak<dyn InputFileTrait>,
+            fields: proto
+                .field()
+                .into_iter()
+                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
+                .map(|f| ff(f, Weak::clone(weak)))
+                .collect(),
+            bitfield_size: OnceCell::new(),
+        }) as Rc<dyn MessageTrait>
     }
 }
 

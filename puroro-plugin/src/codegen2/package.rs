@@ -216,7 +216,7 @@ impl Package {
     pub(super) fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
     ) -> Result<Rc<Box<dyn PackageTrait>>> {
-        Self::try_new_from_files_with(iter, |fd, _weak| InputFile::try_new(fd))
+        Self::try_new_from_files_with(iter, |fd, _weak| InputFile::new(fd))
     }
 
     pub(super) fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
