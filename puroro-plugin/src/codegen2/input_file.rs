@@ -14,6 +14,7 @@
 
 use super::*;
 use crate::Result;
+use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::quote::quote;
 use ::std::fmt::Debug;
@@ -29,7 +30,8 @@ pub(super) trait InputFileTrait: Debug {
 
 #[derive(Debug)]
 pub(super) struct InputFile {
-    syntax: Result<Syntax>,
+    syntax: String,
+    syntax_cell: OnceCell<Syntax>,
     messages: Vec<Rc<dyn MessageTrait>>,
 }
 
@@ -42,7 +44,8 @@ impl InputFile {
         FM: FnMut(&DescriptorProto, Weak<InputFile>) -> Rc<dyn MessageTrait>,
     {
         Rc::new_cyclic(|weak| Self {
-            syntax: proto.syntax().try_into(),
+            syntax: proto.syntax().to_string(),
+            syntax_cell: OnceCell::new(),
             messages: proto
                 .message_type()
                 .into_iter()
@@ -54,7 +57,9 @@ impl InputFile {
 
 impl InputFileTrait for InputFile {
     fn syntax(&self) -> Result<Syntax> {
-        self.syntax
+        self.syntax_cell
+            .get_or_try_init(|| self.syntax.as_str().try_into())
+            .cloned()
     }
 
     fn gen_structs_for_messages(&self) -> Result<TokenStream> {

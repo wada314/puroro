@@ -102,7 +102,7 @@ impl FieldTrait for Field {
 }
 
 impl Field {
-    pub(super) fn new<M: MessageTrait>(
+    pub(super) fn new<M: 'static + MessageTrait>(
         proto: &FieldDescriptorProto,
         message: &Weak<M>,
     ) -> Rc<dyn FieldTrait> {

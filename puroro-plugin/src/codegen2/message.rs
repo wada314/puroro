@@ -99,7 +99,7 @@ impl MessageTrait for Message {
 impl Message {
     pub(super) fn new<F>(proto: &DescriptorProto, input_file: &Weak<F>) -> Rc<dyn MessageTrait>
     where
-        F: InputFileTrait,
+        F: 'static + InputFileTrait,
     {
         Self::new_with(proto, input_file, |fd, weak| Field::new(fd, &weak))
     }
@@ -110,7 +110,7 @@ impl Message {
         mut ff: FF,
     ) -> Rc<dyn MessageTrait>
     where
-        F: InputFileTrait,
+        F: 'static + InputFileTrait,
         FF: FnMut(&FieldDescriptorProto, Weak<Message>) -> Rc<dyn FieldTrait>,
     {
         let name = proto.name().to_string();
