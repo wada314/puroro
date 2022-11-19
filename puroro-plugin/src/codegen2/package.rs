@@ -25,6 +25,9 @@ use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug {
+    #[cfg(test)]
+    fn as_package(&self) -> Option<&Package>;
+
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
     fn module_file_name(&self) -> Result<String>;
     fn gen_module_file(&self) -> Result<TokenStream>;
@@ -40,6 +43,11 @@ pub(super) struct Package {
 }
 
 impl PackageTrait for Package {
+    #[cfg(test)]
+    fn as_package(&self) -> Option<&Package> {
+        Some(self)
+    }
+
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>> {
         Box::new(
             self.subpackages
@@ -279,9 +287,10 @@ mod tests {
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
         let mut factory = InputFileFakeFactory::default();
-        let root_package =
+        let dyn_root_package =
             RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
                 .unwrap();
+        let root_package = dyn_root_package.as_package().unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
     }
@@ -290,21 +299,22 @@ mod tests {
     fn test_make_package_single() {
         let files = [Lazy::force(&FD_G_P_DESC)];
         let mut factory = InputFileFakeFactory::default();
-        let root_package =
+        let dyn_root_package =
             RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
                 .unwrap();
+        let root_package = dyn_root_package.as_package().unwrap();
         assert_eq!(0, root_package.files.len());
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
 
-        let package_g = &root_package.subpackages["google"];
+        let package_g = root_package.subpackages["google"].as_package().unwrap();
         assert_eq!("google", package_g.name);
         assert_eq!("google", package_g.full_name);
         assert_eq!(0, package_g.files.len());
         assert_eq!(1, package_g.subpackages.len());
         assert!(package_g.subpackages.contains_key("protobuf"));
 
-        let package_g_p = &package_g.subpackages["protobuf"];
+        let package_g_p = package_g.subpackages["protobuf"].as_package().unwrap();
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!("google.protobuf", package_g_p.full_name);
         assert_eq!(1, package_g_p.files.len());
@@ -322,29 +332,30 @@ mod tests {
         ];
         let mut factory = InputFileFakeFactory::default();
 
-        let root_package =
+        let dyn_root_package =
             RootPackage::try_new_from_files_with(files.into_iter(), |f, _| Ok(factory.add(f)))
                 .unwrap();
+        let root_package = dyn_root_package.as_package().unwrap();
         assert_eq!(1, root_package.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
         assert_eq!(1, root_package.subpackages.len());
         assert!(root_package.subpackages.contains_key("google"));
 
-        let package_g = &root_package.subpackages["google"];
+        let package_g = root_package.subpackages["google"].as_package().unwrap();
         assert_eq!("google", package_g.name);
         assert_eq!("google", package_g.full_name);
         assert_eq!(0, package_g.files.len());
         assert_eq!(1, package_g.subpackages.len());
         assert!(package_g.subpackages.contains_key("protobuf"));
 
-        let package_g_p = &package_g.subpackages["protobuf"];
+        let package_g_p = package_g.subpackages["protobuf"].as_package().unwrap();
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!("google.protobuf", package_g_p.full_name);
         assert_eq!(2, package_g_p.files.len());
         assert_eq!(1, package_g_p.subpackages.len());
         assert!(package_g_p.subpackages.contains_key("compiler"));
 
-        let package_g_p_c = &package_g_p.subpackages["compiler"];
+        let package_g_p_c = package_g_p.subpackages["compiler"].as_package().unwrap();
         assert_eq!("compiler", package_g_p_c.name);
         assert_eq!("google.protobuf.compiler", package_g_p_c.full_name);
         assert_eq!(1, package_g_p_c.files.len());
