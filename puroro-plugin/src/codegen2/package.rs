@@ -31,6 +31,8 @@ pub(super) trait PackageTrait: Debug {
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
     fn module_file_name(&self) -> Result<String>;
     fn gen_module_file(&self) -> Result<TokenStream>;
+
+    // fn resolve_type_name(&self, type_name: &str) -> Result<MessageOrEnum<>>;
 }
 
 #[derive(Debug, Default)]
