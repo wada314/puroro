@@ -28,8 +28,8 @@ pub(super) trait PackageTrait: Debug {
     #[cfg(test)]
     fn as_package(&self) -> Option<&Package>;
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>>;
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>>;
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>>;
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>>;
 
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
     fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait>;
@@ -39,16 +39,16 @@ pub(super) trait PackageTrait: Debug {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<Box<dyn EnumTrait>>>>;
+    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>>;
 }
 
 #[derive(Debug, Default)]
 pub(super) struct Package {
     name: String,
     full_name: String,
-    subpackages: HashMap<String, Rc<Box<dyn PackageTrait>>>,
-    files: Vec<Rc<Box<dyn InputFileTrait>>>,
-    root: Option<Weak<Box<dyn PackageTrait>>>,
+    subpackages: HashMap<String, Rc<dyn PackageTrait>>,
+    files: Vec<Rc<dyn InputFileTrait>>,
+    root: Option<Weak<dyn PackageTrait>>,
 }
 
 impl PackageTrait for Package {
@@ -58,11 +58,7 @@ impl PackageTrait for Package {
     }
 
     fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>> {
-        Box::new(
-            self.subpackages
-                .iter()
-                .map(|(_, p)| (Box::deref(Rc::deref(p))) as &dyn PackageTrait),
-        )
+        Box::new(self.subpackages.iter().map(|(_, p)| Rc::deref(p)))
     }
 
     fn module_file_name(&self) -> Result<String> {
@@ -135,7 +131,7 @@ impl PackageTrait for Package {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<Box<dyn EnumTrait>>>> {
+    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>> {
         // Case 1, the given type name is an absolute path.
         // If the type_name starts with '.', then redirect it to the root package.
         if let Some(abs_type_name) = type_name.strip_prefix('.') {
@@ -200,55 +196,49 @@ impl PackageTrait for Package {
     }
 
     fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait> {
-        self.subpackages.get(name).map(|p| Box::deref(Rc::deref(p)))
+        self.subpackages.get(name).map(|p| Rc::deref(p))
     }
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn MessageTrait>>>> {
+    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>> {
         Box::new(self.files.iter().flat_map(|f| f.messages()))
     }
 
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<Box<dyn EnumTrait>>>> {
+    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>> {
         Box::new(self.files.iter().flat_map(|f| f.enums()))
     }
 }
 
 impl Package {
-    pub(super) fn try_new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
+    pub(super) fn new_from_files<'a, I: Iterator<Item = &'a FileDescriptorProto>>(
         iter: I,
-    ) -> Result<Rc<Box<dyn PackageTrait>>> {
-        Self::try_new_from_files_with(iter, |fd, _weak| InputFile::new(fd))
+    ) -> Rc<dyn PackageTrait> {
+        Self::new_from_files_with(iter, |fd, _weak| InputFile::new(fd))
     }
 
-    pub(super) fn try_new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
+    pub(super) fn new_from_files_with<'a, I: Iterator<Item = &'a FileDescriptorProto>, FF>(
         iter: I,
         mut ff: FF,
-    ) -> Result<Rc<Box<dyn PackageTrait>>>
+    ) -> Rc<dyn PackageTrait>
     where
-        FF: FnMut(
-            &FileDescriptorProto,
-            Weak<Box<dyn PackageTrait>>,
-        ) -> Result<Rc<Box<dyn InputFileTrait>>>,
+        FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Rc<dyn InputFileTrait>,
     {
         let mut files = iter.collect::<Vec<_>>();
         files.sort_by_key(|f| f.package());
 
-        Package::try_make_package("", "", &files, None, &mut ff)
+        Package::make_package("", "", &files, None, &mut ff)
     }
 
-    fn try_make_package<FF>(
+    fn make_package<FF>(
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Option<Weak<Box<dyn PackageTrait>>>,
+        root: Option<Weak<Package>>,
         ff: &mut FF,
-    ) -> Result<Rc<Box<dyn PackageTrait>>>
+    ) -> Rc<dyn PackageTrait>
     where
-        FF: FnMut(
-            &FileDescriptorProto,
-            Weak<Box<dyn PackageTrait>>,
-        ) -> Result<Rc<Box<dyn InputFileTrait>>>,
+        FF: FnMut(&FileDescriptorProto, Weak<Package>) -> Rc<dyn InputFileTrait>,
     {
-        Rc::try_new_boxed_cyclic(|weak| {
+        Rc::new_cyclic(|weak| {
             // The first few FDs might be FDs which are directly belonging to the current package.
             // The remaining FDs are belonging to the child packages.
             let (self_fds, child_fds) = sorted_fds.split_while(|fd| fd.package() == full_name);
@@ -256,7 +246,7 @@ impl Package {
             let self_files = self_fds
                 .into_iter()
                 .map(|fd| ff(fd, Weak::clone(&weak)))
-                .collect::<Result<Vec<_>>>()?;
+                .collect::<Vec<_>>();
 
             let subpackages = child_fds
                 .group_by_key(|fd| {
@@ -270,32 +260,32 @@ impl Package {
                         None => &fd.package()[prefix_len..],
                     }
                 })
-                .map(|(subpackage_name, subpackage_fds)| -> Result<_> {
+                .map(|(subpackage_name, subpackage_fds)| {
                     let subpackage_full_name = if full_name.is_empty() {
                         subpackage_name.to_string()
                     } else {
                         format!("{}.{}", full_name, subpackage_name)
                     };
-                    Ok((
+                    (
                         subpackage_name.to_string(),
-                        Package::try_make_package(
+                        Package::make_package(
                             subpackage_name,
                             &subpackage_full_name,
                             subpackage_fds,
-                            Some(Weak::clone(&root.as_ref().unwrap_or(&weak))),
+                            Some(Weak::clone(&root.as_ref().unwrap_or(weak))),
                             ff,
-                        )?,
-                    ))
+                        ),
+                    )
                 })
-                .collect::<Result<HashMap<_, _>>>()?;
+                .collect::<HashMap<_, _>>();
 
-            Ok(Box::new(Package {
+            Package {
                 name: name.to_string(),
                 full_name: full_name.to_string(),
                 subpackages,
                 files: self_files,
-                root,
-            }))
+                root: root.map(|p| p as Weak<dyn PackageTrait>),
+            }
         })
     }
 }
@@ -353,12 +343,12 @@ mod tests {
     #[derive(Default, Debug)]
     struct InputFileFakeFactory {
         given_protos: Vec<Rc<FileDescriptorProto>>,
-        generated_fakes: Vec<Rc<Box<dyn InputFileTrait>>>,
+        generated_fakes: Vec<Rc<dyn InputFileTrait>>,
     }
     impl InputFileFakeFactory {
-        fn add(&mut self, proto: &FileDescriptorProto) -> Rc<Box<dyn InputFileTrait>> {
+        fn add(&mut self, proto: &FileDescriptorProto) -> Rc<dyn InputFileTrait> {
             let rc_proto = Rc::new(proto.clone());
-            let fake: Rc<Box<dyn InputFileTrait>> = Rc::new(Box::new(InputFileFake {
+            let fake: Rc<dyn InputFileTrait> = Rc::new(Box::new(InputFileFake {
                 proto: Rc::clone(&rc_proto),
             }));
             self.given_protos.push(rc_proto);

@@ -82,8 +82,8 @@ fn all_packages(root: &dyn PackageTrait) -> Vec<&dyn PackageTrait> {
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
-    let root_package = Package::try_new_from_files(files)?;
-    Ok(all_packages(Box::deref(Rc::deref(&root_package)))
+    let root_package = Package::new_from_files(files);
+    Ok(all_packages(Rc::deref(&root_package))
         .into_iter()
         .map(|p| -> Result<_> { Ok((p.module_file_name()?, p.gen_module_file()?)) })
         .chain(iter::once(Ok((
