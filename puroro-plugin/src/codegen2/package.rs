@@ -150,9 +150,7 @@ impl PackageTrait for Package {
         while let Some((subcomponent_name, rest)) = rest.split_once('.') {
             // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
             if let MessageOrPackage::Package(p) = cur {
-                if let Some(subsub) = p.subpackage(subcomponent_name) {
-                    
-                }
+                if let Some(subsub) = p.subpackage(subcomponent_name) {}
             }
         }
 
@@ -167,6 +165,8 @@ impl PackageTrait for Package {
                 // Do nothing, go to the next section.
             }
         }
+
+        let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
 
         // Case 3, the next component of the path is a message.
         // The message can still have a submessage, so go deeper.
