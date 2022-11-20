@@ -18,13 +18,14 @@ use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::quote::quote;
 use ::std::fmt::Debug;
-use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait InputFileTrait: Debug {
     fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn PackageTrait>>;
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
 }
 
@@ -79,6 +80,14 @@ impl InputFileTrait for InputFile {
 
     fn package(&self) -> Result<Rc<dyn PackageTrait>> {
         self.package.try_upgrade()
+    }
+
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+        Ok(&self.messages)
+    }
+
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+        Ok(&[])
     }
 
     fn gen_structs_for_messages(&self) -> Result<TokenStream> {

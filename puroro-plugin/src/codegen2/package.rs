@@ -29,6 +29,10 @@ pub(super) trait PackageTrait: Debug {
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>;
     fn gen_module_file(&self) -> Result<TokenStream>;
 }
 
@@ -37,6 +41,8 @@ pub(super) struct PackageBase {
     subpackages: HashMap<String, Rc<NonRootPackage>>,
     files: Vec<Rc<dyn InputFileTrait>>,
     root: Weak<RootPackage>,
+    messages: OnceCell<Vec<Rc<dyn MessageTrait>>>,
+    enums: OnceCell<Vec<Rc<dyn EnumTrait>>>,
 }
 
 #[derive(Debug)]
@@ -94,6 +100,8 @@ impl PackageBase {
             root,
             subpackages,
             files: self_files,
+            messages: OnceCell::new(),
+            enums: OnceCell::new(),
         }
     }
 
@@ -117,6 +125,87 @@ impl PackageBase {
             .iter()
             .map(|f| f.gen_structs_for_messages())
             .try_collect()?)
+    }
+
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        // Case 1, the given type name is an absolute path.
+        // If the type_name starts with '.', then redirect it to the root package.
+        if let Some(abs_type_name) = type_name.strip_prefix('.') {
+            return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
+        }
+
+        // Case 2, the next component of the path is a subpackage.
+        // Extract the next component of the path. It must be non-empty, and must have another child.
+        if let Some((subpackage_name, rest)) = type_name.split_once('.') {
+            if let Some(subpackage) = self.subpackages.get(subpackage_name) {
+                // Can dig into a subpackage. Go ahead.
+                return subpackage.resolve_type_name(rest);
+            } else {
+                // When the next path component is an enclosing message, then this case can happen.
+                // Do nothing, go to the next section.
+            }
+        }
+
+        let (subcomponent_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
+
+        // Case 3, the next component of the path is a message.
+        // The message can still have a submessage, so go deeper.
+        if let Some(message) = self
+            .messages()?
+            .iter()
+            .try_find(|m| -> Result<_> { Ok(m.name() == subcomponent_name) })?
+        {
+            return todo!();
+        }
+
+        // Case 4, the next component is an enum.
+        // Enum cannot have a subitem so just return the found enum immediately.
+        if let Some(enume) = self
+            .enums()?
+            .iter()
+            .try_find(|e| -> Result<_> { Ok(e.name() == subcomponent_name) })?
+        {
+            // In this case, there should not be the remaining path component.
+            if !rest.is_empty() {
+                Err(ErrorKind::UnknownTypeName {
+                    name: type_name.to_string(),
+                })?;
+            }
+
+            return Ok(MessageOrEnum::Enum(Rc::clone(enume)));
+        }
+
+        // Case 5, Type not found case.
+        Err(ErrorKind::UnknownTypeName {
+            name: type_name.to_string(),
+        })?
+    }
+
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+        self.messages
+            .get_or_try_init(|| {
+                self.files
+                    .iter()
+                    .map(|f| Ok(f.messages()?.iter().cloned()))
+                    .flatten_ok()
+                    .try_collect()
+            })
+            .map(|v| v.as_slice())
+    }
+
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+        self.enums
+            .get_or_try_init(|| {
+                self.files
+                    .iter()
+                    .map(|f| Ok(f.enums()?.iter().cloned()))
+                    .flatten_ok()
+                    .try_collect()
+            })
+            .map(|v| v.as_slice())
     }
 }
 
@@ -215,6 +304,12 @@ impl PackageTrait for RootPackage {
     fn full_name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        self.base.resolve_type_name(type_name)
+    }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
@@ -268,6 +363,12 @@ impl PackageTrait for NonRootPackage {
             Ok(format!("{}.{}", parent_full_name, &self.name).into())
         }
     }
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        self.base.resolve_type_name(type_name)
+    }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
@@ -283,70 +384,6 @@ impl PackageTrait for NonRootPackage {
         })
     }
 }
-
-// fn resolve_type_name(
-//     &self,
-//     type_name: &str,
-// ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>> {
-//     // Case 1, the given type name is an absolute path.
-//     // If the type_name starts with '.', then redirect it to the root package.
-//     if let Some(abs_type_name) = type_name.strip_prefix('.') {
-//         return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
-//     }
-
-//     let rest = type_name;
-//     let mut cur = MessageOrPackage::<&dyn MessageTrait, &dyn PackageTrait>::Package(self);
-//     while let Some((subcomponent_name, rest)) = rest.split_once('.') {
-//         // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
-//         if let MessageOrPackage::Package(p) = cur {
-//             if let Some(subsub) = p.subpackage(subcomponent_name) {}
-//         }
-//     }
-
-//     // Case 2, the next component of the path is a subpackage.
-//     // Extract the next component of the path. It must be non-empty, and must have another child.
-//     if let Some((subpackage_name, rest)) = type_name.split_once('.') {
-//         if let Some(subpackage) = self.subpackages.get(subpackage_name) {
-//             // Can dig into a subpackage. Go ahead.
-//             return subpackage.resolve_type_name(rest);
-//         } else {
-//             // When the target item is a nested message or enum in a message, then this can happen.
-//             // Do nothing, go to the next section.
-//         }
-//     }
-
-//     let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
-
-//     // Case 3, the next component of the path is a message.
-//     // The message can still have a submessage, so go deeper.
-//     if let Some(message) = self
-//         .messages()
-//         .try_find(|m| -> Result<_> { Ok(m.try_upgrade()?.name() == subitem_name) })?
-//     {
-//         return todo!();
-//     }
-
-//     // Case 4, the next component is an enum.
-//     // Enum cannot have a subitem so just return the found enum immediately.
-//     if let Some(enume) = self
-//         .enums()
-//         .try_find(|e| -> Result<_> { Ok(e.try_upgrade()?.name() == subitem_name) })?
-//     {
-//         // In this case, there should not be the remaining path component.
-//         if !rest.is_empty() {
-//             Err(ErrorKind::UnknownTypeName {
-//                 name: type_name.to_string(),
-//             })?;
-//         }
-
-//         return Ok(MessageOrEnum::Enum(enume));
-//     }
-
-//     // Case 5, Type not found case.
-//     Err(ErrorKind::UnknownTypeName {
-//         name: type_name.to_string(),
-//     })?
-// }
 
 #[cfg(test)]
 mod tests {
@@ -416,6 +453,12 @@ mod tests {
         }
         fn gen_structs_for_messages(&self) -> Result<TokenStream> {
             Ok(TokenStream::new())
+        }
+        fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::MessageTrait>]> {
+            Ok(&[])
+        }
+        fn enums(&self) -> Result<&[Rc<dyn crate::codegen2::r#enum::EnumTrait>]> {
+            Ok(&[])
         }
     }
 
