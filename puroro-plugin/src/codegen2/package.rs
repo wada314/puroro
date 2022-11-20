@@ -42,6 +42,61 @@ pub(super) trait PackageTrait: Debug {
     ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>>;
 }
 
+pub(super) struct PackageBase {
+    subpackages: HashMap<String, Rc<dyn PackageTrait>>,
+    files: Vec<Rc<dyn InputFileTrait>>,
+}
+
+pub(super) struct NonRootPackage {
+    name: String,
+    parent: Weak<dyn PackageTrait>,
+    root: Weak<dyn PackageTrait>,
+    base: PackageBase,
+}
+pub(super) struct RootPackage {
+    base: PackageBase,
+}
+
+impl PackageBase {
+    fn new<'a, FP, FF>(
+        fds: impl Iterator<Item = &'a FileDescriptorProto>,
+        package_depth: usize,
+        mut fp: FP,
+        mut ff: FF,
+    ) -> Self
+    where
+        FP: FnMut(&[&FileDescriptorProto], usize) -> Rc<dyn PackageTrait>,
+        FF: FnMut(&FileDescriptorProto) -> Rc<dyn InputFileTrait>,
+    {
+        // Some FDs might directly belong to the current package.
+        // The remaining FDs belong to the child packages.
+        let (self_fds, child_fds) = fds.partition::<Vec<_>, _>(|fd| {
+            fd.package().split('.').filter(|s| !s.is_empty()).count() <= package_depth
+        });
+
+        let self_files = self_fds.into_iter().map(|fd| ff(fd)).collect::<Vec<_>>();
+
+        let child_fds_map = child_fds
+            .into_iter()
+            .map(|fd| {
+                let package_name = fd
+                    .package()
+                    .split('.')
+                    .filter(|s| !s.is_empty())
+                    .nth(package_depth)
+                    .unwrap_or("")
+                    .to_string();
+                (package_name, *fd)
+            })
+            .into_group_map();
+
+        PackageBase {
+            subpackages,
+            files: self_files,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub(super) struct Package {
     name: String,
