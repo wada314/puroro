@@ -64,13 +64,13 @@ pub(super) struct RootPackage {
 impl PackageBase {
     fn new<'a, FP, FF, PNI>(
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
-        mut fp: FP,
-        mut ff: FF,
+        fp: FP,
+        ff: FF,
     ) -> Self
     where
         PNI: Iterator<Item = &'a str>,
-        FP: FnMut(&str, Vec<(PNI, &FileDescriptorProto)>) -> Rc<NonRootPackage>,
-        FF: FnMut(&FileDescriptorProto) -> Rc<dyn InputFileTrait>,
+        FP: Fn(&str, Vec<(PNI, &'a FileDescriptorProto)>) -> Rc<NonRootPackage>,
+        FF: Fn(&FileDescriptorProto) -> Rc<dyn InputFileTrait>,
     {
         let name_fd_map = names_and_fds
             .map(|(mut name_iter, fd)| {
@@ -111,7 +111,7 @@ impl PackageBase {
             .map(|name| {
                 let ident = format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords());
                 quote! {
-                    pub mod ident;
+                    pub mod #ident;
                 }
             })
             .collect())
@@ -136,7 +136,7 @@ impl RootPackage {
         ff: FF,
     ) -> Rc<RootPackage>
     where
-        FF: FnMut(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
+        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
     {
         Rc::new_cyclic(|weak_root| {
             let names_and_fds = fds.map(|fd| {
@@ -151,13 +151,23 @@ impl RootPackage {
                         names_and_fds_vec.into_iter(),
                         Weak::clone(weak_root) as Weak<dyn PackageTrait>,
                         Weak::clone(weak_root) as Weak<dyn PackageTrait>,
-                        &mut ff,
+                        &ff,
                     )
                 },
                 |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn PackageTrait>),
             );
             Self { base }
         })
+    }
+
+    pub(super) fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn PackageTrait>> {
+        let mut ret = vec![Rc::clone(self) as Rc<dyn PackageTrait>];
+        let mut stack = self.base.subpackages.values().cloned().collect_vec();
+        while let Some(p) = stack.pop() {
+            stack.extend(p.base.subpackages.values().cloned());
+            ret.push(p as Rc<dyn PackageTrait>);
+        }
+        ret
     }
 }
 
@@ -167,11 +177,11 @@ impl NonRootPackage {
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         parent: Weak<dyn PackageTrait>,
         root: Weak<dyn PackageTrait>,
-        ff: FF,
+        ff: &FF,
     ) -> Rc<NonRootPackage>
     where
         PNI: Iterator<Item = &'a str>,
-        FF: FnMut(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
+        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
     {
         Rc::new_cyclic(|weak_self| {
             let base = PackageBase::new(

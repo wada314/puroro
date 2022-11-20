@@ -1,4 +1,3 @@
-//!Generated from package "enum3"
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }

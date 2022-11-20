@@ -35,9 +35,6 @@ use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-use ::std::iter;
-use ::std::ops::Deref;
-use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -69,27 +66,14 @@ enum MessageOrEnum<M, E> {
     Enum(E),
 }
 
-fn all_packages(root: &dyn PackageTrait) -> Vec<&dyn PackageTrait> {
-    let mut ret = Vec::new();
-    let mut stack = vec![root];
-    while let Some(p) = stack.pop() {
-        stack.extend(p.subpackages());
-        ret.push(p);
-    }
-    ret
-}
-
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = RootPackage::new(files);
-    Ok(all_packages(Rc::deref(&root_package))
+    Ok(root_package
+        .all_packages()
         .into_iter()
-        .map(|p| -> Result<_> { Ok((p.module_file_path()?, p.gen_module_file()?)) })
-        .chain(iter::once(Ok((
-            root_package.module_file_path()?,
-            root_package.gen_module_file()?,
-        ))))
+        .map(|p| -> Result<_> { Ok((p.module_file_path()?.to_string(), p.gen_module_file()?)) })
         .collect::<Result<Vec<_>>>()?)
 }
 
