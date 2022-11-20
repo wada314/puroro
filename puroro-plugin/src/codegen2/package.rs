@@ -42,13 +42,13 @@ pub(super) trait PackageTrait: Debug {
     ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>>;
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub(super) struct Package {
     name: String,
     full_name: String,
     subpackages: HashMap<String, Rc<dyn PackageTrait>>,
     files: Vec<Rc<dyn InputFileTrait>>,
-    root: Option<Weak<dyn PackageTrait>>,
+    root: Weak<dyn PackageTrait>,
 }
 
 impl PackageTrait for Package {
@@ -135,10 +135,7 @@ impl PackageTrait for Package {
         // Case 1, the given type name is an absolute path.
         // If the type_name starts with '.', then redirect it to the root package.
         if let Some(abs_type_name) = type_name.strip_prefix('.') {
-            let Some(weak_root) = &self.root else {
-                Err(ErrorKind::UnknownTypeName { name: type_name.to_string() })?
-            };
-            return weak_root.try_upgrade()?.resolve_type_name(abs_type_name);
+            return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
         }
 
         let rest = type_name;
@@ -232,7 +229,7 @@ impl Package {
         name: &str,
         full_name: &str,
         sorted_fds: &[&FileDescriptorProto],
-        root: Option<Weak<Package>>,
+        maybe_root: Option<Weak<dyn PackageTrait>>,
         ff: &mut FF,
     ) -> Rc<dyn PackageTrait>
     where
@@ -242,6 +239,10 @@ impl Package {
             // The first few FDs might be FDs which are directly belonging to the current package.
             // The remaining FDs are belonging to the child packages.
             let (self_fds, child_fds) = sorted_fds.split_while(|fd| fd.package() == full_name);
+            let root = maybe_root.as_ref().map_or_else(
+                || Weak::clone(weak) as Weak<dyn PackageTrait>,
+                |r| Weak::clone(r),
+            );
 
             let self_files = self_fds
                 .into_iter()
@@ -272,7 +273,7 @@ impl Package {
                             subpackage_name,
                             &subpackage_full_name,
                             subpackage_fds,
-                            Some(Weak::clone(&root.as_ref().unwrap_or(weak))),
+                            Some(Weak::clone(&root)),
                             ff,
                         ),
                     )
@@ -284,7 +285,7 @@ impl Package {
                 full_name: full_name.to_string(),
                 subpackages,
                 files: self_files,
-                root: root.map(|p| p as Weak<dyn PackageTrait>),
+                root,
             }
         })
     }
