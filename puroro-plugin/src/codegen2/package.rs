@@ -53,7 +53,7 @@ pub(super) struct RootPackage {
 }
 
 impl PackageBase {
-    fn new<'a, FP, FF, PNI>(
+    fn new<'a, FP, FF, F, PNI>(
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         fp: FP,
         ff: FF,
@@ -61,7 +61,8 @@ impl PackageBase {
     where
         PNI: Iterator<Item = &'a str>,
         FP: Fn(&str, Vec<(PNI, &'a FileDescriptorProto)>) -> Rc<NonRootPackage>,
-        FF: Fn(&FileDescriptorProto) -> Rc<dyn InputFileTrait>,
+        FF: Fn(&FileDescriptorProto) -> Rc<F>,
+        F: 'static + InputFileTrait,
     {
         let name_fd_map = names_and_fds
             .map(|(mut name_iter, fd)| {
@@ -75,7 +76,7 @@ impl PackageBase {
             .get(&None)
             .into_iter()
             .flatten()
-            .map(|(_, fd)| ff(fd))
+            .map(|(_, fd)| ff(fd) as Rc<dyn InputFileTrait>)
             .collect();
 
         // The remaining FDs belong to the child packages.
@@ -119,15 +120,16 @@ impl PackageBase {
 
 impl RootPackage {
     pub(super) fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
-        Self::new_with(fds, |f, p| InputFile::new(f, p))
+        Self::new_with(fds, InputFile::new)
     }
 
-    pub(super) fn new_with<'a, FF>(
+    pub(super) fn new_with<'a, FF, F>(
         fds: impl Iterator<Item = &'a FileDescriptorProto>,
         ff: FF,
     ) -> Rc<RootPackage>
     where
-        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
+        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<F>,
+        F: 'static + InputFileTrait,
     {
         Rc::new_cyclic(|weak_root| {
             let names_and_fds = fds.map(|fd| {
@@ -163,7 +165,7 @@ impl RootPackage {
 }
 
 impl NonRootPackage {
-    fn new_with<'a, PNI, FF>(
+    fn new_with<'a, PNI, FF, F>(
         name: &str,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         parent: Weak<dyn PackageTrait>,
@@ -172,7 +174,8 @@ impl NonRootPackage {
     ) -> Rc<NonRootPackage>
     where
         PNI: Iterator<Item = &'a str>,
-        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
+        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<F>,
+        F: 'static + InputFileTrait,
     {
         Rc::new_cyclic(|weak_self| {
             let base = PackageBase::new(
@@ -405,6 +408,9 @@ mod tests {
                 package,
             }
         }
+        fn new_rc(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
+            Rc::new(Self::new(proto, package))
+        }
     }
     impl InputFileTrait for InputFileFake {
         fn name(&self) -> Result<&str> {
@@ -424,9 +430,7 @@ mod tests {
     #[test]
     fn test_make_package_empty() -> Result<()> {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::new_with(files.into_iter(), |fd, p| {
-            Rc::new(InputFileFake::new(fd, p))
-        });
+        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new_rc);
 
         assert_eq!(1, root_package.base.files.len());
         assert_eq!(FD_ROOT.name(), root_package.base.files[0].name()?);
@@ -440,9 +444,7 @@ mod tests {
     #[test]
     fn test_make_package_single() -> Result<()> {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = RootPackage::new_with(files.into_iter(), |fd, p| {
-            Rc::new(InputFileFake::new(fd, p))
-        });
+        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new_rc);
 
         assert_eq!(0, root_package.base.files.len());
         assert_eq!(1, root_package.base.subpackages.len());
@@ -474,9 +476,7 @@ mod tests {
             Lazy::force(&FD_G_P_EMPTY),
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
-        let root_package = RootPackage::new_with(files.into_iter(), |fd, p| {
-            Rc::new(InputFileFake::new(fd, p))
-        });
+        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new_rc);
 
         assert_eq!(1, root_package.base.files.len());
         assert_eq!("", root_package.base.files[0].package()?.full_name()?);
