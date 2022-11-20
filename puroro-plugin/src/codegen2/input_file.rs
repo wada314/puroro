@@ -101,3 +101,42 @@ impl InputFileTrait for InputFile {
         })
     }
 }
+
+#[cfg(test)]
+#[derive(Debug)]
+pub struct InputFileFake {
+    name: String,
+    package: Weak<dyn PackageTrait>,
+}
+
+#[cfg(test)]
+impl InputFileFake {
+    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
+        Rc::new(Self {
+            name: proto.name().to_string(),
+            package,
+        })
+    }
+}
+
+#[cfg(test)]
+impl InputFileTrait for InputFileFake {
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
+    fn syntax(&self) -> Result<Syntax> {
+        unimplemented!()
+    }
+    fn package(&self) -> Result<Rc<dyn PackageTrait>> {
+        self.package.try_upgrade()
+    }
+    fn gen_structs_for_messages(&self) -> Result<TokenStream> {
+        Ok(TokenStream::new())
+    }
+    fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::MessageTrait>]> {
+        Ok(&[])
+    }
+    fn enums(&self) -> Result<&[Rc<dyn crate::codegen2::r#enum::EnumTrait>]> {
+        Ok(&[])
+    }
+}

@@ -391,16 +391,12 @@ impl PackageTrait for NonRootPackage {
 
 #[cfg(test)]
 mod tests {
-    use super::super::input_file::InputFileTrait;
-    use super::super::util::WeakExt;
-    use super::super::Syntax;
-    use super::{PackageTrait, RootPackage};
+    use super::super::input_file::InputFileFake;
+    use super::RootPackage;
     use crate::Result;
     use ::once_cell::sync::Lazy;
-    use ::proc_macro2::TokenStream;
     use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-    use ::std::ops::Deref;
-    use ::std::rc::{Rc, Weak};
+    use ::std::rc::Rc;
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
@@ -429,47 +425,10 @@ mod tests {
         fd
     });
 
-    #[derive(Debug)]
-    struct InputFileFake {
-        name: String,
-        package: Weak<dyn PackageTrait>,
-    }
-    impl InputFileFake {
-        fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Self {
-            Self {
-                name: proto.name().to_string(),
-                package,
-            }
-        }
-        fn new_rc(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
-            Rc::new(Self::new(proto, package))
-        }
-    }
-    impl InputFileTrait for InputFileFake {
-        fn name(&self) -> Result<&str> {
-            Ok(&self.name)
-        }
-        fn syntax(&self) -> Result<Syntax> {
-            unimplemented!()
-        }
-        fn package(&self) -> Result<Rc<dyn PackageTrait>> {
-            self.package.try_upgrade()
-        }
-        fn gen_structs_for_messages(&self) -> Result<TokenStream> {
-            Ok(TokenStream::new())
-        }
-        fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::MessageTrait>]> {
-            Ok(&[])
-        }
-        fn enums(&self) -> Result<&[Rc<dyn crate::codegen2::r#enum::EnumTrait>]> {
-            Ok(&[])
-        }
-    }
-
     #[test]
     fn test_make_package_empty() -> Result<()> {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new_rc);
+        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
 
         assert_eq!(1, root_package.base.files.len());
         assert_eq!(FD_ROOT.name(), root_package.base.files[0].name()?);
@@ -483,7 +442,7 @@ mod tests {
     #[test]
     fn test_make_package_single() -> Result<()> {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new_rc);
+        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
 
         assert_eq!(0, root_package.base.files.len());
         assert_eq!(1, root_package.base.subpackages.len());
@@ -515,7 +474,7 @@ mod tests {
             Lazy::force(&FD_G_P_EMPTY),
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new_rc);
+        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
 
         assert_eq!(1, root_package.base.files.len());
         assert_eq!("", root_package.base.files[0].package()?.full_name()?);
