@@ -58,14 +58,14 @@ pub(super) struct RootPackage {
 }
 
 impl PackageBase {
-    fn new<'a, FP, FF>(
+    fn new<'a, FP, FF, I>(
         fds: impl Iterator<Item = &'a FileDescriptorProto>,
         package_depth: usize,
         mut fp: FP,
         mut ff: FF,
     ) -> Self
     where
-        FP: FnMut(&[&FileDescriptorProto], usize) -> Rc<dyn PackageTrait>,
+        FP: FnMut(&str, &[&FileDescriptorProto], usize) -> Rc<dyn PackageTrait>,
         FF: FnMut(&FileDescriptorProto) -> Rc<dyn InputFileTrait>,
     {
         // Some FDs might directly belong to the current package.
@@ -86,9 +86,17 @@ impl PackageBase {
                     .nth(package_depth)
                     .unwrap_or("")
                     .to_string();
-                (package_name, *fd)
+                (package_name, fd)
             })
             .into_group_map();
+
+        let subpackages = child_fds_map
+            .into_iter()
+            .map(|(name, fds)| {
+                let p = (fp)(&name, &fds, package_depth + 1);
+                (name, p)
+            })
+            .collect();
 
         PackageBase {
             subpackages,
