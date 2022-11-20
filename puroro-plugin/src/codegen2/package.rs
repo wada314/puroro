@@ -23,6 +23,7 @@ use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug {
@@ -149,36 +150,39 @@ impl PackageBase {
             }
         }
 
-        let (subcomponent_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
-
-        // Case 3, the next component of the path is a message.
-        // The message can still have a submessage, so go deeper.
-        if let Some(message) = self
-            .messages()?
-            .iter()
-            .try_find(|m| -> Result<_> { Ok(m.name() == subcomponent_name) })?
-        {
-            return todo!();
-        }
-
-        // Case 4, the next component is an enum.
-        // Enum cannot have a subitem so just return the found enum immediately.
-        if let Some(enume) = self
-            .enums()?
-            .iter()
-            .try_find(|e| -> Result<_> { Ok(e.name() == subcomponent_name) })?
-        {
-            // In this case, there should not be the remaining path component.
-            if !rest.is_empty() {
-                Err(ErrorKind::UnknownTypeName {
+        // Case 3, no more package components. The further packages are either an enum or
+        // an (enclosing) message.
+        // Go deeper until the last component.
+        let mut messages = self.messages()?;
+        let mut enums = self.enums()?;
+        let mut rest = type_name;
+        for subcomponent in iter::from_fn(|| match rest.split_once('.') {
+            Some((sc, rest_rest)) => {
+                rest = rest_rest;
+                Some(sc)
+            }
+            None => None,
+        }) {
+            let submessage = messages
+                .into_iter()
+                .find(|m| m.name() == subcomponent)
+                .ok_or(ErrorKind::UnknownTypeName {
                     name: type_name.to_string(),
                 })?;
-            }
+            messages = submessage.messages()?;
+            enums = submessage.enums()?;
+        }
 
+        // Case 3.1, the last component is an enum.
+        if let Some(enume) = enums.iter().find(|e| e.name() == type_name) {
             return Ok(MessageOrEnum::Enum(Rc::clone(enume)));
         }
 
-        // Case 5, Type not found case.
+        // Case 3.2, the last component is a message.
+        if let Some(message) = messages.iter().find(|m| m.name() == type_name) {
+            return Ok(MessageOrEnum::Message(Rc::clone(message)));
+        }
+
         Err(ErrorKind::UnknownTypeName {
             name: type_name.to_string(),
         })?

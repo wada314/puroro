@@ -17,12 +17,9 @@ use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
-use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
-};
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
-use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait MessageTrait: Debug {
@@ -30,9 +27,8 @@ pub(super) trait MessageTrait: Debug {
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> &str;
-
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>>;
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>>;
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
 }
 
 #[derive(Debug)]
@@ -87,12 +83,12 @@ impl MessageTrait for Message {
             .cloned()
     }
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>> {
-        Box::new(::std::iter::empty())
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+        Ok(&[])
     }
 
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>> {
-        Box::new(::std::iter::empty())
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+        Ok(&[])
     }
 }
 
@@ -104,7 +100,7 @@ impl Message {
     pub(super) fn new_with<FF, F>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFileTrait>,
-        mut ff: FF,
+        ff: FF,
     ) -> Rc<Self>
     where
         FF: Fn(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Rc<F>,
