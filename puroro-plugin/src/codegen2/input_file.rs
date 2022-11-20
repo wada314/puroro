@@ -39,15 +39,16 @@ pub(super) struct InputFile {
 
 impl InputFile {
     pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
-        Self::new_with(proto, package, |m, weak| Message::new(m, &weak))
+        Self::new_with(proto, package, Message::new)
     }
-    fn new_with<FM>(
+    fn new_with<FM, M>(
         proto: &FileDescriptorProto,
         package: Weak<dyn PackageTrait>,
         mut fm: FM,
     ) -> Rc<Self>
     where
-        FM: FnMut(&DescriptorProto, Weak<InputFile>) -> Rc<dyn MessageTrait>,
+        FM: FnMut(&DescriptorProto, Weak<dyn InputFileTrait>) -> Rc<M>,
+        M: 'static + MessageTrait,
     {
         Rc::new_cyclic(|weak| Self {
             name: proto.name().to_string(),
@@ -57,7 +58,9 @@ impl InputFile {
             messages: proto
                 .message_type()
                 .into_iter()
-                .map(|m| fm(m, Weak::clone(weak)))
+                .map(|m| {
+                    fm(m, Weak::clone(weak) as Weak<dyn InputFileTrait>) as Rc<dyn MessageTrait>
+                })
                 .collect(),
         })
     }

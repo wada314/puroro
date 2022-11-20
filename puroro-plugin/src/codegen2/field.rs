@@ -102,13 +102,10 @@ impl FieldTrait for Field {
 }
 
 impl Field {
-    pub(super) fn new<M: 'static + MessageTrait>(
-        proto: &FieldDescriptorProto,
-        message: &Weak<M>,
-    ) -> Rc<Self> {
+    pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn MessageTrait>) -> Rc<Self> {
         Rc::new(Field {
             name: proto.name().to_string(),
-            message: Weak::clone(message) as Weak<dyn MessageTrait>,
+            message,
             rule: OnceCell::new(),
             r#type: OnceCell::new(),
             label_opt: proto.label_opt(),

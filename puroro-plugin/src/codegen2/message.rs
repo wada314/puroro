@@ -97,31 +97,30 @@ impl MessageTrait for Message {
 }
 
 impl Message {
-    pub(super) fn new<F>(proto: &DescriptorProto, input_file: &Weak<F>) -> Rc<Self>
-    where
-        F: 'static + InputFileTrait,
-    {
-        Self::new_with(proto, input_file, |fd, weak| Field::new(fd, &weak))
+    pub(super) fn new(proto: &DescriptorProto, input_file: Weak<dyn InputFileTrait>) -> Rc<Self> {
+        Self::new_with(proto, input_file, Field::new)
     }
 
-    pub(super) fn new_with<F, FF>(
+    pub(super) fn new_with<FF, F>(
         proto: &DescriptorProto,
-        input_file: &Weak<F>,
+        input_file: Weak<dyn InputFileTrait>,
         mut ff: FF,
     ) -> Rc<Self>
     where
-        F: 'static + InputFileTrait,
-        FF: FnMut(&FieldDescriptorProto, Weak<Message>) -> Rc<dyn FieldTrait>,
+        FF: Fn(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Rc<F>,
+        F: 'static + FieldTrait,
     {
         let name = proto.name().to_string();
-        Rc::new_cyclic(|weak| Message {
+        Rc::new_cyclic(|weak_message| Message {
             name,
-            input_file: Weak::clone(input_file) as Weak<dyn InputFileTrait>,
+            input_file: input_file as Weak<dyn InputFileTrait>,
             fields: proto
                 .field()
                 .into_iter()
                 .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| ff(f, Weak::clone(weak)))
+                .map(|f| {
+                    ff(f, Weak::clone(weak_message) as Weak<dyn MessageTrait>) as Rc<dyn FieldTrait>
+                })
                 .collect(),
             bitfield_size: OnceCell::new(),
         })
