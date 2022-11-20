@@ -354,11 +354,11 @@ impl Package {
 mod tests {
     use super::super::input_file::InputFileTrait;
     use super::super::Syntax;
-    use super::FileDescriptorProto;
-    use super::Package;
+    use super::{PackageTrait, RootPackage};
     use crate::Result;
     use ::once_cell::sync::Lazy;
     use ::proc_macro2::TokenStream;
+    use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
     use ::std::ops::Deref;
     use ::std::rc::Rc;
 
@@ -435,10 +435,9 @@ mod tests {
     fn test_make_package_empty() {
         let files = [Lazy::force(&FD_ROOT)];
         let mut factory = InputFileFakeFactory::default();
-        let dyn_root_package =
-            Package::new_from_files_with(files.into_iter(), |f, _| factory.add(f));
-        let root_package = dyn_root_package.as_package().unwrap();
-        assert_eq!(1, root_package.files.len());
+        let root_package = RootPackage::new_with(files.into_iter(), |f, _| factory.add(f));
+
+        assert_eq!(1, root_package.base.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
     }
 
@@ -446,26 +445,23 @@ mod tests {
     fn test_make_package_single() {
         let files = [Lazy::force(&FD_G_P_DESC)];
         let mut factory = InputFileFakeFactory::default();
-        let dyn_root_package =
-            Package::new_from_files_with(files.into_iter(), |f, _| factory.add(f));
-        let root_package = dyn_root_package.as_package().unwrap();
-        assert_eq!(0, root_package.files.len());
-        assert_eq!(1, root_package.subpackages.len());
-        assert!(root_package.subpackages.contains_key("google"));
+        let root_package = RootPackage::new_with(files.into_iter(), |f, _| factory.add(f));
 
-        let package_g = root_package.subpackages["google"].as_package().unwrap();
+        assert_eq!(0, root_package.base.files.len());
+        assert_eq!(1, root_package.base.subpackages.len());
+        assert!(root_package.base.subpackages.contains_key("google"));
+
+        let package_g = Rc::clone(&root_package.base.subpackages["google"]);
         assert_eq!("google", package_g.name);
-        assert_eq!("google", package_g.full_name);
-        assert_eq!(0, package_g.files.len());
-        assert_eq!(1, package_g.subpackages.len());
-        assert!(package_g.subpackages.contains_key("protobuf"));
+        assert_eq!(0, package_g.base.files.len());
+        assert_eq!(1, package_g.base.subpackages.len());
+        assert!(package_g.base.subpackages.contains_key("protobuf"));
 
-        let package_g_p = package_g.subpackages["protobuf"].as_package().unwrap();
+        let package_g_p = Rc::clone(&package_g.base.subpackages["protobuf"]);
         assert_eq!("protobuf", package_g_p.name);
-        assert_eq!("google.protobuf", package_g_p.full_name);
-        assert_eq!(1, package_g_p.files.len());
+        assert_eq!(1, package_g_p.base.files.len());
         assert_eq!(Lazy::force(&FD_G_P_DESC), factory.given_protos[0].as_ref());
-        assert_eq!(0, package_g_p.subpackages.len());
+        assert_eq!(0, package_g_p.base.subpackages.len());
     }
 
     #[test]
@@ -478,36 +474,32 @@ mod tests {
         ];
         let mut factory = InputFileFakeFactory::default();
 
-        let dyn_root_package =
-            Package::new_from_files_with(files.into_iter(), |f, _| factory.add(f));
-        let root_package = dyn_root_package.as_package().unwrap();
-        assert_eq!(1, root_package.files.len());
+        let root_package = RootPackage::new_with(files.into_iter(), |f, _| factory.add(f));
+
+        assert_eq!(1, root_package.base.files.len());
         assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
-        assert_eq!(1, root_package.subpackages.len());
-        assert!(root_package.subpackages.contains_key("google"));
+        assert_eq!(1, root_package.base.subpackages.len());
+        assert!(root_package.base.subpackages.contains_key("google"));
 
-        let package_g = root_package.subpackages["google"].as_package().unwrap();
+        let package_g = Rc::clone(&root_package.base.subpackages["google"]);
         assert_eq!("google", package_g.name);
-        assert_eq!("google", package_g.full_name);
-        assert_eq!(0, package_g.files.len());
-        assert_eq!(1, package_g.subpackages.len());
-        assert!(package_g.subpackages.contains_key("protobuf"));
+        assert_eq!(0, package_g.base.files.len());
+        assert_eq!(1, package_g.base.subpackages.len());
+        assert!(package_g.base.subpackages.contains_key("protobuf"));
 
-        let package_g_p = package_g.subpackages["protobuf"].as_package().unwrap();
+        let package_g_p = Rc::clone(&package_g.base.subpackages["protobuf"]);
         assert_eq!("protobuf", package_g_p.name);
-        assert_eq!("google.protobuf", package_g_p.full_name);
-        assert_eq!(2, package_g_p.files.len());
-        assert_eq!(1, package_g_p.subpackages.len());
-        assert!(package_g_p.subpackages.contains_key("compiler"));
+        assert_eq!(2, package_g_p.base.files.len());
+        assert_eq!(1, package_g_p.base.subpackages.len());
+        assert!(package_g_p.base.subpackages.contains_key("compiler"));
 
-        let package_g_p_c = package_g_p.subpackages["compiler"].as_package().unwrap();
+        let package_g_p_c = Rc::clone(&package_g_p.base.subpackages["compiler"]);
         assert_eq!("compiler", package_g_p_c.name);
-        assert_eq!("google.protobuf.compiler", package_g_p_c.full_name);
-        assert_eq!(1, package_g_p_c.files.len());
+        assert_eq!(1, package_g_p_c.base.files.len());
         assert_eq!(
             Lazy::force(&FD_G_P_C_PLUGIN),
             factory.given_protos[3].as_ref()
         );
-        assert_eq!(0, package_g_p_c.subpackages.len());
+        assert_eq!(0, package_g_p_c.base.subpackages.len());
     }
 }
