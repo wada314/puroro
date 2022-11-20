@@ -119,7 +119,7 @@ impl PackageBase {
 
 impl RootPackage {
     pub(super) fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
-        Self::new_with(fds, InputFile::new)
+        Self::new_with(fds, |f, p| InputFile::new(f, p))
     }
 
     pub(super) fn new_with<'a, FF>(
