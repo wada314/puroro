@@ -43,7 +43,7 @@ pub(super) trait PackageTrait: Debug {
 
 #[derive(Debug)]
 pub(super) struct PackageBase {
-    subpackages: HashMap<String, Rc<dyn PackageTrait>>,
+    subpackages: HashMap<String, Rc<NonRootPackage>>,
     files: Vec<Rc<dyn InputFileTrait>>,
 }
 
@@ -69,7 +69,7 @@ impl PackageBase {
     ) -> Self
     where
         PNI: Iterator<Item = &'a str>,
-        FP: FnMut(&str, Vec<(PNI, &FileDescriptorProto)>) -> Rc<dyn PackageTrait>,
+        FP: FnMut(&str, Vec<(PNI, &FileDescriptorProto)>) -> Rc<NonRootPackage>,
         FF: FnMut(&FileDescriptorProto) -> Rc<dyn InputFileTrait>,
     {
         let name_fd_map = names_and_fds
