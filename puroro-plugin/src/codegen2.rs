@@ -35,6 +35,7 @@ use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -58,6 +59,20 @@ impl TryFrom<&str> for Syntax {
 enum PackageOrMessage<P, M> {
     Package(P),
     Message(M),
+}
+impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+        match self {
+            PackageOrMessage::Package(p) => p.messages(),
+            PackageOrMessage::Message(m) => m.messages(),
+        }
+    }
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+        match self {
+            PackageOrMessage::Package(p) => p.enums(),
+            PackageOrMessage::Message(m) => m.enums(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
