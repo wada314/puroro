@@ -29,6 +29,13 @@ pub(super) trait MessageTrait: Debug {
     fn name(&self) -> &str;
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
+
+    fn resolve_type_name(
+        self: Rc<Self>,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        todo!()
+    }
 }
 
 #[derive(Debug)]

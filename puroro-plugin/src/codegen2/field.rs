@@ -137,6 +137,7 @@ impl Field {
                 self.type_opt.clone(),
                 &self.type_name,
                 syntax,
+                self,
             )?)
         })
     }

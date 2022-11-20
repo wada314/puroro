@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::field::FieldTrait;
+use super::util::WeakExt;
 use super::Syntax;
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 use ::quote::quote;
+use ::std::rc::Rc;
 
 #[derive(Debug, Clone)]
 pub(super) enum FieldType {
@@ -61,6 +64,7 @@ impl FieldType {
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
+        field: &dyn FieldTrait,
     ) -> Result<Self> {
         use field_descriptor_proto::Type::*;
         use Bits32Type::*;
@@ -69,11 +73,10 @@ impl FieldType {
         use LengthDelimitedType::*;
         use VariantType::*;
 
-        let Some(r#type) = type_opt else {
-            unimplemented!("No field type enum case. 
-            Though the descriptor.proto says the field might not be filled,
-            actually the protoc's generated proto always have this field so
-            I skip this (complex) implementation.")
+        let r#type = if let Some(t) = type_opt {
+            t
+        } else {
+            field.message()?.
         };
 
         Ok(match r#type {
