@@ -16,12 +16,13 @@ use super::*;
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::itertools::Itertools;
+use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::quote::{format_ident, quote};
+use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
-use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug {
@@ -30,7 +31,8 @@ pub(super) trait PackageTrait: Debug {
 
     // fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
     // fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait>;
-    fn module_file_path(&self) -> Result<String>;
+    fn module_file_path(&self) -> Result<Cow<'_, str>>;
+    fn module_file_dir(&self) -> Result<Cow<'_, str>>;
     fn gen_module_file(&self) -> Result<TokenStream>;
 
     // fn resolve_type_name(
@@ -48,8 +50,10 @@ pub(super) struct PackageBase {
 #[derive(Debug)]
 pub(super) struct NonRootPackage {
     name: String,
+    parent: Weak<dyn PackageTrait>,
     root: Weak<dyn PackageTrait>,
     base: PackageBase,
+    module_file_dir: OnceCell<String>,
 }
 
 #[derive(Debug)]
@@ -98,6 +102,28 @@ impl PackageBase {
             files: self_files,
         }
     }
+
+    fn gen_submodule_decls(&self) -> Result<Vec<TokenStream>> {
+        Ok(self
+            .subpackages
+            .keys()
+            .sorted()
+            .map(|name| {
+                let ident = format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords());
+                quote! {
+                    pub mod ident;
+                }
+            })
+            .collect())
+    }
+
+    fn gen_struct_decls(&self) -> Result<Vec<TokenStream>> {
+        Ok(self
+            .files
+            .iter()
+            .map(|f| f.gen_structs_for_messages())
+            .try_collect()?)
+    }
 }
 
 impl RootPackage {
@@ -124,6 +150,7 @@ impl RootPackage {
                         name,
                         names_and_fds_vec.into_iter(),
                         Weak::clone(weak_root) as Weak<dyn PackageTrait>,
+                        Weak::clone(weak_root) as Weak<dyn PackageTrait>,
                         &mut ff,
                     )
                 },
@@ -138,6 +165,7 @@ impl NonRootPackage {
     fn new_with<'a, PNI, FF>(
         name: &str,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
+        parent: Weak<dyn PackageTrait>,
         root: Weak<dyn PackageTrait>,
         ff: FF,
     ) -> Rc<NonRootPackage>
@@ -145,45 +173,97 @@ impl NonRootPackage {
         PNI: Iterator<Item = &'a str>,
         FF: FnMut(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<dyn InputFileTrait>,
     {
-        Rc::new_cyclic(|weak| {
+        Rc::new_cyclic(|weak_self| {
             let base = PackageBase::new(
                 names_and_fds,
                 |name, names_and_fds_vec| {
                     NonRootPackage::new_with(
                         name,
                         names_and_fds_vec.into_iter(),
+                        Weak::clone(weak_self) as Weak<dyn PackageTrait>,
                         Weak::clone(&root),
                         ff,
                     )
                 },
-                |fd| (ff)(fd, Weak::clone(weak) as Weak<dyn PackageTrait>),
+                |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn PackageTrait>),
             );
             Self {
                 name: name.to_string(),
+                parent,
                 root,
                 base,
+                module_file_dir: OnceCell::new(),
             }
         })
     }
 }
 
 impl PackageTrait for RootPackage {
-    fn module_file_path(&self) -> Result<String> {
-        todo!()
+    fn module_file_path(&self) -> Result<Cow<'_, str>> {
+        Ok("lib.rs".into())
     }
-
+    fn module_file_dir(&self) -> Result<Cow<'_, str>> {
+        Ok("".into())
+    }
     fn gen_module_file(&self) -> Result<TokenStream> {
-        todo!()
+        let submodule_decls = self.base.gen_submodule_decls()?;
+        let struct_decls = self.base.gen_struct_decls()?;
+        Ok(quote! {
+            //! "Generated from root package"
+
+            /// re-export puroro.
+            pub use ::puroro;
+            /// re-export the primitive types in puroro namespace.
+            /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
+            pub use ::puroro::*;
+            pub mod _puroro_root {
+                pub use super::*;
+            }
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+
+            #(#submodule_decls)*
+            #(#struct_decls)*
+        })
     }
 }
 
 impl PackageTrait for NonRootPackage {
-    fn module_file_path(&self) -> Result<String> {
-        todo!()
+    fn module_file_path(&self) -> Result<Cow<'_, str>> {
+        Ok(format!(
+            "{}{}.rs",
+            self.parent.try_upgrade()?.module_file_dir()?,
+            self.name.to_lower_snake_case()
+        )
+        .into())
     }
-
+    fn module_file_dir(&self) -> Result<Cow<'_, str>> {
+        self.module_file_dir
+            .get_or_try_init(|| {
+                Ok(format!(
+                    "{}{}/",
+                    self.parent.try_upgrade()?.module_file_dir()?,
+                    self.name.to_lower_snake_case()
+                ))
+            })
+            .map(|s| s.into())
+    }
     fn gen_module_file(&self) -> Result<TokenStream> {
-        todo!()
+        let submodule_decls = self.base.gen_submodule_decls()?;
+        let struct_decls = self.base.gen_struct_decls()?;
+        let comment = format!("Generated from package \"{}\"", self.full_name()?);
+        Ok(quote! {
+            #![doc = #comment]
+            pub mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+            #(#submodule_decls)*
+            #(#struct_decls)*
+        })
     }
 }
 
@@ -197,16 +277,7 @@ pub(super) struct Package {
 }
 
 impl PackageTrait for Package {
-    #[cfg(test)]
-    fn as_package(&self) -> Option<&Package> {
-        Some(self)
-    }
-
-    fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>> {
-        Box::new(self.subpackages.iter().map(|(_, p)| Rc::deref(p)))
-    }
-
-    fn module_file_path(&self) -> Result<String> {
+    fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok(if self.full_name.is_empty() {
             "lib.rs".into()
         } else {
@@ -273,81 +344,73 @@ impl PackageTrait for Package {
         })
     }
 
-    fn resolve_type_name(
-        &self,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>> {
-        // Case 1, the given type name is an absolute path.
-        // If the type_name starts with '.', then redirect it to the root package.
-        if let Some(abs_type_name) = type_name.strip_prefix('.') {
-            return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
-        }
-
-        let rest = type_name;
-        let mut cur = MessageOrPackage::<&dyn MessageTrait, &dyn PackageTrait>::Package(self);
-        while let Some((subcomponent_name, rest)) = rest.split_once('.') {
-            // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
-            if let MessageOrPackage::Package(p) = cur {
-                if let Some(subsub) = p.subpackage(subcomponent_name) {}
-            }
-        }
-
-        // Case 2, the next component of the path is a subpackage.
-        // Extract the next component of the path. It must be non-empty, and must have another child.
-        if let Some((subpackage_name, rest)) = type_name.split_once('.') {
-            if let Some(subpackage) = self.subpackages.get(subpackage_name) {
-                // Can dig into a subpackage. Go ahead.
-                return subpackage.resolve_type_name(rest);
-            } else {
-                // When the target item is a nested message or enum in a message, then this can happen.
-                // Do nothing, go to the next section.
-            }
-        }
-
-        let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
-
-        // Case 3, the next component of the path is a message.
-        // The message can still have a submessage, so go deeper.
-        if let Some(message) = self
-            .messages()
-            .try_find(|m| -> Result<_> { Ok(m.try_upgrade()?.name() == subitem_name) })?
-        {
-            return todo!();
-        }
-
-        // Case 4, the next component is an enum.
-        // Enum cannot have a subitem so just return the found enum immediately.
-        if let Some(enume) = self
-            .enums()
-            .try_find(|e| -> Result<_> { Ok(e.try_upgrade()?.name() == subitem_name) })?
-        {
-            // In this case, there should not be the remaining path component.
-            if !rest.is_empty() {
-                Err(ErrorKind::UnknownTypeName {
-                    name: type_name.to_string(),
-                })?;
-            }
-
-            return Ok(MessageOrEnum::Enum(enume));
-        }
-
-        // Case 5, Type not found case.
-        Err(ErrorKind::UnknownTypeName {
-            name: type_name.to_string(),
-        })?
+    fn module_file_dir(&self) -> Result<Cow<'_, str>> {
+        todo!()
     }
 
-    fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait> {
-        self.subpackages.get(name).map(|p| Rc::deref(p))
-    }
+    // fn resolve_type_name(
+    //     &self,
+    //     type_name: &str,
+    // ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>> {
+    //     // Case 1, the given type name is an absolute path.
+    //     // If the type_name starts with '.', then redirect it to the root package.
+    //     if let Some(abs_type_name) = type_name.strip_prefix('.') {
+    //         return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
+    //     }
 
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>> {
-        Box::new(self.files.iter().flat_map(|f| f.messages()))
-    }
+    //     let rest = type_name;
+    //     let mut cur = MessageOrPackage::<&dyn MessageTrait, &dyn PackageTrait>::Package(self);
+    //     while let Some((subcomponent_name, rest)) = rest.split_once('.') {
+    //         // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
+    //         if let MessageOrPackage::Package(p) = cur {
+    //             if let Some(subsub) = p.subpackage(subcomponent_name) {}
+    //         }
+    //     }
 
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>> {
-        Box::new(self.files.iter().flat_map(|f| f.enums()))
-    }
+    //     // Case 2, the next component of the path is a subpackage.
+    //     // Extract the next component of the path. It must be non-empty, and must have another child.
+    //     if let Some((subpackage_name, rest)) = type_name.split_once('.') {
+    //         if let Some(subpackage) = self.subpackages.get(subpackage_name) {
+    //             // Can dig into a subpackage. Go ahead.
+    //             return subpackage.resolve_type_name(rest);
+    //         } else {
+    //             // When the target item is a nested message or enum in a message, then this can happen.
+    //             // Do nothing, go to the next section.
+    //         }
+    //     }
+
+    //     let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
+
+    //     // Case 3, the next component of the path is a message.
+    //     // The message can still have a submessage, so go deeper.
+    //     if let Some(message) = self
+    //         .messages()
+    //         .try_find(|m| -> Result<_> { Ok(m.try_upgrade()?.name() == subitem_name) })?
+    //     {
+    //         return todo!();
+    //     }
+
+    //     // Case 4, the next component is an enum.
+    //     // Enum cannot have a subitem so just return the found enum immediately.
+    //     if let Some(enume) = self
+    //         .enums()
+    //         .try_find(|e| -> Result<_> { Ok(e.try_upgrade()?.name() == subitem_name) })?
+    //     {
+    //         // In this case, there should not be the remaining path component.
+    //         if !rest.is_empty() {
+    //             Err(ErrorKind::UnknownTypeName {
+    //                 name: type_name.to_string(),
+    //             })?;
+    //         }
+
+    //         return Ok(MessageOrEnum::Enum(enume));
+    //     }
+
+    //     // Case 5, Type not found case.
+    //     Err(ErrorKind::UnknownTypeName {
+    //         name: type_name.to_string(),
+    //     })?
+    // }
 }
 
 #[cfg(test)]
