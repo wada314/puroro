@@ -105,7 +105,7 @@ impl Field {
     pub(super) fn new<M: 'static + MessageTrait>(
         proto: &FieldDescriptorProto,
         message: &Weak<M>,
-    ) -> Rc<dyn FieldTrait> {
+    ) -> Rc<Self> {
         Rc::new(Field {
             name: proto.name().to_string(),
             message: Weak::clone(message) as Weak<dyn MessageTrait>,

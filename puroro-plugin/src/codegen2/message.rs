@@ -97,7 +97,7 @@ impl MessageTrait for Message {
 }
 
 impl Message {
-    pub(super) fn new<F>(proto: &DescriptorProto, input_file: &Weak<F>) -> Rc<dyn MessageTrait>
+    pub(super) fn new<F>(proto: &DescriptorProto, input_file: &Weak<F>) -> Rc<Self>
     where
         F: 'static + InputFileTrait,
     {
@@ -108,7 +108,7 @@ impl Message {
         proto: &DescriptorProto,
         input_file: &Weak<F>,
         mut ff: FF,
-    ) -> Rc<dyn MessageTrait>
+    ) -> Rc<Self>
     where
         F: 'static + InputFileTrait,
         FF: FnMut(&FieldDescriptorProto, Weak<Message>) -> Rc<dyn FieldTrait>,
@@ -124,7 +124,7 @@ impl Message {
                 .map(|f| ff(f, Weak::clone(weak)))
                 .collect(),
             bitfield_size: OnceCell::new(),
-        }) as Rc<dyn MessageTrait>
+        })
     }
 }
 
