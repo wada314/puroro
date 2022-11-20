@@ -14,6 +14,7 @@
 
 use super::field::FieldTrait;
 use super::util::WeakExt;
+use super::MessageOrEnum;
 use super::Syntax;
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
@@ -76,7 +77,10 @@ impl FieldType {
         let r#type = if let Some(t) = type_opt {
             t
         } else {
-            field.message()?.
+            match field.message()?.resolve_type_name(type_name)? {
+                MessageOrEnum::Message(_) => TypeMessage,
+                MessageOrEnum::Enum(_) => TypeEnum,
+            }
         };
 
         Ok(match r#type {
