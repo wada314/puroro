@@ -32,17 +32,20 @@ pub(super) trait PackageTrait: Debug {
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
 
-    fn resolve_type_name(
-        &self,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        self.base()?.resolve_type_name(type_name)
-    }
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
         self.base()?.messages()
     }
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
         self.base()?.enums()
+    }
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>
+    where
+        Self: Sized,
+    {
+        resolve_type_name_impl(self, type_name)
     }
 
     fn gen_module_file(&self) -> Result<TokenStream>;
@@ -137,66 +140,6 @@ impl PackageBase {
             .iter()
             .map(|f| f.gen_structs_for_messages())
             .try_collect()?)
-    }
-
-    fn resolve_type_name(
-        &self,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        // Case 1, the given type name is an absolute path.
-        // If the type_name starts with '.', then redirect it to the root package.
-        if let Some(abs_type_name) = type_name.strip_prefix('.') {
-            return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
-        }
-
-        // Case 2, the next component of the path is a subpackage.
-        // Extract the next component of the path. It must be non-empty, and must have another child.
-        if let Some((subpackage_name, rest)) = type_name.split_once('.') {
-            if let Some(subpackage) = self.subpackages.get(subpackage_name) {
-                // Can dig into a subpackage. Go ahead.
-                return subpackage.resolve_type_name(rest);
-            } else {
-                // When the next path component is an enclosing message, then this case can happen.
-                // Do nothing, go to the next section.
-            }
-        }
-
-        // Case 3, no more package components. The further packages are either an enum or
-        // an (enclosing) message.
-        // Go deeper until the last component.
-        let mut messages = self.messages()?;
-        let mut enums = self.enums()?;
-        let mut rest = type_name;
-        for subcomponent in iter::from_fn(|| match rest.split_once('.') {
-            Some((sc, rest_rest)) => {
-                rest = rest_rest;
-                Some(sc)
-            }
-            None => None,
-        }) {
-            let submessage = messages
-                .into_iter()
-                .find(|m| m.name() == subcomponent)
-                .ok_or(ErrorKind::UnknownTypeName {
-                    name: type_name.to_string(),
-                })?;
-            messages = submessage.messages()?;
-            enums = submessage.enums()?;
-        }
-
-        // Case 3.1, the last component is an enum.
-        if let Some(enume) = enums.iter().find(|e| e.name() == type_name) {
-            return Ok(MessageOrEnum::Enum(Rc::clone(enume)));
-        }
-
-        // Case 3.2, the last component is a message.
-        if let Some(message) = messages.iter().find(|m| m.name() == type_name) {
-            return Ok(MessageOrEnum::Message(Rc::clone(message)));
-        }
-
-        Err(ErrorKind::UnknownTypeName {
-            name: type_name.to_string(),
-        })?
     }
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
@@ -392,6 +335,69 @@ impl PackageTrait for NonRootPackage {
     fn base(&self) -> Result<&PackageBase> {
         Ok(&self.base)
     }
+}
+
+fn resolve_type_name_impl(
+    cur: &dyn PackageTrait,
+    type_name: &str,
+) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+    // Case 1, the given type name is an absolute path.
+    // If the type_name starts with '.', then redirect it to the root package.
+    if let Some(abs_type_name) = type_name.strip_prefix('.') {
+        return cur
+            .base()?
+            .root
+            .try_upgrade()?
+            .resolve_type_name(abs_type_name);
+    }
+
+    // Case 2, the next component of the path is a subpackage.
+    // Extract the next component of the path. It must be non-empty, and must have another child.
+    if let Some((subpackage_name, rest)) = type_name.split_once('.') {
+        if let Some(subpackage) = cur.base()?.subpackages.get(subpackage_name) {
+            // Can dig into a subpackage. Go ahead.
+            return subpackage.resolve_type_name(rest);
+        } else {
+            // When the next path component is an enclosing message, then this case can happen.
+            // Do nothing, go to the next section.
+        }
+    }
+
+    // Case 3, no more package components. The further packages are either an enum or
+    // an (enclosing) message.
+    // Go deeper until the component before the last component.
+    let mut p_or_m = PackageOrMessage::Package(cur);
+    let mut rest = type_name;
+    for subcomponent in iter::from_fn(|| match rest.split_once('.') {
+        Some((sc, rest_rest)) => {
+            rest = rest_rest;
+            Some(sc)
+        }
+        None => None,
+    }) {
+        let submessage = p_or_m
+            .messages()?
+            .into_iter()
+            .find(|m| m.name() == subcomponent)
+            .ok_or(ErrorKind::UnknownTypeName {
+                name: type_name.to_string(),
+            })?;
+        p_or_m = PackageOrMessage::Message(submessage.as_ref())
+    }
+
+    // Case 3.1, the last component is an enum.
+    if let Some(enume) = p_or_m.enums()?.iter().find(|e| e.name() == type_name) {
+        return Ok(MessageOrEnum::Enum(Rc::clone(enume)));
+    }
+
+    // Case 3.2, the last component is a message.
+    if let Some(message) = p_or_m.messages()?.iter().find(|m| m.name() == type_name) {
+        return Ok(MessageOrEnum::Message(Rc::clone(message)));
+    }
+
+    Err(ErrorKind::UnknownTypeName {
+        name: type_name.to_string(),
+    })?
 }
 
 #[cfg(test)]

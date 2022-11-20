@@ -60,7 +60,7 @@ enum PackageOrMessage<P, M> {
     Package(P),
     Message(M),
 }
-impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
+impl<'a> PackageOrMessage<&dyn PackageTrait, &dyn MessageTrait> {
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
         match self {
             PackageOrMessage::Package(p) => p.messages(),
