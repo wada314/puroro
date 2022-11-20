@@ -30,10 +30,21 @@ pub(super) trait PackageTrait: Debug {
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
+    fn base(&self) -> Result<&PackageBase>;
+
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>;
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        self.base()?.resolve_type_name(type_name)
+    }
+    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+        self.base()?.messages()
+    }
+    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+        self.base()?.enums()
+    }
+
     fn gen_module_file(&self) -> Result<TokenStream>;
 }
 
@@ -308,12 +319,6 @@ impl PackageTrait for RootPackage {
     fn full_name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
-    fn resolve_type_name(
-        &self,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        self.base.resolve_type_name(type_name)
-    }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
@@ -335,6 +340,9 @@ impl PackageTrait for RootPackage {
             #(#submodule_decls)*
             #(#struct_decls)*
         })
+    }
+    fn base(&self) -> Result<&PackageBase> {
+        Ok(&self.base)
     }
 }
 
@@ -367,12 +375,6 @@ impl PackageTrait for NonRootPackage {
             Ok(format!("{}.{}", parent_full_name, &self.name).into())
         }
     }
-    fn resolve_type_name(
-        &self,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        self.base.resolve_type_name(type_name)
-    }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
@@ -386,6 +388,9 @@ impl PackageTrait for NonRootPackage {
             #(#submodule_decls)*
             #(#struct_decls)*
         })
+    }
+    fn base(&self) -> Result<&PackageBase> {
+        Ok(&self.base)
     }
 }
 

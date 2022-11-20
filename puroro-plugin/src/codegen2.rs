@@ -55,9 +55,9 @@ impl TryFrom<&str> for Syntax {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum MessageOrPackage<M, P> {
-    Message(M),
+enum PackageOrMessage<P, M> {
     Package(P),
+    Message(M),
 }
 
 #[derive(Debug, Clone, Copy)]
