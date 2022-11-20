@@ -36,13 +36,13 @@ pub(super) trait PackageTrait: Debug {
 pub(super) struct PackageBase {
     subpackages: HashMap<String, Rc<NonRootPackage>>,
     files: Vec<Rc<dyn InputFileTrait>>,
+    root: Weak<RootPackage>,
 }
 
 #[derive(Debug)]
 pub(super) struct NonRootPackage {
     name: String,
     parent: Weak<dyn PackageTrait>,
-    root: Weak<dyn PackageTrait>,
     base: PackageBase,
     module_file_dir: OnceCell<String>,
 }
@@ -54,6 +54,7 @@ pub(super) struct RootPackage {
 
 impl PackageBase {
     fn new<'a, FP, FF, F, PNI>(
+        root: Weak<RootPackage>,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         fp: FP,
         ff: FF,
@@ -90,6 +91,7 @@ impl PackageBase {
             .collect();
 
         PackageBase {
+            root,
             subpackages,
             files: self_files,
         }
@@ -137,13 +139,14 @@ impl RootPackage {
                 (package_name_iter, fd)
             });
             let base = PackageBase::new(
+                Weak::clone(weak_root),
                 names_and_fds,
                 |name, names_and_fds_vec| {
                     NonRootPackage::new_with(
                         name,
                         names_and_fds_vec.into_iter(),
                         Weak::clone(weak_root) as Weak<dyn PackageTrait>,
-                        Weak::clone(weak_root) as Weak<dyn PackageTrait>,
+                        Weak::clone(weak_root),
                         &ff,
                     )
                 },
@@ -169,7 +172,7 @@ impl NonRootPackage {
         name: &str,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         parent: Weak<dyn PackageTrait>,
-        root: Weak<dyn PackageTrait>,
+        root: Weak<RootPackage>,
         ff: &FF,
     ) -> Rc<NonRootPackage>
     where
@@ -179,6 +182,7 @@ impl NonRootPackage {
     {
         Rc::new_cyclic(|weak_self| {
             let base = PackageBase::new(
+                Weak::clone(&root),
                 names_and_fds,
                 |name, names_and_fds_vec| {
                     NonRootPackage::new_with(
@@ -194,7 +198,6 @@ impl NonRootPackage {
             Self {
                 name: name.to_string(),
                 parent,
-                root,
                 base,
                 module_file_dir: OnceCell::new(),
             }
@@ -281,80 +284,69 @@ impl PackageTrait for NonRootPackage {
     }
 }
 
-#[derive(Debug)]
-pub(super) struct Package {
-    name: String,
-    full_name: String,
-    subpackages: HashMap<String, Rc<dyn PackageTrait>>,
-    files: Vec<Rc<dyn InputFileTrait>>,
-    root: Weak<dyn PackageTrait>,
-}
+// fn resolve_type_name(
+//     &self,
+//     type_name: &str,
+// ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>> {
+//     // Case 1, the given type name is an absolute path.
+//     // If the type_name starts with '.', then redirect it to the root package.
+//     if let Some(abs_type_name) = type_name.strip_prefix('.') {
+//         return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
+//     }
 
-impl Package {
-    // fn resolve_type_name(
-    //     &self,
-    //     type_name: &str,
-    // ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>> {
-    //     // Case 1, the given type name is an absolute path.
-    //     // If the type_name starts with '.', then redirect it to the root package.
-    //     if let Some(abs_type_name) = type_name.strip_prefix('.') {
-    //         return self.root.try_upgrade()?.resolve_type_name(abs_type_name);
-    //     }
+//     let rest = type_name;
+//     let mut cur = MessageOrPackage::<&dyn MessageTrait, &dyn PackageTrait>::Package(self);
+//     while let Some((subcomponent_name, rest)) = rest.split_once('.') {
+//         // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
+//         if let MessageOrPackage::Package(p) = cur {
+//             if let Some(subsub) = p.subpackage(subcomponent_name) {}
+//         }
+//     }
 
-    //     let rest = type_name;
-    //     let mut cur = MessageOrPackage::<&dyn MessageTrait, &dyn PackageTrait>::Package(self);
-    //     while let Some((subcomponent_name, rest)) = rest.split_once('.') {
-    //         // There are a sub-sub-component. Thus, the subcomponent is either a package or a message.
-    //         if let MessageOrPackage::Package(p) = cur {
-    //             if let Some(subsub) = p.subpackage(subcomponent_name) {}
-    //         }
-    //     }
+//     // Case 2, the next component of the path is a subpackage.
+//     // Extract the next component of the path. It must be non-empty, and must have another child.
+//     if let Some((subpackage_name, rest)) = type_name.split_once('.') {
+//         if let Some(subpackage) = self.subpackages.get(subpackage_name) {
+//             // Can dig into a subpackage. Go ahead.
+//             return subpackage.resolve_type_name(rest);
+//         } else {
+//             // When the target item is a nested message or enum in a message, then this can happen.
+//             // Do nothing, go to the next section.
+//         }
+//     }
 
-    //     // Case 2, the next component of the path is a subpackage.
-    //     // Extract the next component of the path. It must be non-empty, and must have another child.
-    //     if let Some((subpackage_name, rest)) = type_name.split_once('.') {
-    //         if let Some(subpackage) = self.subpackages.get(subpackage_name) {
-    //             // Can dig into a subpackage. Go ahead.
-    //             return subpackage.resolve_type_name(rest);
-    //         } else {
-    //             // When the target item is a nested message or enum in a message, then this can happen.
-    //             // Do nothing, go to the next section.
-    //         }
-    //     }
+//     let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
 
-    //     let (subitem_name, rest) = type_name.split_once('.').unwrap_or((type_name, ""));
+//     // Case 3, the next component of the path is a message.
+//     // The message can still have a submessage, so go deeper.
+//     if let Some(message) = self
+//         .messages()
+//         .try_find(|m| -> Result<_> { Ok(m.try_upgrade()?.name() == subitem_name) })?
+//     {
+//         return todo!();
+//     }
 
-    //     // Case 3, the next component of the path is a message.
-    //     // The message can still have a submessage, so go deeper.
-    //     if let Some(message) = self
-    //         .messages()
-    //         .try_find(|m| -> Result<_> { Ok(m.try_upgrade()?.name() == subitem_name) })?
-    //     {
-    //         return todo!();
-    //     }
+//     // Case 4, the next component is an enum.
+//     // Enum cannot have a subitem so just return the found enum immediately.
+//     if let Some(enume) = self
+//         .enums()
+//         .try_find(|e| -> Result<_> { Ok(e.try_upgrade()?.name() == subitem_name) })?
+//     {
+//         // In this case, there should not be the remaining path component.
+//         if !rest.is_empty() {
+//             Err(ErrorKind::UnknownTypeName {
+//                 name: type_name.to_string(),
+//             })?;
+//         }
 
-    //     // Case 4, the next component is an enum.
-    //     // Enum cannot have a subitem so just return the found enum immediately.
-    //     if let Some(enume) = self
-    //         .enums()
-    //         .try_find(|e| -> Result<_> { Ok(e.try_upgrade()?.name() == subitem_name) })?
-    //     {
-    //         // In this case, there should not be the remaining path component.
-    //         if !rest.is_empty() {
-    //             Err(ErrorKind::UnknownTypeName {
-    //                 name: type_name.to_string(),
-    //             })?;
-    //         }
+//         return Ok(MessageOrEnum::Enum(enume));
+//     }
 
-    //         return Ok(MessageOrEnum::Enum(enume));
-    //     }
-
-    //     // Case 5, Type not found case.
-    //     Err(ErrorKind::UnknownTypeName {
-    //         name: type_name.to_string(),
-    //     })?
-    // }
-}
+//     // Case 5, Type not found case.
+//     Err(ErrorKind::UnknownTypeName {
+//         name: type_name.to_string(),
+//     })?
+// }
 
 #[cfg(test)]
 mod tests {
