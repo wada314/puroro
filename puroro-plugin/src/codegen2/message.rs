@@ -40,6 +40,37 @@ pub(super) struct Message {
     bitfield_size: OnceCell<usize>,
 }
 
+impl Message {
+    pub(super) fn new(proto: &DescriptorProto, input_file: Weak<dyn InputFileTrait>) -> Rc<Self> {
+        Self::new_with(proto, input_file, Field::new)
+    }
+
+    pub(super) fn new_with<FF, F>(
+        proto: &DescriptorProto,
+        input_file: Weak<dyn InputFileTrait>,
+        ff: FF,
+    ) -> Rc<Self>
+    where
+        FF: Fn(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Rc<F>,
+        F: 'static + FieldTrait,
+    {
+        let name = proto.name().to_string();
+        Rc::new_cyclic(|weak_message| Message {
+            name,
+            input_file: input_file as Weak<dyn InputFileTrait>,
+            fields: proto
+                .field()
+                .into_iter()
+                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
+                .map(|f| {
+                    ff(f, Weak::clone(weak_message) as Weak<dyn MessageTrait>) as Rc<dyn FieldTrait>
+                })
+                .collect(),
+            bitfield_size: OnceCell::new(),
+        })
+    }
+}
+
 impl MessageTrait for Message {
     fn name(&self) -> &str {
         &self.name
@@ -89,47 +120,5 @@ impl MessageTrait for Message {
 
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
         Ok(&[])
-    }
-}
-
-impl Message {
-    pub(super) fn new(proto: &DescriptorProto, input_file: Weak<dyn InputFileTrait>) -> Rc<Self> {
-        Self::new_with(proto, input_file, Field::new)
-    }
-
-    pub(super) fn new_with<FF, F>(
-        proto: &DescriptorProto,
-        input_file: Weak<dyn InputFileTrait>,
-        ff: FF,
-    ) -> Rc<Self>
-    where
-        FF: Fn(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Rc<F>,
-        F: 'static + FieldTrait,
-    {
-        let name = proto.name().to_string();
-        Rc::new_cyclic(|weak_message| Message {
-            name,
-            input_file: input_file as Weak<dyn InputFileTrait>,
-            fields: proto
-                .field()
-                .into_iter()
-                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| {
-                    ff(f, Weak::clone(weak_message) as Weak<dyn MessageTrait>) as Rc<dyn FieldTrait>
-                })
-                .collect(),
-            bitfield_size: OnceCell::new(),
-        })
-    }
-}
-
-#[cfg(test)]
-#[derive(Debug)]
-pub struct MessageFake;
-
-#[cfg(test)]
-impl MessageFake {
-    pub fn try_new(proto: &DescriptorProto) -> Result<Rc<Box<Self>>> {
-        Ok(Rc::new(Box::new(MessageFake)))
     }
 }
