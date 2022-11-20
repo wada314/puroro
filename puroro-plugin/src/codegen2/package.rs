@@ -39,13 +39,14 @@ pub(super) trait PackageTrait: Debug {
         self.base()?.enums()
     }
     fn resolve_type_name(
-        &self,
+        self: &Rc<Self>,
         type_name: &str,
     ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>
     where
-        Self: Sized,
+        Self: 'static + Sized,
     {
-        resolve_type_name_impl(self, type_name)
+        let obj = Rc::clone(self) as Rc<dyn PackageTrait>;
+        resolve_type_name_impl(obj, type_name)
     }
 
     fn gen_module_file(&self) -> Result<TokenStream>;
@@ -338,7 +339,7 @@ impl PackageTrait for NonRootPackage {
 }
 
 fn resolve_type_name_impl(
-    cur: &dyn PackageTrait,
+    cur: Rc<dyn PackageTrait>,
     type_name: &str,
 ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
     // Case 1, the given type name is an absolute path.
@@ -382,7 +383,7 @@ fn resolve_type_name_impl(
             .ok_or(ErrorKind::UnknownTypeName {
                 name: type_name.to_string(),
             })?;
-        p_or_m = PackageOrMessage::Message(submessage.as_ref())
+        p_or_m = PackageOrMessage::Message(Rc::clone(&submessage))
     }
 
     // Case 3.1, the last component is an enum.
