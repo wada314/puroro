@@ -26,19 +26,10 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug {
-    // fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>>;
-    // fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>>;
-
-    // fn subpackages(&self) -> Box<dyn '_ + Iterator<Item = &dyn PackageTrait>>;
-    // fn subpackage(&self, name: &str) -> Option<&dyn PackageTrait>;
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
+    fn full_name(&self) -> Result<Cow<'_, str>>;
     fn gen_module_file(&self) -> Result<TokenStream>;
-
-    // fn resolve_type_name(
-    //     &self,
-    //     type_name: &str,
-    // ) -> Result<MessageOrEnum<Weak<Box<dyn MessageTrait>>, Weak<dyn EnumTrait>>>;
 }
 
 #[derive(Debug)]
@@ -128,7 +119,7 @@ impl PackageBase {
 
 impl RootPackage {
     pub(super) fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
-        Self::new_with(fds, |fd, weak_package| InputFile::new(fd))
+        Self::new_with(fds, InputFile::new)
     }
 
     pub(super) fn new_with<'a, FF>(
@@ -215,6 +206,9 @@ impl PackageTrait for RootPackage {
     fn module_file_dir(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
+    fn full_name(&self) -> Result<Cow<'_, str>> {
+        Ok("".into())
+    }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
@@ -258,6 +252,15 @@ impl PackageTrait for NonRootPackage {
                 ))
             })
             .map(|s| s.into())
+    }
+    fn full_name(&self) -> Result<Cow<'_, str>> {
+        let parent = self.parent.try_upgrade()?;
+        let parent_full_name = parent.full_name()?;
+        if parent_full_name.is_empty() {
+            Ok(self.name.as_str().into())
+        } else {
+            Ok(format!("{}.{}", parent_full_name, &self.name).into())
+        }
     }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
@@ -353,6 +356,7 @@ impl Package {
 #[cfg(test)]
 mod tests {
     use super::super::input_file::InputFileTrait;
+    use super::super::util::WeakExt;
     use super::super::Syntax;
     use super::{PackageTrait, RootPackage};
     use crate::Result;
@@ -360,7 +364,7 @@ mod tests {
     use ::proc_macro2::TokenStream;
     use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
     use ::std::ops::Deref;
-    use ::std::rc::Rc;
+    use ::std::rc::{Rc, Weak};
 
     static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
         let mut fd = FileDescriptorProto::default();
@@ -391,61 +395,54 @@ mod tests {
 
     #[derive(Debug)]
     struct InputFileFake {
-        pub proto: Rc<FileDescriptorProto>,
+        name: String,
+        package: Weak<dyn PackageTrait>,
+    }
+    impl InputFileFake {
+        fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Self {
+            Self {
+                name: proto.name().to_string(),
+                package,
+            }
+        }
     }
     impl InputFileTrait for InputFileFake {
-        fn gen_structs_for_messages(&self) -> Result<TokenStream> {
-            Ok(TokenStream::new())
+        fn name(&self) -> Result<&str> {
+            Ok(&self.name)
         }
         fn syntax(&self) -> Result<Syntax> {
             unimplemented!()
         }
-        fn messages(
-            &self,
-        ) -> Box<dyn '_ + Iterator<Item = std::rc::Weak<dyn crate::codegen2::message::MessageTrait>>>
-        {
-            todo!()
+        fn package(&self) -> Result<Rc<dyn PackageTrait>> {
+            self.package.try_upgrade()
         }
-
-        fn enums(
-            &self,
-        ) -> Box<dyn '_ + Iterator<Item = std::rc::Weak<dyn crate::codegen2::r#enum::EnumTrait>>>
-        {
-            todo!()
-        }
-    }
-    #[derive(Default, Debug)]
-    struct InputFileFakeFactory {
-        given_protos: Vec<Rc<FileDescriptorProto>>,
-        generated_fakes: Vec<Rc<dyn InputFileTrait>>,
-    }
-    impl InputFileFakeFactory {
-        fn add(&mut self, proto: &FileDescriptorProto) -> Rc<dyn InputFileTrait> {
-            let rc_proto = Rc::new(proto.clone());
-            let fake: Rc<dyn InputFileTrait> = Rc::new(InputFileFake {
-                proto: Rc::clone(&rc_proto),
-            });
-            self.given_protos.push(rc_proto);
-            self.generated_fakes.push(Rc::clone(&fake));
-            fake
+        fn gen_structs_for_messages(&self) -> Result<TokenStream> {
+            Ok(TokenStream::new())
         }
     }
 
     #[test]
-    fn test_make_package_empty() {
+    fn test_make_package_empty() -> Result<()> {
         let files = [Lazy::force(&FD_ROOT)];
-        let mut factory = InputFileFakeFactory::default();
-        let root_package = RootPackage::new_with(files.into_iter(), |f, _| factory.add(f));
+        let root_package = RootPackage::new_with(files.into_iter(), |fd, p| {
+            Rc::new(InputFileFake::new(fd, p))
+        });
 
         assert_eq!(1, root_package.base.files.len());
-        assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
+        assert_eq!(FD_ROOT.name(), root_package.base.files[0].name()?);
+        assert_eq!(
+            FD_ROOT.package(),
+            root_package.base.files[0].package()?.full_name()?
+        );
+        Ok(())
     }
 
     #[test]
-    fn test_make_package_single() {
+    fn test_make_package_single() -> Result<()> {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let mut factory = InputFileFakeFactory::default();
-        let root_package = RootPackage::new_with(files.into_iter(), |f, _| factory.add(f));
+        let root_package = RootPackage::new_with(files.into_iter(), |fd, p| {
+            Rc::new(InputFileFake::new(fd, p))
+        });
 
         assert_eq!(0, root_package.base.files.len());
         assert_eq!(1, root_package.base.subpackages.len());
@@ -460,24 +457,29 @@ mod tests {
         let package_g_p = Rc::clone(&package_g.base.subpackages["protobuf"]);
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!(1, package_g_p.base.files.len());
-        assert_eq!(Lazy::force(&FD_G_P_DESC), factory.given_protos[0].as_ref());
+        assert_eq!(
+            "google.protobuf",
+            package_g_p.base.files[0].package()?.full_name()?
+        );
         assert_eq!(0, package_g_p.base.subpackages.len());
+
+        Ok(())
     }
 
     #[test]
-    fn test_make_package_many() {
+    fn test_make_package_many() -> Result<()> {
         let files = [
             Lazy::force(&FD_G_P_DESC),
             Lazy::force(&FD_ROOT),
             Lazy::force(&FD_G_P_EMPTY),
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
-        let mut factory = InputFileFakeFactory::default();
-
-        let root_package = RootPackage::new_with(files.into_iter(), |f, _| factory.add(f));
+        let root_package = RootPackage::new_with(files.into_iter(), |fd, p| {
+            Rc::new(InputFileFake::new(fd, p))
+        });
 
         assert_eq!(1, root_package.base.files.len());
-        assert_eq!(Lazy::force(&FD_ROOT), factory.given_protos[0].as_ref());
+        assert_eq!("", root_package.base.files[0].package()?.full_name()?);
         assert_eq!(1, root_package.base.subpackages.len());
         assert!(root_package.base.subpackages.contains_key("google"));
 
@@ -490,16 +492,22 @@ mod tests {
         let package_g_p = Rc::clone(&package_g.base.subpackages["protobuf"]);
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!(2, package_g_p.base.files.len());
+        assert_eq!(
+            "google.protobuf",
+            package_g_p.base.files[0].package()?.full_name()?
+        );
+        assert_eq!(
+            "google.protobuf",
+            package_g_p.base.files[1].package()?.full_name()?
+        );
         assert_eq!(1, package_g_p.base.subpackages.len());
         assert!(package_g_p.base.subpackages.contains_key("compiler"));
 
         let package_g_p_c = Rc::clone(&package_g_p.base.subpackages["compiler"]);
         assert_eq!("compiler", package_g_p_c.name);
         assert_eq!(1, package_g_p_c.base.files.len());
-        assert_eq!(
-            Lazy::force(&FD_G_P_C_PLUGIN),
-            factory.given_protos[3].as_ref()
-        );
         assert_eq!(0, package_g_p_c.base.subpackages.len());
+
+        Ok(())
     }
 }

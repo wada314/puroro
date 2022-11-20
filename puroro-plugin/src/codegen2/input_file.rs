@@ -22,30 +22,41 @@ use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait InputFileTrait: Debug {
+    fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
+    fn package(&self) -> Result<Rc<dyn PackageTrait>>;
     fn gen_structs_for_messages(&self) -> Result<TokenStream>;
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>>;
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>>;
 }
 
 #[derive(Debug)]
 pub(super) struct InputFile {
+    name: String,
     syntax: String,
     syntax_cell: OnceCell<Syntax>,
+    package: Weak<dyn PackageTrait>,
     messages: Vec<Rc<dyn MessageTrait>>,
 }
 
 impl InputFile {
-    pub(super) fn new(proto: &FileDescriptorProto) -> Rc<dyn InputFileTrait> {
-        Self::new_with(proto, |m, weak| Message::new(m, &weak))
+    pub(super) fn new(
+        proto: &FileDescriptorProto,
+        package: Weak<dyn PackageTrait>,
+    ) -> Rc<dyn InputFileTrait> {
+        Self::new_with(proto, package, |m, weak| Message::new(m, &weak))
     }
-    fn new_with<FM>(proto: &FileDescriptorProto, mut fm: FM) -> Rc<dyn InputFileTrait>
+    fn new_with<FM>(
+        proto: &FileDescriptorProto,
+        package: Weak<dyn PackageTrait>,
+        mut fm: FM,
+    ) -> Rc<dyn InputFileTrait>
     where
         FM: FnMut(&DescriptorProto, Weak<InputFile>) -> Rc<dyn MessageTrait>,
     {
         Rc::new_cyclic(|weak| Self {
+            name: proto.name().to_string(),
             syntax: proto.syntax().to_string(),
             syntax_cell: OnceCell::new(),
+            package,
             messages: proto
                 .message_type()
                 .into_iter()
@@ -56,10 +67,18 @@ impl InputFile {
 }
 
 impl InputFileTrait for InputFile {
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
+
     fn syntax(&self) -> Result<Syntax> {
         self.syntax_cell
             .get_or_try_init(|| self.syntax.as_str().try_into())
             .cloned()
+    }
+
+    fn package(&self) -> Result<Rc<dyn PackageTrait>> {
+        self.package.try_upgrade()
     }
 
     fn gen_structs_for_messages(&self) -> Result<TokenStream> {
@@ -71,13 +90,5 @@ impl InputFileTrait for InputFile {
         Ok(quote! {
             #(#message_structs)*
         })
-    }
-
-    fn messages(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn MessageTrait>>> {
-        Box::new(self.messages.iter().map(|m| Rc::downgrade(m)))
-    }
-
-    fn enums(&self) -> Box<dyn '_ + Iterator<Item = Weak<dyn EnumTrait>>> {
-        Box::new(::std::iter::empty())
     }
 }
