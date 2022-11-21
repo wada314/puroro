@@ -32,6 +32,7 @@ pub(super) trait PackageTrait: Debug {
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait>;
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
         self.base()?.messages()
@@ -48,11 +49,8 @@ pub(super) trait PackageTrait: Debug {
     fn resolve_type_name(
         self: Rc<Self>,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>
-    where
-        Self: 'static + Sized,
-    {
-        PackageOrMessage::Package(self as Rc<dyn PackageTrait>).resolve_type_name(type_name)
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        PackageOrMessage::Package(self.as_dyn_rc()).resolve_type_name(type_name)
     }
 
     fn gen_module_file(&self) -> Result<TokenStream>;
@@ -287,6 +285,9 @@ impl PackageTrait for RootPackage {
     fn full_name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
+        self
+    }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
@@ -345,6 +346,9 @@ impl PackageTrait for NonRootPackage {
         } else {
             Ok(format!("{}.{}", parent_full_name, &self.name).into())
         }
+    }
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
+        self
     }
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;

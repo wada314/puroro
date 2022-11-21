@@ -29,15 +29,13 @@ pub(super) trait MessageTrait: Debug {
     fn name(&self) -> &str;
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
 
     fn resolve_type_name(
         self: Rc<Self>,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>
-    where
-        Self: 'static + Sized,
-    {
-        PackageOrMessage::Message(self as Rc<dyn MessageTrait>).resolve_type_name(type_name)
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+        PackageOrMessage::Message(self.as_dyn_rc()).resolve_type_name(type_name)
     }
 }
 
@@ -130,5 +128,9 @@ impl MessageTrait for Message {
 
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
         Ok(&[])
+    }
+
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait> {
+        self
     }
 }
