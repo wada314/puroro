@@ -42,6 +42,7 @@ pub struct Msg {
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
 pub enum Enum {
-    Foo,
-    Bar,
+    Zeroth,
+    First,
+    Tenth,
 }

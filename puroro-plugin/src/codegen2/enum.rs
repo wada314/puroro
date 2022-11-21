@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! For the enum details, see the official document:
+//!  - [proto2 document](https://developers.google.com/protocol-buffers/docs/proto#enum)
+//!  - [proto3 document](https://developers.google.com/protocol-buffers/docs/proto3#enum)
+//!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
+
 use super::util::WeakExt;
 use super::{InputFileTrait, MessageTrait, PackageOrMessage, PackageTrait};
 use crate::codegen::utils::StrExt;
@@ -34,6 +39,7 @@ pub(super) struct Enum {
     name: String,
     input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+    values: Vec<(String, i32)>,
     rust_enum_path: OnceCell<Rc<TokenStream>>,
 }
 
@@ -43,10 +49,16 @@ impl Enum {
         input_file: Weak<dyn InputFileTrait>,
         parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
     ) -> Rc<Self> {
+        let values = proto
+            .value()
+            .into_iter()
+            .map(|v| (v.name().to_string(), v.number()))
+            .collect::<Vec<_>>();
         Rc::new(Enum {
             name: proto.name().to_string(),
             input_file,
             parent,
+            values,
             rust_enum_path: OnceCell::new(),
         })
     }
@@ -66,10 +78,19 @@ impl EnumTrait for Enum {
 
     fn gen_enum(&self) -> Result<TokenStream> {
         let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+        let values = self
+            .values
+            .iter()
+            .map(|(name, _)| {
+                let ident = format_ident!("{}", name.to_camel_case().escape_rust_keywords());
+                quote! {
+                    #ident,
+                }
+            })
+            .collect::<Vec<_>>();
         Ok(quote! {
             pub enum #ident {
-                Foo,
-                Bar,
+                #(#values)*
             }
         })
     }
