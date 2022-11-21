@@ -13,8 +13,10 @@
 // limitations under the License.
 
 use super::{EnumTrait, MessageOrEnum, MessageTrait, PackageTrait, RootPackage};
+use crate::codegen::utils::StrExt;
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
+use ::quote::{format_ident, quote};
 use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
@@ -60,6 +62,34 @@ impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
             PackageOrMessage::Package(p) => p.gen_rust_module_path(),
             PackageOrMessage::Message(m) => m.gen_rust_module_path(),
         }
+    }
+    pub(super) fn gen_module_file(&self) -> Result<TokenStream> {
+        let submodule_decls = self
+            .subpackages()?
+            .into_iter()
+            .map(|p| {
+                let ident =
+                    format_ident!("{}", p.name()?.to_lower_snake_case().escape_rust_keywords());
+                Ok(quote! {
+                    pub mod #ident;
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let struct_decls = self
+            .messages()?
+            .iter()
+            .map(|m| m.gen_struct())
+            .collect::<Result<Vec<_>>>()?;
+        let enum_decls = self
+            .enums()?
+            .iter()
+            .map(|e| e.gen_enum())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            #(#submodule_decls)*
+            #(#struct_decls)*
+            #(#enum_decls)*
+        })
     }
 
     pub(super) fn resolve_type_name(
