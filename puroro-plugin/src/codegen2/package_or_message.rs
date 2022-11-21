@@ -14,6 +14,7 @@
 
 use super::{EnumTrait, MessageOrEnum, MessageTrait, PackageTrait, RootPackage};
 use crate::{ErrorKind, Result};
+use ::std::borrow::Cow;
 use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
@@ -52,6 +53,12 @@ impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
                 Ok(p.parent()?.map(|parent| PackageOrMessage::Package(parent)))
             }
             PackageOrMessage::Message(m) => Ok(Some(m.parent()?)),
+        }
+    }
+    pub(super) fn rust_module_path(&self) -> Result<Cow<'_, str>> {
+        match self {
+            PackageOrMessage::Package(p) => p.rust_module_path(),
+            PackageOrMessage::Message(m) => m.rust_module_path().map(|s| s.into()),
         }
     }
 
