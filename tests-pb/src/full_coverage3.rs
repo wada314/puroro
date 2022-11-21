@@ -38,16 +38,16 @@ pub struct Msg {
     string_optional: self::_puroro::internal::field_type::OptionalStringField::<3usize>,
     string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
     enum_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
-        (),
+        self::_puroro_root::full_coverage3::Enum,
         self::_puroro::tags::Enum3<()>,
     >,
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
-        (),
+        self::_puroro_root::full_coverage3::Enum,
         self::_puroro::tags::Enum3<()>,
         4usize,
     >,
     enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
-        (),
+        self::_puroro_root::full_coverage3::Enum,
         self::_puroro::tags::Enum3<()>,
     >,
     submsg_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField::<

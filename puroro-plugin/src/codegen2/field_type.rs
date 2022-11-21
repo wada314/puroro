@@ -131,7 +131,7 @@ impl FieldType {
         }
     }
 
-    pub(super) fn rust_type(&self) -> Result<TokenStream> {
+    pub(super) fn rust_type(&self) -> Result<Rc<TokenStream>> {
         use FieldType::*;
         match self {
             Variant(v) => v.rust_type(),
@@ -152,16 +152,16 @@ impl FieldType {
 }
 
 impl VariantType {
-    fn rust_type(&self) -> Result<TokenStream> {
+    fn rust_type(&self) -> Result<Rc<TokenStream>> {
         use VariantType::*;
         Ok(match self {
-            Int32 | SInt32 => quote! { i32 },
-            UInt32 => quote! { u32 },
-            Int64 | SInt64 => quote! { i64 },
-            UInt64 => quote! { u64 },
-            Bool => quote! { bool },
-            Enum2(_) => quote! { () },
-            Enum3(_) => quote! { () },
+            Int32 | SInt32 => Rc::new(quote! { i32 }),
+            UInt32 => Rc::new(quote! { u32 }),
+            Int64 | SInt64 => Rc::new(quote! { i64 }),
+            UInt64 => Rc::new(quote! { u64 }),
+            Bool => Rc::new(quote! { bool }),
+            Enum2(e) => e.gen_rust_enum_path()?,
+            Enum3(e) => e.gen_rust_enum_path()?,
         })
     }
     fn tag_type(&self) -> Result<TokenStream> {
@@ -183,12 +183,12 @@ impl VariantType {
     }
 }
 impl LengthDelimitedType {
-    fn rust_type(&self) -> Result<TokenStream> {
+    fn rust_type(&self) -> Result<Rc<TokenStream>> {
         use LengthDelimitedType::*;
         Ok(match self {
-            String => quote! { ::std::string::String },
-            Bytes => quote! { ::std::vec::Vec<u8> },
-            Message(_) => quote! { () },
+            String => Rc::new(quote! { ::std::string::String }),
+            Bytes => Rc::new(quote! { ::std::vec::Vec<u8> }),
+            Message(m) => m.gen_rust_struct_path()?,
         })
     }
     fn tag_type(&self) -> Result<TokenStream> {
@@ -204,13 +204,13 @@ impl LengthDelimitedType {
     }
 }
 impl Bits32Type {
-    fn rust_type(&self) -> Result<TokenStream> {
+    fn rust_type(&self) -> Result<Rc<TokenStream>> {
         use Bits32Type::*;
-        Ok(match self {
+        Ok(Rc::new(match self {
             Fixed32 => quote! { u32 },
             SFixed32 => quote! { i32 },
             Float => quote! { f32 },
-        })
+        }))
     }
     fn tag_type(&self) -> Result<TokenStream> {
         use Bits32Type::*;
@@ -225,13 +225,13 @@ impl Bits32Type {
     }
 }
 impl Bits64Type {
-    fn rust_type(&self) -> Result<TokenStream> {
+    fn rust_type(&self) -> Result<Rc<TokenStream>> {
         use Bits64Type::*;
-        Ok(match self {
+        Ok(Rc::new(match self {
             Fixed64 => quote! { u64 },
             SFixed64 => quote! { i64 },
             Double => quote! { f64 },
-        })
+        }))
     }
     fn tag_type(&self) -> Result<TokenStream> {
         use Bits64Type::*;

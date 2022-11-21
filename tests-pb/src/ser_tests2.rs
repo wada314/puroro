@@ -28,12 +28,12 @@ pub struct Msg {
     submsg_optional: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
     submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<()>,
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
-        (),
+        self::_puroro_root::ser_tests2::Enum,
         self::_puroro::tags::Enum2<()>,
         3usize,
     >,
     enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
-        (),
+        self::_puroro_root::ser_tests2::Enum,
         self::_puroro::tags::Enum2<()>,
     >,
     very_large_field_number: self::_puroro::internal::field_type::OptionalNumericalField::<
