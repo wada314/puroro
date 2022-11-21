@@ -33,8 +33,11 @@ pub(super) trait MessageTrait: Debug {
     fn resolve_type_name(
         self: Rc<Self>,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        todo!()
+    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>
+    where
+        Self: 'static + Sized,
+    {
+        PackageOrMessage::Message(self as Rc<dyn MessageTrait>).resolve_type_name(type_name)
     }
 }
 

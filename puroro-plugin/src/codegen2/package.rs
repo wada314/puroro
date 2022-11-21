@@ -30,6 +30,7 @@ pub(super) trait PackageTrait: Debug {
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
+    fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
@@ -38,6 +39,12 @@ pub(super) trait PackageTrait: Debug {
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
         self.base()?.enums()
     }
+    fn subpackages(&self) -> Result<&[Rc<dyn PackageTrait>]> {
+        self.base()?.subpackages()
+    }
+    fn root(&self) -> Result<Rc<RootPackage>> {
+        self.base()?.root.try_upgrade()
+    }
     fn resolve_type_name(
         self: Rc<Self>,
         type_name: &str,
@@ -45,8 +52,7 @@ pub(super) trait PackageTrait: Debug {
     where
         Self: 'static + Sized,
     {
-        let obj = Rc::clone(&self) as Rc<dyn PackageTrait>;
-        resolve_type_name_impl(obj, type_name)
+        PackageOrMessage::Package(self as Rc<dyn PackageTrait>).resolve_type_name(type_name)
     }
 
     fn gen_module_file(&self) -> Result<TokenStream>;
@@ -54,7 +60,8 @@ pub(super) trait PackageTrait: Debug {
 
 #[derive(Debug)]
 pub(super) struct PackageBase {
-    subpackages: HashMap<String, Rc<NonRootPackage>>,
+    subpackages_map: HashMap<String, Rc<NonRootPackage>>,
+    subpackages: OnceCell<Vec<Rc<dyn PackageTrait>>>,
     files: Vec<Rc<dyn InputFileTrait>>,
     root: Weak<RootPackage>,
     messages: OnceCell<Vec<Rc<dyn MessageTrait>>>,
@@ -114,7 +121,8 @@ impl PackageBase {
 
         PackageBase {
             root,
-            subpackages,
+            subpackages_map: subpackages,
+            subpackages: OnceCell::new(),
             files: self_files,
             messages: OnceCell::new(),
             enums: OnceCell::new(),
@@ -123,7 +131,7 @@ impl PackageBase {
 
     fn gen_submodule_decls(&self) -> Result<Vec<TokenStream>> {
         Ok(self
-            .subpackages
+            .subpackages_map
             .keys()
             .sorted()
             .map(|name| {
@@ -166,6 +174,19 @@ impl PackageBase {
             })
             .map(|v| v.as_slice())
     }
+
+    fn subpackages(&self) -> Result<&[Rc<dyn PackageTrait>]> {
+        self.subpackages
+            .get_or_try_init(|| {
+                Ok(self
+                    .subpackages_map
+                    .values()
+                    .cloned()
+                    .map(|p| p as Rc<dyn PackageTrait>)
+                    .collect())
+            })
+            .map(|sp| sp.as_slice())
+    }
 }
 
 impl RootPackage {
@@ -206,9 +227,9 @@ impl RootPackage {
 
     pub(super) fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn PackageTrait>> {
         let mut ret = vec![Rc::clone(self) as Rc<dyn PackageTrait>];
-        let mut stack = self.base.subpackages.values().cloned().collect_vec();
+        let mut stack = self.base.subpackages_map.values().cloned().collect_vec();
         while let Some(p) = stack.pop() {
-            stack.extend(p.base.subpackages.values().cloned());
+            stack.extend(p.base.subpackages_map.values().cloned());
             ret.push(p as Rc<dyn PackageTrait>);
         }
         ret
@@ -258,6 +279,9 @@ impl PackageTrait for RootPackage {
         Ok("lib.rs".into())
     }
     fn module_file_dir(&self) -> Result<Cow<'_, str>> {
+        Ok("".into())
+    }
+    fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
     fn full_name(&self) -> Result<Cow<'_, str>> {
@@ -310,6 +334,9 @@ impl PackageTrait for NonRootPackage {
             })
             .map(|s| s.into())
     }
+    fn name(&self) -> Result<Cow<'_, str>> {
+        Ok(self.name.as_str().into())
+    }
     fn full_name(&self) -> Result<Cow<'_, str>> {
         let parent = self.parent.try_upgrade()?;
         let parent_full_name = parent.full_name()?;
@@ -336,69 +363,6 @@ impl PackageTrait for NonRootPackage {
     fn base(&self) -> Result<&PackageBase> {
         Ok(&self.base)
     }
-}
-
-fn resolve_type_name_impl(
-    cur: Rc<dyn PackageTrait>,
-    type_name: &str,
-) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-    // Case 1, the given type name is an absolute path.
-    // If the type_name starts with '.', then redirect it to the root package.
-    if let Some(abs_type_name) = type_name.strip_prefix('.') {
-        return cur
-            .base()?
-            .root
-            .try_upgrade()?
-            .resolve_type_name(abs_type_name);
-    }
-
-    // Case 2, the next component of the path is a subpackage.
-    // Extract the next component of the path. It must be non-empty, and must have another child.
-    if let Some((subpackage_name, rest)) = type_name.split_once('.') {
-        if let Some(subpackage) = cur.base()?.subpackages.get(subpackage_name) {
-            // Can dig into a subpackage. Go ahead.
-            return subpackage.resolve_type_name(rest);
-        } else {
-            // When the next path component is an enclosing message, then this case can happen.
-            // Do nothing, go to the next section.
-        }
-    }
-
-    // Case 3, no more package components. The further packages are either an enum or
-    // an (enclosing) message.
-    // Go deeper until the component before the last component.
-    let mut p_or_m = PackageOrMessage::Package(cur);
-    let mut rest = type_name;
-    for subcomponent in iter::from_fn(|| match rest.split_once('.') {
-        Some((sc, rest_rest)) => {
-            rest = rest_rest;
-            Some(sc)
-        }
-        None => None,
-    }) {
-        let submessage = p_or_m
-            .messages()?
-            .into_iter()
-            .find(|m| m.name() == subcomponent)
-            .ok_or(ErrorKind::UnknownTypeName {
-                name: type_name.to_string(),
-            })?;
-        p_or_m = PackageOrMessage::Message(Rc::clone(&submessage))
-    }
-
-    // Case 3.1, the last component is an enum.
-    if let Some(enume) = p_or_m.enums()?.iter().find(|e| e.name() == type_name) {
-        return Ok(MessageOrEnum::Enum(Rc::clone(enume)));
-    }
-
-    // Case 3.2, the last component is a message.
-    if let Some(message) = p_or_m.messages()?.iter().find(|m| m.name() == type_name) {
-        return Ok(MessageOrEnum::Message(Rc::clone(message)));
-    }
-
-    Err(ErrorKind::UnknownTypeName {
-        name: type_name.to_string(),
-    })?
 }
 
 #[cfg(test)]
@@ -457,23 +421,23 @@ mod tests {
         let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
 
         assert_eq!(0, root_package.base.files.len());
-        assert_eq!(1, root_package.base.subpackages.len());
-        assert!(root_package.base.subpackages.contains_key("google"));
+        assert_eq!(1, root_package.base.subpackages_map.len());
+        assert!(root_package.base.subpackages_map.contains_key("google"));
 
-        let package_g = Rc::clone(&root_package.base.subpackages["google"]);
+        let package_g = Rc::clone(&root_package.base.subpackages_map["google"]);
         assert_eq!("google", package_g.name);
         assert_eq!(0, package_g.base.files.len());
-        assert_eq!(1, package_g.base.subpackages.len());
-        assert!(package_g.base.subpackages.contains_key("protobuf"));
+        assert_eq!(1, package_g.base.subpackages_map.len());
+        assert!(package_g.base.subpackages_map.contains_key("protobuf"));
 
-        let package_g_p = Rc::clone(&package_g.base.subpackages["protobuf"]);
+        let package_g_p = Rc::clone(&package_g.base.subpackages_map["protobuf"]);
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!(1, package_g_p.base.files.len());
         assert_eq!(
             "google.protobuf",
             package_g_p.base.files[0].package()?.full_name()?
         );
-        assert_eq!(0, package_g_p.base.subpackages.len());
+        assert_eq!(0, package_g_p.base.subpackages_map.len());
 
         Ok(())
     }
@@ -490,16 +454,16 @@ mod tests {
 
         assert_eq!(1, root_package.base.files.len());
         assert_eq!("", root_package.base.files[0].package()?.full_name()?);
-        assert_eq!(1, root_package.base.subpackages.len());
-        assert!(root_package.base.subpackages.contains_key("google"));
+        assert_eq!(1, root_package.base.subpackages_map.len());
+        assert!(root_package.base.subpackages_map.contains_key("google"));
 
-        let package_g = Rc::clone(&root_package.base.subpackages["google"]);
+        let package_g = Rc::clone(&root_package.base.subpackages_map["google"]);
         assert_eq!("google", package_g.name);
         assert_eq!(0, package_g.base.files.len());
-        assert_eq!(1, package_g.base.subpackages.len());
-        assert!(package_g.base.subpackages.contains_key("protobuf"));
+        assert_eq!(1, package_g.base.subpackages_map.len());
+        assert!(package_g.base.subpackages_map.contains_key("protobuf"));
 
-        let package_g_p = Rc::clone(&package_g.base.subpackages["protobuf"]);
+        let package_g_p = Rc::clone(&package_g.base.subpackages_map["protobuf"]);
         assert_eq!("protobuf", package_g_p.name);
         assert_eq!(2, package_g_p.base.files.len());
         assert_eq!(
@@ -510,13 +474,13 @@ mod tests {
             "google.protobuf",
             package_g_p.base.files[1].package()?.full_name()?
         );
-        assert_eq!(1, package_g_p.base.subpackages.len());
-        assert!(package_g_p.base.subpackages.contains_key("compiler"));
+        assert_eq!(1, package_g_p.base.subpackages_map.len());
+        assert!(package_g_p.base.subpackages_map.contains_key("compiler"));
 
-        let package_g_p_c = Rc::clone(&package_g_p.base.subpackages["compiler"]);
+        let package_g_p_c = Rc::clone(&package_g_p.base.subpackages_map["compiler"]);
         assert_eq!("compiler", package_g_p_c.name);
         assert_eq!(1, package_g_p_c.base.files.len());
-        assert_eq!(0, package_g_p_c.base.subpackages.len());
+        assert_eq!(0, package_g_p_c.base.subpackages_map.len());
 
         Ok(())
     }

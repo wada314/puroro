@@ -20,6 +20,7 @@ mod input_file;
 mod message;
 mod oneof;
 mod package;
+mod package_or_message;
 mod util;
 use self::r#enum::*;
 use self::field::*;
@@ -29,6 +30,7 @@ use self::input_file::*;
 use self::message::*;
 use self::oneof::*;
 use self::package::*;
+use self::package_or_message::*;
 use self::util::*;
 use crate::{ErrorKind, GeneratorError, Result};
 use ::proc_macro2::TokenStream;
@@ -52,26 +54,6 @@ impl TryFrom<&str> for Syntax {
                 name: value.to_string(),
             })?,
         })
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-enum PackageOrMessage<P, M> {
-    Package(P),
-    Message(M),
-}
-impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
-        match self {
-            PackageOrMessage::Package(p) => p.messages(),
-            PackageOrMessage::Message(m) => m.messages(),
-        }
-    }
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
-        match self {
-            PackageOrMessage::Package(p) => p.enums(),
-            PackageOrMessage::Message(m) => m.enums(),
-        }
     }
 }
 
