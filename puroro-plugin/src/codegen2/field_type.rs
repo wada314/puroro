@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::r#enum::EnumTrait;
 use super::field::FieldTrait;
-use super::util::WeakExt;
-use super::MessageOrEnum;
-use super::Syntax;
+use super::message::MessageTrait;
+use super::{MessageOrEnum, Syntax};
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
@@ -38,14 +38,14 @@ pub(super) enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(String),
-    Enum3(String),
+    Enum2(Rc<dyn EnumTrait>),
+    Enum3(Rc<dyn EnumTrait>),
 }
 #[derive(Debug, Clone)]
 pub(super) enum LengthDelimitedType {
     String,
     Bytes,
-    Message(String),
+    Message(Rc<dyn MessageTrait>),
 }
 #[derive(Debug, Clone)]
 pub(super) enum Bits32Type {
@@ -74,38 +74,61 @@ impl FieldType {
         use LengthDelimitedType::*;
         use VariantType::*;
 
-        let r#type = if let Some(t) = type_opt {
-            t
-        } else {
-            match field.message()?.resolve_type_name(type_name)? {
-                MessageOrEnum::Message(_) => TypeMessage,
-                MessageOrEnum::Enum(_) => TypeEnum,
-            }
-        };
+        let maybe_m_or_e = (!type_name.is_empty())
+            .then(|| -> Result<_> { Ok(field.message()?.resolve_type_name(type_name)?) })
+            .transpose()?;
 
-        Ok(match r#type {
-            TypeInt32 => Variant(Int32),
-            TypeUint32 => Variant(UInt32),
-            TypeSint32 => Variant(SInt32),
-            TypeInt64 => Variant(Int64),
-            TypeUint64 => Variant(UInt64),
-            TypeSint64 => Variant(SInt64),
-            TypeBool => Variant(Bool),
-            TypeEnum => match syntax {
-                Syntax::Proto2 => Variant(Enum2(type_name.to_string())),
-                Syntax::Proto3 => Variant(Enum3(type_name.to_string())),
-            },
-            TypeFixed32 => Bits32(Fixed32),
-            TypeSfixed32 => Bits32(SFixed32),
-            TypeFloat => Bits32(Float),
-            TypeFixed64 => Bits64(Fixed64),
-            TypeSfixed64 => Bits64(SFixed64),
-            TypeDouble => Bits64(Double),
-            TypeString => LengthDelimited(String),
-            TypeBytes => LengthDelimited(Bytes),
-            TypeGroup => Err(ErrorKind::GroupNotSupported)?,
-            TypeMessage => LengthDelimited(Message(type_name.to_string())),
-        })
+        if let Some(r#type) = type_opt {
+            Ok(match r#type {
+                TypeInt32 => Variant(Int32),
+                TypeUint32 => Variant(UInt32),
+                TypeSint32 => Variant(SInt32),
+                TypeInt64 => Variant(Int64),
+                TypeUint64 => Variant(UInt64),
+                TypeSint64 => Variant(SInt64),
+                TypeBool => Variant(Bool),
+                TypeEnum => {
+                    if let Some(MessageOrEnum::Enum(e)) = maybe_m_or_e {
+                        match syntax {
+                            Syntax::Proto2 => Variant(Enum2(e)),
+                            Syntax::Proto3 => Variant(Enum3(e)),
+                        }
+                    } else {
+                        Err(ErrorKind::UnknownTypeName {
+                            name: type_name.to_string(),
+                        })?
+                    }
+                }
+                TypeFixed32 => Bits32(Fixed32),
+                TypeSfixed32 => Bits32(SFixed32),
+                TypeFloat => Bits32(Float),
+                TypeFixed64 => Bits64(Fixed64),
+                TypeSfixed64 => Bits64(SFixed64),
+                TypeDouble => Bits64(Double),
+                TypeString => LengthDelimited(String),
+                TypeBytes => LengthDelimited(Bytes),
+                TypeGroup => Err(ErrorKind::GroupNotSupported)?,
+                TypeMessage => {
+                    if let Some(MessageOrEnum::Message(m)) = maybe_m_or_e {
+                        LengthDelimited(Message(m))
+                    } else {
+                        Err(ErrorKind::UnknownTypeName {
+                            name: type_name.to_string(),
+                        })?
+                    }
+                }
+            })
+        } else if let Some(m_or_e) = maybe_m_or_e {
+            Ok(match m_or_e {
+                MessageOrEnum::Message(m) => LengthDelimited(Message(m)),
+                MessageOrEnum::Enum(e) => match syntax {
+                    Syntax::Proto2 => Variant(Enum2(e)),
+                    Syntax::Proto3 => Variant(Enum3(e)),
+                },
+            })
+        } else {
+            Err(ErrorKind::MissingTypeName)?
+        }
     }
 
     pub(super) fn rust_type(&self) -> Result<TokenStream> {
