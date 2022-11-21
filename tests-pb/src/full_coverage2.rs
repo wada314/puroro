@@ -198,3 +198,7 @@ pub struct Msg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+pub enum Enum {
+    Foo,
+    Bar,
+}

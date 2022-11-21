@@ -146,10 +146,14 @@ impl PackageBase {
 
     fn gen_struct_decls(&self) -> Result<Vec<TokenStream>> {
         Ok(self
-            .files
+            .messages()?
             .iter()
-            .map(|f| f.gen_structs_for_messages())
+            .map(|m| m.gen_struct())
             .try_collect()?)
+    }
+
+    fn gen_enum_decls(&self) -> Result<Vec<TokenStream>> {
+        Ok(self.enums()?.iter().map(|e| e.gen_enum()).try_collect()?)
     }
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
@@ -298,6 +302,7 @@ impl PackageTrait for RootPackage {
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
+        let enum_decls = self.base.gen_enum_decls()?;
         Ok(quote! {
             //! "Generated from root package"
 
@@ -315,6 +320,7 @@ impl PackageTrait for RootPackage {
 
             #(#submodule_decls)*
             #(#struct_decls)*
+            #(#enum_decls)*
         })
     }
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
@@ -380,6 +386,7 @@ impl PackageTrait for NonRootPackage {
     fn gen_module_file(&self) -> Result<TokenStream> {
         let submodule_decls = self.base.gen_submodule_decls()?;
         let struct_decls = self.base.gen_struct_decls()?;
+        let enum_decls = self.base.gen_enum_decls()?;
         Ok(quote! {
             pub mod _puroro_root {
                 pub use super::super::_puroro_root::*;
@@ -389,6 +396,7 @@ impl PackageTrait for NonRootPackage {
             }
             #(#submodule_decls)*
             #(#struct_decls)*
+            #(#enum_decls)*
         })
     }
     fn base(&self) -> Result<&PackageBase> {

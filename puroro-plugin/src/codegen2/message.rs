@@ -29,13 +29,13 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait MessageTrait: Debug {
-    fn gen_struct(&self) -> Result<TokenStream>;
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
     fn parent(&self) -> Result<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> &str;
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
+    fn gen_struct(&self) -> Result<TokenStream>;
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;

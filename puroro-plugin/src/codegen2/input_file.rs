@@ -28,7 +28,6 @@ pub(super) trait InputFileTrait: Debug {
     fn package(&self) -> Result<Rc<dyn PackageTrait>>;
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
-    fn gen_structs_for_messages(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
@@ -117,17 +116,6 @@ impl InputFileTrait for InputFile {
 
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
         Ok(&self.enums)
-    }
-
-    fn gen_structs_for_messages(&self) -> Result<TokenStream> {
-        let message_structs = self
-            .messages
-            .iter()
-            .map(|m| m.gen_struct())
-            .collect::<Result<Vec<_>>>()?;
-        Ok(quote! {
-            #(#message_structs)*
-        })
     }
 }
 

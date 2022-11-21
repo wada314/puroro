@@ -25,6 +25,7 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait EnumTrait: Debug {
     fn name(&self) -> &str;
+    fn gen_enum(&self) -> Result<TokenStream>;
     fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>>;
 }
 
@@ -61,6 +62,16 @@ impl Enum {
 impl EnumTrait for Enum {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn gen_enum(&self) -> Result<TokenStream> {
+        let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+        Ok(quote! {
+            pub enum #ident {
+                Foo,
+                Bar,
+            }
+        })
     }
 
     fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>> {
