@@ -23,7 +23,7 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait EnumTrait: Debug {
     fn name(&self) -> &str;
-    fn rust_struct_path(&self) -> Result<&str>;
+    fn rust_enum_path(&self) -> Result<&str>;
 }
 
 #[derive(Debug)]
@@ -31,7 +31,7 @@ pub(super) struct Enum {
     name: String,
     input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
-    rust_struct_path: OnceCell<String>,
+    rust_enum_path: OnceCell<String>,
 }
 
 impl Enum {
@@ -44,7 +44,7 @@ impl Enum {
             name: proto.name().to_string(),
             input_file,
             parent,
-            rust_struct_path: OnceCell::new(),
+            rust_enum_path: OnceCell::new(),
         })
     }
 
@@ -61,8 +61,8 @@ impl EnumTrait for Enum {
         &self.name
     }
 
-    fn rust_struct_path(&self) -> Result<&str> {
-        self.rust_struct_path
+    fn rust_enum_path(&self) -> Result<&str> {
+        self.rust_enum_path
             .get_or_try_init(|| {
                 Ok(format!(
                     "{}::{}",
