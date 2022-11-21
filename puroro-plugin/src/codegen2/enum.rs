@@ -25,7 +25,7 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait EnumTrait: Debug {
     fn name(&self) -> &str;
-    fn gen_rust_enum_path(&self) -> Result<&TokenStream>;
+    fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>>;
 }
 
 #[derive(Debug)]
@@ -33,7 +33,7 @@ pub(super) struct Enum {
     name: String,
     input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
-    rust_enum_path: OnceCell<TokenStream>,
+    rust_enum_path: OnceCell<Rc<TokenStream>>,
 }
 
 impl Enum {
@@ -63,12 +63,14 @@ impl EnumTrait for Enum {
         &self.name
     }
 
-    fn gen_rust_enum_path(&self) -> Result<&TokenStream> {
-        self.rust_enum_path.get_or_try_init(|| {
-            let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
-            let parent = self.parent()?.gen_rust_module_path()?;
-            Ok(quote! { #parent :: #ident })
-        })
+    fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>> {
+        self.rust_enum_path
+            .get_or_try_init(|| {
+                let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+                let parent = self.parent()?.gen_rust_module_path()?;
+                Ok(Rc::new(quote! { #parent :: #ident }))
+            })
+            .cloned()
     }
 }
 

@@ -54,7 +54,7 @@ pub(super) trait PackageTrait: Debug {
         PackageOrMessage::Package(self.as_dyn_rc()).resolve_type_name(type_name)
     }
 
-    fn gen_rust_module_path(&self) -> Result<&TokenStream>;
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
     fn gen_module_file(&self) -> Result<TokenStream>;
 }
 
@@ -74,7 +74,7 @@ pub(super) struct NonRootPackage {
     parent: Weak<dyn PackageTrait>,
     base: PackageBase,
     module_file_dir: OnceCell<String>,
-    rust_module_path: OnceCell<TokenStream>,
+    rust_module_path: OnceCell<Rc<TokenStream>>,
 }
 
 #[derive(Debug)]
@@ -317,9 +317,8 @@ impl PackageTrait for RootPackage {
             #(#struct_decls)*
         })
     }
-    fn gen_rust_module_path(&self) -> Result<&TokenStream> {
-        const path: TokenStream = quote! { self :: _puroro_root };
-        Ok(&path)
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        Ok(Rc::new(quote! { self :: _puroro_root }))
     }
     fn base(&self) -> Result<&PackageBase> {
         Ok(&self.base)
@@ -346,7 +345,7 @@ impl PackageTrait for NonRootPackage {
             })
             .map(|s| s.into())
     }
-    fn gen_rust_module_path(&self) -> Result<&TokenStream> {
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
         self.rust_module_path
             .get_or_try_init(|| {
                 let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
@@ -354,11 +353,11 @@ impl PackageTrait for NonRootPackage {
                     "{}",
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
-                Ok(quote! {
+                Ok(Rc::new(quote! {
                     #parent :: #ident
-                })
+                }))
             })
-            .map(|s| s.into())
+            .cloned()
     }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok(self.name.as_str().into())

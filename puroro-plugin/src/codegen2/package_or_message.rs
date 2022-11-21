@@ -55,7 +55,7 @@ impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
             PackageOrMessage::Message(m) => Ok(Some(m.parent()?)),
         }
     }
-    pub(super) fn gen_rust_module_path(&self) -> Result<&TokenStream> {
+    pub(super) fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
         match self {
             PackageOrMessage::Package(p) => p.gen_rust_module_path(),
             PackageOrMessage::Message(m) => m.gen_rust_module_path(),
