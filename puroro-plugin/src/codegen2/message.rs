@@ -31,6 +31,7 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait MessageTrait: Debug {
     fn gen_struct(&self) -> Result<TokenStream>;
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
+    fn parent(&self) -> Result<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> &str;
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
@@ -166,6 +167,12 @@ impl MessageTrait for Message {
     }
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>> {
         Ok(self.input_file.try_upgrade()?)
+    }
+    fn parent(&self) -> Result<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>> {
+        Ok(match &self.parent {
+            PackageOrMessage::Package(p) => PackageOrMessage::Package(p.try_upgrade()?),
+            PackageOrMessage::Message(m) => PackageOrMessage::Message(m.try_upgrade()?),
+        })
     }
 
     fn bitfield_size(&self) -> Result<usize> {

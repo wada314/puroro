@@ -32,6 +32,7 @@ pub(super) trait PackageTrait: Debug {
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
+    fn parent(&self) -> Result<Option<Rc<dyn PackageTrait>>>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait>;
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
@@ -285,6 +286,9 @@ impl PackageTrait for RootPackage {
     fn full_name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
+    fn parent(&self) -> Result<Option<Rc<dyn PackageTrait>>> {
+        Ok(None)
+    }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
         self
     }
@@ -346,6 +350,9 @@ impl PackageTrait for NonRootPackage {
         } else {
             Ok(format!("{}.{}", parent_full_name, &self.name).into())
         }
+    }
+    fn parent(&self) -> Result<Option<Rc<dyn PackageTrait>>> {
+        Ok(Some(self.parent.try_upgrade()?))
     }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
         self

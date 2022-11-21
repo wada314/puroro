@@ -46,6 +46,14 @@ impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
             PackageOrMessage::Message(m) => m.input_file()?.package()?.root(),
         }
     }
+    pub(super) fn parent(&self) -> Result<Option<Self>> {
+        match self {
+            PackageOrMessage::Package(p) => {
+                Ok(p.parent()?.map(|parent| PackageOrMessage::Package(parent)))
+            }
+            PackageOrMessage::Message(m) => Ok(Some(m.parent()?)),
+        }
+    }
 
     pub(super) fn resolve_type_name(
         &self,
