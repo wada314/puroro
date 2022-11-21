@@ -7,12 +7,12 @@ pub mod _puroro {
 pub struct Msg {
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         self::_puroro_root::enum2::Enum,
-        self::_puroro::tags::Enum2<()>,
+        self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
         0usize,
     >,
     enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         self::_puroro_root::enum2::Enum,
-        self::_puroro::tags::Enum2<()>,
+        self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }

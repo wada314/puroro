@@ -140,7 +140,7 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
-    pub(super) fn tag_type(&self) -> Result<TokenStream> {
+    pub(super) fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use FieldType::*;
         match self {
             Variant(v) => v.tag_type(),
@@ -164,7 +164,7 @@ impl VariantType {
             Enum3(e) => e.gen_rust_enum_path()?,
         })
     }
-    fn tag_type(&self) -> Result<TokenStream> {
+    fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use VariantType::*;
         let tag_name = match self {
             Int32 => quote! { Int32 },
@@ -174,12 +174,18 @@ impl VariantType {
             SInt64 => quote! { SInt64 },
             UInt64 => quote! { UInt64 },
             Bool => quote! { Bool },
-            Enum2(_) => quote! { Enum2<()> },
-            Enum3(_) => quote! { Enum3<()> },
+            Enum2(e) => {
+                let enum_path = e.gen_rust_enum_path()?;
+                quote! { Enum2 :: <#enum_path> }
+            }
+            Enum3(e) => {
+                let enum_path = e.gen_rust_enum_path()?;
+                quote! { Enum3 :: <#enum_path> }
+            }
         };
-        Ok(quote! {
+        Ok(Rc::new(quote! {
             self::_puroro::tags::#tag_name
-        })
+        }))
     }
 }
 impl LengthDelimitedType {
@@ -191,16 +197,19 @@ impl LengthDelimitedType {
             Message(m) => m.gen_rust_struct_path()?,
         })
     }
-    fn tag_type(&self) -> Result<TokenStream> {
+    fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use LengthDelimitedType::*;
         let tag_name = match self {
             String => quote! { String },
             Bytes => quote! { Bytes },
-            Message(_) => quote! { Message<()> },
+            Message(m) => {
+                let struct_path = m.gen_rust_struct_path()?;
+                quote! { Message :: <#struct_path> }
+            }
         };
-        Ok(quote! {
+        Ok(Rc::new(quote! {
             self::_puroro::tags::#tag_name
-        })
+        }))
     }
 }
 impl Bits32Type {
@@ -212,16 +221,16 @@ impl Bits32Type {
             Float => quote! { f32 },
         }))
     }
-    fn tag_type(&self) -> Result<TokenStream> {
+    fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use Bits32Type::*;
         let tag_name = match self {
             Fixed32 => quote! { Fixed32 },
             SFixed32 => quote! { SFixed32 },
             Float => quote! { Float },
         };
-        Ok(quote! {
+        Ok(Rc::new(quote! {
             self::_puroro::tags::#tag_name
-        })
+        }))
     }
 }
 impl Bits64Type {
@@ -233,15 +242,15 @@ impl Bits64Type {
             Double => quote! { f64 },
         }))
     }
-    fn tag_type(&self) -> Result<TokenStream> {
+    fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use Bits64Type::*;
         let tag_name = match self {
             Fixed64 => quote! { Fixed64 },
             SFixed64 => quote! { SFixed64 },
             Double => quote! { Double },
         };
-        Ok(quote! {
+        Ok(Rc::new(quote! {
             self::_puroro::tags::#tag_name
-        })
+        }))
     }
 }

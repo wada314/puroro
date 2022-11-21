@@ -41,17 +41,17 @@ pub struct Msg {
     string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
     enum_required: self::_puroro::internal::field_type::OptionalNumericalField::<
         self::_puroro_root::full_coverage2::Enum,
-        self::_puroro::tags::Enum2<()>,
+        self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
         8usize,
     >,
     enum_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         self::_puroro_root::full_coverage2::Enum,
-        self::_puroro::tags::Enum2<()>,
+        self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
         9usize,
     >,
     enum_repeated: self::_puroro::internal::field_type::RepeatedNumericalField::<
         self::_puroro_root::full_coverage2::Enum,
-        self::_puroro::tags::Enum2<()>,
+        self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
     >,
     submsg_required: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
     submsg_optional: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
