@@ -39,13 +39,13 @@ pub(super) trait PackageTrait: Debug {
         self.base()?.enums()
     }
     fn resolve_type_name(
-        self: &Rc<Self>,
+        self: Rc<Self>,
         type_name: &str,
     ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>>
     where
         Self: 'static + Sized,
     {
-        let obj = Rc::clone(self) as Rc<dyn PackageTrait>;
+        let obj = Rc::clone(&self) as Rc<dyn PackageTrait>;
         resolve_type_name_impl(obj, type_name)
     }
 
