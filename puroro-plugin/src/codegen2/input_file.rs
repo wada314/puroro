@@ -15,7 +15,9 @@
 use super::*;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
+use ::puroro_protobuf_compiled::google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
+};
 use ::quote::quote;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
@@ -36,24 +38,32 @@ pub(super) struct InputFile {
     syntax_cell: OnceCell<Syntax>,
     package: Weak<dyn PackageTrait>,
     messages: Vec<Rc<dyn MessageTrait>>,
+    enums: Vec<Rc<dyn EnumTrait>>,
 }
 
 impl InputFile {
     pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
-        Self::new_with(proto, package, Message::new)
+        Self::new_with(proto, package, Message::new, Enum::new)
     }
-    fn new_with<FM, M>(
+    fn new_with<FM, M, FE, E>(
         proto: &FileDescriptorProto,
         package: Weak<dyn PackageTrait>,
-        mut fm: FM,
+        fm: FM,
+        fe: FE,
     ) -> Rc<Self>
     where
-        FM: FnMut(
+        FM: Fn(
             &DescriptorProto,
             Weak<dyn InputFileTrait>,
             PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
         ) -> Rc<M>,
+        FE: Fn(
+            &EnumDescriptorProto,
+            Weak<dyn InputFileTrait>,
+            PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+        ) -> Rc<E>,
         M: 'static + MessageTrait,
+        E: 'static + EnumTrait,
     {
         Rc::new_cyclic(|weak| Self {
             name: proto.name().to_string(),
@@ -69,6 +79,17 @@ impl InputFile {
                         Weak::clone(weak) as Weak<dyn InputFileTrait>,
                         PackageOrMessage::Package(Weak::clone(&package)),
                     ) as Rc<dyn MessageTrait>
+                })
+                .collect(),
+            enums: proto
+                .enum_type()
+                .into_iter()
+                .map(|e| {
+                    fe(
+                        e,
+                        Weak::clone(weak) as Weak<dyn InputFileTrait>,
+                        PackageOrMessage::Package(Weak::clone(&package)),
+                    ) as Rc<dyn EnumTrait>
                 })
                 .collect(),
         })
@@ -95,7 +116,7 @@ impl InputFileTrait for InputFile {
     }
 
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
-        Ok(&[])
+        Ok(&self.enums)
     }
 
     fn gen_structs_for_messages(&self) -> Result<TokenStream> {

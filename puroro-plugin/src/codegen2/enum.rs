@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{MessageTrait, PackageOrMessage, PackageTrait};
+use super::{InputFileTrait, MessageTrait, PackageOrMessage, PackageTrait};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 use ::std::fmt::Debug;
@@ -25,16 +25,19 @@ pub(super) trait EnumTrait: Debug {
 #[derive(Debug)]
 pub(super) struct Enum {
     name: String,
+    input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
 }
 
 impl Enum {
     pub(super) fn new(
         proto: &EnumDescriptorProto,
+        input_file: Weak<dyn InputFileTrait>,
         parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
     ) -> Rc<Self> {
         Rc::new(Enum {
             name: proto.name().to_string(),
+            input_file,
             parent,
         })
     }
