@@ -29,7 +29,6 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait PackageTrait: Debug {
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
-    fn rust_module_path(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
@@ -55,6 +54,7 @@ pub(super) trait PackageTrait: Debug {
         PackageOrMessage::Package(self.as_dyn_rc()).resolve_type_name(type_name)
     }
 
+    fn gen_rust_module_path(&self) -> Result<&TokenStream>;
     fn gen_module_file(&self) -> Result<TokenStream>;
 }
 
@@ -74,7 +74,7 @@ pub(super) struct NonRootPackage {
     parent: Weak<dyn PackageTrait>,
     base: PackageBase,
     module_file_dir: OnceCell<String>,
-    rust_module_path: OnceCell<String>,
+    rust_module_path: OnceCell<TokenStream>,
 }
 
 #[derive(Debug)]
@@ -283,9 +283,6 @@ impl PackageTrait for RootPackage {
     fn module_file_dir(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
-    fn rust_module_path(&self) -> Result<Cow<'_, str>> {
-        Ok("self::_puroro_root".into())
-    }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
@@ -320,6 +317,10 @@ impl PackageTrait for RootPackage {
             #(#struct_decls)*
         })
     }
+    fn gen_rust_module_path(&self) -> Result<&TokenStream> {
+        const path: TokenStream = quote! { self :: _puroro_root };
+        Ok(&path)
+    }
     fn base(&self) -> Result<&PackageBase> {
         Ok(&self.base)
     }
@@ -345,14 +346,17 @@ impl PackageTrait for NonRootPackage {
             })
             .map(|s| s.into())
     }
-    fn rust_module_path(&self) -> Result<Cow<'_, str>> {
+    fn gen_rust_module_path(&self) -> Result<&TokenStream> {
         self.rust_module_path
             .get_or_try_init(|| {
-                Ok(format!(
-                    "{}::{}",
-                    self.parent.try_upgrade()?.rust_module_path()?,
+                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
+                let ident = format_ident!(
+                    "{}",
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
-                ))
+                );
+                Ok(quote! {
+                    #parent :: #ident
+                })
             })
             .map(|s| s.into())
     }

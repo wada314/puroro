@@ -14,7 +14,7 @@
 
 use super::{EnumTrait, MessageOrEnum, MessageTrait, PackageTrait, RootPackage};
 use crate::{ErrorKind, Result};
-use ::std::borrow::Cow;
+use ::proc_macro2::TokenStream;
 use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
@@ -55,10 +55,10 @@ impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
             PackageOrMessage::Message(m) => Ok(Some(m.parent()?)),
         }
     }
-    pub(super) fn rust_module_path(&self) -> Result<Cow<'_, str>> {
+    pub(super) fn gen_rust_module_path(&self) -> Result<&TokenStream> {
         match self {
-            PackageOrMessage::Package(p) => p.rust_module_path(),
-            PackageOrMessage::Message(m) => m.rust_module_path().map(|s| s.into()),
+            PackageOrMessage::Package(p) => p.gen_rust_module_path(),
+            PackageOrMessage::Message(m) => m.gen_rust_module_path(),
         }
     }
 

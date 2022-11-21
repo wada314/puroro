@@ -17,13 +17,15 @@ use super::{InputFileTrait, MessageTrait, PackageOrMessage, PackageTrait};
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
+use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
+use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait EnumTrait: Debug {
     fn name(&self) -> &str;
-    fn rust_enum_path(&self) -> Result<&str>;
+    fn gen_rust_enum_path(&self) -> Result<&TokenStream>;
 }
 
 #[derive(Debug)]
@@ -31,7 +33,7 @@ pub(super) struct Enum {
     name: String,
     input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
-    rust_enum_path: OnceCell<String>,
+    rust_enum_path: OnceCell<TokenStream>,
 }
 
 impl Enum {
@@ -61,16 +63,12 @@ impl EnumTrait for Enum {
         &self.name
     }
 
-    fn rust_enum_path(&self) -> Result<&str> {
-        self.rust_enum_path
-            .get_or_try_init(|| {
-                Ok(format!(
-                    "{}::{}",
-                    self.parent()?.rust_module_path()?,
-                    self.name().to_camel_case().escape_rust_keywords(),
-                ))
-            })
-            .map(|s| s.as_str())
+    fn gen_rust_enum_path(&self) -> Result<&TokenStream> {
+        self.rust_enum_path.get_or_try_init(|| {
+            let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+            let parent = self.parent()?.gen_rust_module_path()?;
+            Ok(quote! { #parent :: #ident })
+        })
     }
 }
 

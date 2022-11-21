@@ -36,8 +36,8 @@ pub(super) trait MessageTrait: Debug {
     fn name(&self) -> &str;
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
-    fn rust_module_path(&self) -> Result<&str>;
-    fn rust_struct_path(&self) -> Result<&str>;
+    fn gen_rust_module_path(&self) -> Result<&TokenStream>;
+    fn gen_rust_struct_path(&self) -> Result<&TokenStream>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
 
     fn resolve_type_name(
@@ -56,8 +56,8 @@ pub(super) struct Message {
     enums: Vec<Rc<dyn EnumTrait>>,
     input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
-    rust_module_path: OnceCell<String>,
-    rust_struct_path: OnceCell<String>,
+    rust_module_path: OnceCell<TokenStream>,
+    rust_struct_path: OnceCell<TokenStream>,
 
     bitfield_size: OnceCell<usize>,
 }
@@ -205,28 +205,23 @@ impl MessageTrait for Message {
         Ok(&self.enums)
     }
 
-    fn rust_module_path(&self) -> Result<&str> {
-        self.rust_module_path
-            .get_or_try_init(|| {
-                Ok(format!(
-                    "{}::{}",
-                    self.parent()?.rust_module_path()?,
-                    self.name().to_lower_snake_case().escape_rust_keywords(),
-                ))
-            })
-            .map(|s| s.as_str())
+    fn gen_rust_module_path(&self) -> Result<&TokenStream> {
+        self.rust_module_path.get_or_try_init(|| {
+            let parent = self.parent()?.gen_rust_module_path()?;
+            let ident = format_ident!(
+                "{}",
+                self.name().to_lower_snake_case().escape_rust_keywords()
+            );
+            Ok(quote! { #parent :: #ident })
+        })
     }
 
-    fn rust_struct_path(&self) -> Result<&str> {
-        self.rust_struct_path
-            .get_or_try_init(|| {
-                Ok(format!(
-                    "{}::{}",
-                    self.parent()?.rust_module_path()?,
-                    self.name().to_camel_case().escape_rust_keywords(),
-                ))
-            })
-            .map(|s| s.as_str())
+    fn gen_rust_struct_path(&self) -> Result<&TokenStream> {
+        self.rust_struct_path.get_or_try_init(|| {
+            let parent = self.parent()?.gen_rust_module_path()?;
+            let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+            Ok(quote! { #parent :: #ident })
+        })
     }
 
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait> {
