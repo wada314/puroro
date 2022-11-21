@@ -37,6 +37,7 @@ pub(super) trait MessageTrait: Debug {
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
     fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
     fn rust_module_path(&self) -> Result<&str>;
+    fn rust_struct_path(&self) -> Result<&str>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
 
     fn resolve_type_name(
@@ -56,6 +57,7 @@ pub(super) struct Message {
     input_file: Weak<dyn InputFileTrait>,
     parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
     rust_module_path: OnceCell<String>,
+    rust_struct_path: OnceCell<String>,
 
     bitfield_size: OnceCell<usize>,
 }
@@ -140,6 +142,7 @@ impl Message {
                 })
                 .collect(),
             rust_module_path: OnceCell::new(),
+            rust_struct_path: OnceCell::new(),
             bitfield_size: OnceCell::new(),
         })
     }
@@ -209,6 +212,18 @@ impl MessageTrait for Message {
                     "{}::{}",
                     self.parent()?.rust_module_path()?,
                     self.name().to_lower_snake_case().escape_rust_keywords(),
+                ))
+            })
+            .map(|s| s.as_str())
+    }
+
+    fn rust_struct_path(&self) -> Result<&str> {
+        self.rust_struct_path
+            .get_or_try_init(|| {
+                Ok(format!(
+                    "{}::{}",
+                    self.parent()?.rust_module_path()?,
+                    self.name().to_camel_case().escape_rust_keywords(),
                 ))
             })
             .map(|s| s.as_str())
