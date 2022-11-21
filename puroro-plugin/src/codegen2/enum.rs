@@ -12,27 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::*;
+use super::{MessageTrait, PackageOrMessage, PackageTrait};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 use ::std::fmt::Debug;
+use ::std::rc::{Rc, Weak};
 
 pub(super) trait EnumTrait: Debug {
     fn name(&self) -> &str;
 }
 
 #[derive(Debug)]
-pub struct Enum {}
+pub(super) struct Enum {
+    name: String,
+    parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+}
 
 impl Enum {
-    fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
-        Ok(Enum {})
+    pub(super) fn new(
+        proto: &EnumDescriptorProto,
+        parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+    ) -> Rc<Self> {
+        Rc::new(Enum {
+            name: proto.name().to_string(),
+            parent,
+        })
     }
 }
 
 impl EnumTrait for Enum {
     fn name(&self) -> &str {
-        ""
+        &self.name
     }
 }
 

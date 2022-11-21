@@ -48,19 +48,27 @@ impl InputFile {
         mut fm: FM,
     ) -> Rc<Self>
     where
-        FM: FnMut(&DescriptorProto, Weak<dyn InputFileTrait>) -> Rc<M>,
+        FM: FnMut(
+            &DescriptorProto,
+            Weak<dyn InputFileTrait>,
+            PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+        ) -> Rc<M>,
         M: 'static + MessageTrait,
     {
         Rc::new_cyclic(|weak| Self {
             name: proto.name().to_string(),
             syntax: proto.syntax().to_string(),
             syntax_cell: OnceCell::new(),
-            package,
+            package: Weak::clone(&package),
             messages: proto
                 .message_type()
                 .into_iter()
                 .map(|m| {
-                    fm(m, Weak::clone(weak) as Weak<dyn InputFileTrait>) as Rc<dyn MessageTrait>
+                    fm(
+                        m,
+                        Weak::clone(weak) as Weak<dyn InputFileTrait>,
+                        PackageOrMessage::Package(Weak::clone(&package)),
+                    ) as Rc<dyn MessageTrait>
                 })
                 .collect(),
         })

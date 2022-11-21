@@ -44,18 +44,24 @@ pub(super) struct Message {
     name: String,
     fields: Vec<Rc<dyn FieldTrait>>,
     input_file: Weak<dyn InputFileTrait>,
+    parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
 
     bitfield_size: OnceCell<usize>,
 }
 
 impl Message {
-    pub(super) fn new(proto: &DescriptorProto, input_file: Weak<dyn InputFileTrait>) -> Rc<Self> {
-        Self::new_with(proto, input_file, Field::new)
+    pub(super) fn new(
+        proto: &DescriptorProto,
+        input_file: Weak<dyn InputFileTrait>,
+        parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+    ) -> Rc<Self> {
+        Self::new_with(proto, input_file, parent, Field::new)
     }
 
     pub(super) fn new_with<FF, F>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFileTrait>,
+        parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
         ff: FF,
     ) -> Rc<Self>
     where
@@ -65,7 +71,8 @@ impl Message {
         let name = proto.name().to_string();
         Rc::new_cyclic(|weak_message| Message {
             name,
-            input_file: input_file as Weak<dyn InputFileTrait>,
+            input_file,
+            parent,
             fields: proto
                 .field()
                 .into_iter()
