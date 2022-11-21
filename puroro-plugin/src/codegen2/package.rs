@@ -130,8 +130,8 @@ impl PackageBase {
         }
     }
 
-    fn gen_submodule_decls(&self) -> Result<Vec<TokenStream>> {
-        Ok(self
+    fn gen_common_part(&self) -> Result<TokenStream> {
+        let submodule_decls = self
             .subpackages_map
             .keys()
             .sorted()
@@ -141,19 +141,22 @@ impl PackageBase {
                     pub mod #ident;
                 }
             })
-            .collect())
-    }
-
-    fn gen_struct_decls(&self) -> Result<Vec<TokenStream>> {
-        Ok(self
+            .collect::<Vec<_>>();
+        let struct_decls = self
             .messages()?
             .iter()
             .map(|m| m.gen_struct())
-            .try_collect()?)
-    }
-
-    fn gen_enum_decls(&self) -> Result<Vec<TokenStream>> {
-        Ok(self.enums()?.iter().map(|e| e.gen_enum()).try_collect()?)
+            .collect::<Result<Vec<_>>>()?;
+        let enum_decls = self
+            .enums()?
+            .iter()
+            .map(|e| e.gen_enum())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            #(#submodule_decls)*
+            #(#struct_decls)*
+            #(#enum_decls)*
+        })
     }
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
@@ -300,9 +303,7 @@ impl PackageTrait for RootPackage {
         self
     }
     fn gen_module_file(&self) -> Result<TokenStream> {
-        let submodule_decls = self.base.gen_submodule_decls()?;
-        let struct_decls = self.base.gen_struct_decls()?;
-        let enum_decls = self.base.gen_enum_decls()?;
+        let common_part = self.base.gen_common_part()?;
         Ok(quote! {
             //! "Generated from root package"
 
@@ -318,9 +319,7 @@ impl PackageTrait for RootPackage {
                 pub use ::puroro::*;
             }
 
-            #(#submodule_decls)*
-            #(#struct_decls)*
-            #(#enum_decls)*
+            #common_part
         })
     }
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
@@ -384,9 +383,7 @@ impl PackageTrait for NonRootPackage {
         self
     }
     fn gen_module_file(&self) -> Result<TokenStream> {
-        let submodule_decls = self.base.gen_submodule_decls()?;
-        let struct_decls = self.base.gen_struct_decls()?;
-        let enum_decls = self.base.gen_enum_decls()?;
+        let common_part = self.base.gen_common_part()?;
         Ok(quote! {
             pub mod _puroro_root {
                 pub use super::super::_puroro_root::*;
@@ -394,9 +391,7 @@ impl PackageTrait for NonRootPackage {
             pub mod _puroro {
                 pub use ::puroro::*;
             }
-            #(#submodule_decls)*
-            #(#struct_decls)*
-            #(#enum_decls)*
+            #common_part
         })
     }
     fn base(&self) -> Result<&PackageBase> {
