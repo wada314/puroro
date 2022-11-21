@@ -29,6 +29,7 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait PackageTrait: Debug {
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
+    fn rust_path(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
@@ -73,6 +74,7 @@ pub(super) struct NonRootPackage {
     parent: Weak<dyn PackageTrait>,
     base: PackageBase,
     module_file_dir: OnceCell<String>,
+    rust_path: OnceCell<String>,
 }
 
 #[derive(Debug)]
@@ -268,6 +270,7 @@ impl NonRootPackage {
                 parent,
                 base,
                 module_file_dir: OnceCell::new(),
+                rust_path: OnceCell::new(),
             }
         })
     }
@@ -279,6 +282,9 @@ impl PackageTrait for RootPackage {
     }
     fn module_file_dir(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
+    }
+    fn rust_path(&self) -> Result<Cow<'_, str>> {
+        Ok("self::_puroro_root".into())
     }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
@@ -335,6 +341,17 @@ impl PackageTrait for NonRootPackage {
                     "{}{}/",
                     self.parent.try_upgrade()?.module_file_dir()?,
                     self.name.to_lower_snake_case()
+                ))
+            })
+            .map(|s| s.into())
+    }
+    fn rust_path(&self) -> Result<Cow<'_, str>> {
+        self.rust_path
+            .get_or_try_init(|| {
+                Ok(format!(
+                    "{}::{}",
+                    self.parent.try_upgrade()?.rust_path()?,
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
                 ))
             })
             .map(|s| s.into())
