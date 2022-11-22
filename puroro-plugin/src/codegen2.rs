@@ -67,11 +67,12 @@ pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = RootPackage::new(files);
-    Ok(root_package
+    let from_packages = root_package
         .all_packages()
         .into_iter()
-        .map(|p| -> Result<_> { Ok((p.module_file_path()?.to_string(), p.gen_module_file()?)) })
-        .collect::<Result<Vec<_>>>()?)
+        .map(|p| -> Result<_> { Ok((p.module_file_path()?.to_string(), p.gen_module_file()?)) });
+
+    from_packages.collect::<Result<Vec<_>>>()
 }
 
 // This method is actually used in lib build rule but vscode+Rust analyzer often reports
