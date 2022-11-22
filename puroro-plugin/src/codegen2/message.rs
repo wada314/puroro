@@ -40,6 +40,12 @@ pub(super) trait MessageTrait: Debug {
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
 
+    fn should_generate_module_file(&self) -> Result<bool> {
+        let has_submessages = !self.messages()?.is_empty();
+        let has_subenums = !self.enums()?.is_empty();
+        let has_oneofs = false; // TODO!
+        Ok(has_submessages || has_subenums || has_oneofs)
+    }
     fn resolve_type_name(
         self: Rc<Self>,
         type_name: &str,
