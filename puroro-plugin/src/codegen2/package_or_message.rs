@@ -17,6 +17,7 @@ use crate::codegen::utils::StrExt;
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
+use ::std::ops::Deref;
 use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
@@ -24,7 +25,13 @@ pub(super) enum PackageOrMessage<P, M> {
     Package(P),
     Message(M),
 }
-impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
+impl<P, M> PackageOrMessage<P, M>
+where
+    P: Deref,
+    P::Target: PackageTrait,
+    M: Deref,
+    M::Target: MessageTrait,
+{
     pub(super) fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
         match self {
             PackageOrMessage::Package(p) => p.messages(),
@@ -49,7 +56,9 @@ impl PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>> {
             PackageOrMessage::Message(m) => m.input_file()?.package()?.root(),
         }
     }
-    pub(super) fn parent(&self) -> Result<Option<Self>> {
+    pub(super) fn parent(
+        &self,
+    ) -> Result<Option<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>>> {
         match self {
             PackageOrMessage::Package(p) => {
                 Ok(p.parent()?.map(|parent| PackageOrMessage::Package(parent)))
