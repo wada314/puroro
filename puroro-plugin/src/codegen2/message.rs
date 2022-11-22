@@ -39,8 +39,8 @@ pub(super) trait MessageTrait: Debug + PackageOrMessageTrait {
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
-        let has_submessages = self.messages()?.next().is_none();
-        let has_subenums = self.enums()?.next().is_none();
+        let has_submessages = self.messages()?.next().is_some();
+        let has_subenums = self.enums()?.next().is_some();
         let has_oneofs = false; // TODO!
         Ok(has_submessages || has_subenums || has_oneofs)
     }

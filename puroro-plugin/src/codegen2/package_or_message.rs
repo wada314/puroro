@@ -17,9 +17,9 @@ use crate::codegen::utils::StrExt;
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
+use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
-use ::std::borrow::Cow;
 
 pub(super) trait PackageOrMessageTrait: Debug {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>>;
@@ -27,6 +27,21 @@ pub(super) trait PackageOrMessageTrait: Debug {
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>>;
+
+    fn all_messages(&self) -> Result<Vec<Rc<dyn MessageTrait>>> {
+        let mut ret = self.messages()?.collect::<Vec<_>>();
+        let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessageTrait>);
+        let packages_iter = self
+            .subpackages()?
+            .map(|p| p as Rc<dyn PackageOrMessageTrait>);
+        let mut stack = messages_iter.chain(packages_iter).collect::<Vec<_>>();
+        while let Some(p) = stack.pop() {
+            stack.extend(p.messages()?.map(|m| m as Rc<dyn PackageOrMessageTrait>));
+            stack.extend(p.subpackages()?.map(|p| p as Rc<dyn PackageOrMessageTrait>));
+            ret.extend(p.messages()?);
+        }
+        Ok(ret)
+    }
 
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;

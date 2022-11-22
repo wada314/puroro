@@ -37,7 +37,6 @@ use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
 enum Syntax {
@@ -71,8 +70,22 @@ pub fn generate_file_names_and_tokens<'a>(
         .all_packages()
         .into_iter()
         .map(|p| -> Result<_> { Ok((p.module_file_path()?.to_string(), p.gen_module_file()?)) });
+    let from_messages = root_package
+        .all_messages()?
+        .into_iter()
+        .filter_map(|m| match m.should_generate_module_file() {
+            Ok(true) => Some(Ok(m)),
+            Ok(false) => None,
+            Err(e) => Some(Err(e)),
+        })
+        .map(|rm| {
+            let m = rm?;
+            Ok((m.module_file_path()?.to_string(), m.gen_module_file()?))
+        });
 
-    from_packages.collect::<Result<Vec<_>>>()
+    from_packages
+        .chain(from_messages)
+        .collect::<Result<Vec<_>>>()
 }
 
 // This method is actually used in lib build rule but vscode+Rust analyzer often reports
