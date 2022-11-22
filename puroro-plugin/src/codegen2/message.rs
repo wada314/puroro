@@ -14,7 +14,7 @@
 
 use super::util::WeakExt;
 use super::{
-    Enum, EnumTrait, Field, FieldTrait, InputFileTrait, MessageOrEnum, PackageOrMessage,
+    Enum, EnumTrait, Field, FieldTrait, InputFileTrait, MessageOrEnum, PackageOrMessageTrait,
     PackageTrait,
 };
 use crate::codegen::utils::StrExt;
@@ -26,31 +26,22 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 };
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait MessageTrait: Debug {
+pub(super) trait MessageTrait: Debug + PackageOrMessageTrait {
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
-    fn parent(&self) -> Result<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> &str;
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
     fn gen_struct(&self) -> Result<TokenStream>;
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
-        let has_submessages = !self.messages()?.is_empty();
-        let has_subenums = !self.enums()?.is_empty();
+        let has_submessages = self.messages()?.next().is_none();
+        let has_subenums = self.enums()?.next().is_none();
         let has_oneofs = false; // TODO!
         Ok(has_submessages || has_subenums || has_oneofs)
-    }
-    fn resolve_type_name(
-        self: Rc<Self>,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        PackageOrMessage::Message(self.as_dyn_rc()).resolve_type_name(type_name)
     }
 }
 
@@ -61,7 +52,7 @@ pub(super) struct Message {
     messages: Vec<Rc<dyn MessageTrait>>,
     enums: Vec<Rc<dyn EnumTrait>>,
     input_file: Weak<dyn InputFileTrait>,
-    parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+    parent: Weak<dyn PackageOrMessageTrait>,
     rust_module_path: OnceCell<Rc<TokenStream>>,
     rust_struct_path: OnceCell<Rc<TokenStream>>,
 
@@ -72,7 +63,7 @@ impl Message {
     pub(super) fn new(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFileTrait>,
-        parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+        parent: Weak<dyn PackageOrMessageTrait>,
     ) -> Rc<Self> {
         Self::new_with(
             proto,
@@ -87,7 +78,7 @@ impl Message {
     pub(super) fn new_with<FF, F, FM, M, FE, E>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFileTrait>,
-        parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+        parent: Weak<dyn PackageOrMessageTrait>,
         ff: FF,
         fm: FM,
         fe: FE,
@@ -97,12 +88,12 @@ impl Message {
         FM: Fn(
             &DescriptorProto,
             Weak<dyn InputFileTrait>,
-            PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+            Weak<dyn PackageOrMessageTrait>,
         ) -> Rc<M>,
         FE: Fn(
             &EnumDescriptorProto,
             Weak<dyn InputFileTrait>,
-            PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+            Weak<dyn PackageOrMessageTrait>,
         ) -> Rc<E>,
         F: 'static + FieldTrait,
         M: 'static + MessageTrait,
@@ -128,9 +119,7 @@ impl Message {
                     fm(
                         m,
                         Weak::clone(&input_file),
-                        PackageOrMessage::Message(
-                            Weak::clone(weak_message) as Weak<dyn MessageTrait>
-                        ),
+                        Weak::clone(weak_message) as Weak<dyn PackageOrMessageTrait>,
                     ) as Rc<dyn MessageTrait>
                 })
                 .collect(),
@@ -141,9 +130,7 @@ impl Message {
                     fe(
                         e,
                         Weak::clone(&input_file),
-                        PackageOrMessage::Message(
-                            Weak::clone(weak_message) as Weak<dyn MessageTrait>
-                        ),
+                        Weak::clone(weak_message) as Weak<dyn PackageOrMessageTrait>,
                     ) as Rc<dyn EnumTrait>
                 })
                 .collect(),
@@ -151,6 +138,40 @@ impl Message {
             rust_struct_path: OnceCell::new(),
             bitfield_size: OnceCell::new(),
         })
+    }
+}
+
+impl PackageOrMessageTrait for Message {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
+        Ok(Box::new(self.messages.iter().cloned()))
+    }
+
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
+        Ok(Box::new(self.enums.iter().cloned()))
+    }
+
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
+        Ok(Box::new(iter::empty()))
+    }
+
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
+        Ok(Some(self.parent.try_upgrade()?))
+    }
+    fn root_package(&self) -> Result<Rc<super::package::RootPackage>> {
+        self.parent.try_upgrade()?.root_package()
+    }
+
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        self.rust_module_path
+            .get_or_try_init(|| {
+                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
+                let ident = format_ident!(
+                    "{}",
+                    self.name().to_lower_snake_case().escape_rust_keywords()
+                );
+                Ok(Rc::new(quote! { #parent :: #ident }))
+            })
+            .cloned()
     }
 }
 
@@ -180,12 +201,6 @@ impl MessageTrait for Message {
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>> {
         Ok(self.input_file.try_upgrade()?)
     }
-    fn parent(&self) -> Result<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>> {
-        Ok(match &self.parent {
-            PackageOrMessage::Package(p) => PackageOrMessage::Package(p.try_upgrade()?),
-            PackageOrMessage::Message(m) => PackageOrMessage::Message(m.try_upgrade()?),
-        })
-    }
 
     fn bitfield_size(&self) -> Result<usize> {
         self.bitfield_size
@@ -203,31 +218,10 @@ impl MessageTrait for Message {
             .cloned()
     }
 
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
-        Ok(&self.messages)
-    }
-
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
-        Ok(&self.enums)
-    }
-
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        self.rust_module_path
-            .get_or_try_init(|| {
-                let parent = self.parent()?.gen_rust_module_path()?;
-                let ident = format_ident!(
-                    "{}",
-                    self.name().to_lower_snake_case().escape_rust_keywords()
-                );
-                Ok(Rc::new(quote! { #parent :: #ident }))
-            })
-            .cloned()
-    }
-
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>> {
         self.rust_struct_path
             .get_or_try_init(|| {
-                let parent = self.parent()?.gen_rust_module_path()?;
+                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
                 let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
                 Ok(Rc::new(quote! { #parent :: #ident }))
             })

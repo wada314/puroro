@@ -18,7 +18,7 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::util::WeakExt;
-use super::{InputFileTrait, MessageTrait, PackageOrMessage, PackageTrait};
+use super::{InputFileTrait, MessageTrait, PackageOrMessageTrait, PackageTrait};
 use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -38,7 +38,7 @@ pub(super) trait EnumTrait: Debug {
 pub(super) struct Enum {
     name: String,
     input_file: Weak<dyn InputFileTrait>,
-    parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+    parent: Weak<dyn PackageOrMessageTrait>,
     values: Vec<(String, i32)>,
     rust_enum_path: OnceCell<Rc<TokenStream>>,
 }
@@ -47,7 +47,7 @@ impl Enum {
     pub(super) fn new(
         proto: &EnumDescriptorProto,
         input_file: Weak<dyn InputFileTrait>,
-        parent: PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+        parent: Weak<dyn PackageOrMessageTrait>,
     ) -> Rc<Self> {
         let values = proto
             .value()
@@ -63,11 +63,8 @@ impl Enum {
         })
     }
 
-    fn parent(&self) -> Result<PackageOrMessage<Rc<dyn PackageTrait>, Rc<dyn MessageTrait>>> {
-        Ok(match &self.parent {
-            PackageOrMessage::Package(p) => PackageOrMessage::Package(p.try_upgrade()?),
-            PackageOrMessage::Message(m) => PackageOrMessage::Message(m.try_upgrade()?),
-        })
+    fn parent(&self) -> Result<Rc<dyn PackageOrMessageTrait>> {
+        Ok(self.parent.try_upgrade()?)
     }
 }
 

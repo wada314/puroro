@@ -26,36 +26,13 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait PackageTrait: Debug {
+pub(super) trait PackageTrait: Debug + PackageOrMessageTrait {
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
-    fn parent(&self) -> Result<Option<Rc<dyn PackageTrait>>>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait>;
-
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
-        self.base()?.messages()
-    }
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
-        self.base()?.enums()
-    }
-    fn subpackages(&self) -> Result<&[Rc<dyn PackageTrait>]> {
-        self.base()?.subpackages()
-    }
-    fn root(&self) -> Result<Rc<RootPackage>> {
-        self.base()?.root.try_upgrade()
-    }
-    fn resolve_type_name(
-        self: Rc<Self>,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
-        PackageOrMessage::Package(self.as_dyn_rc()).resolve_type_name(type_name)
-    }
-
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
-    fn gen_module_file(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug)]
@@ -195,6 +172,10 @@ impl PackageBase {
             })
             .map(|sp| sp.as_slice())
     }
+
+    fn root(&self) -> Result<Rc<RootPackage>> {
+        self.root.try_upgrade()
+    }
 }
 
 impl RootPackage {
@@ -283,6 +264,27 @@ impl NonRootPackage {
     }
 }
 
+impl PackageOrMessageTrait for RootPackage {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
+        Ok(Box::new(self.base()?.messages()?.iter().cloned()))
+    }
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
+        Ok(Box::new(self.base()?.enums()?.iter().cloned()))
+    }
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
+        Ok(Box::new(self.base()?.subpackages()?.iter().cloned()))
+    }
+    fn root_package(&self) -> Result<Rc<RootPackage>> {
+        self.base()?.root()
+    }
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
+        Ok(None)
+    }
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        Ok(Rc::new(quote! { self :: _puroro_root }))
+    }
+}
+
 impl PackageTrait for RootPackage {
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok("lib.rs".into())
@@ -296,37 +298,43 @@ impl PackageTrait for RootPackage {
     fn full_name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageTrait>>> {
-        Ok(None)
-    }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
         self
     }
-    fn gen_module_file(&self) -> Result<TokenStream> {
-        let common_part = self.base.gen_common_part()?;
-        Ok(quote! {
-            //! "Generated from root package"
-
-            /// re-export puroro.
-            pub use ::puroro;
-            /// re-export the primitive types in puroro namespace.
-            /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
-            pub use ::puroro::*;
-            pub mod _puroro_root {
-                pub use super::*;
-            }
-            pub mod _puroro {
-                pub use ::puroro::*;
-            }
-
-            #common_part
-        })
-    }
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        Ok(Rc::new(quote! { self :: _puroro_root }))
-    }
     fn base(&self) -> Result<&PackageBase> {
         Ok(&self.base)
+    }
+}
+
+impl PackageOrMessageTrait for NonRootPackage {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
+        Ok(Box::new(self.base()?.messages()?.iter().cloned()))
+    }
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
+        Ok(Box::new(self.base()?.enums()?.iter().cloned()))
+    }
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
+        Ok(Box::new(self.base()?.subpackages()?.iter().cloned()))
+    }
+    fn root_package(&self) -> Result<Rc<RootPackage>> {
+        self.base()?.root()
+    }
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
+        Ok(Some(self.parent.try_upgrade()?))
+    }
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        self.rust_module_path
+            .get_or_try_init(|| {
+                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
+                let ident = format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
+                );
+                Ok(Rc::new(quote! {
+                    #parent :: #ident
+                }))
+            })
+            .cloned()
     }
 }
 
@@ -350,20 +358,6 @@ impl PackageTrait for NonRootPackage {
             })
             .map(|s| s.into())
     }
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        self.rust_module_path
-            .get_or_try_init(|| {
-                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
-                let ident = format_ident!(
-                    "{}",
-                    self.name()?.to_lower_snake_case().escape_rust_keywords()
-                );
-                Ok(Rc::new(quote! {
-                    #parent :: #ident
-                }))
-            })
-            .cloned()
-    }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok(self.name.as_str().into())
     }
@@ -376,23 +370,8 @@ impl PackageTrait for NonRootPackage {
             Ok(format!("{}.{}", parent_full_name, &self.name).into())
         }
     }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageTrait>>> {
-        Ok(Some(self.parent.try_upgrade()?))
-    }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
         self
-    }
-    fn gen_module_file(&self) -> Result<TokenStream> {
-        let common_part = self.base.gen_common_part()?;
-        Ok(quote! {
-            pub mod _puroro_root {
-                pub use super::super::_puroro_root::*;
-            }
-            pub mod _puroro {
-                pub use ::puroro::*;
-            }
-            #common_part
-        })
     }
     fn base(&self) -> Result<&PackageBase> {
         Ok(&self.base)

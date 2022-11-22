@@ -18,6 +18,7 @@
 #![feature(slice_group_by)]
 #![feature(new_uninit)]
 #![feature(try_find)]
+#![feature(trait_upcasting)]
 
 mod codegen;
 mod codegen2;

@@ -54,12 +54,12 @@ impl InputFile {
         FM: Fn(
             &DescriptorProto,
             Weak<dyn InputFileTrait>,
-            PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+            Weak<dyn PackageOrMessageTrait>,
         ) -> Rc<M>,
         FE: Fn(
             &EnumDescriptorProto,
             Weak<dyn InputFileTrait>,
-            PackageOrMessage<Weak<dyn PackageTrait>, Weak<dyn MessageTrait>>,
+            Weak<dyn PackageOrMessageTrait>,
         ) -> Rc<E>,
         M: 'static + MessageTrait,
         E: 'static + EnumTrait,
@@ -76,7 +76,7 @@ impl InputFile {
                     fm(
                         m,
                         Weak::clone(weak) as Weak<dyn InputFileTrait>,
-                        PackageOrMessage::Package(Weak::clone(&package)),
+                        Weak::clone(&package) as Weak<dyn PackageOrMessageTrait>,
                     ) as Rc<dyn MessageTrait>
                 })
                 .collect(),
@@ -87,7 +87,7 @@ impl InputFile {
                     fe(
                         e,
                         Weak::clone(weak) as Weak<dyn InputFileTrait>,
-                        PackageOrMessage::Package(Weak::clone(&package)),
+                        Weak::clone(&package) as Weak<dyn PackageOrMessageTrait>,
                     ) as Rc<dyn EnumTrait>
                 })
                 .collect(),
