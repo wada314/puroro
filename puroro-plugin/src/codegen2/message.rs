@@ -32,7 +32,7 @@ use ::std::rc::{Rc, Weak};
 pub(super) trait MessageTrait: Debug + PackageOrMessageTrait {
     fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
     fn bitfield_size(&self) -> Result<usize>;
-    fn name(&self) -> &str;
+    fn name(&self) -> Result<&str>;
     fn gen_struct(&self) -> Result<TokenStream>;
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
@@ -167,7 +167,7 @@ impl PackageOrMessageTrait for Message {
                 let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
                 let ident = format_ident!(
                     "{}",
-                    self.name().to_lower_snake_case().escape_rust_keywords()
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
                 Ok(Rc::new(quote! { #parent :: #ident }))
             })
@@ -176,8 +176,8 @@ impl PackageOrMessageTrait for Message {
 }
 
 impl MessageTrait for Message {
-    fn name(&self) -> &str {
-        &self.name
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
     }
 
     fn gen_struct(&self) -> Result<TokenStream> {
@@ -222,7 +222,8 @@ impl MessageTrait for Message {
         self.rust_struct_path
             .get_or_try_init(|| {
                 let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
-                let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+                let ident =
+                    format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
                 Ok(Rc::new(quote! { #parent :: #ident }))
             })
             .cloned()

@@ -92,7 +92,7 @@ pub(super) trait PackageOrMessageTrait: Debug {
             // 2 or more remaining components. The next component is either a message or a package.
             if let Some(m) = self
                 .messages()?
-                .try_find(|m| -> Result<_> { Ok(m.name() == subcomponent) })?
+                .try_find(|m| -> Result<_> { Ok(m.name()? == subcomponent) })?
             {
                 return m.resolve_type_name(rest);
             } else if let Some(p) = self
@@ -105,7 +105,7 @@ pub(super) trait PackageOrMessageTrait: Debug {
             // Exactly 1 remaining component. Message or Enum. Return that item.
             if let Some(m) = self
                 .messages()?
-                .try_find(|m| -> Result<_> { Ok(m.name() == type_name) })?
+                .try_find(|m| -> Result<_> { Ok(m.name()? == type_name) })?
             {
                 return Ok(MessageOrEnum::Message(m));
             } else if let Some(m) = self
