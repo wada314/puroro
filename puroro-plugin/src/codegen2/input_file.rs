@@ -147,9 +147,6 @@ impl InputFileTrait for InputFileFake {
     fn package(&self) -> Result<Rc<dyn PackageTrait>> {
         self.package.try_upgrade()
     }
-    fn gen_structs_for_messages(&self) -> Result<TokenStream> {
-        Ok(TokenStream::new())
-    }
     fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::MessageTrait>]> {
         Ok(&[])
     }
