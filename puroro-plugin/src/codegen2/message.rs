@@ -25,6 +25,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto,
 };
 use ::quote::{format_ident, quote};
+use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
@@ -55,7 +56,7 @@ pub(super) struct Message {
     parent: Weak<dyn PackageOrMessageTrait>,
     rust_module_path: OnceCell<Rc<TokenStream>>,
     rust_struct_path: OnceCell<Rc<TokenStream>>,
-
+    module_file_dir: OnceCell<String>,
     bitfield_size: OnceCell<usize>,
 }
 
@@ -136,6 +137,7 @@ impl Message {
                 .collect(),
             rust_module_path: OnceCell::new(),
             rust_struct_path: OnceCell::new(),
+            module_file_dir: OnceCell::new(),
             bitfield_size: OnceCell::new(),
         })
     }
@@ -145,20 +147,37 @@ impl PackageOrMessageTrait for Message {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
-
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
     }
-
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
         Ok(Box::new(iter::empty()))
     }
-
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
         Ok(Some(self.parent.try_upgrade()?))
     }
     fn root_package(&self) -> Result<Rc<super::package::RootPackage>> {
         self.parent.try_upgrade()?.root_package()
+    }
+
+    fn module_file_path(&self) -> Result<Cow<'_, str>> {
+        Ok(format!(
+            "{}{}.rs",
+            self.parent.try_upgrade()?.module_file_dir()?,
+            self.name.to_lower_snake_case()
+        )
+        .into())
+    }
+    fn module_file_dir(&self) -> Result<Cow<'_, str>> {
+        self.module_file_dir
+            .get_or_try_init(|| {
+                Ok(format!(
+                    "{}{}/",
+                    self.parent.try_upgrade()?.module_file_dir()?,
+                    self.name.to_lower_snake_case()
+                ))
+            })
+            .map(|s| s.into())
     }
 
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {

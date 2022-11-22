@@ -27,8 +27,6 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug + PackageOrMessageTrait {
-    fn module_file_path(&self) -> Result<Cow<'_, str>>;
-    fn module_file_dir(&self) -> Result<Cow<'_, str>>;
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
@@ -105,35 +103,6 @@ impl PackageBase {
             messages: OnceCell::new(),
             enums: OnceCell::new(),
         }
-    }
-
-    fn gen_common_part(&self) -> Result<TokenStream> {
-        let submodule_decls = self
-            .subpackages_map
-            .keys()
-            .sorted()
-            .map(|name| {
-                let ident = format_ident!("{}", name.to_lower_snake_case().escape_rust_keywords());
-                quote! {
-                    pub mod #ident;
-                }
-            })
-            .collect::<Vec<_>>();
-        let struct_decls = self
-            .messages()?
-            .iter()
-            .map(|m| m.gen_struct())
-            .collect::<Result<Vec<_>>>()?;
-        let enum_decls = self
-            .enums()?
-            .iter()
-            .map(|e| e.gen_enum())
-            .collect::<Result<Vec<_>>>()?;
-        Ok(quote! {
-            #(#submodule_decls)*
-            #(#struct_decls)*
-            #(#enum_decls)*
-        })
     }
 
     fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
@@ -280,18 +249,18 @@ impl PackageOrMessageTrait for RootPackage {
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
         Ok(None)
     }
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        Ok(Rc::new(quote! { self :: _puroro_root }))
-    }
-}
-
-impl PackageTrait for RootPackage {
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok("lib.rs".into())
     }
     fn module_file_dir(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        Ok(Rc::new(quote! { self :: _puroro_root }))
+    }
+}
+
+impl PackageTrait for RootPackage {
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
@@ -322,23 +291,6 @@ impl PackageOrMessageTrait for NonRootPackage {
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
         Ok(Some(self.parent.try_upgrade()?))
     }
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        self.rust_module_path
-            .get_or_try_init(|| {
-                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
-                let ident = format_ident!(
-                    "{}",
-                    self.name()?.to_lower_snake_case().escape_rust_keywords()
-                );
-                Ok(Rc::new(quote! {
-                    #parent :: #ident
-                }))
-            })
-            .cloned()
-    }
-}
-
-impl PackageTrait for NonRootPackage {
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok(format!(
             "{}{}.rs",
@@ -358,6 +310,23 @@ impl PackageTrait for NonRootPackage {
             })
             .map(|s| s.into())
     }
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        self.rust_module_path
+            .get_or_try_init(|| {
+                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
+                let ident = format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
+                );
+                Ok(Rc::new(quote! {
+                    #parent :: #ident
+                }))
+            })
+            .cloned()
+    }
+}
+
+impl PackageTrait for NonRootPackage {
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok(self.name.as_str().into())
     }

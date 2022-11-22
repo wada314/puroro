@@ -19,6 +19,7 @@ use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
+use ::std::borrow::Cow;
 
 pub(super) trait PackageOrMessageTrait: Debug {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>>;
@@ -26,6 +27,9 @@ pub(super) trait PackageOrMessageTrait: Debug {
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>>;
+
+    fn module_file_path(&self) -> Result<Cow<'_, str>>;
+    fn module_file_dir(&self) -> Result<Cow<'_, str>>;
 
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
 
