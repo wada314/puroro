@@ -46,6 +46,13 @@ impl self::_puroro::Message for Msg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        Self {
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Submsg {
     i32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -104,5 +111,17 @@ impl self::_puroro::Message for Submsg {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         Ok(todo!())
+    }
+}
+impl ::std::clone::Clone for Submsg {
+    fn clone(&self) -> Self {
+        Self {
+            i32_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+                0usize,
+            > as ::std::clone::Clone>::clone(&self.i32_optional),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
     }
 }

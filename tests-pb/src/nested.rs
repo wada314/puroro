@@ -63,3 +63,14 @@ impl self::_puroro::Message for Msg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        Self {
+            item_outer: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.item_outer),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}

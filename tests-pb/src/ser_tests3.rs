@@ -182,6 +182,53 @@ impl self::_puroro::Message for Msg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        Self {
+            i32_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.i32_unlabeled),
+            i32_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.i32_repeated),
+            float_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
+                f32,
+                self::_puroro::tags::Float,
+            > as ::std::clone::Clone>::clone(&self.float_unlabeled),
+            float_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                f32,
+                self::_puroro::tags::Float,
+            > as ::std::clone::Clone>::clone(&self.float_repeated),
+            string_unlabeled: <self::_puroro::internal::field_type::SingularStringField as ::std::clone::Clone>::clone(
+                &self.string_unlabeled,
+            ),
+            string_repeated: <self::_puroro::internal::field_type::RepeatedStringField as ::std::clone::Clone>::clone(
+                &self.string_repeated,
+            ),
+            submsg_unlabeled: <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                self::_puroro_root::ser_tests3::msg::Submsg,
+            > as ::std::clone::Clone>::clone(&self.submsg_unlabeled),
+            submsg_repeated: <self::_puroro::internal::field_type::RepeatedMessageField::<
+                self::_puroro_root::ser_tests3::msg::Submsg,
+            > as ::std::clone::Clone>::clone(&self.submsg_repeated),
+            enum_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
+                self::_puroro_root::ser_tests3::Enum,
+                self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+            > as ::std::clone::Clone>::clone(&self.enum_unlabeled),
+            enum_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                self::_puroro_root::ser_tests3::Enum,
+                self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+            > as ::std::clone::Clone>::clone(&self.enum_repeated),
+            very_large_field_number: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.very_large_field_number),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

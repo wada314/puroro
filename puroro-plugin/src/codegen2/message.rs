@@ -244,6 +244,7 @@ impl Message for MessageImpl {
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = self.gen_struct_message_impl()?;
+        let clone_impl = self.gen_struct_clone_impl()?;
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
@@ -256,6 +257,7 @@ impl Message for MessageImpl {
             }
 
             #message_impl
+            #clone_impl
         })
     }
 }
@@ -294,6 +296,28 @@ impl MessageImpl {
                     #[allow(unused)]
                     use ::std::result::Result::Ok;
                     Ok(todo!())
+                }
+            }
+        })
+    }
+
+    fn gen_struct_clone_impl(&self) -> Result<TokenStream> {
+        let ident = format_ident!(
+            "{}",
+            self.name.to_camel_case().escape_rust_keywords().to_string()
+        );
+        let field_clones = self
+            .fields
+            .iter()
+            .map(|f|f.gen_struct_field_clone())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            impl ::std::clone::Clone for #ident {
+                fn clone(&self) -> Self {
+                    Self {
+                        #(#field_clones)*
+                        _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                    }
                 }
             }
         })

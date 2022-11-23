@@ -62,6 +62,17 @@ impl self::_puroro::Message for Test1 {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Test1 {
+    fn clone(&self) -> Self {
+        Self {
+            a: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.a),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test2 {
     b: self::_puroro::internal::field_type::SingularStringField,
@@ -112,6 +123,16 @@ impl self::_puroro::Message for Test2 {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         Ok(todo!())
+    }
+}
+impl ::std::clone::Clone for Test2 {
+    fn clone(&self) -> Self {
+        Self {
+            b: <self::_puroro::internal::field_type::SingularStringField as ::std::clone::Clone>::clone(
+                &self.b,
+            ),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
     }
 }
 #[derive(::std::default::Default)]
@@ -172,6 +193,16 @@ impl self::_puroro::Message for Test3 {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Test3 {
+    fn clone(&self) -> Self {
+        Self {
+            c: <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                self::_puroro_root::official_samples3::Test1,
+            > as ::std::clone::Clone>::clone(&self.c),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test4 {
     d: self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -224,5 +255,16 @@ impl self::_puroro::Message for Test4 {
         #[allow(unused)]
         use ::std::result::Result::Ok;
         Ok(todo!())
+    }
+}
+impl ::std::clone::Clone for Test4 {
+    fn clone(&self) -> Self {
+        Self {
+            d: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.d),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
     }
 }

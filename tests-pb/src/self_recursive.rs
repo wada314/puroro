@@ -62,3 +62,13 @@ impl self::_puroro::Message for Msg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        Self {
+            recursive_unlabeled: <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                self::_puroro_root::self_recursive::Msg,
+            > as ::std::clone::Clone>::clone(&self.recursive_unlabeled),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}

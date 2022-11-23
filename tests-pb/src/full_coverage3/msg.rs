@@ -92,3 +92,22 @@ impl self::_puroro::Message for Submsg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Submsg {
+    fn clone(&self) -> Self {
+        Self {
+            i32_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.i32_unlabeled),
+            i32_optional: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.i32_optional),
+            i64_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i64,
+                self::_puroro::tags::Int64,
+            > as ::std::clone::Clone>::clone(&self.i64_unlabeled),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}

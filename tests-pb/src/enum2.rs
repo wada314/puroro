@@ -75,6 +75,22 @@ impl self::_puroro::Message for Msg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        Self {
+            enum_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                self::_puroro_root::enum2::Enum,
+                self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+                0usize,
+            > as ::std::clone::Clone>::clone(&self.enum_optional),
+            enum_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                self::_puroro_root::enum2::Enum,
+                self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+            > as ::std::clone::Clone>::clone(&self.enum_repeated),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

@@ -62,6 +62,17 @@ impl self::_puroro::Message for Submsg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Submsg {
+    fn clone(&self) -> Self {
+        Self {
+            item_inner: <self::_puroro::internal::field_type::SingularNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.item_inner),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

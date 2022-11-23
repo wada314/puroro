@@ -732,6 +732,222 @@ impl self::_puroro::Message for Msg {
         Ok(todo!())
     }
 }
+impl ::std::clone::Clone for Msg {
+    fn clone(&self) -> Self {
+        Self {
+            i32_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+                0usize,
+            > as ::std::clone::Clone>::clone(&self.i32_required),
+            i32_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+                1usize,
+            > as ::std::clone::Clone>::clone(&self.i32_optional),
+            i32_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i32,
+                self::_puroro::tags::Int32,
+            > as ::std::clone::Clone>::clone(&self.i32_repeated),
+            float_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                f32,
+                self::_puroro::tags::Float,
+                2usize,
+            > as ::std::clone::Clone>::clone(&self.float_required),
+            float_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                f32,
+                self::_puroro::tags::Float,
+                3usize,
+            > as ::std::clone::Clone>::clone(&self.float_optional),
+            float_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                f32,
+                self::_puroro::tags::Float,
+            > as ::std::clone::Clone>::clone(&self.float_repeated),
+            bytes_required: <self::_puroro::internal::field_type::OptionalBytesField::<
+                4usize,
+            > as ::std::clone::Clone>::clone(&self.bytes_required),
+            bytes_optional: <self::_puroro::internal::field_type::OptionalBytesField::<
+                5usize,
+            > as ::std::clone::Clone>::clone(&self.bytes_optional),
+            bytes_repeated: <self::_puroro::internal::field_type::RepeatedBytesField as ::std::clone::Clone>::clone(
+                &self.bytes_repeated,
+            ),
+            string_required: <self::_puroro::internal::field_type::OptionalStringField::<
+                6usize,
+            > as ::std::clone::Clone>::clone(&self.string_required),
+            string_optional: <self::_puroro::internal::field_type::OptionalStringField::<
+                7usize,
+            > as ::std::clone::Clone>::clone(&self.string_optional),
+            string_repeated: <self::_puroro::internal::field_type::RepeatedStringField as ::std::clone::Clone>::clone(
+                &self.string_repeated,
+            ),
+            enum_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                self::_puroro_root::full_coverage2::Enum,
+                self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
+                8usize,
+            > as ::std::clone::Clone>::clone(&self.enum_required),
+            enum_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                self::_puroro_root::full_coverage2::Enum,
+                self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
+                9usize,
+            > as ::std::clone::Clone>::clone(&self.enum_optional),
+            enum_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                self::_puroro_root::full_coverage2::Enum,
+                self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
+            > as ::std::clone::Clone>::clone(&self.enum_repeated),
+            submsg_required: <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                self::_puroro_root::full_coverage2::msg::Submsg,
+            > as ::std::clone::Clone>::clone(&self.submsg_required),
+            submsg_optional: <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                self::_puroro_root::full_coverage2::msg::Submsg,
+            > as ::std::clone::Clone>::clone(&self.submsg_optional),
+            submsg_repeated: <self::_puroro::internal::field_type::RepeatedMessageField::<
+                self::_puroro_root::full_coverage2::msg::Submsg,
+            > as ::std::clone::Clone>::clone(&self.submsg_repeated),
+            i64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i64,
+                self::_puroro::tags::Int64,
+                10usize,
+            > as ::std::clone::Clone>::clone(&self.i64_required),
+            i64_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i64,
+                self::_puroro::tags::Int64,
+                11usize,
+            > as ::std::clone::Clone>::clone(&self.i64_optional),
+            i64_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i64,
+                self::_puroro::tags::Int64,
+            > as ::std::clone::Clone>::clone(&self.i64_repeated),
+            u32_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u32,
+                self::_puroro::tags::UInt32,
+                12usize,
+            > as ::std::clone::Clone>::clone(&self.u32_required),
+            u32_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u32,
+                self::_puroro::tags::UInt32,
+                13usize,
+            > as ::std::clone::Clone>::clone(&self.u32_optional),
+            u32_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                u32,
+                self::_puroro::tags::UInt32,
+            > as ::std::clone::Clone>::clone(&self.u32_repeated),
+            u64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u64,
+                self::_puroro::tags::UInt64,
+                14usize,
+            > as ::std::clone::Clone>::clone(&self.u64_required),
+            u64_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u64,
+                self::_puroro::tags::UInt64,
+                15usize,
+            > as ::std::clone::Clone>::clone(&self.u64_optional),
+            u64_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                u64,
+                self::_puroro::tags::UInt64,
+            > as ::std::clone::Clone>::clone(&self.u64_repeated),
+            s32_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::SInt32,
+                16usize,
+            > as ::std::clone::Clone>::clone(&self.s32_required),
+            s32_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::SInt32,
+                17usize,
+            > as ::std::clone::Clone>::clone(&self.s32_optional),
+            s32_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i32,
+                self::_puroro::tags::SInt32,
+            > as ::std::clone::Clone>::clone(&self.s32_repeated),
+            s64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i64,
+                self::_puroro::tags::SInt64,
+                18usize,
+            > as ::std::clone::Clone>::clone(&self.s64_required),
+            s64_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i64,
+                self::_puroro::tags::SInt64,
+                19usize,
+            > as ::std::clone::Clone>::clone(&self.s64_optional),
+            s64_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i64,
+                self::_puroro::tags::SInt64,
+            > as ::std::clone::Clone>::clone(&self.s64_repeated),
+            fixed32_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u32,
+                self::_puroro::tags::Fixed32,
+                20usize,
+            > as ::std::clone::Clone>::clone(&self.fixed32_required),
+            fixed32_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u32,
+                self::_puroro::tags::Fixed32,
+                21usize,
+            > as ::std::clone::Clone>::clone(&self.fixed32_optional),
+            fixed32_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                u32,
+                self::_puroro::tags::Fixed32,
+            > as ::std::clone::Clone>::clone(&self.fixed32_repeated),
+            fixed64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u64,
+                self::_puroro::tags::Fixed64,
+                22usize,
+            > as ::std::clone::Clone>::clone(&self.fixed64_required),
+            fixed64_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                u64,
+                self::_puroro::tags::Fixed64,
+                23usize,
+            > as ::std::clone::Clone>::clone(&self.fixed64_optional),
+            fixed64_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                u64,
+                self::_puroro::tags::Fixed64,
+            > as ::std::clone::Clone>::clone(&self.fixed64_repeated),
+            sfixed32_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::SFixed32,
+                24usize,
+            > as ::std::clone::Clone>::clone(&self.sfixed32_required),
+            sfixed32_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i32,
+                self::_puroro::tags::SFixed32,
+                25usize,
+            > as ::std::clone::Clone>::clone(&self.sfixed32_optional),
+            sfixed32_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i32,
+                self::_puroro::tags::SFixed32,
+            > as ::std::clone::Clone>::clone(&self.sfixed32_repeated),
+            sfixed64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i64,
+                self::_puroro::tags::SFixed64,
+                26usize,
+            > as ::std::clone::Clone>::clone(&self.sfixed64_required),
+            sfixed64_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                i64,
+                self::_puroro::tags::SFixed64,
+                27usize,
+            > as ::std::clone::Clone>::clone(&self.sfixed64_optional),
+            sfixed64_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                i64,
+                self::_puroro::tags::SFixed64,
+            > as ::std::clone::Clone>::clone(&self.sfixed64_repeated),
+            f64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                f64,
+                self::_puroro::tags::Double,
+                28usize,
+            > as ::std::clone::Clone>::clone(&self.f64_required),
+            f64_optional: <self::_puroro::internal::field_type::OptionalNumericalField::<
+                f64,
+                self::_puroro::tags::Double,
+                29usize,
+            > as ::std::clone::Clone>::clone(&self.f64_optional),
+            f64_repeated: <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                f64,
+                self::_puroro::tags::Double,
+            > as ::std::clone::Clone>::clone(&self.f64_repeated),
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+        }
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,
