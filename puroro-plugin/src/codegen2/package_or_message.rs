@@ -20,6 +20,7 @@ use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
+use itertools::Itertools;
 
 pub(super) trait PackageOrMessageTrait: Debug {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>>;
@@ -72,6 +73,7 @@ pub(super) trait PackageOrMessageTrait: Debug {
 
         let submodule_decls = self
             .subpackages()?
+            .sorted_by_cached_key(|p| p.name().unwrap_or(Cow::Borrowed("")).to_string())
             .map(|p| {
                 let ident =
                     format_ident!("{}", p.name()?.to_lower_snake_case().escape_rust_keywords());
