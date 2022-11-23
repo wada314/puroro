@@ -70,11 +70,11 @@ impl<T> FieldData<T> {
 }
 
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
-    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(u32, Self)>> {
+    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
             let var_u32 = var.get_u32()?;
             let wire_type: WireType = (var_u32 & 0x7).try_into()?;
-            let number = var_u32 >> 3;
+            let number = (var_u32 >> 3) as i32;
 
             let field_data = match wire_type {
                 WireType::Variant => FieldData::Variant(
@@ -138,17 +138,17 @@ impl TryFrom<u32> for WireType {
 
 pub(crate) fn ser_wire_and_number<W: Write>(
     wire: WireType,
-    number: u32,
+    number: i32,
     out: &mut W,
 ) -> Result<()> {
-    let var = Variant::from_u32((number << 3) | (wire as u32));
+    let var = Variant::from_i32((number << 3) | (wire as i32));
     var.encode_bytes(out)?;
     Ok(())
 }
 
 pub(crate) fn ser_numerical_shared<RustType, ProtoType, W>(
     val: RustType,
-    number: u32,
+    number: i32,
     out: &mut W,
 ) -> Result<()>
 where
@@ -181,7 +181,7 @@ where
     Ok(())
 }
 
-pub(crate) fn ser_bytes_shared<W: Write>(bytes: &[u8], number: u32, out: &mut W) -> Result<()> {
+pub(crate) fn ser_bytes_shared<W: Write>(bytes: &[u8], number: i32, out: &mut W) -> Result<()> {
     ser_wire_and_number(WireType::LengthDelimited, number, out)?;
     Variant::from_i32(bytes.len().try_into()?).encode_bytes(out)?;
     out.write_all(bytes)?;
