@@ -210,10 +210,9 @@ impl EnumImpl {
             impl ::std::convert::TryFrom::<i32> for #ident {
                 type Error = self::_puroro::PuroroError;
                 fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-                    use ::std::result::Result::{Ok, Err};
                     match val {
-                        #(#value_numbers => Ok(self::#ident::#value_idents),)*
-                        _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+                        #(#value_numbers => ::std::result::Result::Ok(self::#ident::#value_idents),)*
+                        _ => ::std::result::Result::Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
                     }
                 }
             }

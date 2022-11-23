@@ -55,6 +55,14 @@ impl Test1 {
         > as NonRepeatedFieldType>::get_field_opt(&self.a, &self._bitfield)
             .is_some()
     }
+    pub fn clear_a(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.a, &mut self._bitfield)
+    }
 }
 impl self::_puroro::Message for Test1 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -156,6 +164,12 @@ impl Test2 {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.b, &self._bitfield)
             .is_some()
+    }
+    pub fn clear_b(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.b, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Test2 {
@@ -259,6 +273,12 @@ impl Test3 {
         > as NonRepeatedFieldType>::get_field_opt(&self.c, &self._bitfield)
             .is_some()
     }
+    pub fn clear_c(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::official_samples2::Test1,
+        > as NonRepeatedFieldType>::clear(&mut self.c, &mut self._bitfield)
+    }
 }
 impl self::_puroro::Message for Test3 {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -331,6 +351,20 @@ impl Test4 {
             i32,
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.d, &self._bitfield)
+    }
+    pub fn d_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::mut_field(&mut self.d, &mut self._bitfield)
+    }
+    pub fn clear_d(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::clear(&mut self.d, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Test4 {

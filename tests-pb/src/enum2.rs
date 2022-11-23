@@ -61,12 +61,36 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field_opt(&self.enum_optional, &self._bitfield)
             .is_some()
     }
+    pub fn clear_enum_optional(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.enum_optional, &mut self._bitfield)
+    }
     pub fn enum_repeated(&self) -> &[self::_puroro_root::enum2::Enum] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             self::_puroro_root::enum2::Enum,
             self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
         > as RepeatedFieldType>::get_field(&self.enum_repeated, &self._bitfield)
+    }
+    pub fn enum_repeated_mut(
+        &mut self,
+    ) -> &mut ::std::vec::Vec::<self::_puroro_root::enum2::Enum> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::enum2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+        > as RepeatedFieldType>::mut_field(&mut self.enum_repeated, &mut self._bitfield)
+    }
+    pub fn clear_enum_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::enum2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+        > as RepeatedFieldType>::clear(&mut self.enum_repeated, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Msg {
@@ -187,13 +211,16 @@ impl ::std::convert::From::<Enum> for i32 {
 impl ::std::convert::TryFrom::<i32> for Enum {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            7i32 => Ok(self::Enum::ValueSeven),
-            0i32 => Ok(self::Enum::ValueZero),
-            1i32 => Ok(self::Enum::ValueOne),
-            42i32 => Ok(self::Enum::ValueFourtyTwo),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            7i32 => ::std::result::Result::Ok(self::Enum::ValueSeven),
+            0i32 => ::std::result::Result::Ok(self::Enum::ValueZero),
+            1i32 => ::std::result::Result::Ok(self::Enum::ValueOne),
+            42i32 => ::std::result::Result::Ok(self::Enum::ValueFourtyTwo),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }

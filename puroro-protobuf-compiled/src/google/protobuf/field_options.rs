@@ -35,12 +35,15 @@ impl ::std::convert::From::<CType> for i32 {
 impl ::std::convert::TryFrom::<i32> for CType {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            0i32 => Ok(self::CType::String),
-            1i32 => Ok(self::CType::Cord),
-            2i32 => Ok(self::CType::StringPiece),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            0i32 => ::std::result::Result::Ok(self::CType::String),
+            1i32 => ::std::result::Result::Ok(self::CType::Cord),
+            2i32 => ::std::result::Result::Ok(self::CType::StringPiece),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }
@@ -75,12 +78,15 @@ impl ::std::convert::From::<JSType> for i32 {
 impl ::std::convert::TryFrom::<i32> for JSType {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            0i32 => Ok(self::JSType::JsNormal),
-            1i32 => Ok(self::JSType::JsString),
-            2i32 => Ok(self::JSType::JsNumber),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            0i32 => ::std::result::Result::Ok(self::JSType::JsNormal),
+            1i32 => ::std::result::Result::Ok(self::JSType::JsString),
+            2i32 => ::std::result::Result::Ok(self::JSType::JsNumber),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }

@@ -65,27 +65,30 @@ impl ::std::convert::From::<Type> for i32 {
 impl ::std::convert::TryFrom::<i32> for Type {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            1i32 => Ok(self::Type::TypeDouble),
-            2i32 => Ok(self::Type::TypeFloat),
-            3i32 => Ok(self::Type::TypeInt64),
-            4i32 => Ok(self::Type::TypeUint64),
-            5i32 => Ok(self::Type::TypeInt32),
-            6i32 => Ok(self::Type::TypeFixed64),
-            7i32 => Ok(self::Type::TypeFixed32),
-            8i32 => Ok(self::Type::TypeBool),
-            9i32 => Ok(self::Type::TypeString),
-            10i32 => Ok(self::Type::TypeGroup),
-            11i32 => Ok(self::Type::TypeMessage),
-            12i32 => Ok(self::Type::TypeBytes),
-            13i32 => Ok(self::Type::TypeUint32),
-            14i32 => Ok(self::Type::TypeEnum),
-            15i32 => Ok(self::Type::TypeSfixed32),
-            16i32 => Ok(self::Type::TypeSfixed64),
-            17i32 => Ok(self::Type::TypeSint32),
-            18i32 => Ok(self::Type::TypeSint64),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            1i32 => ::std::result::Result::Ok(self::Type::TypeDouble),
+            2i32 => ::std::result::Result::Ok(self::Type::TypeFloat),
+            3i32 => ::std::result::Result::Ok(self::Type::TypeInt64),
+            4i32 => ::std::result::Result::Ok(self::Type::TypeUint64),
+            5i32 => ::std::result::Result::Ok(self::Type::TypeInt32),
+            6i32 => ::std::result::Result::Ok(self::Type::TypeFixed64),
+            7i32 => ::std::result::Result::Ok(self::Type::TypeFixed32),
+            8i32 => ::std::result::Result::Ok(self::Type::TypeBool),
+            9i32 => ::std::result::Result::Ok(self::Type::TypeString),
+            10i32 => ::std::result::Result::Ok(self::Type::TypeGroup),
+            11i32 => ::std::result::Result::Ok(self::Type::TypeMessage),
+            12i32 => ::std::result::Result::Ok(self::Type::TypeBytes),
+            13i32 => ::std::result::Result::Ok(self::Type::TypeUint32),
+            14i32 => ::std::result::Result::Ok(self::Type::TypeEnum),
+            15i32 => ::std::result::Result::Ok(self::Type::TypeSfixed32),
+            16i32 => ::std::result::Result::Ok(self::Type::TypeSfixed64),
+            17i32 => ::std::result::Result::Ok(self::Type::TypeSint32),
+            18i32 => ::std::result::Result::Ok(self::Type::TypeSint64),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }
@@ -120,12 +123,15 @@ impl ::std::convert::From::<Label> for i32 {
 impl ::std::convert::TryFrom::<i32> for Label {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            1i32 => Ok(self::Label::LabelOptional),
-            2i32 => Ok(self::Label::LabelRequired),
-            3i32 => Ok(self::Label::LabelRepeated),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            1i32 => ::std::result::Result::Ok(self::Label::LabelOptional),
+            2i32 => ::std::result::Result::Ok(self::Label::LabelRequired),
+            3i32 => ::std::result::Result::Ok(self::Label::LabelRepeated),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }

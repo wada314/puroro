@@ -60,6 +60,14 @@ impl Submsg {
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
             .is_some()
     }
+    pub fn clear_i32_required(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.i32_required, &mut self._bitfield)
+    }
     pub fn i64_required(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -100,6 +108,14 @@ impl Submsg {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
             .is_some()
+    }
+    pub fn clear_i64_required(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+            1usize,
+        > as NonRepeatedFieldType>::clear(&mut self.i64_required, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Submsg {

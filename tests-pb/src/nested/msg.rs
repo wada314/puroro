@@ -50,6 +50,13 @@ impl Submsg {
         > as NonRepeatedFieldType>::get_field_opt(&self.item_inner, &self._bitfield)
             .is_some()
     }
+    pub fn clear_item_inner(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::clear(&mut self.item_inner, &mut self._bitfield)
+    }
 }
 impl self::_puroro::Message for Submsg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

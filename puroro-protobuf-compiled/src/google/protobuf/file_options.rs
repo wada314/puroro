@@ -35,12 +35,15 @@ impl ::std::convert::From::<OptimizeMode> for i32 {
 impl ::std::convert::TryFrom::<i32> for OptimizeMode {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            1i32 => Ok(self::OptimizeMode::Speed),
-            2i32 => Ok(self::OptimizeMode::CodeSize),
-            3i32 => Ok(self::OptimizeMode::LiteRuntime),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            1i32 => ::std::result::Result::Ok(self::OptimizeMode::Speed),
+            2i32 => ::std::result::Result::Ok(self::OptimizeMode::CodeSize),
+            3i32 => ::std::result::Result::Ok(self::OptimizeMode::LiteRuntime),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }

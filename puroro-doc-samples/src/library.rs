@@ -48,6 +48,13 @@ impl Book {
             )
             .is_some()
     }
+    pub fn clear_title(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::clear(
+            &mut self.title,
+            &mut self._bitfield,
+        )
+    }
     pub fn num_pages(&self) -> u32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
@@ -85,6 +92,13 @@ impl Book {
         > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
             .is_some()
     }
+    pub fn clear_num_pages(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            u32,
+            self::_puroro::tags::UInt32,
+        > as NonRepeatedFieldType>::clear(&mut self.num_pages, &mut self._bitfield)
+    }
     pub fn author(
         &self,
     ) -> ::std::option::Option::<&self::_puroro_root::library::Author> {
@@ -121,6 +135,12 @@ impl Book {
             self::_puroro_root::library::Author,
         > as NonRepeatedFieldType>::get_field_opt(&self.author, &self._bitfield)
             .is_some()
+    }
+    pub fn clear_author(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::library::Author,
+        > as NonRepeatedFieldType>::clear(&mut self.author, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Book {
@@ -254,6 +274,13 @@ impl Author {
                 &self._bitfield,
             )
             .is_some()
+    }
+    pub fn clear_name(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::clear(
+            &mut self.name,
+            &mut self._bitfield,
+        )
     }
 }
 impl self::_puroro::Message for Author {

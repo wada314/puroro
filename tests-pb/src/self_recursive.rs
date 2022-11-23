@@ -57,6 +57,15 @@ impl Msg {
             )
             .is_some()
     }
+    pub fn clear_recursive_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::self_recursive::Msg,
+        > as NonRepeatedFieldType>::clear(
+            &mut self.recursive_unlabeled,
+            &mut self._bitfield,
+        )
+    }
 }
 impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

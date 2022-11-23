@@ -65,6 +65,14 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field_opt(&self.enum_optional, &self._bitfield)
             .is_some()
     }
+    pub fn clear_enum_optional(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.enum_optional, &mut self._bitfield)
+    }
     pub fn enum_unlabeled(&self) -> self::_puroro_root::enum3::Enum {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
@@ -104,12 +112,35 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field_opt(&self.enum_unlabeled, &self._bitfield)
             .is_some()
     }
+    pub fn clear_enum_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as NonRepeatedFieldType>::clear(&mut self.enum_unlabeled, &mut self._bitfield)
+    }
     pub fn enum_repeated(&self) -> &[self::_puroro_root::enum3::Enum] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             self::_puroro_root::enum3::Enum,
             self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
         > as RepeatedFieldType>::get_field(&self.enum_repeated, &self._bitfield)
+    }
+    pub fn enum_repeated_mut(
+        &mut self,
+    ) -> &mut ::std::vec::Vec::<self::_puroro_root::enum3::Enum> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as RepeatedFieldType>::mut_field(&mut self.enum_repeated, &mut self._bitfield)
+    }
+    pub fn clear_enum_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as RepeatedFieldType>::clear(&mut self.enum_repeated, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Msg {

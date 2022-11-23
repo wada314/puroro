@@ -35,12 +35,15 @@ impl ::std::convert::From::<IdempotencyLevel> for i32 {
 impl ::std::convert::TryFrom::<i32> for IdempotencyLevel {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
-        use ::std::result::Result::{Ok, Err};
         match val {
-            0i32 => Ok(self::IdempotencyLevel::IdempotencyUnknown),
-            1i32 => Ok(self::IdempotencyLevel::NoSideEffects),
-            2i32 => Ok(self::IdempotencyLevel::Idempotent),
-            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+            0i32 => ::std::result::Result::Ok(self::IdempotencyLevel::IdempotencyUnknown),
+            1i32 => ::std::result::Result::Ok(self::IdempotencyLevel::NoSideEffects),
+            2i32 => ::std::result::Result::Ok(self::IdempotencyLevel::Idempotent),
+            _ => {
+                ::std::result::Result::Err(
+                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                )?
+            }
         }
     }
 }

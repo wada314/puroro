@@ -31,6 +31,20 @@ impl Annotation {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.path, &self._bitfield)
     }
+    pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::mut_field(&mut self.path, &mut self._bitfield)
+    }
+    pub fn clear_path(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::clear(&mut self.path, &mut self._bitfield)
+    }
     pub fn source_file(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
@@ -63,6 +77,12 @@ impl Annotation {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.source_file, &self._bitfield)
             .is_some()
+    }
+    pub fn clear_source_file(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.source_file, &mut self._bitfield)
     }
     pub fn begin(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -105,6 +125,14 @@ impl Annotation {
         > as NonRepeatedFieldType>::get_field_opt(&self.begin, &self._bitfield)
             .is_some()
     }
+    pub fn clear_begin(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::clear(&mut self.begin, &mut self._bitfield)
+    }
     pub fn end(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -145,6 +173,14 @@ impl Annotation {
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
             .is_some()
+    }
+    pub fn clear_end(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            2usize,
+        > as NonRepeatedFieldType>::clear(&mut self.end, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Annotation {

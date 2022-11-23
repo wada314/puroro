@@ -83,12 +83,33 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_unlabeled, &self._bitfield)
             .is_some()
     }
+    pub fn clear_i32_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::clear(&mut self.i32_unlabeled, &mut self._bitfield)
+    }
     pub fn i32_repeated(&self) -> &[i32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.i32_repeated, &self._bitfield)
+    }
+    pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::mut_field(&mut self.i32_repeated, &mut self._bitfield)
+    }
+    pub fn clear_i32_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::clear(&mut self.i32_repeated, &mut self._bitfield)
     }
     pub fn float_unlabeled(&self) -> f32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -127,12 +148,33 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field_opt(&self.float_unlabeled, &self._bitfield)
             .is_some()
     }
+    pub fn clear_float_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as NonRepeatedFieldType>::clear(&mut self.float_unlabeled, &mut self._bitfield)
+    }
     pub fn float_repeated(&self) -> &[f32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             f32,
             self::_puroro::tags::Float,
         > as RepeatedFieldType>::get_field(&self.float_repeated, &self._bitfield)
+    }
+    pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as RepeatedFieldType>::mut_field(&mut self.float_repeated, &mut self._bitfield)
+    }
+    pub fn clear_float_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as RepeatedFieldType>::clear(&mut self.float_repeated, &mut self._bitfield)
     }
     pub fn string_unlabeled(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -165,11 +207,34 @@ impl Msg {
             )
             .is_some()
     }
+    pub fn clear_string_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::clear(
+            &mut self.string_unlabeled,
+            &mut self._bitfield,
+        )
+    }
     pub fn string_repeated(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.string_repeated,
             &self._bitfield,
+        )
+    }
+    pub fn string_repeated_mut(
+        &mut self,
+    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
+            &mut self.string_repeated,
+            &mut self._bitfield,
+        )
+    }
+    pub fn clear_string_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::clear(
+            &mut self.string_repeated,
+            &mut self._bitfield,
         )
     }
     pub fn submsg_unlabeled(
@@ -217,11 +282,37 @@ impl Msg {
             )
             .is_some()
     }
+    pub fn clear_submsg_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::ser_tests3::msg::Submsg,
+        > as NonRepeatedFieldType>::clear(
+            &mut self.submsg_unlabeled,
+            &mut self._bitfield,
+        )
+    }
     pub fn submsg_repeated(&self) -> &[self::_puroro_root::ser_tests3::msg::Submsg] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::ser_tests3::msg::Submsg,
         > as RepeatedFieldType>::get_field(&self.submsg_repeated, &self._bitfield)
+    }
+    pub fn submsg_repeated_mut(
+        &mut self,
+    ) -> &mut ::std::vec::Vec::<self::_puroro_root::ser_tests3::msg::Submsg> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedMessageField::<
+            self::_puroro_root::ser_tests3::msg::Submsg,
+        > as RepeatedFieldType>::mut_field(
+            &mut self.submsg_repeated,
+            &mut self._bitfield,
+        )
+    }
+    pub fn clear_submsg_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedMessageField::<
+            self::_puroro_root::ser_tests3::msg::Submsg,
+        > as RepeatedFieldType>::clear(&mut self.submsg_repeated, &mut self._bitfield)
     }
     pub fn enum_unlabeled(&self) -> self::_puroro_root::ser_tests3::Enum {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -262,12 +353,35 @@ impl Msg {
         > as NonRepeatedFieldType>::get_field_opt(&self.enum_unlabeled, &self._bitfield)
             .is_some()
     }
+    pub fn clear_enum_unlabeled(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+        > as NonRepeatedFieldType>::clear(&mut self.enum_unlabeled, &mut self._bitfield)
+    }
     pub fn enum_repeated(&self) -> &[self::_puroro_root::ser_tests3::Enum] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             self::_puroro_root::ser_tests3::Enum,
             self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
         > as RepeatedFieldType>::get_field(&self.enum_repeated, &self._bitfield)
+    }
+    pub fn enum_repeated_mut(
+        &mut self,
+    ) -> &mut ::std::vec::Vec::<self::_puroro_root::ser_tests3::Enum> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+        > as RepeatedFieldType>::mut_field(&mut self.enum_repeated, &mut self._bitfield)
+    }
+    pub fn clear_enum_repeated(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+        > as RepeatedFieldType>::clear(&mut self.enum_repeated, &mut self._bitfield)
     }
     pub fn very_large_field_number(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -311,6 +425,16 @@ impl Msg {
                 &self._bitfield,
             )
             .is_some()
+    }
+    pub fn clear_very_large_field_number(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::clear(
+            &mut self.very_large_field_number,
+            &mut self._bitfield,
+        )
     }
 }
 impl self::_puroro::Message for Msg {

@@ -29,12 +29,40 @@ impl Location {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.path, &self._bitfield)
     }
+    pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::mut_field(&mut self.path, &mut self._bitfield)
+    }
+    pub fn clear_path(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::clear(&mut self.path, &mut self._bitfield)
+    }
     pub fn span(&self) -> &[i32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.span, &self._bitfield)
+    }
+    pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::mut_field(&mut self.span, &mut self._bitfield)
+    }
+    pub fn clear_span(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::clear(&mut self.span, &mut self._bitfield)
     }
     pub fn leading_comments(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -75,6 +103,15 @@ impl Location {
             )
             .is_some()
     }
+    pub fn clear_leading_comments(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            0usize,
+        > as NonRepeatedFieldType>::clear(
+            &mut self.leading_comments,
+            &mut self._bitfield,
+        )
+    }
     pub fn trailing_comments(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
@@ -114,6 +151,15 @@ impl Location {
             )
             .is_some()
     }
+    pub fn clear_trailing_comments(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            1usize,
+        > as NonRepeatedFieldType>::clear(
+            &mut self.trailing_comments,
+            &mut self._bitfield,
+        )
+    }
     pub fn leading_detached_comments(
         &self,
     ) -> &[impl ::std::ops::Deref::<Target = str>] {
@@ -121,6 +167,22 @@ impl Location {
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.leading_detached_comments,
             &self._bitfield,
+        )
+    }
+    pub fn leading_detached_comments_mut(
+        &mut self,
+    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
+            &mut self.leading_detached_comments,
+            &mut self._bitfield,
+        )
+    }
+    pub fn clear_leading_detached_comments(&mut self) {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::clear(
+            &mut self.leading_detached_comments,
+            &mut self._bitfield,
         )
     }
 }

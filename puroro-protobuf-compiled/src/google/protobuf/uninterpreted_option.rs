@@ -48,6 +48,12 @@ impl NamePart {
         > as NonRepeatedFieldType>::get_field_opt(&self.name_part, &self._bitfield)
             .is_some()
     }
+    pub fn clear_name_part(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            0usize,
+        > as NonRepeatedFieldType>::clear(&mut self.name_part, &mut self._bitfield)
+    }
     pub fn is_extension(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -88,6 +94,14 @@ impl NamePart {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.is_extension, &self._bitfield)
             .is_some()
+    }
+    pub fn clear_is_extension(&mut self) {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            bool,
+            self::_puroro::tags::Bool,
+            1usize,
+        > as NonRepeatedFieldType>::clear(&mut self.is_extension, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for NamePart {
