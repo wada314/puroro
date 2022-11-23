@@ -24,9 +24,11 @@ pub struct Msg {
     string_unlabeled: self::_puroro::internal::field_type::SingularStringField,
     string_repeated: self::_puroro::internal::field_type::RepeatedStringField,
     submsg_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField::<
-        (),
+        self::_puroro_root::ser_tests3::msg::Submsg,
     >,
-    submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<()>,
+    submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<
+        self::_puroro_root::ser_tests3::msg::Submsg,
+    >,
     enum_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
         self::_puroro_root::ser_tests3::Enum,
         self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
@@ -98,7 +100,7 @@ impl Msg {
     ) -> ::std::option::Option::<&self::_puroro_root::ser_tests3::msg::Submsg> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            (),
+            self::_puroro_root::ser_tests3::msg::Submsg,
         > as NonRepeatedFieldType>::get_field(
             &self.submsg_unlabeled,
             &self._bitfield,
@@ -108,7 +110,7 @@ impl Msg {
     pub fn submsg_repeated(&self) -> &[self::_puroro_root::ser_tests3::msg::Submsg] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
-            (),
+            self::_puroro_root::ser_tests3::msg::Submsg,
         > as RepeatedFieldType>::get_field(&self.submsg_repeated, &self._bitfield)
     }
     pub fn enum_unlabeled(&self) -> self::_puroro_root::ser_tests3::Enum {
@@ -141,9 +143,23 @@ impl Msg {
         )
     }
 }
+#[derive(
+    ::std::clone::Clone,
+    ::std::marker::Copy,
+    ::std::cmp::PartialEq,
+    ::std::cmp::Eq,
+    ::std::cmp::PartialOrd,
+    ::std::cmp::Ord,
+    ::std::hash::Hash,
+)]
 pub enum Enum {
     Zeroth,
     First,
     Tenth,
     _None(i32),
+}
+impl ::std::default::Default for Enum {
+    fn default() -> Self {
+        Self::Zeroth
+    }
 }

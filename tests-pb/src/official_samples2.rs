@@ -43,7 +43,9 @@ impl Test2 {
     }
 }
 pub struct Test3 {
-    c: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
+    c: self::_puroro::internal::field_type::SingularHeapMessageField::<
+        self::_puroro_root::official_samples2::Test1,
+    >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
 impl Test3 {
@@ -52,7 +54,7 @@ impl Test3 {
     ) -> ::std::option::Option::<&self::_puroro_root::official_samples2::Test1> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            (),
+            self::_puroro_root::official_samples2::Test1,
         > as NonRepeatedFieldType>::get_field(
             &self.c,
             &self._bitfield,

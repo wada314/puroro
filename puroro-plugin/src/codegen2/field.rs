@@ -209,10 +209,10 @@ impl FieldImpl {
                         RepeatedBytesField
                     },
                     (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                        SingularHeapMessageField::<()>
+                        SingularHeapMessageField::<#primitive_type>
                     },
                     (Repeated, LengthDelimited(Message(_))) => quote! {
-                        RepeatedMessageField::<()>
+                        RepeatedMessageField::<#primitive_type>
                     },
                 };
                 Ok(Rc::new(quote! {

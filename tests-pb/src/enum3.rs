@@ -52,10 +52,24 @@ impl Msg {
         > as RepeatedFieldType>::get_field(&self.enum_repeated, &self._bitfield)
     }
 }
+#[derive(
+    ::std::clone::Clone,
+    ::std::marker::Copy,
+    ::std::cmp::PartialEq,
+    ::std::cmp::Eq,
+    ::std::cmp::PartialOrd,
+    ::std::cmp::Ord,
+    ::std::hash::Hash,
+)]
 pub enum Enum {
     ValueZero,
     ValueSeven,
     ValueOne,
     ValueFourtyTwo,
     _None(i32),
+}
+impl ::std::default::Default for Enum {
+    fn default() -> Self {
+        Self::ValueZero
+    }
 }

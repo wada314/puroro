@@ -19,7 +19,7 @@
 
 use super::util::{StrExt, WeakExt};
 use super::{InputFile, PackageOrMessage, Syntax};
-use crate::Result;
+use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
@@ -77,26 +77,37 @@ impl Enum for EnumImpl {
 
     fn gen_enum(&self) -> Result<TokenStream> {
         let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
-        let values = self
+        let value_idents = self
             .values
             .iter()
-            .map(|(name, _)| {
-                let ident = format_ident!("{}", name.to_camel_case().escape_rust_keywords());
-                quote! {
-                    #ident,
-                }
-            })
+            .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))
             .collect::<Vec<_>>();
         let syntax = self.syntax()?;
         let maybe_extra_value = match syntax {
             Syntax::Proto2 => quote! {},
             Syntax::Proto3 => quote! { _None(i32), },
         };
+        let first_value_ident = value_idents.first().ok_or(ErrorKind::NoEnumValues)?;
 
         Ok(quote! {
+            #[derive(
+                ::std::clone::Clone,
+                ::std::marker::Copy,
+                ::std::cmp::PartialEq,
+                ::std::cmp::Eq,
+                ::std::cmp::PartialOrd,
+                ::std::cmp::Ord,
+                ::std::hash::Hash,
+            )]
             pub enum #ident {
-                #(#values)*
+                #(#value_idents,)*
                 #maybe_extra_value
+            }
+
+            impl ::std::default::Default for #ident {
+                fn default() -> Self {
+                    Self::#first_value_ident
+                }
             }
         })
     }

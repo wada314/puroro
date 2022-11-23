@@ -53,9 +53,15 @@ pub struct Msg {
         self::_puroro_root::full_coverage2::Enum,
         self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
     >,
-    submsg_required: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
-    submsg_optional: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
-    submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<()>,
+    submsg_required: self::_puroro::internal::field_type::SingularHeapMessageField::<
+        self::_puroro_root::full_coverage2::msg::Submsg,
+    >,
+    submsg_optional: self::_puroro::internal::field_type::SingularHeapMessageField::<
+        self::_puroro_root::full_coverage2::msg::Submsg,
+    >,
+    submsg_repeated: self::_puroro::internal::field_type::RepeatedMessageField::<
+        self::_puroro_root::full_coverage2::msg::Submsg,
+    >,
     i64_required: self::_puroro::internal::field_type::OptionalNumericalField::<
         i64,
         self::_puroro::tags::Int64,
@@ -351,7 +357,7 @@ impl Msg {
     ) -> ::std::option::Option::<&self::_puroro_root::full_coverage2::msg::Submsg> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            (),
+            self::_puroro_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field(
             &self.submsg_required,
             &self._bitfield,
@@ -363,7 +369,7 @@ impl Msg {
     ) -> ::std::option::Option::<&self::_puroro_root::full_coverage2::msg::Submsg> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            (),
+            self::_puroro_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field(
             &self.submsg_optional,
             &self._bitfield,
@@ -373,7 +379,7 @@ impl Msg {
     pub fn submsg_repeated(&self) -> &[self::_puroro_root::full_coverage2::msg::Submsg] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
-            (),
+            self::_puroro_root::full_coverage2::msg::Submsg,
         > as RepeatedFieldType>::get_field(&self.submsg_repeated, &self._bitfield)
     }
     pub fn i64_required(&self) -> i64 {
@@ -687,8 +693,22 @@ impl Msg {
         > as RepeatedFieldType>::get_field(&self.f64_repeated, &self._bitfield)
     }
 }
+#[derive(
+    ::std::clone::Clone,
+    ::std::marker::Copy,
+    ::std::cmp::PartialEq,
+    ::std::cmp::Eq,
+    ::std::cmp::PartialOrd,
+    ::std::cmp::Ord,
+    ::std::hash::Hash,
+)]
 pub enum Enum {
     Zeroth,
     First,
     Tenth,
+}
+impl ::std::default::Default for Enum {
+    fn default() -> Self {
+        Self::Zeroth
+    }
 }
