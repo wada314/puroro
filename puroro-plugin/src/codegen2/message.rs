@@ -27,12 +27,12 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait Message: Debug + PackageOrMessage {
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message>;
+    fn name(&self) -> Result<&str>;
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn bitfield_size(&self) -> Result<usize>;
-    fn name(&self) -> Result<&str>;
-    fn gen_struct(&self) -> Result<TokenStream>;
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message>;
+    fn gen_struct(&self) -> Result<TokenStream>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();
@@ -181,27 +181,11 @@ impl PackageOrMessage for MessageImpl {
 }
 
 impl Message for MessageImpl {
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message> {
+        self
+    }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
-    }
-
-    fn gen_struct(&self) -> Result<TokenStream> {
-        let ident = format_ident!(
-            "{}",
-            self.name.to_camel_case().escape_rust_keywords().to_string()
-        );
-        let fields = self
-            .fields
-            .iter()
-            .map(|f| f.gen_struct_field_decl())
-            .collect::<Result<Vec<_>>>()?;
-        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
-        Ok(quote! {
-            pub struct #ident {
-                #(#fields)*
-                _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
-            }
-        })
     }
     fn input_file(&self) -> Result<Rc<dyn InputFile>> {
         Ok(self.input_file.try_upgrade()?)
@@ -234,7 +218,26 @@ impl Message for MessageImpl {
             .cloned()
     }
 
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message> {
-        self
+    fn gen_struct(&self) -> Result<TokenStream> {
+        let ident = format_ident!(
+            "{}",
+            self.name.to_camel_case().escape_rust_keywords().to_string()
+        );
+        let fields = self
+            .fields
+            .iter()
+            .map(|f| f.gen_struct_field_decl())
+            .collect::<Result<Vec<_>>>()?;
+        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
+        Ok(quote! {
+            pub struct #ident {
+                #(#fields)*
+                _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
+            }
+
+            impl #ident {
+
+            }
+        })
     }
 }

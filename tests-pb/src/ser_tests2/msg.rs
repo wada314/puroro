@@ -12,3 +12,4 @@ pub struct Submsg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+impl Submsg {}

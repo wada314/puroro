@@ -12,6 +12,7 @@ pub struct Msg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+impl Msg {}
 pub struct _Self {
     r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
@@ -20,3 +21,4 @@ pub struct _Self {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+impl _Self {}

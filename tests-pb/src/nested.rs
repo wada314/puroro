@@ -11,3 +11,4 @@ pub struct Msg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
+impl Msg {}

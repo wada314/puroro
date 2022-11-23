@@ -7,6 +7,7 @@ pub mod _puroro {
 pub struct Msg {
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
+impl Msg {}
 pub struct Submsg {
     i32_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
@@ -15,3 +16,4 @@ pub struct Submsg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+impl Submsg {}

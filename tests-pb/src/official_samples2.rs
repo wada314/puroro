@@ -12,14 +12,17 @@ pub struct Test1 {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+impl Test1 {}
 pub struct Test2 {
     b: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
+impl Test2 {}
 pub struct Test3 {
     c: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
+impl Test3 {}
 pub struct Test4 {
     d: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i32,
@@ -27,3 +30,4 @@ pub struct Test4 {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
+impl Test4 {}
