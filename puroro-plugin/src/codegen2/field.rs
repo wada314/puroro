@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::{StrExt, WeakExt};
+use super::util::{AnonymousCache, StrExt, WeakExt};
 use super::{FieldRule, FieldType, LengthDelimitedType, Message};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -23,6 +23,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait Field: Debug {
+    fn cache(&self) -> &AnonymousCache;
     fn message(&self) -> Result<Rc<dyn Message>>;
     fn number(&self) -> i32;
 
@@ -39,6 +40,7 @@ pub(super) trait Field: Debug {
 
 #[derive(Debug)]
 pub(super) struct FieldImpl {
+    cache: AnonymousCache,
     name: String,
     message: Weak<dyn Message>,
     rule: OnceCell<FieldRule>,
@@ -65,6 +67,9 @@ struct FieldBitfieldAllocation {
 }
 
 impl Field for FieldImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
     }
@@ -153,6 +158,7 @@ impl Field for FieldImpl {
 impl FieldImpl {
     pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
         Rc::new(FieldImpl {
+            cache: Default::default(),
             name: proto.name().to_string(),
             message,
             rule: OnceCell::new(),

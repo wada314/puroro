@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::WeakExt;
+use super::util::{AnonymousCache, WeakExt};
 use super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -23,6 +23,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait InputFile: Debug {
+    fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn Package>>;
@@ -32,6 +33,7 @@ pub(super) trait InputFile: Debug {
 
 #[derive(Debug)]
 pub(super) struct InputFileImpl {
+    cache: AnonymousCache,
     name: String,
     syntax: String,
     syntax_cell: OnceCell<Syntax>,
@@ -57,6 +59,7 @@ impl InputFileImpl {
         E: 'static + Enum,
     {
         Rc::new_cyclic(|weak| Self {
+            cache: Default::default(),
             name: proto.name().to_string(),
             syntax: proto.syntax().to_string(),
             syntax_cell: OnceCell::new(),
@@ -88,6 +91,9 @@ impl InputFileImpl {
 }
 
 impl InputFile for InputFileImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }

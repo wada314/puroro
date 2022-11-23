@@ -14,6 +14,7 @@
 
 use super::{Enum, Message, MessageOrEnum, Package, RootPackage};
 use crate::{ErrorKind, Result};
+use super::util::AnonymousCache;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
@@ -21,6 +22,7 @@ use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub(super) trait PackageOrMessage: Debug {
+    fn cache(&self) -> &AnonymousCache;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;

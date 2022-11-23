@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::{StrExt, WeakExt};
+use super::util::{AnonymousCache, StrExt, WeakExt};
 use super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
 use crate::Result;
 use ::itertools::Itertools;
@@ -26,6 +26,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait Package: Debug + PackageOrMessage {
+    fn cache(&self) -> &AnonymousCache;
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
@@ -44,6 +45,7 @@ pub(super) struct PackageBase {
 
 #[derive(Debug)]
 pub(super) struct NonRootPackage {
+    cache: AnonymousCache,
     name: String,
     parent: Weak<dyn Package>,
     base: PackageBase,
@@ -53,6 +55,7 @@ pub(super) struct NonRootPackage {
 
 #[derive(Debug)]
 pub(super) struct RootPackage {
+    cache: AnonymousCache,
     base: PackageBase,
 }
 
@@ -178,7 +181,10 @@ impl RootPackage {
                 },
                 |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn Package>),
             );
-            Self { base }
+            Self {
+                cache: Default::default(),
+                base,
+            }
         })
     }
 
@@ -222,6 +228,7 @@ impl NonRootPackage {
                 |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn Package>),
             );
             Self {
+                cache: Default::default(),
                 name: name.to_string(),
                 parent,
                 base,
@@ -233,6 +240,9 @@ impl NonRootPackage {
 }
 
 impl PackageOrMessage for RootPackage {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
     }
@@ -263,6 +273,9 @@ impl PackageOrMessage for RootPackage {
 }
 
 impl Package for RootPackage {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
@@ -278,6 +291,9 @@ impl Package for RootPackage {
 }
 
 impl PackageOrMessage for NonRootPackage {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
     }
@@ -337,6 +353,9 @@ impl PackageOrMessage for NonRootPackage {
 }
 
 impl Package for NonRootPackage {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok(self.name.as_str().into())
     }

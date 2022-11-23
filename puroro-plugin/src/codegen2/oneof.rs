@@ -12,18 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::util::AnonymousCache;
 use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait Oneof: Debug {}
+pub trait Oneof: Debug {
+    fn cache(&self) -> &AnonymousCache;
+}
 
 #[derive(Debug)]
-pub struct OneofImpl {}
+pub struct OneofImpl {
+    cache: AnonymousCache,
+}
 
 impl OneofImpl {
     #[allow(unused)]
     fn new(proto: &OneofDescriptorProto) -> Rc<Self> {
-        Rc::new(OneofImpl {})
+        Rc::new(OneofImpl {
+            cache: Default::default(),
+        })
+    }
+}
+
+impl Oneof for OneofImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
     }
 }

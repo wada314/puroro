@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::{StrExt, WeakExt};
+use super::util::{AnonymousCache, StrExt, WeakExt};
 use super::{Enum, EnumImpl, Field, FieldImpl, InputFile, Package, PackageOrMessage};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -27,6 +27,7 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait Message: Debug + PackageOrMessage {
+    fn cache(&self) -> &AnonymousCache;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message>;
     fn name(&self) -> Result<&str>;
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
@@ -44,6 +45,7 @@ pub(super) trait Message: Debug + PackageOrMessage {
 
 #[derive(Debug)]
 pub(super) struct MessageImpl {
+    cache: AnonymousCache,
     name: String,
     fields: Vec<Rc<dyn Field>>,
     messages: Vec<Rc<dyn Message>>,
@@ -90,6 +92,7 @@ impl MessageImpl {
     {
         let name = proto.name().to_string();
         Rc::new_cyclic(|weak_message| MessageImpl {
+            cache: Default::default(),
             name,
             input_file: Weak::clone(&input_file),
             parent,
@@ -130,6 +133,9 @@ impl MessageImpl {
 }
 
 impl PackageOrMessage for MessageImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
@@ -190,6 +196,9 @@ impl PackageOrMessage for MessageImpl {
 }
 
 impl Message for MessageImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message> {
         self
     }

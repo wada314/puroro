@@ -17,7 +17,7 @@
 //!  - [proto3 document](https://developers.google.com/protocol-buffers/docs/proto3#enum)
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
-use super::util::{StrExt, WeakExt};
+use super::util::{AnonymousCache, StrExt, WeakExt};
 use super::{InputFile, PackageOrMessage, Syntax};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -28,6 +28,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait Enum: Debug {
+    fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> &str;
     fn gen_enum(&self) -> Result<TokenStream>;
     fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>>;
@@ -35,6 +36,7 @@ pub(super) trait Enum: Debug {
 
 #[derive(Debug)]
 pub(super) struct EnumImpl {
+    cache: AnonymousCache,
     name: String,
     input_file: Weak<dyn InputFile>,
     parent: Weak<dyn PackageOrMessage>,
@@ -54,6 +56,7 @@ impl EnumImpl {
             .map(|v| (v.name().to_string(), v.number()))
             .collect::<Vec<_>>();
         Rc::new(EnumImpl {
+            cache: Default::default(),
             name: proto.name().to_string(),
             input_file,
             parent,
@@ -71,6 +74,10 @@ impl EnumImpl {
 }
 
 impl Enum for EnumImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
+    }
+
     fn name(&self) -> &str {
         &self.name
     }

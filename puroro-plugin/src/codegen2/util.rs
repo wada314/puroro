@@ -31,11 +31,12 @@ impl<T: ?Sized> WeakExt<T> for Weak<T> {
     }
 }
 
+#[derive(Debug, Default)]
 pub struct AnonymousCache {
     any_box: OnceCell<Box<dyn Any>>,
 }
 impl AnonymousCache {
-    fn get<T: 'static + Default>(&self) -> Result<&T> {
+    pub fn get<T: 'static + Default>(&self) -> Result<&T> {
         Ok(self
             .any_box
             .get_or_init(|| Box::new(T::default()))
