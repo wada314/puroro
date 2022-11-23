@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! For the enum details, see the official document:
+//! For the enum details, see the official documents:
 //!  - [proto2 document](https://developers.google.com/protocol-buffers/docs/proto#enum)
 //!  - [proto3 document](https://developers.google.com/protocol-buffers/docs/proto3#enum)
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
