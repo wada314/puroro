@@ -31,6 +31,35 @@ impl Submsg {
             ::std::default::Default::default,
         )
     }
+    pub fn i32_required_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
+    }
+    pub fn i32_required_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.i32_required,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_i32_required(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
+            .is_some()
+    }
     pub fn i64_required(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -42,6 +71,35 @@ impl Submsg {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn i64_required_opt(&self) -> ::std::option::Option::<i64> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+            1usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
+    }
+    pub fn i64_required_mut(&mut self) -> &mut i64 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+            1usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.i64_required,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_i64_required(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+            1usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
+            .is_some()
     }
 }
 impl self::_puroro::Message for Submsg {

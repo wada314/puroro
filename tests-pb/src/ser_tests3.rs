@@ -57,6 +57,32 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn i32_unlabeled_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i32_unlabeled, &self._bitfield)
+    }
+    pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.i32_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_i32_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field_opt(&self.i32_unlabeled, &self._bitfield)
+            .is_some()
+    }
     pub fn i32_repeated(&self) -> &[i32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -75,6 +101,32 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn float_unlabeled_opt(&self) -> ::std::option::Option::<f32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as NonRepeatedFieldType>::get_field_opt(&self.float_unlabeled, &self._bitfield)
+    }
+    pub fn float_unlabeled_mut(&mut self) -> &mut f32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.float_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_float_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as NonRepeatedFieldType>::get_field_opt(&self.float_unlabeled, &self._bitfield)
+            .is_some()
+    }
     pub fn float_repeated(&self) -> &[f32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -89,6 +141,29 @@ impl Msg {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn string_unlabeled_opt(&self) -> ::std::option::Option::<&str> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+            &self.string_unlabeled,
+            &self._bitfield,
+        )
+    }
+    pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::mut_field(
+            &mut self.string_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_string_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
+                &self.string_unlabeled,
+                &self._bitfield,
+            )
+            .is_some()
     }
     pub fn string_repeated(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
@@ -109,6 +184,39 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn submsg_unlabeled_opt(
+        &self,
+    ) -> ::std::option::Option::<&self::_puroro_root::ser_tests3::msg::Submsg> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::ser_tests3::msg::Submsg,
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.submsg_unlabeled,
+            &self._bitfield,
+        )
+    }
+    pub fn submsg_unlabeled_mut(
+        &mut self,
+    ) -> &mut self::_puroro_root::ser_tests3::msg::Submsg {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::ser_tests3::msg::Submsg,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.submsg_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_submsg_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::ser_tests3::msg::Submsg,
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.submsg_unlabeled,
+                &self._bitfield,
+            )
+            .is_some()
+    }
     pub fn submsg_repeated(&self) -> &[self::_puroro_root::ser_tests3::msg::Submsg] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
@@ -125,6 +233,34 @@ impl Msg {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn enum_unlabeled_opt(
+        &self,
+    ) -> ::std::option::Option::<self::_puroro_root::ser_tests3::Enum> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_unlabeled, &self._bitfield)
+    }
+    pub fn enum_unlabeled_mut(&mut self) -> &mut self::_puroro_root::ser_tests3::Enum {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.enum_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_enum_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::ser_tests3::Enum>,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_unlabeled, &self._bitfield)
+            .is_some()
     }
     pub fn enum_repeated(&self) -> &[self::_puroro_root::ser_tests3::Enum] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
@@ -143,6 +279,38 @@ impl Msg {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn very_large_field_number_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.very_large_field_number,
+            &self._bitfield,
+        )
+    }
+    pub fn very_large_field_number_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.very_large_field_number,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_very_large_field_number(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.very_large_field_number,
+                &self._bitfield,
+            )
+            .is_some()
     }
 }
 impl self::_puroro::Message for Msg {

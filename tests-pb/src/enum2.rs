@@ -30,6 +30,37 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn enum_optional_opt(
+        &self,
+    ) -> ::std::option::Option::<self::_puroro_root::enum2::Enum> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_optional, &self._bitfield)
+    }
+    pub fn enum_optional_mut(&mut self) -> &mut self::_puroro_root::enum2::Enum {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.enum_optional,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_enum_optional(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_optional, &self._bitfield)
+            .is_some()
+    }
     pub fn enum_repeated(&self) -> &[self::_puroro_root::enum2::Enum] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<

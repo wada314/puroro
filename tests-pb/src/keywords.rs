@@ -26,6 +26,35 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn type_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.r#type, &self._bitfield)
+    }
+    pub fn type_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.r#type,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_type(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.r#type, &self._bitfield)
+            .is_some()
+    }
 }
 impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -110,6 +139,35 @@ impl _Self {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn type_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.r#type, &self._bitfield)
+    }
+    pub fn type_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.r#type,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_type(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.r#type, &self._bitfield)
+            .is_some()
     }
 }
 impl self::_puroro::Message for _Self {

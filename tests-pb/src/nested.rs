@@ -25,6 +25,32 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn item_outer_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field_opt(&self.item_outer, &self._bitfield)
+    }
+    pub fn item_outer_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.item_outer,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_item_outer(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field_opt(&self.item_outer, &self._bitfield)
+            .is_some()
+    }
 }
 impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

@@ -147,6 +147,14 @@ impl FieldType {
             self.rust_type()
         }
     }
+    pub(super) fn rust_mut_ref_type(&self) -> Result<Rc<TokenStream>> {
+        if let FieldType::LengthDelimited(ref ld) = self {
+            ld.rust_mut_ref_type()
+        } else {
+            let raw_type = self.rust_type()?;
+            Ok(Rc::new(quote! { &mut #raw_type }))
+        }
+    }
     pub(super) fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use FieldType::*;
         match self {
@@ -213,6 +221,19 @@ impl LengthDelimitedType {
                 let path = m.gen_rust_struct_path()?;
                 Rc::new(quote! {
                     & #path
+                })
+            }
+        })
+    }
+    fn rust_mut_ref_type(&self) -> Result<Rc<TokenStream>> {
+        use LengthDelimitedType::*;
+        Ok(match self {
+            String => Rc::new(quote! { &mut ::std::string::String }),
+            Bytes => Rc::new(quote! { &mut ::std::vec::Vec::<u8> }),
+            Message(m) => {
+                let path = m.gen_rust_struct_path()?;
+                Rc::new(quote! {
+                    &mut #path
                 })
             }
         })

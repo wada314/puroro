@@ -24,6 +24,39 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn recursive_unlabeled_opt(
+        &self,
+    ) -> ::std::option::Option::<&self::_puroro_root::self_recursive::Msg> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::self_recursive::Msg,
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.recursive_unlabeled,
+            &self._bitfield,
+        )
+    }
+    pub fn recursive_unlabeled_mut(
+        &mut self,
+    ) -> &mut self::_puroro_root::self_recursive::Msg {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::self_recursive::Msg,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.recursive_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_recursive_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::self_recursive::Msg,
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.recursive_unlabeled,
+                &self._bitfield,
+            )
+            .is_some()
+    }
 }
 impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

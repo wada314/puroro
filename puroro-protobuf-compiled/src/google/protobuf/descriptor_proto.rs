@@ -34,6 +34,35 @@ impl ExtensionRange {
             ::std::default::Default::default,
         )
     }
+    pub fn start_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+    }
+    pub fn start_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.start,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_start(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+            .is_some()
+    }
     pub fn end(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -45,6 +74,35 @@ impl ExtensionRange {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+    }
+    pub fn end_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.end,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_end(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+            .is_some()
     }
     pub fn options(
         &self,
@@ -60,6 +118,35 @@ impl ExtensionRange {
             ::std::default::Default::default,
         )
     }
+    pub fn options_opt(
+        &self,
+    ) -> ::std::option::Option::<
+        &self::_puroro_root::google::protobuf::ExtensionRangeOptions,
+    > {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::google::protobuf::ExtensionRangeOptions,
+        > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
+    }
+    pub fn options_mut(
+        &mut self,
+    ) -> &mut self::_puroro_root::google::protobuf::ExtensionRangeOptions {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::google::protobuf::ExtensionRangeOptions,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.options,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_options(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::google::protobuf::ExtensionRangeOptions,
+        > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
+            .is_some()
+    }
 }
 impl self::_puroro::Message for ExtensionRange {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -73,29 +160,80 @@ impl self::_puroro::Message for ExtensionRange {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                1i32 => {
+                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                        0usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.start,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                2i32 => {
+                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                        1usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.end,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                3i32 => {
+                    <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                        self::_puroro_root::google::protobuf::ExtensionRangeOptions,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.options,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.start,
+            &self._bitfield,
+            1i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.end,
+            &self._bitfield,
+            2i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::google::protobuf::ExtensionRangeOptions,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.options,
+            &self._bitfield,
+            3i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for ExtensionRange {
@@ -145,6 +283,35 @@ impl ReservedRange {
             ::std::default::Default::default,
         )
     }
+    pub fn start_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+    }
+    pub fn start_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.start,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_start(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+            .is_some()
+    }
     pub fn end(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -156,6 +323,35 @@ impl ReservedRange {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+    }
+    pub fn end_mut(&mut self) -> &mut i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.end,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_end(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+            .is_some()
     }
 }
 impl self::_puroro::Message for ReservedRange {
@@ -170,29 +366,63 @@ impl self::_puroro::Message for ReservedRange {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                1i32 => {
+                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                        0usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.start,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                2i32 => {
+                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                        1usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.end,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.start,
+            &self._bitfield,
+            1i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.end,
+            &self._bitfield,
+            2i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for ReservedRange {

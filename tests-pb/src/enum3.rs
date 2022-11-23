@@ -34,6 +34,37 @@ impl Msg {
             ::std::default::Default::default,
         )
     }
+    pub fn enum_optional_opt(
+        &self,
+    ) -> ::std::option::Option::<self::_puroro_root::enum3::Enum> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_optional, &self._bitfield)
+    }
+    pub fn enum_optional_mut(&mut self) -> &mut self::_puroro_root::enum3::Enum {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.enum_optional,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_enum_optional(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_optional, &self._bitfield)
+            .is_some()
+    }
     pub fn enum_unlabeled(&self) -> self::_puroro_root::enum3::Enum {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
@@ -44,6 +75,34 @@ impl Msg {
             &self._bitfield,
             ::std::default::Default::default,
         )
+    }
+    pub fn enum_unlabeled_opt(
+        &self,
+    ) -> ::std::option::Option::<self::_puroro_root::enum3::Enum> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_unlabeled, &self._bitfield)
+    }
+    pub fn enum_unlabeled_mut(&mut self) -> &mut self::_puroro_root::enum3::Enum {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as NonRepeatedFieldType>::mut_field(
+            &mut self.enum_unlabeled,
+            &mut self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn has_enum_unlabeled(&self) -> bool {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as NonRepeatedFieldType>::get_field_opt(&self.enum_unlabeled, &self._bitfield)
+            .is_some()
     }
     pub fn enum_repeated(&self) -> &[self::_puroro_root::enum3::Enum] {
         use self::_puroro::internal::field_type::RepeatedFieldType;

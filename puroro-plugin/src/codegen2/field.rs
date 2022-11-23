@@ -303,23 +303,46 @@ impl FieldImpl {
         ));
         let getter_ident =
             format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
+        let getter_opt_ident = format_ident!("{}_opt", self.name.to_lower_snake_case());
+        let getter_mut_ident = format_ident!("{}_mut", self.name.to_lower_snake_case());
+        let getter_has_ident = format_ident!("has_{}", self.name.to_lower_snake_case());
         let field_ident = self.gen_struct_field_ident()?;
         let field_type = self.gen_struct_field_type()?;
+        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type()?;
         let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
-                let message_ref = self.r#type()?.rust_maybe_borrowed_type()?;
-                Rc::new(quote! {
-                    ::std::option::Option::< #message_ref >
-                })
-            }
-            _ => self.r#type()?.rust_maybe_borrowed_type()?,
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
+                ::std::option::Option::< #borrowed_type >
+            }),
+            _ => Rc::clone(&borrowed_type),
         };
+        let getter_opt_type = Rc::new(quote! {
+            ::std::option::Option::< #borrowed_type >
+        });
+        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         Ok(quote! {
             pub fn #getter_ident(&self) -> #getter_type {
                use self::_puroro::internal::field_type::NonRepeatedFieldType;
                 <#field_type as NonRepeatedFieldType>::get_field(
                     &self.#field_ident, &self._bitfield, ::std::default::Default::default,
                 )
+            }
+            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::get_field_opt(
+                    &self.#field_ident, &self._bitfield,
+                )
+            }
+            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::mut_field(
+                    &mut self.#field_ident, &mut self._bitfield, ::std::default::Default::default,
+                )
+            }
+            pub fn #getter_has_ident(&self) -> bool {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::get_field_opt(
+                    &self.#field_ident, &self._bitfield,
+                ).is_some()
             }
         })
     }
