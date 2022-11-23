@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::util::{StrExt, WeakExt};
-use super::{EnumTrait, InputFile, InputFileTrait, MessageTrait, PackageOrMessageTrait};
+use super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -25,27 +25,27 @@ use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait PackageTrait: Debug + PackageOrMessageTrait {
+pub(super) trait Package: Debug + PackageOrMessage {
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
     fn base(&self) -> Result<&PackageBase>;
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait>;
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package>;
 }
 
 #[derive(Debug)]
 pub(super) struct PackageBase {
     subpackages_map: HashMap<String, Rc<NonRootPackage>>,
-    subpackages: OnceCell<Vec<Rc<dyn PackageTrait>>>,
-    files: Vec<Rc<dyn InputFileTrait>>,
+    subpackages: OnceCell<Vec<Rc<dyn Package>>>,
+    files: Vec<Rc<dyn InputFile>>,
     root: Weak<RootPackage>,
-    messages: OnceCell<Vec<Rc<dyn MessageTrait>>>,
-    enums: OnceCell<Vec<Rc<dyn EnumTrait>>>,
+    messages: OnceCell<Vec<Rc<dyn Message>>>,
+    enums: OnceCell<Vec<Rc<dyn Enum>>>,
 }
 
 #[derive(Debug)]
 pub(super) struct NonRootPackage {
     name: String,
-    parent: Weak<dyn PackageTrait>,
+    parent: Weak<dyn Package>,
     base: PackageBase,
     module_file_dir: OnceCell<String>,
     rust_module_path: OnceCell<Rc<TokenStream>>,
@@ -67,7 +67,7 @@ impl PackageBase {
         PNI: Iterator<Item = &'a str>,
         FP: Fn(&str, Vec<(PNI, &'a FileDescriptorProto)>) -> Rc<NonRootPackage>,
         FF: Fn(&FileDescriptorProto) -> Rc<F>,
-        F: 'static + InputFileTrait,
+        F: 'static + InputFile,
     {
         let name_fd_map = names_and_fds
             .map(|(mut name_iter, fd)| {
@@ -81,7 +81,7 @@ impl PackageBase {
             .get(&None)
             .into_iter()
             .flatten()
-            .map(|(_, fd)| ff(fd) as Rc<dyn InputFileTrait>)
+            .map(|(_, fd)| ff(fd) as Rc<dyn InputFile>)
             .collect();
 
         // The remaining FDs belong to the child packages.
@@ -104,7 +104,7 @@ impl PackageBase {
         }
     }
 
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+    fn messages(&self) -> Result<&[Rc<dyn Message>]> {
         self.messages
             .get_or_try_init(|| {
                 self.files
@@ -116,7 +116,7 @@ impl PackageBase {
             .map(|v| v.as_slice())
     }
 
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+    fn enums(&self) -> Result<&[Rc<dyn Enum>]> {
         self.enums
             .get_or_try_init(|| {
                 self.files
@@ -128,14 +128,14 @@ impl PackageBase {
             .map(|v| v.as_slice())
     }
 
-    fn subpackages(&self) -> Result<&[Rc<dyn PackageTrait>]> {
+    fn subpackages(&self) -> Result<&[Rc<dyn Package>]> {
         self.subpackages
             .get_or_try_init(|| {
                 Ok(self
                     .subpackages_map
                     .values()
                     .cloned()
-                    .map(|p| p as Rc<dyn PackageTrait>)
+                    .map(|p| p as Rc<dyn Package>)
                     .collect())
             })
             .map(|sp| sp.as_slice())
@@ -148,7 +148,7 @@ impl PackageBase {
 
 impl RootPackage {
     pub(super) fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
-        Self::new_with(fds, InputFile::new)
+        Self::new_with(fds, InputFileImpl::new)
     }
 
     pub(super) fn new_with<'a, FF, F>(
@@ -156,8 +156,8 @@ impl RootPackage {
         ff: FF,
     ) -> Rc<RootPackage>
     where
-        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<F>,
-        F: 'static + InputFileTrait,
+        FF: Fn(&FileDescriptorProto, Weak<dyn Package>) -> Rc<F>,
+        F: 'static + InputFile,
     {
         Rc::new_cyclic(|weak_root| {
             let names_and_fds = fds.map(|fd| {
@@ -171,23 +171,23 @@ impl RootPackage {
                     NonRootPackage::new_with(
                         name,
                         names_and_fds_vec.into_iter(),
-                        Weak::clone(weak_root) as Weak<dyn PackageTrait>,
+                        Weak::clone(weak_root) as Weak<dyn Package>,
                         Weak::clone(weak_root),
                         &ff,
                     )
                 },
-                |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn PackageTrait>),
+                |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn Package>),
             );
             Self { base }
         })
     }
 
-    pub(super) fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn PackageTrait>> {
-        let mut ret = vec![Rc::clone(self) as Rc<dyn PackageTrait>];
+    pub(super) fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn Package>> {
+        let mut ret = vec![Rc::clone(self) as Rc<dyn Package>];
         let mut stack = self.base.subpackages_map.values().cloned().collect_vec();
         while let Some(p) = stack.pop() {
             stack.extend(p.base.subpackages_map.values().cloned());
-            ret.push(p as Rc<dyn PackageTrait>);
+            ret.push(p as Rc<dyn Package>);
         }
         ret
     }
@@ -197,14 +197,14 @@ impl NonRootPackage {
     fn new_with<'a, PNI, FF, F>(
         name: &str,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
-        parent: Weak<dyn PackageTrait>,
+        parent: Weak<dyn Package>,
         root: Weak<RootPackage>,
         ff: &FF,
     ) -> Rc<NonRootPackage>
     where
         PNI: Iterator<Item = &'a str>,
-        FF: Fn(&FileDescriptorProto, Weak<dyn PackageTrait>) -> Rc<F>,
-        F: 'static + InputFileTrait,
+        FF: Fn(&FileDescriptorProto, Weak<dyn Package>) -> Rc<F>,
+        F: 'static + InputFile,
     {
         Rc::new_cyclic(|weak_self| {
             let base = PackageBase::new(
@@ -214,12 +214,12 @@ impl NonRootPackage {
                     NonRootPackage::new_with(
                         name,
                         names_and_fds_vec.into_iter(),
-                        Weak::clone(weak_self) as Weak<dyn PackageTrait>,
+                        Weak::clone(weak_self) as Weak<dyn Package>,
                         Weak::clone(&root),
                         ff,
                     )
                 },
-                |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn PackageTrait>),
+                |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn Package>),
             );
             Self {
                 name: name.to_string(),
@@ -232,20 +232,20 @@ impl NonRootPackage {
     }
 }
 
-impl PackageOrMessageTrait for RootPackage {
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
+impl PackageOrMessage for RootPackage {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
         Ok(Box::new(self.base()?.enums()?.iter().cloned()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(self.base()?.subpackages()?.iter().cloned()))
     }
     fn root_package(&self) -> Result<Rc<RootPackage>> {
         self.base()?.root()
     }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(None)
     }
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
@@ -259,14 +259,14 @@ impl PackageOrMessageTrait for RootPackage {
     }
 }
 
-impl PackageTrait for RootPackage {
+impl Package for RootPackage {
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
     fn full_name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
     }
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package> {
         self
     }
     fn base(&self) -> Result<&PackageBase> {
@@ -274,20 +274,20 @@ impl PackageTrait for RootPackage {
     }
 }
 
-impl PackageOrMessageTrait for NonRootPackage {
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
+impl PackageOrMessage for NonRootPackage {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
         Ok(Box::new(self.base()?.enums()?.iter().cloned()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(self.base()?.subpackages()?.iter().cloned()))
     }
     fn root_package(&self) -> Result<Rc<RootPackage>> {
         self.base()?.root()
     }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(Some(self.parent.try_upgrade()?))
     }
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
@@ -325,7 +325,7 @@ impl PackageOrMessageTrait for NonRootPackage {
     }
 }
 
-impl PackageTrait for NonRootPackage {
+impl Package for NonRootPackage {
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok(self.name.as_str().into())
     }
@@ -338,7 +338,7 @@ impl PackageTrait for NonRootPackage {
             Ok(format!("{}.{}", parent_full_name, &self.name).into())
         }
     }
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn PackageTrait> {
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package> {
         self
     }
     fn base(&self) -> Result<&PackageBase> {

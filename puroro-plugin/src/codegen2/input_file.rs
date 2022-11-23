@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::util::WeakExt;
-use super::{Enum, EnumTrait, Message, MessageTrait, PackageOrMessageTrait, PackageTrait, Syntax};
+use super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -22,47 +22,39 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait InputFileTrait: Debug {
+pub(super) trait InputFile: Debug {
     fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
-    fn package(&self) -> Result<Rc<dyn PackageTrait>>;
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]>;
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]>;
+    fn package(&self) -> Result<Rc<dyn Package>>;
+    fn messages(&self) -> Result<&[Rc<dyn Message>]>;
+    fn enums(&self) -> Result<&[Rc<dyn Enum>]>;
 }
 
 #[derive(Debug)]
-pub(super) struct InputFile {
+pub(super) struct InputFileImpl {
     name: String,
     syntax: String,
     syntax_cell: OnceCell<Syntax>,
-    package: Weak<dyn PackageTrait>,
-    messages: Vec<Rc<dyn MessageTrait>>,
-    enums: Vec<Rc<dyn EnumTrait>>,
+    package: Weak<dyn Package>,
+    messages: Vec<Rc<dyn Message>>,
+    enums: Vec<Rc<dyn Enum>>,
 }
 
-impl InputFile {
-    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
-        Self::new_with(proto, package, Message::new, Enum::new)
+impl InputFileImpl {
+    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
+        Self::new_with(proto, package, MessageImpl::new, EnumImpl::new)
     }
     fn new_with<FM, M, FE, E>(
         proto: &FileDescriptorProto,
-        package: Weak<dyn PackageTrait>,
+        package: Weak<dyn Package>,
         fm: FM,
         fe: FE,
     ) -> Rc<Self>
     where
-        FM: Fn(
-            &DescriptorProto,
-            Weak<dyn InputFileTrait>,
-            Weak<dyn PackageOrMessageTrait>,
-        ) -> Rc<M>,
-        FE: Fn(
-            &EnumDescriptorProto,
-            Weak<dyn InputFileTrait>,
-            Weak<dyn PackageOrMessageTrait>,
-        ) -> Rc<E>,
-        M: 'static + MessageTrait,
-        E: 'static + EnumTrait,
+        FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
+        FE: Fn(&EnumDescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<E>,
+        M: 'static + Message,
+        E: 'static + Enum,
     {
         Rc::new_cyclic(|weak| Self {
             name: proto.name().to_string(),
@@ -75,9 +67,9 @@ impl InputFile {
                 .map(|m| {
                     fm(
                         m,
-                        Weak::clone(weak) as Weak<dyn InputFileTrait>,
-                        Weak::clone(&package) as Weak<dyn PackageOrMessageTrait>,
-                    ) as Rc<dyn MessageTrait>
+                        Weak::clone(weak) as Weak<dyn InputFile>,
+                        Weak::clone(&package) as Weak<dyn PackageOrMessage>,
+                    ) as Rc<dyn Message>
                 })
                 .collect(),
             enums: proto
@@ -86,16 +78,16 @@ impl InputFile {
                 .map(|e| {
                     fe(
                         e,
-                        Weak::clone(weak) as Weak<dyn InputFileTrait>,
-                        Weak::clone(&package) as Weak<dyn PackageOrMessageTrait>,
-                    ) as Rc<dyn EnumTrait>
+                        Weak::clone(weak) as Weak<dyn InputFile>,
+                        Weak::clone(&package) as Weak<dyn PackageOrMessage>,
+                    ) as Rc<dyn Enum>
                 })
                 .collect(),
         })
     }
 }
 
-impl InputFileTrait for InputFile {
+impl InputFile for InputFileImpl {
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
@@ -106,15 +98,15 @@ impl InputFileTrait for InputFile {
             .cloned()
     }
 
-    fn package(&self) -> Result<Rc<dyn PackageTrait>> {
+    fn package(&self) -> Result<Rc<dyn Package>> {
         self.package.try_upgrade()
     }
 
-    fn messages(&self) -> Result<&[Rc<dyn MessageTrait>]> {
+    fn messages(&self) -> Result<&[Rc<dyn Message>]> {
         Ok(&self.messages)
     }
 
-    fn enums(&self) -> Result<&[Rc<dyn EnumTrait>]> {
+    fn enums(&self) -> Result<&[Rc<dyn Enum>]> {
         Ok(&self.enums)
     }
 }
@@ -123,12 +115,12 @@ impl InputFileTrait for InputFile {
 #[derive(Debug)]
 pub struct InputFileFake {
     name: String,
-    package: Weak<dyn PackageTrait>,
+    package: Weak<dyn Package>,
 }
 
 #[cfg(test)]
 impl InputFileFake {
-    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn PackageTrait>) -> Rc<Self> {
+    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
         Rc::new(Self {
             name: proto.name().to_string(),
             package,
@@ -137,20 +129,20 @@ impl InputFileFake {
 }
 
 #[cfg(test)]
-impl InputFileTrait for InputFileFake {
+impl InputFile for InputFileFake {
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
     fn syntax(&self) -> Result<Syntax> {
         unimplemented!()
     }
-    fn package(&self) -> Result<Rc<dyn PackageTrait>> {
+    fn package(&self) -> Result<Rc<dyn Package>> {
         self.package.try_upgrade()
     }
-    fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::MessageTrait>]> {
+    fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::Message>]> {
         Ok(&[])
     }
-    fn enums(&self) -> Result<&[Rc<dyn crate::codegen2::r#enum::EnumTrait>]> {
+    fn enums(&self) -> Result<&[Rc<dyn crate::codegen2::r#enum::Enum>]> {
         Ok(&[])
     }
 }

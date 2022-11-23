@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::util::{StrExt, WeakExt};
-use super::{FieldRule, FieldType, LengthDelimitedType, MessageTrait};
+use super::{FieldRule, FieldType, LengthDelimitedType, Message};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -22,9 +22,9 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait FieldTrait: Debug {
+pub(super) trait Field: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
-    fn message(&self) -> Result<Rc<dyn MessageTrait>>;
+    fn message(&self) -> Result<Rc<dyn Message>>;
     fn number(&self) -> i32;
 
     // Message's bitfield allocation
@@ -33,9 +33,9 @@ pub(super) trait FieldTrait: Debug {
 }
 
 #[derive(Debug)]
-pub(super) struct Field {
+pub(super) struct FieldImpl {
     name: String,
-    message: Weak<dyn MessageTrait>,
+    message: Weak<dyn Message>,
     rule: OnceCell<FieldRule>,
     r#type: OnceCell<FieldType>,
     proto3_optional: bool,
@@ -55,7 +55,7 @@ struct FieldBitfieldAllocation {
     tail: usize,
 }
 
-impl FieldTrait for Field {
+impl Field for FieldImpl {
     fn gen_struct_field_decl(&self) -> Result<TokenStream> {
         let name = format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
         let r#type = self.gen_struct_field_type()?;
@@ -63,7 +63,7 @@ impl FieldTrait for Field {
             #name: #r#type,
         })
     }
-    fn message(&self) -> Result<Rc<dyn MessageTrait>> {
+    fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
     }
     fn number(&self) -> i32 {
@@ -100,9 +100,9 @@ impl FieldTrait for Field {
     }
 }
 
-impl Field {
-    pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn MessageTrait>) -> Rc<Self> {
-        Rc::new(Field {
+impl FieldImpl {
+    pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
+        Rc::new(FieldImpl {
             name: proto.name().to_string(),
             message,
             rule: OnceCell::new(),

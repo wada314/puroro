@@ -17,8 +17,8 @@
 //!  - [proto3 document](https://developers.google.com/protocol-buffers/docs/proto3#enum)
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
-use super::util::{WeakExt, StrExt};
-use super::{InputFileTrait, PackageOrMessageTrait};
+use super::util::{StrExt, WeakExt};
+use super::{InputFile, PackageOrMessage};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -27,33 +27,33 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait EnumTrait: Debug {
+pub(super) trait Enum: Debug {
     fn name(&self) -> &str;
     fn gen_enum(&self) -> Result<TokenStream>;
     fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>>;
 }
 
 #[derive(Debug)]
-pub(super) struct Enum {
+pub(super) struct EnumImpl {
     name: String,
-    input_file: Weak<dyn InputFileTrait>,
-    parent: Weak<dyn PackageOrMessageTrait>,
+    input_file: Weak<dyn InputFile>,
+    parent: Weak<dyn PackageOrMessage>,
     values: Vec<(String, i32)>,
     rust_enum_path: OnceCell<Rc<TokenStream>>,
 }
 
-impl Enum {
+impl EnumImpl {
     pub(super) fn new(
         proto: &EnumDescriptorProto,
-        input_file: Weak<dyn InputFileTrait>,
-        parent: Weak<dyn PackageOrMessageTrait>,
+        input_file: Weak<dyn InputFile>,
+        parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
         let values = proto
             .value()
             .into_iter()
             .map(|v| (v.name().to_string(), v.number()))
             .collect::<Vec<_>>();
-        Rc::new(Enum {
+        Rc::new(EnumImpl {
             name: proto.name().to_string(),
             input_file,
             parent,
@@ -62,12 +62,12 @@ impl Enum {
         })
     }
 
-    fn parent(&self) -> Result<Rc<dyn PackageOrMessageTrait>> {
+    fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
 }
 
-impl EnumTrait for Enum {
+impl Enum for EnumImpl {
     fn name(&self) -> &str {
         &self.name
     }

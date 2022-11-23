@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::util::StrExt;
-use super::{EnumTrait, MessageOrEnum, MessageTrait, PackageTrait, RootPackage};
+use super::{Enum, Message, MessageOrEnum, Package, RootPackage};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
@@ -22,23 +22,21 @@ use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub(super) trait PackageOrMessageTrait: Debug {
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>>;
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>>;
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>>;
+pub(super) trait PackageOrMessage: Debug {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
-    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>>;
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;
 
-    fn all_messages(&self) -> Result<Vec<Rc<dyn MessageTrait>>> {
+    fn all_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
         let mut ret = self.messages()?.collect::<Vec<_>>();
-        let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessageTrait>);
-        let packages_iter = self
-            .subpackages()?
-            .map(|p| p as Rc<dyn PackageOrMessageTrait>);
+        let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessage>);
+        let packages_iter = self.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>);
         let mut stack = messages_iter.chain(packages_iter).collect::<Vec<_>>();
         while let Some(p) = stack.pop() {
-            stack.extend(p.messages()?.map(|m| m as Rc<dyn PackageOrMessageTrait>));
-            stack.extend(p.subpackages()?.map(|p| p as Rc<dyn PackageOrMessageTrait>));
+            stack.extend(p.messages()?.map(|m| m as Rc<dyn PackageOrMessage>));
+            stack.extend(p.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>));
             ret.extend(p.messages()?);
         }
         Ok(ret)
@@ -104,7 +102,7 @@ pub(super) trait PackageOrMessageTrait: Debug {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn MessageTrait>, Rc<dyn EnumTrait>>> {
+    ) -> Result<MessageOrEnum<Rc<dyn Message>, Rc<dyn Enum>>> {
         if let Some(absolute_path) = type_name.strip_prefix('.') {
             return self.root_package()?.resolve_type_name(absolute_path);
         }

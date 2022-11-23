@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::r#enum::EnumTrait;
-use super::field::FieldTrait;
-use super::message::MessageTrait;
+use super::r#enum::Enum;
+use super::field::Field;
+use super::message::Message;
 use super::{MessageOrEnum, Syntax};
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
@@ -38,14 +38,14 @@ pub(super) enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(Rc<dyn EnumTrait>),
-    Enum3(Rc<dyn EnumTrait>),
+    Enum2(Rc<dyn Enum>),
+    Enum3(Rc<dyn Enum>),
 }
 #[derive(Debug, Clone)]
 pub(super) enum LengthDelimitedType {
     String,
     Bytes,
-    Message(Rc<dyn MessageTrait>),
+    Message(Rc<dyn Message>),
 }
 #[derive(Debug, Clone)]
 pub(super) enum Bits32Type {
@@ -65,7 +65,7 @@ impl FieldType {
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
-        field: &dyn FieldTrait,
+        field: &dyn Field,
     ) -> Result<Self> {
         use field_descriptor_proto::Type::*;
         use Bits32Type::*;

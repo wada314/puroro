@@ -13,9 +13,7 @@
 // limitations under the License.
 
 use super::util::{StrExt, WeakExt};
-use super::{
-    Enum, EnumTrait, Field, FieldTrait, InputFileTrait, PackageOrMessageTrait, PackageTrait,
-};
+use super::{Enum, EnumImpl, Field, FieldImpl, InputFile, Package, PackageOrMessage};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -28,13 +26,13 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait MessageTrait: Debug + PackageOrMessageTrait {
-    fn input_file(&self) -> Result<Rc<dyn InputFileTrait>>;
+pub(super) trait Message: Debug + PackageOrMessage {
+    fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn bitfield_size(&self) -> Result<usize>;
     fn name(&self) -> Result<&str>;
     fn gen_struct(&self) -> Result<TokenStream>;
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait>;
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();
@@ -45,61 +43,53 @@ pub(super) trait MessageTrait: Debug + PackageOrMessageTrait {
 }
 
 #[derive(Debug)]
-pub(super) struct Message {
+pub(super) struct MessageImpl {
     name: String,
-    fields: Vec<Rc<dyn FieldTrait>>,
-    messages: Vec<Rc<dyn MessageTrait>>,
-    enums: Vec<Rc<dyn EnumTrait>>,
-    input_file: Weak<dyn InputFileTrait>,
-    parent: Weak<dyn PackageOrMessageTrait>,
+    fields: Vec<Rc<dyn Field>>,
+    messages: Vec<Rc<dyn Message>>,
+    enums: Vec<Rc<dyn Enum>>,
+    input_file: Weak<dyn InputFile>,
+    parent: Weak<dyn PackageOrMessage>,
     rust_module_path: OnceCell<Rc<TokenStream>>,
     rust_struct_path: OnceCell<Rc<TokenStream>>,
     module_file_dir: OnceCell<String>,
     bitfield_size: OnceCell<usize>,
 }
 
-impl Message {
+impl MessageImpl {
     pub(super) fn new(
         proto: &DescriptorProto,
-        input_file: Weak<dyn InputFileTrait>,
-        parent: Weak<dyn PackageOrMessageTrait>,
+        input_file: Weak<dyn InputFile>,
+        parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
         Self::new_with(
             proto,
             input_file,
             parent,
-            Field::new,
-            Message::new,
-            Enum::new,
+            FieldImpl::new,
+            MessageImpl::new,
+            EnumImpl::new,
         )
     }
 
     pub(super) fn new_with<FF, F, FM, M, FE, E>(
         proto: &DescriptorProto,
-        input_file: Weak<dyn InputFileTrait>,
-        parent: Weak<dyn PackageOrMessageTrait>,
+        input_file: Weak<dyn InputFile>,
+        parent: Weak<dyn PackageOrMessage>,
         ff: FF,
         fm: FM,
         fe: FE,
     ) -> Rc<Self>
     where
-        FF: Fn(&FieldDescriptorProto, Weak<dyn MessageTrait>) -> Rc<F>,
-        FM: Fn(
-            &DescriptorProto,
-            Weak<dyn InputFileTrait>,
-            Weak<dyn PackageOrMessageTrait>,
-        ) -> Rc<M>,
-        FE: Fn(
-            &EnumDescriptorProto,
-            Weak<dyn InputFileTrait>,
-            Weak<dyn PackageOrMessageTrait>,
-        ) -> Rc<E>,
-        F: 'static + FieldTrait,
-        M: 'static + MessageTrait,
-        E: 'static + EnumTrait,
+        FF: Fn(&FieldDescriptorProto, Weak<dyn Message>) -> Rc<F>,
+        FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
+        FE: Fn(&EnumDescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<E>,
+        F: 'static + Field,
+        M: 'static + Message,
+        E: 'static + Enum,
     {
         let name = proto.name().to_string();
-        Rc::new_cyclic(|weak_message| Message {
+        Rc::new_cyclic(|weak_message| MessageImpl {
             name,
             input_file: Weak::clone(&input_file),
             parent,
@@ -107,9 +97,7 @@ impl Message {
                 .field()
                 .into_iter()
                 .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| {
-                    ff(f, Weak::clone(weak_message) as Weak<dyn MessageTrait>) as Rc<dyn FieldTrait>
-                })
+                .map(|f| ff(f, Weak::clone(weak_message) as Weak<dyn Message>) as Rc<dyn Field>)
                 .collect(),
             messages: proto
                 .nested_type()
@@ -118,8 +106,8 @@ impl Message {
                     fm(
                         m,
                         Weak::clone(&input_file),
-                        Weak::clone(weak_message) as Weak<dyn PackageOrMessageTrait>,
-                    ) as Rc<dyn MessageTrait>
+                        Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
+                    ) as Rc<dyn Message>
                 })
                 .collect(),
             enums: proto
@@ -129,8 +117,8 @@ impl Message {
                     fe(
                         e,
                         Weak::clone(&input_file),
-                        Weak::clone(weak_message) as Weak<dyn PackageOrMessageTrait>,
-                    ) as Rc<dyn EnumTrait>
+                        Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
+                    ) as Rc<dyn Enum>
                 })
                 .collect(),
             rust_module_path: OnceCell::new(),
@@ -141,17 +129,17 @@ impl Message {
     }
 }
 
-impl PackageOrMessageTrait for Message {
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>> {
+impl PackageOrMessage for MessageImpl {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn EnumTrait>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn PackageTrait>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessageTrait>>> {
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(Some(self.parent.try_upgrade()?))
     }
     fn root_package(&self) -> Result<Rc<super::package::RootPackage>> {
@@ -192,7 +180,7 @@ impl PackageOrMessageTrait for Message {
     }
 }
 
-impl MessageTrait for Message {
+impl Message for MessageImpl {
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
@@ -215,7 +203,7 @@ impl MessageTrait for Message {
             }
         })
     }
-    fn input_file(&self) -> Result<Rc<dyn InputFileTrait>> {
+    fn input_file(&self) -> Result<Rc<dyn InputFile>> {
         Ok(self.input_file.try_upgrade()?)
     }
 
@@ -246,7 +234,7 @@ impl MessageTrait for Message {
             .cloned()
     }
 
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn MessageTrait> {
+    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message> {
         self
     }
 }

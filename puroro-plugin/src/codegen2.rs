@@ -31,7 +31,6 @@ use self::message::*;
 use self::oneof::*;
 use self::package::*;
 use self::package_or_message::*;
-use self::util::*;
 use crate::{ErrorKind, GeneratorError, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;

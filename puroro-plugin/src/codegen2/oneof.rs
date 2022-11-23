@@ -16,14 +16,14 @@ use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait OneofTrait: Debug {}
+pub trait Oneof: Debug {}
 
 #[derive(Debug)]
-pub struct Oneof {}
+pub struct OneofImpl {}
 
-impl Oneof {
+impl OneofImpl {
     #[allow(unused)]
     fn new(proto: &OneofDescriptorProto) -> Rc<Self> {
-        Rc::new(Oneof {})
+        Rc::new(OneofImpl {})
     }
 }
