@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use puroro_plugin::puroro::Message;
-use puroro_plugin::{generate_output_files_from_file_descriptors, Config, FileDescriptorSet};
+use puroro_plugin::{generate_output_file_protos, FileDescriptorSet};
 use std::env;
 use std::fs::{create_dir_all, remove_dir_all, rename, File};
 use std::io::{Read, Write};
@@ -62,9 +62,8 @@ fn main() {
     let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
-    let output_files =
-        generate_output_files_from_file_descriptors(file_descriptor_set.file(), &Config::default())
-            .unwrap();
+    let cgr = generate_output_file_protos(file_descriptor_set.file().into_iter()).unwrap();
+    let output_files = cgr.file();
 
     // Delete the all contents of the temp dir, so that we can output into clean dir.
     if temp_output_rust_path.is_dir() {

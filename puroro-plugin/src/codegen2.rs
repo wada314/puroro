@@ -28,6 +28,7 @@ use self::field_rule::*;
 use self::field_type::*;
 use self::input_file::*;
 use self::message::*;
+#[allow(unused)]
 use self::oneof::*;
 use self::package::*;
 use self::package_or_message::*;
