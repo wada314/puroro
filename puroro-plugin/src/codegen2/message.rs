@@ -271,10 +271,16 @@ impl MessageImpl {
     fn gen_struct_message_impl(&self) -> Result<TokenStream> {
         let ident = self.gen_struct_ident()?;
         let field_data_ident = quote! { field_data };
+        let out_ident = quote! { out };
         let deser_arms = self
             .fields
             .iter()
             .map(|f| f.gen_struct_field_deser_arm(&field_data_ident))
+            .collect::<Result<Vec<_>>>()?;
+        let ser_fields = self
+            .fields
+            .iter()
+            .map(|f| f.gen_struct_field_ser(&out_ident))
             .collect::<Result<Vec<_>>>()?;
 
         Ok(quote! {
@@ -296,10 +302,9 @@ impl MessageImpl {
                     ::std::result::Result::Ok(())
                 }
 
-                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] out: &mut W) -> self::_puroro::Result<()> {
-                    #[allow(unused)]
-                    use ::std::result::Result::Ok;
-                    Ok(todo!())
+                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> self::_puroro::Result<()> {
+                    #(#ser_fields)*
+                    ::std::result::Result::Ok(())
                 }
             }
         })

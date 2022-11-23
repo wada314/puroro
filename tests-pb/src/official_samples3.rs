@@ -61,9 +61,16 @@ impl self::_puroro::Message for Test1 {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.a,
+            &self._bitfield,
+            1i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Test1 {
@@ -125,9 +132,13 @@ impl self::_puroro::Message for Test2 {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.b,
+            &self._bitfield,
+            2i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Test2 {
@@ -196,9 +207,15 @@ impl self::_puroro::Message for Test3 {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::official_samples3::Test1,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.c,
+            &self._bitfield,
+            3i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Test3 {
@@ -264,9 +281,16 @@ impl self::_puroro::Message for Test4 {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.d,
+            &self._bitfield,
+            4i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Test4 {

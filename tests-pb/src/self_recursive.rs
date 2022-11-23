@@ -60,9 +60,15 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::self_recursive::Msg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.recursive_unlabeled,
+            &self._bitfield,
+            1i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Msg {

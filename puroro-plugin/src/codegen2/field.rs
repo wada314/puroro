@@ -30,8 +30,9 @@ pub(super) trait Field: Debug {
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
 
-    // Message's bitfield allocation
+    // Message's bitfield allocationi
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 }
@@ -132,6 +133,19 @@ impl Field for FieldImpl {
                 &mut self._bitfield,
                 #field_data_ident,
             )?,
+        })
+    }
+    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
+        let ident = self.gen_struct_field_ident()?;
+        let number = self.number();
+        let r#type = self.gen_struct_field_type()?;
+        Ok(quote! {
+            <#r#type as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+                &self.#ident,
+                &self._bitfield,
+                #number,
+                #out_ident,
+            )?;
         })
     }
 }

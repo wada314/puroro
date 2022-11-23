@@ -293,9 +293,104 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_optional,
+            &self._bitfield,
+            1i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_repeated,
+            &self._bitfield,
+            2i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+            1usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_optional,
+            &self._bitfield,
+            3i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_repeated,
+            &self._bitfield,
+            4i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            2usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_optional,
+            &self._bitfield,
+            5i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_repeated,
+            &self._bitfield,
+            6i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::ser_tests2::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_optional,
+            &self._bitfield,
+            7i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedMessageField::<
+            self::_puroro_root::ser_tests2::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_repeated,
+            &self._bitfield,
+            8i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::ser_tests2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::ser_tests2::Enum>,
+            3usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_optional,
+            &self._bitfield,
+            9i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::ser_tests2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::ser_tests2::Enum>,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_repeated,
+            &self._bitfield,
+            10i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            4usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.very_large_field_number,
+            &self._bitfield,
+            536870911i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Msg {

@@ -1220,9 +1220,452 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        Ok(todo!())
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_required,
+            &self._bitfield,
+            1i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            1usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_optional,
+            &self._bitfield,
+            2i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i32_repeated,
+            &self._bitfield,
+            3i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+            2usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_required,
+            &self._bitfield,
+            11i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+            3usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_optional,
+            &self._bitfield,
+            12i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.float_repeated,
+            &self._bitfield,
+            13i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalBytesField::<
+            4usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.bytes_required,
+            &self._bitfield,
+            21i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalBytesField::<
+            5usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.bytes_optional,
+            &self._bitfield,
+            22i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedBytesField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.bytes_repeated,
+            &self._bitfield,
+            23i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            6usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_required,
+            &self._bitfield,
+            31i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalStringField::<
+            7usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_optional,
+            &self._bitfield,
+            32i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.string_repeated,
+            &self._bitfield,
+            33i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::full_coverage2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
+            8usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_required,
+            &self._bitfield,
+            41i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::full_coverage2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
+            9usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_optional,
+            &self._bitfield,
+            42i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::full_coverage2::Enum,
+            self::_puroro::tags::Enum2::<self::_puroro_root::full_coverage2::Enum>,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.enum_repeated,
+            &self._bitfield,
+            43i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::full_coverage2::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_required,
+            &self._bitfield,
+            51i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            self::_puroro_root::full_coverage2::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_optional,
+            &self._bitfield,
+            52i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedMessageField::<
+            self::_puroro_root::full_coverage2::msg::Submsg,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.submsg_repeated,
+            &self._bitfield,
+            53i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+            10usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i64_required,
+            &self._bitfield,
+            101i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+            11usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i64_optional,
+            &self._bitfield,
+            102i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i64,
+            self::_puroro::tags::Int64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.i64_repeated,
+            &self._bitfield,
+            103i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u32,
+            self::_puroro::tags::UInt32,
+            12usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u32_required,
+            &self._bitfield,
+            111i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u32,
+            self::_puroro::tags::UInt32,
+            13usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u32_optional,
+            &self._bitfield,
+            112i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            u32,
+            self::_puroro::tags::UInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u32_repeated,
+            &self._bitfield,
+            113i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u64,
+            self::_puroro::tags::UInt64,
+            14usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u64_required,
+            &self._bitfield,
+            121i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u64,
+            self::_puroro::tags::UInt64,
+            15usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u64_optional,
+            &self._bitfield,
+            122i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            u64,
+            self::_puroro::tags::UInt64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.u64_repeated,
+            &self._bitfield,
+            123i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::SInt32,
+            16usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s32_required,
+            &self._bitfield,
+            131i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::SInt32,
+            17usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s32_optional,
+            &self._bitfield,
+            132i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::SInt32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s32_repeated,
+            &self._bitfield,
+            133i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::SInt64,
+            18usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s64_required,
+            &self._bitfield,
+            141i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::SInt64,
+            19usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s64_optional,
+            &self._bitfield,
+            142i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i64,
+            self::_puroro::tags::SInt64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.s64_repeated,
+            &self._bitfield,
+            143i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u32,
+            self::_puroro::tags::Fixed32,
+            20usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed32_required,
+            &self._bitfield,
+            151i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u32,
+            self::_puroro::tags::Fixed32,
+            21usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed32_optional,
+            &self._bitfield,
+            152i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            u32,
+            self::_puroro::tags::Fixed32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed32_repeated,
+            &self._bitfield,
+            153i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u64,
+            self::_puroro::tags::Fixed64,
+            22usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed64_required,
+            &self._bitfield,
+            161i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            u64,
+            self::_puroro::tags::Fixed64,
+            23usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed64_optional,
+            &self._bitfield,
+            162i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            u64,
+            self::_puroro::tags::Fixed64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.fixed64_repeated,
+            &self._bitfield,
+            163i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::SFixed32,
+            24usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed32_required,
+            &self._bitfield,
+            171i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::SFixed32,
+            25usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed32_optional,
+            &self._bitfield,
+            172i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::SFixed32,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed32_repeated,
+            &self._bitfield,
+            173i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::SFixed64,
+            26usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed64_required,
+            &self._bitfield,
+            181i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i64,
+            self::_puroro::tags::SFixed64,
+            27usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed64_optional,
+            &self._bitfield,
+            182i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i64,
+            self::_puroro::tags::SFixed64,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.sfixed64_repeated,
+            &self._bitfield,
+            183i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            f64,
+            self::_puroro::tags::Double,
+            28usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.f64_required,
+            &self._bitfield,
+            191i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            f64,
+            self::_puroro::tags::Double,
+            29usize,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.f64_optional,
+            &self._bitfield,
+            192i32,
+            out,
+        )?;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            f64,
+            self::_puroro::tags::Double,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+            &self.f64_repeated,
+            &self._bitfield,
+            193i32,
+            out,
+        )?;
+        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Msg {
