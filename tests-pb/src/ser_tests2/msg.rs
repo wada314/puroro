@@ -12,4 +12,17 @@ pub struct Submsg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
-impl Submsg {}
+impl Submsg {
+    pub fn i32_optional(&self) -> i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field(
+            &self.i32_optional,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+}

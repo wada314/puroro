@@ -11,17 +11,51 @@ pub struct Test1 {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
-impl Test1 {}
+impl Test1 {
+    pub fn a(&self) -> i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as NonRepeatedFieldType>::get_field(
+            &self.a,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+}
 pub struct Test2 {
     b: self::_puroro::internal::field_type::SingularStringField,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
-impl Test2 {}
+impl Test2 {
+    pub fn b(&self) -> &str {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
+            &self.b,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+}
 pub struct Test3 {
     c: self::_puroro::internal::field_type::SingularHeapMessageField::<()>,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
-impl Test3 {}
+impl Test3 {
+    pub fn c(
+        &self,
+    ) -> ::std::option::Option::<&self::_puroro_root::official_samples3::Test1> {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+            (),
+        > as NonRepeatedFieldType>::get_field(
+            &self.c,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+}
 pub struct Test4 {
     d: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i32,
@@ -29,4 +63,12 @@ pub struct Test4 {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
-impl Test4 {}
+impl Test4 {
+    pub fn d(&self) -> &[i32] {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        > as RepeatedFieldType>::get_field(&self.d, &self._bitfield)
+    }
+}

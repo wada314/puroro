@@ -140,6 +140,13 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
+    pub(super) fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
+        if let FieldType::LengthDelimited(ref ld) = self {
+            ld.rust_maybe_borrowed_type()
+        } else {
+            self.rust_type()
+        }
+    }
     pub(super) fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use FieldType::*;
         match self {
@@ -195,6 +202,19 @@ impl LengthDelimitedType {
             String => Rc::new(quote! { ::std::string::String }),
             Bytes => Rc::new(quote! { ::std::vec::Vec<u8> }),
             Message(m) => m.gen_rust_struct_path()?,
+        })
+    }
+    fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
+        use LengthDelimitedType::*;
+        Ok(match self {
+            String => Rc::new(quote! { &str }),
+            Bytes => Rc::new(quote! { &[u8] }),
+            Message(m) => {
+                let path = m.gen_rust_struct_path()?;
+                Rc::new(quote! {
+                    & #path
+                })
+            }
         })
     }
     fn tag_type(&self) -> Result<Rc<TokenStream>> {

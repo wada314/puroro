@@ -110,7 +110,7 @@ impl Field for FieldImpl {
     fn gen_struct_field_methods(&self) -> Result<TokenStream> {
         match self.rule()? {
             FieldRule::Repeated => self.gen_struct_field_methods_for_repeated(),
-            _ => todo!(),
+            _ => self.gen_struct_field_methods_for_non_repeated(),
         }
     }
 }
@@ -255,6 +255,34 @@ impl FieldImpl {
                 use self::_puroro::internal::field_type::RepeatedFieldType;
                 <#field_type as RepeatedFieldType>::get_field(
                     &self.#field_ident, &self._bitfield,
+                )
+            }
+        })
+    }
+
+    fn gen_struct_field_methods_for_non_repeated(&self) -> Result<TokenStream> {
+        debug_assert!(matches!(
+            self.rule(),
+            Ok(FieldRule::Optional | FieldRule::Singular)
+        ));
+        let getter_ident =
+            format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
+        let field_ident = self.gen_struct_field_ident()?;
+        let field_type = self.gen_struct_field_type()?;
+        let getter_type = match self.r#type()? {
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
+                let message_ref = self.r#type()?.rust_maybe_borrowed_type()?;
+                Rc::new(quote! {
+                    ::std::option::Option::< #message_ref >
+                })
+            }
+            _ => self.r#type()?.rust_maybe_borrowed_type()?,
+        };
+        Ok(quote! {
+            pub fn #getter_ident(&self) -> #getter_type {
+               use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::get_field(
+                    &self.#field_ident, &self._bitfield, ::std::default::Default::default,
                 )
             }
         })

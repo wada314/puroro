@@ -228,6 +228,11 @@ impl Message for MessageImpl {
             .iter()
             .map(|f| f.gen_struct_field_decl())
             .collect::<Result<Vec<_>>>()?;
+        let methods = self
+            .fields
+            .iter()
+            .map(|f| f.gen_struct_field_methods())
+            .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         Ok(quote! {
             pub struct #ident {
@@ -236,7 +241,7 @@ impl Message for MessageImpl {
             }
 
             impl #ident {
-
+                #(#methods)*
             }
         })
     }

@@ -12,7 +12,20 @@ pub struct Msg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
-impl Msg {}
+impl Msg {
+    pub fn r#type(&self) -> i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field(
+            &self.r#type,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+}
 pub struct _Self {
     r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
@@ -21,4 +34,17 @@ pub struct _Self {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
-impl _Self {}
+impl _Self {
+    pub fn r#type(&self) -> i32 {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+            0usize,
+        > as NonRepeatedFieldType>::get_field(
+            &self.r#type,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+}

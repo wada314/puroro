@@ -20,7 +20,38 @@ pub struct Msg {
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
-impl Msg {}
+impl Msg {
+    pub fn enum_optional(&self) -> self::_puroro_root::enum3::Enum {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::OptionalNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+            0usize,
+        > as NonRepeatedFieldType>::get_field(
+            &self.enum_optional,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn enum_unlabeled(&self) -> self::_puroro_root::enum3::Enum {
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        <self::_puroro::internal::field_type::SingularNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as NonRepeatedFieldType>::get_field(
+            &self.enum_unlabeled,
+            &self._bitfield,
+            ::std::default::Default::default,
+        )
+    }
+    pub fn enum_repeated(&self) -> &[self::_puroro_root::enum3::Enum] {
+        use self::_puroro::internal::field_type::RepeatedFieldType;
+        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+            self::_puroro_root::enum3::Enum,
+            self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+        > as RepeatedFieldType>::get_field(&self.enum_repeated, &self._bitfield)
+    }
+}
 pub enum Enum {
     ValueZero,
     ValueSeven,
