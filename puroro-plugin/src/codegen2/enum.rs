@@ -220,13 +220,3 @@ impl EnumImpl {
         })
     }
 }
-
-#[cfg(test)]
-pub struct EnumFake;
-
-#[cfg(test)]
-impl EnumFake {
-    fn try_new(proto: &EnumDescriptorProto) -> Result<Self> {
-        Ok(EnumFake)
-    }
-}
