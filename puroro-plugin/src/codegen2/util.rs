@@ -14,6 +14,8 @@
 
 use crate::{ErrorKind, Result};
 use ::lazy_static::lazy_static;
+use ::once_cell::unsync::OnceCell;
+use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 use ::std::rc::{Rc, Weak};
@@ -26,6 +28,21 @@ impl<T: ?Sized> WeakExt<T> for Weak<T> {
         Ok(Weak::upgrade(self).ok_or(ErrorKind::InternalError {
             detail: "Weak ptr upgrade failed".to_string(),
         })?)
+    }
+}
+
+pub struct AnonymousCache {
+    any_box: OnceCell<Box<dyn Any>>,
+}
+impl AnonymousCache {
+    fn get<T: 'static + Default>(&self) -> Result<&T> {
+        Ok(self
+            .any_box
+            .get_or_init(|| Box::new(T::default()))
+            .downcast_ref()
+            .ok_or(ErrorKind::InternalError {
+                detail: "Wrong type has requested for the cache.".to_string(),
+            })?)
     }
 }
 
