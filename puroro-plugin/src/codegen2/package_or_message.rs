@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::StrExt;
 use super::{Enum, Message, MessageOrEnum, Package, RootPackage};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -42,6 +41,7 @@ pub(super) trait PackageOrMessage: Debug {
         Ok(ret)
     }
 
+    fn module_name(&self) -> Result<Cow<'_, str>>;
     fn module_file_path(&self) -> Result<Cow<'_, str>>;
     fn module_file_dir(&self) -> Result<Cow<'_, str>>;
 
@@ -69,17 +69,24 @@ pub(super) trait PackageOrMessage: Debug {
             }
         };
 
-        let submodule_decls = self
+        let submodule_sources = self
             .subpackages()?
-            .sorted_by_cached_key(|p| p.name().unwrap_or(Cow::Borrowed("")).to_string())
-            .map(|p| {
-                let ident =
-                    format_ident!("{}", p.name()?.to_lower_snake_case().escape_rust_keywords());
-                Ok(quote! {
-                    pub mod #ident;
-                })
-            })
-            .collect::<Result<Vec<_>>>()?;
+            .map(|p| Ok(p as Rc<dyn PackageOrMessage>))
+            .chain(
+                self.messages()?
+                    .filter_map(|m| match m.should_generate_module_file() {
+                        Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
+                        Ok(false) => None,
+                        Err(e) => Some(Err(e)),
+                    }),
+            );
+        let submodule_idents = {
+            let mut unsorted = submodule_sources
+                .map(|p| Ok(format_ident!("{}", p?.module_name()?)))
+                .collect::<Result<Vec<_>>>()?;
+            unsorted.sort();
+            unsorted
+        };
         let struct_decls = self
             .messages()?
             .map(|m| m.gen_struct())
@@ -93,7 +100,7 @@ pub(super) trait PackageOrMessage: Debug {
             pub mod _puroro {
                 pub use ::puroro::*;
             }
-            #(#submodule_decls)*
+            #(pub mod #submodule_idents;)*
             #(#struct_decls)*
             #(#enum_decls)*
         })

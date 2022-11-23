@@ -248,6 +248,9 @@ impl PackageOrMessage for RootPackage {
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(None)
     }
+    fn module_name(&self) -> Result<Cow<'_, str>> {
+        Ok("".into())
+    }
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok("lib.rs".into())
     }
@@ -289,6 +292,14 @@ impl PackageOrMessage for NonRootPackage {
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(Some(self.parent.try_upgrade()?))
+    }
+    fn module_name(&self) -> Result<Cow<'_, str>> {
+        Ok(self
+            .name
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string()
+            .into())
     }
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok(format!(

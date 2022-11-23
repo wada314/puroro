@@ -213,7 +213,7 @@ impl EnumImpl {
                     use ::std::result::Result::{Ok, Err};
                     match val {
                         #(#value_numbers => Ok(self::#ident::#value_idents),)*
-                        _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
+                        _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
                     }
                 }
             }

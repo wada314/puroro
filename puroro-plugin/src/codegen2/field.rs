@@ -221,7 +221,7 @@ impl FieldImpl {
             })
             .cloned()
     }
-    
+
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
         self.struct_field_ident
             .get_or_try_init(|| {
@@ -241,10 +241,10 @@ impl FieldImpl {
         let field_type = self.gen_struct_field_type()?;
         let getter_item_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
-                impl ::std::ops::Deref::<Target = &str>
+                impl ::std::ops::Deref::<Target = str>
             }),
             FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
-                impl ::std::ops::Deref::<Target = &[u8]>
+                impl ::std::ops::Deref::<Target = [u8]>
             }),
             FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
                 m.gen_rust_struct_path()?

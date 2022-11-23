@@ -139,13 +139,21 @@ impl PackageOrMessage for MessageImpl {
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
-        Ok(Some(self.parent.try_upgrade()?))
-    }
     fn root_package(&self) -> Result<Rc<super::package::RootPackage>> {
         self.parent.try_upgrade()?.root_package()
     }
+    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
+        Ok(Some(self.parent.try_upgrade()?))
+    }
 
+    fn module_name(&self) -> Result<Cow<'_, str>> {
+        Ok(self
+            .name()?
+            .to_lower_snake_case()
+            .escape_rust_keywords()
+            .to_string()
+            .into())
+    }
     fn module_file_path(&self) -> Result<Cow<'_, str>> {
         Ok(format!(
             "{}{}.rs",
@@ -154,6 +162,7 @@ impl PackageOrMessage for MessageImpl {
         )
         .into())
     }
+
     fn module_file_dir(&self) -> Result<Cow<'_, str>> {
         self.module_file_dir
             .get_or_try_init(|| {
@@ -234,7 +243,9 @@ impl Message for MessageImpl {
             .map(|f| f.gen_struct_field_methods())
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
+        let message_impl = self.gen_struct_message_impl()?;
         Ok(quote! {
+            #[derive(::std::default::Default)]
             pub struct #ident {
                 #(#fields)*
                 _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
@@ -242,6 +253,48 @@ impl Message for MessageImpl {
 
             impl #ident {
                 #(#methods)*
+            }
+
+            #message_impl
+        })
+    }
+}
+
+impl MessageImpl {
+    fn gen_struct_message_impl(&self) -> Result<TokenStream> {
+        let ident = format_ident!(
+            "{}",
+            self.name.to_camel_case().escape_rust_keywords().to_string()
+        );
+        Ok(quote! {
+            impl self::_puroro::Message for #ident {
+                fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
+                    let mut msg = <Self as ::std::default::Default>::default();
+                    msg.merge_from_bytes_iter(iter)?;
+                    ::std::result::Result::Ok(msg)
+                }
+
+                fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
+                    #[allow(unused)]
+                    use ::std::result::Result::Ok;
+                    #[allow(unused)]
+                    use ::std::option::Option::Some;
+                    #[allow(unused)]
+                    use self::_puroro::internal::field_type::FieldType;
+                    #[allow(unused)]
+                    use self::_puroro::internal::oneof_type::OneofUnion;
+                    use self::_puroro::internal::ser::FieldData;
+                    while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                        todo!()
+                    }
+                    Ok(())
+                }
+
+                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] out: &mut W) -> self::_puroro::Result<()> {
+                    #[allow(unused)]
+                    use ::std::result::Result::Ok;
+                    Ok(todo!())
+                }
             }
         })
     }
