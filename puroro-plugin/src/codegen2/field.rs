@@ -24,18 +24,28 @@ use ::std::rc::{Rc, Weak};
 
 pub(super) trait Field: Debug {
     fn cache(&self) -> &AnonymousCache;
+    fn name(&self) -> Result<&str>;
     fn message(&self) -> Result<Rc<dyn Message>>;
     fn number(&self) -> i32;
+    fn rule(&self) -> Result<FieldRule>;
+    fn r#type(&self) -> Result<&FieldType>;
+}
 
+pub(super) trait FieldExt {
+    // Message's bitfield allocation
+    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
+    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
+    fn bitfield_index_for_optional(&self) -> Result<Option<usize>>;
+
+    fn gen_struct_field_type(&self) -> Result<Rc<TokenStream>>;
+    fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_struct_field_methods_for_repeated(&self) -> Result<TokenStream>;
+    fn gen_struct_field_methods_for_non_repeated(&self) -> Result<TokenStream>;
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
-
-    // Message's bitfield allocationi
-    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
-    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 }
 
 #[derive(Debug)]
@@ -50,13 +60,6 @@ pub(super) struct FieldImpl {
     type_opt: Option<field_descriptor_proto::Type>,
     number: i32,
     type_name: String,
-
-    // Message's bitfield allocation
-    allocated_bitfield: OnceCell<FieldBitfieldAllocation>,
-
-    // Generated tokens cache
-    struct_field_ident: OnceCell<Rc<Ident>>,
-    struct_field_type: OnceCell<Rc<TokenStream>>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -66,9 +69,22 @@ struct FieldBitfieldAllocation {
     tail: usize,
 }
 
+#[derive(Debug, Default)]
+struct Cache {
+    // Message's bitfield allocation
+    allocated_bitfield: OnceCell<FieldBitfieldAllocation>,
+
+    // Generated tokens cache
+    struct_field_ident: OnceCell<Rc<Ident>>,
+    struct_field_type: OnceCell<Rc<TokenStream>>,
+}
+
 impl Field for FieldImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
+    }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
@@ -76,9 +92,56 @@ impl Field for FieldImpl {
     fn number(&self) -> i32 {
         self.number
     }
+    fn rule(&self) -> Result<FieldRule> {
+        self.rule
+            .get_or_try_init(|| {
+                let syntax = self.message()?.input_file()?.syntax()?;
+                Ok(FieldRule::try_new(
+                    self.label_opt.clone(),
+                    syntax,
+                    self.proto3_optional,
+                )?)
+            })
+            .cloned()
+    }
+    fn r#type(&self) -> Result<&FieldType> {
+        self.r#type.get_or_try_init(|| {
+            let syntax = self.message()?.input_file()?.syntax()?;
+            Ok(FieldType::try_new(
+                self.type_opt.clone(),
+                &self.type_name,
+                syntax,
+                self,
+            )?)
+        })
+    }
+}
 
+impl FieldImpl {
+    pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
+        Rc::new(FieldImpl {
+            cache: Default::default(),
+            name: proto.name().to_string(),
+            message,
+            rule: OnceCell::new(),
+            r#type: OnceCell::new(),
+            proto3_optional: proto.proto3_optional(),
+            label_opt: proto.label_opt(),
+            type_opt: proto.type_opt(),
+            number: proto.number(),
+            type_name: proto.type_name().to_string(),
+        })
+    }
+}
+
+impl<T: ?Sized + Field> FieldExt for T {
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
-        Ok(self.allocated_bitfield.get().map(|a| a.tail))
+        Ok(self
+            .cache()
+            .get::<Cache>()?
+            .allocated_bitfield
+            .get()
+            .map(|a| a.tail))
     }
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
         // We need to allocate the bit for optional bit.
@@ -100,12 +163,31 @@ impl Field for FieldImpl {
                 // Do nothing
             }
         }
-        match self.allocated_bitfield.try_insert(alloc) {
+        match self
+            .cache()
+            .get::<Cache>()?
+            .allocated_bitfield
+            .try_insert(alloc)
+        {
             Ok(alloc) => Ok(alloc.tail),
             Err(_) => Err(ErrorKind::InternalError {
                 detail: "Tried to assign the field's bitfield twice.".to_string(),
             })?,
         }
+    }
+    fn bitfield_index_for_optional(&self) -> Result<Option<usize>> {
+        let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
+            alloc
+        } else {
+            let _ = self.message()?.bitfield_size()?;
+            let Some(alloc) = self
+            .cache()
+            .get::<Cache>()?.allocated_bitfield.get() else {
+                Err(ErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
+            };
+            alloc
+        };
+        Ok(alloc.maybe_optional)
     }
 
     fn gen_struct_field_decl(&self) -> Result<TokenStream> {
@@ -153,70 +235,14 @@ impl Field for FieldImpl {
             )?;
         })
     }
-}
-
-impl FieldImpl {
-    pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
-        Rc::new(FieldImpl {
-            cache: Default::default(),
-            name: proto.name().to_string(),
-            message,
-            rule: OnceCell::new(),
-            r#type: OnceCell::new(),
-            proto3_optional: proto.proto3_optional(),
-            label_opt: proto.label_opt(),
-            type_opt: proto.type_opt(),
-            number: proto.number(),
-            type_name: proto.type_name().to_string(),
-            allocated_bitfield: OnceCell::new(),
-            struct_field_type: OnceCell::new(),
-            struct_field_ident: OnceCell::new(),
-        })
-    }
-
-    fn rule(&self) -> Result<FieldRule> {
-        self.rule
-            .get_or_try_init(|| {
-                let syntax = self.message()?.input_file()?.syntax()?;
-                Ok(FieldRule::try_new(
-                    self.label_opt.clone(),
-                    syntax,
-                    self.proto3_optional,
-                )?)
-            })
-            .cloned()
-    }
-
-    fn r#type(&self) -> Result<&FieldType> {
-        self.r#type.get_or_try_init(|| {
-            let syntax = self.message()?.input_file()?.syntax()?;
-            Ok(FieldType::try_new(
-                self.type_opt.clone(),
-                &self.type_name,
-                syntax,
-                self,
-            )?)
-        })
-    }
-
-    fn bitfield_index_for_optional(&self) -> Result<Option<usize>> {
-        let alloc = if let Some(alloc) = self.allocated_bitfield.get() {
-            alloc
-        } else {
-            let _ = self.message()?.bitfield_size()?;
-            let Some(alloc) = self.allocated_bitfield.get() else {
-                Err(ErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
-            };
-            alloc
-        };
-        Ok(alloc.maybe_optional)
-    }
 
     fn gen_struct_field_type(&self) -> Result<Rc<TokenStream>> {
         use FieldRule::*;
         use FieldType::*;
         use LengthDelimitedType::*;
-        self.struct_field_type
+        self.cache()
+            .get::<Cache>()?
+            .struct_field_type
             .get_or_try_init(|| {
                 let primitive_type = self.r#type()?.rust_type()?;
                 let tag_type = self.r#type()?.tag_type()?;
@@ -264,11 +290,13 @@ impl FieldImpl {
     }
 
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
-        self.struct_field_ident
+        self.cache()
+            .get::<Cache>()?
+            .struct_field_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}",
-                    self.name.to_lower_snake_case().escape_rust_keywords()
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
                 )))
             })
             .cloned()
@@ -276,10 +304,12 @@ impl FieldImpl {
 
     fn gen_struct_field_methods_for_repeated(&self) -> Result<TokenStream> {
         debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
-        let getter_ident =
-            format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
-        let getter_mut_ident = format_ident!("{}_mut", self.name.to_lower_snake_case());
-        let clear_ident = format_ident!("clear_{}", self.name.to_lower_snake_case());
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_struct_field_ident()?;
         let field_type = self.gen_struct_field_type()?;
         let getter_item_type = match self.r#type()? {
@@ -321,12 +351,14 @@ impl FieldImpl {
             self.rule(),
             Ok(FieldRule::Optional | FieldRule::Singular)
         ));
-        let getter_ident =
-            format_ident!("{}", self.name.to_lower_snake_case().escape_rust_keywords());
-        let getter_opt_ident = format_ident!("{}_opt", self.name.to_lower_snake_case());
-        let getter_mut_ident = format_ident!("{}_mut", self.name.to_lower_snake_case());
-        let getter_has_ident = format_ident!("has_{}", self.name.to_lower_snake_case());
-        let clear_ident = format_ident!("clear_{}", self.name.to_lower_snake_case());
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
+        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
+        let getter_has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_struct_field_ident()?;
         let field_type = self.gen_struct_field_type()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type()?;

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::util::{AnonymousCache, StrExt, WeakExt};
-use super::{Enum, EnumImpl, Field, FieldImpl, InputFile, Package, PackageOrMessage};
+use super::{Enum, EnumImpl, Field, FieldExt, FieldImpl, InputFile, Package, PackageOrMessage};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
