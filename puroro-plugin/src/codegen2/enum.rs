@@ -17,9 +17,8 @@
 //!  - [proto3 document](https://developers.google.com/protocol-buffers/docs/proto3#enum)
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
-use super::util::WeakExt;
-use super::{InputFileTrait, MessageTrait, PackageOrMessageTrait, PackageTrait};
-use crate::codegen::utils::StrExt;
+use super::util::{WeakExt, StrExt};
+use super::{InputFileTrait, PackageOrMessageTrait};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;

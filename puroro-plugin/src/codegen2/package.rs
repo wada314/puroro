@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::*;
-use crate::codegen::utils::StrExt;
+use super::util::{StrExt, WeakExt};
+use super::{EnumTrait, InputFile, InputFileTrait, MessageTrait, PackageOrMessageTrait};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -23,7 +23,6 @@ use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
-use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub(super) trait PackageTrait: Debug + PackageOrMessageTrait {

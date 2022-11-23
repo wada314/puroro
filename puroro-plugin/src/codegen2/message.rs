@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::WeakExt;
+use super::util::{StrExt, WeakExt};
 use super::{
-    Enum, EnumTrait, Field, FieldTrait, InputFileTrait, MessageOrEnum, PackageOrMessageTrait,
-    PackageTrait,
+    Enum, EnumTrait, Field, FieldTrait, InputFileTrait, PackageOrMessageTrait, PackageTrait,
 };
-use crate::codegen::utils::StrExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;

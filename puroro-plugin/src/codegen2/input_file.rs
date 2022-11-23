@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::*;
+use super::util::WeakExt;
+use super::{Enum, EnumTrait, Message, MessageTrait, PackageOrMessageTrait, PackageTrait, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
 };
-use ::quote::quote;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 

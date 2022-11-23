@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::*;
-use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
 use ::std::fmt::Debug;
+use ::std::rc::Rc;
 
 pub trait OneofTrait: Debug {}
 
@@ -23,7 +22,8 @@ pub trait OneofTrait: Debug {}
 pub struct Oneof {}
 
 impl Oneof {
-    fn try_new(proto: &OneofDescriptorProto) -> Result<Self> {
-        Ok(Oneof {})
+    #[allow(unused)]
+    fn new(proto: &OneofDescriptorProto) -> Rc<Self> {
+        Rc::new(Oneof {})
     }
 }

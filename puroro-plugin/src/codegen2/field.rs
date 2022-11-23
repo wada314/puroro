@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::WeakExt;
-use super::*;
-use crate::codegen::utils::StrExt;
-use crate::Result;
+use super::util::{StrExt, WeakExt};
+use super::{FieldRule, FieldType, LengthDelimitedType, MessageTrait};
+use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};

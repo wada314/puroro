@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::util::StrExt;
 use super::{EnumTrait, MessageOrEnum, MessageTrait, PackageTrait, RootPackage};
-use crate::codegen::utils::StrExt;
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
-use itertools::Itertools;
 
 pub(super) trait PackageOrMessageTrait: Debug {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn MessageTrait>>>>;
