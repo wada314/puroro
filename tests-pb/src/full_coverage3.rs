@@ -683,3 +683,13 @@ impl ::std::default::Default for Enum {
         Self::Zeroth
     }
 }
+impl ::std::convert::From::<Enum> for i32 {
+    fn from(val: Enum) -> i32 {
+        match val {
+            Enum::Zeroth => 0i32,
+            Enum::First => 1i32,
+            Enum::Tenth => 10i32,
+            Enum::_None(i) => i,
+        }
+    }
+}

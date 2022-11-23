@@ -42,3 +42,11 @@ impl ::std::default::Default for Enum {
         Self::MyValue
     }
 }
+impl ::std::convert::From::<Enum> for i32 {
+    fn from(val: Enum) -> i32 {
+        match val {
+            Enum::MyValue => 0i32,
+            Enum::_None(i) => i,
+        }
+    }
+}

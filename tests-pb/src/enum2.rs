@@ -57,3 +57,13 @@ impl ::std::default::Default for Enum {
         Self::ValueSeven
     }
 }
+impl ::std::convert::From::<Enum> for i32 {
+    fn from(val: Enum) -> i32 {
+        match val {
+            Enum::ValueSeven => 7i32,
+            Enum::ValueZero => 0i32,
+            Enum::ValueOne => 1i32,
+            Enum::ValueFourtyTwo => 42i32,
+        }
+    }
+}

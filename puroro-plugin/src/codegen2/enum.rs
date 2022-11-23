@@ -88,6 +88,7 @@ impl Enum for EnumImpl {
             Syntax::Proto3 => quote! { _None(i32), },
         };
         let first_value_ident = value_idents.first().ok_or(ErrorKind::NoEnumValues)?;
+        let into_i32 = self.gen_enum_into_i32()?;
 
         Ok(quote! {
             #[derive(
@@ -109,6 +110,8 @@ impl Enum for EnumImpl {
                     Self::#first_value_ident
                 }
             }
+
+            #into_i32
         })
     }
 
@@ -120,6 +123,40 @@ impl Enum for EnumImpl {
                 Ok(Rc::new(quote! { #parent :: #ident }))
             })
             .cloned()
+    }
+}
+
+impl EnumImpl {
+    fn gen_enum_into_i32(&self) -> Result<TokenStream> {
+        let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+        let syntax = self.syntax()?;
+        let value_idents = self
+            .values
+            .iter()
+            .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))
+            .collect::<Vec<_>>();
+        let value_numbers = self
+            .values
+            .iter()
+            .map(|(_, number)| number)
+            .collect::<Vec<_>>();
+        let maybe_none_arm = match syntax {
+            Syntax::Proto2 => quote! {},
+            Syntax::Proto3 => quote! {
+                #ident::_None(i) => i,
+            },
+        };
+
+        Ok(quote! {
+            impl ::std::convert::From::<#ident> for i32 {
+                fn from(val: #ident) -> i32 {
+                    match val {
+                        #(#ident::#value_idents => #value_numbers,)*
+                        #maybe_none_arm
+                    }
+                }
+            }
+        })
     }
 }
 

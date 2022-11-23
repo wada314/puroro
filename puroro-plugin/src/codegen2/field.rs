@@ -221,6 +221,7 @@ impl FieldImpl {
             })
             .cloned()
     }
+    
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
         self.struct_field_ident
             .get_or_try_init(|| {
