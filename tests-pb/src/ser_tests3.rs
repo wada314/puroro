@@ -157,20 +157,120 @@ impl self::_puroro::Message for Msg {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                1i32 => {
+                    <self::_puroro::internal::field_type::SingularNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.i32_unlabeled,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                2i32 => {
+                    <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.i32_repeated,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                3i32 => {
+                    <self::_puroro::internal::field_type::SingularNumericalField::<
+                        f32,
+                        self::_puroro::tags::Float,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.float_unlabeled,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                4i32 => {
+                    <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                        f32,
+                        self::_puroro::tags::Float,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.float_repeated,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                5i32 => {
+                    <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.string_unlabeled,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                6i32 => {
+                    <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.string_repeated,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                7i32 => {
+                    <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                        self::_puroro_root::ser_tests3::msg::Submsg,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.submsg_unlabeled,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                8i32 => {
+                    <self::_puroro::internal::field_type::RepeatedMessageField::<
+                        self::_puroro_root::ser_tests3::msg::Submsg,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.submsg_repeated,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                9i32 => {
+                    <self::_puroro::internal::field_type::SingularNumericalField::<
+                        self::_puroro_root::ser_tests3::Enum,
+                        self::_puroro::tags::Enum3::<
+                            self::_puroro_root::ser_tests3::Enum,
+                        >,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.enum_unlabeled,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                10i32 => {
+                    <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                        self::_puroro_root::ser_tests3::Enum,
+                        self::_puroro::tags::Enum3::<
+                            self::_puroro_root::ser_tests3::Enum,
+                        >,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.enum_repeated,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                536870911i32 => {
+                    <self::_puroro::internal::field_type::SingularNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.very_large_field_number,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,

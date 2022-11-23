@@ -270,6 +270,12 @@ impl MessageImpl {
 
     fn gen_struct_message_impl(&self) -> Result<TokenStream> {
         let ident = self.gen_struct_ident()?;
+        let field_data_ident = quote! { field_data };
+        let deser_arms = self
+            .fields
+            .iter()
+            .map(|f| f.gen_struct_field_deser_arm(&field_data_ident))
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(quote! {
             impl self::_puroro::Message for #ident {
@@ -280,19 +286,14 @@ impl MessageImpl {
                 }
 
                 fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
-                    #[allow(unused)]
-                    use ::std::result::Result::Ok;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
-                    #[allow(unused)]
-                    use self::_puroro::internal::field_type::FieldType;
-                    #[allow(unused)]
-                    use self::_puroro::internal::oneof_type::OneofUnion;
                     use self::_puroro::internal::ser::FieldData;
-                    while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
-                        todo!()
+                    while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                        match number {
+                            #(#deser_arms)*
+                            _ => todo!(), // Unknown field number
+                        }
                     }
-                    Ok(())
+                    ::std::result::Result::Ok(())
                 }
 
                 fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] out: &mut W) -> self::_puroro::Result<()> {

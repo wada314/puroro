@@ -29,6 +29,7 @@ pub(super) trait Field: Debug {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
+    fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
 
     // Message's bitfield allocation
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
@@ -119,6 +120,18 @@ impl Field for FieldImpl {
         let r#type = self.gen_struct_field_type()?;
         Ok(quote! {
             #ident: <#r#type as ::std::clone::Clone>::clone(&self.#ident),
+        })
+    }
+    fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {
+        let ident = self.gen_struct_field_ident()?;
+        let number = self.number();
+        let r#type = self.gen_struct_field_type()?;
+        Ok(quote! {
+            #number => <#r#type as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                &mut self.#ident,
+                &mut self._bitfield,
+                #field_data_ident,
+            )?,
         })
     }
 }

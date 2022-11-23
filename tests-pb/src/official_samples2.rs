@@ -39,20 +39,25 @@ impl self::_puroro::Message for Test1 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                1i32 => {
+                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                        0usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.a,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -105,20 +110,23 @@ impl self::_puroro::Message for Test2 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                2i32 => {
+                    <self::_puroro::internal::field_type::OptionalStringField::<
+                        0usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.b,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -173,20 +181,23 @@ impl self::_puroro::Message for Test3 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                3i32 => {
+                    <self::_puroro::internal::field_type::SingularHeapMessageField::<
+                        self::_puroro_root::official_samples2::Test1,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.c,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -237,20 +248,24 @@ impl self::_puroro::Message for Test4 {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                4i32 => {
+                    <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                        i32,
+                        self::_puroro::tags::Int32,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.d,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,

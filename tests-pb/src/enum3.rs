@@ -65,20 +65,45 @@ impl self::_puroro::Message for Msg {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use ::std::result::Result::Ok;
-        #[allow(unused)]
-        use ::std::option::Option::Some;
-        #[allow(unused)]
-        use self::_puroro::internal::field_type::FieldType;
-        #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion;
         use self::_puroro::internal::ser::FieldData;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            todo!()
+            match number {
+                1i32 => {
+                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                        self::_puroro_root::enum3::Enum,
+                        self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+                        0usize,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.enum_optional,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                2i32 => {
+                    <self::_puroro::internal::field_type::SingularNumericalField::<
+                        self::_puroro_root::enum3::Enum,
+                        self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.enum_unlabeled,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                3i32 => {
+                    <self::_puroro::internal::field_type::RepeatedNumericalField::<
+                        self::_puroro_root::enum3::Enum,
+                        self::_puroro::tags::Enum3::<self::_puroro_root::enum3::Enum>,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                        &mut self.enum_repeated,
+                        &mut self._bitfield,
+                        field_data,
+                    )?
+                }
+                _ => todo!(),
+            }
         }
-        Ok(())
+        ::std::result::Result::Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
