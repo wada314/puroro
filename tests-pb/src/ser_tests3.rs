@@ -45,4 +45,5 @@ pub enum Enum {
     Zeroth,
     First,
     Tenth,
+    _None(i32),
 }

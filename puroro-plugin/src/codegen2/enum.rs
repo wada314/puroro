@@ -18,7 +18,7 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::util::{StrExt, WeakExt};
-use super::{InputFile, PackageOrMessage};
+use super::{InputFile, PackageOrMessage, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -65,6 +65,9 @@ impl EnumImpl {
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
+    fn syntax(&self) -> Result<Syntax> {
+        Ok(self.input_file.try_upgrade()?.syntax()?)
+    }
 }
 
 impl Enum for EnumImpl {
@@ -84,9 +87,16 @@ impl Enum for EnumImpl {
                 }
             })
             .collect::<Vec<_>>();
+        let syntax = self.syntax()?;
+        let maybe_extra_value = match syntax {
+            Syntax::Proto2 => quote! {},
+            Syntax::Proto3 => quote! { _None(i32), },
+        };
+
         Ok(quote! {
             pub enum #ident {
                 #(#values)*
+                #maybe_extra_value
             }
         })
     }

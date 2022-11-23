@@ -13,4 +13,5 @@ pub struct Submsg {
 }
 pub enum Enum {
     MyValue,
+    _None(i32),
 }

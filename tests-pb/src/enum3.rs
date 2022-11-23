@@ -25,4 +25,5 @@ pub enum Enum {
     ValueSeven,
     ValueOne,
     ValueFourtyTwo,
+    _None(i32),
 }
