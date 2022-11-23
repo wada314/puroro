@@ -45,7 +45,8 @@ pub(super) trait Message: Debug + PackageOrMessage {
 
 #[derive(Debug)]
 pub(super) struct MessageImpl {
-    cache: AnonymousCache,
+    cache1: AnonymousCache,
+    cache2: AnonymousCache,
     name: String,
     fields: Vec<Rc<dyn Field>>,
     messages: Vec<Rc<dyn Message>>,
@@ -92,7 +93,8 @@ impl MessageImpl {
     {
         let name = proto.name().to_string();
         Rc::new_cyclic(|weak_message| MessageImpl {
-            cache: Default::default(),
+            cache1: Default::default(),
+            cache2: Default::default(),
             name,
             input_file: Weak::clone(&input_file),
             parent,
@@ -134,7 +136,7 @@ impl MessageImpl {
 
 impl PackageOrMessage for MessageImpl {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache
+        &self.cache1
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
@@ -197,7 +199,7 @@ impl PackageOrMessage for MessageImpl {
 
 impl Message for MessageImpl {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache
+        &self.cache2
     }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message> {
         self

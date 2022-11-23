@@ -45,7 +45,8 @@ pub(super) struct PackageBase {
 
 #[derive(Debug)]
 pub(super) struct NonRootPackage {
-    cache: AnonymousCache,
+    cache1: AnonymousCache,
+    cache2: AnonymousCache,
     name: String,
     parent: Weak<dyn Package>,
     base: PackageBase,
@@ -55,7 +56,8 @@ pub(super) struct NonRootPackage {
 
 #[derive(Debug)]
 pub(super) struct RootPackage {
-    cache: AnonymousCache,
+    cache1: AnonymousCache,
+    cache2: AnonymousCache,
     base: PackageBase,
 }
 
@@ -182,7 +184,8 @@ impl RootPackage {
                 |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn Package>),
             );
             Self {
-                cache: Default::default(),
+                cache1: Default::default(),
+                cache2: Default::default(),
                 base,
             }
         })
@@ -228,7 +231,8 @@ impl NonRootPackage {
                 |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn Package>),
             );
             Self {
-                cache: Default::default(),
+                cache1: Default::default(),
+                cache2: Default::default(),
                 name: name.to_string(),
                 parent,
                 base,
@@ -241,7 +245,7 @@ impl NonRootPackage {
 
 impl PackageOrMessage for RootPackage {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache
+        &self.cache1
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
@@ -274,7 +278,7 @@ impl PackageOrMessage for RootPackage {
 
 impl Package for RootPackage {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache
+        &self.cache2
     }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok("".into())
@@ -292,7 +296,7 @@ impl Package for RootPackage {
 
 impl PackageOrMessage for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache
+        &self.cache1
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
@@ -354,7 +358,7 @@ impl PackageOrMessage for NonRootPackage {
 
 impl Package for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache
+        &self.cache2
     }
     fn name(&self) -> Result<Cow<'_, str>> {
         Ok(self.name.as_str().into())
