@@ -80,7 +80,18 @@ impl ::std::convert::From::<Enum> for i32 {
             Enum::ValueSeven => 7i32,
             Enum::ValueOne => 1i32,
             Enum::ValueFourtyTwo => 42i32,
-            Enum::_None(i) => i,
+            self::Enum::_None(i) => i,
+        }
+    }
+}
+impl ::std::convert::From::<i32> for Enum {
+    fn from(val: i32) -> Self {
+        match val {
+            0i32 => self::Enum::ValueZero,
+            7i32 => self::Enum::ValueSeven,
+            1i32 => self::Enum::ValueOne,
+            42i32 => self::Enum::ValueFourtyTwo,
+            _ => Enum::_None(val),
         }
     }
 }

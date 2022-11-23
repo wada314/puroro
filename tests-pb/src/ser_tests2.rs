@@ -181,3 +181,15 @@ impl ::std::convert::From::<Enum> for i32 {
         }
     }
 }
+impl ::std::convert::TryFrom::<i32> for Enum {
+    type Error = self::_puroro::PuroroError;
+    fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
+        use ::std::result::Result::{Ok, Err};
+        match val {
+            0i32 => Ok(self::Enum::Zeroth),
+            1i32 => Ok(self::Enum::First),
+            10i32 => Ok(self::Enum::Tenth),
+            _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
+        }
+    }
+}

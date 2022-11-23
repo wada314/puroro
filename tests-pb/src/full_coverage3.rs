@@ -689,7 +689,17 @@ impl ::std::convert::From::<Enum> for i32 {
             Enum::Zeroth => 0i32,
             Enum::First => 1i32,
             Enum::Tenth => 10i32,
-            Enum::_None(i) => i,
+            self::Enum::_None(i) => i,
+        }
+    }
+}
+impl ::std::convert::From::<i32> for Enum {
+    fn from(val: i32) -> Self {
+        match val {
+            0i32 => self::Enum::Zeroth,
+            1i32 => self::Enum::First,
+            10i32 => self::Enum::Tenth,
+            _ => Enum::_None(val),
         }
     }
 }

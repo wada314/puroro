@@ -46,7 +46,15 @@ impl ::std::convert::From::<Enum> for i32 {
     fn from(val: Enum) -> i32 {
         match val {
             Enum::MyValue => 0i32,
-            Enum::_None(i) => i,
+            self::Enum::_None(i) => i,
+        }
+    }
+}
+impl ::std::convert::From::<i32> for Enum {
+    fn from(val: i32) -> Self {
+        match val {
+            0i32 => self::Enum::MyValue,
+            _ => Enum::_None(val),
         }
     }
 }

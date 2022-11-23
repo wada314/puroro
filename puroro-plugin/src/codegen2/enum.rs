@@ -89,6 +89,10 @@ impl Enum for EnumImpl {
         };
         let first_value_ident = value_idents.first().ok_or(ErrorKind::NoEnumValues)?;
         let into_i32 = self.gen_enum_into_i32()?;
+        let from_i32 = match syntax {
+            Syntax::Proto2 => self.gen_enum_try_from_i32()?,
+            Syntax::Proto3 => self.gen_enum_from_i32()?,
+        };
 
         Ok(quote! {
             #[derive(
@@ -112,6 +116,7 @@ impl Enum for EnumImpl {
             }
 
             #into_i32
+            #from_i32
         })
     }
 
@@ -143,7 +148,7 @@ impl EnumImpl {
         let maybe_none_arm = match syntax {
             Syntax::Proto2 => quote! {},
             Syntax::Proto3 => quote! {
-                #ident::_None(i) => i,
+                self::#ident::_None(i) => i,
             },
         };
 
@@ -153,6 +158,62 @@ impl EnumImpl {
                     match val {
                         #(#ident::#value_idents => #value_numbers,)*
                         #maybe_none_arm
+                    }
+                }
+            }
+        })
+    }
+
+    fn gen_enum_from_i32(&self) -> Result<TokenStream> {
+        if matches!(self.syntax()?, Syntax::Proto2) {
+            return Ok(quote! {});
+        }
+        let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+        let value_idents = self
+            .values
+            .iter()
+            .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))
+            .collect::<Vec<_>>();
+        let value_numbers = self
+            .values
+            .iter()
+            .map(|(_, number)| number)
+            .collect::<Vec<_>>();
+        Ok(quote! {
+            impl ::std::convert::From::<i32> for #ident {
+                fn from(val: i32) -> Self {
+                    match val {
+                        #(#value_numbers => self::#ident::#value_idents,)*
+                        _ => #ident::_None(val),
+                    }
+                }
+            }
+        })
+    }
+
+    fn gen_enum_try_from_i32(&self) -> Result<TokenStream> {
+        if matches!(self.syntax()?, Syntax::Proto3) {
+            return Ok(quote! {});
+        }
+        let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+        let value_idents = self
+            .values
+            .iter()
+            .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))
+            .collect::<Vec<_>>();
+        let value_numbers = self
+            .values
+            .iter()
+            .map(|(_, number)| number)
+            .collect::<Vec<_>>();
+        Ok(quote! {
+            impl ::std::convert::TryFrom::<i32> for #ident {
+                type Error = self::_puroro::PuroroError;
+                fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
+                    use ::std::result::Result::{Ok, Err};
+                    match val {
+                        #(#value_numbers => Ok(self::#ident::#value_idents),)*
+                        _ => Err(self::_puroro::ErrorKind::UnknownEnumVariant(e))?,
                     }
                 }
             }
