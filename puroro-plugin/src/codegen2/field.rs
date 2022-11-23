@@ -28,7 +28,7 @@ pub(super) trait Field: Debug {
 
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
-    fn gen_struct_field_clone(&self) -> Result<TokenStream>;
+    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
 
     // Message's bitfield allocation
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
@@ -114,7 +114,7 @@ impl Field for FieldImpl {
             _ => self.gen_struct_field_methods_for_non_repeated(),
         }
     }
-    fn gen_struct_field_clone(&self) -> Result<TokenStream> {
+    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
         let ident = self.gen_struct_field_ident()?;
         let r#type = self.gen_struct_field_type()?;
         Ok(quote! {

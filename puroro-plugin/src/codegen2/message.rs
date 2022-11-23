@@ -228,10 +228,7 @@ impl Message for MessageImpl {
     }
 
     fn gen_struct(&self) -> Result<TokenStream> {
-        let ident = format_ident!(
-            "{}",
-            self.name.to_camel_case().escape_rust_keywords().to_string()
-        );
+        let ident = self.gen_struct_ident()?;
         let fields = self
             .fields
             .iter()
@@ -263,11 +260,17 @@ impl Message for MessageImpl {
 }
 
 impl MessageImpl {
-    fn gen_struct_message_impl(&self) -> Result<TokenStream> {
+    fn gen_struct_ident(&self) -> Result<TokenStream> {
         let ident = format_ident!(
             "{}",
             self.name.to_camel_case().escape_rust_keywords().to_string()
         );
+        Ok(quote! { #ident })
+    }
+
+    fn gen_struct_message_impl(&self) -> Result<TokenStream> {
+        let ident = self.gen_struct_ident()?;
+
         Ok(quote! {
             impl self::_puroro::Message for #ident {
                 fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
@@ -302,14 +305,11 @@ impl MessageImpl {
     }
 
     fn gen_struct_clone_impl(&self) -> Result<TokenStream> {
-        let ident = format_ident!(
-            "{}",
-            self.name.to_camel_case().escape_rust_keywords().to_string()
-        );
+        let ident = self.gen_struct_ident()?;
         let field_clones = self
             .fields
             .iter()
-            .map(|f|f.gen_struct_field_clone())
+            .map(|f| f.gen_struct_field_clone_arm())
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             impl ::std::clone::Clone for #ident {
