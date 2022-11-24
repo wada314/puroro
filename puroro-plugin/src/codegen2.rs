@@ -13,6 +13,8 @@
 // limitations under the License.
 
 mod data;
+mod gen;
+
 mod r#enum;
 mod field_rule;
 mod field_type;
@@ -22,7 +24,10 @@ mod oneof;
 mod package;
 mod package_or_message;
 mod util;
+
 use self::data::*;
+use self::gen::*;
+
 use self::r#enum::*;
 use self::field_rule::*;
 use self::field_type::*;
@@ -39,7 +44,7 @@ use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorRespons
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 
 #[derive(Debug, Clone, Copy)]
-enum Syntax {
+pub enum Syntax {
     Proto2,
     Proto3,
 }
