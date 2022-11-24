@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod r#enum;
 mod field;
 
+pub use self::r#enum::*;
 pub use self::field::*;

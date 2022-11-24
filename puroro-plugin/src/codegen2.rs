@@ -15,7 +15,6 @@
 mod data;
 mod gen;
 
-mod r#enum;
 mod field_rule;
 mod field_type;
 mod input_file;
@@ -28,7 +27,6 @@ mod util;
 use self::data::*;
 use self::gen::*;
 
-use self::r#enum::*;
 use self::field_rule::*;
 use self::field_type::*;
 use self::input_file::*;

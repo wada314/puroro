@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::util::AnonymousCache;
-use super::{Enum, Message, MessageOrEnum, Package, RootPackage};
+use super::{Enum, EnumExt, Message, MessageOrEnum, Package, RootPackage};
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
