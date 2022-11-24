@@ -29,8 +29,6 @@ pub trait FieldExt {
 
     fn gen_struct_field_type(&self) -> Result<Rc<TokenStream>>;
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_struct_field_methods_for_repeated(&self) -> Result<TokenStream>;
-    fn gen_struct_field_methods_for_non_repeated(&self) -> Result<TokenStream>;
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
@@ -120,8 +118,8 @@ impl<T: ?Sized + Field> FieldExt for T {
     }
     fn gen_struct_field_methods(&self) -> Result<TokenStream> {
         match self.rule()? {
-            FieldRule::Repeated => self.gen_struct_field_methods_for_repeated(),
-            _ => self.gen_struct_field_methods_for_non_repeated(),
+            FieldRule::Repeated => gen_struct_field_methods_for_repeated(self),
+            _ => gen_struct_field_methods_for_non_repeated(self),
         }
     }
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
@@ -222,108 +220,106 @@ impl<T: ?Sized + Field> FieldExt for T {
             })
             .cloned()
     }
+}
 
-    fn gen_struct_field_methods_for_repeated(&self) -> Result<TokenStream> {
-        debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
-        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
-        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
-        let field_ident = self.gen_struct_field_ident()?;
-        let field_type = self.gen_struct_field_type()?;
-        let getter_item_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
-                impl ::std::ops::Deref::<Target = str>
-            }),
-            FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
-                impl ::std::ops::Deref::<Target = [u8]>
-            }),
-            FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-                m.gen_rust_struct_path()?
-            }
-            _ => self.r#type()?.rust_type()?,
-        };
-        Ok(quote! {
-            pub fn #getter_ident(&self) -> &[#getter_item_type] {
-                use self::_puroro::internal::field_type::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::get_field(
-                    &self.#field_ident, &self._bitfield,
-                )
-            }
-            pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#getter_item_type> {
-                use self::_puroro::internal::field_type::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::mut_field(
-                    &mut self.#field_ident, &mut self._bitfield,
-                )
-            }
-            pub fn #clear_ident(&mut self) {
-                use self::_puroro::internal::field_type::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::clear(
-                    &mut self.#field_ident, &mut self._bitfield,
-                )
-            }
-        })
-    }
+fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result<TokenStream> {
+    debug_assert!(matches!(this.rule(), Ok(FieldRule::Repeated)));
+    let getter_ident = format_ident!(
+        "{}",
+        this.name()?.to_lower_snake_case().escape_rust_keywords()
+    );
+    let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
+    let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
+    let field_ident = this.gen_struct_field_ident()?;
+    let field_type = this.gen_struct_field_type()?;
+    let getter_item_type = match this.r#type()? {
+        FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
+            impl ::std::ops::Deref::<Target = str>
+        }),
+        FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
+            impl ::std::ops::Deref::<Target = [u8]>
+        }),
+        FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => m.gen_rust_struct_path()?,
+        _ => this.r#type()?.rust_type()?,
+    };
+    Ok(quote! {
+        pub fn #getter_ident(&self) -> &[#getter_item_type] {
+            use self::_puroro::internal::field_type::RepeatedFieldType;
+            <#field_type as RepeatedFieldType>::get_field(
+                &self.#field_ident, &self._bitfield,
+            )
+        }
+        pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#getter_item_type> {
+            use self::_puroro::internal::field_type::RepeatedFieldType;
+            <#field_type as RepeatedFieldType>::mut_field(
+                &mut self.#field_ident, &mut self._bitfield,
+            )
+        }
+        pub fn #clear_ident(&mut self) {
+            use self::_puroro::internal::field_type::RepeatedFieldType;
+            <#field_type as RepeatedFieldType>::clear(
+                &mut self.#field_ident, &mut self._bitfield,
+            )
+        }
+    })
+}
 
-    fn gen_struct_field_methods_for_non_repeated(&self) -> Result<TokenStream> {
-        debug_assert!(matches!(
-            self.rule(),
-            Ok(FieldRule::Optional | FieldRule::Singular)
-        ));
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
-        let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
-        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
-        let getter_has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
-        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
-        let field_ident = self.gen_struct_field_ident()?;
-        let field_type = self.gen_struct_field_type()?;
-        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type()?;
-        let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
-                ::std::option::Option::< #borrowed_type >
-            }),
-            _ => Rc::clone(&borrowed_type),
-        };
-        let getter_opt_type = Rc::new(quote! {
+fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Result<TokenStream> {
+    debug_assert!(matches!(
+        this.rule(),
+        Ok(FieldRule::Optional | FieldRule::Singular)
+    ));
+    let getter_ident = format_ident!(
+        "{}",
+        this.name()?.to_lower_snake_case().escape_rust_keywords()
+    );
+    let getter_opt_ident = format_ident!("{}_opt", this.name()?.to_lower_snake_case());
+    let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
+    let getter_has_ident = format_ident!("has_{}", this.name()?.to_lower_snake_case());
+    let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
+    let field_ident = this.gen_struct_field_ident()?;
+    let field_type = this.gen_struct_field_type()?;
+    let borrowed_type = this.r#type()?.rust_maybe_borrowed_type()?;
+    let getter_type = match this.r#type()? {
+        FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
             ::std::option::Option::< #borrowed_type >
-        });
-        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
-        Ok(quote! {
-            pub fn #getter_ident(&self) -> #getter_type {
-               use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field(
-                    &self.#field_ident, &self._bitfield, ::std::default::Default::default,
-                )
-            }
-            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field_opt(
-                    &self.#field_ident, &self._bitfield,
-                )
-            }
-            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::mut_field(
-                    &mut self.#field_ident, &mut self._bitfield, ::std::default::Default::default,
-                )
-            }
-            pub fn #getter_has_ident(&self) -> bool {
-                use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field_opt(
-                    &self.#field_ident, &self._bitfield,
-                ).is_some()
-            }
-            pub fn #clear_ident(&mut self) {
-                use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::clear(
-                    &mut self.#field_ident, &mut self._bitfield,
-                )
-            }
-        })
-    }
+        }),
+        _ => Rc::clone(&borrowed_type),
+    };
+    let getter_opt_type = Rc::new(quote! {
+        ::std::option::Option::< #borrowed_type >
+    });
+    let getter_mut_type = this.r#type()?.rust_mut_ref_type()?;
+    Ok(quote! {
+        pub fn #getter_ident(&self) -> #getter_type {
+           use self::_puroro::internal::field_type::NonRepeatedFieldType;
+            <#field_type as NonRepeatedFieldType>::get_field(
+                &self.#field_ident, &self._bitfield, ::std::default::Default::default,
+            )
+        }
+        pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+            use self::_puroro::internal::field_type::NonRepeatedFieldType;
+            <#field_type as NonRepeatedFieldType>::get_field_opt(
+                &self.#field_ident, &self._bitfield,
+            )
+        }
+        pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+            use self::_puroro::internal::field_type::NonRepeatedFieldType;
+            <#field_type as NonRepeatedFieldType>::mut_field(
+                &mut self.#field_ident, &mut self._bitfield, ::std::default::Default::default,
+            )
+        }
+        pub fn #getter_has_ident(&self) -> bool {
+            use self::_puroro::internal::field_type::NonRepeatedFieldType;
+            <#field_type as NonRepeatedFieldType>::get_field_opt(
+                &self.#field_ident, &self._bitfield,
+            ).is_some()
+        }
+        pub fn #clear_ident(&mut self) {
+            use self::_puroro::internal::field_type::NonRepeatedFieldType;
+            <#field_type as NonRepeatedFieldType>::clear(
+                &mut self.#field_ident, &mut self._bitfield,
+            )
+        }
+    })
 }
