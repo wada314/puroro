@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::{AnonymousCache, StrExt, WeakExt};
-use super::{FieldRule, FieldType, LengthDelimitedType, Message};
+use super::super::util::{AnonymousCache, StrExt, WeakExt};
+use super::super::{FieldRule, FieldType, LengthDelimitedType, Message};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -22,7 +22,7 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait Field: Debug {
+pub trait Field: Debug {
     fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
     fn message(&self) -> Result<Rc<dyn Message>>;
@@ -31,7 +31,7 @@ pub(super) trait Field: Debug {
     fn r#type(&self) -> Result<&FieldType>;
 }
 
-pub(super) trait FieldExt {
+pub trait FieldExt {
     // Message's bitfield allocation
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
@@ -49,7 +49,7 @@ pub(super) trait FieldExt {
 }
 
 #[derive(Debug)]
-pub(super) struct FieldImpl {
+pub struct FieldImpl {
     cache: AnonymousCache,
     name: String,
     message: Weak<dyn Message>,
@@ -118,7 +118,7 @@ impl Field for FieldImpl {
 }
 
 impl FieldImpl {
-    pub(super) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
+    pub fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
         Rc::new(FieldImpl {
             cache: Default::default(),
             name: proto.name().to_string(),

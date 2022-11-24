@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod data;
 mod r#enum;
-mod field;
 mod field_rule;
 mod field_type;
 mod input_file;
@@ -22,8 +22,8 @@ mod oneof;
 mod package;
 mod package_or_message;
 mod util;
+use self::data::*;
 use self::r#enum::*;
-use self::field::*;
 use self::field_rule::*;
 use self::field_type::*;
 use self::input_file::*;

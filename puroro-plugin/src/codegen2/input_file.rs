@@ -22,7 +22,7 @@ use ::puroro_protobuf_compiled::google::protobuf::{
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait InputFile: Debug {
+pub trait InputFile: Debug {
     fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
@@ -32,7 +32,7 @@ pub(super) trait InputFile: Debug {
 }
 
 #[derive(Debug)]
-pub(super) struct InputFileImpl {
+pub struct InputFileImpl {
     cache: AnonymousCache,
     name: String,
     syntax: String,
@@ -43,7 +43,7 @@ pub(super) struct InputFileImpl {
 }
 
 impl InputFileImpl {
-    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
+    pub fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
         Self::new_with(proto, package, MessageImpl::new, EnumImpl::new)
     }
     fn new_with<FM, M, FE, E>(
@@ -126,7 +126,7 @@ pub struct InputFileFake {
 
 #[cfg(test)]
 impl InputFileFake {
-    pub(super) fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
+    pub fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
         Rc::new(Self {
             name: proto.name().to_string(),
             package,

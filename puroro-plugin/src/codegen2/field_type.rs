@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::r#enum::Enum;
-use super::field::Field;
-use super::message::Message;
-use super::{MessageOrEnum, Syntax};
+use super::{Enum, Field, Message, MessageOrEnum, Syntax};
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
@@ -23,14 +20,14 @@ use ::quote::quote;
 use ::std::rc::Rc;
 
 #[derive(Debug, Clone)]
-pub(super) enum FieldType {
+pub enum FieldType {
     Variant(VariantType),
     LengthDelimited(LengthDelimitedType),
     Bits32(Bits32Type),
     Bits64(Bits64Type),
 }
 #[derive(Debug, Clone)]
-pub(super) enum VariantType {
+pub enum VariantType {
     Int32,
     UInt32,
     SInt32,
@@ -42,26 +39,26 @@ pub(super) enum VariantType {
     Enum3(Rc<dyn Enum>),
 }
 #[derive(Debug, Clone)]
-pub(super) enum LengthDelimitedType {
+pub enum LengthDelimitedType {
     String,
     Bytes,
     Message(Rc<dyn Message>),
 }
 #[derive(Debug, Clone)]
-pub(super) enum Bits32Type {
+pub enum Bits32Type {
     Fixed32,
     SFixed32,
     Float,
 }
 #[derive(Debug, Clone)]
-pub(super) enum Bits64Type {
+pub enum Bits64Type {
     Fixed64,
     SFixed64,
     Double,
 }
 
 impl FieldType {
-    pub(super) fn try_new(
+    pub fn try_new(
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
@@ -131,7 +128,7 @@ impl FieldType {
         }
     }
 
-    pub(super) fn rust_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn rust_type(&self) -> Result<Rc<TokenStream>> {
         use FieldType::*;
         match self {
             Variant(v) => v.rust_type(),
@@ -140,14 +137,14 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
-    pub(super) fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_maybe_borrowed_type()
         } else {
             self.rust_type()
         }
     }
-    pub(super) fn rust_mut_ref_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn rust_mut_ref_type(&self) -> Result<Rc<TokenStream>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_mut_ref_type()
         } else {
@@ -155,7 +152,7 @@ impl FieldType {
             Ok(Rc::new(quote! { &mut #raw_type }))
         }
     }
-    pub(super) fn tag_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn tag_type(&self) -> Result<Rc<TokenStream>> {
         use FieldType::*;
         match self {
             Variant(v) => v.tag_type(),

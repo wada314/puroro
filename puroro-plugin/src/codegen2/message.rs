@@ -26,7 +26,7 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait Message: Debug + PackageOrMessage {
+pub trait Message: Debug + PackageOrMessage {
     fn cache(&self) -> &AnonymousCache;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message>;
     fn name(&self) -> Result<&str>;
@@ -44,7 +44,7 @@ pub(super) trait Message: Debug + PackageOrMessage {
 }
 
 #[derive(Debug)]
-pub(super) struct MessageImpl {
+pub struct MessageImpl {
     cache1: AnonymousCache,
     cache2: AnonymousCache,
     name: String,
@@ -60,7 +60,7 @@ pub(super) struct MessageImpl {
 }
 
 impl MessageImpl {
-    pub(super) fn new(
+    pub fn new(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,
@@ -75,7 +75,7 @@ impl MessageImpl {
         )
     }
 
-    pub(super) fn new_with<FF, F, FM, M, FE, E>(
+    pub fn new_with<FF, F, FM, M, FE, E>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,

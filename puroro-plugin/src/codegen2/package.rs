@@ -25,7 +25,7 @@ use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait Package: Debug + PackageOrMessage {
+pub trait Package: Debug + PackageOrMessage {
     fn cache(&self) -> &AnonymousCache;
     fn full_name(&self) -> Result<Cow<'_, str>>;
     fn name(&self) -> Result<Cow<'_, str>>;
@@ -34,7 +34,7 @@ pub(super) trait Package: Debug + PackageOrMessage {
 }
 
 #[derive(Debug)]
-pub(super) struct PackageBase {
+pub struct PackageBase {
     subpackages_map: HashMap<String, Rc<NonRootPackage>>,
     subpackages: OnceCell<Vec<Rc<dyn Package>>>,
     files: Vec<Rc<dyn InputFile>>,
@@ -44,7 +44,7 @@ pub(super) struct PackageBase {
 }
 
 #[derive(Debug)]
-pub(super) struct NonRootPackage {
+pub struct NonRootPackage {
     cache1: AnonymousCache,
     cache2: AnonymousCache,
     name: String,
@@ -55,7 +55,7 @@ pub(super) struct NonRootPackage {
 }
 
 #[derive(Debug)]
-pub(super) struct RootPackage {
+pub struct RootPackage {
     cache1: AnonymousCache,
     cache2: AnonymousCache,
     base: PackageBase,
@@ -152,11 +152,11 @@ impl PackageBase {
 }
 
 impl RootPackage {
-    pub(super) fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
+    pub fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
         Self::new_with(fds, InputFileImpl::new)
     }
 
-    pub(super) fn new_with<'a, FF, F>(
+    pub fn new_with<'a, FF, F>(
         fds: impl Iterator<Item = &'a FileDescriptorProto>,
         ff: FF,
     ) -> Rc<RootPackage>
@@ -191,7 +191,7 @@ impl RootPackage {
         })
     }
 
-    pub(super) fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn Package>> {
+    pub fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn Package>> {
         let mut ret = vec![Rc::clone(self) as Rc<dyn Package>];
         let mut stack = self.base.subpackages_map.values().cloned().collect_vec();
         while let Some(p) = stack.pop() {

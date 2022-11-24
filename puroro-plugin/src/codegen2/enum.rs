@@ -27,7 +27,7 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub(super) trait Enum: Debug {
+pub trait Enum: Debug {
     fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> &str;
     fn gen_enum(&self) -> Result<TokenStream>;
@@ -35,7 +35,7 @@ pub(super) trait Enum: Debug {
 }
 
 #[derive(Debug)]
-pub(super) struct EnumImpl {
+pub struct EnumImpl {
     cache: AnonymousCache,
     name: String,
     input_file: Weak<dyn InputFile>,
@@ -45,7 +45,7 @@ pub(super) struct EnumImpl {
 }
 
 impl EnumImpl {
-    pub(super) fn new(
+    pub fn new(
         proto: &EnumDescriptorProto,
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,
