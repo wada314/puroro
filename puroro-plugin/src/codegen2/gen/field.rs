@@ -25,10 +25,7 @@ pub trait FieldExt {
     // Message's bitfield allocation
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
-    fn bitfield_index_for_optional(&self) -> Result<Option<usize>>;
 
-    fn gen_struct_field_type(&self) -> Result<Rc<TokenStream>>;
-    fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
@@ -94,24 +91,10 @@ impl<T: ?Sized + Field> FieldExt for T {
             })?,
         }
     }
-    fn bitfield_index_for_optional(&self) -> Result<Option<usize>> {
-        let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
-            alloc
-        } else {
-            let _ = self.message()?.bitfield_size()?;
-            let Some(alloc) = self
-            .cache()
-            .get::<Cache>()?.allocated_bitfield.get() else {
-                Err(ErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
-            };
-            alloc
-        };
-        Ok(alloc.maybe_optional)
-    }
 
     fn gen_struct_field_decl(&self) -> Result<TokenStream> {
-        let ident = self.gen_struct_field_ident()?;
-        let r#type = self.gen_struct_field_type()?;
+        let ident = gen_struct_field_ident(self)?;
+        let r#type = gen_struct_field_type(self)?;
         Ok(quote! {
             #ident: #r#type,
         })
@@ -123,16 +106,16 @@ impl<T: ?Sized + Field> FieldExt for T {
         }
     }
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
-        let ident = self.gen_struct_field_ident()?;
-        let r#type = self.gen_struct_field_type()?;
+        let ident = gen_struct_field_ident(self)?;
+        let r#type = gen_struct_field_type(self)?;
         Ok(quote! {
             #ident: <#r#type as ::std::clone::Clone>::clone(&self.#ident),
         })
     }
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {
-        let ident = self.gen_struct_field_ident()?;
+        let ident = gen_struct_field_ident(self)?;
         let number = self.number();
-        let r#type = self.gen_struct_field_type()?;
+        let r#type = gen_struct_field_type(self)?;
         Ok(quote! {
             #number => <#r#type as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                 &mut self.#ident,
@@ -142,9 +125,9 @@ impl<T: ?Sized + Field> FieldExt for T {
         })
     }
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
-        let ident = self.gen_struct_field_ident()?;
+        let ident = gen_struct_field_ident(self)?;
         let number = self.number();
-        let r#type = self.gen_struct_field_type()?;
+        let r#type = gen_struct_field_type(self)?;
         Ok(quote! {
             <#r#type as self::_puroro::internal::field_type::FieldType>::ser_to_write(
                 &self.#ident,
@@ -154,72 +137,87 @@ impl<T: ?Sized + Field> FieldExt for T {
             )?;
         })
     }
+}
 
-    fn gen_struct_field_type(&self) -> Result<Rc<TokenStream>> {
-        use FieldRule::*;
-        use FieldType::*;
-        use LengthDelimitedType::*;
-        self.cache()
-            .get::<Cache>()?
-            .struct_field_type
-            .get_or_try_init(|| {
-                let primitive_type = self.r#type()?.rust_type()?;
-                let tag_type = self.r#type()?.tag_type()?;
-                let bitfield_index = self.bitfield_index_for_optional()?.unwrap_or(usize::MAX);
-                let type_name = match (self.rule()?, self.r#type()?) {
-                    (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                        OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
-                    },
-                    (Singular, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                        SingularNumericalField::<#primitive_type, #tag_type>
-                    },
-                    (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                        RepeatedNumericalField::<#primitive_type, #tag_type>
-                    },
-                    (Optional, LengthDelimited(String)) => quote! {
-                        OptionalStringField::<#bitfield_index>
-                    },
-                    (Singular, LengthDelimited(String)) => quote! {
-                        SingularStringField
-                    },
-                    (Repeated, LengthDelimited(String)) => quote! {
-                        RepeatedStringField
-                    },
-                    (Optional, LengthDelimited(Bytes)) => quote! {
-                        OptionalBytesField::<#bitfield_index>
-                    },
-                    (Singular, LengthDelimited(Bytes)) => quote! {
-                        SingularBytesField
-                    },
-                    (Repeated, LengthDelimited(Bytes)) => quote! {
-                        RepeatedBytesField
-                    },
-                    (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                        SingularHeapMessageField::<#primitive_type>
-                    },
-                    (Repeated, LengthDelimited(Message(_))) => quote! {
-                        RepeatedMessageField::<#primitive_type>
-                    },
-                };
-                Ok(Rc::new(quote! {
-                    self::_puroro::internal::field_type::#type_name
-                }))
-            })
-            .cloned()
-    }
+fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<usize>> {
+    let alloc = if let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() {
+        alloc
+    } else {
+        let _ = this.message()?.bitfield_size()?;
+        let Some(alloc) = this
+            .cache()
+            .get::<Cache>()?.allocated_bitfield.get() else {
+                Err(ErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
+            };
+        alloc
+    };
+    Ok(alloc.maybe_optional)
+}
 
-    fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
-        self.cache()
-            .get::<Cache>()?
-            .struct_field_ident
-            .get_or_try_init(|| {
-                Ok(Rc::new(format_ident!(
-                    "{}",
-                    self.name()?.to_lower_snake_case().escape_rust_keywords()
-                )))
-            })
-            .cloned()
-    }
+fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<TokenStream>> {
+    use FieldRule::*;
+    use FieldType::*;
+    use LengthDelimitedType::*;
+    this.cache()
+        .get::<Cache>()?
+        .struct_field_type
+        .get_or_try_init(|| {
+            let primitive_type = this.r#type()?.rust_type()?;
+            let tag_type = this.r#type()?.tag_type()?;
+            let bitfield_index = bitfield_index_for_optional(this)?.unwrap_or(usize::MAX);
+            let type_name = match (this.rule()?, this.r#type()?) {
+                (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
+                    OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
+                },
+                (Singular, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
+                    SingularNumericalField::<#primitive_type, #tag_type>
+                },
+                (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
+                    RepeatedNumericalField::<#primitive_type, #tag_type>
+                },
+                (Optional, LengthDelimited(String)) => quote! {
+                    OptionalStringField::<#bitfield_index>
+                },
+                (Singular, LengthDelimited(String)) => quote! {
+                    SingularStringField
+                },
+                (Repeated, LengthDelimited(String)) => quote! {
+                    RepeatedStringField
+                },
+                (Optional, LengthDelimited(Bytes)) => quote! {
+                    OptionalBytesField::<#bitfield_index>
+                },
+                (Singular, LengthDelimited(Bytes)) => quote! {
+                    SingularBytesField
+                },
+                (Repeated, LengthDelimited(Bytes)) => quote! {
+                    RepeatedBytesField
+                },
+                (Optional | Singular, LengthDelimited(Message(_))) => quote! {
+                    SingularHeapMessageField::<#primitive_type>
+                },
+                (Repeated, LengthDelimited(Message(_))) => quote! {
+                    RepeatedMessageField::<#primitive_type>
+                },
+            };
+            Ok(Rc::new(quote! {
+                self::_puroro::internal::field_type::#type_name
+            }))
+        })
+        .cloned()
+}
+
+fn gen_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
+    this.cache()
+        .get::<Cache>()?
+        .struct_field_ident
+        .get_or_try_init(|| {
+            Ok(Rc::new(format_ident!(
+                "{}",
+                this.name()?.to_lower_snake_case().escape_rust_keywords()
+            )))
+        })
+        .cloned()
 }
 
 fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result<TokenStream> {
@@ -230,8 +228,8 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
     );
     let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
-    let field_ident = this.gen_struct_field_ident()?;
-    let field_type = this.gen_struct_field_type()?;
+    let field_ident = gen_struct_field_ident(this)?;
+    let field_type = gen_struct_field_type(this)?;
     let getter_item_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
             impl ::std::ops::Deref::<Target = str>
@@ -277,8 +275,8 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
     let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
     let getter_has_ident = format_ident!("has_{}", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
-    let field_ident = this.gen_struct_field_ident()?;
-    let field_type = this.gen_struct_field_type()?;
+    let field_ident = gen_struct_field_ident(this)?;
+    let field_type = gen_struct_field_type(this)?;
     let borrowed_type = this.r#type()?.rust_maybe_borrowed_type()?;
     let getter_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
