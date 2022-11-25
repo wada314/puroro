@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::AnonymousCache;
+use super::util::*;
 use super::{Enum, EnumExt, Message, MessageOrEnum, Package, RootPackage};
 use crate::{ErrorKind, Result};
+use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
@@ -23,11 +24,16 @@ use ::std::rc::Rc;
 
 pub trait PackageOrMessage: Debug {
     fn cache(&self) -> &AnonymousCache;
+    fn name(&self) -> Result<&str>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;
+
+    fn is_root(&self) -> Result<bool> {
+        Ok(self.parent()?.is_some())
+    }
 
     fn all_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
         let mut ret = self.messages()?.collect::<Vec<_>>();
@@ -42,11 +48,124 @@ pub trait PackageOrMessage: Debug {
         Ok(ret)
     }
 
-    fn module_name(&self) -> Result<Cow<'_, str>>;
-    fn module_file_path(&self) -> Result<Cow<'_, str>>;
-    fn module_file_dir(&self) -> Result<Cow<'_, str>>;
+    fn resolve_type_name(
+        &self,
+        type_name: &str,
+    ) -> Result<MessageOrEnum<Rc<dyn Message>, Rc<dyn Enum>>> {
+        if let Some(absolute_path) = type_name.strip_prefix('.') {
+            return self.root_package()?.resolve_type_name(absolute_path);
+        }
 
+        if let Some((subcomponent, rest)) = type_name.split_once('.') {
+            // 2 or more remaining components. The next component is either a message or a package.
+            if let Some(m) = self
+                .messages()?
+                .try_find(|m| -> Result<_> { Ok(m.name()? == subcomponent) })?
+            {
+                return m.resolve_type_name(rest);
+            } else if let Some(p) = self
+                .subpackages()?
+                .try_find(|p| -> Result<_> { Ok(p.name()? == subcomponent) })?
+            {
+                return p.resolve_type_name(rest);
+            }
+        } else {
+            // Exactly 1 remaining component. Message or Enum. Return that item.
+            if let Some(m) = self
+                .messages()?
+                .try_find(|m| -> Result<_> { Ok(m.name()? == type_name) })?
+            {
+                return Ok(MessageOrEnum::Message(m));
+            } else if let Some(m) = self
+                .enums()?
+                .try_find(|e| -> Result<_> { Ok(e.name() == type_name) })?
+            {
+                return Ok(MessageOrEnum::Enum(m));
+            }
+        }
+        Err(ErrorKind::UnknownTypeName {
+            name: type_name.to_string(),
+        })?
+    }
+}
+
+trait PackageOrMessageExt {
+    fn module_name(&self) -> Result<&str>;
+    fn module_file_path(&self) -> Result<&str>;
+    fn module_file_dir(&self) -> Result<&str>;
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
+    fn gen_module_file(&self) -> Result<TokenStream>;
+}
+
+#[derive(Debug, Default)]
+struct Cache {
+    module_file_dir: OnceCell<String>,
+    rust_module_path: OnceCell<Rc<TokenStream>>,
+}
+
+impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
+    fn module_name(&self) -> Result<&str> {
+        Ok(if self.is_root()? {
+            ""
+        } else {
+            self.name()?
+                .to_lower_snake_case()
+                .escape_rust_keywords()
+                .to_string()
+                .as_str()
+        })
+    }
+    fn module_file_path(&self) -> Result<&str> {
+        Ok(if let Some(parent) = self.parent()? {
+            format!(
+                "{}{}.rs",
+                parent.module_file_dir()?,
+                self.name()?.to_lower_snake_case()
+            )
+            .as_str()
+        } else {
+            "lib.rs"
+        })
+    }
+
+    fn module_file_dir(&self) -> Result<&str> {
+        self.cache()
+            .get::<Cache>()?
+            .module_file_dir
+            .get_or_try_init(|| {
+                if let Some(parent) = self.parent()? {
+                    Ok(format!(
+                        "{}{}/",
+                        parent.module_file_dir()?,
+                        self.name()?.to_lower_snake_case()
+                    ))
+                } else {
+                    Ok("".to_string())
+                }
+            })
+            .map(|s| s.as_str())
+    }
+
+    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+        self.cache()
+            .get::<Cache>()?
+            .rust_module_path
+            .get_or_try_init(|| {
+                Ok(Rc::new(if let Some(parent) = self.parent()? {
+                    let parent_path = parent.gen_rust_module_path()?;
+                    let ident = format_ident!(
+                        "{}",
+                        self.name()?.to_lower_snake_case().escape_rust_keywords()
+                    );
+                    quote! {
+                        #parent_path :: #ident
+                    }
+                } else {
+                    quote! { self :: _puroro_root }
+                }))
+            })
+            .cloned()
+    }
 
     fn gen_module_file(&self) -> Result<TokenStream> {
         let header = if self.parent()?.is_some() {
@@ -105,45 +224,5 @@ pub trait PackageOrMessage: Debug {
             #(#struct_decls)*
             #(#enum_decls)*
         })
-    }
-
-    fn resolve_type_name(
-        &self,
-        type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn Message>, Rc<dyn Enum>>> {
-        if let Some(absolute_path) = type_name.strip_prefix('.') {
-            return self.root_package()?.resolve_type_name(absolute_path);
-        }
-
-        if let Some((subcomponent, rest)) = type_name.split_once('.') {
-            // 2 or more remaining components. The next component is either a message or a package.
-            if let Some(m) = self
-                .messages()?
-                .try_find(|m| -> Result<_> { Ok(m.name()? == subcomponent) })?
-            {
-                return m.resolve_type_name(rest);
-            } else if let Some(p) = self
-                .subpackages()?
-                .try_find(|p| -> Result<_> { Ok(p.name()? == subcomponent) })?
-            {
-                return p.resolve_type_name(rest);
-            }
-        } else {
-            // Exactly 1 remaining component. Message or Enum. Return that item.
-            if let Some(m) = self
-                .messages()?
-                .try_find(|m| -> Result<_> { Ok(m.name()? == type_name) })?
-            {
-                return Ok(MessageOrEnum::Message(m));
-            } else if let Some(m) = self
-                .enums()?
-                .try_find(|e| -> Result<_> { Ok(e.name() == type_name) })?
-            {
-                return Ok(MessageOrEnum::Enum(m));
-            }
-        }
-        Err(ErrorKind::UnknownTypeName {
-            name: type_name.to_string(),
-        })?
     }
 }

@@ -247,6 +247,9 @@ impl PackageOrMessage for RootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache1
     }
+    fn name(&self) -> Result<&str> {
+        Ok("".into())
+    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
     }
@@ -261,18 +264,6 @@ impl PackageOrMessage for RootPackage {
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(None)
-    }
-    fn module_name(&self) -> Result<Cow<'_, str>> {
-        Ok("".into())
-    }
-    fn module_file_path(&self) -> Result<Cow<'_, str>> {
-        Ok("lib.rs".into())
-    }
-    fn module_file_dir(&self) -> Result<Cow<'_, str>> {
-        Ok("".into())
-    }
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        Ok(Rc::new(quote! { self :: _puroro_root }))
     }
 }
 
@@ -298,6 +289,9 @@ impl PackageOrMessage for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache1
     }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base()?.messages()?.iter().cloned()))
     }
@@ -312,47 +306,6 @@ impl PackageOrMessage for NonRootPackage {
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(Some(self.parent.try_upgrade()?))
-    }
-    fn module_name(&self) -> Result<Cow<'_, str>> {
-        Ok(self
-            .name
-            .to_lower_snake_case()
-            .escape_rust_keywords()
-            .to_string()
-            .into())
-    }
-    fn module_file_path(&self) -> Result<Cow<'_, str>> {
-        Ok(format!(
-            "{}{}.rs",
-            self.parent.try_upgrade()?.module_file_dir()?,
-            self.name.to_lower_snake_case()
-        )
-        .into())
-    }
-    fn module_file_dir(&self) -> Result<Cow<'_, str>> {
-        self.module_file_dir
-            .get_or_try_init(|| {
-                Ok(format!(
-                    "{}{}/",
-                    self.parent.try_upgrade()?.module_file_dir()?,
-                    self.name.to_lower_snake_case()
-                ))
-            })
-            .map(|s| s.into())
-    }
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
-        self.rust_module_path
-            .get_or_try_init(|| {
-                let parent = self.parent.try_upgrade()?.gen_rust_module_path()?;
-                let ident = format_ident!(
-                    "{}",
-                    self.name()?.to_lower_snake_case().escape_rust_keywords()
-                );
-                Ok(Rc::new(quote! {
-                    #parent :: #ident
-                }))
-            })
-            .cloned()
     }
 }
 
