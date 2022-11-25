@@ -18,7 +18,6 @@ mod gen;
 mod field_rule;
 mod field_type;
 mod input_file;
-mod message;
 mod oneof;
 mod package;
 mod util;
@@ -29,7 +28,6 @@ use self::gen::*;
 use self::field_rule::*;
 use self::field_type::*;
 use self::input_file::*;
-use self::message::*;
 #[allow(unused)]
 use self::oneof::*;
 use self::package::*;
