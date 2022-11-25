@@ -89,7 +89,7 @@ pub trait PackageOrMessage: Debug {
     }
 }
 
-trait PackageOrMessageExt {
+pub trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
     fn module_file_path(&self) -> Result<&str>;
     fn module_file_dir(&self) -> Result<&str>;
