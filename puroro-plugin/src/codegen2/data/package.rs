@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::*;
-use super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
+use super::super::util::*;
+use super::super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -103,7 +103,7 @@ impl PackageBase {
             .get_or_try_init(|| {
                 self.files
                     .iter()
-                    .map(|f| Ok(f.messages()?.iter().cloned()))
+                    .map(|f| f.messages())
                     .flatten_ok()
                     .try_collect()
             })
@@ -115,7 +115,7 @@ impl PackageBase {
             .get_or_try_init(|| {
                 self.files
                     .iter()
-                    .map(|f| Ok(f.enums()?.iter().cloned()))
+                    .map(|f| f.enums())
                     .flatten_ok()
                     .try_collect()
             })

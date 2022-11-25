@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::{AnonymousCache, WeakExt};
-use super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
+use super::super::util::*;
+use super::super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -27,8 +27,8 @@ pub trait InputFile: Debug {
     fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn Package>>;
-    fn messages(&self) -> Result<&[Rc<dyn Message>]>;
-    fn enums(&self) -> Result<&[Rc<dyn Enum>]>;
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
 }
 
 #[derive(Debug)]
@@ -103,17 +103,14 @@ impl InputFile for InputFileImpl {
             .get_or_try_init(|| self.syntax.as_str().try_into())
             .cloned()
     }
-
     fn package(&self) -> Result<Rc<dyn Package>> {
         self.package.try_upgrade()
     }
-
-    fn messages(&self) -> Result<&[Rc<dyn Message>]> {
-        Ok(&self.messages)
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
+        Ok(Box::new(self.messages.iter().cloned()))
     }
-
-    fn enums(&self) -> Result<&[Rc<dyn Enum>]> {
-        Ok(&self.enums)
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+        Ok(Box::new(self.enums.iter().cloned()))
     }
 }
 

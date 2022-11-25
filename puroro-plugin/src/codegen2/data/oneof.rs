@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::AnonymousCache;
+use super::super::util::*;
 use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;

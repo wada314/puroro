@@ -17,9 +17,6 @@ mod gen;
 
 mod field_rule;
 mod field_type;
-mod input_file;
-mod oneof;
-mod package;
 mod util;
 
 use self::data::*;
@@ -27,10 +24,6 @@ use self::gen::*;
 
 use self::field_rule::*;
 use self::field_type::*;
-use self::input_file::*;
-#[allow(unused)]
-use self::oneof::*;
-use self::package::*;
 use crate::{ErrorKind, GeneratorError, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
