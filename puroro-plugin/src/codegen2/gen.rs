@@ -14,6 +14,10 @@
 
 mod r#enum;
 mod field;
+mod message;
+mod package_or_message;
 
 pub use self::r#enum::*;
 pub use self::field::*;
+pub use self::message::*;
+pub use self::package_or_message::*;

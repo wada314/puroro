@@ -21,7 +21,6 @@ mod input_file;
 mod message;
 mod oneof;
 mod package;
-mod package_or_message;
 mod util;
 
 use self::data::*;
@@ -34,7 +33,6 @@ use self::message::*;
 #[allow(unused)]
 use self::oneof::*;
 use self::package::*;
-use self::package_or_message::*;
 use crate::{ErrorKind, GeneratorError, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
@@ -62,7 +60,7 @@ impl TryFrom<&str> for Syntax {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum MessageOrEnum<M, E> {
+pub enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
 }

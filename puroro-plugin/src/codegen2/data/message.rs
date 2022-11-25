@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod r#enum;
-mod field;
-mod message;
-mod package_or_message;
-
-pub use self::r#enum::*;
-pub use self::field::*;
-pub use self::message::*;
-pub use self::package_or_message::*;
+use super::super::util::{AnonymousCache, StrExt, WeakExt};
+use super::super::{
+    Enum, EnumImpl, Field, FieldExt, FieldImpl, InputFile, Package, PackageOrMessage,
+    PackageOrMessageExt,
+};
+use crate::Result;
+use ::once_cell::unsync::OnceCell;
+use ::proc_macro2::TokenStream;
+use ::puroro_protobuf_compiled::google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto,
+};
+use ::quote::{format_ident, quote};
+use ::std::borrow::Cow;
+use ::std::fmt::Debug;
+use ::std::iter;
+use ::std::rc::{Rc, Weak};
