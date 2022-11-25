@@ -27,8 +27,7 @@ use ::std::rc::{Rc, Weak};
 
 pub trait Package: Debug + PackageOrMessage {
     fn cache(&self) -> &AnonymousCache;
-    fn full_name(&self) -> Result<Cow<'_, str>>;
-    fn name(&self) -> Result<Cow<'_, str>>;
+    fn full_name(&self) -> Result<&str>;
     fn base(&self) -> Result<&PackageBase>;
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package>;
 }
@@ -48,6 +47,7 @@ pub struct NonRootPackage {
     cache1: AnonymousCache,
     cache2: AnonymousCache,
     name: String,
+    full_name: OnceCell<String>,
     parent: Weak<dyn Package>,
     base: PackageBase,
     module_file_dir: OnceCell<String>,
@@ -234,6 +234,7 @@ impl NonRootPackage {
                 cache1: Default::default(),
                 cache2: Default::default(),
                 name: name.to_string(),
+                full_name: OnceCell::new(),
                 parent,
                 base,
                 module_file_dir: OnceCell::new(),
@@ -271,10 +272,7 @@ impl Package for RootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache2
     }
-    fn name(&self) -> Result<Cow<'_, str>> {
-        Ok("".into())
-    }
-    fn full_name(&self) -> Result<Cow<'_, str>> {
+    fn full_name(&self) -> Result<&str> {
         Ok("".into())
     }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package> {
@@ -313,17 +311,18 @@ impl Package for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache2
     }
-    fn name(&self) -> Result<Cow<'_, str>> {
-        Ok(self.name.as_str().into())
-    }
-    fn full_name(&self) -> Result<Cow<'_, str>> {
-        let parent = self.parent.try_upgrade()?;
-        let parent_full_name = parent.full_name()?;
-        if parent_full_name.is_empty() {
-            Ok(self.name.as_str().into())
-        } else {
-            Ok(format!("{}.{}", parent_full_name, &self.name).into())
-        }
+    fn full_name(&self) -> Result<&str> {
+        self.full_name
+            .get_or_try_init(|| {
+                let parent = self.parent.try_upgrade()?;
+                let parent_full_name = parent.full_name()?;
+                if parent_full_name.is_empty() {
+                    Ok(self.name.clone())
+                } else {
+                    Ok(format!("{}.{}", parent_full_name, &self.name))
+                }
+            })
+            .map(|s| s.as_str())
     }
     fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package> {
         self

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{Enum, EnumExt, Field, Message, MessageOrEnum, Syntax};
+use super::{Enum, EnumExt, Field, Message, MessageExt, MessageOrEnum, Syntax};
 use crate::{ErrorKind, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;

@@ -18,7 +18,7 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::super::util::*;
-use super::super::{Enum, Syntax};
+use super::super::{Enum, PackageOrMessageExt, Syntax};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;

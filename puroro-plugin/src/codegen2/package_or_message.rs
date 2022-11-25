@@ -13,12 +13,11 @@
 // limitations under the License.
 
 use super::util::*;
-use super::{Enum, EnumExt, Message, MessageOrEnum, Package, RootPackage};
+use super::{Enum, EnumExt, Message, MessageExt, MessageOrEnum, Package, RootPackage};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
-use ::std::borrow::Cow;
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
@@ -32,7 +31,7 @@ pub trait PackageOrMessage: Debug {
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;
 
     fn is_root(&self) -> Result<bool> {
-        Ok(self.parent()?.is_some())
+        Ok(self.parent()?.is_none())
     }
 
     fn all_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
@@ -101,31 +100,43 @@ pub trait PackageOrMessageExt {
 struct Cache {
     module_file_dir: OnceCell<String>,
     rust_module_path: OnceCell<Rc<TokenStream>>,
+    module_name: OnceCell<String>,
+    module_file_path: OnceCell<String>,
 }
 
 impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
     fn module_name(&self) -> Result<&str> {
-        Ok(if self.is_root()? {
-            ""
-        } else {
-            self.name()?
-                .to_lower_snake_case()
-                .escape_rust_keywords()
-                .to_string()
-                .as_str()
-        })
+        self.cache()
+            .get::<Cache>()?
+            .module_name
+            .get_or_try_init(|| {
+                Ok(if self.is_root()? {
+                    "".to_string()
+                } else {
+                    self.name()?
+                        .to_lower_snake_case()
+                        .escape_rust_keywords()
+                        .to_string()
+                })
+            })
+            .map(|s| s.as_str())
     }
     fn module_file_path(&self) -> Result<&str> {
-        Ok(if let Some(parent) = self.parent()? {
-            format!(
-                "{}{}.rs",
-                parent.module_file_dir()?,
-                self.name()?.to_lower_snake_case()
-            )
-            .as_str()
-        } else {
-            "lib.rs"
-        })
+        self.cache()
+            .get::<Cache>()?
+            .module_file_path
+            .get_or_try_init(|| {
+                Ok(if let Some(parent) = self.parent()? {
+                    format!(
+                        "{}{}.rs",
+                        parent.module_file_dir()?,
+                        self.name()?.to_lower_snake_case()
+                    )
+                } else {
+                    "lib.rs".to_string()
+                })
+            })
+            .map(|s| s.as_str())
     }
 
     fn module_file_dir(&self) -> Result<&str> {

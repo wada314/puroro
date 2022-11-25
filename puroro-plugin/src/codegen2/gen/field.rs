@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::StrExt;
-use super::super::{Field, FieldRule, FieldType, LengthDelimitedType};
+use super::super::{Field, FieldRule, FieldType, LengthDelimitedType, MessageExt};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
