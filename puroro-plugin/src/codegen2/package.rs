@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::util::{AnonymousCache, StrExt, WeakExt};
+use super::util::*;
 use super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
-use ::quote::{format_ident, quote};
-use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
@@ -34,8 +31,7 @@ pub trait Package: Debug + PackageOrMessage {
 
 #[derive(Debug)]
 pub struct PackageBase {
-    subpackages_map: HashMap<String, Rc<NonRootPackage>>,
-    subpackages: OnceCell<Vec<Rc<dyn Package>>>,
+    subpackages: Vec<Rc<NonRootPackage>>,
     files: Vec<Rc<dyn InputFile>>,
     root: Weak<RootPackage>,
     messages: OnceCell<Vec<Rc<dyn Message>>>,
@@ -50,8 +46,6 @@ pub struct NonRootPackage {
     full_name: OnceCell<String>,
     parent: Weak<dyn Package>,
     base: PackageBase,
-    module_file_dir: OnceCell<String>,
-    rust_module_path: OnceCell<Rc<TokenStream>>,
 }
 
 #[derive(Debug)]
@@ -93,16 +87,12 @@ impl PackageBase {
         let subpackages = name_fd_map
             .into_iter()
             .filter_map(|(name_opt, child_files)| name_opt.map(|name| (name, child_files)))
-            .map(|(name, child_files)| {
-                let subpackage = fp(&name, child_files);
-                (name.to_string(), subpackage)
-            })
+            .map(|(name, child_files)| fp(&name, child_files))
             .collect();
 
         PackageBase {
             root,
-            subpackages_map: subpackages,
-            subpackages: OnceCell::new(),
+            subpackages,
             files: self_files,
             messages: OnceCell::new(),
             enums: OnceCell::new(),
@@ -134,16 +124,7 @@ impl PackageBase {
     }
 
     fn subpackages(&self) -> Result<&[Rc<dyn Package>]> {
-        self.subpackages
-            .get_or_try_init(|| {
-                Ok(self
-                    .subpackages_map
-                    .values()
-                    .cloned()
-                    .map(|p| p as Rc<dyn Package>)
-                    .collect())
-            })
-            .map(|sp| sp.as_slice())
+        Ok(self.subpackages.as_slice())
     }
 
     fn root(&self) -> Result<Rc<RootPackage>> {
@@ -191,15 +172,6 @@ impl RootPackage {
         })
     }
 
-    pub fn all_packages(self: &Rc<Self>) -> Vec<Rc<dyn Package>> {
-        let mut ret = vec![Rc::clone(self) as Rc<dyn Package>];
-        let mut stack = self.base.subpackages_map.values().cloned().collect_vec();
-        while let Some(p) = stack.pop() {
-            stack.extend(p.base.subpackages_map.values().cloned());
-            ret.push(p as Rc<dyn Package>);
-        }
-        ret
-    }
 }
 
 impl NonRootPackage {
@@ -237,8 +209,6 @@ impl NonRootPackage {
                 full_name: OnceCell::new(),
                 parent,
                 base,
-                module_file_dir: OnceCell::new(),
-                rust_module_path: OnceCell::new(),
             }
         })
     }

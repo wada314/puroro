@@ -34,6 +34,16 @@ pub trait PackageOrMessage: Debug {
         Ok(self.parent()?.is_none())
     }
 
+    fn all_packages(&self) -> Result<Vec<Rc<dyn Package>>> {
+        let mut ret = Vec::new();
+        let mut stack = self.subpackages()?.collect::<Vec<_>>();
+        while let Some(p) = stack.pop() {
+            stack.extend(p.subpackages()?);
+            ret.push(p as Rc<dyn Package>);
+        }
+        Ok(ret)
+    }
+
     fn all_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
         let mut ret = self.messages()?.collect::<Vec<_>>();
         let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessage>);
