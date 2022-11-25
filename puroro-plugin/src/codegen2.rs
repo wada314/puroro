@@ -14,16 +14,11 @@
 
 mod data;
 mod gen;
-
-mod field_rule;
-mod field_type;
 mod util;
 
 use self::data::*;
 use self::gen::*;
 
-use self::field_rule::*;
-use self::field_type::*;
 use crate::{ErrorKind, GeneratorError, Result};
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;

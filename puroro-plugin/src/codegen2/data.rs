@@ -14,6 +14,8 @@
 
 mod r#enum;
 mod field;
+mod field_rule;
+mod field_type;
 mod input_file;
 mod message;
 mod oneof;
@@ -22,6 +24,8 @@ mod package_or_message;
 
 pub use self::r#enum::*;
 pub use self::field::*;
+pub use self::field_rule::*;
+pub use self::field_type::*;
 pub use self::input_file::*;
 pub use self::message::*;
 pub use self::oneof::*;
