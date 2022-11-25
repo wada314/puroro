@@ -99,7 +99,7 @@ impl PackageBase {
         }
     }
 
-    fn messages(&self) -> Result<&[Rc<dyn Message>]> {
+    fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Message>>> {
         self.messages
             .get_or_try_init(|| {
                 self.files
@@ -108,10 +108,10 @@ impl PackageBase {
                     .flatten_ok()
                     .try_collect()
             })
-            .map(|v| v.as_slice())
+            .map(|v| v.iter().cloned())
     }
 
-    fn enums(&self) -> Result<&[Rc<dyn Enum>]> {
+    fn enums(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Enum>>> {
         self.enums
             .get_or_try_init(|| {
                 self.files
@@ -120,11 +120,11 @@ impl PackageBase {
                     .flatten_ok()
                     .try_collect()
             })
-            .map(|v| v.as_slice())
+            .map(|v| v.iter().cloned())
     }
 
-    fn subpackages(&self) -> Result<&[Rc<dyn Package>]> {
-        Ok(self.subpackages.as_slice())
+    fn subpackages(&self) -> Result<impl '_ + Iterator<Item = Rc<NonRootPackage>>> {
+        Ok(self.subpackages.iter().cloned())
     }
 
     fn root(&self) -> Result<Rc<RootPackage>> {
@@ -171,7 +171,6 @@ impl RootPackage {
             }
         })
     }
-
 }
 
 impl NonRootPackage {
@@ -222,13 +221,15 @@ impl PackageOrMessage for RootPackage {
         Ok("".into())
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
-        Ok(Box::new(self.base()?.messages()?.iter().cloned()))
+        Ok(Box::new(self.base()?.messages()?))
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
-        Ok(Box::new(self.base()?.enums()?.iter().cloned()))
+        Ok(Box::new(self.base()?.enums()?))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
-        Ok(Box::new(self.base()?.subpackages()?.iter().cloned()))
+        Ok(Box::new(
+            self.base()?.subpackages()?.map(|p| p as Rc<dyn Package>),
+        ))
     }
     fn root_package(&self) -> Result<Rc<RootPackage>> {
         self.base()?.root()
@@ -261,13 +262,15 @@ impl PackageOrMessage for NonRootPackage {
         Ok(&self.name)
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
-        Ok(Box::new(self.base()?.messages()?.iter().cloned()))
+        Ok(Box::new(self.base()?.messages()?))
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
-        Ok(Box::new(self.base()?.enums()?.iter().cloned()))
+        Ok(Box::new(self.base()?.enums()?))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
-        Ok(Box::new(self.base()?.subpackages()?.iter().cloned()))
+        Ok(Box::new(
+            self.base()?.subpackages()?.map(|p| p as Rc<dyn Package>),
+        ))
     }
     fn root_package(&self) -> Result<Rc<RootPackage>> {
         self.base()?.root()

@@ -40,6 +40,8 @@ use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::std::iter;
+use ::std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Syntax {
@@ -70,8 +72,9 @@ pub fn generate_file_names_and_tokens<'a>(
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = RootPackage::new(files);
     let from_packages = root_package
-        .all_packages()
+        .all_packages()?
         .into_iter()
+        .chain(iter::once(Rc::clone(&root_package) as Rc<dyn Package>))
         .map(|p| -> Result<_> { Ok((p.module_file_path()?.to_string(), p.gen_module_file()?)) });
     let from_messages = root_package
         .all_messages()?
