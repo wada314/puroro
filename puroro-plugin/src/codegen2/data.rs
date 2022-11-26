@@ -19,6 +19,7 @@ mod field_type;
 mod input_file;
 mod message;
 mod oneof;
+mod oneof_field;
 mod package;
 mod package_or_message;
 
@@ -29,5 +30,6 @@ pub use self::field_type::*;
 pub use self::input_file::*;
 pub use self::message::*;
 pub use self::oneof::*;
+pub use self::oneof_field::*;
 pub use self::package::*;
 pub use self::package_or_message::*;

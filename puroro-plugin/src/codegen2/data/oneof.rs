@@ -13,24 +13,48 @@
 // limitations under the License.
 
 use super::super::util::*;
-use ::puroro_protobuf_compiled::google::protobuf::OneofDescriptorProto;
+use super::super::{Message, OneofField, OneofFieldImpl};
+use crate::Result;
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescriptorProto};
 use ::std::fmt::Debug;
-use ::std::rc::Rc;
+use ::std::rc::{Rc, Weak};
 
 pub trait Oneof: Debug {
     fn cache(&self) -> &AnonymousCache;
+    fn message(&self) -> Result<Rc<dyn Message>>;
+    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>>;
 }
 
 #[derive(Debug)]
 pub struct OneofImpl {
     cache: AnonymousCache,
+    message: Weak<dyn Message>,
+    fields: Vec<Rc<dyn OneofField>>,
 }
 
 impl OneofImpl {
     #[allow(unused)]
-    fn new(proto: &OneofDescriptorProto) -> Rc<Self> {
-        Rc::new(OneofImpl {
-            cache: Default::default(),
+    fn new(
+        proto: &DescriptorProto,
+        oneof_index: usize,
+        message: Weak<dyn Message>,
+    ) -> Rc<OneofImpl> {
+        Rc::new_cyclic(|weak| {
+            let oneof_proto = &proto.oneof_decl()[oneof_index];
+            let fields = proto
+                .field()
+                .iter()
+                .filter(|f| f.oneof_index() as usize == oneof_index)
+                .map(|f| {
+                    OneofFieldImpl::new(f, Weak::clone(weak) as Weak<dyn Oneof>)
+                        as Rc<dyn OneofField>
+                })
+                .collect::<Vec<_>>();
+            OneofImpl {
+                cache: Default::default(),
+                message,
+                fields,
+            }
         })
     }
 }
@@ -38,5 +62,11 @@ impl OneofImpl {
 impl Oneof for OneofImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
+    }
+    fn message(&self) -> Result<Rc<dyn Message>> {
+        Ok(self.message.try_upgrade()?)
+    }
+    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>> {
+        Ok(Box::new(self.fields.iter().cloned()))
     }
 }
