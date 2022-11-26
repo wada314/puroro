@@ -4,6 +4,7 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
+pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,

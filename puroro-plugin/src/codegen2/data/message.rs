@@ -14,11 +14,12 @@
 
 use super::super::util::*;
 use super::super::{
-    Enum, EnumImpl, Field, FieldImpl, InputFile, Package, PackageOrMessage, RootPackage,
+    Enum, EnumImpl, Field, FieldImpl, InputFile, Oneof, OneofImpl, Package, PackageOrMessage,
+    RootPackage,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto,
+    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
 };
 use ::std::fmt::Debug;
 use ::std::iter;
@@ -30,11 +31,12 @@ pub trait Message: Debug + PackageOrMessage {
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>>;
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();
         let has_subenums = self.enums()?.next().is_some();
-        let has_oneofs = false; // TODO!
+        let has_oneofs = self.oneofs()?.next().is_some();
         Ok(has_submessages || has_subenums || has_oneofs)
     }
 }
@@ -47,6 +49,7 @@ pub struct MessageImpl {
     fields: Vec<Rc<dyn Field>>,
     messages: Vec<Rc<dyn Message>>,
     enums: Vec<Rc<dyn Enum>>,
+    oneofs: Vec<Rc<dyn Oneof>>,
     input_file: Weak<dyn InputFile>,
     parent: Weak<dyn PackageOrMessage>,
 }
@@ -64,39 +67,38 @@ impl MessageImpl {
             FieldImpl::new,
             MessageImpl::new,
             EnumImpl::new,
+            OneofImpl::new,
         )
     }
 
-    pub fn new_with<FF, F, FM, M, FE, E>(
+    pub fn new_with<FF, F, FM, M, FE, E, FO, O>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,
         ff: FF,
         fm: FM,
         fe: FE,
+        fo: FO,
     ) -> Rc<Self>
     where
         FF: Fn(&FieldDescriptorProto, Weak<dyn Message>) -> Rc<F>,
         FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
         FE: Fn(&EnumDescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<E>,
+        FO: Fn(&DescriptorProto, &OneofDescriptorProto, usize, Weak<dyn Message>) -> Rc<O>,
         F: 'static + Field,
         M: 'static + Message,
         E: 'static + Enum,
+        O: 'static + Oneof,
     {
         let name = proto.name().to_string();
-        Rc::new_cyclic(|weak_message| MessageImpl {
-            cache1: Default::default(),
-            cache2: Default::default(),
-            name,
-            input_file: Weak::clone(&input_file),
-            parent,
-            fields: proto
+        Rc::new_cyclic(|weak_message| {
+            let fields = proto
                 .field()
                 .into_iter()
                 .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
                 .map(|f| ff(f, Weak::clone(weak_message) as Weak<dyn Message>) as Rc<dyn Field>)
-                .collect(),
-            messages: proto
+                .collect();
+            let messages = proto
                 .nested_type()
                 .into_iter()
                 .map(|m| {
@@ -106,8 +108,8 @@ impl MessageImpl {
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
                     ) as Rc<dyn Message>
                 })
-                .collect(),
-            enums: proto
+                .collect();
+            let enums = proto
                 .enum_type()
                 .into_iter()
                 .map(|e| {
@@ -117,7 +119,38 @@ impl MessageImpl {
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
                     ) as Rc<dyn Enum>
                 })
-                .collect(),
+                .collect();
+            let oneof_num = proto
+                .field()
+                .iter()
+                .filter_map(|f| match (f.oneof_index_opt(), f.proto3_optional()) {
+                    (Some(i), false) => Some(i as usize),
+                    _ => None,
+                })
+                .max()
+                .map_or(0, |i| i + 1);
+            let oneofs = (0..oneof_num)
+                .into_iter()
+                .map(|i| {
+                    fo(
+                        proto,
+                        &proto.oneof_decl()[i],
+                        i,
+                        Weak::clone(weak_message) as Weak<dyn Message>,
+                    ) as Rc<dyn Oneof>
+                })
+                .collect();
+            MessageImpl {
+                cache1: Default::default(),
+                cache2: Default::default(),
+                name,
+                input_file: Weak::clone(&input_file),
+                parent,
+                fields,
+                messages,
+                enums,
+                oneofs,
+            }
         })
     }
 }
@@ -161,5 +194,8 @@ impl Message for MessageImpl {
     }
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
+    }
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>> {
+        Ok(Box::new(self.oneofs.iter().cloned()))
     }
 }

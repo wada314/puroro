@@ -22,6 +22,7 @@ use ::std::rc::{Rc, Weak};
 pub trait Oneof: Debug {
     fn cache(&self) -> &AnonymousCache;
     fn message(&self) -> Result<Rc<dyn Message>>;
+    fn name(&self) -> Result<&str>;
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>>;
 }
 
@@ -29,19 +30,19 @@ pub trait Oneof: Debug {
 pub struct OneofImpl {
     cache: AnonymousCache,
     message: Weak<dyn Message>,
+    name: String,
     fields: Vec<Rc<dyn OneofField>>,
 }
 
 impl OneofImpl {
-    #[allow(unused)]
-    fn new(
-        proto: &DescriptorProto,
+    pub fn new(
+        message_proto: &DescriptorProto,
+        oneof_proto: &OneofDescriptorProto,
         oneof_index: usize,
         message: Weak<dyn Message>,
     ) -> Rc<OneofImpl> {
         Rc::new_cyclic(|weak| {
-            let oneof_proto = &proto.oneof_decl()[oneof_index];
-            let fields = proto
+            let fields = message_proto
                 .field()
                 .iter()
                 .filter(|f| f.oneof_index() as usize == oneof_index)
@@ -53,6 +54,7 @@ impl OneofImpl {
             OneofImpl {
                 cache: Default::default(),
                 message,
+                name: oneof_proto.name().to_string(),
                 fields,
             }
         })
@@ -65,6 +67,9 @@ impl Oneof for OneofImpl {
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
+    }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
     }
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
