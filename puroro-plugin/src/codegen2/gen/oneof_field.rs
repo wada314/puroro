@@ -25,6 +25,7 @@ use ::std::rc::Rc;
 
 pub trait OneofFieldExt {
     fn gen_union_item_decl(&self) -> Result<TokenStream>;
+    fn gen_union_methods(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -66,6 +67,10 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(quote! {
             #ident: #field_type,
         })
+    }
+
+    fn gen_union_methods(&self) -> Result<TokenStream> {
+        todo!()
     }
 }
 

@@ -23,12 +23,23 @@ use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub trait OneofExt {
+    // Message's bitfield allocation
+    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
+    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
+
     fn gen_union(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
     enum_ident: OnceCell<Rc<Ident>>,
+    allocated_bitfield: OnceCell<OneofBitfieldAllocation>,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct OneofBitfieldAllocation {
+    oneof_bits_range: (usize, usize),
+    tail: usize,
 }
 
 impl<T: ?Sized + Oneof> OneofExt for T {
@@ -56,6 +67,19 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #(#items)*
             }
         })
+    }
+
+    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
+        Ok(self
+            .cache()
+            .get::<Cache>()?
+            .allocated_bitfield
+            .get()
+            .map(|a| a.tail))
+    }
+
+    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
+        todo!()
     }
 }
 
