@@ -34,6 +34,7 @@ struct Cache {
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_item_decl(&self) -> Result<TokenStream> {
+        dbg!(self);
         let ident = gen_union_item_ident(self)?;
         let inner_type_name = {
             use FieldType::*;
