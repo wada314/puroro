@@ -34,7 +34,8 @@ struct Cache {
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_item_decl(&self) -> Result<TokenStream> {
-        let rust_field_inner_type_name = {
+        let ident = gen_union_item_ident(self)?;
+        let inner_type_name = {
             use FieldType::*;
             use LengthDelimitedType::*;
             let r#type = self.r#type()?;
@@ -60,7 +61,16 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 }
             }
         };
-        todo!()
+        let field_type = quote! {
+            ::std::mem::ManuallyDrop::<
+                self::_puroro::internal::oneof_field_type:: #inner_type_name
+            >
+        };
+
+        Ok(quote! {
+            _none: (),
+            #ident: #field_type,
+        })
     }
 }
 

@@ -14,6 +14,7 @@
 
 use super::super::util::*;
 use super::super::{Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof};
+use super::OneofFieldExt;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -33,10 +34,14 @@ struct Cache {
 impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
         let ident = gen_union_ident(self)?;
+        let items = self
+            .fields()?
+            .map(|f| f.gen_union_item_decl())
+            .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             pub(super) union #ident {
-                _none,
-                Foo,
+                _none: ,
+                #(#items)*
             }
         })
     }
