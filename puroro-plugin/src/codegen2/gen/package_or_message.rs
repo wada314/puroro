@@ -161,7 +161,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let oneof_decls = self
             .oneofs()?
-            .map(|o| o.gen_enum())
+            .map(|o| o.gen_union())
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             #header

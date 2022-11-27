@@ -22,7 +22,7 @@ use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub trait OneofExt {
-    fn gen_enum(&self) -> Result<TokenStream>;
+    fn gen_union(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -31,17 +31,18 @@ struct Cache {
 }
 
 impl<T: ?Sized + Oneof> OneofExt for T {
-    fn gen_enum(&self) -> Result<TokenStream> {
-        let ident = gen_enum_ident(self)?;
+    fn gen_union(&self) -> Result<TokenStream> {
+        let ident = gen_union_ident(self)?;
         Ok(quote! {
-            enum #ident {
+            union #ident {
+                _none,
                 Foo,
             }
         })
     }
 }
 
-fn gen_enum_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
+fn gen_union_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
         .enum_ident
