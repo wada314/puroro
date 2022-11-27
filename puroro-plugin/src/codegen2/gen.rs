@@ -16,10 +16,12 @@ mod r#enum;
 mod field;
 mod field_type;
 mod message;
+mod oneof;
 mod package_or_message;
 
 pub use self::r#enum::*;
 pub use self::field::*;
 pub use self::field_type::*;
 pub use self::message::*;
+pub use self::oneof::*;
 pub use self::package_or_message::*;

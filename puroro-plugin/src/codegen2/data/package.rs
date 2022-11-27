@@ -19,6 +19,7 @@ use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub trait Package: Debug + PackageOrMessage {
@@ -225,6 +226,9 @@ impl PackageOrMessage for RootPackage {
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
         Ok(Box::new(self.base()?.enums()?))
     }
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
+        Ok(Box::new(iter::empty()))
+    }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(
             self.base()?.subpackages()?.map(|p| p as Rc<dyn Package>),
@@ -265,6 +269,9 @@ impl PackageOrMessage for NonRootPackage {
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
         Ok(Box::new(self.base()?.enums()?))
+    }
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
+        Ok(Box::new(iter::empty()))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(

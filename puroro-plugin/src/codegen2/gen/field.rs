@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::util::StrExt;
+use super::super::util::*;
 use super::super::{Field, FieldRule, FieldType, LengthDelimitedType, MessageExt};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;

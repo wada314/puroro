@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Enum, Message, MessageOrEnum, Package, RootPackage};
+use super::super::{Enum, Message, MessageOrEnum, Oneof, Package, RootPackage};
 use crate::{ErrorKind, Result};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
@@ -23,6 +23,7 @@ pub trait PackageOrMessage: Debug {
     fn name(&self) -> Result<&str>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;

@@ -14,6 +14,7 @@
 
 use super::super::util::*;
 use super::super::{EnumExt, MessageExt, PackageOrMessage};
+use super::OneofExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -158,6 +159,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .enums()?
             .map(|e| e.gen_enum())
             .collect::<Result<Vec<_>>>()?;
+        let oneof_decls = self
+            .oneofs()?
+            .map(|o| o.gen_enum())
+            .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             #header
             pub mod _puroro {
@@ -166,8 +171,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             #(pub mod #submodule_idents;)*
             #(#struct_decls)*
             #(#enum_decls)*
+            #(#oneof_decls)*
         })
     }
 }
-
-

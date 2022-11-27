@@ -31,7 +31,6 @@ pub trait Message: Debug + PackageOrMessage {
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>>;
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();
@@ -168,6 +167,9 @@ impl PackageOrMessage for MessageImpl {
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
     }
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>> {
+        Ok(Box::new(self.oneofs.iter().cloned()))
+    }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(iter::empty()))
     }
@@ -194,8 +196,5 @@ impl Message for MessageImpl {
     }
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
-    }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>> {
-        Ok(Box::new(self.oneofs.iter().cloned()))
     }
 }
