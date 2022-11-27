@@ -68,7 +68,6 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         };
 
         Ok(quote! {
-            _none: (),
             #ident: #field_type,
         })
     }

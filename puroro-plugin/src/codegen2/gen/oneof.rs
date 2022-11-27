@@ -40,7 +40,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             pub(super) union #ident {
-                _none: ,
+                _none: (),
                 #(#items)*
             }
         })
