@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::super::util::*;
 use super::super::{
     Bits32Type, Bits64Type, EnumExt, FieldType, LengthDelimitedType, MessageExt, VariantType,
 };
@@ -65,8 +66,8 @@ impl VariantType {
             Int64 | SInt64 => Rc::new(quote! { i64 }),
             UInt64 => Rc::new(quote! { u64 }),
             Bool => Rc::new(quote! { bool }),
-            Enum2(e) => e.gen_rust_enum_path()?,
-            Enum3(e) => e.gen_rust_enum_path()?,
+            Enum2(e) => e.try_upgrade()?.gen_rust_enum_path()?,
+            Enum3(e) => e.try_upgrade()?.gen_rust_enum_path()?,
         })
     }
     fn tag_type(&self) -> Result<Rc<TokenStream>> {
@@ -80,11 +81,11 @@ impl VariantType {
             UInt64 => quote! { UInt64 },
             Bool => quote! { Bool },
             Enum2(e) => {
-                let enum_path = e.gen_rust_enum_path()?;
+                let enum_path = e.try_upgrade()?.gen_rust_enum_path()?;
                 quote! { Enum2 :: <#enum_path> }
             }
             Enum3(e) => {
-                let enum_path = e.gen_rust_enum_path()?;
+                let enum_path = e.try_upgrade()?.gen_rust_enum_path()?;
                 quote! { Enum3 :: <#enum_path> }
             }
         };
@@ -99,7 +100,7 @@ impl LengthDelimitedType {
         Ok(match self {
             String => Rc::new(quote! { ::std::string::String }),
             Bytes => Rc::new(quote! { ::std::vec::Vec<u8> }),
-            Message(m) => m.gen_rust_struct_path()?,
+            Message(m) => m.try_upgrade()?.gen_rust_struct_path()?,
         })
     }
     fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
@@ -108,7 +109,7 @@ impl LengthDelimitedType {
             String => Rc::new(quote! { &str }),
             Bytes => Rc::new(quote! { &[u8] }),
             Message(m) => {
-                let path = m.gen_rust_struct_path()?;
+                let path = m.try_upgrade()?.gen_rust_struct_path()?;
                 Rc::new(quote! {
                     & #path
                 })
@@ -121,7 +122,7 @@ impl LengthDelimitedType {
             String => Rc::new(quote! { &mut ::std::string::String }),
             Bytes => Rc::new(quote! { &mut ::std::vec::Vec::<u8> }),
             Message(m) => {
-                let path = m.gen_rust_struct_path()?;
+                let path = m.try_upgrade()?.gen_rust_struct_path()?;
                 Rc::new(quote! {
                     &mut #path
                 })
@@ -134,7 +135,7 @@ impl LengthDelimitedType {
             String => quote! { String },
             Bytes => quote! { Bytes },
             Message(m) => {
-                let struct_path = m.gen_rust_struct_path()?;
+                let struct_path = m.try_upgrade()?.gen_rust_struct_path()?;
                 quote! { Message :: <#struct_path> }
             }
         };

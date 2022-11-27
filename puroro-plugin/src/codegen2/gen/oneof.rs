@@ -34,7 +34,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
         let ident = gen_union_ident(self)?;
         Ok(quote! {
-            union #ident {
+            pub(super) union #ident {
                 _none,
                 Foo,
             }

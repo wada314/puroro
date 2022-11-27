@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::{Enum, Field, Message, MessageOrEnum, Syntax};
+use super::super::{Enum, Message, MessageOrEnum, Syntax};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
-use ::std::rc::Rc;
+use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone)]
 pub enum FieldType {
@@ -33,14 +33,14 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(Rc<dyn Enum>),
-    Enum3(Rc<dyn Enum>),
+    Enum2(Weak<dyn Enum>),
+    Enum3(Weak<dyn Enum>),
 }
 #[derive(Debug, Clone)]
 pub enum LengthDelimitedType {
     String,
     Bytes,
-    Message(Rc<dyn Message>),
+    Message(Weak<dyn Message>),
 }
 #[derive(Debug, Clone)]
 pub enum Bits32Type {
@@ -60,7 +60,7 @@ impl FieldType {
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
-        field: &dyn Field,
+        message: Rc<dyn Message>,
     ) -> Result<Self> {
         use field_descriptor_proto::Type::*;
         use Bits32Type::*;
@@ -70,7 +70,7 @@ impl FieldType {
         use VariantType::*;
 
         let maybe_m_or_e = (!type_name.is_empty())
-            .then(|| -> Result<_> { Ok(field.message()?.resolve_type_name(type_name)?) })
+            .then(|| -> Result<_> { Ok(message.resolve_type_name(type_name)?) })
             .transpose()?;
 
         if let Some(r#type) = type_opt {
@@ -85,8 +85,8 @@ impl FieldType {
                 TypeEnum => {
                     if let Some(MessageOrEnum::Enum(e)) = maybe_m_or_e {
                         match syntax {
-                            Syntax::Proto2 => Variant(Enum2(e)),
-                            Syntax::Proto3 => Variant(Enum3(e)),
+                            Syntax::Proto2 => Variant(Enum2(Rc::downgrade(&e))),
+                            Syntax::Proto3 => Variant(Enum3(Rc::downgrade(&e))),
                         }
                     } else {
                         Err(ErrorKind::UnknownTypeName {
@@ -105,7 +105,7 @@ impl FieldType {
                 TypeGroup => Err(ErrorKind::GroupNotSupported)?,
                 TypeMessage => {
                     if let Some(MessageOrEnum::Message(m)) = maybe_m_or_e {
-                        LengthDelimited(Message(m))
+                        LengthDelimited(Message(Rc::downgrade(&m)))
                     } else {
                         Err(ErrorKind::UnknownTypeName {
                             name: type_name.to_string(),
@@ -115,10 +115,10 @@ impl FieldType {
             })
         } else if let Some(m_or_e) = maybe_m_or_e {
             Ok(match m_or_e {
-                MessageOrEnum::Message(m) => LengthDelimited(Message(m)),
+                MessageOrEnum::Message(m) => LengthDelimited(Message(Rc::downgrade(&m))),
                 MessageOrEnum::Enum(e) => match syntax {
-                    Syntax::Proto2 => Variant(Enum2(e)),
-                    Syntax::Proto3 => Variant(Enum3(e)),
+                    Syntax::Proto2 => Variant(Enum2(Rc::downgrade(&e))),
+                    Syntax::Proto3 => Variant(Enum3(Rc::downgrade(&e))),
                 },
             })
         } else {

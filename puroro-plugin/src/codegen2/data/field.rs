@@ -75,7 +75,7 @@ impl Field for FieldImpl {
                 self.type_opt.clone(),
                 &self.type_name,
                 syntax,
-                self,
+                self.message()?,
             )?)
         })
     }

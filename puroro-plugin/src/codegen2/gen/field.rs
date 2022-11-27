@@ -237,7 +237,9 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
         FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
             impl ::std::ops::Deref::<Target = [u8]>
         }),
-        FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => m.gen_rust_struct_path()?,
+        FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
+            m.try_upgrade()?.gen_rust_struct_path()?
+        }
         _ => this.r#type()?.rust_type()?,
     };
     Ok(quote! {

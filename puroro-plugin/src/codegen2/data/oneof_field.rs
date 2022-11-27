@@ -13,9 +13,10 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Message, Oneof};
+use super::super::{FieldType, Message, Oneof};
 use crate::Result;
-use ::puroro_protobuf_compiled::google::protobuf::FieldDescriptorProto;
+use ::once_cell::unsync::OnceCell;
+use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
@@ -24,6 +25,7 @@ pub trait OneofField: Debug {
     fn name(&self) -> Result<&str>;
     fn oneof(&self) -> Result<Rc<dyn Oneof>>;
     fn message(&self) -> Result<Rc<dyn Message>>;
+    fn r#type(&self) -> Result<&FieldType>;
 }
 
 #[derive(Debug)]
@@ -31,6 +33,9 @@ pub struct OneofFieldImpl {
     cache: AnonymousCache,
     oneof: Weak<dyn Oneof>,
     name: String,
+    type_opt: Option<field_descriptor_proto::Type>,
+    type_name: String,
+    r#type: OnceCell<FieldType>,
 }
 
 impl OneofField for OneofFieldImpl {
@@ -46,6 +51,17 @@ impl OneofField for OneofFieldImpl {
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.oneof()?.message()?)
     }
+    fn r#type(&self) -> Result<&FieldType> {
+        self.r#type.get_or_try_init(|| {
+            let syntax = self.message()?.input_file()?.syntax()?;
+            Ok(FieldType::try_new(
+                self.type_opt.clone(),
+                &self.type_name,
+                syntax,
+                self.message()?,
+            )?)
+        })
+    }
 }
 
 impl OneofFieldImpl {
@@ -54,6 +70,9 @@ impl OneofFieldImpl {
             cache: Default::default(),
             oneof,
             name: proto.name().to_string(),
+            type_opt: proto.type_opt(),
+            type_name: proto.type_name().to_string(),
+            r#type: OnceCell::new(),
         })
     }
 }
