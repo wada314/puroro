@@ -34,7 +34,6 @@ struct Cache {
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_item_decl(&self) -> Result<TokenStream> {
-        dbg!(self);
         let ident = gen_union_item_ident(self)?;
         let inner_type_name = {
             use FieldType::*;
@@ -42,23 +41,19 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             let r#type = self.r#type()?;
             match r#type {
                 Variant(_) | Bits32(_) | Bits64(_) => {
-                    format!(
-                        "NumericalField::<{}, {}>",
-                        r#type.rust_type()?,
-                        r#type.tag_type()?,
-                    )
+                    let primitive = r#type.rust_type()?;
+                    let tag = r#type.tag_type()?;
+                    quote! {
+                        NumericalField::<#primitive, #tag>
+                    }
                 }
-                LengthDelimited(Bytes) => {
-                    format!("BytesField")
-                }
-                LengthDelimited(String) => {
-                    format!("StringField")
-                }
+                LengthDelimited(Bytes) => quote! { BytesField },
+                LengthDelimited(String) => quote! { StringField },
                 LengthDelimited(Message(m)) => {
-                    format!(
-                        "HeapMessageField::<{}>",
-                        m.try_upgrade()?.gen_rust_struct_path()?
-                    )
+                    let message_path = m.try_upgrade()?.gen_rust_struct_path()?;
+                    quote! {
+                        HeapMessageField::< #message_path >
+                    }
                 }
             }
         };

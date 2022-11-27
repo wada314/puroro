@@ -38,6 +38,18 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .fields()?
             .map(|f| f.gen_union_item_decl())
             .collect::<Result<Vec<_>>>()?;
+        let r = quote! {
+            pub(super) union #ident {
+                _none: (),
+                #(#items)*
+            }
+        };
+        dbg!(&r);
+
+        let syn_file = syn::parse2::<syn::File>(r).unwrap();
+        let formatted = prettyplease::unparse(&syn_file);
+        // dbg!(formatted);
+
         Ok(quote! {
             pub(super) union #ident {
                 _none: (),

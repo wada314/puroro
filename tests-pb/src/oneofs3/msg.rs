@@ -4,12 +4,41 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-enum GroupOne {
-    Foo,
+pub(super) union GroupOne {
+    _none: (),
+    g1_int32: ::std::mem::ManuallyDrop::<
+        self::_puroro::internal::oneof_field_type::NumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        >,
+    >,
+    g1_string: ::std::mem::ManuallyDrop::<
+        self::_puroro::internal::oneof_field_type::StringField,
+    >,
 }
-enum GroupTwo {
-    Foo,
+pub(super) union GroupTwo {
+    _none: (),
+    g2_f32: ::std::mem::ManuallyDrop::<
+        self::_puroro::internal::oneof_field_type::NumericalField::<
+            f32,
+            self::_puroro::tags::Float,
+        >,
+    >,
+    g2_string: ::std::mem::ManuallyDrop::<
+        self::_puroro::internal::oneof_field_type::StringField,
+    >,
+    g2_submsg: ::std::mem::ManuallyDrop::<
+        self::_puroro::internal::oneof_field_type::HeapMessageField::<
+            self::_puroro_root::oneofs3::Submsg,
+        >,
+    >,
 }
-enum GroupThree {
-    Foo,
+pub(super) union GroupThree {
+    _none: (),
+    g3_int32: ::std::mem::ManuallyDrop::<
+        self::_puroro::internal::oneof_field_type::NumericalField::<
+            i32,
+            self::_puroro::tags::Int32,
+        >,
+    >,
 }
