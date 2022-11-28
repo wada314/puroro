@@ -14,6 +14,7 @@
 
 use super::super::util::*;
 use super::super::{FieldExt, Message, PackageOrMessageExt};
+use super::OneofExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -39,6 +40,8 @@ impl<T: ?Sized + Message> MessageExt for T {
             .bitfield_size
             .get_or_try_init(|| {
                 let mut tail = 0;
+
+                // bits for each field
                 for field in self.fields()? {
                     if let Some(next_tail) = field.maybe_allocated_bitfield_tail()? {
                         tail = next_tail;
@@ -46,6 +49,16 @@ impl<T: ?Sized + Message> MessageExt for T {
                         tail = field.assign_and_get_bitfield_tail(tail)?;
                     }
                 }
+
+                // bits for oneofs
+                for oneof in self.oneofs()? {
+                    if let Some(next_tail) = oneof.maybe_allocated_bitfield_tail()? {
+                        tail = next_tail;
+                    } else {
+                        tail = oneof.assign_and_get_bitfield_tail(tail)?;
+                    }
+                }
+
                 Ok(tail)
             })
             .cloned()
