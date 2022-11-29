@@ -81,6 +81,20 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     }
 }
 
+fn bitfield_index_for_oneof(this: &(impl ?Sized + Field)) -> Result<(usize, usize)> {
+    let alloc = if let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() {
+        alloc
+    } else {
+        // Force allocate the bitfields
+        let _ = this.message()?.bitfield_size()?;
+        let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() else {
+            Err(ErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
+        };
+        alloc
+    };
+    Ok(alloc.oneof_bits_range)
+}
+
 fn gen_union_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
