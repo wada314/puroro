@@ -67,7 +67,17 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     }
 
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
-        todo!()
+        let case_num = self.fields()?.count() + 1 /* 1 for none case */;
+        let required_bits = (usize::leading_zeros(0) - usize::leading_zeros(case_num)) as usize;
+        Ok(self
+            .cache()
+            .get::<Cache>()?
+            .allocated_bitfield
+            .get_or_init(|| OneofBitfieldAllocation {
+                oneof_bits_range: (head, head + required_bits),
+                tail: required_bits,
+            })
+            .tail)
     }
 }
 
