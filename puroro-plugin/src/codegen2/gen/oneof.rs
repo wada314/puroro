@@ -49,6 +49,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let union_ident = gen_union_ident(self)?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let items = try_map_fields(self, |f| f.gen_union_item_decl())?;
+        let item_indices = (0..(items.len() as u32)).collect::<Vec<_>>();
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
         let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
@@ -57,6 +58,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         })?;
         let bitfield_begin = bitfield_index_for_oneof(self)?.0;
         let bitfield_end = bitfield_index_for_oneof(self)?.1;
+        // Union includes none case, where the case enum does not.
         Ok(quote! {
             pub union #union_ident {
                 _none: (),
@@ -112,11 +114,16 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             impl self::_puroro::internal::oneof_type::OneofCase for #case_ident {
                 const BITFIELD_BEGIN: usize = #bitfield_begin;
                 const BITFIELD_END: usize = #bitfield_end;
-                fn from_u32(x: u32) -> Option<Self> {
-                    todo!()
+                fn from_u32(x: u32) -> ::std::option::Option<Self> {
+                    match x {
+                        #(#item_indices => ::std::option::Option::Some(Self::#case_names(())),)*
+                        _ => ::std::option::Option::None,
+                    }
                 }
                 fn into_u32(self) -> u32 {
-                    todo!()
+                    match self {
+                        #(Self:: #case_names(_) => #item_indices,)*
+                    }
                 }
             }
 

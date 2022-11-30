@@ -58,11 +58,18 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
 impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     const BITFIELD_BEGIN: usize = 0usize;
     const BITFIELD_END: usize = 2usize;
-    fn from_u32(x: u32) -> Option<Self> {
-        todo!()
+    fn from_u32(x: u32) -> ::std::option::Option<Self> {
+        match x {
+            0u32 => ::std::option::Option::Some(Self::G1Int32(())),
+            1u32 => ::std::option::Option::Some(Self::G1String(())),
+            _ => ::std::option::Option::None,
+        }
     }
     fn into_u32(self) -> u32 {
-        todo!()
+        match self {
+            Self::G1Int32(_) => 0u32,
+            Self::G1String(_) => 1u32,
+        }
     }
 }
 impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a>
@@ -137,11 +144,20 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
 impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     const BITFIELD_BEGIN: usize = 2usize;
     const BITFIELD_END: usize = 5usize;
-    fn from_u32(x: u32) -> Option<Self> {
-        todo!()
+    fn from_u32(x: u32) -> ::std::option::Option<Self> {
+        match x {
+            0u32 => ::std::option::Option::Some(Self::G2F32(())),
+            1u32 => ::std::option::Option::Some(Self::G2String(())),
+            2u32 => ::std::option::Option::Some(Self::G2Submsg(())),
+            _ => ::std::option::Option::None,
+        }
     }
     fn into_u32(self) -> u32 {
-        todo!()
+        match self {
+            Self::G2F32(_) => 0u32,
+            Self::G2String(_) => 1u32,
+            Self::G2Submsg(_) => 2u32,
+        }
     }
 }
 impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a>
@@ -202,11 +218,16 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
 impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
     const BITFIELD_BEGIN: usize = 3usize;
     const BITFIELD_END: usize = 5usize;
-    fn from_u32(x: u32) -> Option<Self> {
-        todo!()
+    fn from_u32(x: u32) -> ::std::option::Option<Self> {
+        match x {
+            0u32 => ::std::option::Option::Some(Self::G3Int32(())),
+            _ => ::std::option::Option::None,
+        }
     }
     fn into_u32(self) -> u32 {
-        todo!()
+        match self {
+            Self::G3Int32(_) => 0u32,
+        }
     }
 }
 impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for GroupThreeCase<i32> {
