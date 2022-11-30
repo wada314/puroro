@@ -46,7 +46,7 @@ struct OneofBitfieldAllocation {
 
 impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
-        let ident = gen_union_ident(self)?;
+        let union_ident = gen_union_ident(self)?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let items = try_map_fields(self, |f| f.gen_union_item_decl())?;
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
@@ -58,7 +58,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let bitfield_begin = bitfield_index_for_oneof(self)?.0;
         let bitfield_end = bitfield_index_for_oneof(self)?.1;
         Ok(quote! {
-            pub union #ident {
+            pub union #union_ident {
                 _none: (),
                 #(#items)*
             }
@@ -69,7 +69,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #(#case_names(#item_type_names),)*
             }
 
-            impl self::_puroro::internal::oneof_type::OneofUnion for #ident {
+            impl self::_puroro::internal::oneof_type::OneofUnion for #union_ident {
                 type Case = self::#case_ident;
                 type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>;
 
@@ -124,7 +124,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #(#borrowed_types_a,)*
             > {
                 type Case = self::#case_ident;
-                type Union = self::#ident;
+                type Union = self::#union_ident;
                 fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
                     todo!()
                 }
