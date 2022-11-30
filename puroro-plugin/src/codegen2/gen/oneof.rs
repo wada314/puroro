@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof};
+use super::super::{
+    Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof, OneofField,
+};
 use super::OneofFieldExt;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -45,29 +47,26 @@ struct OneofBitfieldAllocation {
 impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
         let ident = gen_union_ident(self)?;
-        let ident_case = format_ident!("{}Case", self.name()?.to_camel_case());
-        let items = self
-            .fields()?
-            .map(|f| f.gen_union_item_decl())
-            .collect::<Result<Vec<_>>>()?;
-        let item_type_names = self
-            .fields()?
-            .map(|f| f.gen_generic_type_param_ident())
-            .collect::<Result<Vec<_>>>()?;
-        let case_names = self
-            .fields()?
-            .map(|f| f.gen_case_enum_value_ident())
-            .collect::<Result<Vec<_>>>()?;
+        let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
+        let items = try_map_fields(self, |f| f.gen_union_item_decl())?;
+        let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
+        let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
+        let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type())?;
         Ok(quote! {
             pub(super) union #ident {
                 _none: (),
                 #(#items)*
             }
 
-            pub enum #ident_case<
+            pub enum #case_ident<
                 #(#item_type_names = (),)*
             > {
                 #(#case_names(#item_type_names),)*
+            }
+
+            impl self::_puroro::internal::oneof_type::OneofUnion for #ident {
+                type Case = self::#case_ident;
+                type CaseRef<'a> = self::#case_ident::<#(#borrowed_types,)*>;
             }
         })
     }
@@ -94,6 +93,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             })
             .tail)
     }
+}
+
+fn try_map_fields<F, R>(this: &(impl ?Sized + Oneof), f: F) -> Result<Vec<R>>
+where
+    F: FnMut(Rc<dyn OneofField>) -> Result<R>,
+{
+    this.fields()?.map(f).collect::<Result<Vec<_>>>()
 }
 
 fn bitfield_index_for_oneof(this: &(impl ?Sized + Field)) -> Result<(usize, usize)> {
