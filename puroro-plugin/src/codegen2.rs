@@ -88,9 +88,13 @@ pub fn generate_output_file_protos<'a>(
     *cgr.file_mut() = generate_file_names_and_tokens(files)?
         .into_iter()
         .map(|(file_name, ts)| {
-            let syn_file = syn::parse2::<syn::File>(ts).unwrap();
-            let formatted = prettyplease::unparse(&syn_file);
-
+            let formatted = if let Ok(syn_file) = syn::parse2::<syn::File>(ts.clone()) {
+                prettyplease::unparse(&syn_file)
+            } else {
+                // Parse failed route. Print the output file for debugging.
+                eprintln!("Generated code error!");
+                format!("{}", ts)
+            };
             let mut output_file = File::default();
             *output_file.name_mut() = file_name;
             *output_file.content_mut() = formatted;

@@ -48,8 +48,9 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
         let union_ident = gen_union_ident(self)?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
-        let items = try_map_fields(self, |f| f.gen_union_item_decl())?;
-        let item_indices = (0..(items.len() as u32)).collect::<Vec<_>>();
+        let union_item_idents = try_map_fields(self, |f| f.gen_union_item_ident())?;
+        let union_items = try_map_fields(self, |f| f.gen_union_item_decl())?;
+        let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
         let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
@@ -62,7 +63,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         Ok(quote! {
             pub union #union_ident {
                 _none: (),
-                #(#items)*
+                #(#union_items)*
             }
 
             pub enum #case_ident<
@@ -111,6 +112,12 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 }
             }
 
+            impl ::std::default::Default for #union_ident {
+                fn default() -> Self {
+                    Self { _none: () }
+                }
+            }
+
             impl self::_puroro::internal::oneof_type::OneofCase for #case_ident {
                 const BITFIELD_BEGIN: usize = #bitfield_begin;
                 const BITFIELD_END: usize = #bitfield_end;
@@ -122,7 +129,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 }
                 fn into_u32(self) -> u32 {
                     match self {
-                        #(Self:: #case_names(_) => #item_indices,)*
+                        #(Self::#case_names(_) => #item_indices,)*
                     }
                 }
             }
@@ -133,7 +140,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 type Case = self::#case_ident;
                 type Union = self::#union_ident;
                 fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-                    todo!()
+                    use ::std::ops::Deref as _;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+                    match case {
+                        #(Self::Case::#case_names(_) => Self::#case_names(
+                             unsafe { &u.#union_item_idents }.deref().get_field()
+                        ),)*
+                    }
                 }
             }
         })

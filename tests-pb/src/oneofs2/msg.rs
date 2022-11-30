@@ -55,20 +55,25 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         todo!()
     }
 }
+impl ::std::default::Default for GroupOne {
+    fn default() -> Self {
+        Self { _none: () }
+    }
+}
 impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     const BITFIELD_BEGIN: usize = 0usize;
     const BITFIELD_END: usize = 2usize;
     fn from_u32(x: u32) -> ::std::option::Option<Self> {
         match x {
-            0u32 => ::std::option::Option::Some(Self::G1Int32(())),
-            1u32 => ::std::option::Option::Some(Self::G1String(())),
+            1u32 => ::std::option::Option::Some(Self::G1Int32(())),
+            2u32 => ::std::option::Option::Some(Self::G1String(())),
             _ => ::std::option::Option::None,
         }
     }
     fn into_u32(self) -> u32 {
         match self {
-            Self::G1Int32(_) => 0u32,
-            Self::G1String(_) => 1u32,
+            Self::G1Int32(_) => 1u32,
+            Self::G1String(_) => 2u32,
         }
     }
 }
@@ -77,7 +82,16 @@ for GroupOneCase<i32, &'a str> {
     type Case = self::GroupOneCase;
     type Union = self::GroupOne;
     fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-        todo!()
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        match case {
+            Self::Case::G1Int32(_) => {
+                Self::G1Int32(unsafe { &u.g1_int32 }.deref().get_field())
+            }
+            Self::Case::G1String(_) => {
+                Self::G1String(unsafe { &u.g1_string }.deref().get_field())
+            }
+        }
     }
 }
 pub union GroupTwo {
@@ -141,22 +155,27 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         todo!()
     }
 }
+impl ::std::default::Default for GroupTwo {
+    fn default() -> Self {
+        Self { _none: () }
+    }
+}
 impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     const BITFIELD_BEGIN: usize = 2usize;
     const BITFIELD_END: usize = 5usize;
     fn from_u32(x: u32) -> ::std::option::Option<Self> {
         match x {
-            0u32 => ::std::option::Option::Some(Self::G2F32(())),
-            1u32 => ::std::option::Option::Some(Self::G2String(())),
-            2u32 => ::std::option::Option::Some(Self::G2Submsg(())),
+            1u32 => ::std::option::Option::Some(Self::G2F32(())),
+            2u32 => ::std::option::Option::Some(Self::G2String(())),
+            3u32 => ::std::option::Option::Some(Self::G2Submsg(())),
             _ => ::std::option::Option::None,
         }
     }
     fn into_u32(self) -> u32 {
         match self {
-            Self::G2F32(_) => 0u32,
-            Self::G2String(_) => 1u32,
-            Self::G2Submsg(_) => 2u32,
+            Self::G2F32(_) => 1u32,
+            Self::G2String(_) => 2u32,
+            Self::G2Submsg(_) => 3u32,
         }
     }
 }
@@ -165,7 +184,17 @@ for GroupTwoCase<f32, &'a str, &'a self::_puroro_root::oneofs2::Submsg> {
     type Case = self::GroupTwoCase;
     type Union = self::GroupTwo;
     fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-        todo!()
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        match case {
+            Self::Case::G2F32(_) => Self::G2F32(unsafe { &u.g2_f32 }.deref().get_field()),
+            Self::Case::G2String(_) => {
+                Self::G2String(unsafe { &u.g2_string }.deref().get_field())
+            }
+            Self::Case::G2Submsg(_) => {
+                Self::G2Submsg(unsafe { &u.g2_submsg }.deref().get_field())
+            }
+        }
     }
 }
 pub union GroupThree {
@@ -215,18 +244,23 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         todo!()
     }
 }
+impl ::std::default::Default for GroupThree {
+    fn default() -> Self {
+        Self { _none: () }
+    }
+}
 impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
     const BITFIELD_BEGIN: usize = 3usize;
     const BITFIELD_END: usize = 5usize;
     fn from_u32(x: u32) -> ::std::option::Option<Self> {
         match x {
-            0u32 => ::std::option::Option::Some(Self::G3Int32(())),
+            1u32 => ::std::option::Option::Some(Self::G3Int32(())),
             _ => ::std::option::Option::None,
         }
     }
     fn into_u32(self) -> u32 {
         match self {
-            Self::G3Int32(_) => 0u32,
+            Self::G3Int32(_) => 1u32,
         }
     }
 }
@@ -234,6 +268,12 @@ impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for GroupThreeCas
     type Case = self::GroupThreeCase;
     type Union = self::GroupThree;
     fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-        todo!()
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        match case {
+            Self::Case::G3Int32(_) => {
+                Self::G3Int32(unsafe { &u.g3_int32 }.deref().get_field())
+            }
+        }
     }
 }
