@@ -4,7 +4,7 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-pub(super) union GroupOne {
+pub union GroupOne {
     _none: (),
     g1_int32: ::std::mem::ManuallyDrop::<
         self::_puroro::internal::oneof_field_type::NumericalField::<
@@ -22,7 +22,7 @@ pub enum GroupOneCase<G1Int32 = (), G1String = ()> {
 }
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
     type Case = self::GroupOneCase;
-    type CaseRef<'a> = self::GroupOneCase::<i32, &str>;
+    type CaseRef<'a> = self::GroupOneCase::<i32, &'a str>;
     fn case_ref<B: self::_puroro::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -66,14 +66,14 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     }
 }
 impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a>
-for GroupOneCase<i32, &str> {
+for GroupOneCase<i32, &'a str> {
     type Case = self::GroupOneCase;
     type Union = self::GroupOne;
     fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
         todo!()
     }
 }
-pub(super) union GroupTwo {
+pub union GroupTwo {
     _none: (),
     g2_f32: ::std::mem::ManuallyDrop::<
         self::_puroro::internal::oneof_field_type::NumericalField::<
@@ -99,8 +99,8 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
     type Case = self::GroupTwoCase;
     type CaseRef<'a> = self::GroupTwoCase::<
         f32,
-        &str,
-        &self::_puroro_root::oneofs2::Submsg,
+        &'a str,
+        &'a self::_puroro_root::oneofs2::Submsg,
     >;
     fn case_ref<B: self::_puroro::bitvec::BitSlice>(
         &self,
@@ -145,14 +145,14 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     }
 }
 impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a>
-for GroupTwoCase<f32, &str, &self::_puroro_root::oneofs2::Submsg> {
+for GroupTwoCase<f32, &'a str, &'a self::_puroro_root::oneofs2::Submsg> {
     type Case = self::GroupTwoCase;
     type Union = self::GroupTwo;
     fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
         todo!()
     }
 }
-pub(super) union GroupThree {
+pub union GroupThree {
     _none: (),
     g3_int32: ::std::mem::ManuallyDrop::<
         self::_puroro::internal::oneof_field_type::NumericalField::<

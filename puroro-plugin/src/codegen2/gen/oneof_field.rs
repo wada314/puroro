@@ -28,7 +28,7 @@ pub trait OneofFieldExt {
     fn gen_union_methods(&self) -> Result<TokenStream>;
     fn gen_generic_type_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
-    fn gen_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>>;
+    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>>;
 }
 
 #[derive(Debug, Default)]
@@ -88,8 +88,8 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             self.name()?.to_camel_case().escape_rust_keywords()
         ))
     }
-    fn gen_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
-        Ok(self.r#type()?.rust_maybe_borrowed_type()?.clone())
+    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
+        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?.clone())
     }
 }
 

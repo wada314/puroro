@@ -279,7 +279,7 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
     let field_ident = gen_struct_field_ident(this)?;
     let field_type = gen_struct_field_type(this)?;
-    let borrowed_type = this.r#type()?.rust_maybe_borrowed_type()?;
+    let borrowed_type = this.r#type()?.rust_maybe_borrowed_type(None)?;
     let getter_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
             ::std::option::Option::< #borrowed_type >

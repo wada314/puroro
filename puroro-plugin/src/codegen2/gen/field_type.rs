@@ -17,9 +17,10 @@ use super::super::{
     Bits32Type, Bits64Type, EnumExt, FieldType, LengthDelimitedType, MessageExt, VariantType,
 };
 use crate::Result;
-use ::proc_macro2::TokenStream;
+use ::proc_macro2::{Span, TokenStream};
 use ::quote::quote;
 use ::std::rc::Rc;
+use ::syn::{Ident, Lifetime};
 
 impl FieldType {
     pub fn rust_type(&self) -> Result<Rc<TokenStream>> {
@@ -31,9 +32,9 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
-    pub fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn rust_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
         if let FieldType::LengthDelimited(ref ld) = self {
-            ld.rust_maybe_borrowed_type()
+            ld.rust_maybe_borrowed_type(lt)
         } else {
             self.rust_type()
         }
@@ -103,15 +104,19 @@ impl LengthDelimitedType {
             Message(m) => m.try_upgrade()?.gen_rust_struct_path()?,
         })
     }
-    fn rust_maybe_borrowed_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
         use LengthDelimitedType::*;
+        let lt = lt.map(|ident| Lifetime {
+            apostrophe: Span::call_site(),
+            ident,
+        });
         Ok(match self {
-            String => Rc::new(quote! { &str }),
-            Bytes => Rc::new(quote! { &[u8] }),
+            String => Rc::new(quote! { &#lt str }),
+            Bytes => Rc::new(quote! { &#lt [u8] }),
             Message(m) => {
                 let path = m.try_upgrade()?.gen_rust_struct_path()?;
                 Rc::new(quote! {
-                    & #path
+                    &#lt #path
                 })
             }
         })

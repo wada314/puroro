@@ -51,11 +51,14 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let items = try_map_fields(self, |f| f.gen_union_item_decl())?;
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
-        let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type())?;
+        let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
+        let borrowed_types_a = try_map_fields(self, |f| {
+            f.gen_maybe_borrowed_type(Some(format_ident!("a")))
+        })?;
         let bitfield_begin = bitfield_index_for_oneof(self)?.0;
         let bitfield_end = bitfield_index_for_oneof(self)?.1;
         Ok(quote! {
-            pub(super) union #ident {
+            pub union #ident {
                 _none: (),
                 #(#items)*
             }
@@ -68,7 +71,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
             impl self::_puroro::internal::oneof_type::OneofUnion for #ident {
                 type Case = self::#case_ident;
-                type CaseRef<'a> = self::#case_ident::<#(#borrowed_types,)*>;
+                type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>;
 
                 fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B)
                     -> ::std::option::Option<Self::CaseRef<'_>>
@@ -118,7 +121,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             }
 
             impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for #case_ident<
-                #(#borrowed_types,)*
+                #(#borrowed_types_a,)*
             > {
                 type Case = self::#case_ident;
                 type Union = self::#ident;
