@@ -7,7 +7,7 @@ pub mod _puroro {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    _bitfield: self::_puroro::bitvec::BitArray<0usize>,
+    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl Msg {}
 impl self::_puroro::Message for Msg {

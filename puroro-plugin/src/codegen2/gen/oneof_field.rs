@@ -26,6 +26,8 @@ use ::std::rc::Rc;
 pub trait OneofFieldExt {
     fn gen_union_item_decl(&self) -> Result<TokenStream>;
     fn gen_union_methods(&self) -> Result<TokenStream>;
+    fn gen_generic_type_param_ident(&self) -> Result<Ident>;
+    fn gen_case_enum_value_ident(&self) -> Result<Ident>;
 }
 
 #[derive(Debug, Default)]
@@ -72,12 +74,30 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_methods(&self) -> Result<TokenStream> {
         todo!()
     }
+
+    fn gen_generic_type_param_ident(&self) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}",
+            self.name()?.to_camel_case().escape_rust_keywords()
+        ))
+    }
+    fn gen_case_enum_value_ident(&self) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}",
+            self.name()?.to_camel_case().escape_rust_keywords()
+        ))
+    }
 }
 
 fn gen_union_item_ident(this: &(impl ?Sized + OneofField)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
         .union_item_ident
-        .get_or_try_init(|| Ok(Rc::new(format_ident!("{}", this.name()?))))
+        .get_or_try_init(|| {
+            Ok(Rc::new(format_ident!(
+                "{}",
+                this.name()?.to_lower_snake_case().escape_rust_keywords()
+            )))
+        })
         .cloned()
 }

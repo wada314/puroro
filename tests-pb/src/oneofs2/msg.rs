@@ -16,6 +16,10 @@ pub(super) union GroupOne {
         self::_puroro::internal::oneof_field_type::StringField,
     >,
 }
+pub enum GroupOneCase<G1Int32 = (), G1String = ()> {
+    G1Int32(G1Int32),
+    G1String(G1String),
+}
 pub(super) union GroupTwo {
     _none: (),
     g2_f32: ::std::mem::ManuallyDrop::<
@@ -33,6 +37,11 @@ pub(super) union GroupTwo {
         >,
     >,
 }
+pub enum GroupTwoCase<G2F32 = (), G2String = (), G2Submsg = ()> {
+    G2F32(G2F32),
+    G2String(G2String),
+    G2Submsg(G2Submsg),
+}
 pub(super) union GroupThree {
     _none: (),
     g3_int32: ::std::mem::ManuallyDrop::<
@@ -41,4 +50,7 @@ pub(super) union GroupThree {
             self::_puroro::tags::Int32,
         >,
     >,
+}
+pub enum GroupThreeCase<G3Int32 = ()> {
+    G3Int32(G3Int32),
 }

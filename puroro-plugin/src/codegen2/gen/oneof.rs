@@ -45,14 +45,29 @@ struct OneofBitfieldAllocation {
 impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
         let ident = gen_union_ident(self)?;
+        let ident_case = format_ident!("{}Case", self.name()?.to_camel_case());
         let items = self
             .fields()?
             .map(|f| f.gen_union_item_decl())
+            .collect::<Result<Vec<_>>>()?;
+        let item_type_names = self
+            .fields()?
+            .map(|f| f.gen_generic_type_param_ident())
+            .collect::<Result<Vec<_>>>()?;
+        let case_names = self
+            .fields()?
+            .map(|f| f.gen_case_enum_value_ident())
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             pub(super) union #ident {
                 _none: (),
                 #(#items)*
+            }
+
+            pub enum #ident_case<
+                #(#item_type_names = (),)*
+            > {
+                #(#case_names(#item_type_names),)*
             }
         })
     }
