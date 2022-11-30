@@ -52,6 +52,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
         let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type())?;
+        let bitfield_begin = bitfield_index_for_oneof(self)?.0;
+        let bitfield_end = bitfield_index_for_oneof(self)?.1;
         Ok(quote! {
             pub(super) union #ident {
                 _none: (),
@@ -67,6 +69,62 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             impl self::_puroro::internal::oneof_type::OneofUnion for #ident {
                 type Case = self::#case_ident;
                 type CaseRef<'a> = self::#case_ident::<#(#borrowed_types,)*>;
+
+                fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B)
+                    -> ::std::option::Option<Self::CaseRef<'_>>
+                {
+                    todo!()
+                }
+
+                fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+                    todo!()
+                }
+
+                fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+                    todo!()
+                }
+
+                fn deser_from_iter<I, B>(
+                    &mut self,
+                    bitvec: &mut B,
+                    field_data: self::_puroro::internal::ser::FieldData<I>,
+                    case: Self::Case,
+                ) -> self::_puroro::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                    B: self::_puroro::bitvec::BitSlice,
+                {
+                    todo!()
+                }
+
+                fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                    B: self::_puroro::bitvec::BitSlice
+                {
+                    todo!()
+                }
+            }
+
+            impl self::_puroro::internal::oneof_type::OneofCase for #case_ident {
+                const BITFIELD_BEGIN: usize = #bitfield_begin;
+                const BITFIELD_END: usize = #bitfield_end;
+                fn from_u32(x: u32) -> Option<Self> {
+                    todo!()
+                }
+                fn into_u32(self) -> u32 {
+                    todo!()
+                }
+            }
+
+            impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for #case_ident<
+                #(#borrowed_types,)*
+            > {
+                type Case = self::#case_ident;
+                type Union = self::#ident;
+                fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
+                    todo!()
+                }
             }
         })
     }
@@ -102,7 +160,7 @@ where
     this.fields()?.map(f).collect::<Result<Vec<_>>>()
 }
 
-fn bitfield_index_for_oneof(this: &(impl ?Sized + Field)) -> Result<(usize, usize)> {
+fn bitfield_index_for_oneof(this: &(impl ?Sized + Oneof)) -> Result<(usize, usize)> {
     let alloc = if let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() {
         alloc
     } else {

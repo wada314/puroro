@@ -39,6 +39,9 @@ pub trait OneofUnion {
 pub trait OneofCase: Sized {
     const BITFIELD_BEGIN: usize;
     const BITFIELD_END: usize;
+    // Intentionall not using ::std::convert::From trait.
+    // This conversion is puroro internal only and should not be exposed to the
+    // library user.
     fn from_u32(x: u32) -> Option<Self>;
     fn from_bitslice<B: BitSlice>(b: &B) -> Option<Self> {
         Self::from_u32(b.get_range(Self::BITFIELD_BEGIN..Self::BITFIELD_END))
