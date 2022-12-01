@@ -149,6 +149,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
                 while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
                     match number {
                         #(#deser_arms)*
+                        // TODO: oneofs
                         _ => todo!(), // Unknown field number
                     }
                 }
@@ -157,6 +158,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
 
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> self::_puroro::Result<()> {
                 #(#ser_fields)*
+                // TODO: oneofs
                 ::std::result::Result::Ok(())
             }
         }
@@ -174,6 +176,7 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
             fn clone(&self) -> Self {
                 Self {
                     #(#field_clones)*
+                    // TODO: oneofs
                     _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 }
             }
