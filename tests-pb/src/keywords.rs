@@ -130,6 +130,12 @@ impl ::std::clone::Clone for Msg {
         }
     }
 }
+impl ::std::ops::Drop for Msg {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
 #[derive(::std::default::Default)]
 pub struct _Self {
     r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -254,5 +260,11 @@ impl ::std::clone::Clone for _Self {
             > as ::std::clone::Clone>::clone(&self.r#type),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for _Self {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }

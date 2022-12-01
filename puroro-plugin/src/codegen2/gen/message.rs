@@ -102,6 +102,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = gen_struct_message_impl(self)?;
         let clone_impl = gen_struct_clone_impl(self)?;
+        let drop_impl = gen_struct_drop_impl(self)?;
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
@@ -117,6 +118,7 @@ impl<T: ?Sized + Message> MessageExt for T {
 
             #message_impl
             #clone_impl
+            #drop_impl
         })
     }
 }
@@ -202,6 +204,24 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
                     #(#oneof_clones)*
                     _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 }
+            }
+        }
+    })
+}
+
+fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+    let ident = gen_struct_ident(this)?;
+    let oneof_idents = this
+        .oneofs()?
+        .map(|o| o.gen_struct_field_ident())
+        .collect::<Result<Vec<_>>>()?;
+    // We need to explicitly clear the oneof unions.
+    Ok(quote! {
+        impl ::std::ops::Drop for #ident {
+            fn drop(&mut self) {
+                #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
+
+                #(self.#oneof_idents.clear(&mut self._bitfield);)*
             }
         }
     })

@@ -121,6 +121,12 @@ impl ::std::clone::Clone for Submsg {
         }
     }
 }
+impl ::std::ops::Drop for Submsg {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

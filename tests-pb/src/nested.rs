@@ -122,3 +122,9 @@ impl ::std::clone::Clone for Msg {
         }
     }
 }
+impl ::std::ops::Drop for Msg {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}

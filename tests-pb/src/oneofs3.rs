@@ -259,6 +259,15 @@ impl ::std::clone::Clone for Msg {
         }
     }
 }
+impl ::std::ops::Drop for Msg {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_one.clear(&mut self._bitfield);
+        self.group_two.clear(&mut self._bitfield);
+        self.group_three.clear(&mut self._bitfield);
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Submsg {
     i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
@@ -374,5 +383,11 @@ impl ::std::clone::Clone for Submsg {
             > as ::std::clone::Clone>::clone(&self.i32_unlabeled),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Submsg {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }

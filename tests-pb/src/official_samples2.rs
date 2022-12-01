@@ -130,6 +130,12 @@ impl ::std::clone::Clone for Test1 {
         }
     }
 }
+impl ::std::ops::Drop for Test1 {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test2 {
     b: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
@@ -234,6 +240,12 @@ impl ::std::clone::Clone for Test2 {
             > as ::std::clone::Clone>::clone(&self.b),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Test2 {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
 #[derive(::std::default::Default)]
@@ -348,6 +360,12 @@ impl ::std::clone::Clone for Test3 {
         }
     }
 }
+impl ::std::ops::Drop for Test3 {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test4 {
     d: self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -440,5 +458,11 @@ impl ::std::clone::Clone for Test4 {
             > as ::std::clone::Clone>::clone(&self.d),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Test4 {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
