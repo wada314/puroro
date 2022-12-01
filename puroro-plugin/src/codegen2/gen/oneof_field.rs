@@ -90,12 +90,16 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
+        let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
                 ::std::option::Option::< #borrowed_type >
             }),
             _ => Rc::clone(&borrowed_type),
+        };
+        let getter_opt_type = quote! {
+            ::std::option::Option::< #borrowed_type >
         };
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
         let union_item_ident = self.gen_union_item_ident()?;
@@ -115,6 +119,21 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     }
                 });
                 OneofFieldTypeOpt::get_field(item_opt, Default::default)
+            }
+
+            pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
+                #[allow(unused)] use ::std::option::Option::{None, Some};
+                use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                use ::std::ops::Deref as _;
+                use self::_puroro::internal::oneof_type::OneofCase as _;
+
+                let case_opt = self::#case_ident::from_bitslice(bits);
+                let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                    unsafe {
+                        self.#union_item_ident.deref()
+                    }
+                });
+                OneofFieldTypeOpt::get_field_opt(item_opt)
             }
         })
     }

@@ -34,6 +34,20 @@ impl GroupOne {
             .then(|| { unsafe { self.g1_int32.deref() } });
         OneofFieldTypeOpt::get_field(item_opt, Default::default)
     }
+    pub(crate) fn g1_int32_opt<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<i32> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupOneCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32(())))
+            .then(|| { unsafe { self.g1_int32.deref() } });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
+    }
     pub(crate) fn g1_string<B: self::_puroro::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -49,6 +63,20 @@ impl GroupOne {
         let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
             .then(|| { unsafe { self.g1_string.deref() } });
         OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+    pub(crate) fn g1_string_opt<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<&str> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupOneCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
+            .then(|| { unsafe { self.g1_string.deref() } });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 }
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
@@ -196,6 +224,20 @@ impl GroupTwo {
             .then(|| { unsafe { self.g2_f32.deref() } });
         OneofFieldTypeOpt::get_field(item_opt, Default::default)
     }
+    pub(crate) fn g2_f32_opt<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<f32> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupTwoCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32(())))
+            .then(|| { unsafe { self.g2_f32.deref() } });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
+    }
     pub(crate) fn g2_string<B: self::_puroro::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -212,6 +254,20 @@ impl GroupTwo {
             .then(|| { unsafe { self.g2_string.deref() } });
         OneofFieldTypeOpt::get_field(item_opt, Default::default)
     }
+    pub(crate) fn g2_string_opt<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<&str> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupTwoCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String(())))
+            .then(|| { unsafe { self.g2_string.deref() } });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
+    }
     pub(crate) fn g2_submsg<B: self::_puroro::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -227,6 +283,20 @@ impl GroupTwo {
         let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
             .then(|| { unsafe { self.g2_submsg.deref() } });
         OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+    pub(crate) fn g2_submsg_opt<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<&self::_puroro_root::oneofs2::Submsg> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupTwoCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
+            .then(|| { unsafe { self.g2_submsg.deref() } });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 }
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
@@ -382,6 +452,20 @@ impl GroupThree {
         let item_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
             .then(|| { unsafe { self.g3_int32.deref() } });
         OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+    pub(crate) fn g3_int32_opt<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<i32> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupThreeCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
+            .then(|| { unsafe { self.g3_int32.deref() } });
+        OneofFieldTypeOpt::get_field_opt(item_opt)
     }
 }
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
