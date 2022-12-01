@@ -188,6 +188,17 @@ impl ::std::ops::Drop for Msg {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Msg))
+            .field(stringify!(enum_optional), &self.enum_optional())
+            .field(stringify!(enum_repeated), &self.enum_repeated())
+            .finish()
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

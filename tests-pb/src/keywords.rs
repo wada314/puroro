@@ -136,6 +136,16 @@ impl ::std::ops::Drop for Msg {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Msg))
+            .field(stringify!(r#type), &self.r#type())
+            .finish()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct _Self {
     r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -266,5 +276,15 @@ impl ::std::ops::Drop for _Self {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for _Self {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(_Self))
+            .field(stringify!(r#type), &self.r#type())
+            .finish()
     }
 }

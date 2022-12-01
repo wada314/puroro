@@ -3363,6 +3363,63 @@ impl ::std::ops::Drop for Msg {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Msg))
+            .field(stringify!(i32_required), &self.i32_required())
+            .field(stringify!(i32_optional), &self.i32_optional())
+            .field(stringify!(i32_repeated), &self.i32_repeated())
+            .field(stringify!(float_required), &self.float_required())
+            .field(stringify!(float_optional), &self.float_optional())
+            .field(stringify!(float_repeated), &self.float_repeated())
+            .field(stringify!(bytes_required), &self.bytes_required())
+            .field(stringify!(bytes_optional), &self.bytes_optional())
+            .field(stringify!(bytes_repeated), &self.bytes_repeated())
+            .field(stringify!(string_required), &self.string_required())
+            .field(stringify!(string_optional), &self.string_optional())
+            .field(stringify!(string_repeated), &self.string_repeated())
+            .field(stringify!(enum_required), &self.enum_required())
+            .field(stringify!(enum_optional), &self.enum_optional())
+            .field(stringify!(enum_repeated), &self.enum_repeated())
+            .field(stringify!(submsg_required), &self.submsg_required())
+            .field(stringify!(submsg_optional), &self.submsg_optional())
+            .field(stringify!(submsg_repeated), &self.submsg_repeated())
+            .field(stringify!(i64_required), &self.i64_required())
+            .field(stringify!(i64_optional), &self.i64_optional())
+            .field(stringify!(i64_repeated), &self.i64_repeated())
+            .field(stringify!(u32_required), &self.u32_required())
+            .field(stringify!(u32_optional), &self.u32_optional())
+            .field(stringify!(u32_repeated), &self.u32_repeated())
+            .field(stringify!(u64_required), &self.u64_required())
+            .field(stringify!(u64_optional), &self.u64_optional())
+            .field(stringify!(u64_repeated), &self.u64_repeated())
+            .field(stringify!(s32_required), &self.s32_required())
+            .field(stringify!(s32_optional), &self.s32_optional())
+            .field(stringify!(s32_repeated), &self.s32_repeated())
+            .field(stringify!(s64_required), &self.s64_required())
+            .field(stringify!(s64_optional), &self.s64_optional())
+            .field(stringify!(s64_repeated), &self.s64_repeated())
+            .field(stringify!(fixed32_required), &self.fixed32_required())
+            .field(stringify!(fixed32_optional), &self.fixed32_optional())
+            .field(stringify!(fixed32_repeated), &self.fixed32_repeated())
+            .field(stringify!(fixed64_required), &self.fixed64_required())
+            .field(stringify!(fixed64_optional), &self.fixed64_optional())
+            .field(stringify!(fixed64_repeated), &self.fixed64_repeated())
+            .field(stringify!(sfixed32_required), &self.sfixed32_required())
+            .field(stringify!(sfixed32_optional), &self.sfixed32_optional())
+            .field(stringify!(sfixed32_repeated), &self.sfixed32_repeated())
+            .field(stringify!(sfixed64_required), &self.sfixed64_required())
+            .field(stringify!(sfixed64_optional), &self.sfixed64_optional())
+            .field(stringify!(sfixed64_repeated), &self.sfixed64_repeated())
+            .field(stringify!(f64_required), &self.f64_required())
+            .field(stringify!(f64_optional), &self.f64_optional())
+            .field(stringify!(f64_repeated), &self.f64_repeated())
+            .finish()
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

@@ -31,6 +31,7 @@ pub trait FieldExt {
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_field_debug(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -135,6 +136,16 @@ impl<T: ?Sized + Field> FieldExt for T {
                 #number,
                 #out_ident,
             )?;
+        })
+    }
+    fn gen_struct_field_debug(&self) -> Result<TokenStream> {
+        let ident = gen_struct_field_ident(self)?;
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        Ok(quote! {
+            .field(stringify!(#ident), &self.#getter_ident())
         })
     }
 }

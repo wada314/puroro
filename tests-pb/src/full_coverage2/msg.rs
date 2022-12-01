@@ -216,3 +216,14 @@ impl ::std::ops::Drop for Submsg {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
+impl ::std::fmt::Debug for Submsg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Submsg))
+            .field(stringify!(i32_required), &self.i32_required())
+            .field(stringify!(i64_required), &self.i64_required())
+            .finish()
+    }
+}

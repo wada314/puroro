@@ -107,6 +107,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         let message_impl = gen_struct_message_impl(self)?;
         let clone_impl = gen_struct_clone_impl(self)?;
         let drop_impl = gen_struct_drop_impl(self)?;
+        let debug_impl = gen_struct_debug_impl(self)?;
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
@@ -124,6 +125,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             #message_impl
             #clone_impl
             #drop_impl
+            #debug_impl
         })
     }
 }
@@ -227,6 +229,24 @@ fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
                 #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
 
                 #(self.#oneof_idents.clear(&mut self._bitfield);)*
+            }
+        }
+    })
+}
+
+fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+    let ident = gen_struct_ident(this)?;
+    let from_fields = this
+        .fields()?
+        .map(|f| f.gen_struct_field_debug())
+        .collect::<Result<Vec<_>>>()?;
+    Ok(quote! {
+        impl ::std::fmt::Debug for #ident {
+            fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
+                fmt.debug_struct(stringify!(#ident))
+                    #(#from_fields)*
+                    // TODO oneofs
+                    .finish()
             }
         }
     })

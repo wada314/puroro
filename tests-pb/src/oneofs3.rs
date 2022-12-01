@@ -310,6 +310,14 @@ impl ::std::ops::Drop for Msg {
         self.group_three.clear(&mut self._bitfield);
     }
 }
+impl ::std::fmt::Debug for Msg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Msg)).finish()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Submsg {
     i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
@@ -431,5 +439,15 @@ impl ::std::ops::Drop for Submsg {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Submsg {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Submsg))
+            .field(stringify!(i32_unlabeled), &self.i32_unlabeled())
+            .finish()
     }
 }

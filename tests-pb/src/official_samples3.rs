@@ -127,6 +127,14 @@ impl ::std::ops::Drop for Test1 {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
+impl ::std::fmt::Debug for Test1 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Test1)).field(stringify!(a), &self.a()).finish()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test2 {
     b: self::_puroro::internal::field_type::SingularStringField,
@@ -232,6 +240,14 @@ impl ::std::ops::Drop for Test2 {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Test2 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Test2)).field(stringify!(b), &self.b()).finish()
     }
 }
 #[derive(::std::default::Default)]
@@ -352,6 +368,14 @@ impl ::std::ops::Drop for Test3 {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
     }
 }
+impl ::std::fmt::Debug for Test3 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Test3)).field(stringify!(c), &self.c()).finish()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test4 {
     d: self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -450,5 +474,13 @@ impl ::std::ops::Drop for Test4 {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Test4 {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Test4)).field(stringify!(d), &self.d()).finish()
     }
 }
