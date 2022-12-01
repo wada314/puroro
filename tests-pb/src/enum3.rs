@@ -281,6 +281,7 @@ impl ::std::fmt::Debug for Msg {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum Enum {
     ValueZero,

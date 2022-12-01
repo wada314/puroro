@@ -243,10 +243,10 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
     let field_type = gen_struct_field_type(this)?;
     let getter_item_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
-            impl ::std::ops::Deref::<Target = str>
+            impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug
         }),
         FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
-            impl ::std::ops::Deref::<Target = [u8]>
+            impl ::std::ops::Deref::<Target = [u8]> + ::std::fmt::Debug
         }),
         FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
             m.try_upgrade()?.gen_rust_struct_path()?

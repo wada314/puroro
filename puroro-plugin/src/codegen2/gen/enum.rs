@@ -64,6 +64,7 @@ impl<T: ?Sized + Enum> EnumExt for T {
                 ::std::cmp::PartialOrd,
                 ::std::cmp::Ord,
                 ::std::hash::Hash,
+                ::std::fmt::Debug,
             )]
             pub enum #ident {
                 #(#value_idents,)*

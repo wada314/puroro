@@ -499,7 +499,9 @@ impl Msg {
             2usize,
         > as NonRepeatedFieldType>::clear(&mut self.bytes_optional, &mut self._bitfield)
     }
-    pub fn bytes_repeated(&self) -> &[impl ::std::ops::Deref::<Target = [u8]>] {
+    pub fn bytes_repeated(
+        &self,
+    ) -> &[impl ::std::ops::Deref::<Target = [u8]> + ::std::fmt::Debug] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedBytesField as RepeatedFieldType>::get_field(
             &self.bytes_repeated,
@@ -508,7 +510,9 @@ impl Msg {
     }
     pub fn bytes_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = [u8]>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<Target = [u8]> + ::std::fmt::Debug,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedBytesField as RepeatedFieldType>::mut_field(
             &mut self.bytes_repeated,
@@ -599,7 +603,9 @@ impl Msg {
             3usize,
         > as NonRepeatedFieldType>::clear(&mut self.string_optional, &mut self._bitfield)
     }
-    pub fn string_repeated(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
+    pub fn string_repeated(
+        &self,
+    ) -> &[impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.string_repeated,
@@ -608,7 +614,9 @@ impl Msg {
     }
     pub fn string_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.string_repeated,
@@ -3310,6 +3318,7 @@ impl ::std::fmt::Debug for Msg {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum Enum {
     Zeroth,
