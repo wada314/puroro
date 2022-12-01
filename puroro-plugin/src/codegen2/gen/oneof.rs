@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::super::{
     Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof, OneofField,
 };
-use super::OneofFieldExt;
+use super::{OneofFieldExt, PackageOrMessageExt};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -31,13 +31,16 @@ pub trait OneofExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_union_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
 
     fn gen_union(&self) -> Result<TokenStream>;
+    fn gen_struct_field_decl(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    enum_ident: OnceCell<Rc<Ident>>,
+    union_ident: OnceCell<Rc<Ident>>,
+    struct_feild_ident: OnceCell<Rc<Ident>>,
     allocated_bitfield: OnceCell<OneofBitfieldAllocation>,
 }
 
@@ -88,11 +91,24 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
-            .enum_ident
+            .union_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}",
                     self.name()?.to_camel_case().escape_rust_keywords()
+                )))
+            })
+            .cloned()
+    }
+
+    fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
                 )))
             })
             .cloned()
@@ -134,6 +150,15 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                     Self { _none: () }
                 }
             }
+        })
+    }
+
+    fn gen_struct_field_decl(&self) -> Result<TokenStream> {
+        let field_ident = self.gen_struct_field_ident()?;
+        let message_module = self.message()?.gen_rust_module_path()?;
+        let union_ident = self.gen_union_ident()?;
+        Ok(quote! {
+            #field_ident: #message_module :: #union_ident,
         })
     }
 }

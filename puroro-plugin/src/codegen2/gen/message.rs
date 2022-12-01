@@ -83,6 +83,10 @@ impl<T: ?Sized + Message> MessageExt for T {
             .fields()?
             .map(|f| f.gen_struct_field_decl())
             .collect::<Result<Vec<_>>>()?;
+        let oneof_fields = self
+            .oneofs()?
+            .map(|o| o.gen_struct_field_decl())
+            .collect::<Result<Vec<_>>>()?;
         let methods = self
             .fields()?
             .map(|f| f.gen_struct_field_methods())
@@ -94,6 +98,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             #[derive(::std::default::Default)]
             pub struct #ident {
                 #(#fields)*
+                #(#oneof_fields)*
                 _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
             }
 

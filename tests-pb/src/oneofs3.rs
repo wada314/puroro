@@ -7,6 +7,9 @@ pub mod _puroro {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
+    group_one: self::_puroro_root::oneofs3::msg::group_one,
+    group_two: self::_puroro_root::oneofs3::msg::group_two,
+    group_three: self::_puroro_root::oneofs3::msg::group_three,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl Msg {}

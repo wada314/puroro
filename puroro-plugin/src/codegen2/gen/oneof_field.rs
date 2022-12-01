@@ -35,6 +35,7 @@ pub trait OneofFieldExt {
 
     fn gen_union_item_decl(&self) -> Result<TokenStream>;
     fn gen_union_methods(&self) -> Result<TokenStream>;
+    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -145,6 +146,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             #ident: #field_type,
         })
     }
+
     fn gen_union_methods(&self) -> Result<TokenStream> {
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
@@ -221,6 +223,36 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 unsafe {
                     &mut self.#union_item_ident
                 }.mut_field()
+            }
+        })
+    }
+
+    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+        let oneof_struct_field_ident = self.oneof()?.gen_struct_field_ident()?;
+        let getter_ident = self.gen_union_getter_ident()?;
+        let getter_opt_ident = self.gen_union_getter_opt_ident()?;
+        let getter_mut_ident = self.gen_union_getter_mut_ident()?;
+        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
+        let getter_type = match self.r#type()? {
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
+                ::std::option::Option::< #borrowed_type >
+            }),
+            _ => Rc::clone(&borrowed_type),
+        };
+        let getter_opt_type = quote! {
+            ::std::option::Option::< #borrowed_type >
+        };
+        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
+        let union_ident = self.oneof()?.gen_union_ident()?;
+        let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
+        let union_item_ident = self.gen_union_item_ident()?;
+        let enum_item_ident = self.gen_case_enum_value_ident()?;
+        let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
+        let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
+
+        Ok(quote! {
+            pub fn #getter_ident(&self) -> #getter_type {
+                self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
             }
         })
     }
