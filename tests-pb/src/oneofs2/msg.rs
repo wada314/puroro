@@ -27,21 +27,22 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         &self,
         bits: &B,
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use ::std::mem::ManuallyDrop;
         use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use ::std::ops::Deref as _;
         let case_opt = <self::GroupOneCase as OneofCase>::from_bitslice(bits);
         case_opt
             .map(|case| {
                 match case {
                     self::GroupOneCase::G1Int32(_) => {
                         self::GroupOneCase::G1Int32(
-                            unsafe { &self.g1_int32 }.deref().get_field(),
+                            ManuallyDrop::deref(unsafe { &self.g1_int32 }).get_field(),
                         )
                     }
                     self::GroupOneCase::G1String(_) => {
                         self::GroupOneCase::G1String(
-                            unsafe { &self.g1_string }.deref().get_field(),
+                            ManuallyDrop::deref(unsafe { &self.g1_string }).get_field(),
                         )
                     }
                 }
@@ -107,23 +108,6 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
         }
     }
 }
-impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a>
-for GroupOneCase<i32, &'a str> {
-    type Case = self::GroupOneCase;
-    type Union = self::GroupOne;
-    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-        use ::std::ops::Deref as _;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
-        match case {
-            Self::Case::G1Int32(_) => {
-                Self::G1Int32(unsafe { &u.g1_int32 }.deref().get_field())
-            }
-            Self::Case::G1String(_) => {
-                Self::G1String(unsafe { &u.g1_string }.deref().get_field())
-            }
-        }
-    }
-}
 pub union GroupTwo {
     _none: (),
     g2_f32: ::std::mem::ManuallyDrop::<
@@ -157,26 +141,27 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         &self,
         bits: &B,
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use ::std::mem::ManuallyDrop;
         use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use ::std::ops::Deref as _;
         let case_opt = <self::GroupTwoCase as OneofCase>::from_bitslice(bits);
         case_opt
             .map(|case| {
                 match case {
                     self::GroupTwoCase::G2F32(_) => {
                         self::GroupTwoCase::G2F32(
-                            unsafe { &self.g2_f32 }.deref().get_field(),
+                            ManuallyDrop::deref(unsafe { &self.g2_f32 }).get_field(),
                         )
                     }
                     self::GroupTwoCase::G2String(_) => {
                         self::GroupTwoCase::G2String(
-                            unsafe { &self.g2_string }.deref().get_field(),
+                            ManuallyDrop::deref(unsafe { &self.g2_string }).get_field(),
                         )
                     }
                     self::GroupTwoCase::G2Submsg(_) => {
                         self::GroupTwoCase::G2Submsg(
-                            unsafe { &self.g2_submsg }.deref().get_field(),
+                            ManuallyDrop::deref(unsafe { &self.g2_submsg }).get_field(),
                         )
                     }
                 }
@@ -247,24 +232,6 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
         }
     }
 }
-impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a>
-for GroupTwoCase<f32, &'a str, &'a self::_puroro_root::oneofs2::Submsg> {
-    type Case = self::GroupTwoCase;
-    type Union = self::GroupTwo;
-    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-        use ::std::ops::Deref as _;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
-        match case {
-            Self::Case::G2F32(_) => Self::G2F32(unsafe { &u.g2_f32 }.deref().get_field()),
-            Self::Case::G2String(_) => {
-                Self::G2String(unsafe { &u.g2_string }.deref().get_field())
-            }
-            Self::Case::G2Submsg(_) => {
-                Self::G2Submsg(unsafe { &u.g2_submsg }.deref().get_field())
-            }
-        }
-    }
-}
 pub union GroupThree {
     _none: (),
     g3_int32: ::std::mem::ManuallyDrop::<
@@ -284,16 +251,17 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         &self,
         bits: &B,
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
-        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
-        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use ::std::mem::ManuallyDrop;
         use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use ::std::ops::Deref as _;
         let case_opt = <self::GroupThreeCase as OneofCase>::from_bitslice(bits);
         case_opt
             .map(|case| {
                 match case {
                     self::GroupThreeCase::G3Int32(_) => {
                         self::GroupThreeCase::G3Int32(
-                            unsafe { &self.g3_int32 }.deref().get_field(),
+                            ManuallyDrop::deref(unsafe { &self.g3_int32 }).get_field(),
                         )
                     }
                 }
@@ -351,19 +319,6 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
     fn into_u32(self) -> u32 {
         match self {
             Self::G3Int32(_) => 1u32,
-        }
-    }
-}
-impl<'a> self::_puroro::internal::oneof_type::OneofCaseRef<'a> for GroupThreeCase<i32> {
-    type Case = self::GroupThreeCase;
-    type Union = self::GroupThree;
-    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self {
-        use ::std::ops::Deref as _;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
-        match case {
-            Self::Case::G3Int32(_) => {
-                Self::G3Int32(unsafe { &u.g3_int32 }.deref().get_field())
-            }
         }
     }
 }

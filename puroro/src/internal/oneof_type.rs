@@ -19,7 +19,7 @@ use ::std::io::{Result as IoResult, Write};
 
 pub trait OneofUnion {
     type Case: OneofCase;
-    type CaseRef<'a>: OneofCaseRef<'a, Union = Self>
+    type CaseRef<'a>
     where
         Self: 'a;
     fn case_ref<B: BitSlice>(&self, bits: &B) -> Option<Self::CaseRef<'_>>;
@@ -47,10 +47,4 @@ pub trait OneofCase: Sized {
         Self::from_u32(b.get_range(Self::BITFIELD_BEGIN..Self::BITFIELD_END))
     }
     fn into_u32(self) -> u32;
-}
-
-pub trait OneofCaseRef<'a>: Sized {
-    type Case: OneofCase;
-    type Union;
-    fn from_union_and_case(u: &'a Self::Union, case: Self::Case) -> Self;
 }
