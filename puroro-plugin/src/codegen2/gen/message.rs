@@ -171,12 +171,16 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
         .fields()?
         .map(|f| f.gen_struct_field_clone_arm())
         .collect::<Result<Vec<_>>>()?;
+    let oneof_clones = this
+        .oneofs()?
+        .map(|o| o.gen_struct_field_clone_arm())
+        .collect::<Result<Vec<_>>>()?;
     Ok(quote! {
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
                 Self {
                     #(#field_clones)*
-                    // TODO: oneofs
+                    #(#oneof_clones)*
                     _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 }
             }

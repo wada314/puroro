@@ -35,6 +35,7 @@ pub trait OneofExt {
 
     fn gen_union(&self) -> Result<TokenStream>;
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
+    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -159,6 +160,17 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let union_ident = self.gen_union_ident()?;
         Ok(quote! {
             #field_ident: #message_module :: #union_ident,
+        })
+    }
+
+    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
+        let ident = self.gen_struct_field_ident()?;
+        let message_module = self.message()?.gen_rust_module_path()?;
+        let union_ident = self.gen_union_ident()?;
+
+        Ok(quote! {
+            #ident: <#message_module :: #union_ident as self::_puroro::internal::oneof_type::OneofUnion>
+                ::clone(&self.#ident, &self._bitfield),
         })
     }
 }
