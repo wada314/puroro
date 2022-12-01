@@ -92,8 +92,12 @@ impl<T: ?Sized + Message> MessageExt for T {
             .fields()?
             .map(|f| f.gen_struct_field_methods())
             .collect::<Result<Vec<_>>>()?;
+        let oneof_methods = self
+            .oneofs()?
+            .map(|o| o.gen_struct_field_methods())
+            .collect::<Result<Vec<_>>>()?;
         let oneofs = self.oneofs()?.collect::<Vec<_>>();
-        let oneof_methods = oneofs
+        let oneof_fields_methods = oneofs
             .iter()
             .map(|o| o.fields())
             .flatten_ok()
@@ -114,6 +118,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             impl #ident {
                 #(#field_methods)*
                 #(#oneof_methods)*
+                #(#oneof_fields_methods)*
             }
 
             #message_impl

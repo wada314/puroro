@@ -33,6 +33,7 @@ pub trait OneofExt {
 
     fn gen_union(&self) -> Result<TokenStream>;
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
+    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
@@ -160,6 +161,32 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let union_ident = self.gen_union_ident()?;
         Ok(quote! {
             #field_ident: #message_module :: #union_ident,
+        })
+    }
+
+    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
+        let field_ident = self.gen_struct_field_ident()?;
+        let message_module = self.message()?.gen_rust_module_path()?;
+        let union_ident = self.gen_union_ident()?;
+
+        Ok(quote! {
+            pub fn #getter_ident(&self) -> ::std::option::Option<
+                <#message_module::#union_ident as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<'_>
+            >
+            {
+                use self::_puroro::internal::oneof_type::OneofUnion as _;
+                self.#field_ident.case_ref(&self._bitfield)
+            }
+
+            pub fn #clear_ident(&mut self) {
+                use self::_puroro::internal::oneof_type::OneofUnion as _;
+                self.#field_ident.clear(&mut self._bitfield)
+            }
         })
     }
 

@@ -13,6 +13,48 @@ pub struct Msg {
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl Msg {
+    pub fn group_one(
+        &self,
+    ) -> ::std::option::Option<
+        <self::_puroro_root::oneofs2::msg::GroupOne as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<
+            '_,
+        >,
+    > {
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_one.case_ref(&self._bitfield)
+    }
+    pub fn clear_group_one(&mut self) {
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_one.clear(&mut self._bitfield)
+    }
+    pub fn group_two(
+        &self,
+    ) -> ::std::option::Option<
+        <self::_puroro_root::oneofs2::msg::GroupTwo as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<
+            '_,
+        >,
+    > {
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_two.case_ref(&self._bitfield)
+    }
+    pub fn clear_group_two(&mut self) {
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_two.clear(&mut self._bitfield)
+    }
+    pub fn group_three(
+        &self,
+    ) -> ::std::option::Option<
+        <self::_puroro_root::oneofs2::msg::GroupThree as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<
+            '_,
+        >,
+    > {
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_three.case_ref(&self._bitfield)
+    }
+    pub fn clear_group_three(&mut self) {
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        self.group_three.clear(&mut self._bitfield)
+    }
     pub fn g1_int32(&self) -> i32 {
         self.group_one.g1_int32(&self._bitfield)
     }
