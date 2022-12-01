@@ -162,7 +162,9 @@ impl Location {
     }
     pub fn leading_detached_comments(
         &self,
-    ) -> &[impl ::std::ops::Deref::<Target = str>] {
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.leading_detached_comments,
@@ -171,7 +173,11 @@ impl Location {
     }
     pub fn leading_detached_comments_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.leading_detached_comments,
@@ -199,6 +205,8 @@ impl self::_puroro::Message for Location {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -257,6 +265,8 @@ impl self::_puroro::Message for Location {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
             self::_puroro::tags::Int32,
@@ -322,5 +332,38 @@ impl ::std::clone::Clone for Location {
             ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Location {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Location {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Location))
+            .field(stringify!(path), &self.path())
+            .field(stringify!(span), &self.span())
+            .field(stringify!(leading_comments), &self.leading_comments())
+            .field(stringify!(trailing_comments), &self.trailing_comments())
+            .field(
+                stringify!(leading_detached_comments),
+                &self.leading_detached_comments(),
+            )
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Location {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.path() == rhs.path() && self.span() == rhs.span()
+            && self.leading_comments_opt() == rhs.leading_comments_opt()
+            && self.trailing_comments_opt() == rhs.trailing_comments_opt()
+            && self.leading_detached_comments() == rhs.leading_detached_comments()
     }
 }

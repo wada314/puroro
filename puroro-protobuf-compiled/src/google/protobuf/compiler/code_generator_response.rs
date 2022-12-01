@@ -204,6 +204,8 @@ impl self::_puroro::Message for File {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -253,6 +255,8 @@ impl self::_puroro::Message for File {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -307,6 +311,35 @@ impl ::std::clone::Clone for File {
         }
     }
 }
+impl ::std::ops::Drop for File {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for File {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(File))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(insertion_point), &self.insertion_point())
+            .field(stringify!(content), &self.content())
+            .field(stringify!(generated_code_info), &self.generated_code_info())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for File {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
+            && self.insertion_point_opt() == rhs.insertion_point_opt()
+            && self.content_opt() == rhs.content_opt()
+            && self.generated_code_info_opt() == rhs.generated_code_info_opt()
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,
@@ -315,6 +348,7 @@ impl ::std::clone::Clone for File {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum Feature {
     FeatureNone,

@@ -117,6 +117,8 @@ impl self::_puroro::Message for NamePart {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -150,6 +152,8 @@ impl self::_puroro::Message for NamePart {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -184,5 +188,30 @@ impl ::std::clone::Clone for NamePart {
             > as ::std::clone::Clone>::clone(&self.is_extension),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for NamePart {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for NamePart {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(NamePart))
+            .field(stringify!(name_part), &self.name_part())
+            .field(stringify!(is_extension), &self.is_extension())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for NamePart {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_part_opt() == rhs.name_part_opt()
+            && self.is_extension_opt() == rhs.is_extension_opt()
     }
 }

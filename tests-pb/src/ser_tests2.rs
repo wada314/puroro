@@ -242,11 +242,7 @@ impl Msg {
     }
     pub fn string_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
-    > {
+    ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.string_repeated,

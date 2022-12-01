@@ -196,6 +196,8 @@ impl self::_puroro::Message for Annotation {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -250,6 +252,8 @@ impl self::_puroro::Message for Annotation {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
             self::_puroro::tags::Int32,
@@ -312,5 +316,33 @@ impl ::std::clone::Clone for Annotation {
             > as ::std::clone::Clone>::clone(&self.end),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Annotation {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Annotation {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Annotation))
+            .field(stringify!(path), &self.path())
+            .field(stringify!(source_file), &self.source_file())
+            .field(stringify!(begin), &self.begin())
+            .field(stringify!(end), &self.end())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Annotation {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.path() == rhs.path()
+            && self.source_file_opt() == rhs.source_file_opt()
+            && self.begin_opt() == rhs.begin_opt() && self.end_opt() == rhs.end_opt()
     }
 }

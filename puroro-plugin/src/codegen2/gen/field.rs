@@ -273,6 +273,7 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
         }
         _ => this.r#type()?.rust_type()?,
     };
+    let mut_item_type = this.r#type()?.rust_type()?;
     Ok(quote! {
         pub fn #getter_ident(&self) -> &[#getter_item_type] {
             use self::_puroro::internal::field_type::RepeatedFieldType;
@@ -280,7 +281,7 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
                 &self.#field_ident, &self._bitfield,
             )
         }
-        pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#getter_item_type> {
+        pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
             use self::_puroro::internal::field_type::RepeatedFieldType;
             <#field_type as RepeatedFieldType>::mut_field(
                 &mut self.#field_ident, &mut self._bitfield,

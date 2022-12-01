@@ -226,6 +226,8 @@ impl self::_puroro::Message for Version {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -281,6 +283,8 @@ impl self::_puroro::Message for Version {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::tags::Int32,
@@ -347,6 +351,34 @@ impl ::std::clone::Clone for Version {
         }
     }
 }
+impl ::std::ops::Drop for Version {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Version {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Version))
+            .field(stringify!(major), &self.major())
+            .field(stringify!(minor), &self.minor())
+            .field(stringify!(patch), &self.patch())
+            .field(stringify!(suffix), &self.suffix())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Version {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.major_opt() == rhs.major_opt()
+            && self.minor_opt() == rhs.minor_opt() && self.patch_opt() == rhs.patch_opt()
+            && self.suffix_opt() == rhs.suffix_opt()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct CodeGeneratorRequest {
     file_to_generate: self::_puroro::internal::field_type::RepeatedStringField,
@@ -360,7 +392,11 @@ pub struct CodeGeneratorRequest {
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl CodeGeneratorRequest {
-    pub fn file_to_generate(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
+    pub fn file_to_generate(
+        &self,
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.file_to_generate,
@@ -369,7 +405,11 @@ impl CodeGeneratorRequest {
     }
     pub fn file_to_generate_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.file_to_generate,
@@ -518,6 +558,8 @@ impl self::_puroro::Message for CodeGeneratorRequest {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -565,6 +607,8 @@ impl self::_puroro::Message for CodeGeneratorRequest {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.file_to_generate,
             &self._bitfield,
@@ -615,6 +659,35 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
             > as ::std::clone::Clone>::clone(&self.compiler_version),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for CodeGeneratorRequest {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for CodeGeneratorRequest {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(CodeGeneratorRequest))
+            .field(stringify!(file_to_generate), &self.file_to_generate())
+            .field(stringify!(parameter), &self.parameter())
+            .field(stringify!(proto_file), &self.proto_file())
+            .field(stringify!(compiler_version), &self.compiler_version())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for CodeGeneratorRequest {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.file_to_generate() == rhs.file_to_generate()
+            && self.parameter_opt() == rhs.parameter_opt()
+            && self.proto_file() == rhs.proto_file()
+            && self.compiler_version_opt() == rhs.compiler_version_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -766,6 +839,8 @@ impl self::_puroro::Message for CodeGeneratorResponse {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -808,6 +883,8 @@ impl self::_puroro::Message for CodeGeneratorResponse {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -853,5 +930,32 @@ impl ::std::clone::Clone for CodeGeneratorResponse {
             > as ::std::clone::Clone>::clone(&self.file),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for CodeGeneratorResponse {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for CodeGeneratorResponse {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(CodeGeneratorResponse))
+            .field(stringify!(error), &self.error())
+            .field(stringify!(supported_features), &self.supported_features())
+            .field(stringify!(file), &self.file())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for CodeGeneratorResponse {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.error_opt() == rhs.error_opt()
+            && self.supported_features_opt() == rhs.supported_features_opt()
+            && self.file() == rhs.file()
     }
 }

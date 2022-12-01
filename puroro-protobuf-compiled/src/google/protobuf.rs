@@ -58,6 +58,8 @@ impl self::_puroro::Message for FileDescriptorSet {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -80,6 +82,8 @@ impl self::_puroro::Message for FileDescriptorSet {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -99,6 +103,29 @@ impl ::std::clone::Clone for FileDescriptorSet {
             > as ::std::clone::Clone>::clone(&self.file),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for FileDescriptorSet {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for FileDescriptorSet {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(FileDescriptorSet))
+            .field(stringify!(file), &self.file())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for FileDescriptorSet {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.file() == rhs.file()
     }
 }
 #[derive(::std::default::Default)]
@@ -214,7 +241,11 @@ impl FileDescriptorProto {
             1usize,
         > as NonRepeatedFieldType>::clear(&mut self.package, &mut self._bitfield)
     }
-    pub fn dependency(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
+    pub fn dependency(
+        &self,
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.dependency,
@@ -223,7 +254,11 @@ impl FileDescriptorProto {
     }
     pub fn dependency_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.dependency,
@@ -531,6 +566,8 @@ impl self::_puroro::Message for FileDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -652,6 +689,8 @@ impl self::_puroro::Message for FileDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -794,6 +833,50 @@ impl ::std::clone::Clone for FileDescriptorProto {
             > as ::std::clone::Clone>::clone(&self.syntax),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for FileDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for FileDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(FileDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(package), &self.package())
+            .field(stringify!(dependency), &self.dependency())
+            .field(stringify!(public_dependency), &self.public_dependency())
+            .field(stringify!(weak_dependency), &self.weak_dependency())
+            .field(stringify!(message_type), &self.message_type())
+            .field(stringify!(enum_type), &self.enum_type())
+            .field(stringify!(service), &self.service())
+            .field(stringify!(extension), &self.extension())
+            .field(stringify!(options), &self.options())
+            .field(stringify!(source_code_info), &self.source_code_info())
+            .field(stringify!(syntax), &self.syntax())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for FileDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
+            && self.package_opt() == rhs.package_opt()
+            && self.dependency() == rhs.dependency()
+            && self.public_dependency() == rhs.public_dependency()
+            && self.weak_dependency() == rhs.weak_dependency()
+            && self.message_type() == rhs.message_type()
+            && self.enum_type() == rhs.enum_type() && self.service() == rhs.service()
+            && self.extension() == rhs.extension()
+            && self.options_opt() == rhs.options_opt()
+            && self.source_code_info_opt() == rhs.source_code_info_opt()
+            && self.syntax_opt() == rhs.syntax_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -1080,7 +1163,11 @@ impl DescriptorProto {
             self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
         > as RepeatedFieldType>::clear(&mut self.reserved_range, &mut self._bitfield)
     }
-    pub fn reserved_name(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
+    pub fn reserved_name(
+        &self,
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.reserved_name,
@@ -1089,7 +1176,11 @@ impl DescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.reserved_name,
@@ -1117,6 +1208,8 @@ impl self::_puroro::Message for DescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -1218,6 +1311,8 @@ impl self::_puroro::Message for DescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -1336,6 +1431,46 @@ impl ::std::clone::Clone for DescriptorProto {
         }
     }
 }
+impl ::std::ops::Drop for DescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for DescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(DescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(field), &self.field())
+            .field(stringify!(extension), &self.extension())
+            .field(stringify!(nested_type), &self.nested_type())
+            .field(stringify!(enum_type), &self.enum_type())
+            .field(stringify!(extension_range), &self.extension_range())
+            .field(stringify!(oneof_decl), &self.oneof_decl())
+            .field(stringify!(options), &self.options())
+            .field(stringify!(reserved_range), &self.reserved_range())
+            .field(stringify!(reserved_name), &self.reserved_name())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for DescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt() && self.field() == rhs.field()
+            && self.extension() == rhs.extension()
+            && self.nested_type() == rhs.nested_type()
+            && self.enum_type() == rhs.enum_type()
+            && self.extension_range() == rhs.extension_range()
+            && self.oneof_decl() == rhs.oneof_decl()
+            && self.options_opt() == rhs.options_opt()
+            && self.reserved_range() == rhs.reserved_range()
+            && self.reserved_name() == rhs.reserved_name()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct ExtensionRangeOptions {
     uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
@@ -1388,6 +1523,8 @@ impl self::_puroro::Message for ExtensionRangeOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -1410,6 +1547,8 @@ impl self::_puroro::Message for ExtensionRangeOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -1429,6 +1568,29 @@ impl ::std::clone::Clone for ExtensionRangeOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for ExtensionRangeOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for ExtensionRangeOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(ExtensionRangeOptions))
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for ExtensionRangeOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -2008,6 +2170,8 @@ impl self::_puroro::Message for FieldDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -2134,6 +2298,8 @@ impl self::_puroro::Message for FieldDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -2293,6 +2459,48 @@ impl ::std::clone::Clone for FieldDescriptorProto {
         }
     }
 }
+impl ::std::ops::Drop for FieldDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for FieldDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(FieldDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(number), &self.number())
+            .field(stringify!(label), &self.label())
+            .field(stringify!(r#type), &self.r#type())
+            .field(stringify!(type_name), &self.type_name())
+            .field(stringify!(extendee), &self.extendee())
+            .field(stringify!(default_value), &self.default_value())
+            .field(stringify!(oneof_index), &self.oneof_index())
+            .field(stringify!(json_name), &self.json_name())
+            .field(stringify!(options), &self.options())
+            .field(stringify!(proto3_optional), &self.proto3_optional())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for FieldDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
+            && self.number_opt() == rhs.number_opt()
+            && self.label_opt() == rhs.label_opt() && self.type_opt() == rhs.type_opt()
+            && self.type_name_opt() == rhs.type_name_opt()
+            && self.extendee_opt() == rhs.extendee_opt()
+            && self.default_value_opt() == rhs.default_value_opt()
+            && self.oneof_index_opt() == rhs.oneof_index_opt()
+            && self.json_name_opt() == rhs.json_name_opt()
+            && self.options_opt() == rhs.options_opt()
+            && self.proto3_optional_opt() == rhs.proto3_optional_opt()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct OneofDescriptorProto {
     name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
@@ -2400,6 +2608,8 @@ impl self::_puroro::Message for OneofDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -2431,6 +2641,8 @@ impl self::_puroro::Message for OneofDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -2461,6 +2673,31 @@ impl ::std::clone::Clone for OneofDescriptorProto {
             > as ::std::clone::Clone>::clone(&self.options),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for OneofDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for OneofDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(OneofDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(options), &self.options())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for OneofDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
+            && self.options_opt() == rhs.options_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -2611,7 +2848,11 @@ impl EnumDescriptorProto {
             self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
         > as RepeatedFieldType>::clear(&mut self.reserved_range, &mut self._bitfield)
     }
-    pub fn reserved_name(&self) -> &[impl ::std::ops::Deref::<Target = str>] {
+    pub fn reserved_name(
+        &self,
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.reserved_name,
@@ -2620,7 +2861,11 @@ impl EnumDescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<impl ::std::ops::Deref::<Target = str>> {
+    ) -> &mut ::std::vec::Vec::<
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
+    > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.reserved_name,
@@ -2648,6 +2893,8 @@ impl self::_puroro::Message for EnumDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -2704,6 +2951,8 @@ impl self::_puroro::Message for EnumDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -2765,6 +3014,36 @@ impl ::std::clone::Clone for EnumDescriptorProto {
             ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for EnumDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for EnumDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(EnumDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(value), &self.value())
+            .field(stringify!(options), &self.options())
+            .field(stringify!(reserved_range), &self.reserved_range())
+            .field(stringify!(reserved_name), &self.reserved_name())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for EnumDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt() && self.value() == rhs.value()
+            && self.options_opt() == rhs.options_opt()
+            && self.reserved_range() == rhs.reserved_range()
+            && self.reserved_name() == rhs.reserved_name()
     }
 }
 #[derive(::std::default::Default)]
@@ -2932,6 +3211,8 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -2974,6 +3255,8 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -3019,6 +3302,33 @@ impl ::std::clone::Clone for EnumValueDescriptorProto {
             > as ::std::clone::Clone>::clone(&self.options),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for EnumValueDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for EnumValueDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(EnumValueDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(number), &self.number())
+            .field(stringify!(options), &self.options())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
+            && self.number_opt() == rhs.number_opt()
+            && self.options_opt() == rhs.options_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -3155,6 +3465,8 @@ impl self::_puroro::Message for ServiceDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -3195,6 +3507,8 @@ impl self::_puroro::Message for ServiceDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -3236,6 +3550,32 @@ impl ::std::clone::Clone for ServiceDescriptorProto {
             > as ::std::clone::Clone>::clone(&self.options),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for ServiceDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for ServiceDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(ServiceDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(method), &self.method())
+            .field(stringify!(options), &self.options())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for ServiceDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt() && self.method() == rhs.method()
+            && self.options_opt() == rhs.options_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -3551,6 +3891,8 @@ impl self::_puroro::Message for MethodDescriptorProto {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -3622,6 +3964,8 @@ impl self::_puroro::Message for MethodDescriptorProto {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -3704,6 +4048,39 @@ impl ::std::clone::Clone for MethodDescriptorProto {
             > as ::std::clone::Clone>::clone(&self.server_streaming),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for MethodDescriptorProto {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for MethodDescriptorProto {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(MethodDescriptorProto))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(input_type), &self.input_type())
+            .field(stringify!(output_type), &self.output_type())
+            .field(stringify!(options), &self.options())
+            .field(stringify!(client_streaming), &self.client_streaming())
+            .field(stringify!(server_streaming), &self.server_streaming())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for MethodDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
+            && self.input_type_opt() == rhs.input_type_opt()
+            && self.output_type_opt() == rhs.output_type_opt()
+            && self.options_opt() == rhs.options_opt()
+            && self.client_streaming_opt() == rhs.client_streaming_opt()
+            && self.server_streaming_opt() == rhs.server_streaming_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -4845,6 +5222,8 @@ impl self::_puroro::Message for FileOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -5069,6 +5448,8 @@ impl self::_puroro::Message for FileOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -5352,6 +5733,73 @@ impl ::std::clone::Clone for FileOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for FileOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for FileOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(FileOptions))
+            .field(stringify!(java_package), &self.java_package())
+            .field(stringify!(java_outer_classname), &self.java_outer_classname())
+            .field(stringify!(java_multiple_files), &self.java_multiple_files())
+            .field(
+                stringify!(java_generate_equals_and_hash),
+                &self.java_generate_equals_and_hash(),
+            )
+            .field(stringify!(java_string_check_utf8), &self.java_string_check_utf8())
+            .field(stringify!(optimize_for), &self.optimize_for())
+            .field(stringify!(go_package), &self.go_package())
+            .field(stringify!(cc_generic_services), &self.cc_generic_services())
+            .field(stringify!(java_generic_services), &self.java_generic_services())
+            .field(stringify!(py_generic_services), &self.py_generic_services())
+            .field(stringify!(php_generic_services), &self.php_generic_services())
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(cc_enable_arenas), &self.cc_enable_arenas())
+            .field(stringify!(objc_class_prefix), &self.objc_class_prefix())
+            .field(stringify!(csharp_namespace), &self.csharp_namespace())
+            .field(stringify!(swift_prefix), &self.swift_prefix())
+            .field(stringify!(php_class_prefix), &self.php_class_prefix())
+            .field(stringify!(php_namespace), &self.php_namespace())
+            .field(stringify!(php_metadata_namespace), &self.php_metadata_namespace())
+            .field(stringify!(ruby_package), &self.ruby_package())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for FileOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.java_package_opt() == rhs.java_package_opt()
+            && self.java_outer_classname_opt() == rhs.java_outer_classname_opt()
+            && self.java_multiple_files_opt() == rhs.java_multiple_files_opt()
+            && self.java_generate_equals_and_hash_opt()
+                == rhs.java_generate_equals_and_hash_opt()
+            && self.java_string_check_utf8_opt() == rhs.java_string_check_utf8_opt()
+            && self.optimize_for_opt() == rhs.optimize_for_opt()
+            && self.go_package_opt() == rhs.go_package_opt()
+            && self.cc_generic_services_opt() == rhs.cc_generic_services_opt()
+            && self.java_generic_services_opt() == rhs.java_generic_services_opt()
+            && self.py_generic_services_opt() == rhs.py_generic_services_opt()
+            && self.php_generic_services_opt() == rhs.php_generic_services_opt()
+            && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.cc_enable_arenas_opt() == rhs.cc_enable_arenas_opt()
+            && self.objc_class_prefix_opt() == rhs.objc_class_prefix_opt()
+            && self.csharp_namespace_opt() == rhs.csharp_namespace_opt()
+            && self.swift_prefix_opt() == rhs.swift_prefix_opt()
+            && self.php_class_prefix_opt() == rhs.php_class_prefix_opt()
+            && self.php_namespace_opt() == rhs.php_namespace_opt()
+            && self.php_metadata_namespace_opt() == rhs.php_metadata_namespace_opt()
+            && self.ruby_package_opt() == rhs.ruby_package_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -5640,6 +6088,8 @@ impl self::_puroro::Message for MessageOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -5706,6 +6156,8 @@ impl self::_puroro::Message for MessageOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
             self::_puroro::tags::Bool,
@@ -5785,6 +6237,41 @@ impl ::std::clone::Clone for MessageOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for MessageOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for MessageOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(MessageOptions))
+            .field(stringify!(message_set_wire_format), &self.message_set_wire_format())
+            .field(
+                stringify!(no_standard_descriptor_accessor),
+                &self.no_standard_descriptor_accessor(),
+            )
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(map_entry), &self.map_entry())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for MessageOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.message_set_wire_format_opt() == rhs.message_set_wire_format_opt()
+            && self.no_standard_descriptor_accessor_opt()
+                == rhs.no_standard_descriptor_accessor_opt()
+            && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.map_entry_opt() == rhs.map_entry_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -6199,6 +6686,8 @@ impl self::_puroro::Message for FieldOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -6291,6 +6780,8 @@ impl self::_puroro::Message for FieldOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             self::_puroro_root::google::protobuf::field_options::CType,
             self::_puroro::tags::Enum2::<
@@ -6410,6 +6901,40 @@ impl ::std::clone::Clone for FieldOptions {
         }
     }
 }
+impl ::std::ops::Drop for FieldOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for FieldOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(FieldOptions))
+            .field(stringify!(ctype), &self.ctype())
+            .field(stringify!(packed), &self.packed())
+            .field(stringify!(jstype), &self.jstype())
+            .field(stringify!(lazy), &self.lazy())
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(weak), &self.weak())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for FieldOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.ctype_opt() == rhs.ctype_opt()
+            && self.packed_opt() == rhs.packed_opt()
+            && self.jstype_opt() == rhs.jstype_opt() && self.lazy_opt() == rhs.lazy_opt()
+            && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.weak_opt() == rhs.weak_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct OneofOptions {
     uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
@@ -6462,6 +6987,8 @@ impl self::_puroro::Message for OneofOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -6484,6 +7011,8 @@ impl self::_puroro::Message for OneofOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -6503,6 +7032,29 @@ impl ::std::clone::Clone for OneofOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for OneofOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for OneofOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(OneofOptions))
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for OneofOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -6665,6 +7217,8 @@ impl self::_puroro::Message for EnumOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -6709,6 +7263,8 @@ impl self::_puroro::Message for EnumOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
             self::_puroro::tags::Bool,
@@ -6758,6 +7314,33 @@ impl ::std::clone::Clone for EnumOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for EnumOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for EnumOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(EnumOptions))
+            .field(stringify!(allow_alias), &self.allow_alias())
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for EnumOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.allow_alias_opt() == rhs.allow_alias_opt()
+            && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -6866,6 +7449,8 @@ impl self::_puroro::Message for EnumValueOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -6899,6 +7484,8 @@ impl self::_puroro::Message for EnumValueOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
             self::_puroro::tags::Bool,
@@ -6933,6 +7520,31 @@ impl ::std::clone::Clone for EnumValueOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for EnumValueOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for EnumValueOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(EnumValueOptions))
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for EnumValueOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -7041,6 +7653,8 @@ impl self::_puroro::Message for ServiceOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -7074,6 +7688,8 @@ impl self::_puroro::Message for ServiceOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
             self::_puroro::tags::Bool,
@@ -7108,6 +7724,31 @@ impl ::std::clone::Clone for ServiceOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for ServiceOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for ServiceOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(ServiceOptions))
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for ServiceOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -7299,6 +7940,8 @@ impl self::_puroro::Message for MethodOptions {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -7345,6 +7988,8 @@ impl self::_puroro::Message for MethodOptions {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
             self::_puroro::tags::Bool,
@@ -7398,6 +8043,33 @@ impl ::std::clone::Clone for MethodOptions {
             > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for MethodOptions {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for MethodOptions {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(MethodOptions))
+            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(idempotency_level), &self.idempotency_level())
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for MethodOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.deprecated_opt() == rhs.deprecated_opt()
+            && self.idempotency_level_opt() == rhs.idempotency_level_opt()
+            && self.uninterpreted_option() == rhs.uninterpreted_option()
     }
 }
 #[derive(::std::default::Default)]
@@ -7755,6 +8427,8 @@ impl self::_puroro::Message for UninterpretedOption {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -7837,6 +8511,8 @@ impl self::_puroro::Message for UninterpretedOption {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -7936,6 +8612,41 @@ impl ::std::clone::Clone for UninterpretedOption {
         }
     }
 }
+impl ::std::ops::Drop for UninterpretedOption {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for UninterpretedOption {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(UninterpretedOption))
+            .field(stringify!(name), &self.name())
+            .field(stringify!(identifier_value), &self.identifier_value())
+            .field(stringify!(positive_int_value), &self.positive_int_value())
+            .field(stringify!(negative_int_value), &self.negative_int_value())
+            .field(stringify!(double_value), &self.double_value())
+            .field(stringify!(string_value), &self.string_value())
+            .field(stringify!(aggregate_value), &self.aggregate_value())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for UninterpretedOption {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name() == rhs.name()
+            && self.identifier_value_opt() == rhs.identifier_value_opt()
+            && self.positive_int_value_opt() == rhs.positive_int_value_opt()
+            && self.negative_int_value_opt() == rhs.negative_int_value_opt()
+            && self.double_value_opt() == rhs.double_value_opt()
+            && self.string_value_opt() == rhs.string_value_opt()
+            && self.aggregate_value_opt() == rhs.aggregate_value_opt()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct SourceCodeInfo {
     location: self::_puroro::internal::field_type::RepeatedMessageField::<
@@ -7982,6 +8693,8 @@ impl self::_puroro::Message for SourceCodeInfo {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -8004,6 +8717,8 @@ impl self::_puroro::Message for SourceCodeInfo {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::google::protobuf::source_code_info::Location,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -8023,6 +8738,29 @@ impl ::std::clone::Clone for SourceCodeInfo {
             > as ::std::clone::Clone>::clone(&self.location),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for SourceCodeInfo {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for SourceCodeInfo {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(SourceCodeInfo))
+            .field(stringify!(location), &self.location())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for SourceCodeInfo {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.location() == rhs.location()
     }
 }
 #[derive(::std::default::Default)]
@@ -8071,6 +8809,8 @@ impl self::_puroro::Message for GeneratedCodeInfo {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -8093,6 +8833,8 @@ impl self::_puroro::Message for GeneratedCodeInfo {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedMessageField::<
             self::_puroro_root::google::protobuf::generated_code_info::Annotation,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -8112,5 +8854,28 @@ impl ::std::clone::Clone for GeneratedCodeInfo {
             > as ::std::clone::Clone>::clone(&self.annotation),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for GeneratedCodeInfo {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for GeneratedCodeInfo {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(GeneratedCodeInfo))
+            .field(stringify!(annotation), &self.annotation())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for GeneratedCodeInfo {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.annotation() == rhs.annotation()
     }
 }

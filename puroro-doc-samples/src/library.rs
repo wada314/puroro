@@ -156,6 +156,8 @@ impl self::_puroro::Message for Book {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -195,6 +197,8 @@ impl self::_puroro::Message for Book {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.title,
             &self._bitfield,
@@ -236,6 +240,33 @@ impl ::std::clone::Clone for Book {
             > as ::std::clone::Clone>::clone(&self.author),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Book {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Book {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Book))
+            .field(stringify!(title), &self.title())
+            .field(stringify!(num_pages), &self.num_pages())
+            .field(stringify!(author), &self.author())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Book {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.title_opt() == rhs.title_opt()
+            && self.num_pages_opt() == rhs.num_pages_opt()
+            && self.author_opt() == rhs.author_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -296,6 +327,8 @@ impl self::_puroro::Message for Author {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -316,6 +349,8 @@ impl self::_puroro::Message for Author {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.name,
             &self._bitfield,
@@ -333,5 +368,28 @@ impl ::std::clone::Clone for Author {
             ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for Author {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for Author {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(Author))
+            .field(stringify!(name), &self.name())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Author {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.name_opt() == rhs.name_opt()
     }
 }

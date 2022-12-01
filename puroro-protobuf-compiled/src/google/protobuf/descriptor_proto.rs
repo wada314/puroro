@@ -183,6 +183,8 @@ impl self::_puroro::Message for ExtensionRange {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -227,6 +229,8 @@ impl self::_puroro::Message for ExtensionRange {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::tags::Int32,
@@ -276,6 +280,32 @@ impl ::std::clone::Clone for ExtensionRange {
             > as ::std::clone::Clone>::clone(&self.options),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for ExtensionRange {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for ExtensionRange {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(ExtensionRange))
+            .field(stringify!(start), &self.start())
+            .field(stringify!(end), &self.end())
+            .field(stringify!(options), &self.options())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for ExtensionRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
+            && self.options_opt() == rhs.options_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -405,6 +435,8 @@ impl self::_puroro::Message for ReservedRange {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
@@ -440,6 +472,8 @@ impl self::_puroro::Message for ReservedRange {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::tags::Int32,
@@ -478,5 +512,29 @@ impl ::std::clone::Clone for ReservedRange {
             > as ::std::clone::Clone>::clone(&self.end),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
+    }
+}
+impl ::std::ops::Drop for ReservedRange {
+    fn drop(&mut self) {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+    }
+}
+impl ::std::fmt::Debug for ReservedRange {
+    fn fmt(
+        &self,
+        fmt: &mut ::std::fmt::Formatter<'_>,
+    ) -> ::std::result::Result<(), ::std::fmt::Error> {
+        fmt.debug_struct(stringify!(ReservedRange))
+            .field(stringify!(start), &self.start())
+            .field(stringify!(end), &self.end())
+            .finish()
+    }
+}
+impl ::std::cmp::PartialEq for ReservedRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
     }
 }

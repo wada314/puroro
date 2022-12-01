@@ -12,6 +12,7 @@ pub mod _puroro {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum CType {
     String,
@@ -55,6 +56,7 @@ impl ::std::convert::TryFrom::<i32> for CType {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum JSType {
     JsNormal,

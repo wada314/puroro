@@ -12,6 +12,7 @@ pub mod _puroro {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum Type {
     TypeDouble,
@@ -100,6 +101,7 @@ impl ::std::convert::TryFrom::<i32> for Type {
     ::std::cmp::PartialOrd,
     ::std::cmp::Ord,
     ::std::hash::Hash,
+    ::std::fmt::Debug,
 )]
 pub enum Label {
     LabelOptional,
