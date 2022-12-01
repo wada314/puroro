@@ -106,6 +106,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let getter_mut_idents = try_map_fields(self, |f| f.gen_union_getter_mut_ident())?;
         let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
+        let field_numbers = try_map_fields(self, |f| f.number())?;
         let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
         let borrowed_types_a = try_map_fields(self, |f| {
@@ -202,7 +203,19 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                     W: ::std::io::Write,
                     B: self::_puroro::bitvec::BitSlice
                 {
-                    todo!()
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    #[allow(unused)] use ::std::result::Result::Ok;
+                    use self::_puroro::internal::oneof_type::OneofCase as _;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+                    match self::#case_ident::from_bitslice(bitvec) {
+                        #(Some(self::#case_ident::#case_names(_)) => {
+                            unsafe { &self.#union_item_idents }.ser_to_write(
+                                #field_numbers, out,
+                            )?;
+                        })*
+                        _ => (),
+                    }
+                    Ok(())
                 }
             }
 

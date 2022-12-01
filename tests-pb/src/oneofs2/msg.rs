@@ -217,7 +217,22 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice,
     {
-        todo!()
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        match self::GroupOneCase::from_bitslice(bitvec) {
+            Some(self::GroupOneCase::G1Int32(_)) => {
+                unsafe { &self.g1_int32 }.ser_to_write(1i32, out)?;
+            }
+            Some(self::GroupOneCase::G1String(_)) => {
+                unsafe { &self.g1_string }.ser_to_write(2i32, out)?;
+            }
+            _ => {}
+        }
+        Ok(())
     }
 }
 impl ::std::default::Default for GroupOne {
@@ -534,7 +549,25 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice,
     {
-        todo!()
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        match self::GroupTwoCase::from_bitslice(bitvec) {
+            Some(self::GroupTwoCase::G2F32(_)) => {
+                unsafe { &self.g2_f32 }.ser_to_write(3i32, out)?;
+            }
+            Some(self::GroupTwoCase::G2String(_)) => {
+                unsafe { &self.g2_string }.ser_to_write(4i32, out)?;
+            }
+            Some(self::GroupTwoCase::G2Submsg(_)) => {
+                unsafe { &self.g2_submsg }.ser_to_write(5i32, out)?;
+            }
+            _ => {}
+        }
+        Ok(())
     }
 }
 impl ::std::default::Default for GroupTwo {
@@ -703,7 +736,19 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         W: ::std::io::Write,
         B: self::_puroro::bitvec::BitSlice,
     {
-        todo!()
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        match self::GroupThreeCase::from_bitslice(bitvec) {
+            Some(self::GroupThreeCase::G3Int32(_)) => {
+                unsafe { &self.g3_int32 }.ser_to_write(6i32, out)?;
+            }
+            _ => {}
+        }
+        Ok(())
     }
 }
 impl ::std::default::Default for GroupThree {

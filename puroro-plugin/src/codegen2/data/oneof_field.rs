@@ -25,6 +25,7 @@ pub trait OneofField: Debug {
     fn name(&self) -> Result<&str>;
     fn oneof(&self) -> Result<Rc<dyn Oneof>>;
     fn message(&self) -> Result<Rc<dyn Message>>;
+    fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
 }
 
@@ -33,6 +34,7 @@ pub struct OneofFieldImpl {
     cache: AnonymousCache,
     oneof: Weak<dyn Oneof>,
     name: String,
+    number: i32,
     type_opt: Option<field_descriptor_proto::Type>,
     type_name: String,
     r#type: OnceCell<FieldType>,
@@ -50,6 +52,9 @@ impl OneofField for OneofFieldImpl {
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.oneof()?.message()?)
+    }
+    fn number(&self) -> Result<i32> {
+        Ok(self.number)
     }
     fn r#type(&self) -> Result<&FieldType> {
         self.r#type.get_or_try_init(|| {
@@ -70,6 +75,7 @@ impl OneofFieldImpl {
             cache: Default::default(),
             oneof,
             name: proto.name().to_string(),
+            number: proto.number(),
             type_opt: proto.type_opt(),
             type_name: proto.type_name().to_string(),
             r#type: OnceCell::new(),
