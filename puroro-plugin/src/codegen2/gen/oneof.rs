@@ -31,6 +31,7 @@ pub trait OneofExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_union_ident(&self) -> Result<Rc<Ident>>;
+
     fn gen_union(&self) -> Result<TokenStream>;
 }
 
@@ -47,6 +48,43 @@ struct OneofBitfieldAllocation {
 }
 
 impl<T: ?Sized + Oneof> OneofExt for T {
+    fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)> {
+        let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
+            alloc
+        } else {
+            // Force allocate the bitfields
+            let _ = self.message()?.bitfield_size()?;
+            let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() else {
+            Err(ErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
+        };
+            alloc
+        };
+        Ok(alloc.oneof_bits_range)
+    }
+
+    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
+        Ok(self
+            .cache()
+            .get::<Cache>()?
+            .allocated_bitfield
+            .get()
+            .map(|a| a.tail))
+    }
+
+    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
+        let case_num = self.fields()?.count() + 1 /* 1 for none case */;
+        let required_bits = (usize::leading_zeros(0) - usize::leading_zeros(case_num)) as usize;
+        Ok(self
+            .cache()
+            .get::<Cache>()?
+            .allocated_bitfield
+            .get_or_init(|| OneofBitfieldAllocation {
+                oneof_bits_range: (head, head + required_bits),
+                tail: required_bits,
+            })
+            .tail)
+    }
+
     fn gen_union_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
@@ -70,7 +108,6 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
-        let borrowed_types = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
         let borrowed_types_a = try_map_fields(self, |f| {
             f.gen_maybe_borrowed_type(Some(format_ident!("a")))
         })?;
@@ -191,43 +228,6 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 }
             }
         })
-    }
-
-    fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)> {
-        let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
-            alloc
-        } else {
-            // Force allocate the bitfields
-            let _ = self.message()?.bitfield_size()?;
-            let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() else {
-            Err(ErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
-        };
-            alloc
-        };
-        Ok(alloc.oneof_bits_range)
-    }
-
-    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
-        Ok(self
-            .cache()
-            .get::<Cache>()?
-            .allocated_bitfield
-            .get()
-            .map(|a| a.tail))
-    }
-
-    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
-        let case_num = self.fields()?.count() + 1 /* 1 for none case */;
-        let required_bits = (usize::leading_zeros(0) - usize::leading_zeros(case_num)) as usize;
-        Ok(self
-            .cache()
-            .get::<Cache>()?
-            .allocated_bitfield
-            .get_or_init(|| OneofBitfieldAllocation {
-                oneof_bits_range: (head, head + required_bits),
-                tail: required_bits,
-            })
-            .tail)
     }
 }
 
