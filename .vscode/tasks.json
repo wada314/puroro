@@ -74,6 +74,9 @@
                 "showReuseMessage": true,
                 "clear": true
             },
+            "env": {
+                "RUST_BACKTRACE": "1"
+            },
             "group": "test",
             "label": "rust: cargo test"
         },
@@ -94,6 +97,9 @@
                 "panel": "shared",
                 "showReuseMessage": true,
                 "clear": true
+            },
+            "env": {
+                "RUST_BACKTRACE": "1"
             },
             "group": "test",
             "label": "rust: cargo test -p tests"
@@ -116,6 +122,9 @@
                 "showReuseMessage": true,
                 "clear": true
             },
+            "env": {
+                "RUST_BACKTRACE": "1"
+            },
             "group": "test",
             "label": "rust: cargo test -p puroro"
         },
@@ -129,6 +138,9 @@
             "problemMatcher": [
                 "$rustc"
             ],
+            "env": {
+                "RUST_BACKTRACE": "1"
+            },
             "presentation": {
                 "echo": true,
                 "reveal": "always",

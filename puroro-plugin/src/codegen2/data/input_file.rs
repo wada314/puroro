@@ -142,10 +142,10 @@ impl InputFile for InputFileFake {
     fn package(&self) -> Result<Rc<dyn Package>> {
         self.package.try_upgrade()
     }
-    fn messages(&self) -> Result<&[Rc<dyn crate::codegen2::message::Message>]> {
+    fn messages(&self) -> Result<&[Rc<dyn Message>]> {
         Ok(&[])
     }
-    fn enums(&self) -> Result<&[Rc<dyn crate::codegen2::r#enum::Enum>]> {
+    fn enums(&self) -> Result<&[Rc<dyn Enum>]> {
         Ok(&[])
     }
 }
