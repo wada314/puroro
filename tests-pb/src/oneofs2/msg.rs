@@ -20,6 +20,37 @@ pub enum GroupOneCase<G1Int32 = (), G1String = ()> {
     G1Int32(G1Int32),
     G1String(G1String),
 }
+impl GroupOne {
+    pub(crate) fn g1_int32<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> i32 {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        #[allow(unused)]
+        use ::std::default::Default;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupOneCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32(())))
+            .then(|| { unsafe { self.g1_int32.deref() } });
+        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+    pub(crate) fn g1_string<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> &str {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        #[allow(unused)]
+        use ::std::default::Default;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupOneCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
+            .then(|| { unsafe { self.g1_string.deref() } });
+        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+}
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
     type Case = self::GroupOneCase;
     type CaseRef<'a> = self::GroupOneCase::<i32, &'a str>;
@@ -94,6 +125,9 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         B: self::_puroro::bitvec::BitSlice,
     {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         todo!()
     }
     fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
@@ -147,6 +181,53 @@ pub enum GroupTwoCase<G2F32 = (), G2String = (), G2Submsg = ()> {
     G2F32(G2F32),
     G2String(G2String),
     G2Submsg(G2Submsg),
+}
+impl GroupTwo {
+    pub(crate) fn g2_f32<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> f32 {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        #[allow(unused)]
+        use ::std::default::Default;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupTwoCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32(())))
+            .then(|| { unsafe { self.g2_f32.deref() } });
+        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+    pub(crate) fn g2_string<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> &str {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        #[allow(unused)]
+        use ::std::default::Default;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupTwoCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String(())))
+            .then(|| { unsafe { self.g2_string.deref() } });
+        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
+    pub(crate) fn g2_submsg<B: self::_puroro::bitvec::BitSlice>(
+        &self,
+        bits: &B,
+    ) -> ::std::option::Option::<&self::_puroro_root::oneofs2::Submsg> {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        #[allow(unused)]
+        use ::std::default::Default;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupTwoCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
+            .then(|| { unsafe { self.g2_submsg.deref() } });
+        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
 }
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
     type Case = self::GroupTwoCase;
@@ -239,6 +320,9 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         B: self::_puroro::bitvec::BitSlice,
     {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         todo!()
     }
     fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
@@ -284,6 +368,21 @@ pub union GroupThree {
 }
 pub enum GroupThreeCase<G3Int32 = ()> {
     G3Int32(G3Int32),
+}
+impl GroupThree {
+    pub(crate) fn g3_int32<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> i32 {
+        #[allow(unused)]
+        use ::std::option::Option::{None, Some};
+        #[allow(unused)]
+        use ::std::default::Default;
+        use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_type::OneofCase as _;
+        let case_opt = self::GroupThreeCase::from_bitslice(bits);
+        let item_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
+            .then(|| { unsafe { self.g3_int32.deref() } });
+        OneofFieldTypeOpt::get_field(item_opt, Default::default)
+    }
 }
 impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
     type Case = self::GroupThreeCase;
@@ -346,6 +445,9 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         B: self::_puroro::bitvec::BitSlice,
     {
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        #[allow(unused)]
+        use ::std::result::Result::Ok;
         todo!()
     }
     fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
