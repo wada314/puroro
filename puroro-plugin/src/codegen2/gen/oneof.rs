@@ -26,9 +26,11 @@ use ::std::rc::Rc;
 
 pub trait OneofExt {
     // Message's bitfield allocation
+    fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)>;
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
+    fn gen_union_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union(&self) -> Result<TokenStream>;
 }
 
@@ -45,8 +47,21 @@ struct OneofBitfieldAllocation {
 }
 
 impl<T: ?Sized + Oneof> OneofExt for T {
+    fn gen_union_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .enum_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}",
+                    self.name()?.to_camel_case().escape_rust_keywords()
+                )))
+            })
+            .cloned()
+    }
+
     fn gen_union(&self) -> Result<TokenStream> {
-        let union_ident = gen_union_ident(self)?;
+        let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let union_item_idents = try_map_fields(self, |f| f.gen_union_item_ident())?;
         let union_items = try_map_fields(self, |f| f.gen_union_item_decl())?;
@@ -58,8 +73,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let borrowed_types_a = try_map_fields(self, |f| {
             f.gen_maybe_borrowed_type(Some(format_ident!("a")))
         })?;
-        let bitfield_begin = bitfield_index_for_oneof(self)?.0;
-        let bitfield_end = bitfield_index_for_oneof(self)?.1;
+        let bitfield_begin = self.bitfield_index_for_oneof()?.0;
+        let bitfield_end = self.bitfield_index_for_oneof()?.1;
         // Union includes none case, where the case enum does not.
         Ok(quote! {
             pub union #union_ident {
@@ -171,6 +186,20 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         })
     }
 
+    fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)> {
+        let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
+            alloc
+        } else {
+            // Force allocate the bitfields
+            let _ = self.message()?.bitfield_size()?;
+            let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() else {
+            Err(ErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
+        };
+            alloc
+        };
+        Ok(alloc.oneof_bits_range)
+    }
+
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
         Ok(self
             .cache()
@@ -200,31 +229,4 @@ where
     F: FnMut(Rc<dyn OneofField>) -> Result<R>,
 {
     this.fields()?.map(f).collect::<Result<Vec<_>>>()
-}
-
-fn bitfield_index_for_oneof(this: &(impl ?Sized + Oneof)) -> Result<(usize, usize)> {
-    let alloc = if let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() {
-        alloc
-    } else {
-        // Force allocate the bitfields
-        let _ = this.message()?.bitfield_size()?;
-        let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() else {
-            Err(ErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
-        };
-        alloc
-    };
-    Ok(alloc.oneof_bits_range)
-}
-
-fn gen_union_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
-    this.cache()
-        .get::<Cache>()?
-        .enum_ident
-        .get_or_try_init(|| {
-            Ok(Rc::new(format_ident!(
-                "{}",
-                this.name()?.to_camel_case().escape_rust_keywords()
-            )))
-        })
-        .cloned()
 }

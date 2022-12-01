@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::super::{
-    Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof, OneofField,
+    Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof, OneofExt, OneofField,
 };
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -91,6 +91,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
         let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
+        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
@@ -101,9 +102,14 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let getter_opt_type = quote! {
             ::std::option::Option::< #borrowed_type >
         };
+        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
+        let union_ident = self.oneof()?.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
         let union_item_ident = self.gen_union_item_ident()?;
         let enum_item_ident = self.gen_case_enum_value_ident()?;
+        let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
+        let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
+
         Ok(quote! {
             pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
                 #[allow(unused)] use ::std::option::Option::{None, Some};
@@ -134,6 +140,30 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     }
                 });
                 OneofFieldTypeOpt::get_field_opt(item_opt)
+            }
+
+            pub(crate) fn #getter_mut_ident<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
+                #[allow(unused)] use ::std::option::Option::Some;
+                #[allow(unused)] use ::std::default::Default;
+                use ::std::mem::ManuallyDrop;
+                use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
+                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+
+                let case_opt = self::#case_ident::from_bitslice(bits);
+                if let Some(self::#case_ident::#enum_item_ident(())) = case_opt {
+                    // The union is already set to the expected value. Do nothing.
+                } else {
+                    // Need to reset the union value to the expected field type.
+                    <Self as OneofUnion>::clear(self, bits);
+                    let index = self::#case_ident::into_u32(self::#case_ident::#enum_item_ident(()));
+                    bits.set_range(#bitfield_begin..#bitfield_end, index);
+                    *self = self::#union_ident {
+                        #union_item_ident: ManuallyDrop::new(Default::default())
+                    };
+                }
+                unsafe {
+                    &mut self.#union_item_ident
+                }.mut_field()
             }
         })
     }
