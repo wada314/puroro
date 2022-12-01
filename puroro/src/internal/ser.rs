@@ -141,7 +141,7 @@ pub(crate) fn ser_wire_and_number<W: Write>(
     number: i32,
     out: &mut W,
 ) -> Result<()> {
-    let var = Variant::from_i32((number << 3) | (wire as i32));
+    let var = Variant::from_u32(((number << 3) | (wire as i32)) as u32);
     var.encode_bytes(out)?;
     Ok(())
 }
