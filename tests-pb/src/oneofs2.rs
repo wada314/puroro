@@ -163,9 +163,65 @@ impl self::_puroro::Message for Msg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
+                1i32 => {
+                    self
+                        .group_one
+                        .deser_from_iter(
+                            &mut self._bitfield,
+                            field_data,
+                            self::_puroro_root::oneofs2::msg::GroupOneCase::G1Int32(()),
+                        )?
+                }
+                2i32 => {
+                    self
+                        .group_one
+                        .deser_from_iter(
+                            &mut self._bitfield,
+                            field_data,
+                            self::_puroro_root::oneofs2::msg::GroupOneCase::G1String(()),
+                        )?
+                }
+                3i32 => {
+                    self
+                        .group_two
+                        .deser_from_iter(
+                            &mut self._bitfield,
+                            field_data,
+                            self::_puroro_root::oneofs2::msg::GroupTwoCase::G2F32(()),
+                        )?
+                }
+                4i32 => {
+                    self
+                        .group_two
+                        .deser_from_iter(
+                            &mut self._bitfield,
+                            field_data,
+                            self::_puroro_root::oneofs2::msg::GroupTwoCase::G2String(()),
+                        )?
+                }
+                5i32 => {
+                    self
+                        .group_two
+                        .deser_from_iter(
+                            &mut self._bitfield,
+                            field_data,
+                            self::_puroro_root::oneofs2::msg::GroupTwoCase::G2Submsg(()),
+                        )?
+                }
+                6i32 => {
+                    self
+                        .group_three
+                        .deser_from_iter(
+                            &mut self._bitfield,
+                            field_data,
+                            self::_puroro_root::oneofs2::msg::GroupThreeCase::G3Int32(()),
+                        )?
+                }
                 _ => todo!(),
             }
         }
@@ -271,6 +327,8 @@ impl self::_puroro::Message for Submsg {
         mut iter: I,
     ) -> self::_puroro::Result<()> {
         use self::_puroro::internal::ser::FieldData;
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {

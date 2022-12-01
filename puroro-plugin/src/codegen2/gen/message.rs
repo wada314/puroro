@@ -140,6 +140,10 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
         .fields()?
         .map(|f| f.gen_struct_field_deser_arm(&field_data_ident))
         .collect::<Result<Vec<_>>>()?;
+    let oneof_deser_arms = this
+        .oneofs()?
+        .map(|o| o.gen_struct_field_deser_arms(&field_data_ident))
+        .collect::<Result<Vec<_>>>()?;
     let ser_fields = this
         .fields()?
         .map(|f| f.gen_struct_field_ser(&out_ident))
@@ -155,10 +159,11 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
 
             fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
                 use self::_puroro::internal::ser::FieldData;
+                #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
                 while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
                     match number {
                         #(#deser_arms)*
-                        // TODO: oneofs
+                        #(#oneof_deser_arms)*
                         _ => todo!(), // Unknown field number
                     }
                 }
