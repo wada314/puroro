@@ -25,17 +25,23 @@ use ::std::rc::Rc;
 
 pub trait OneofFieldExt {
     fn gen_union_item_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_item_decl(&self) -> Result<TokenStream>;
-    fn gen_union_methods(&self) -> Result<TokenStream>;
+    fn gen_union_getter_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
     fn gen_generic_type_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
+
     fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>>;
+
+    fn gen_union_item_decl(&self) -> Result<TokenStream>;
+    fn gen_union_methods(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
     union_item_ident: OnceCell<Rc<Ident>>,
+    union_gettr_ident: OnceCell<Rc<Ident>>,
+    union_gettr_opt_ident: OnceCell<Rc<Ident>>,
     union_gettr_mut_ident: OnceCell<Rc<Ident>>,
 }
 
@@ -52,6 +58,59 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
+    fn gen_union_getter_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_gettr_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
+                )))
+            })
+            .cloned()
+    }
+    fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_gettr_opt_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}_opt",
+                    self.name()?.to_lower_snake_case()
+                )))
+            })
+            .cloned()
+    }
+    fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_gettr_mut_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}_mut",
+                    self.name()?.to_lower_snake_case()
+                )))
+            })
+            .cloned()
+    }
+    fn gen_generic_type_param_ident(&self) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}",
+            self.name()?.to_camel_case().escape_rust_keywords()
+        ))
+    }
+    fn gen_case_enum_value_ident(&self) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}",
+            self.name()?.to_camel_case().escape_rust_keywords()
+        ))
+    }
+
+    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
+        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?.clone())
+    }
+
     fn gen_union_item_decl(&self) -> Result<TokenStream> {
         let ident = self.gen_union_item_ident()?;
         let inner_type_name = {
@@ -86,13 +145,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             #ident: #field_type,
         })
     }
-
     fn gen_union_methods(&self) -> Result<TokenStream> {
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
-        let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
+        let getter_ident = self.gen_union_getter_ident()?;
+        let getter_opt_ident = self.gen_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_union_getter_mut_ident()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
@@ -168,33 +223,5 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 }.mut_field()
             }
         })
-    }
-
-    fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
-        self.cache()
-            .get::<Cache>()?
-            .union_gettr_mut_ident
-            .get_or_try_init(|| {
-                Ok(Rc::new(format_ident!(
-                    "{}_mut",
-                    self.name()?.to_lower_snake_case()
-                )))
-            })
-            .cloned()
-    }
-    fn gen_generic_type_param_ident(&self) -> Result<Ident> {
-        Ok(format_ident!(
-            "{}",
-            self.name()?.to_camel_case().escape_rust_keywords()
-        ))
-    }
-    fn gen_case_enum_value_ident(&self) -> Result<Ident> {
-        Ok(format_ident!(
-            "{}",
-            self.name()?.to_camel_case().escape_rust_keywords()
-        ))
-    }
-    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
-        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?.clone())
     }
 }
