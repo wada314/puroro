@@ -16,6 +16,7 @@ pub union GroupOne {
         self::_puroro::internal::oneof_field_type::StringField,
     >,
 }
+#[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
 pub enum GroupOneCase<G1Int32 = (), G1String = ()> {
     G1Int32(G1Int32),
     G1String(G1String),
@@ -274,6 +275,7 @@ pub union GroupTwo {
         >,
     >,
 }
+#[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
 pub enum GroupTwoCase<G2F32 = (), G2String = (), G2Submsg = ()> {
     G2F32(G2F32),
     G2String(G2String),
@@ -603,6 +605,7 @@ pub union GroupThree {
         >,
     >,
 }
+#[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
 pub enum GroupThreeCase<G3Int32 = ()> {
     G3Int32(G3Int32),
 }

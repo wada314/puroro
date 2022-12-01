@@ -32,6 +32,7 @@ pub trait FieldExt {
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_debug(&self) -> Result<TokenStream>;
+    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -148,6 +149,21 @@ impl<T: ?Sized + Field> FieldExt for T {
             .field(stringify!(#ident), &self.#getter_ident())
         })
     }
+    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {
+        Ok(match self.rule()? {
+            FieldRule::Repeated => {
+                let getter_ident = format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
+                );
+                quote! { && self.#getter_ident() == #rhs_ident.#getter_ident() }
+            }
+            _ => {
+                let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
+                quote! { && self.#getter_opt_ident() == #rhs_ident.#getter_opt_ident() }
+            }
+        })
+    }
 }
 
 fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<usize>> {
@@ -243,10 +259,14 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
     let field_type = gen_struct_field_type(this)?;
     let getter_item_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
-            impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug
+            impl ::std::ops::Deref::<Target = str> +
+                ::std::fmt::Debug +
+                ::std::cmp::PartialEq
         }),
         FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
-            impl ::std::ops::Deref::<Target = [u8]> + ::std::fmt::Debug
+            impl ::std::ops::Deref::<Target = [u8]> +
+                ::std::fmt::Debug +
+                ::std::cmp::PartialEq
         }),
         FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
             m.try_upgrade()?.gen_rust_struct_path()?

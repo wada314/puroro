@@ -137,6 +137,13 @@ impl ::std::fmt::Debug for Submsg {
             .finish()
     }
 }
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.item_inner_opt() == rhs.item_inner_opt()
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

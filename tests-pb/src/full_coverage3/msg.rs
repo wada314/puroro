@@ -281,3 +281,12 @@ impl ::std::fmt::Debug for Submsg {
             .finish()
     }
 }
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
+            && self.i32_optional_opt() == rhs.i32_optional_opt()
+            && self.i64_unlabeled_opt() == rhs.i64_unlabeled_opt()
+    }
+}

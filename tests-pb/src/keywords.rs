@@ -146,6 +146,13 @@ impl ::std::fmt::Debug for Msg {
             .finish()
     }
 }
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.type_opt() == rhs.type_opt()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct _Self {
     r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -286,5 +293,12 @@ impl ::std::fmt::Debug for _Self {
         fmt.debug_struct(stringify!(_Self))
             .field(stringify!(r#type), &self.r#type())
             .finish()
+    }
+}
+impl ::std::cmp::PartialEq for _Self {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.type_opt() == rhs.type_opt()
     }
 }

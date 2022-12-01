@@ -199,6 +199,14 @@ impl ::std::fmt::Debug for Msg {
             .finish()
     }
 }
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.enum_optional_opt() == rhs.enum_optional_opt()
+            && self.enum_repeated() == rhs.enum_repeated()
+    }
+}
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

@@ -525,7 +525,9 @@ impl Msg {
     }
     pub fn bytes_repeated(
         &self,
-    ) -> &[impl ::std::ops::Deref::<Target = [u8]> + ::std::fmt::Debug] {
+    ) -> &[impl ::std::ops::Deref::<
+        Target = [u8],
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedBytesField as RepeatedFieldType>::get_field(
             &self.bytes_repeated,
@@ -535,7 +537,9 @@ impl Msg {
     pub fn bytes_repeated_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<Target = [u8]> + ::std::fmt::Debug,
+        impl ::std::ops::Deref::<
+            Target = [u8],
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
     > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedBytesField as RepeatedFieldType>::mut_field(
@@ -630,7 +634,9 @@ impl Msg {
     }
     pub fn string_repeated(
         &self,
-    ) -> &[impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug] {
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.string_repeated,
@@ -640,7 +646,9 @@ impl Msg {
     pub fn string_repeated_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug,
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
     > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
@@ -3426,6 +3434,60 @@ impl ::std::fmt::Debug for Msg {
             .field(stringify!(f64_optional), &self.f64_optional())
             .field(stringify!(f64_repeated), &self.f64_repeated())
             .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.i32_required_opt() == rhs.i32_required_opt()
+            && self.i32_optional_opt() == rhs.i32_optional_opt()
+            && self.i32_repeated() == rhs.i32_repeated()
+            && self.float_required_opt() == rhs.float_required_opt()
+            && self.float_optional_opt() == rhs.float_optional_opt()
+            && self.float_repeated() == rhs.float_repeated()
+            && self.bytes_required_opt() == rhs.bytes_required_opt()
+            && self.bytes_optional_opt() == rhs.bytes_optional_opt()
+            && self.bytes_repeated() == rhs.bytes_repeated()
+            && self.string_required_opt() == rhs.string_required_opt()
+            && self.string_optional_opt() == rhs.string_optional_opt()
+            && self.string_repeated() == rhs.string_repeated()
+            && self.enum_required_opt() == rhs.enum_required_opt()
+            && self.enum_optional_opt() == rhs.enum_optional_opt()
+            && self.enum_repeated() == rhs.enum_repeated()
+            && self.submsg_required_opt() == rhs.submsg_required_opt()
+            && self.submsg_optional_opt() == rhs.submsg_optional_opt()
+            && self.submsg_repeated() == rhs.submsg_repeated()
+            && self.i64_required_opt() == rhs.i64_required_opt()
+            && self.i64_optional_opt() == rhs.i64_optional_opt()
+            && self.i64_repeated() == rhs.i64_repeated()
+            && self.u32_required_opt() == rhs.u32_required_opt()
+            && self.u32_optional_opt() == rhs.u32_optional_opt()
+            && self.u32_repeated() == rhs.u32_repeated()
+            && self.u64_required_opt() == rhs.u64_required_opt()
+            && self.u64_optional_opt() == rhs.u64_optional_opt()
+            && self.u64_repeated() == rhs.u64_repeated()
+            && self.s32_required_opt() == rhs.s32_required_opt()
+            && self.s32_optional_opt() == rhs.s32_optional_opt()
+            && self.s32_repeated() == rhs.s32_repeated()
+            && self.s64_required_opt() == rhs.s64_required_opt()
+            && self.s64_optional_opt() == rhs.s64_optional_opt()
+            && self.s64_repeated() == rhs.s64_repeated()
+            && self.fixed32_required_opt() == rhs.fixed32_required_opt()
+            && self.fixed32_optional_opt() == rhs.fixed32_optional_opt()
+            && self.fixed32_repeated() == rhs.fixed32_repeated()
+            && self.fixed64_required_opt() == rhs.fixed64_required_opt()
+            && self.fixed64_optional_opt() == rhs.fixed64_optional_opt()
+            && self.fixed64_repeated() == rhs.fixed64_repeated()
+            && self.sfixed32_required_opt() == rhs.sfixed32_required_opt()
+            && self.sfixed32_optional_opt() == rhs.sfixed32_optional_opt()
+            && self.sfixed32_repeated() == rhs.sfixed32_repeated()
+            && self.sfixed64_required_opt() == rhs.sfixed64_required_opt()
+            && self.sfixed64_optional_opt() == rhs.sfixed64_optional_opt()
+            && self.sfixed64_repeated() == rhs.sfixed64_repeated()
+            && self.f64_required_opt() == rhs.f64_required_opt()
+            && self.f64_optional_opt() == rhs.f64_optional_opt()
+            && self.f64_repeated() == rhs.f64_repeated()
     }
 }
 #[derive(

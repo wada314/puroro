@@ -143,3 +143,10 @@ impl ::std::fmt::Debug for Msg {
             .finish()
     }
 }
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.recursive_unlabeled_opt() == rhs.recursive_unlabeled_opt()
+    }
+}

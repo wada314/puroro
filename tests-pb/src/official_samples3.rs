@@ -135,6 +135,13 @@ impl ::std::fmt::Debug for Test1 {
         fmt.debug_struct(stringify!(Test1)).field(stringify!(a), &self.a()).finish()
     }
 }
+impl ::std::cmp::PartialEq for Test1 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.a_opt() == rhs.a_opt()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test2 {
     b: self::_puroro::internal::field_type::SingularStringField,
@@ -248,6 +255,13 @@ impl ::std::fmt::Debug for Test2 {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Test2)).field(stringify!(b), &self.b()).finish()
+    }
+}
+impl ::std::cmp::PartialEq for Test2 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.b_opt() == rhs.b_opt()
     }
 }
 #[derive(::std::default::Default)]
@@ -376,6 +390,13 @@ impl ::std::fmt::Debug for Test3 {
         fmt.debug_struct(stringify!(Test3)).field(stringify!(c), &self.c()).finish()
     }
 }
+impl ::std::cmp::PartialEq for Test3 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.c_opt() == rhs.c_opt()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Test4 {
     d: self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -482,5 +503,12 @@ impl ::std::fmt::Debug for Test4 {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Test4)).field(stringify!(d), &self.d()).finish()
+    }
+}
+impl ::std::cmp::PartialEq for Test4 {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.d() == rhs.d()
     }
 }

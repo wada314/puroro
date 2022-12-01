@@ -216,7 +216,9 @@ impl Msg {
     }
     pub fn string_repeated(
         &self,
-    ) -> &[impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug] {
+    ) -> &[impl ::std::ops::Deref::<
+        Target = str,
+    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.string_repeated,
@@ -226,7 +228,9 @@ impl Msg {
     pub fn string_repeated_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<Target = str> + ::std::fmt::Debug,
+        impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
     > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
@@ -742,6 +746,23 @@ impl ::std::fmt::Debug for Msg {
             .field(stringify!(enum_repeated), &self.enum_repeated())
             .field(stringify!(very_large_field_number), &self.very_large_field_number())
             .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
+            && self.i32_repeated() == rhs.i32_repeated()
+            && self.float_unlabeled_opt() == rhs.float_unlabeled_opt()
+            && self.float_repeated() == rhs.float_repeated()
+            && self.string_unlabeled_opt() == rhs.string_unlabeled_opt()
+            && self.string_repeated() == rhs.string_repeated()
+            && self.submsg_unlabeled_opt() == rhs.submsg_unlabeled_opt()
+            && self.submsg_repeated() == rhs.submsg_repeated()
+            && self.enum_unlabeled_opt() == rhs.enum_unlabeled_opt()
+            && self.enum_repeated() == rhs.enum_repeated()
+            && self.very_large_field_number_opt() == rhs.very_large_field_number_opt()
     }
 }
 #[derive(

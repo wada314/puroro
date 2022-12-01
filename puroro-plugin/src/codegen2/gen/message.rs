@@ -108,6 +108,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         let clone_impl = gen_struct_clone_impl(self)?;
         let drop_impl = gen_struct_drop_impl(self)?;
         let debug_impl = gen_struct_debug_impl(self)?;
+        let partial_eq_impl = gen_struct_partial_eq_impl(self)?;
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
@@ -126,6 +127,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             #clone_impl
             #drop_impl
             #debug_impl
+            #partial_eq_impl
         })
     }
 }
@@ -247,6 +249,31 @@ fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
                     #(#from_fields)*
                     // TODO oneofs
                     .finish()
+            }
+        }
+    })
+}
+
+fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+    let ident = gen_struct_ident(this)?;
+    let rhs_ident = format_ident!("rhs");
+    let rhs = quote! { #rhs_ident };
+    let field_cmps = this
+        .fields()?
+        .map(|f| f.gen_struct_field_partial_eq_cmp(&rhs))
+        .collect::<Result<Vec<_>>>()?;
+    let oneof_cmps = this
+        .oneofs()?
+        .map(|o| o.gen_struct_field_partial_eq_cmp(&rhs))
+        .collect::<Result<Vec<_>>>()?;
+    Ok(quote! {
+        impl ::std::cmp::PartialEq for #ident {
+            fn eq(&self, rhs: &Self) -> bool {
+                #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
+
+                true
+                    #(#field_cmps)*
+                    #(#oneof_cmps)*
             }
         }
     })

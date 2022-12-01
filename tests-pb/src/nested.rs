@@ -138,3 +138,10 @@ impl ::std::fmt::Debug for Msg {
             .finish()
     }
 }
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.item_outer_opt() == rhs.item_outer_opt()
+    }
+}

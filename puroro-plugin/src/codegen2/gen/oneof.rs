@@ -37,6 +37,7 @@ pub trait OneofExt {
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -134,6 +135,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #(#union_items)*
             }
 
+            #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
             pub enum #case_ident<
                 #(#item_type_names = (),)*
             > {
@@ -225,6 +227,16 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 &self._bitfield,
                 #out_ident
             )?;
+        })
+    }
+
+    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        Ok(quote! {
+            && self.#getter_ident() == #rhs_ident.#getter_ident()
         })
     }
 }

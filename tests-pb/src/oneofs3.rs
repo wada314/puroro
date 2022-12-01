@@ -318,6 +318,15 @@ impl ::std::fmt::Debug for Msg {
         fmt.debug_struct(stringify!(Msg)).finish()
     }
 }
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.group_one() == rhs.group_one()
+            && self.group_two() == rhs.group_two()
+            && self.group_three() == rhs.group_three()
+    }
+}
 #[derive(::std::default::Default)]
 pub struct Submsg {
     i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
@@ -449,5 +458,12 @@ impl ::std::fmt::Debug for Submsg {
         fmt.debug_struct(stringify!(Submsg))
             .field(stringify!(i32_unlabeled), &self.i32_unlabeled())
             .finish()
+    }
+}
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
     }
 }
