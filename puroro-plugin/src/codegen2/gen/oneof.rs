@@ -128,6 +128,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                     B: self::_puroro::bitvec::BitSlice,
                 {
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+                    #[allow(unused)] use ::std::result::Result::Ok;
                     todo!()
                 }
 
