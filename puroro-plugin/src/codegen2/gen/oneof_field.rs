@@ -14,6 +14,7 @@
 
 use super::super::util::*;
 use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
+use super::PackageOrMessageExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -230,6 +231,8 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_union_getter_mut_ident()?;
+        let has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
 
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
@@ -242,12 +245,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             ::std::option::Option::< #borrowed_type >
         };
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
-        let union_ident = self.oneof()?.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
-        let union_item_ident = self.gen_union_item_ident()?;
+        let case_path = {
+            let module_path = self.oneof()?.message()?.gen_rust_module_path()?;
+            quote! { #module_path :: #case_ident }
+        };
         let enum_item_ident = self.gen_case_enum_value_ident()?;
-        let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
-        let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
 
         Ok(quote! {
             pub fn #getter_ident(&self) -> #getter_type {
@@ -258,6 +261,17 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             }
             pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                 self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
+            }
+            pub fn #has_ident(&self) -> bool {
+                self.#getter_opt_ident().is_some()
+            }
+            pub fn #clear_ident(&mut self) {
+                #[allow(unused)] use ::std::option::Option::Some;
+                use self::_puroro::internal::oneof_type::OneofCase;
+                use self::_puroro::internal::oneof_type::OneofUnion;
+                if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
+                    self.#oneof_struct_field_ident.clear(&mut self._bitfield)
+                }
             }
         })
     }

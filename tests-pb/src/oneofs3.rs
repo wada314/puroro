@@ -22,6 +22,19 @@ impl Msg {
     pub fn g1_int32_mut(&mut self) -> &mut i32 {
         self.group_one.g1_int32_mut(&mut self._bitfield)
     }
+    pub fn has_g1_int32(&self) -> bool {
+        self.g1_int32_opt().is_some()
+    }
+    pub fn clear_g1_int32(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        if let Some(self::_puroro_root::oneofs3::msg::GroupOneCase::G1Int32(_))
+            = OneofCase::from_bitslice(&self._bitfield) {
+            self.group_one.clear(&mut self._bitfield)
+        }
+    }
     pub fn g1_string(&self) -> &str {
         self.group_one.g1_string(&self._bitfield)
     }
@@ -30,6 +43,19 @@ impl Msg {
     }
     pub fn g1_string_mut(&mut self) -> &mut ::std::string::String {
         self.group_one.g1_string_mut(&mut self._bitfield)
+    }
+    pub fn has_g1_string(&self) -> bool {
+        self.g1_string_opt().is_some()
+    }
+    pub fn clear_g1_string(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        if let Some(self::_puroro_root::oneofs3::msg::GroupOneCase::G1String(_))
+            = OneofCase::from_bitslice(&self._bitfield) {
+            self.group_one.clear(&mut self._bitfield)
+        }
     }
     pub fn g2_f32(&self) -> f32 {
         self.group_two.g2_f32(&self._bitfield)
@@ -40,6 +66,19 @@ impl Msg {
     pub fn g2_f32_mut(&mut self) -> &mut f32 {
         self.group_two.g2_f32_mut(&mut self._bitfield)
     }
+    pub fn has_g2_f32(&self) -> bool {
+        self.g2_f32_opt().is_some()
+    }
+    pub fn clear_g2_f32(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        if let Some(self::_puroro_root::oneofs3::msg::GroupTwoCase::G2F32(_))
+            = OneofCase::from_bitslice(&self._bitfield) {
+            self.group_two.clear(&mut self._bitfield)
+        }
+    }
     pub fn g2_string(&self) -> &str {
         self.group_two.g2_string(&self._bitfield)
     }
@@ -48,6 +87,19 @@ impl Msg {
     }
     pub fn g2_string_mut(&mut self) -> &mut ::std::string::String {
         self.group_two.g2_string_mut(&mut self._bitfield)
+    }
+    pub fn has_g2_string(&self) -> bool {
+        self.g2_string_opt().is_some()
+    }
+    pub fn clear_g2_string(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        if let Some(self::_puroro_root::oneofs3::msg::GroupTwoCase::G2String(_))
+            = OneofCase::from_bitslice(&self._bitfield) {
+            self.group_two.clear(&mut self._bitfield)
+        }
     }
     pub fn g2_submsg(
         &self,
@@ -62,6 +114,19 @@ impl Msg {
     pub fn g2_submsg_mut(&mut self) -> &mut self::_puroro_root::oneofs3::Submsg {
         self.group_two.g2_submsg_mut(&mut self._bitfield)
     }
+    pub fn has_g2_submsg(&self) -> bool {
+        self.g2_submsg_opt().is_some()
+    }
+    pub fn clear_g2_submsg(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        if let Some(self::_puroro_root::oneofs3::msg::GroupTwoCase::G2Submsg(_))
+            = OneofCase::from_bitslice(&self._bitfield) {
+            self.group_two.clear(&mut self._bitfield)
+        }
+    }
     pub fn g3_int32(&self) -> i32 {
         self.group_three.g3_int32(&self._bitfield)
     }
@@ -70,6 +135,19 @@ impl Msg {
     }
     pub fn g3_int32_mut(&mut self) -> &mut i32 {
         self.group_three.g3_int32_mut(&mut self._bitfield)
+    }
+    pub fn has_g3_int32(&self) -> bool {
+        self.g3_int32_opt().is_some()
+    }
+    pub fn clear_g3_int32(&mut self) {
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use self::_puroro::internal::oneof_type::OneofUnion;
+        if let Some(self::_puroro_root::oneofs3::msg::GroupThreeCase::G3Int32(_))
+            = OneofCase::from_bitslice(&self._bitfield) {
+            self.group_three.clear(&mut self._bitfield)
+        }
     }
 }
 impl self::_puroro::Message for Msg {
