@@ -51,6 +51,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         use self::_puroro::internal::oneof_type::OneofCase;
         use ::std::mem::ManuallyDrop;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         match <self::GroupOneCase as OneofCase>::from_bitslice(bits) {
             Some(self::GroupOneCase::G1Int32(())) => {
@@ -64,7 +65,24 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         bits.set_range(0usize..2usize, 0);
     }
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-        todo!()
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        match <self::GroupOneCase as OneofCase>::from_bitslice(bits) {
+            Some(self::GroupOneCase::G1Int32(())) => {
+                Self {
+                    g1_int32: Clone::clone(unsafe { &self.g1_int32 }),
+                }
+            }
+            Some(self::GroupOneCase::G1String(())) => {
+                Self {
+                    g1_string: Clone::clone(unsafe { &self.g1_string }),
+                }
+            }
+            _ => Self { _none: () },
+        }
     }
     fn deser_from_iter<I, B>(
         &mut self,
@@ -170,6 +188,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         use self::_puroro::internal::oneof_type::OneofCase;
         use ::std::mem::ManuallyDrop;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         match <self::GroupTwoCase as OneofCase>::from_bitslice(bits) {
             Some(self::GroupTwoCase::G2F32(())) => {
@@ -186,7 +205,29 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         bits.set_range(2usize..5usize, 0);
     }
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-        todo!()
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        match <self::GroupTwoCase as OneofCase>::from_bitslice(bits) {
+            Some(self::GroupTwoCase::G2F32(())) => {
+                Self {
+                    g2_f32: Clone::clone(unsafe { &self.g2_f32 }),
+                }
+            }
+            Some(self::GroupTwoCase::G2String(())) => {
+                Self {
+                    g2_string: Clone::clone(unsafe { &self.g2_string }),
+                }
+            }
+            Some(self::GroupTwoCase::G2Submsg(())) => {
+                Self {
+                    g2_submsg: Clone::clone(unsafe { &self.g2_submsg }),
+                }
+            }
+            _ => Self { _none: () },
+        }
     }
     fn deser_from_iter<I, B>(
         &mut self,
@@ -270,6 +311,7 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         use self::_puroro::internal::oneof_type::OneofCase;
         use ::std::mem::ManuallyDrop;
+        #[allow(unused)]
         use ::std::option::Option::Some;
         match <self::GroupThreeCase as OneofCase>::from_bitslice(bits) {
             Some(self::GroupThreeCase::G3Int32(())) => {
@@ -280,7 +322,19 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         bits.set_range(3usize..5usize, 0);
     }
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-        todo!()
+        use self::_puroro::internal::oneof_type::OneofCase;
+        #[allow(unused)]
+        use ::std::option::Option::Some;
+        #[allow(unused)]
+        use ::std::clone::Clone;
+        match <self::GroupThreeCase as OneofCase>::from_bitslice(bits) {
+            Some(self::GroupThreeCase::G3Int32(())) => {
+                Self {
+                    g3_int32: Clone::clone(unsafe { &self.g3_int32 }),
+                }
+            }
+            _ => Self { _none: () },
+        }
     }
     fn deser_from_iter<I, B>(
         &mut self,

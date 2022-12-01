@@ -96,7 +96,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
                     use self::_puroro::internal::oneof_type::OneofCase;
                     use ::std::mem::ManuallyDrop;
-                    use ::std::option::Option::Some;
+                    #[allow(unused)] use ::std::option::Option::Some;
                     match <self::#case_ident as OneofCase>::from_bitslice(bits) {
                         #(Some(self::#case_ident::#case_names(())) => {
                             unsafe { ManuallyDrop::take(&mut self.#union_item_idents) };
@@ -107,7 +107,15 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 }
 
                 fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
-                    todo!()
+                    use self::_puroro::internal::oneof_type::OneofCase;
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    #[allow(unused)] use ::std::clone::Clone;
+                    match <self::#case_ident as OneofCase>::from_bitslice(bits) {
+                        #(Some(self::#case_ident::#case_names(())) => Self {
+                            #union_item_idents: Clone::clone(unsafe { &self.#union_item_idents }),
+                        },)*
+                        _ => Self { _none: (), },
+                    }
                 }
 
                 fn deser_from_iter<I, B>(
