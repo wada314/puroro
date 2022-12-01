@@ -41,7 +41,7 @@ pub trait OneofExt {
 #[derive(Debug, Default)]
 struct Cache {
     union_ident: OnceCell<Rc<Ident>>,
-    struct_feild_ident: OnceCell<Rc<Ident>>,
+    struct_field_ident: OnceCell<Rc<Ident>>,
     allocated_bitfield: OnceCell<OneofBitfieldAllocation>,
 }
 
@@ -105,7 +105,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
-            .union_ident
+            .struct_field_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}",

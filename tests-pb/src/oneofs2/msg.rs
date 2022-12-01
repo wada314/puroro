@@ -4,7 +4,7 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-pub union group_one {
+pub union GroupOne {
     _none: (),
     g1_int32: ::std::mem::ManuallyDrop::<
         self::_puroro::internal::oneof_field_type::NumericalField::<
@@ -20,7 +20,7 @@ pub enum GroupOneCase<G1Int32 = (), G1String = ()> {
     G1Int32(G1Int32),
     G1String(G1String),
 }
-impl group_one {
+impl GroupOne {
     pub(crate) fn g1_int32<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> i32 {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
@@ -64,7 +64,7 @@ impl group_one {
             <Self as OneofUnion>::clear(self, bits);
             let index = self::GroupOneCase::into_u32(self::GroupOneCase::G1Int32(()));
             bits.set_range(0usize..2usize, index);
-            *self = self::group_one {
+            *self = self::GroupOne {
                 g1_int32: ManuallyDrop::new(Default::default()),
             };
         }
@@ -116,14 +116,14 @@ impl group_one {
             <Self as OneofUnion>::clear(self, bits);
             let index = self::GroupOneCase::into_u32(self::GroupOneCase::G1String(()));
             bits.set_range(0usize..2usize, index);
-            *self = self::group_one {
+            *self = self::GroupOne {
                 g1_string: ManuallyDrop::new(Default::default()),
             };
         }
         unsafe { &mut self.g1_string }.mut_field()
     }
 }
-impl self::_puroro::internal::oneof_type::OneofUnion for group_one {
+impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
     type Case = self::GroupOneCase;
     type CaseRef<'a> = self::GroupOneCase::<i32, &'a str>;
     fn case_ref<B: self::_puroro::bitvec::BitSlice>(
@@ -252,12 +252,12 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
         }
     }
 }
-impl ::std::default::Default for group_one {
+impl ::std::default::Default for GroupOne {
     fn default() -> Self {
         Self { _none: () }
     }
 }
-pub union group_two {
+pub union GroupTwo {
     _none: (),
     g2_f32: ::std::mem::ManuallyDrop::<
         self::_puroro::internal::oneof_field_type::NumericalField::<
@@ -279,7 +279,7 @@ pub enum GroupTwoCase<G2F32 = (), G2String = (), G2Submsg = ()> {
     G2String(G2String),
     G2Submsg(G2Submsg),
 }
-impl group_two {
+impl GroupTwo {
     pub(crate) fn g2_f32<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> f32 {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
@@ -323,7 +323,7 @@ impl group_two {
             <Self as OneofUnion>::clear(self, bits);
             let index = self::GroupTwoCase::into_u32(self::GroupTwoCase::G2F32(()));
             bits.set_range(2usize..5usize, index);
-            *self = self::group_two {
+            *self = self::GroupTwo {
                 g2_f32: ManuallyDrop::new(Default::default()),
             };
         }
@@ -375,7 +375,7 @@ impl group_two {
             <Self as OneofUnion>::clear(self, bits);
             let index = self::GroupTwoCase::into_u32(self::GroupTwoCase::G2String(()));
             bits.set_range(2usize..5usize, index);
-            *self = self::group_two {
+            *self = self::GroupTwo {
                 g2_string: ManuallyDrop::new(Default::default()),
             };
         }
@@ -427,14 +427,14 @@ impl group_two {
             <Self as OneofUnion>::clear(self, bits);
             let index = self::GroupTwoCase::into_u32(self::GroupTwoCase::G2Submsg(()));
             bits.set_range(2usize..5usize, index);
-            *self = self::group_two {
+            *self = self::GroupTwo {
                 g2_submsg: ManuallyDrop::new(Default::default()),
             };
         }
         unsafe { &mut self.g2_submsg }.mut_field()
     }
 }
-impl self::_puroro::internal::oneof_type::OneofUnion for group_two {
+impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
     type Case = self::GroupTwoCase;
     type CaseRef<'a> = self::GroupTwoCase::<
         f32,
@@ -589,12 +589,12 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
         }
     }
 }
-impl ::std::default::Default for group_two {
+impl ::std::default::Default for GroupTwo {
     fn default() -> Self {
         Self { _none: () }
     }
 }
-pub union group_three {
+pub union GroupThree {
     _none: (),
     g3_int32: ::std::mem::ManuallyDrop::<
         self::_puroro::internal::oneof_field_type::NumericalField::<
@@ -606,7 +606,7 @@ pub union group_three {
 pub enum GroupThreeCase<G3Int32 = ()> {
     G3Int32(G3Int32),
 }
-impl group_three {
+impl GroupThree {
     pub(crate) fn g3_int32<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> i32 {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
@@ -652,14 +652,14 @@ impl group_three {
                 self::GroupThreeCase::G3Int32(()),
             );
             bits.set_range(3usize..5usize, index);
-            *self = self::group_three {
+            *self = self::GroupThree {
                 g3_int32: ManuallyDrop::new(Default::default()),
             };
         }
         unsafe { &mut self.g3_int32 }.mut_field()
     }
 }
-impl self::_puroro::internal::oneof_type::OneofUnion for group_three {
+impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
     type Case = self::GroupThreeCase;
     type CaseRef<'a> = self::GroupThreeCase::<i32>;
     fn case_ref<B: self::_puroro::bitvec::BitSlice>(
@@ -766,7 +766,7 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
         }
     }
 }
-impl ::std::default::Default for group_three {
+impl ::std::default::Default for GroupThree {
     fn default() -> Self {
         Self { _none: () }
     }

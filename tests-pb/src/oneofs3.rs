@@ -7,9 +7,9 @@ pub mod _puroro {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    group_one: self::_puroro_root::oneofs3::msg::group_one,
-    group_two: self::_puroro_root::oneofs3::msg::group_two,
-    group_three: self::_puroro_root::oneofs3::msg::group_three,
+    group_one: self::_puroro_root::oneofs3::msg::GroupOne,
+    group_two: self::_puroro_root::oneofs3::msg::GroupTwo,
+    group_three: self::_puroro_root::oneofs3::msg::GroupThree,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl Msg {}
@@ -45,15 +45,15 @@ impl self::_puroro::Message for Msg {
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         Self {
-            group_one: <self::_puroro_root::oneofs3::msg::group_one as self::_puroro::internal::oneof_type::OneofUnion>::clone(
+            group_one: <self::_puroro_root::oneofs3::msg::GroupOne as self::_puroro::internal::oneof_type::OneofUnion>::clone(
                 &self.group_one,
                 &self._bitfield,
             ),
-            group_two: <self::_puroro_root::oneofs3::msg::group_two as self::_puroro::internal::oneof_type::OneofUnion>::clone(
+            group_two: <self::_puroro_root::oneofs3::msg::GroupTwo as self::_puroro::internal::oneof_type::OneofUnion>::clone(
                 &self.group_two,
                 &self._bitfield,
             ),
-            group_three: <self::_puroro_root::oneofs3::msg::group_three as self::_puroro::internal::oneof_type::OneofUnion>::clone(
+            group_three: <self::_puroro_root::oneofs3::msg::GroupThree as self::_puroro::internal::oneof_type::OneofUnion>::clone(
                 &self.group_three,
                 &self._bitfield,
             ),
