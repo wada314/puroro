@@ -83,7 +83,16 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 }
 
                 fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-                    todo!()
+                    use self::_puroro::internal::oneof_type::OneofCase;
+                    use ::std::mem::ManuallyDrop;
+                    use ::std::option::Option::Some;
+                    match <self::#case_ident as OneofCase>::from_bitslice(bits) {
+                        #(Some(self::#case_ident::#case_names(())) => {
+                            unsafe { ManuallyDrop::take(&mut self.#union_item_idents) };
+                        })*
+                        _ => ()
+                    }
+                    bits.set_range(#bitfield_begin..#bitfield_end, 0);
                 }
 
                 fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {

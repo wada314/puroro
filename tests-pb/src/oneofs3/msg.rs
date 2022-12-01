@@ -30,7 +30,19 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         todo!()
     }
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-        todo!()
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use ::std::mem::ManuallyDrop;
+        use ::std::option::Option::Some;
+        match <self::GroupOneCase as OneofCase>::from_bitslice(bits) {
+            Some(self::GroupOneCase::G1Int32(())) => {
+                unsafe { ManuallyDrop::take(&mut self.g1_int32) };
+            }
+            Some(self::GroupOneCase::G1String(())) => {
+                unsafe { ManuallyDrop::take(&mut self.g1_string) };
+            }
+            _ => {}
+        }
+        bits.set_range(0usize..2usize, 0);
     }
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
         todo!()
@@ -130,7 +142,22 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         todo!()
     }
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-        todo!()
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use ::std::mem::ManuallyDrop;
+        use ::std::option::Option::Some;
+        match <self::GroupTwoCase as OneofCase>::from_bitslice(bits) {
+            Some(self::GroupTwoCase::G2F32(())) => {
+                unsafe { ManuallyDrop::take(&mut self.g2_f32) };
+            }
+            Some(self::GroupTwoCase::G2String(())) => {
+                unsafe { ManuallyDrop::take(&mut self.g2_string) };
+            }
+            Some(self::GroupTwoCase::G2Submsg(())) => {
+                unsafe { ManuallyDrop::take(&mut self.g2_submsg) };
+            }
+            _ => {}
+        }
+        bits.set_range(2usize..5usize, 0);
     }
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
         todo!()
@@ -219,7 +246,16 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         todo!()
     }
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
-        todo!()
+        use self::_puroro::internal::oneof_type::OneofCase;
+        use ::std::mem::ManuallyDrop;
+        use ::std::option::Option::Some;
+        match <self::GroupThreeCase as OneofCase>::from_bitslice(bits) {
+            Some(self::GroupThreeCase::G3Int32(())) => {
+                unsafe { ManuallyDrop::take(&mut self.g3_int32) };
+            }
+            _ => {}
+        }
+        bits.set_range(3usize..5usize, 0);
     }
     fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
         todo!()
