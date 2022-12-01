@@ -168,6 +168,8 @@ impl self::_puroro::Message for Submsg {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::tags::Int32,

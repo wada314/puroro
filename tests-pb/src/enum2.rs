@@ -142,6 +142,8 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             self::_puroro_root::enum2::Enum,
             self::_puroro::tags::Enum2::<self::_puroro_root::enum2::Enum>,

@@ -35,6 +35,7 @@ pub trait OneofExt {
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -187,6 +188,16 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #field_data_ident,
                 #message_module::#case_ident::#case_names(()),
             )?,)*
+        })
+    }
+
+    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
+        let field_ident = self.gen_struct_field_ident()?;
+        Ok(quote! {
+            self.#field_ident.ser_to_write(
+                &self._bitfield,
+                #out_ident
+            )?;
         })
     }
 }

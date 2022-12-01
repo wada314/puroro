@@ -104,6 +104,8 @@ impl self::_puroro::Message for Msg {
         #[allow(unused)]
         out: &mut W,
     ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::self_recursive::Msg,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
