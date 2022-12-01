@@ -200,7 +200,17 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        todo!()
+        match case {
+            Self::Case::G1Int32(_) => {
+                let _ = <Self>::g1_int32_mut(self, bitvec);
+                unsafe { &mut self.g1_int32 }.deser_from_iter(field_data)?;
+            }
+            Self::Case::G1String(_) => {
+                let _ = <Self>::g1_string_mut(self, bitvec);
+                unsafe { &mut self.g1_string }.deser_from_iter(field_data)?;
+            }
+        }
+        Ok(())
     }
     fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
     where
@@ -503,7 +513,21 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        todo!()
+        match case {
+            Self::Case::G2F32(_) => {
+                let _ = <Self>::g2_f32_mut(self, bitvec);
+                unsafe { &mut self.g2_f32 }.deser_from_iter(field_data)?;
+            }
+            Self::Case::G2String(_) => {
+                let _ = <Self>::g2_string_mut(self, bitvec);
+                unsafe { &mut self.g2_string }.deser_from_iter(field_data)?;
+            }
+            Self::Case::G2Submsg(_) => {
+                let _ = <Self>::g2_submsg_mut(self, bitvec);
+                unsafe { &mut self.g2_submsg }.deser_from_iter(field_data)?;
+            }
+        }
+        Ok(())
     }
     fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
     where
@@ -666,7 +690,13 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        todo!()
+        match case {
+            Self::Case::G3Int32(_) => {
+                let _ = <Self>::g3_int32_mut(self, bitvec);
+                unsafe { &mut self.g3_int32 }.deser_from_iter(field_data)?;
+            }
+        }
+        Ok(())
     }
     fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
     where

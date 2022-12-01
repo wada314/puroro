@@ -27,6 +27,7 @@ pub trait OneofFieldExt {
     fn gen_union_item_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_item_decl(&self) -> Result<TokenStream>;
     fn gen_union_methods(&self) -> Result<TokenStream>;
+    fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
     fn gen_generic_type_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
     fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>>;
@@ -35,6 +36,7 @@ pub trait OneofFieldExt {
 #[derive(Debug, Default)]
 struct Cache {
     union_item_ident: OnceCell<Rc<Ident>>,
+    union_gettr_mut_ident: OnceCell<Rc<Ident>>,
 }
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
@@ -91,7 +93,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
         let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
-        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
+        let getter_mut_ident = self.gen_union_getter_mut_ident()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
@@ -168,6 +170,18 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         })
     }
 
+    fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_gettr_mut_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}_mut",
+                    self.name()?.to_lower_snake_case()
+                )))
+            })
+            .cloned()
+    }
     fn gen_generic_type_param_ident(&self) -> Result<Ident> {
         Ok(format_ident!(
             "{}",

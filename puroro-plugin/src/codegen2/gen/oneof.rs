@@ -65,6 +65,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let union_item_idents = try_map_fields(self, |f| f.gen_union_item_ident())?;
         let union_items = try_map_fields(self, |f| f.gen_union_item_decl())?;
+        let getter_mut_idents = try_map_fields(self, |f| f.gen_union_getter_mut_ident())?;
         let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
@@ -150,7 +151,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 {
                     use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                     #[allow(unused)] use ::std::result::Result::Ok;
-                    todo!()
+                    match case {
+                        #(Self::Case::#case_names(_) => {
+                            let _ = <Self>::#getter_mut_idents(self, bitvec);
+                            unsafe { &mut self.#union_item_idents }.deser_from_iter(field_data)?;
+                        })*
+                    }
+                    Ok(())
                 }
 
                 fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
