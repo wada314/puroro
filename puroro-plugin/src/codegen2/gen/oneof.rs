@@ -79,7 +79,17 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B)
                     -> ::std::option::Option<Self::CaseRef<'_>>
                 {
-                    todo!()
+                    use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+                    use ::std::ops::Deref as _;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+                    let case_opt = <self::#case_ident as OneofCase>::from_bitslice(bits);
+                    case_opt.map(|case| {
+                        match case {
+                            #(self::#case_ident::#case_names(_) => self::#case_ident::#case_names(
+                                unsafe { &self.#union_item_idents }.deref().get_field()
+                            ),)*
+                        }
+                    })
                 }
 
                 fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {

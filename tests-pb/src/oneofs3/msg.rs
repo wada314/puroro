@@ -27,7 +27,25 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         &self,
         bits: &B,
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        let case_opt = <self::GroupOneCase as OneofCase>::from_bitslice(bits);
+        case_opt
+            .map(|case| {
+                match case {
+                    self::GroupOneCase::G1Int32(_) => {
+                        self::GroupOneCase::G1Int32(
+                            unsafe { &self.g1_int32 }.deref().get_field(),
+                        )
+                    }
+                    self::GroupOneCase::G1String(_) => {
+                        self::GroupOneCase::G1String(
+                            unsafe { &self.g1_string }.deref().get_field(),
+                        )
+                    }
+                }
+            })
     }
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         use self::_puroro::internal::oneof_type::OneofCase;
@@ -139,7 +157,30 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         &self,
         bits: &B,
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        let case_opt = <self::GroupTwoCase as OneofCase>::from_bitslice(bits);
+        case_opt
+            .map(|case| {
+                match case {
+                    self::GroupTwoCase::G2F32(_) => {
+                        self::GroupTwoCase::G2F32(
+                            unsafe { &self.g2_f32 }.deref().get_field(),
+                        )
+                    }
+                    self::GroupTwoCase::G2String(_) => {
+                        self::GroupTwoCase::G2String(
+                            unsafe { &self.g2_string }.deref().get_field(),
+                        )
+                    }
+                    self::GroupTwoCase::G2Submsg(_) => {
+                        self::GroupTwoCase::G2Submsg(
+                            unsafe { &self.g2_submsg }.deref().get_field(),
+                        )
+                    }
+                }
+            })
     }
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         use self::_puroro::internal::oneof_type::OneofCase;
@@ -243,7 +284,20 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         &self,
         bits: &B,
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
-        todo!()
+        use self::_puroro::internal::oneof_type::{OneofCase, OneofCaseRef};
+        use ::std::ops::Deref as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        let case_opt = <self::GroupThreeCase as OneofCase>::from_bitslice(bits);
+        case_opt
+            .map(|case| {
+                match case {
+                    self::GroupThreeCase::G3Int32(_) => {
+                        self::GroupThreeCase::G3Int32(
+                            unsafe { &self.g3_int32 }.deref().get_field(),
+                        )
+                    }
+                }
+            })
     }
     fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
         use self::_puroro::internal::oneof_type::OneofCase;
