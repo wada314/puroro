@@ -13,9 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{
-    Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof, OneofField,
-};
+use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;

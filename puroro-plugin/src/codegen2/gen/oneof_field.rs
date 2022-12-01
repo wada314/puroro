@@ -13,10 +13,8 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{
-    Field, FieldRule, FieldType, LengthDelimitedType, MessageExt, Oneof, OneofExt, OneofField,
-};
-use crate::{ErrorKind, Result};
+use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
+use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::{format_ident, quote};
@@ -232,6 +230,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_union_getter_mut_ident()?;
+
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
@@ -253,6 +252,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(quote! {
             pub fn #getter_ident(&self) -> #getter_type {
                 self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
+            }
+            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+                self.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
+            }
+            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
             }
         })
     }

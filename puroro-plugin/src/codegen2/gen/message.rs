@@ -14,8 +14,9 @@
 
 use super::super::util::*;
 use super::super::{FieldExt, Message, PackageOrMessageExt};
-use super::OneofExt;
+use super::{OneofExt, OneofFieldExt};
 use crate::Result;
+use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
@@ -79,17 +80,24 @@ impl<T: ?Sized + Message> MessageExt for T {
 
     fn gen_struct(&self) -> Result<TokenStream> {
         let ident = gen_struct_ident(self)?;
-        let fields = self
+        let field_decls = self
             .fields()?
             .map(|f| f.gen_struct_field_decl())
             .collect::<Result<Vec<_>>>()?;
-        let oneof_fields = self
+        let oneof_decls = self
             .oneofs()?
             .map(|o| o.gen_struct_field_decl())
             .collect::<Result<Vec<_>>>()?;
-        let methods = self
+        let field_methods = self
             .fields()?
             .map(|f| f.gen_struct_field_methods())
+            .collect::<Result<Vec<_>>>()?;
+        let oneofs = self.oneofs()?.collect::<Vec<_>>();
+        let oneof_methods = oneofs
+            .iter()
+            .map(|o| o.fields())
+            .flatten_ok()
+            .map(|f| f?.gen_struct_field_methods())
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = gen_struct_message_impl(self)?;
@@ -97,13 +105,14 @@ impl<T: ?Sized + Message> MessageExt for T {
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
-                #(#fields)*
-                #(#oneof_fields)*
+                #(#field_decls)*
+                #(#oneof_decls)*
                 _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
             }
 
             impl #ident {
-                #(#methods)*
+                #(#field_methods)*
+                #(#oneof_methods)*
             }
 
             #message_impl
