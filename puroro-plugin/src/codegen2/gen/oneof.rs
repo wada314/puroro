@@ -102,14 +102,12 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let union_items = try_map_fields(self, |f| f.gen_union_item_decl())?;
-        let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
-        let bitfield_begin = self.bitfield_index_for_oneof()?.0;
-        let bitfield_end = self.bitfield_index_for_oneof()?.1;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
+        let oneof_case_impl = gen_oneof_case_impl(self)?;
 
         // Union includes none case, where the case enum does not.
         Ok(quote! {
@@ -129,26 +127,11 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             }
 
             #oneof_union_impl
+            #oneof_case_impl
 
             impl ::std::default::Default for #union_ident {
                 fn default() -> Self {
                     Self { _none: () }
-                }
-            }
-
-            impl self::_puroro::internal::oneof_type::OneofCase for #case_ident {
-                const BITFIELD_BEGIN: usize = #bitfield_begin;
-                const BITFIELD_END: usize = #bitfield_end;
-                fn from_u32(x: u32) -> ::std::option::Option<Self> {
-                    match x {
-                        #(#item_indices => ::std::option::Option::Some(Self::#case_names(())),)*
-                        _ => ::std::option::Option::None,
-                    }
-                }
-                fn into_u32(self) -> u32 {
-                    match self {
-                        #(Self::#case_names(_) => #item_indices,)*
-                    }
                 }
             }
         })
@@ -261,6 +244,33 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
                     _ => (),
                 }
                 Ok(())
+            }
+        }
+    })
+}
+
+fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
+    let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
+    let union_items = try_map_fields(this, |f| f.gen_union_item_decl())?;
+    let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
+    let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
+    let bitfield_begin = this.bitfield_index_for_oneof()?.0;
+    let bitfield_end = this.bitfield_index_for_oneof()?.1;
+
+    Ok(quote! {
+        impl self::_puroro::internal::oneof_type::OneofCase for #case_ident {
+            const BITFIELD_BEGIN: usize = #bitfield_begin;
+            const BITFIELD_END: usize = #bitfield_end;
+            fn from_u32(x: u32) -> ::std::option::Option<Self> {
+                match x {
+                    #(#item_indices => ::std::option::Option::Some(Self::#case_names(())),)*
+                    _ => ::std::option::Option::None,
+                }
+            }
+            fn into_u32(self) -> u32 {
+                match self {
+                    #(Self::#case_names(_) => #item_indices,)*
+                }
             }
         }
     })

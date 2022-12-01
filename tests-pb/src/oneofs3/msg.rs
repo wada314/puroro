@@ -235,11 +235,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupOne {
         Ok(())
     }
 }
-impl ::std::default::Default for GroupOne {
-    fn default() -> Self {
-        Self { _none: () }
-    }
-}
 impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
     const BITFIELD_BEGIN: usize = 0usize;
     const BITFIELD_END: usize = 2usize;
@@ -255,6 +250,11 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupOneCase {
             Self::G1Int32(_) => 1u32,
             Self::G1String(_) => 2u32,
         }
+    }
+}
+impl ::std::default::Default for GroupOne {
+    fn default() -> Self {
+        Self { _none: () }
     }
 }
 pub union GroupTwo {
@@ -570,11 +570,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupTwo {
         Ok(())
     }
 }
-impl ::std::default::Default for GroupTwo {
-    fn default() -> Self {
-        Self { _none: () }
-    }
-}
 impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
     const BITFIELD_BEGIN: usize = 2usize;
     const BITFIELD_END: usize = 5usize;
@@ -592,6 +587,11 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupTwoCase {
             Self::G2String(_) => 2u32,
             Self::G2Submsg(_) => 3u32,
         }
+    }
+}
+impl ::std::default::Default for GroupTwo {
+    fn default() -> Self {
+        Self { _none: () }
     }
 }
 pub union GroupThree {
@@ -751,11 +751,6 @@ impl self::_puroro::internal::oneof_type::OneofUnion for GroupThree {
         Ok(())
     }
 }
-impl ::std::default::Default for GroupThree {
-    fn default() -> Self {
-        Self { _none: () }
-    }
-}
 impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
     const BITFIELD_BEGIN: usize = 3usize;
     const BITFIELD_END: usize = 5usize;
@@ -769,5 +764,10 @@ impl self::_puroro::internal::oneof_type::OneofCase for GroupThreeCase {
         match self {
             Self::G3Int32(_) => 1u32,
         }
+    }
+}
+impl ::std::default::Default for GroupThree {
+    fn default() -> Self {
+        Self { _none: () }
     }
 }
