@@ -133,7 +133,7 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Submsg))
-            .field(stringify!(i32_unlabeled), &self.i32_unlabeled())
+            .field(stringify!(i32_unlabeled), &self.i32_unlabeled_opt())
             .finish()
     }
 }

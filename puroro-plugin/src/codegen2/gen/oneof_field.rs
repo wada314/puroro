@@ -35,6 +35,7 @@ pub trait OneofFieldExt {
     fn gen_union_item_decl(&self) -> Result<TokenStream>;
     fn gen_union_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
+    fn gen_struct_field_debug(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -273,6 +274,14 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     self.#oneof_struct_field_ident.clear(&mut self._bitfield)
                 }
             }
+        })
+    }
+
+    fn gen_struct_field_debug(&self) -> Result<TokenStream> {
+        let ident = self.gen_union_item_ident()?;
+        let getter_opt_ident = self.gen_union_getter_opt_ident()?;
+        Ok(quote! {
+            .field(stringify!(#ident), &self.#getter_opt_ident())
         })
     }
 }

@@ -730,17 +730,20 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Msg))
-            .field(stringify!(i32_unlabeled), &self.i32_unlabeled())
+            .field(stringify!(i32_unlabeled), &self.i32_unlabeled_opt())
             .field(stringify!(i32_repeated), &self.i32_repeated())
-            .field(stringify!(float_unlabeled), &self.float_unlabeled())
+            .field(stringify!(float_unlabeled), &self.float_unlabeled_opt())
             .field(stringify!(float_repeated), &self.float_repeated())
-            .field(stringify!(string_unlabeled), &self.string_unlabeled())
+            .field(stringify!(string_unlabeled), &self.string_unlabeled_opt())
             .field(stringify!(string_repeated), &self.string_repeated())
-            .field(stringify!(submsg_unlabeled), &self.submsg_unlabeled())
+            .field(stringify!(submsg_unlabeled), &self.submsg_unlabeled_opt())
             .field(stringify!(submsg_repeated), &self.submsg_repeated())
-            .field(stringify!(enum_unlabeled), &self.enum_unlabeled())
+            .field(stringify!(enum_unlabeled), &self.enum_unlabeled_opt())
             .field(stringify!(enum_repeated), &self.enum_repeated())
-            .field(stringify!(very_large_field_number), &self.very_large_field_number())
+            .field(
+                stringify!(very_large_field_number),
+                &self.very_large_field_number_opt(),
+            )
             .finish()
     }
 }

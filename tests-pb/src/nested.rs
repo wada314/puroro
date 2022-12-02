@@ -134,7 +134,7 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Msg))
-            .field(stringify!(item_outer), &self.item_outer())
+            .field(stringify!(item_outer), &self.item_outer_opt())
             .finish()
     }
 }

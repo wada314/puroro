@@ -222,8 +222,8 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Submsg))
-            .field(stringify!(i32_required), &self.i32_required())
-            .field(stringify!(i64_required), &self.i64_required())
+            .field(stringify!(i32_required), &self.i32_required_opt())
+            .field(stringify!(i64_required), &self.i64_required_opt())
             .finish()
     }
 }

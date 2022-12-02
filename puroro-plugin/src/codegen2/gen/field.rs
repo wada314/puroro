@@ -141,12 +141,22 @@ impl<T: ?Sized + Field> FieldExt for T {
     }
     fn gen_struct_field_debug(&self) -> Result<TokenStream> {
         let ident = gen_struct_field_ident(self)?;
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
-        Ok(quote! {
-            .field(stringify!(#ident), &self.#getter_ident())
+        Ok(match self.rule()? {
+            FieldRule::Repeated => {
+                let getter_ident = format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
+                );
+                quote! {
+                    .field(stringify!(#ident), &self.#getter_ident())
+                }
+            }
+            _ => {
+                let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
+                quote! {
+                    .field(stringify!(#ident), &self.#getter_opt_ident())
+                }
+            }
         })
     }
     fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {

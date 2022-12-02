@@ -762,17 +762,20 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Msg))
-            .field(stringify!(i32_optional), &self.i32_optional())
+            .field(stringify!(i32_optional), &self.i32_optional_opt())
             .field(stringify!(i32_repeated), &self.i32_repeated())
-            .field(stringify!(float_optional), &self.float_optional())
+            .field(stringify!(float_optional), &self.float_optional_opt())
             .field(stringify!(float_repeated), &self.float_repeated())
-            .field(stringify!(string_optional), &self.string_optional())
+            .field(stringify!(string_optional), &self.string_optional_opt())
             .field(stringify!(string_repeated), &self.string_repeated())
-            .field(stringify!(submsg_optional), &self.submsg_optional())
+            .field(stringify!(submsg_optional), &self.submsg_optional_opt())
             .field(stringify!(submsg_repeated), &self.submsg_repeated())
-            .field(stringify!(enum_optional), &self.enum_optional())
+            .field(stringify!(enum_optional), &self.enum_optional_opt())
             .field(stringify!(enum_repeated), &self.enum_repeated())
-            .field(stringify!(very_large_field_number), &self.very_large_field_number())
+            .field(
+                stringify!(very_large_field_number),
+                &self.very_large_field_number_opt(),
+            )
             .finish()
     }
 }

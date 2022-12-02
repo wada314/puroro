@@ -141,7 +141,7 @@ impl ::std::fmt::Debug for Test1 {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Test1)).field(stringify!(a), &self.a()).finish()
+        fmt.debug_struct(stringify!(Test1)).field(stringify!(a), &self.a_opt()).finish()
     }
 }
 impl ::std::cmp::PartialEq for Test1 {
@@ -268,7 +268,7 @@ impl ::std::fmt::Debug for Test2 {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Test2)).field(stringify!(b), &self.b()).finish()
+        fmt.debug_struct(stringify!(Test2)).field(stringify!(b), &self.b_opt()).finish()
     }
 }
 impl ::std::cmp::PartialEq for Test2 {
@@ -401,7 +401,7 @@ impl ::std::fmt::Debug for Test3 {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Test3)).field(stringify!(c), &self.c()).finish()
+        fmt.debug_struct(stringify!(Test3)).field(stringify!(c), &self.c_opt()).finish()
     }
 }
 impl ::std::cmp::PartialEq for Test3 {

@@ -142,7 +142,7 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Msg))
-            .field(stringify!(r#type), &self.r#type())
+            .field(stringify!(r#type), &self.type_opt())
             .finish()
     }
 }
@@ -291,7 +291,7 @@ impl ::std::fmt::Debug for _Self {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(_Self))
-            .field(stringify!(r#type), &self.r#type())
+            .field(stringify!(r#type), &self.type_opt())
             .finish()
     }
 }

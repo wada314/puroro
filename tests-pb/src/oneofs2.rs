@@ -315,7 +315,14 @@ impl ::std::fmt::Debug for Msg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Msg)).finish()
+        fmt.debug_struct(stringify!(Msg))
+            .field(stringify!(g1_int32), &self.g1_int32_opt())
+            .field(stringify!(g1_string), &self.g1_string_opt())
+            .field(stringify!(g2_f32), &self.g2_f32_opt())
+            .field(stringify!(g2_string), &self.g2_string_opt())
+            .field(stringify!(g2_submsg), &self.g2_submsg_opt())
+            .field(stringify!(g3_int32), &self.g3_int32_opt())
+            .finish()
     }
 }
 impl ::std::cmp::PartialEq for Msg {
@@ -465,7 +472,7 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Submsg))
-            .field(stringify!(i32_optional), &self.i32_optional())
+            .field(stringify!(i32_optional), &self.i32_optional_opt())
             .finish()
     }
 }

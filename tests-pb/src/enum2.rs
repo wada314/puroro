@@ -194,7 +194,7 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Msg))
-            .field(stringify!(enum_optional), &self.enum_optional())
+            .field(stringify!(enum_optional), &self.enum_optional_opt())
             .field(stringify!(enum_repeated), &self.enum_repeated())
             .finish()
     }

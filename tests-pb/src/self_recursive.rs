@@ -139,7 +139,7 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Msg))
-            .field(stringify!(recursive_unlabeled), &self.recursive_unlabeled())
+            .field(stringify!(recursive_unlabeled), &self.recursive_unlabeled_opt())
             .finish()
     }
 }

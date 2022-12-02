@@ -242,12 +242,19 @@ fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
         .fields()?
         .map(|f| f.gen_struct_field_debug())
         .collect::<Result<Vec<_>>>()?;
+    let oneofs = this.oneofs()?.collect::<Vec<_>>();
+    let from_oneofs = oneofs
+        .iter()
+        .map(|o| o.fields())
+        .flatten_ok()
+        .map(|f| f?.gen_struct_field_debug())
+        .collect::<Result<Vec<_>>>()?;
     Ok(quote! {
         impl ::std::fmt::Debug for #ident {
             fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
                 fmt.debug_struct(stringify!(#ident))
                     #(#from_fields)*
-                    // TODO oneofs
+                    #(#from_oneofs)*
                     .finish()
             }
         }

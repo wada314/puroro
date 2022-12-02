@@ -275,9 +275,9 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Submsg))
-            .field(stringify!(i32_unlabeled), &self.i32_unlabeled())
-            .field(stringify!(i32_optional), &self.i32_optional())
-            .field(stringify!(i64_unlabeled), &self.i64_unlabeled())
+            .field(stringify!(i32_unlabeled), &self.i32_unlabeled_opt())
+            .field(stringify!(i32_optional), &self.i32_optional_opt())
+            .field(stringify!(i64_unlabeled), &self.i64_unlabeled_opt())
             .finish()
     }
 }
