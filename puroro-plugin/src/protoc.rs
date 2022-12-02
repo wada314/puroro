@@ -13,7 +13,16 @@
 // limitations under the License.
 
 //! A wrapper around protoc command.
+//! Stragety: As an initial implementation step, let's start form a simple code,
+//! and then aggeregate those into a strucutered api.
 
-pub trait Protoc {
-    
+use crate::Result;
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
+use ::std::io::Read;
+
+pub fn generate_fds_from_input_reads_using_protoc_naively<'a, I>(input: I) -> Result<FileDescriptorSet>
+where
+    I: Iterator<Item = (String, &'a dyn Read)>,
+{
+    todo!()
 }
