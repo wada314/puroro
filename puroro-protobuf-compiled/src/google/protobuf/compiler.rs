@@ -363,10 +363,10 @@ impl ::std::fmt::Debug for Version {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Version))
-            .field(stringify!(major), &self.major())
-            .field(stringify!(minor), &self.minor())
-            .field(stringify!(patch), &self.patch())
-            .field(stringify!(suffix), &self.suffix())
+            .field(stringify!(major), &self.major_opt())
+            .field(stringify!(minor), &self.minor_opt())
+            .field(stringify!(patch), &self.patch_opt())
+            .field(stringify!(suffix), &self.suffix_opt())
             .finish()
     }
 }
@@ -405,11 +405,7 @@ impl CodeGeneratorRequest {
     }
     pub fn file_to_generate_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
-    > {
+    ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.file_to_generate,
@@ -674,9 +670,9 @@ impl ::std::fmt::Debug for CodeGeneratorRequest {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(CodeGeneratorRequest))
             .field(stringify!(file_to_generate), &self.file_to_generate())
-            .field(stringify!(parameter), &self.parameter())
+            .field(stringify!(parameter), &self.parameter_opt())
             .field(stringify!(proto_file), &self.proto_file())
-            .field(stringify!(compiler_version), &self.compiler_version())
+            .field(stringify!(compiler_version), &self.compiler_version_opt())
             .finish()
     }
 }
@@ -944,8 +940,8 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(CodeGeneratorResponse))
-            .field(stringify!(error), &self.error())
-            .field(stringify!(supported_features), &self.supported_features())
+            .field(stringify!(error), &self.error_opt())
+            .field(stringify!(supported_features), &self.supported_features_opt())
             .field(stringify!(file), &self.file())
             .finish()
     }

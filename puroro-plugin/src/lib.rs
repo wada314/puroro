@@ -19,7 +19,7 @@
 #![feature(try_find)]
 #![feature(trait_upcasting)]
 
-mod codegen2;
+mod codegen;
 mod error;
 
 use crate::error::{ErrorKind, GeneratorError};
@@ -29,4 +29,4 @@ pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_r
 pub use ::puroro_protobuf_compiled::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
 pub use ::puroro_protobuf_compiled::puroro;
 
-pub use crate::codegen2::generate_output_file_protos;
+pub use crate::codegen::generate_output_file_protos;

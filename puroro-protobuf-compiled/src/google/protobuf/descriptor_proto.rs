@@ -294,9 +294,9 @@ impl ::std::fmt::Debug for ExtensionRange {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(ExtensionRange))
-            .field(stringify!(start), &self.start())
-            .field(stringify!(end), &self.end())
-            .field(stringify!(options), &self.options())
+            .field(stringify!(start), &self.start_opt())
+            .field(stringify!(end), &self.end_opt())
+            .field(stringify!(options), &self.options_opt())
             .finish()
     }
 }
@@ -526,8 +526,8 @@ impl ::std::fmt::Debug for ReservedRange {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(ReservedRange))
-            .field(stringify!(start), &self.start())
-            .field(stringify!(end), &self.end())
+            .field(stringify!(start), &self.start_opt())
+            .field(stringify!(end), &self.end_opt())
             .finish()
     }
 }

@@ -252,13 +252,7 @@ impl FileDescriptorProto {
             &self._bitfield,
         )
     }
-    pub fn dependency_mut(
-        &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
-    > {
+    pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.dependency,
@@ -847,8 +841,8 @@ impl ::std::fmt::Debug for FileDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(FileDescriptorProto))
-            .field(stringify!(name), &self.name())
-            .field(stringify!(package), &self.package())
+            .field(stringify!(name), &self.name_opt())
+            .field(stringify!(package), &self.package_opt())
             .field(stringify!(dependency), &self.dependency())
             .field(stringify!(public_dependency), &self.public_dependency())
             .field(stringify!(weak_dependency), &self.weak_dependency())
@@ -856,9 +850,9 @@ impl ::std::fmt::Debug for FileDescriptorProto {
             .field(stringify!(enum_type), &self.enum_type())
             .field(stringify!(service), &self.service())
             .field(stringify!(extension), &self.extension())
-            .field(stringify!(options), &self.options())
-            .field(stringify!(source_code_info), &self.source_code_info())
-            .field(stringify!(syntax), &self.syntax())
+            .field(stringify!(options), &self.options_opt())
+            .field(stringify!(source_code_info), &self.source_code_info_opt())
+            .field(stringify!(syntax), &self.syntax_opt())
             .finish()
     }
 }
@@ -1176,11 +1170,7 @@ impl DescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
-    > {
+    ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.reserved_name,
@@ -1443,14 +1433,14 @@ impl ::std::fmt::Debug for DescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(DescriptorProto))
-            .field(stringify!(name), &self.name())
+            .field(stringify!(name), &self.name_opt())
             .field(stringify!(field), &self.field())
             .field(stringify!(extension), &self.extension())
             .field(stringify!(nested_type), &self.nested_type())
             .field(stringify!(enum_type), &self.enum_type())
             .field(stringify!(extension_range), &self.extension_range())
             .field(stringify!(oneof_decl), &self.oneof_decl())
-            .field(stringify!(options), &self.options())
+            .field(stringify!(options), &self.options_opt())
             .field(stringify!(reserved_range), &self.reserved_range())
             .field(stringify!(reserved_name), &self.reserved_name())
             .finish()
@@ -2471,17 +2461,17 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(FieldDescriptorProto))
-            .field(stringify!(name), &self.name())
-            .field(stringify!(number), &self.number())
-            .field(stringify!(label), &self.label())
-            .field(stringify!(r#type), &self.r#type())
-            .field(stringify!(type_name), &self.type_name())
-            .field(stringify!(extendee), &self.extendee())
-            .field(stringify!(default_value), &self.default_value())
-            .field(stringify!(oneof_index), &self.oneof_index())
-            .field(stringify!(json_name), &self.json_name())
-            .field(stringify!(options), &self.options())
-            .field(stringify!(proto3_optional), &self.proto3_optional())
+            .field(stringify!(name), &self.name_opt())
+            .field(stringify!(number), &self.number_opt())
+            .field(stringify!(label), &self.label_opt())
+            .field(stringify!(r#type), &self.type_opt())
+            .field(stringify!(type_name), &self.type_name_opt())
+            .field(stringify!(extendee), &self.extendee_opt())
+            .field(stringify!(default_value), &self.default_value_opt())
+            .field(stringify!(oneof_index), &self.oneof_index_opt())
+            .field(stringify!(json_name), &self.json_name_opt())
+            .field(stringify!(options), &self.options_opt())
+            .field(stringify!(proto3_optional), &self.proto3_optional_opt())
             .finish()
     }
 }
@@ -2687,8 +2677,8 @@ impl ::std::fmt::Debug for OneofDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(OneofDescriptorProto))
-            .field(stringify!(name), &self.name())
-            .field(stringify!(options), &self.options())
+            .field(stringify!(name), &self.name_opt())
+            .field(stringify!(options), &self.options_opt())
             .finish()
     }
 }
@@ -2861,11 +2851,7 @@ impl EnumDescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
-    > {
+    ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.reserved_name,
@@ -3028,9 +3014,9 @@ impl ::std::fmt::Debug for EnumDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(EnumDescriptorProto))
-            .field(stringify!(name), &self.name())
+            .field(stringify!(name), &self.name_opt())
             .field(stringify!(value), &self.value())
-            .field(stringify!(options), &self.options())
+            .field(stringify!(options), &self.options_opt())
             .field(stringify!(reserved_range), &self.reserved_range())
             .field(stringify!(reserved_name), &self.reserved_name())
             .finish()
@@ -3316,9 +3302,9 @@ impl ::std::fmt::Debug for EnumValueDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(EnumValueDescriptorProto))
-            .field(stringify!(name), &self.name())
-            .field(stringify!(number), &self.number())
-            .field(stringify!(options), &self.options())
+            .field(stringify!(name), &self.name_opt())
+            .field(stringify!(number), &self.number_opt())
+            .field(stringify!(options), &self.options_opt())
             .finish()
     }
 }
@@ -3564,9 +3550,9 @@ impl ::std::fmt::Debug for ServiceDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(ServiceDescriptorProto))
-            .field(stringify!(name), &self.name())
+            .field(stringify!(name), &self.name_opt())
             .field(stringify!(method), &self.method())
-            .field(stringify!(options), &self.options())
+            .field(stringify!(options), &self.options_opt())
             .finish()
     }
 }
@@ -4062,12 +4048,12 @@ impl ::std::fmt::Debug for MethodDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(MethodDescriptorProto))
-            .field(stringify!(name), &self.name())
-            .field(stringify!(input_type), &self.input_type())
-            .field(stringify!(output_type), &self.output_type())
-            .field(stringify!(options), &self.options())
-            .field(stringify!(client_streaming), &self.client_streaming())
-            .field(stringify!(server_streaming), &self.server_streaming())
+            .field(stringify!(name), &self.name_opt())
+            .field(stringify!(input_type), &self.input_type_opt())
+            .field(stringify!(output_type), &self.output_type_opt())
+            .field(stringify!(options), &self.options_opt())
+            .field(stringify!(client_streaming), &self.client_streaming_opt())
+            .field(stringify!(server_streaming), &self.server_streaming_opt())
             .finish()
     }
 }
@@ -5747,29 +5733,35 @@ impl ::std::fmt::Debug for FileOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(FileOptions))
-            .field(stringify!(java_package), &self.java_package())
-            .field(stringify!(java_outer_classname), &self.java_outer_classname())
-            .field(stringify!(java_multiple_files), &self.java_multiple_files())
+            .field(stringify!(java_package), &self.java_package_opt())
+            .field(stringify!(java_outer_classname), &self.java_outer_classname_opt())
+            .field(stringify!(java_multiple_files), &self.java_multiple_files_opt())
             .field(
                 stringify!(java_generate_equals_and_hash),
-                &self.java_generate_equals_and_hash(),
+                &self.java_generate_equals_and_hash_opt(),
             )
-            .field(stringify!(java_string_check_utf8), &self.java_string_check_utf8())
-            .field(stringify!(optimize_for), &self.optimize_for())
-            .field(stringify!(go_package), &self.go_package())
-            .field(stringify!(cc_generic_services), &self.cc_generic_services())
-            .field(stringify!(java_generic_services), &self.java_generic_services())
-            .field(stringify!(py_generic_services), &self.py_generic_services())
-            .field(stringify!(php_generic_services), &self.php_generic_services())
-            .field(stringify!(deprecated), &self.deprecated())
-            .field(stringify!(cc_enable_arenas), &self.cc_enable_arenas())
-            .field(stringify!(objc_class_prefix), &self.objc_class_prefix())
-            .field(stringify!(csharp_namespace), &self.csharp_namespace())
-            .field(stringify!(swift_prefix), &self.swift_prefix())
-            .field(stringify!(php_class_prefix), &self.php_class_prefix())
-            .field(stringify!(php_namespace), &self.php_namespace())
-            .field(stringify!(php_metadata_namespace), &self.php_metadata_namespace())
-            .field(stringify!(ruby_package), &self.ruby_package())
+            .field(
+                stringify!(java_string_check_utf8),
+                &self.java_string_check_utf8_opt(),
+            )
+            .field(stringify!(optimize_for), &self.optimize_for_opt())
+            .field(stringify!(go_package), &self.go_package_opt())
+            .field(stringify!(cc_generic_services), &self.cc_generic_services_opt())
+            .field(stringify!(java_generic_services), &self.java_generic_services_opt())
+            .field(stringify!(py_generic_services), &self.py_generic_services_opt())
+            .field(stringify!(php_generic_services), &self.php_generic_services_opt())
+            .field(stringify!(deprecated), &self.deprecated_opt())
+            .field(stringify!(cc_enable_arenas), &self.cc_enable_arenas_opt())
+            .field(stringify!(objc_class_prefix), &self.objc_class_prefix_opt())
+            .field(stringify!(csharp_namespace), &self.csharp_namespace_opt())
+            .field(stringify!(swift_prefix), &self.swift_prefix_opt())
+            .field(stringify!(php_class_prefix), &self.php_class_prefix_opt())
+            .field(stringify!(php_namespace), &self.php_namespace_opt())
+            .field(
+                stringify!(php_metadata_namespace),
+                &self.php_metadata_namespace_opt(),
+            )
+            .field(stringify!(ruby_package), &self.ruby_package_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -6251,13 +6243,16 @@ impl ::std::fmt::Debug for MessageOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(MessageOptions))
-            .field(stringify!(message_set_wire_format), &self.message_set_wire_format())
+            .field(
+                stringify!(message_set_wire_format),
+                &self.message_set_wire_format_opt(),
+            )
             .field(
                 stringify!(no_standard_descriptor_accessor),
-                &self.no_standard_descriptor_accessor(),
+                &self.no_standard_descriptor_accessor_opt(),
             )
-            .field(stringify!(deprecated), &self.deprecated())
-            .field(stringify!(map_entry), &self.map_entry())
+            .field(stringify!(deprecated), &self.deprecated_opt())
+            .field(stringify!(map_entry), &self.map_entry_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -6913,12 +6908,12 @@ impl ::std::fmt::Debug for FieldOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(FieldOptions))
-            .field(stringify!(ctype), &self.ctype())
-            .field(stringify!(packed), &self.packed())
-            .field(stringify!(jstype), &self.jstype())
-            .field(stringify!(lazy), &self.lazy())
-            .field(stringify!(deprecated), &self.deprecated())
-            .field(stringify!(weak), &self.weak())
+            .field(stringify!(ctype), &self.ctype_opt())
+            .field(stringify!(packed), &self.packed_opt())
+            .field(stringify!(jstype), &self.jstype_opt())
+            .field(stringify!(lazy), &self.lazy_opt())
+            .field(stringify!(deprecated), &self.deprecated_opt())
+            .field(stringify!(weak), &self.weak_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -7328,8 +7323,8 @@ impl ::std::fmt::Debug for EnumOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(EnumOptions))
-            .field(stringify!(allow_alias), &self.allow_alias())
-            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(allow_alias), &self.allow_alias_opt())
+            .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -7534,7 +7529,7 @@ impl ::std::fmt::Debug for EnumValueOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(EnumValueOptions))
-            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -7738,7 +7733,7 @@ impl ::std::fmt::Debug for ServiceOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(ServiceOptions))
-            .field(stringify!(deprecated), &self.deprecated())
+            .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -8057,8 +8052,8 @@ impl ::std::fmt::Debug for MethodOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(MethodOptions))
-            .field(stringify!(deprecated), &self.deprecated())
-            .field(stringify!(idempotency_level), &self.idempotency_level())
+            .field(stringify!(deprecated), &self.deprecated_opt())
+            .field(stringify!(idempotency_level), &self.idempotency_level_opt())
             .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
             .finish()
     }
@@ -8625,12 +8620,12 @@ impl ::std::fmt::Debug for UninterpretedOption {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(UninterpretedOption))
             .field(stringify!(name), &self.name())
-            .field(stringify!(identifier_value), &self.identifier_value())
-            .field(stringify!(positive_int_value), &self.positive_int_value())
-            .field(stringify!(negative_int_value), &self.negative_int_value())
-            .field(stringify!(double_value), &self.double_value())
-            .field(stringify!(string_value), &self.string_value())
-            .field(stringify!(aggregate_value), &self.aggregate_value())
+            .field(stringify!(identifier_value), &self.identifier_value_opt())
+            .field(stringify!(positive_int_value), &self.positive_int_value_opt())
+            .field(stringify!(negative_int_value), &self.negative_int_value_opt())
+            .field(stringify!(double_value), &self.double_value_opt())
+            .field(stringify!(string_value), &self.string_value_opt())
+            .field(stringify!(aggregate_value), &self.aggregate_value_opt())
             .finish()
     }
 }

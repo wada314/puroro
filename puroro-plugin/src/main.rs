@@ -19,7 +19,7 @@
 #![feature(try_find)]
 #![feature(trait_upcasting)]
 
-mod codegen2;
+mod codegen;
 mod error;
 
 use crate::error::{ErrorKind, GeneratorError};
@@ -32,7 +32,7 @@ use ::std::io::{stdin, stdout};
 
 fn main() -> Result<()> {
     let request = CodeGeneratorRequest::from_bytes_iter(&mut stdin().bytes()).unwrap();
-    let response = codegen2::generate_output_file_protos(request.proto_file().into_iter())?;
+    let response = codegen::generate_output_file_protos(request.proto_file().into_iter())?;
     response.to_bytes(&mut stdout())?;
     Ok(())
 }

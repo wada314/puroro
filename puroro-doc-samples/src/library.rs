@@ -254,9 +254,9 @@ impl ::std::fmt::Debug for Book {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Book))
-            .field(stringify!(title), &self.title())
-            .field(stringify!(num_pages), &self.num_pages())
-            .field(stringify!(author), &self.author())
+            .field(stringify!(title), &self.title_opt())
+            .field(stringify!(num_pages), &self.num_pages_opt())
+            .field(stringify!(author), &self.author_opt())
             .finish()
     }
 }
@@ -382,7 +382,7 @@ impl ::std::fmt::Debug for Author {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Author))
-            .field(stringify!(name), &self.name())
+            .field(stringify!(name), &self.name_opt())
             .finish()
     }
 }

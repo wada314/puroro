@@ -331,9 +331,9 @@ impl ::std::fmt::Debug for Annotation {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(Annotation))
             .field(stringify!(path), &self.path())
-            .field(stringify!(source_file), &self.source_file())
-            .field(stringify!(begin), &self.begin())
-            .field(stringify!(end), &self.end())
+            .field(stringify!(source_file), &self.source_file_opt())
+            .field(stringify!(begin), &self.begin_opt())
+            .field(stringify!(end), &self.end_opt())
             .finish()
     }
 }

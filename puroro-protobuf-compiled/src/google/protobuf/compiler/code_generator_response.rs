@@ -323,10 +323,10 @@ impl ::std::fmt::Debug for File {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(File))
-            .field(stringify!(name), &self.name())
-            .field(stringify!(insertion_point), &self.insertion_point())
-            .field(stringify!(content), &self.content())
-            .field(stringify!(generated_code_info), &self.generated_code_info())
+            .field(stringify!(name), &self.name_opt())
+            .field(stringify!(insertion_point), &self.insertion_point_opt())
+            .field(stringify!(content), &self.content_opt())
+            .field(stringify!(generated_code_info), &self.generated_code_info_opt())
             .finish()
     }
 }

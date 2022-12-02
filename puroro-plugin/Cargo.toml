@@ -13,7 +13,6 @@ documentation = "https://docs.rs/puroro/"
 [dependencies]
 puroro = { path = "../puroro", version = "0.6.0" }
 puroro-protobuf-compiled = "0.6.0"
-askama = "0.11"
 itertools = "0.10"
 lazy_static = "1.4"
 thiserror = "1.0"

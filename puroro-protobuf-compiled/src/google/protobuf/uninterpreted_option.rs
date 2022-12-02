@@ -202,8 +202,8 @@ impl ::std::fmt::Debug for NamePart {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(NamePart))
-            .field(stringify!(name_part), &self.name_part())
-            .field(stringify!(is_extension), &self.is_extension())
+            .field(stringify!(name_part), &self.name_part_opt())
+            .field(stringify!(is_extension), &self.is_extension_opt())
             .finish()
     }
 }

@@ -173,11 +173,7 @@ impl Location {
     }
     pub fn leading_detached_comments_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq,
-    > {
+    ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.leading_detached_comments,
@@ -348,8 +344,8 @@ impl ::std::fmt::Debug for Location {
         fmt.debug_struct(stringify!(Location))
             .field(stringify!(path), &self.path())
             .field(stringify!(span), &self.span())
-            .field(stringify!(leading_comments), &self.leading_comments())
-            .field(stringify!(trailing_comments), &self.trailing_comments())
+            .field(stringify!(leading_comments), &self.leading_comments_opt())
+            .field(stringify!(trailing_comments), &self.trailing_comments_opt())
             .field(
                 stringify!(leading_detached_comments),
                 &self.leading_detached_comments(),
