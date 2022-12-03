@@ -22,10 +22,13 @@
 mod codegen;
 mod error;
 
-use crate::error::{ErrorKind, GeneratorError};
-type Result<T> = ::std::result::Result<T, GeneratorError>;
+pub use crate::error::{ErrorKind, GeneratorError};
+pub type Result<T> = ::std::result::Result<T, GeneratorError>;
 
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
+pub use ::puroro_protobuf_compiled::google::protobuf::compiler::{
+    CodeGeneratorRequest, CodeGeneratorResponse,
+};
 pub use ::puroro_protobuf_compiled::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
 pub use ::puroro_protobuf_compiled::puroro;
 

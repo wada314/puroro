@@ -9,4 +9,4 @@ edition = "2021"
 
 [build-dependencies]
 puroro = { path = "../puroro" }
-puroro-plugin = { path = "../puroro-plugin" }
+puroro-codegen = { path = "../codegen" }

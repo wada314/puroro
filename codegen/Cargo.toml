@@ -1,5 +1,5 @@
 [package]
-name = "puroro-plugin"
+name = "puroro-codegen"
 version = "0.6.0"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2021"

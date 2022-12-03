@@ -10,7 +10,7 @@ publish = false
 puroro = { path = "../puroro" }
 
 [build-dependencies]
-puroro-plugin = { path = "../puroro-plugin" }
+puroro-codegen = { path = "../codegen" }
 
 [features]
 default = []

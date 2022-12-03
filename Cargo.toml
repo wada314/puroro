@@ -1,7 +1,8 @@
 [workspace]
 members = [
     "puroro",
-    "puroro-plugin",
+    "codegen",
+    "plugin",
     "puroro-protobuf-compiled",
     "puroro-protobuf-compiler",
     "puroro-doc-samples",

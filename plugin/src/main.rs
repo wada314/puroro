@@ -12,27 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(incomplete_features)]
-#![feature(error_generic_member_access)]
-#![feature(provide_any)]
-#![feature(is_some_and)]
-#![feature(try_find)]
-#![feature(trait_upcasting)]
+use ::puroro_codegen::{
+    generate_output_file_protos, puroro::Message, CodeGeneratorRequest, Result,
+};
 
-mod codegen;
-mod error;
-
-use crate::error::{ErrorKind, GeneratorError};
-type Result<T> = ::std::result::Result<T, GeneratorError>;
-use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorRequest;
-use ::puroro_protobuf_compiled::puroro;
-use ::puroro_protobuf_compiled::Message;
 use ::std::io::Read;
 use ::std::io::{stdin, stdout};
 
 fn main() -> Result<()> {
     let request = CodeGeneratorRequest::from_bytes_iter(&mut stdin().bytes()).unwrap();
-    let response = codegen::generate_output_file_protos(request.proto_file().into_iter())?;
+    let response = generate_output_file_protos(request.proto_file().into_iter())?;
     response.to_bytes(&mut stdout())?;
     Ok(())
 }
