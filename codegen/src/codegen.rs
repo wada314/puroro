@@ -78,9 +78,6 @@ pub fn generate_file_names_and_tokens<'a>(
         .collect::<Result<Vec<_>>>()
 }
 
-// This method is actually used in lib build rule but vscode+Rust analyzer often reports
-// it's not used so I explicitly mark it.
-#[allow(unused)]
 pub fn generate_output_file_protos<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<CodeGeneratorResponse> {
