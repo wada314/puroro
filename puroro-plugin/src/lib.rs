@@ -21,7 +21,6 @@
 
 mod codegen;
 mod error;
-mod protoc;
 
 use crate::error::{ErrorKind, GeneratorError};
 type Result<T> = ::std::result::Result<T, GeneratorError>;
