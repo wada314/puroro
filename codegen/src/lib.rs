@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![allow(incomplete_features)]
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
-#![feature(generic_associated_types)]
-#![feature(is_some_with)]
+#![feature(is_some_and)]
+#![feature(try_find)]
+#![feature(trait_upcasting)]
 
 mod codegen;
 mod error;
-mod rustfmt;
 
-use error::{ErrorKind, GeneratorError};
-type Result<T> = std::result::Result<T, GeneratorError>;
+pub use crate::error::{ErrorKind, GeneratorError};
+pub type Result<T> = ::std::result::Result<T, GeneratorError>;
 
-pub use crate::codegen::Config;
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
+pub use ::puroro_protobuf_compiled::google::protobuf::compiler::{
+    CodeGeneratorRequest, CodeGeneratorResponse,
+};
 pub use ::puroro_protobuf_compiled::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
 pub use ::puroro_protobuf_compiled::puroro;
 
-pub use crate::codegen::generate_output_files_from_file_descriptors;
+pub use crate::codegen::generate_output_file_protos;

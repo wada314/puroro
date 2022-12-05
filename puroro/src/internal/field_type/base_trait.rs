@@ -68,7 +68,7 @@ pub trait FieldType {
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         #[allow(unused)] bitvec: &B,
-        #[allow(unused)] number: u32,
+        #[allow(unused)] number: i32,
         #[allow(unused)] out: &mut W,
     ) -> Result<()>;
 }
@@ -102,7 +102,7 @@ where
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if self.0 == Default::default() {
@@ -137,7 +137,7 @@ where
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if !bitvec.get(BITFIELD_INDEX) {
@@ -181,7 +181,7 @@ where
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if let Some(first) = self.0.first() {
@@ -233,7 +233,7 @@ impl FieldType for SingularStringField {
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if !self.0.is_empty() {
@@ -258,7 +258,7 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if bitvec.get(BITFIELD_INDEX) {
@@ -282,7 +282,7 @@ impl FieldType for RepeatedStringField {
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         for s in &self.0 {
@@ -308,7 +308,7 @@ impl FieldType for SingularBytesField {
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if !self.0.is_empty() {
@@ -332,7 +332,7 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalBytesField<BITFIELD_INDE
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if bitvec.get(BITFIELD_INDEX) {
@@ -356,7 +356,7 @@ impl FieldType for RepeatedBytesField {
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         for v in &self.0 {
@@ -382,7 +382,7 @@ where
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         if let Some(ref message) = &self.0 {
@@ -411,7 +411,7 @@ where
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
-        number: u32,
+        number: i32,
         out: &mut W,
     ) -> Result<()> {
         for message in &self.0 {

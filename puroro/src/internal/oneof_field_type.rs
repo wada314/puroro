@@ -44,7 +44,7 @@ pub trait OneofFieldType {
         &mut self,
         field_data: FieldData<I>,
     ) -> Result<()>;
-    fn ser_to_write<W: Write>(&self, number: u32, out: &mut W) -> Result<()>;
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()>;
 }
 
 pub trait OneofFieldTypeOpt<'a> {
@@ -94,7 +94,7 @@ where
         Ok(())
     }
 
-    fn ser_to_write<W: Write>(&self, number: u32, out: &mut W) -> Result<()> {
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
         ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
         Ok(())
     }
@@ -126,7 +126,7 @@ impl OneofFieldType for BytesField {
         }
     }
 
-    fn ser_to_write<W: Write>(&self, number: u32, out: &mut W) -> Result<()> {
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
         ser_bytes_shared(self.0.as_slice(), number, out)
     }
 }
@@ -157,7 +157,7 @@ impl OneofFieldType for StringField {
         }
     }
 
-    fn ser_to_write<W: Write>(&self, number: u32, out: &mut W) -> Result<()> {
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
         ser_bytes_shared(self.0.as_bytes(), number, out)
     }
 }
@@ -189,7 +189,7 @@ impl<M: Message + Default> OneofFieldType for HeapMessageField<M> {
         }
     }
 
-    fn ser_to_write<W: Write>(&self, number: u32, out: &mut W) -> Result<()> {
+    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
         let mut vec = Vec::new();
         self.0.to_bytes(&mut vec)?;
         ser_bytes_shared(vec.as_slice(), number, out)?;

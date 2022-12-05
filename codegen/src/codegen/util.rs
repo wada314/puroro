@@ -13,12 +13,39 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
-use ::std::borrow::Borrow;
+use ::once_cell::unsync::OnceCell;
+use ::std::any::Any;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
-use ::std::fmt::Display;
+use ::std::rc::{Rc, Weak};
+
+pub trait WeakExt<T: ?Sized> {
+    fn try_upgrade(&self) -> Result<Rc<T>>;
+}
+impl<T: ?Sized> WeakExt<T> for Weak<T> {
+    fn try_upgrade(&self) -> Result<Rc<T>> {
+        Ok(Weak::upgrade(self).ok_or(ErrorKind::InternalError {
+            detail: "Weak ptr upgrade failed".to_string(),
+        })?)
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct AnonymousCache {
+    any_box: OnceCell<Box<dyn Any>>,
+}
+impl AnonymousCache {
+    pub fn get<T: 'static + Default>(&self) -> Result<&T> {
+        Ok(self
+            .any_box
+            .get_or_init(|| Box::new(T::default()))
+            .downcast_ref()
+            .ok_or(ErrorKind::InternalError {
+                detail: "Wrong type has requested for the cache.".to_string(),
+            })?)
+    }
+}
 
 #[derive(Debug, Clone, Copy)]
 pub enum WordCase {
@@ -214,206 +241,4 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
         .into_iter()
         .map(|b| format!(r"\x{:02x}", b))
         .collect::<String>())
-}
-
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub struct Package<S>(S);
-
-impl<S> Package<S> {
-    pub fn new(package_str: S) -> Self {
-        Self(package_str)
-    }
-}
-
-impl<S: AsRef<str>> Package<S> {
-    pub fn packages_and_subpackages(&self) -> impl Iterator<Item = (Package<&str>, &str)> {
-        self.0.as_ref().split('.').scan(0, |path_end, package| {
-            let path = &self.0.as_ref()[0..*path_end];
-
-            if *path_end != 0 {
-                *path_end += 1;
-            }
-            *path_end += package.len();
-
-            Some((Package::new(path), package))
-        })
-    }
-
-    pub fn leaf_package_name(&self) -> Option<&str> {
-        let s = self.0.as_ref();
-        match (s.is_empty(), s.rsplit_once('.')) {
-            (false, Some((_, p))) => Some(p),
-            (false, None) => Some(s),
-            (true, _) => None,
-        }
-    }
-
-    pub fn full_package_path(&self) -> &str {
-        self.0.as_ref()
-    }
-
-    pub fn to_owned(&self) -> Package<String> {
-        Package::new(self.0.as_ref().to_string())
-    }
-
-    pub fn as_str(&self) -> &str {
-        self.0.as_ref()
-    }
-}
-
-impl<S: Borrow<str>> Borrow<str> for Package<S> {
-    fn borrow(&self) -> &str {
-        self.0.borrow()
-    }
-}
-
-impl<S: AsRef<str>> Display for Package<S> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.write_str(self.0.as_ref())
-    }
-}
-
-impl<S, T> ::std::ops::Add<T> for &Package<S>
-where
-    S: AsRef<str>,
-    T: AsRef<str>,
-{
-    type Output = Package<String>;
-    fn add(self, rhs: T) -> Self::Output {
-        let mut new_string = self.0.as_ref().to_string();
-        if !new_string.is_empty() {
-            new_string.push('.');
-        }
-        new_string.push_str(rhs.as_ref());
-        Package::new(new_string)
-    }
-}
-
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub struct Fqtn(String);
-impl Fqtn {
-    pub fn new<S: ToString>(s: S) -> Self {
-        Self(s.to_string())
-    }
-}
-impl Fqtn {
-    #[allow(unused)]
-    pub fn as_str(&self) -> &str {
-        self.0.as_ref()
-    }
-
-    pub fn to_rust_path(&self) -> String {
-        assert!(self.0.starts_with('.'));
-        let absl_path = &self.0[1..];
-        let (path_nodes, leaf) = match absl_path.rsplit_once('.') {
-            Some((path, leaf)) => (Some(path.split('.')).into_iter().flatten(), leaf),
-            None => (None.into_iter().flatten(), self.0.as_ref()),
-        };
-        let escaped_path_nodes =
-            path_nodes.map(|s| s.to_lower_snake_case().escape_rust_keywords().into_owned());
-        let escaped_leaf = leaf.to_camel_case().escape_rust_keywords().into_owned();
-        let mut result = String::new();
-        result.push_str("_puroro_root");
-        for node in escaped_path_nodes {
-            result.push_str("::");
-            result.push_str(&node);
-        }
-        result.push_str("::");
-        result.push_str(&escaped_leaf);
-        result
-    }
-
-    pub fn to_rust_module_path(&self) -> String {
-        assert!(self.0.starts_with('.'));
-        let absl_path = &self.0[1..];
-        let path_nodes = absl_path
-            .split('.')
-            .map(|s| s.to_lower_snake_case().escape_rust_keywords().into_owned());
-        let mut result = String::new();
-        result.push_str("_puroro_root");
-        for node in path_nodes {
-            result.push_str("::");
-            result.push_str(&node);
-        }
-        result
-    }
-
-    pub fn to_rust_module_file_path(&self) -> String {
-        assert!(self.0.starts_with('.'));
-        let absl_path = &self.0[1..];
-        absl_path
-            .split('.')
-            .map(|s| s.to_lower_snake_case().into_owned())
-            .join("/")
-            + ".rs"
-    }
-}
-impl Display for Fqtn {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        String::fmt(&self.0, f)
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::{Package, StrExt, WordCase};
-
-    #[test]
-    fn test_case_check() {
-        use WordCase::*;
-        const STR1: &'static str = "ThisIsAPen";
-        const STR2: &'static str = "this_is_a_pen";
-        const STR3: &'static str = "THIS_IS_A_PEN";
-        assert_eq!(true, STR1.word_case_matches(CamelCase));
-        assert_eq!(false, STR1.word_case_matches(LowerSnakeCase));
-        assert_eq!(false, STR1.word_case_matches(UpperSnakeCase));
-        assert_eq!(false, STR2.word_case_matches(CamelCase));
-        assert_eq!(true, STR2.word_case_matches(LowerSnakeCase));
-        assert_eq!(false, STR2.word_case_matches(UpperSnakeCase));
-        assert_eq!(false, STR3.word_case_matches(CamelCase));
-        assert_eq!(false, STR3.word_case_matches(LowerSnakeCase));
-        assert_eq!(true, STR3.word_case_matches(UpperSnakeCase));
-    }
-
-    #[test]
-    fn test_case_convert() {
-        const STR_CAMEL: &'static str = "ThisIsAPen";
-        const STR_LSNAKE: &'static str = "this_is_a_pen";
-        const STR_USNAKE: &'static str = "THIS_IS_A_PEN";
-        assert_eq!(STR_CAMEL, STR_CAMEL.to_camel_case());
-        assert_eq!(STR_CAMEL, STR_LSNAKE.to_camel_case());
-        assert_eq!(STR_CAMEL, STR_USNAKE.to_camel_case());
-        assert_eq!(STR_LSNAKE, STR_CAMEL.to_lower_snake_case());
-        assert_eq!(STR_LSNAKE, STR_LSNAKE.to_lower_snake_case());
-        assert_eq!(STR_LSNAKE, STR_USNAKE.to_lower_snake_case());
-        assert_eq!(STR_USNAKE, STR_CAMEL.to_upper_snake_case());
-        assert_eq!(STR_USNAKE, STR_LSNAKE.to_upper_snake_case());
-        assert_eq!(STR_USNAKE, STR_USNAKE.to_upper_snake_case());
-    }
-
-    #[test]
-    fn test_case_convert_short() {
-        const STR_CAMEL: &'static str = "This";
-        const STR_LSNAKE: &'static str = "this";
-        const STR_USNAKE: &'static str = "THIS";
-        assert_eq!(STR_CAMEL, STR_CAMEL.to_camel_case());
-        assert_eq!(STR_CAMEL, STR_LSNAKE.to_camel_case());
-        assert_eq!(STR_CAMEL, STR_USNAKE.to_camel_case());
-        assert_eq!(STR_LSNAKE, STR_CAMEL.to_lower_snake_case());
-        assert_eq!(STR_LSNAKE, STR_LSNAKE.to_lower_snake_case());
-        assert_eq!(STR_LSNAKE, STR_USNAKE.to_lower_snake_case());
-        assert_eq!(STR_USNAKE, STR_CAMEL.to_upper_snake_case());
-        assert_eq!(STR_USNAKE, STR_LSNAKE.to_upper_snake_case());
-        assert_eq!(STR_USNAKE, STR_USNAKE.to_upper_snake_case());
-    }
-
-    #[test]
-    fn test_subpackages() {
-        let package = Package::new("foo.bar.baz");
-        let mut iter = package.packages_and_subpackages();
-        assert_eq!(Some((Package::new(""), "foo")), iter.next());
-        assert_eq!(Some((Package::new("foo"), "bar")), iter.next());
-        assert_eq!(Some((Package::new("foo.bar"), "baz")), iter.next());
-        assert_eq!(None, iter.next());
-    }
 }

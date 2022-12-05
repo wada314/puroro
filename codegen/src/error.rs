@@ -44,9 +44,20 @@ pub enum ErrorKind {
     PuroroError { source: crate::puroro::PuroroError },
     #[error(r#"Expected the field descriptor's type_name field is filled, but is not"#)]
     MissingTypeName,
+    #[error(r#"Enum must have at least one value"#)]
+    NoEnumValues,
     #[error(r#"Utf8 error."#)]
     FromUtf8Error {
         source: ::std::string::FromUtf8Error,
+    },
+    #[error(
+        r#"Invalid combination of the field's label and proto syntax.
+     label: {label}, syntax: {syntax}, proto3_optional: {proto3_optional}"#
+    )]
+    InvalidLabel {
+        label: String,
+        syntax: String,
+        proto3_optional: bool,
     },
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
