@@ -25,8 +25,7 @@ use ::std::rc::{Rc, Weak};
 pub trait Package: Debug + PackageOrMessage {
     fn cache(&self) -> &AnonymousCache;
     fn full_name(&self) -> Result<&str>;
-    fn base(&self) -> Result<&PackageBase>;
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package>;
+    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>>;
 }
 
 #[derive(Debug)]
@@ -97,6 +96,10 @@ impl PackageBase {
             messages: OnceCell::new(),
             enums: OnceCell::new(),
         }
+    }
+
+    fn files(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn InputFile>>> {
+        Ok(self.files.iter().cloned())
     }
 
     fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Message>>> {
@@ -221,21 +224,21 @@ impl PackageOrMessage for RootPackage {
         Ok("".into())
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
-        Ok(Box::new(self.base()?.messages()?))
+        Ok(Box::new(self.base.messages()?))
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
-        Ok(Box::new(self.base()?.enums()?))
+        Ok(Box::new(self.base.enums()?))
     }
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
         Ok(Box::new(iter::empty()))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(
-            self.base()?.subpackages()?.map(|p| p as Rc<dyn Package>),
+            self.base.subpackages()?.map(|p| p as Rc<dyn Package>),
         ))
     }
     fn root_package(&self) -> Result<Rc<RootPackage>> {
-        self.base()?.root()
+        self.base.root()
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(None)
@@ -249,11 +252,8 @@ impl Package for RootPackage {
     fn full_name(&self) -> Result<&str> {
         Ok("".into())
     }
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package> {
-        self
-    }
-    fn base(&self) -> Result<&PackageBase> {
-        Ok(&self.base)
+    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>> {
+        Ok(Box::new(self.base.files()?))
     }
 }
 
@@ -265,21 +265,21 @@ impl PackageOrMessage for NonRootPackage {
         Ok(&self.name)
     }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
-        Ok(Box::new(self.base()?.messages()?))
+        Ok(Box::new(self.base.messages()?))
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
-        Ok(Box::new(self.base()?.enums()?))
+        Ok(Box::new(self.base.enums()?))
     }
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
         Ok(Box::new(iter::empty()))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
         Ok(Box::new(
-            self.base()?.subpackages()?.map(|p| p as Rc<dyn Package>),
+            self.base.subpackages()?.map(|p| p as Rc<dyn Package>),
         ))
     }
     fn root_package(&self) -> Result<Rc<RootPackage>> {
-        self.base()?.root()
+        self.base.root()
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(Some(self.parent.try_upgrade()?))
@@ -303,11 +303,8 @@ impl Package for NonRootPackage {
             })
             .map(|s| s.as_str())
     }
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Package> {
-        self
-    }
-    fn base(&self) -> Result<&PackageBase> {
-        Ok(&self.base)
+    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>> {
+        Ok(Box::new(self.base.files()?))
     }
 }
 
@@ -366,9 +363,13 @@ mod tests {
         let files = [Lazy::force(&FD_G_P_DESC)];
         let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
 
-        assert_eq!(0, root_package.base.files.len());
-        assert_eq!(1, root_package.base.subpackages_map.len());
-        assert!(root_package.base.subpackages_map.contains_key("google"));
+        assert_eq!(0, root_package.files()?.len());
+        assert_eq!(1, root_package.subpackages()?.len());
+        assert!(
+            root_package
+                .subpackages()?
+                .contains(|p| p.name() == "google")
+        );
 
         let package_g = Rc::clone(&root_package.base.subpackages_map["google"]);
         assert_eq!("google", package_g.name);
