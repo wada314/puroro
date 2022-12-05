@@ -310,8 +310,7 @@ impl Package for NonRootPackage {
 
 #[cfg(test)]
 mod tests {
-    use super::super::input_file::InputFileFake;
-    use super::RootPackage;
+    use super::super::{InputFileFake, Package, PackageOrMessage, RootPackage};
     use crate::Result;
     use ::once_cell::sync::Lazy;
     use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
@@ -344,17 +343,22 @@ mod tests {
         fd
     });
 
+    trait IteratorExt: Sized + Iterator<Item = Rc<dyn Package>> {
+        fn find_subp(&mut self, name: &str) -> Option<Rc<dyn Package>> {
+            self.find(|p| p.name().is_ok_and(|n| n == name))
+        }
+    }
+    impl<T: Iterator<Item = Rc<dyn Package>>> IteratorExt for T {}
+
     #[test]
     fn test_make_package_empty() -> Result<()> {
         let files = [Lazy::force(&FD_ROOT)];
         let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_files = root_package.files()?.collect::<Vec<_>>();
 
-        assert_eq!(1, root_package.base.files.len());
-        assert_eq!(FD_ROOT.name(), root_package.base.files[0].name()?);
-        assert_eq!(
-            FD_ROOT.package(),
-            root_package.base.files[0].package()?.full_name()?
-        );
+        assert_eq!(1, root_files.len());
+        assert_eq!(FD_ROOT.name(), root_files[0].name()?);
+        assert_eq!(FD_ROOT.package(), root_files[0].package()?.full_name()?);
         Ok(())
     }
 
@@ -362,29 +366,24 @@ mod tests {
     fn test_make_package_single() -> Result<()> {
         let files = [Lazy::force(&FD_G_P_DESC)];
         let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_files = root_package.files()?.collect::<Vec<_>>();
 
-        assert_eq!(0, root_package.files()?.len());
-        assert_eq!(1, root_package.subpackages()?.len());
-        assert!(
-            root_package
-                .subpackages()?
-                .contains(|p| p.name() == "google")
-        );
+        assert_eq!(0, root_files.len());
+        assert_eq!(1, root_package.subpackages()?.count());
 
-        let package_g = Rc::clone(&root_package.base.subpackages_map["google"]);
-        assert_eq!("google", package_g.name);
-        assert_eq!(0, package_g.base.files.len());
-        assert_eq!(1, package_g.base.subpackages_map.len());
-        assert!(package_g.base.subpackages_map.contains_key("protobuf"));
+        let Some(g_package) = root_package.subpackages()?.find_subp("google") else {
+            panic!()
+        };
+        assert_eq!(0, g_package.files()?.count());
+        assert_eq!(1, g_package.subpackages()?.count());
 
-        let package_g_p = Rc::clone(&package_g.base.subpackages_map["protobuf"]);
-        assert_eq!("protobuf", package_g_p.name);
-        assert_eq!(1, package_g_p.base.files.len());
-        assert_eq!(
-            "google.protobuf",
-            package_g_p.base.files[0].package()?.full_name()?
-        );
-        assert_eq!(0, package_g_p.base.subpackages_map.len());
+        let Some(g_p_package) = g_package.subpackages()?.find_subp("protobuf") else {
+            panic!()
+        };
+        let g_p_files = g_p_package.files()?.collect::<Vec<_>>();
+        assert_eq!(1, g_p_files.len());
+        assert_eq!("google.protobuf", g_p_files[0].package()?.full_name()?);
+        assert_eq!(0, g_p_package.subpackages()?.count());
 
         Ok(())
     }
@@ -399,35 +398,31 @@ mod tests {
         ];
         let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
 
-        assert_eq!(1, root_package.base.files.len());
-        assert_eq!("", root_package.base.files[0].package()?.full_name()?);
-        assert_eq!(1, root_package.base.subpackages_map.len());
-        assert!(root_package.base.subpackages_map.contains_key("google"));
+        let root_files = root_package.files()?.collect::<Vec<_>>();
+        assert_eq!(1, root_files.len());
+        assert_eq!("", root_files[0].package()?.full_name()?);
+        assert_eq!(1, root_package.subpackages()?.count());
 
-        let package_g = Rc::clone(&root_package.base.subpackages_map["google"]);
-        assert_eq!("google", package_g.name);
-        assert_eq!(0, package_g.base.files.len());
-        assert_eq!(1, package_g.base.subpackages_map.len());
-        assert!(package_g.base.subpackages_map.contains_key("protobuf"));
+        let Some(g_package) = root_package.subpackages()?.find_subp("google") else {
+            panic!()
+        };
+        assert_eq!(0, g_package.files()?.count());
+        assert_eq!(1, g_package.subpackages()?.count());
 
-        let package_g_p = Rc::clone(&package_g.base.subpackages_map["protobuf"]);
-        assert_eq!("protobuf", package_g_p.name);
-        assert_eq!(2, package_g_p.base.files.len());
-        assert_eq!(
-            "google.protobuf",
-            package_g_p.base.files[0].package()?.full_name()?
-        );
-        assert_eq!(
-            "google.protobuf",
-            package_g_p.base.files[1].package()?.full_name()?
-        );
-        assert_eq!(1, package_g_p.base.subpackages_map.len());
-        assert!(package_g_p.base.subpackages_map.contains_key("compiler"));
+        let Some(g_p_package) = g_package.subpackages()?.find_subp("protobuf") else {
+            panic!()
+        };
+        let g_p_files = g_p_package.files()?.collect::<Vec<_>>();
+        assert_eq!(2, g_p_files.len());
+        assert_eq!("google.protobuf", g_p_files[0].package()?.full_name()?);
+        assert_eq!("google.protobuf", g_p_files[1].package()?.full_name()?);
+        assert_eq!(1, g_p_package.subpackages()?.count());
 
-        let package_g_p_c = Rc::clone(&package_g_p.base.subpackages_map["compiler"]);
-        assert_eq!("compiler", package_g_p_c.name);
-        assert_eq!(1, package_g_p_c.base.files.len());
-        assert_eq!(0, package_g_p_c.base.subpackages_map.len());
+        let Some(g_p_c_package) = g_p_package.subpackages()?.find_subp("compiler") else {
+            panic!()
+        };
+        assert_eq!(1, g_p_c_package.files()?.count());
+        assert_eq!(0, g_p_c_package.subpackages()?.count());
 
         Ok(())
     }

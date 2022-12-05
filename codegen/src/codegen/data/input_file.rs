@@ -20,6 +20,8 @@ use ::puroro_protobuf_compiled::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
 };
 use ::std::fmt::Debug;
+#[cfg(test)]
+use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub trait InputFile: Debug {
@@ -133,6 +135,9 @@ impl InputFileFake {
 
 #[cfg(test)]
 impl InputFile for InputFileFake {
+    fn cache(&self) -> &AnonymousCache {
+        unimplemented!()
+    }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
@@ -142,10 +147,10 @@ impl InputFile for InputFileFake {
     fn package(&self) -> Result<Rc<dyn Package>> {
         self.package.try_upgrade()
     }
-    fn messages(&self) -> Result<&[Rc<dyn Message>]> {
-        Ok(&[])
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
+        Ok(Box::new(iter::empty()))
     }
-    fn enums(&self) -> Result<&[Rc<dyn Enum>]> {
-        Ok(&[])
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+        Ok(Box::new(iter::empty()))
     }
 }
