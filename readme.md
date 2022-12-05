@@ -75,13 +75,15 @@ your own crate. Congraturations!
 
 # subcrates
 - puroro -- The crate that the library user need to import
-- puroro-plugin -- A protoc compiler plugin
+- codegen -- A protoc compiler plugin
+- plugin -- A protoc compiler plugin
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
 - protobuf -- A git submodule of Google's official protobuf repository
   - When you cloned & checkout the puroro repository, remember to run `git submodule init` and
    `git submodule update` to download this directory.
 - puroro-protobuf-compiled -- Compiled .rs files from protobuf crate so that puroro-plugin crate can use it
+- puroro-protobuf-compiler -- A crate which only contains build.rs that generates the ...-compiled crate.
 
 # TODOs
 - proto2
@@ -123,3 +125,5 @@ your own crate. Congraturations!
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth
     - [ ] Get multiple fields mutable references at once
+    - [ ] An open struct for each message type so that the user can construct the message instance easily using struct initializer syntax and `..Default::default()` syntax.
+    - [ ] proc_macro to generate the message inline. For testing purpose.
