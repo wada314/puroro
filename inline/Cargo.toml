@@ -1,0 +1,19 @@
+[package]
+name = "puroro-inline"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+puroro-codegen = { path = "../codegen" }
+puroro-protobuf-compiled = "0.7.0"
+litrs = "0.2.3"
+quote = "1.0"
+proc-macro2 = "1.0"
+tempdir = "0.3"
+protoc-bin-vendored = "3.0.0"

@@ -27,6 +27,7 @@ pub trait PackageOrMessageExt {
     fn module_file_dir(&self) -> Result<&str>;
     fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
     fn gen_module_file(&self) -> Result<TokenStream>;
+    fn gen_inline_code(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -112,13 +113,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
     }
 
     fn gen_module_file(&self) -> Result<TokenStream> {
-        let header = if self.parent()?.is_some() {
-            quote! {
-                pub mod _puroro_root {
-                    pub use super::super::_puroro_root::*;
-                }
-            }
-        } else {
+        let header = if self.is_root()? {
             quote! {
                 /// re-export puroro.
                 pub use ::puroro;
@@ -129,6 +124,12 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
 
                 pub mod _puroro_root {
                     pub use super::*;
+                }
+            }
+        } else {
+            quote! {
+                pub mod _puroro_root {
+                    pub use super::super::_puroro_root::*;
                 }
             }
         };
@@ -169,6 +170,79 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 pub use ::puroro::*;
             }
             #(pub mod #submodule_idents;)*
+            #(#struct_decls)*
+            #(#enum_decls)*
+            #(#oneof_decls)*
+        })
+    }
+
+    fn gen_inline_code(&self) -> Result<TokenStream> {
+        let header = if self.is_root()? {
+            quote! {
+                pub mod _puroro_root {
+                    pub use super::*;
+                }
+            }
+        } else {
+            quote! {
+                pub mod _puroro_root {
+                    pub use super::super::_puroro_root::*;
+                }
+            }
+        };
+
+        let submodule_sources = self
+            .subpackages()?
+            .map(|p| Ok(p as Rc<dyn PackageOrMessage>))
+            .chain(
+                self.messages()?
+                    .filter_map(|m| match m.should_generate_module_file() {
+                        Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
+                        Ok(false) => None,
+                        Err(e) => Some(Err(e)),
+                    }),
+            );
+        let submodule_names_and_contents = {
+            let mut unsorted = submodule_sources
+                .map(|rp| {
+                    let p = rp?;
+                    let name = format_ident!("{}", p.module_name()?);
+                    let contents = p.gen_inline_code()?;
+                    Ok((name, contents))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            unsorted.sort_by_key(|(name, _)| name.clone());
+            unsorted
+        };
+        let submodule_idents = submodule_names_and_contents
+            .iter()
+            .map(|(name, _)| name.clone())
+            .collect::<Vec<_>>();
+        let submodule_contents = submodule_names_and_contents
+            .into_iter()
+            .map(|(_, contents)| contents)
+            .collect::<Vec<_>>();
+
+        let struct_decls = self
+            .messages()?
+            .map(|m| m.gen_struct())
+            .collect::<Result<Vec<_>>>()?;
+        let enum_decls = self
+            .enums()?
+            .map(|e| e.gen_enum())
+            .collect::<Result<Vec<_>>>()?;
+        let oneof_decls = self
+            .oneofs()?
+            .map(|o| o.gen_union())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(quote! {
+            #header
+            pub mod _puroro {
+                pub use ::puroro::*;
+            }
+            #(pub mod #submodule_idents {
+                #submodule_contents
+            })*
             #(#struct_decls)*
             #(#enum_decls)*
             #(#oneof_decls)*

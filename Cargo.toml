@@ -2,6 +2,7 @@
 members = [
     "puroro",
     "codegen",
+    "inline",
     "plugin",
     "puroro-protobuf-compiled",
     "puroro-protobuf-compiler",

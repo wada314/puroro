@@ -101,3 +101,10 @@ pub fn generate_output_file_protos<'a>(
 
     Ok(cgr)
 }
+
+pub fn generate_tokens_for_inline<'a>(
+    files: impl Iterator<Item = &'a FileDescriptorProto>,
+) -> Result<TokenStream> {
+    let root_package = RootPackage::new(files);
+    root_package.gen_inline_code()
+}

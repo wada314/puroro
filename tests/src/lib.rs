@@ -15,4 +15,27 @@
 #![allow(unused)]
 
 mod cases;
+
+use ::puroro_inline::puroro_inline;
 use ::tests_pb;
+
+puroro_inline! { r#"
+syntax = "proto3";
+message SampleMessage {
+    uint32 year = 1;
+}
+"# }
+
+puroro_inline! { r#"
+syntax = "proto3";
+message SampleMessage2 {
+    uint32 year = 1;
+}
+"# }
+
+#[test]
+fn test_inline_protobuf() {
+    let mut sample = SampleMessage::default();
+    *sample.year_mut() = 2022;
+    assert_eq!(2022, sample.year());
+}
