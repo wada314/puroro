@@ -9,8 +9,6 @@ pub mod _puroro_root {
 pub mod _puroro {
     pub use ::puroro::*;
 }
-pub mod enum2;
-pub mod enum3;
 pub mod full_coverage2;
 pub mod full_coverage3;
 pub mod keywords;
