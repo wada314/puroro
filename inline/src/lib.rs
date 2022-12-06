@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![feature(proc_macro_span)]
+
 use ::litrs::StringLit;
-use ::proc_macro::TokenStream;
+use ::proc_macro::{LineColumn, Span, TokenStream};
 use ::protoc_bin_vendored::protoc_bin_path;
 use ::puroro_codegen::generate_tokens_for_inline;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
 use ::puroro_protobuf_compiled::Message;
-use ::quote::quote;
+use ::quote::{format_ident, quote};
 use ::std::fs::File;
 use ::std::io::{Read, Write};
 use ::std::process::Command;
 use ::tempdir::TempDir;
 
-// We need protoc to support stdin / stdout handling:
+// I really want protoc to support stdin / stdout handling:
 // https://github.com/protocolbuffers/protobuf/issues/4163
 
 #[proc_macro]
@@ -70,7 +72,16 @@ pub fn puroro_inline(input: TokenStream) -> TokenStream {
         FileDescriptorSet::from_bytes_iter(f.bytes()).unwrap()
     };
 
-    generate_tokens_for_inline(fd_set.file().into_iter())
-        .unwrap()
-        .into()
+    let main_code = generate_tokens_for_inline(fd_set.file().into_iter()).unwrap();
+
+    let LineColumn { line, column } = Span::call_site().start();
+    let wrapping_mod = format_ident!("_puroro_inline_{}_{}", line, column);
+
+    quote! {
+        mod #wrapping_mod {
+            #main_code
+        }
+        use self::#wrapping_mod::*;
+    }
+    .into()
 }
