@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// mod builder;
-// mod bumpalo;
 mod enums;
 mod official_samples;
 mod oneof;
-// mod proto2_defaults;
-// mod variants_packed;
-// mod proto3_defaults;
 mod self_recursive;
+mod serialization;
 mod simple_get_set;
 mod simple_misc_traits;
-mod serialization;
