@@ -16,3 +16,10 @@
 
 mod cases;
 use ::tests_pb;
+
+use ::puroro_inline::inline;
+
+#[test]
+fn test_inline() {
+    assert_eq!("Yeah!", inline! { r#"Woofoo!"# });
+}

@@ -9,6 +9,7 @@ publish = false
 
 [dependencies]
 tests-pb = { path = "../tests-pb" }
+puroro-inline = { path = "../inline" }
 itertools = "0.10"
 
 [features]
