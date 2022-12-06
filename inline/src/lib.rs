@@ -16,9 +16,14 @@ use ::litrs::StringLit;
 use ::proc_macro::TokenStream;
 use ::protoc_bin_vendored::protoc_bin_path;
 use ::puroro_codegen::generate_tokens_for_inline;
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
+use ::puroro_protobuf_compiled::Message;
 use ::quote::quote;
+use ::std::fs::File;
+use ::std::io::{Read, Write};
 use ::std::process::{Command, Stdio};
-use std::io::Write;
+use ::tempdir::TempDir;
 
 // We need protoc to support stdin / stdout handling:
 // https://github.com/protocolbuffers/protobuf/issues/4163
@@ -38,20 +43,35 @@ pub fn inline(input: TokenStream) -> TokenStream {
         Err(e) => return e.to_compile_error(),
     };
 
-    let mut child = Command::new(protoc_bin_path().unwrap())
-        .arg("/dev/stdin")
-        .arg("--experimental_allow_proto3_optional")
-        .arg("--descriptor_set_out=CON")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
+    let temp_dir = TempDir::new("puroro-inline").unwrap();
+    let input_file_path = temp_dir.path().join("input.proto");
+    let output_file_path = temp_dir.path().join("output.pb");
 
-    if let Some(mut stdin) = child.stdin.take() {
-        stdin.write_all(string_lit.value().as_bytes()).unwrap();
+    {
+        let mut f = File::create(&input_file_path).unwrap();
+        f.write_all(string_lit.value().as_bytes()).unwrap();
     }
 
-    let output = child.wait_with_output().unwrap();
-    let string = format!("{:?}", &output.stdout);
-    quote! { #string }.into()
+    let status = Command::new(protoc_bin_path().unwrap())
+        .arg(&input_file_path)
+        .arg("--proto_path")
+        .arg(temp_dir.path())
+        .arg("--descriptor_set_out")
+        .arg(&output_file_path)
+        .arg("--experimental_allow_proto3_optional")
+        .status()
+        .unwrap();
+
+    if !status.success() {
+        panic!("protoc command failed.");
+    }
+
+    let fd_set = {
+        let f = File::open(&output_file_path).unwrap();
+        FileDescriptorSet::from_bytes_iter(f.bytes()).unwrap()
+    };
+
+    generate_tokens_for_inline(fd_set.file().into_iter())
+        .unwrap()
+        .into()
 }

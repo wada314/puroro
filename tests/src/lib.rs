@@ -19,7 +19,21 @@ use ::tests_pb;
 
 use ::puroro_inline::inline;
 
+inline! { r#"
+syntax = "proto3";
+message FooBar {
+    optional int32 yeah = 1;
+}
+"# }
+
+inline! { r#"
+syntax = "proto3";
+message FooBar2 {
+    optional int32 yeah = 1;
+}
+"# }
+
 #[test]
 fn test_inline() {
-    assert_eq!("Yeah!", inline! { r#"Woofoo!"# });
+    let gen = FooBar::default();
 }
