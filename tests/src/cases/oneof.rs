@@ -12,19 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::tests_pb::oneofs2::msg::{
-    GroupOneCase as GroupOneCase2, GroupThreeCase as GroupThreeCase2,
-    GroupTwoCase as GroupTwoCase2,
+use ::puroro::Message;
+use ::puroro_inline::puroro_inline;
+
+puroro_inline! {r#"
+syntax = "proto2";
+package oneofs2;
+
+message Msg {
+    oneof group_one {
+        int32 g1_int32 = 1;
+        string g1_string = 2;
+    }
+    oneof group_two {
+        float g2_f32 = 3;
+        string g2_string = 4;
+        Submsg g2_submsg = 5;
+    }
+    oneof group_three {
+        int32 g3_int32 = 6;
+    }
+}
+
+message Submsg {
+    optional int32 i32_optional = 1;
+}
+"#}
+use oneofs2::msg::{
+    GroupOneCase as GroupOneCase2, GroupThreeCase as GroupThreeCase2, GroupTwoCase as GroupTwoCase2,
 };
-use ::tests_pb::oneofs2::{Msg as Msg2, Submsg as Submsg2};
-use ::tests_pb::oneofs3::msg::{
-    GroupOneCase as GroupOneCase3, GroupThreeCase as GroupThreeCase3,
-    GroupTwoCase as GroupTwoCase3,
-};
-use ::tests_pb::oneofs3::{Msg as Msg3, Submsg as Submsg3};
+use oneofs2::{Msg as Msg2, Submsg as Submsg2};
 
 #[test]
-fn test_oneof_simple2() {
+fn test_oneof2() {
     let mut msg = Msg2::default();
 
     // Check the default values are empty
@@ -40,10 +60,7 @@ fn test_oneof_simple2() {
 
     // Set values and check it via getter methods
     *msg.g1_int32_mut() = 100;
-    assert!(matches!(
-        msg.group_one(),
-        Some(GroupOneCase2::G1Int32(100))
-    ));
+    assert!(matches!(msg.group_one(), Some(GroupOneCase2::G1Int32(100))));
     assert_eq!(msg.g1_int32(), 100);
     assert!(!msg.has_g1_string());
     *msg.g1_string_mut() = "Test".to_string();
@@ -70,10 +87,7 @@ fn test_oneof_simple2() {
     assert!(!msg.has_g2_submsg());
     *msg.g2_submsg_mut() = Submsg2::default();
     *msg.g2_submsg_mut().i32_optional_mut() = 100;
-    assert!(matches!(
-        msg.group_two(),
-        Some(GroupTwoCase2::G2Submsg(_))
-    ));
+    assert!(matches!(msg.group_two(), Some(GroupTwoCase2::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());
     assert_eq!(msg.g2_submsg().unwrap().i32_optional(), 100);
     assert!(!msg.has_g2_f32());
@@ -95,8 +109,37 @@ fn test_oneof_simple2() {
     assert!(!msg.has_g3_int32());
 }
 
+puroro_inline! {r#"
+syntax = "proto3";
+package oneofs3;
+
+message Msg {
+    oneof group_one {
+        int32 g1_int32 = 1;
+        string g1_string = 2;
+    }
+    oneof group_two {
+        float g2_f32 = 3;
+        string g2_string = 4;
+        Submsg g2_submsg = 5;
+    }
+    oneof group_three {
+        int32 g3_int32 = 6;
+    }
+}
+
+message Submsg {
+    int32 i32_unlabeled = 1;
+}
+"#}
+
+use oneofs3::msg::{
+    GroupOneCase as GroupOneCase3, GroupThreeCase as GroupThreeCase3, GroupTwoCase as GroupTwoCase3,
+};
+use oneofs3::{Msg as Msg3, Submsg as Submsg3};
+
 #[test]
-fn test_oneof_simple3() {
+fn test_oneof3() {
     let mut msg = Msg3::default();
 
     // Check the default values are empty
@@ -112,10 +155,7 @@ fn test_oneof_simple3() {
 
     // Set values and check it via getter methods
     *msg.g1_int32_mut() = 100;
-    assert!(matches!(
-        msg.group_one(),
-        Some(GroupOneCase3::G1Int32(100))
-    ));
+    assert!(matches!(msg.group_one(), Some(GroupOneCase3::G1Int32(100))));
     assert_eq!(msg.g1_int32(), 100);
     assert!(!msg.has_g1_string());
     *msg.g1_string_mut() = "Test".to_string();
@@ -141,10 +181,7 @@ fn test_oneof_simple3() {
     assert!(!msg.has_g2_f32());
     assert!(!msg.has_g2_submsg());
     *msg.g2_submsg_mut().i32_unlabeled_mut() = 100;
-    assert!(matches!(
-        msg.group_two(),
-        Some(GroupTwoCase3::G2Submsg(_))
-    ));
+    assert!(matches!(msg.group_two(), Some(GroupTwoCase3::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());
     assert_eq!(msg.g2_submsg().unwrap().i32_unlabeled(), 100);
     assert!(!msg.has_g2_f32());
