@@ -17,7 +17,11 @@ use ::proc_macro::TokenStream;
 use ::protoc_bin_vendored::protoc_bin_path;
 use ::puroro_codegen::generate_tokens_for_inline;
 use ::quote::quote;
-use ::std::process::Command;
+use ::std::process::{Command, Stdio};
+use std::io::Write;
+
+// We need protoc to support stdin / stdout handling:
+// https://github.com/protocolbuffers/protobuf/issues/4163
 
 #[proc_macro]
 pub fn inline(input: TokenStream) -> TokenStream {
@@ -34,10 +38,20 @@ pub fn inline(input: TokenStream) -> TokenStream {
         Err(e) => return e.to_compile_error(),
     };
 
-    let protoc_status = Command::new(protoc_bin_path().unwrap()).status().unwrap();
-    if !protoc_status.success() {
-        panic!("Failed to run `protoc` command.");
+    let mut child = Command::new(protoc_bin_path().unwrap())
+        .arg("/dev/stdin")
+        .arg("--experimental_allow_proto3_optional")
+        .arg("--descriptor_set_out=CON")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+
+    if let Some(mut stdin) = child.stdin.take() {
+        stdin.write_all(string_lit.value().as_bytes()).unwrap();
     }
 
-    quote! { "Hello!" }.into()
+    let output = child.wait_with_output().unwrap();
+    let string = format!("{:?}", &output.stdout);
+    quote! { #string }.into()
 }
