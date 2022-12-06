@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::puroro::Message;
+use ::puroro_inline::puroro_inline;
 use ::std::convert::{TryFrom, TryInto};
-use ::tests_pb::enum2::Enum as Enum2;
-use ::tests_pb::enum3::Enum as Enum3;
+
+puroro_inline! {r#"
+syntax = "proto2";
+package enum2;
+
+enum Enum {
+    VALUE_SEVEN = 7;
+    VALUE_ZERO = 0;
+    VALUE_ONE = 1;
+    VALUE_FOURTY_TWO = 42;
+}
+"#}
+
+use enum2::Enum as Enum2;
 
 #[test]
 fn test_enum2_default() {
@@ -32,6 +46,20 @@ fn test_enum2_convert() {
     assert_eq!(0, Enum2::ValueZero.into());
     assert_eq!(42, Enum2::ValueFourtyTwo.into());
 }
+
+puroro_inline! {r#"
+syntax = "proto3";
+package enum3;
+
+enum Enum {
+    VALUE_ZERO = 0;
+    VALUE_SEVEN = 7;
+    VALUE_ONE = 1;
+    VALUE_FOURTY_TWO = 42;
+}
+"#}
+
+use enum3::Enum as Enum3;
 
 #[test]
 fn test_enum3_default() {
