@@ -1,11 +1,8 @@
 [package]
 name = "puroro-inline"
-version = "0.7.0"
+version = "0.1.0"
 edition = "2021"
-license = "Apache-2.0"
-description = "Google Protocol Buffer's compiler plugin implementation for puroro"
-repository = "https://github.com/wada314/puroro"
-documentation = "https://docs.rs/puroro/"
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,7 +10,7 @@ documentation = "https://docs.rs/puroro/"
 proc-macro = true
 
 [dependencies]
-puroro-codegen = { path = "../codegen", version = "0.7.0" }
+puroro-codegen = { path = "../codegen" }
 puroro-protobuf-compiled = "0.7.0"
 litrs = "0.2.3"
 quote = "1.0"
