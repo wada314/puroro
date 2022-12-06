@@ -16,20 +16,19 @@ use ::litrs::StringLit;
 use ::proc_macro::TokenStream;
 use ::protoc_bin_vendored::protoc_bin_path;
 use ::puroro_codegen::generate_tokens_for_inline;
-use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
 use ::puroro_protobuf_compiled::Message;
 use ::quote::quote;
 use ::std::fs::File;
 use ::std::io::{Read, Write};
-use ::std::process::{Command, Stdio};
+use ::std::process::Command;
 use ::tempdir::TempDir;
 
 // We need protoc to support stdin / stdout handling:
 // https://github.com/protocolbuffers/protobuf/issues/4163
 
 #[proc_macro]
-pub fn inline(input: TokenStream) -> TokenStream {
+pub fn puroro_inline(input: TokenStream) -> TokenStream {
     let mut input_iter = input.into_iter();
     let Some(token) = input_iter.next() else {
         panic!("No token inside the puroro inline macro.");

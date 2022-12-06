@@ -17,23 +17,16 @@
 mod cases;
 use ::tests_pb;
 
-use ::puroro_inline::inline;
-
-inline! { r#"
+use ::puroro_inline::puroro_inline;
+puroro_inline! { r#"
 syntax = "proto3";
-message FooBar {
-    optional int32 yeah = 1;
+message SampleMessage {
+    uint32 year = 1;
 }
 "# }
-
-inline! { r#"
-syntax = "proto3";
-message FooBar2 {
-    optional int32 yeah = 1;
-}
-"# }
-
 #[test]
-fn test_inline() {
-    let gen = FooBar::default();
+fn test_inline_protobuf() {
+    let mut sample = SampleMessage::default();
+    *sample.year_mut() = 2022;
+    assert_eq!(2022, sample.year());
 }
