@@ -12,23 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tests_pb::ser_tests2::msg::Submsg as Submsg2;
-use crate::tests_pb::ser_tests2::{Enum as Enum2, Msg as Msg2};
-use crate::tests_pb::ser_tests3::msg::Submsg as Submsg3;
-use crate::tests_pb::ser_tests3::{Enum as Enum3, Msg as Msg3};
-use crate::tests_pb::Message;
+use ::puroro::Message;
+use ::puroro_inline::puroro_inline;
+
+puroro_inline! {r#"
+syntax = "proto2";
+package ser_tests2;
+
+message Msg {
+    optional int32 i32_optional = 1;
+    repeated int32 i32_repeated = 2;
+    optional float float_optional = 3;
+    repeated float float_repeated = 4;
+    optional string string_optional = 5;
+    repeated string string_repeated = 6;
+
+    message Submsg {
+        optional int32 i32_optional = 1;
+    }
+    optional Submsg submsg_optional = 7;
+    repeated Submsg submsg_repeated = 8;
+
+    optional Enum enum_optional = 9;
+    repeated Enum enum_repeated = 10;
+
+    optional int32 very_large_field_number = 536870911; // 2^29 - 1
+}
+
+enum Enum {
+    ZEROTH = 0;
+    FIRST = 1;
+    TENTH = 10;
+}
+"#}
+
+use ser_tests2::{msg::Submsg as Submsg2, Enum as Enum2, Msg as Msg2};
 
 #[test]
 fn test_empty2() {
     let msg: Msg2 = Msg2::default();
-    let mut buf: Vec<u8> = Vec::new();
-    msg.to_bytes(&mut buf).unwrap();
-    assert!(buf.is_empty());
-}
-
-#[test]
-fn test_empty3() {
-    let msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.to_bytes(&mut buf).unwrap();
     assert!(buf.is_empty());
@@ -44,6 +66,65 @@ fn test_i32_optional2() {
 }
 
 #[test]
+fn test_submsg_optional_empty2() {
+    let mut msg: Msg2 = Msg2::default();
+    let mut buf: Vec<u8> = Vec::new();
+    msg.submsg_optional_mut();
+    msg.to_bytes(&mut buf).unwrap();
+    assert_eq!(&[(7 << 3) | 2, 0], buf.as_slice());
+}
+
+puroro_inline! {r#"
+syntax = "proto3";
+package ser_tests3;
+
+message Msg {
+    int32 i32_unlabeled = 1;
+    repeated int32 i32_repeated = 2;
+    float float_unlabeled = 3;
+    repeated float float_repeated = 4;
+    string string_unlabeled = 5;
+    repeated string string_repeated = 6;
+
+    message Submsg {
+        int32 i32_unlabeled = 1;
+    }
+    Submsg submsg_unlabeled = 7;
+    repeated Submsg submsg_repeated = 8;
+
+    Enum enum_unlabeled = 9;
+    repeated Enum enum_repeated = 10;
+
+    int32 very_large_field_number = 536870911; // 2^29 - 1
+}
+
+enum Enum {
+    ZEROTH = 0;
+    FIRST = 1;
+    TENTH = 10;
+}
+"#}
+
+use ser_tests3::{msg::Submsg as Submsg3, Enum as Enum3, Msg as Msg3};
+
+#[test]
+fn test_submsg_optional_filled2() {
+    let mut msg: Msg2 = Msg2::default();
+    let mut buf: Vec<u8> = Vec::new();
+    *msg.submsg_optional_mut().i32_optional_mut() = 10;
+    msg.to_bytes(&mut buf).unwrap();
+    assert_eq!(&[(7 << 3) | 2, 2, (1 << 3) | 0, 10], buf.as_slice());
+}
+
+#[test]
+fn test_empty3() {
+    let msg: Msg3 = Msg3::default();
+    let mut buf: Vec<u8> = Vec::new();
+    msg.to_bytes(&mut buf).unwrap();
+    assert!(buf.is_empty());
+}
+
+#[test]
 fn test_i32_unlabeled3() {
     let mut msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
@@ -53,30 +134,12 @@ fn test_i32_unlabeled3() {
 }
 
 #[test]
-fn test_submsg_optional_empty2() {
-    let mut msg: Msg2 = Msg2::default();
-    let mut buf: Vec<u8> = Vec::new();
-    msg.submsg_optional_mut();
-    msg.to_bytes(&mut buf).unwrap();
-    assert_eq!(&[(7 << 3) | 2, 0], buf.as_slice());
-}
-
-#[test]
 fn test_submsg_unlabeled_empty3() {
     let mut msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.submsg_unlabeled_mut();
     msg.to_bytes(&mut buf).unwrap();
     assert_eq!(&[(7 << 3) | 2, 0], buf.as_slice());
-}
-
-#[test]
-fn test_submsg_optional_filled2() {
-    let mut msg: Msg2 = Msg2::default();
-    let mut buf: Vec<u8> = Vec::new();
-    *msg.submsg_optional_mut().i32_optional_mut() = 10;
-    msg.to_bytes(&mut buf).unwrap();
-    assert_eq!(&[(7 << 3) | 2, 2, (1 << 3) | 0, 10], buf.as_slice());
 }
 
 #[test]

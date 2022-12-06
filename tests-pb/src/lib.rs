@@ -13,8 +13,4 @@ pub mod full_coverage2;
 pub mod full_coverage3;
 pub mod keywords;
 pub mod nested;
-pub mod oneofs2;
-pub mod oneofs3;
 pub mod self_recursive;
-pub mod ser_tests2;
-pub mod ser_tests3;
