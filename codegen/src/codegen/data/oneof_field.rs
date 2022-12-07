@@ -13,25 +13,22 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{FieldType, Message, Oneof};
+use super::super::{FieldBase, FieldType, Message, Oneof};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait OneofField: Debug {
+pub trait OneofField: FieldBase + Debug {
     fn cache(&self) -> &AnonymousCache;
-    fn name(&self) -> Result<&str>;
     fn oneof(&self) -> Result<Rc<dyn Oneof>>;
-    fn message(&self) -> Result<Rc<dyn Message>>;
-    fn number(&self) -> Result<i32>;
-    fn r#type(&self) -> Result<&FieldType>;
 }
 
 #[derive(Debug)]
 pub struct OneofFieldImpl {
-    cache: AnonymousCache,
+    cache1: AnonymousCache,
+    cache2: AnonymousCache,
     oneof: Weak<dyn Oneof>,
     name: String,
     number: i32,
@@ -41,15 +38,12 @@ pub struct OneofFieldImpl {
     default_value: Option<String>,
 }
 
-impl OneofField for OneofFieldImpl {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache
+impl FieldBase for OneofFieldImpl {
+    fn cache_base(&self) -> &AnonymousCache {
+        &self.cache1
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
-    }
-    fn oneof(&self) -> Result<Rc<dyn Oneof>> {
-        Ok(self.oneof.try_upgrade()?)
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.oneof()?.message()?)
@@ -68,12 +62,25 @@ impl OneofField for OneofFieldImpl {
             )?)
         })
     }
+    fn default_value(&self) -> Result<Option<&str>> {
+        Ok(self.default_value.as_deref())
+    }
+}
+
+impl OneofField for OneofFieldImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache2
+    }
+    fn oneof(&self) -> Result<Rc<dyn Oneof>> {
+        Ok(self.oneof.try_upgrade()?)
+    }
 }
 
 impl OneofFieldImpl {
     pub fn new(proto: &FieldDescriptorProto, oneof: Weak<dyn Oneof>) -> Rc<Self> {
         Rc::new(Self {
-            cache: Default::default(),
+            cache1: Default::default(),
+            cache2: Default::default(),
             oneof,
             name: proto.name().to_string(),
             number: proto.number(),

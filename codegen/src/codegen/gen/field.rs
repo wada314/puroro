@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Field, FieldRule, FieldType, LengthDelimitedType, MessageExt};
+use super::super::{Field, FieldBase, FieldRule, FieldType, LengthDelimitedType, MessageExt};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -116,7 +116,7 @@ impl<T: ?Sized + Field> FieldExt for T {
     }
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {
         let ident = gen_struct_field_ident(self)?;
-        let number = self.number();
+        let number = self.number()?;
         let r#type = gen_struct_field_type(self)?;
         Ok(quote! {
             #number => <#r#type as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
@@ -128,7 +128,7 @@ impl<T: ?Sized + Field> FieldExt for T {
     }
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
         let ident = gen_struct_field_ident(self)?;
-        let number = self.number();
+        let number = self.number()?;
         let r#type = gen_struct_field_type(self)?;
         Ok(quote! {
             <#r#type as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -364,4 +364,8 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
             )
         }
     })
+}
+
+fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<TokenStream> {
+    todo!()
 }
