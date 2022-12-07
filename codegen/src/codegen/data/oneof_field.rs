@@ -38,6 +38,7 @@ pub struct OneofFieldImpl {
     type_opt: Option<field_descriptor_proto::Type>,
     type_name: String,
     r#type: OnceCell<FieldType>,
+    default_value: Option<String>,
 }
 
 impl OneofField for OneofFieldImpl {
@@ -79,6 +80,7 @@ impl OneofFieldImpl {
             type_opt: proto.type_opt(),
             type_name: proto.type_name().to_string(),
             r#type: OnceCell::new(),
+            default_value: proto.default_value_opt().map(|s| s.to_string()),
         })
     }
 }

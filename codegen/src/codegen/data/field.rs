@@ -41,6 +41,7 @@ pub struct FieldImpl {
     type_opt: Option<field_descriptor_proto::Type>,
     number: i32,
     type_name: String,
+    default_value: Option<String>,
 }
 
 impl Field for FieldImpl {
@@ -94,6 +95,7 @@ impl FieldImpl {
             type_opt: proto.type_opt(),
             number: proto.number(),
             type_name: proto.type_name().to_string(),
+            default_value: proto.default_value_opt().map(|s| s.to_string()),
         })
     }
 }
