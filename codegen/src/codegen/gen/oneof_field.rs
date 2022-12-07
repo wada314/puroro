@@ -14,6 +14,7 @@
 
 use super::super::util::*;
 use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
+use super::field::gen_default_fn;
 use super::PackageOrMessageExt;
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -168,6 +169,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let enum_item_ident = self.gen_case_enum_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
+        let default_fn = gen_default_fn(self)?;
 
         Ok(quote! {
             pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
@@ -183,7 +185,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                         self.#union_item_ident.deref()
                     }
                 });
-                OneofFieldTypeOpt::get_field(item_opt, Default::default)
+                OneofFieldTypeOpt::get_field(item_opt, #default_fn)
             }
 
             pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
@@ -217,7 +219,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     let index = self::#case_ident::into_u32(self::#case_ident::#enum_item_ident(()));
                     bits.set_range(#bitfield_begin..#bitfield_end, index);
                     *self = self::#union_ident {
-                        #union_item_ident: ManuallyDrop::new(Default::default())
+                        #union_item_ident: ManuallyDrop::new((#default_fn)())
                     };
                 }
                 unsafe {

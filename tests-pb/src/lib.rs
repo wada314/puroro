@@ -13,4 +13,5 @@ pub mod full_coverage2;
 pub mod full_coverage3;
 pub mod keywords;
 pub mod nested;
+pub mod proto2_defaults;
 pub mod self_recursive;

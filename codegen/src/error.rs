@@ -36,6 +36,10 @@ pub enum ErrorKind {
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from ParseIntError: "{source}""#)]
     ParseIntError { source: std::num::ParseIntError },
+    #[error(r#"An error from ParseFloatError: "{source}""#)]
+    ParseBoolError { source: std::str::ParseBoolError },
+    #[error(r#"An error from ParseFloatError: "{source}""#)]
+    ParseFloatError { source: std::num::ParseFloatError },
     #[error(r#"Ar error from std::io::Error: "{source}""#)]
     IoError { source: ::std::io::Error },
     #[error(r#"Bad format string: "{string}""#)]
@@ -90,6 +94,30 @@ impl From<::std::string::FromUtf8Error> for GeneratorError {
     fn from(e: ::std::string::FromUtf8Error) -> Self {
         Self {
             kind: ErrorKind::FromUtf8Error { source: e },
+            backtrace: std::backtrace::Backtrace::capture(),
+        }
+    }
+}
+impl From<::std::num::ParseIntError> for GeneratorError {
+    fn from(e: ::std::num::ParseIntError) -> Self {
+        Self {
+            kind: ErrorKind::ParseIntError { source: e },
+            backtrace: std::backtrace::Backtrace::capture(),
+        }
+    }
+}
+impl From<::std::num::ParseFloatError> for GeneratorError {
+    fn from(e: ::std::num::ParseFloatError) -> Self {
+        Self {
+            kind: ErrorKind::ParseFloatError { source: e },
+            backtrace: std::backtrace::Backtrace::capture(),
+        }
+    }
+}
+impl From<::std::str::ParseBoolError> for GeneratorError {
+    fn from(e: ::std::str::ParseBoolError) -> Self {
+        Self {
+            kind: ErrorKind::ParseBoolError { source: e },
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }

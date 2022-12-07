@@ -13,13 +13,17 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Field, FieldBase, FieldRule, FieldType, LengthDelimitedType, MessageExt};
+use super::super::{
+    Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldRule, FieldType, LengthDelimitedType,
+    MessageExt, VariantType,
+};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::{Ident, TokenStream};
+use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
+use ::syn::{LitBool, LitByteStr};
 
 pub trait FieldExt {
     // Message's bitfield allocation
@@ -332,11 +336,12 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
         ::std::option::Option::< #borrowed_type >
     });
     let getter_mut_type = this.r#type()?.rust_mut_ref_type()?;
+    let default_fn = gen_default_fn(this)?;
     Ok(quote! {
         pub fn #getter_ident(&self) -> #getter_type {
            use self::_puroro::internal::field_type::NonRepeatedFieldType;
             <#field_type as NonRepeatedFieldType>::get_field(
-                &self.#field_ident, &self._bitfield, ::std::default::Default::default,
+                &self.#field_ident, &self._bitfield, #default_fn,
             )
         }
         pub fn #getter_opt_ident(&self) -> #getter_opt_type {
@@ -348,7 +353,7 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
         pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
             use self::_puroro::internal::field_type::NonRepeatedFieldType;
             <#field_type as NonRepeatedFieldType>::mut_field(
-                &mut self.#field_ident, &mut self._bitfield, ::std::default::Default::default,
+                &mut self.#field_ident, &mut self._bitfield, #default_fn,
             )
         }
         pub fn #getter_has_ident(&self) -> bool {
@@ -366,6 +371,85 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
     })
 }
 
-fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<TokenStream> {
-    todo!()
+pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<TokenStream> {
+    use ::std::str::FromStr;
+
+    Ok(if let Some(default_value_string) = this.default_value()? {
+        use FieldType::*;
+        match this.r#type()? {
+            // Floats. I believe the rust's `f32::from_str()` method supports
+            // all the possible patterns of protoc command output:
+            // https://doc.rust-lang.org/std/primitive.f32.html#impl-FromStr-for-f32
+            Bits32(Bits32Type::Float) => {
+                let value = f32::from_str(&default_value_string)?;
+                if value.is_infinite() && value.is_sign_positive() {
+                    quote! { || f32::INFINITY }
+                } else if value.is_infinite() && value.is_sign_negative() {
+                    quote! { || f32::NEG_INFINITY }
+                } else if value.is_nan() {
+                    quote! { || f32::NAN }
+                } else {
+                    quote! { || #value }
+                }
+            }
+            Bits64(Bits64Type::Double) => {
+                let value = f64::from_str(&default_value_string)?;
+                if value.is_infinite() && value.is_sign_positive() {
+                    quote! { || f64::INFINITY }
+                } else if value.is_infinite() && value.is_sign_negative() {
+                    quote! { || f64::NEG_INFINITY }
+                } else if value.is_nan() {
+                    quote! { || f64::NAN }
+                } else {
+                    quote! { || #value }
+                }
+            }
+            LengthDelimited(LengthDelimitedType::String) => {
+                quote! { || #default_value_string }
+            }
+            LengthDelimited(LengthDelimitedType::Bytes) => {
+                let bytes = convert_octal_escapes_to_bytes(&default_value_string)?;
+                let byte_lit = LitByteStr::new(&bytes, Span::call_site());
+                quote! { || #byte_lit }
+            }
+            LengthDelimited(LengthDelimitedType::Message(_)) => Err(ErrorKind::InternalError {
+                detail: "The field default value should not be set for the message field."
+                    .to_string(),
+            })?,
+            FieldType::Variant(VariantType::Enum2(e) | VariantType::Enum3(e)) => {
+                let e = e.try_upgrade()?;
+                let enum_path = e.gen_rust_enum_path()?;
+                let enum_value_ident = format_ident!(
+                    "{}",
+                    default_value_string.to_camel_case().escape_rust_keywords()
+                );
+                quote! { || #enum_path :: #enum_value_ident }
+            }
+            // Integers and boolean. For the both cases just convert the given string
+            // as-is is okay.
+            Variant(VariantType::Bool) => {
+                let value = bool::from_str(&default_value_string)?;
+                let lit_bool = LitBool::new(value, Span::call_site());
+                quote! { || #lit_bool }
+            }
+            Variant(VariantType::Int32 | VariantType::SInt32) | Bits32(Bits32Type::SFixed32) => {
+                let value = i32::from_str(&default_value_string)?;
+                quote! { || #value }
+            }
+            Variant(VariantType::Int64 | VariantType::SInt64) | Bits64(Bits64Type::SFixed64) => {
+                let value = i64::from_str(&default_value_string)?;
+                quote! { || #value }
+            }
+            Variant(VariantType::UInt32) | Bits32(Bits32Type::Fixed32) => {
+                let value = u32::from_str(&default_value_string)?;
+                quote! { || #value }
+            }
+            Variant(VariantType::UInt64) | Bits64(Bits64Type::Fixed64) => {
+                let value = u64::from_str(&default_value_string)?;
+                quote! { || #value }
+            }
+        }
+    } else {
+        quote! { ::std::default::Default::default }
+    })
 }
