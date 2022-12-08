@@ -26,8 +26,6 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub trait Message: Debug + PackageOrMessage {
-    fn cache(&self) -> &AnonymousCache;
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message>;
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>>;
@@ -42,8 +40,7 @@ pub trait Message: Debug + PackageOrMessage {
 
 #[derive(Debug)]
 pub struct MessageImpl {
-    cache1: AnonymousCache,
-    cache2: AnonymousCache,
+    cache: AnonymousCache,
     name: String,
     fields: Vec<Rc<dyn Field>>,
     messages: Vec<Rc<dyn Message>>,
@@ -140,8 +137,7 @@ impl MessageImpl {
                 })
                 .collect();
             MessageImpl {
-                cache1: Default::default(),
-                cache2: Default::default(),
+                cache: Default::default(),
                 name,
                 input_file: Weak::clone(&input_file),
                 parent,
@@ -156,7 +152,7 @@ impl MessageImpl {
 
 impl PackageOrMessage for MessageImpl {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache1
+        &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
@@ -182,12 +178,6 @@ impl PackageOrMessage for MessageImpl {
 }
 
 impl Message for MessageImpl {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache2
-    }
-    fn as_dyn_rc(self: Rc<Self>) -> Rc<dyn Message> {
-        self
-    }
     fn input_file(&self) -> Result<Rc<dyn InputFile>> {
         Ok(self.input_file.try_upgrade()?)
     }

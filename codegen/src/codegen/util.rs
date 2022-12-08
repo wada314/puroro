@@ -33,17 +33,39 @@ impl<T: ?Sized> WeakExt<T> for Weak<T> {
 
 #[derive(Debug, Default)]
 pub struct AnonymousCache {
-    any_box: OnceCell<Box<dyn Any>>,
+    list: OnceCell<Cell>,
 }
 impl AnonymousCache {
     pub fn get<T: 'static + Default>(&self) -> Result<&T> {
-        Ok(self
-            .any_box
-            .get_or_init(|| Box::new(T::default()))
-            .downcast_ref()
-            .ok_or(ErrorKind::InternalError {
-                detail: "Wrong type has requested for the cache.".to_string(),
-            })?)
+        self.list
+            .get_or_try_init(|| -> Result<_> {
+                Ok(Cell {
+                    car: Box::new(T::default()),
+                    cdr: OnceCell::default(),
+                })
+            })?
+            .get_or_insert()
+    }
+}
+#[derive(Debug)]
+struct Cell {
+    car: Box<dyn Any>,
+    cdr: OnceCell<Box<Cell>>,
+}
+impl Cell {
+    fn get_or_insert<T: 'static + Default>(&self) -> Result<&T> {
+        if let Some(t) = self.car.downcast_ref::<T>() {
+            Ok(t)
+        } else {
+            self.cdr
+                .get_or_try_init(|| -> Result<_> {
+                    Ok(Box::new(Cell {
+                        car: Box::new(T::default()),
+                        cdr: OnceCell::default(),
+                    }))
+                })?
+                .get_or_insert::<T>()
+        }
     }
 }
 

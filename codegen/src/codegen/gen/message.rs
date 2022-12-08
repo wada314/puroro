@@ -36,7 +36,7 @@ struct Cache {
 }
 impl<T: ?Sized + Message> MessageExt for T {
     fn bitfield_size(&self) -> Result<usize> {
-        <Self as Message>::cache(self)
+        self.cache()
             .get::<Cache>()?
             .bitfield_size
             .get_or_try_init(|| {
@@ -66,7 +66,7 @@ impl<T: ?Sized + Message> MessageExt for T {
     }
 
     fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>> {
-        <Self as Message>::cache(self)
+        self.cache()
             .get::<Cache>()?
             .rust_struct_path
             .get_or_try_init(|| {
