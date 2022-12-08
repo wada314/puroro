@@ -20,18 +20,28 @@ use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, Field
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait Field: Debug {
-    fn cache(&self) -> &AnonymousCache;
+/// A field of message, regardless if it's directly under the message or
+/// the field under the `oneof`.
+pub trait FieldBase: Debug {
+    fn cache_base(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
     fn message(&self) -> Result<Rc<dyn Message>>;
-    fn number(&self) -> i32;
-    fn rule(&self) -> Result<FieldRule>;
+    fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
+    fn default_value(&self) -> Result<Option<&str>>;
+}
+
+/// A field of message, but not including the field belonging to an `oneof`.
+/// Proto3 optional field IS this type.
+pub trait Field: FieldBase + Debug {
+    fn cache(&self) -> &AnonymousCache;
+    fn rule(&self) -> Result<FieldRule>;
 }
 
 #[derive(Debug)]
 pub struct FieldImpl {
-    cache: AnonymousCache,
+    cache1: AnonymousCache,
+    cache2: AnonymousCache,
     name: String,
     message: Weak<dyn Message>,
     rule: OnceCell<FieldRule>,
@@ -41,11 +51,12 @@ pub struct FieldImpl {
     type_opt: Option<field_descriptor_proto::Type>,
     number: i32,
     type_name: String,
+    default_value: Option<String>,
 }
 
-impl Field for FieldImpl {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache
+impl FieldBase for FieldImpl {
+    fn cache_base(&self) -> &AnonymousCache {
+        &self.cache1
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
@@ -53,8 +64,28 @@ impl Field for FieldImpl {
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
     }
-    fn number(&self) -> i32 {
-        self.number
+    fn number(&self) -> Result<i32> {
+        Ok(self.number)
+    }
+    fn r#type(&self) -> Result<&FieldType> {
+        self.r#type.get_or_try_init(|| {
+            let syntax = self.message()?.input_file()?.syntax()?;
+            Ok(FieldType::try_new(
+                self.type_opt.clone(),
+                &self.type_name,
+                syntax,
+                self.message()?,
+            )?)
+        })
+    }
+    fn default_value(&self) -> Result<Option<&str>> {
+        Ok(self.default_value.as_deref())
+    }
+}
+
+impl Field for FieldImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache2
     }
     fn rule(&self) -> Result<FieldRule> {
         self.rule
@@ -68,23 +99,13 @@ impl Field for FieldImpl {
             })
             .cloned()
     }
-    fn r#type(&self) -> Result<&FieldType> {
-        self.r#type.get_or_try_init(|| {
-            let syntax = self.message()?.input_file()?.syntax()?;
-            Ok(FieldType::try_new(
-                self.type_opt.clone(),
-                &self.type_name,
-                syntax,
-                self.message()?,
-            )?)
-        })
-    }
 }
 
 impl FieldImpl {
     pub fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
         Rc::new(FieldImpl {
-            cache: Default::default(),
+            cache1: Default::default(),
+            cache2: Default::default(),
             name: proto.name().to_string(),
             message,
             rule: OnceCell::new(),
@@ -94,6 +115,7 @@ impl FieldImpl {
             type_opt: proto.type_opt(),
             number: proto.number(),
             type_name: proto.type_name().to_string(),
+            default_value: proto.default_value_opt().map(|s| s.to_string()),
         })
     }
 }

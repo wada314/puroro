@@ -23,7 +23,7 @@
             "command": "build",
             "args": [
                 "-p",
-                "puroro*"
+                "puroro-codegen"
             ],
             "problemMatcher": [
                 "$rustc"
@@ -37,7 +37,7 @@
                 "clear": true
             },
             "group": "build",
-            "label": "rust: cargo build -p puroro*"
+            "label": "rust: cargo build -p puroro-codegen"
         },
         {
             "type": "cargo",

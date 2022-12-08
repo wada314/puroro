@@ -14,8 +14,8 @@
 
 /// About the proto3's default values, check the following official document:
 /// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
-use crate::tests_pb::proto3_defaults::{Msg, Submsg};
 use ::puroro::Message;
+use ::puroro_inline::puroro_inline;
 
 const INPUT_FIELD1_I32_ZERO: &[u8] = &[(1 << 3) | 0, 0x00];
 const INPUT_FIELD1_I32_ONE: &[u8] = &[(1 << 3) | 0, 0x01];
@@ -42,6 +42,25 @@ const INPUT_FIELDS6_MSG_EMPTY: &[u8] = &[(6 << 3) | 0x02, 0x00];
 const INPUT_FIELDS6_MSG_FIELD1_I32_ZERO: &[u8] = &[(6 << 3) | 0x02, 0x02, (1 << 3) | 0, 0x00];
 const INPUT_FIELDS6_MSG_FIELD1_I32_ONE: &[u8] = &[(6 << 3) | 0x02, 0x02, (1 << 3) | 0, 0x01];
 
+puroro_inline! {r#"
+syntax = "proto3";
+package proto3_defaults;
+
+message Msg {
+    int32 i32_unlabeled = 1;
+    optional int32 i32_optional = 2;
+    repeated int32 i32_repeated = 3;
+    float f32_unlabeled = 4;
+    string string_unlabeled = 5;
+    Submsg submsg_unlabeled = 6;
+}
+
+message Submsg {
+    int32 i32_unlabeled = 1;
+}
+"#}
+use proto3_defaults::{Msg, Submsg};
+
 #[test]
 fn test_i32_unlabeled() {
     use std::io::Read as _;
@@ -53,17 +72,19 @@ fn test_i32_unlabeled() {
     assert_eq!(10, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
 
-    // merge_from_bytes 0 into the field, but it is a default value so it should be ignored
-    msg.merge_from_bytes(INPUT_FIELD1_I32_ZERO.bytes()).unwrap();
+    // merge_from_bytes_iter 0 into the field, but it is a default value so it should be ignored
+    msg.merge_from_bytes_iter(INPUT_FIELD1_I32_ZERO.bytes())
+        .unwrap();
     assert_eq!(10, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
-    msg.merge_from_bytes(INPUT_FIELD1_I32_PACKED_ZERO.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELD1_I32_PACKED_ZERO.bytes())
         .unwrap();
     assert_eq!(10, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
 
-    // merge_from_bytes 1 into the field. Should overwrite the value.
-    msg.merge_from_bytes(INPUT_FIELD1_I32_ONE.bytes()).unwrap();
+    // merge_from_bytes_iter 1 into the field. Should overwrite the value.
+    msg.merge_from_bytes_iter(INPUT_FIELD1_I32_ONE.bytes())
+        .unwrap();
     assert_eq!(1, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
 }
@@ -82,17 +103,19 @@ fn test_i32_optional() {
     // Deserializing (merging into) the field by 0 value.
     // Doing the same thing with i32_unlabeled, but for optional field
     // the field value is overwritten even if the input value is 0.
-    msg.merge_from_bytes(INPUT_FIELD2_I32_ZERO.bytes()).unwrap();
+    msg.merge_from_bytes_iter(INPUT_FIELD2_I32_ZERO.bytes())
+        .unwrap();
     assert_eq!(Some(0), msg.i32_optional_opt());
     *msg.i32_optional_mut() = 10;
     assert_eq!(10, msg.i32_optional());
     assert!(msg.has_i32_optional());
-    msg.merge_from_bytes(INPUT_FIELD2_I32_PACKED_ZERO.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELD2_I32_PACKED_ZERO.bytes())
         .unwrap();
     assert_eq!(0, msg.i32_optional());
     assert!(msg.has_i32_optional());
 
-    msg.merge_from_bytes(INPUT_FIELD2_I32_ONE.bytes()).unwrap();
+    msg.merge_from_bytes_iter(INPUT_FIELD2_I32_ONE.bytes())
+        .unwrap();
     assert_eq!(1, msg.i32_optional());
     assert!(msg.has_i32_optional());
 }
@@ -105,13 +128,15 @@ fn test_i32_repeated() {
     *msg.i32_repeated_mut() = vec![10, 20];
     assert_eq!(&vec![10, 20], msg.i32_repeated());
 
-    msg.merge_from_bytes(INPUT_FIELD3_I32_ZERO.bytes()).unwrap();
+    msg.merge_from_bytes_iter(INPUT_FIELD3_I32_ZERO.bytes())
+        .unwrap();
     assert_eq!(&vec![10, 20, 0], msg.i32_repeated());
 
-    msg.merge_from_bytes(INPUT_FIELD3_I32_ONE.bytes()).unwrap();
+    msg.merge_from_bytes_iter(INPUT_FIELD3_I32_ONE.bytes())
+        .unwrap();
     assert_eq!(&vec![10, 20, 0, 1], msg.i32_repeated());
 
-    msg.merge_from_bytes(INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE.bytes())
         .unwrap();
     assert_eq!(&vec![10, 20, 0, 1, 0, 1, 2, 3], msg.i32_repeated());
 }
@@ -127,12 +152,12 @@ fn test_string_unlabeled() {
     assert_eq!("test1", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
 
-    msg.merge_from_bytes(INPUT_FIELD5_STRING_EMPTY.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELD5_STRING_EMPTY.bytes())
         .unwrap();
     assert_eq!("test1", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
 
-    msg.merge_from_bytes(INPUT_FIELD5_STRING_TEST2.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELD5_STRING_TEST2.bytes())
         .unwrap();
     assert_eq!("test2", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
@@ -153,12 +178,12 @@ fn test_message_unlabeled() {
     assert_eq!(Some(10), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());
 
-    msg.merge_from_bytes(INPUT_FIELDS6_MSG_FIELD1_I32_ZERO.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELDS6_MSG_FIELD1_I32_ZERO.bytes())
         .unwrap();
     assert_eq!(Some(10), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());
 
-    msg.merge_from_bytes(INPUT_FIELDS6_MSG_FIELD1_I32_ONE.bytes())
+    msg.merge_from_bytes_iter(INPUT_FIELDS6_MSG_FIELD1_I32_ONE.bytes())
         .unwrap();
     assert_eq!(Some(1), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());

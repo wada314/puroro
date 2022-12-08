@@ -187,7 +187,7 @@ lazy_static! {
 }
 
 #[allow(unused)]
-pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> {
+pub fn convert_octal_escapes_to_bytes(input: &str) -> Result<Vec<u8>> {
     // protoc escapes 0x7F~0xFF character as octal escape "\234".
     // Rust does not support that style so we need to re-encode it.
     let mut decoded = Vec::new();
@@ -237,8 +237,5 @@ pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> 
             break;
         }
     }
-    Ok(decoded
-        .into_iter()
-        .map(|b| format!(r"\x{:02x}", b))
-        .collect::<String>())
+    Ok(decoded)
 }
