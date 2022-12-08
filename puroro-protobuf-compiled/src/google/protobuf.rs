@@ -3756,7 +3756,7 @@ impl MethodDescriptorProto {
         > as NonRepeatedFieldType>::get_field(
             &self.client_streaming,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn client_streaming_opt(&self) -> ::std::option::Option::<bool> {
@@ -3779,7 +3779,7 @@ impl MethodDescriptorProto {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.client_streaming,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_client_streaming(&self) -> bool {
@@ -3814,7 +3814,7 @@ impl MethodDescriptorProto {
         > as NonRepeatedFieldType>::get_field(
             &self.server_streaming,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn server_streaming_opt(&self) -> ::std::option::Option::<bool> {
@@ -3837,7 +3837,7 @@ impl MethodDescriptorProto {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.server_streaming,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_server_streaming(&self) -> bool {
@@ -4245,7 +4245,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.java_multiple_files,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn java_multiple_files_opt(&self) -> ::std::option::Option::<bool> {
@@ -4268,7 +4268,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.java_multiple_files,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_java_multiple_files(&self) -> bool {
@@ -4361,7 +4361,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.java_string_check_utf8,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn java_string_check_utf8_opt(&self) -> ::std::option::Option::<bool> {
@@ -4384,7 +4384,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.java_string_check_utf8,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_java_string_check_utf8(&self) -> bool {
@@ -4423,7 +4423,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.optimize_for,
             &self._bitfield,
-            ::std::default::Default::default,
+            || self::_puroro_root::google::protobuf::file_options::OptimizeMode::Speed,
         )
     }
     pub fn optimize_for_opt(
@@ -4453,7 +4453,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.optimize_for,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || self::_puroro_root::google::protobuf::file_options::OptimizeMode::Speed,
         )
     }
     pub fn has_optimize_for(&self) -> bool {
@@ -4525,7 +4525,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.cc_generic_services,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn cc_generic_services_opt(&self) -> ::std::option::Option::<bool> {
@@ -4548,7 +4548,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.cc_generic_services,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_cc_generic_services(&self) -> bool {
@@ -4583,7 +4583,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.java_generic_services,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn java_generic_services_opt(&self) -> ::std::option::Option::<bool> {
@@ -4606,7 +4606,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.java_generic_services,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_java_generic_services(&self) -> bool {
@@ -4641,7 +4641,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.py_generic_services,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn py_generic_services_opt(&self) -> ::std::option::Option::<bool> {
@@ -4664,7 +4664,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.py_generic_services,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_py_generic_services(&self) -> bool {
@@ -4699,7 +4699,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.php_generic_services,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn php_generic_services_opt(&self) -> ::std::option::Option::<bool> {
@@ -4722,7 +4722,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.php_generic_services,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_php_generic_services(&self) -> bool {
@@ -4757,7 +4757,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -4777,7 +4777,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -4806,7 +4806,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.cc_enable_arenas,
             &self._bitfield,
-            ::std::default::Default::default,
+            || true,
         )
     }
     pub fn cc_enable_arenas_opt(&self) -> ::std::option::Option::<bool> {
@@ -4829,7 +4829,7 @@ impl FileOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.cc_enable_arenas,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || true,
         )
     }
     pub fn has_cc_enable_arenas(&self) -> bool {
@@ -5831,7 +5831,7 @@ impl MessageOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.message_set_wire_format,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn message_set_wire_format_opt(&self) -> ::std::option::Option::<bool> {
@@ -5854,7 +5854,7 @@ impl MessageOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.message_set_wire_format,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_message_set_wire_format(&self) -> bool {
@@ -5889,7 +5889,7 @@ impl MessageOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.no_standard_descriptor_accessor,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn no_standard_descriptor_accessor_opt(&self) -> ::std::option::Option::<bool> {
@@ -5912,7 +5912,7 @@ impl MessageOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.no_standard_descriptor_accessor,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_no_standard_descriptor_accessor(&self) -> bool {
@@ -5947,7 +5947,7 @@ impl MessageOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -5967,7 +5967,7 @@ impl MessageOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -6322,7 +6322,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.ctype,
             &self._bitfield,
-            ::std::default::Default::default,
+            || self::_puroro_root::google::protobuf::field_options::CType::String,
         )
     }
     pub fn ctype_opt(
@@ -6352,7 +6352,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.ctype,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || self::_puroro_root::google::protobuf::field_options::CType::String,
         )
     }
     pub fn has_ctype(&self) -> bool {
@@ -6436,7 +6436,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.jstype,
             &self._bitfield,
-            ::std::default::Default::default,
+            || self::_puroro_root::google::protobuf::field_options::JSType::JsNormal,
         )
     }
     pub fn jstype_opt(
@@ -6466,7 +6466,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.jstype,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || self::_puroro_root::google::protobuf::field_options::JSType::JsNormal,
         )
     }
     pub fn has_jstype(&self) -> bool {
@@ -6496,11 +6496,7 @@ impl FieldOptions {
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.lazy,
-            &self._bitfield,
-            ::std::default::Default::default,
-        )
+        > as NonRepeatedFieldType>::get_field(&self.lazy, &self._bitfield, || false)
     }
     pub fn lazy_opt(&self) -> ::std::option::Option::<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -6519,7 +6515,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.lazy,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_lazy(&self) -> bool {
@@ -6548,7 +6544,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -6568,7 +6564,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -6594,11 +6590,7 @@ impl FieldOptions {
             bool,
             self::_puroro::tags::Bool,
             5usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.weak,
-            &self._bitfield,
-            ::std::default::Default::default,
-        )
+        > as NonRepeatedFieldType>::get_field(&self.weak, &self._bitfield, || false)
     }
     pub fn weak_opt(&self) -> ::std::option::Option::<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -6617,7 +6609,7 @@ impl FieldOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.weak,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_weak(&self) -> bool {
@@ -7128,7 +7120,7 @@ impl EnumOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -7148,7 +7140,7 @@ impl EnumOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -7360,7 +7352,7 @@ impl EnumValueOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -7380,7 +7372,7 @@ impl EnumValueOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -7564,7 +7556,7 @@ impl ServiceOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -7584,7 +7576,7 @@ impl ServiceOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -7775,7 +7767,7 @@ impl MethodOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.deprecated,
             &self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
@@ -7795,7 +7787,7 @@ impl MethodOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.deprecated,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || false,
         )
     }
     pub fn has_deprecated(&self) -> bool {
@@ -7828,7 +7820,9 @@ impl MethodOptions {
         > as NonRepeatedFieldType>::get_field(
             &self.idempotency_level,
             &self._bitfield,
-            ::std::default::Default::default,
+            || {
+                self::_puroro_root::google::protobuf::method_options::IdempotencyLevel::IdempotencyUnknown
+            },
         )
     }
     pub fn idempotency_level_opt(
@@ -7861,7 +7855,9 @@ impl MethodOptions {
         > as NonRepeatedFieldType>::mut_field(
             &mut self.idempotency_level,
             &mut self._bitfield,
-            ::std::default::Default::default,
+            || {
+                self::_puroro_root::google::protobuf::method_options::IdempotencyLevel::IdempotencyUnknown
+            },
         )
     }
     pub fn has_idempotency_level(&self) -> bool {

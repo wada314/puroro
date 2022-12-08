@@ -404,6 +404,8 @@ pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<TokenSt
                     quote! { || #value }
                 }
             }
+            // Strings and bytes. Strings are okay for as-is, but bytes need to parse
+            // the octal escape sequences.
             LengthDelimited(LengthDelimitedType::String) => {
                 quote! { || #default_value_string }
             }
@@ -416,6 +418,7 @@ pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<TokenSt
                 detail: "The field default value should not be set for the message field."
                     .to_string(),
             })?,
+            // Enum. Need to generate the value name.
             FieldType::Variant(VariantType::Enum2(e) | VariantType::Enum3(e)) => {
                 let e = e.try_upgrade()?;
                 let enum_path = e.gen_rust_enum_path()?;

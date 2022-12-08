@@ -15,6 +15,7 @@
 mod enums;
 mod official_samples;
 mod oneof;
+mod proto2_defaults;
 mod self_recursive;
 mod serialization;
 mod simple_get_set;
