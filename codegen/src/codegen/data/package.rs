@@ -23,7 +23,6 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub trait Package: Debug + PackageOrMessage {
-    fn cache(&self) -> &AnonymousCache;
     fn full_name(&self) -> Result<&str>;
     fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>>;
 }
@@ -39,8 +38,7 @@ pub struct PackageBase {
 
 #[derive(Debug)]
 pub struct NonRootPackage {
-    cache1: AnonymousCache,
-    cache2: AnonymousCache,
+    cache: AnonymousCache,
     name: String,
     full_name: OnceCell<String>,
     parent: Weak<dyn Package>,
@@ -49,8 +47,7 @@ pub struct NonRootPackage {
 
 #[derive(Debug)]
 pub struct RootPackage {
-    cache1: AnonymousCache,
-    cache2: AnonymousCache,
+    cache: AnonymousCache,
     base: PackageBase,
 }
 
@@ -168,8 +165,7 @@ impl RootPackage {
                 |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn Package>),
             );
             Self {
-                cache1: Default::default(),
-                cache2: Default::default(),
+                cache: Default::default(),
                 base,
             }
         })
@@ -205,8 +201,7 @@ impl NonRootPackage {
                 |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn Package>),
             );
             Self {
-                cache1: Default::default(),
-                cache2: Default::default(),
+                cache: Default::default(),
                 name: name.to_string(),
                 full_name: OnceCell::new(),
                 parent,
@@ -218,7 +213,7 @@ impl NonRootPackage {
 
 impl PackageOrMessage for RootPackage {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache1
+        &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok("".into())
@@ -246,9 +241,6 @@ impl PackageOrMessage for RootPackage {
 }
 
 impl Package for RootPackage {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache2
-    }
     fn full_name(&self) -> Result<&str> {
         Ok("".into())
     }
@@ -259,7 +251,7 @@ impl Package for RootPackage {
 
 impl PackageOrMessage for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
-        &self.cache1
+        &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
@@ -287,9 +279,6 @@ impl PackageOrMessage for NonRootPackage {
 }
 
 impl Package for NonRootPackage {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache2
-    }
     fn full_name(&self) -> Result<&str> {
         self.full_name
             .get_or_try_init(|| {
