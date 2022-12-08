@@ -85,6 +85,19 @@ where
         }
         Ok(())
     }
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        #[allow(unused)] bitvec: &mut B,
+        mut iter: I,
+    ) -> Result<()> {
+        while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
+            let v = var.get::<ProtoType>()?;
+            if v != RustType::default() {
+                self.0 = v
+            }
+        }
+        Ok(())
+    }
     fn deser_from_bits32<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
         let x = <ProtoType as tags::NumericalType>::from_bits32(bits)?;
         if x != RustType::default() {
@@ -99,6 +112,7 @@ where
         }
         Ok(())
     }
+
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         _bitvec: &B,
@@ -111,6 +125,19 @@ where
         ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
         Ok(())
     }
+
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        match field_data {
+            FieldData::Variant(v) => self.deser_from_variant(bitvec, v),
+            FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
+            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits),
+            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits),
+        }
+    }
 }
 
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
@@ -122,6 +149,16 @@ where
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
         bitvec.set(BITFIELD_INDEX, true);
+        Ok(())
+    }
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        #[allow(unused)] bitvec: &mut B,
+        mut iter: I,
+    ) -> Result<()> {
+        while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
+            self.0 = var.get::<ProtoType>()?;
+        }
         Ok(())
     }
     fn deser_from_bits32<B: BitSlice>(&mut self, bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
