@@ -75,7 +75,7 @@ your own crate. Congraturations!
 
 # subcrates
 - puroro -- The crate that the library user need to import
-- codegen -- A protoc compiler plugin
+- codegen -- Generate rust code from the given .proto files info
 - plugin -- A protoc compiler plugin
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
@@ -89,7 +89,7 @@ your own crate. Congraturations!
 - proto2
     - [ ] Groups, at least correctly ignore it
     - [x] Enums (In proto2 we need to refuse the unknown value)
-    - [ ] default value (something like `optional int32 foo = 1; [default=10]`)
+    - [x] default value (something like `optional int32 foo = 1; [default=10]`)
     - [ ] extensions
 - proto2 & 3
     - [ ] Maps
