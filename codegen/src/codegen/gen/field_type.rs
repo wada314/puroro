@@ -67,8 +67,10 @@ impl VariantType {
             Int64 | SInt64 => Rc::new(quote! { i64 }),
             UInt64 => Rc::new(quote! { u64 }),
             Bool => Rc::new(quote! { bool }),
-            Enum2(e) => e.try_upgrade()?.gen_rust_enum_path()?,
-            Enum3(e) => e.try_upgrade()?.gen_rust_enum_path()?,
+            Enum2(e) | Enum3(e) => {
+                let ty = e.try_upgrade()?.gen_rust_enum_type()?;
+                Rc::new(quote! { #ty })
+            }
         })
     }
     fn tag_type(&self) -> Result<Rc<TokenStream>> {

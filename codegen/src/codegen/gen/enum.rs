@@ -19,6 +19,7 @@
 
 use super::super::util::*;
 use super::super::{Enum, PackageOrMessageExt, Syntax};
+use crate::syn;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -28,12 +29,14 @@ use ::std::rc::Rc;
 
 pub trait EnumExt {
     fn gen_enum(&self) -> Result<TokenStream>;
-    fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>>;
+    fn gen_rust_enum_path(&self) -> Result<Rc<syn::Path>>;
+    fn gen_rust_enum_type(&self) -> Result<Rc<syn::Type>>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    rust_enum_path: OnceCell<Rc<TokenStream>>,
+    rust_enum_path: OnceCell<Rc<syn::Path>>,
+    rust_enum_type: OnceCell<Rc<syn::Type>>,
 }
 
 impl<T: ?Sized + Enum> EnumExt for T {
@@ -82,14 +85,25 @@ impl<T: ?Sized + Enum> EnumExt for T {
         })
     }
 
-    fn gen_rust_enum_path(&self) -> Result<Rc<TokenStream>> {
+    fn gen_rust_enum_path(&self) -> Result<Rc<syn::Path>> {
         self.cache()
             .get::<Cache>()?
             .rust_enum_path
             .get_or_try_init(|| {
                 let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
                 let parent = self.parent()?.gen_rust_module_path()?;
-                Ok(Rc::new(quote! { #parent :: #ident }))
+                Ok(Rc::new(syn::parse2(quote! { #parent :: #ident })?))
+            })
+            .cloned()
+    }
+
+    fn gen_rust_enum_type(&self) -> Result<Rc<syn::Type>> {
+        self.cache()
+            .get::<Cache>()?
+            .rust_enum_type
+            .get_or_try_init(|| {
+                let path = self.gen_rust_enum_path()?;
+                Ok(Rc::new(syn::parse2(quote! { #path })?))
             })
             .cloned()
     }
