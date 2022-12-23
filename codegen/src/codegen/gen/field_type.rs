@@ -101,7 +101,10 @@ impl LengthDelimitedType {
         Ok(match self {
             String => Rc::new(quote! { ::std::string::String }),
             Bytes => Rc::new(quote! { ::std::vec::Vec<u8> }),
-            Message(m) => m.try_upgrade()?.gen_rust_struct_path()?,
+            Message(m) => {
+                let ty = m.try_upgrade()?.gen_rust_struct_type()?;
+                Rc::new(quote! { #ty })
+            }
         })
     }
     fn rust_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
@@ -114,7 +117,7 @@ impl LengthDelimitedType {
             String => Rc::new(quote! { &#lt str }),
             Bytes => Rc::new(quote! { &#lt [u8] }),
             Message(m) => {
-                let path = m.try_upgrade()?.gen_rust_struct_path()?;
+                let path = m.try_upgrade()?.gen_rust_struct_type()?;
                 Rc::new(quote! {
                     &#lt #path
                 })
@@ -127,7 +130,7 @@ impl LengthDelimitedType {
             String => Rc::new(quote! { &mut ::std::string::String }),
             Bytes => Rc::new(quote! { &mut ::std::vec::Vec::<u8> }),
             Message(m) => {
-                let path = m.try_upgrade()?.gen_rust_struct_path()?;
+                let path = m.try_upgrade()?.gen_rust_struct_type()?;
                 Rc::new(quote! {
                     &mut #path
                 })
@@ -140,7 +143,7 @@ impl LengthDelimitedType {
             String => quote! { String },
             Bytes => quote! { Bytes },
             Message(m) => {
-                let struct_path = m.try_upgrade()?.gen_rust_struct_path()?;
+                let struct_path = m.try_upgrade()?.gen_rust_struct_type()?;
                 quote! { Message :: <#struct_path> }
             }
         };

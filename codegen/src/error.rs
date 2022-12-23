@@ -40,6 +40,8 @@ pub enum ErrorKind {
     ParseBoolError { source: std::str::ParseBoolError },
     #[error(r#"An error from ParseFloatError: "{source}""#)]
     ParseFloatError { source: std::num::ParseFloatError },
+    #[error(r#"An error from syn::parse::Error: "{source}""#)]
+    SynParseError { source: ::syn::parse::Error },
     #[error(r#"Ar error from std::io::Error: "{source}""#)]
     IoError { source: ::std::io::Error },
     #[error(r#"Bad format string: "{string}""#)]
@@ -118,6 +120,14 @@ impl From<::std::str::ParseBoolError> for GeneratorError {
     fn from(e: ::std::str::ParseBoolError) -> Self {
         Self {
             kind: ErrorKind::ParseBoolError { source: e },
+            backtrace: std::backtrace::Backtrace::capture(),
+        }
+    }
+}
+impl From<::syn::parse::Error> for GeneratorError {
+    fn from(e: ::syn::parse::Error) -> Self {
+        Self {
+            kind: ErrorKind::SynParseError { source: e },
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }

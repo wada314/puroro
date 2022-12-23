@@ -130,7 +130,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 LengthDelimited(Bytes) => quote! { BytesField },
                 LengthDelimited(String) => quote! { StringField },
                 LengthDelimited(Message(m)) => {
-                    let message_path = m.try_upgrade()?.gen_rust_struct_path()?;
+                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
                     quote! {
                         HeapMessageField::< #message_path >
                     }

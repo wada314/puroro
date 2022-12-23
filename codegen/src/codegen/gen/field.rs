@@ -283,7 +283,8 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
                 ::std::cmp::PartialEq
         }),
         FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-            m.try_upgrade()?.gen_rust_struct_path()?
+            let ty = Rc::unwrap_or_clone(m.try_upgrade()?.gen_rust_struct_type()?);
+            Rc::new(quote! { #ty })
         }
         _ => this.r#type()?.rust_type()?,
     };

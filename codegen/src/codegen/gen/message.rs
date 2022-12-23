@@ -15,6 +15,7 @@
 use super::super::util::*;
 use super::super::{FieldExt, Message, PackageOrMessageExt};
 use super::{OneofExt, OneofFieldExt};
+use crate::syn;
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -25,13 +26,13 @@ use ::std::rc::Rc;
 
 pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
-    fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>>;
+    fn gen_rust_struct_type(&self) -> Result<Rc<syn::Type>>;
     fn gen_struct(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    rust_struct_path: OnceCell<Rc<TokenStream>>,
+    rust_struct_type: OnceCell<Rc<syn::Type>>,
     bitfield_size: OnceCell<usize>,
 }
 impl<T: ?Sized + Message> MessageExt for T {
@@ -65,15 +66,15 @@ impl<T: ?Sized + Message> MessageExt for T {
             .cloned()
     }
 
-    fn gen_rust_struct_path(&self) -> Result<Rc<TokenStream>> {
+    fn gen_rust_struct_type(&self) -> Result<Rc<syn::Type>> {
         self.cache()
             .get::<Cache>()?
-            .rust_struct_path
+            .rust_struct_type
             .get_or_try_init(|| {
                 let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
                 let ident =
                     format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
-                Ok(Rc::new(quote! { #parent :: #ident }))
+                Ok(Rc::new(syn::parse2(quote! { #parent :: #ident })?))
             })
             .cloned()
     }

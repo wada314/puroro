@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #![allow(incomplete_features)]
+#![feature(arc_unwrap_or_clone)]
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
 #![feature(is_some_and)]
@@ -21,6 +22,20 @@
 
 mod codegen;
 mod error;
+
+#[cfg(debug_assertions)]
+use syn;
+#[cfg(not(debug_assertions))]
+mod syn {
+    use ::proc_macro2::TokenStream;
+    use ::syn::parse::Result;
+    pub(crate) type Type = TokenStream;
+    pub(crate) type Ident = TokenStream;
+    pub(crate) type Path = TokenStream;
+    pub(crate) fn parse2(ts: TokenStream) -> Result<TokenStream> {
+        Ok(ts)
+    }
+}
 
 pub use crate::error::{ErrorKind, GeneratorError};
 pub type Result<T> = ::std::result::Result<T, GeneratorError>;
