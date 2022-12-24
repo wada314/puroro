@@ -24,7 +24,9 @@ mod codegen;
 mod error;
 
 #[cfg(debug_assertions)]
-use syn;
+mod syn {
+    pub(crate) use ::syn::{parse2, Ident, Path, Type};
+}
 #[cfg(not(debug_assertions))]
 mod syn {
     use ::proc_macro2::TokenStream;
