@@ -27,7 +27,7 @@ mod error;
 mod syn {
     pub(crate) use ::syn::{
         parse2, Arm, Expr, ExprMethodCall, Field, FieldValue, Ident, ImplItemMethod, Item,
-        ItemImpl, Lifetime, Path, PathSegment, Type,
+        ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
     };
     pub(crate) struct NamedField(::syn::Field);
     impl ::syn::parse::Parse for NamedField {
@@ -57,6 +57,7 @@ mod syn {
     pub(crate) type Lifetime = TokenStream;
     pub(crate) type Path = TokenStream;
     pub(crate) type PathSegment = TokenStream;
+    pub(crate) type Stmt = TokenStream;
     pub(crate) type Type = TokenStream;
     pub(crate) fn parse2(ts: TokenStream) -> Result<TokenStream> {
         Ok(ts)

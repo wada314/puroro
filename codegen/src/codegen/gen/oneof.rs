@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
-use crate::syn::{parse2, Arm, Expr, Field, FieldValue, ImplItemMethod, Item, NamedField};
+use crate::syn::{parse2, Arm, Expr, Field, FieldValue, ImplItemMethod, Item, NamedField, Stmt};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -38,7 +38,7 @@ pub trait OneofExt {
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_struct_impl_message_deser_arms(&self, field_data_expr: &Expr) -> Result<Vec<Arm>>;
-    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
     fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
 }
 
@@ -241,14 +241,14 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .collect::<Result<Vec<_>>>()
     }
 
-    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let field_ident = self.gen_struct_field_ident()?;
-        Ok(quote! {
+        Ok(parse2(quote! {
             self.#field_ident.ser_to_write(
                 &self._bitfield,
-                #out_ident
+                #out_expr
             )?;
-        })
+        })?)
     }
 
     fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {

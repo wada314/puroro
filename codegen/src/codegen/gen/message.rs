@@ -152,6 +152,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
     let field_data_ident = quote! { field_data };
     let field_data_expr = parse2(quote! { field_data })?;
     let out_ident = quote! { out };
+    let out_expr = parse2(quote! { out })?;
     let field_deser_arms = this
         .fields()?
         .map(|f| f.gen_struct_field_deser_arm(&field_data_ident))
@@ -168,9 +169,9 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
         .fields()?
         .map(|f| f.gen_struct_field_ser(&out_ident))
         .collect::<Result<Vec<_>>>()?;
-    let ser_oneofs = this
+    let ser_oneof_stmts = this
         .oneofs()?
-        .map(|o| o.gen_struct_field_ser(&out_ident))
+        .map(|o| o.gen_struct_impl_message_ser_stmt(&out_expr))
         .collect::<Result<Vec<_>>>()?;
 
     Ok(quote! {
@@ -197,7 +198,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> self::_puroro::Result<()> {
                 #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
                 #(#ser_fields)*
-                #(#ser_oneofs)*
+                #(#ser_oneof_stmts)*
                 ::std::result::Result::Ok(())
             }
         }
