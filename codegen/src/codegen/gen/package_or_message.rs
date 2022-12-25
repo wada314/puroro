@@ -21,6 +21,7 @@ use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
+use itertools::Itertools;
 pub trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
     fn module_file_path(&self) -> Result<&str>;
@@ -160,9 +161,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .enums()?
             .map(|e| e.gen_enum())
             .collect::<Result<Vec<_>>>()?;
-        let oneof_decls = self
+        let oneof_items = self
             .oneofs()?
-            .map(|o| o.gen_union())
+            .map(|o| Ok(o.gen_union()?.into_iter()))
+            .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             #header
@@ -172,7 +174,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             #(pub mod #submodule_idents;)*
             #(#struct_decls)*
             #(#enum_decls)*
-            #(#oneof_decls)*
+            #(#oneof_items)*
         })
     }
 
@@ -231,9 +233,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .enums()?
             .map(|e| e.gen_enum())
             .collect::<Result<Vec<_>>>()?;
-        let oneof_decls = self
+        let oneof_items = self
             .oneofs()?
-            .map(|o| o.gen_union())
+            .map(|o| Ok(o.gen_union()?.into_iter()))
+            .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             #header
@@ -245,7 +248,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             })*
             #(#struct_decls)*
             #(#enum_decls)*
-            #(#oneof_decls)*
+            #(#oneof_items)*
         })
     }
 }

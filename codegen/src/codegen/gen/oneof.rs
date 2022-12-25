@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
-use crate::syn::parse2;
+use crate::syn::{parse2, Item};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -32,7 +32,7 @@ pub trait OneofExt {
     fn gen_union_ident(&self) -> Result<Rc<Ident>>;
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
 
-    fn gen_union(&self) -> Result<TokenStream>;
+    fn gen_union(&self) -> Result<Vec<Item>>;
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
@@ -118,7 +118,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .cloned()
     }
 
-    fn gen_union(&self) -> Result<TokenStream> {
+    fn gen_union(&self) -> Result<Vec<Item>> {
         let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
@@ -133,32 +133,40 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let oneof_case_impl = gen_oneof_case_impl(self)?;
 
         // Union includes none case, where the case enum does not.
-        Ok(quote! {
-            pub union #union_ident {
-                _none: (),
-                #(#union_items),*,
-            }
-
-            #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
-            pub enum #case_ident<
-                #(#item_type_names = (),)*
-            > {
-                #(#case_names(#item_type_names),)*
-            }
-
-            impl #union_ident {
-                #(#union_methods)*
-            }
-
-            #oneof_union_impl
-            #oneof_case_impl
-
-            impl ::std::default::Default for #union_ident {
-                fn default() -> Self {
-                    Self { _none: () }
+        Ok(vec![
+            parse2(quote! {
+                pub union #union_ident {
+                    _none: (),
+                    #(#union_items),*,
                 }
-            }
-        })
+            })?,
+            parse2(quote! {
+                #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
+                pub enum #case_ident<
+                    #(#item_type_names = (),)*
+                > {
+                    #(#case_names(#item_type_names),)*
+                }
+            })?,
+            parse2(quote! {
+                impl #union_ident {
+                    #(#union_methods)*
+                }
+            })?,
+            parse2(quote! {
+                #oneof_union_impl
+            })?,
+            parse2(quote! {
+                #oneof_case_impl
+            })?,
+            parse2(quote! {
+                impl ::std::default::Default for #union_ident {
+                    fn default() -> Self {
+                        Self { _none: () }
+                    }
+                }
+            })?,
+        ])
     }
 
     fn gen_struct_field_decl(&self) -> Result<TokenStream> {
