@@ -16,10 +16,12 @@ use super::super::util::*;
 use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
 use super::field::gen_default_fn;
 use super::PackageOrMessageExt;
-use crate::syn::{parse2, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment, Type};
+use crate::syn::{
+    parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
+    Type,
+};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
@@ -37,7 +39,7 @@ pub trait OneofFieldExt {
     fn gen_union_item_field(&self) -> Result<Rc<Field>>;
     fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_field_debug(&self) -> Result<TokenStream>;
+    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
 }
 
 #[derive(Debug, Default)]
@@ -301,11 +303,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_struct_field_debug(&self) -> Result<TokenStream> {
+    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
         let ident = self.gen_union_item_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
-        Ok(quote! {
-            .field(stringify!(#ident), &self.#getter_opt_ident())
-        })
+        Ok(parse2(quote! {
+            #receiver.field(stringify!(#ident), &self.#getter_opt_ident())
+        })?)
     }
 }

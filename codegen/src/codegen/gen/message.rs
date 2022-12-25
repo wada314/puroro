@@ -16,6 +16,7 @@ use super::super::util::*;
 use super::super::{FieldExt, Message, PackageOrMessageExt};
 use super::{OneofExt, OneofFieldExt};
 use crate::syn;
+use crate::syn::{parse2, Expr, ItemImpl};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -238,29 +239,26 @@ fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
     })
 }
 
-fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
-    let from_fields = this
-        .fields()?
-        .map(|f| f.gen_struct_field_debug())
-        .collect::<Result<Vec<_>>>()?;
-    let oneofs = this.oneofs()?.collect::<Vec<_>>();
-    let from_oneofs = oneofs
-        .iter()
-        .map(|o| o.fields())
-        .flatten_ok()
-        .map(|f| f?.gen_struct_field_debug())
-        .collect::<Result<Vec<_>>>()?;
-    Ok(quote! {
+    let mut fmt_body: Expr = parse2(quote! { fmt.debug_struct(stringify!(#ident)) })?;
+
+    for field in this.fields()? {
+        fmt_body = field.gen_struct_impl_debug_method_call(fmt_body)?.into();
+    }
+    for oneof in this.oneofs()? {
+        for field in oneof.fields()? {
+            fmt_body = field.gen_struct_impl_debug_method_call(fmt_body)?.into();
+        }
+    }
+
+    Ok(parse2(quote! {
         impl ::std::fmt::Debug for #ident {
             fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                fmt.debug_struct(stringify!(#ident))
-                    #(#from_fields)*
-                    #(#from_oneofs)*
-                    .finish()
+                #fmt_body.finish()
             }
         }
-    })
+    })?)
 }
 
 fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
