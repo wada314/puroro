@@ -25,7 +25,7 @@ mod error;
 
 #[cfg(debug_assertions)]
 mod syn {
-    pub(crate) use ::syn::{parse2, Ident, Path, Type};
+    pub(crate) use ::syn::{parse2, Ident, Lifetime, Path, Type};
 }
 #[cfg(not(debug_assertions))]
 mod syn {
@@ -33,6 +33,7 @@ mod syn {
     use ::syn::parse::Result;
     pub(crate) type Type = TokenStream;
     pub(crate) type Ident = TokenStream;
+    pub(crate) type Lifetime = TokenStream;
     pub(crate) type Path = TokenStream;
     pub(crate) fn parse2(ts: TokenStream) -> Result<TokenStream> {
         Ok(ts)

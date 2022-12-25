@@ -16,9 +16,10 @@ use super::super::util::*;
 use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
 use super::field::gen_default_fn;
 use super::PackageOrMessageExt;
+use crate::syn::{parse2, Ident, Lifetime, Type};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::{Ident, TokenStream};
+use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
@@ -31,7 +32,7 @@ pub trait OneofFieldExt {
     fn gen_generic_type_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
 
-    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>>;
+    fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
     fn gen_union_item_decl(&self) -> Result<TokenStream>;
     fn gen_union_methods(&self) -> Result<TokenStream>;
@@ -109,8 +110,8 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ))
     }
 
-    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
-        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?.clone())
+    fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
+        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
 
     fn gen_union_item_decl(&self) -> Result<TokenStream> {
@@ -154,9 +155,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let getter_mut_ident = self.gen_union_getter_mut_ident()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
-                ::std::option::Option::< #borrowed_type >
-            }),
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
+                Rc::new(parse2(quote! {
+                    ::std::option::Option::< #borrowed_type >
+                })?)
+            }
             _ => Rc::clone(&borrowed_type),
         };
         let getter_opt_type = quote! {
@@ -239,9 +242,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
-                ::std::option::Option::< #borrowed_type >
-            }),
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
+                Rc::new(parse2(quote! {
+                    ::std::option::Option::< #borrowed_type >
+                })?)
+            }
             _ => Rc::clone(&borrowed_type),
         };
         let getter_opt_type = quote! {

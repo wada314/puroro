@@ -17,6 +17,7 @@ use super::super::{
     Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldRule, FieldType, LengthDelimitedType,
     MessageExt, VariantType,
 };
+use crate::syn::parse2;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -272,19 +273,18 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
     let field_ident = gen_struct_field_ident(this)?;
     let field_type = gen_struct_field_type(this)?;
     let getter_item_type = match this.r#type()? {
-        FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(quote! {
+        FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
             impl ::std::ops::Deref::<Target = str> +
                 ::std::fmt::Debug +
                 ::std::cmp::PartialEq
-        }),
-        FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(quote! {
+        })?),
+        FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(parse2(quote! {
             impl ::std::ops::Deref::<Target = [u8]> +
                 ::std::fmt::Debug +
                 ::std::cmp::PartialEq
-        }),
+        })?),
         FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-            let ty = Rc::unwrap_or_clone(m.try_upgrade()?.gen_rust_struct_type()?);
-            Rc::new(quote! { #ty })
+            m.try_upgrade()?.gen_rust_struct_type()?
         }
         _ => this.r#type()?.rust_type()?,
     };
@@ -328,9 +328,9 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
     let field_type = gen_struct_field_type(this)?;
     let borrowed_type = this.r#type()?.rust_maybe_borrowed_type(None)?;
     let getter_type = match this.r#type()? {
-        FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
+        FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(parse2(quote! {
             ::std::option::Option::< #borrowed_type >
-        }),
+        })?),
         _ => Rc::clone(&borrowed_type),
     };
     let getter_opt_type = Rc::new(quote! {

@@ -15,6 +15,7 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
+use crate::syn::parse2;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -256,7 +257,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let borrowed_types_a = try_map_fields(this, |f| {
-        f.gen_maybe_borrowed_type(Some(format_ident!("a")))
+        f.gen_maybe_borrowed_type(Some(parse2(quote! { 'a })?))
     })?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
