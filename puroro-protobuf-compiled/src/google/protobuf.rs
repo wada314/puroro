@@ -1,8 +1,10 @@
-pub mod _puroro_root {
-    pub use super::super::_puroro_root::*;
+mod _puroro_root {
+    #[allow(unused)]
+    pub(crate) use super::super::_puroro_root::*;
 }
-pub mod _puroro {
-    pub use ::puroro::*;
+mod _puroro {
+    #[allow(unused)]
+    pub(crate) use ::puroro::*;
 }
 pub mod compiler;
 pub mod descriptor_proto;

@@ -123,14 +123,16 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
                 pub use ::puroro::*;
 
-                pub mod _puroro_root {
-                    pub use super::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::*;
                 }
             }
         } else {
             quote! {
-                pub mod _puroro_root {
-                    pub use super::super::_puroro_root::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::super::_puroro_root::*;
                 }
             }
         };
@@ -168,8 +170,9 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             #header
-            pub mod _puroro {
-                pub use ::puroro::*;
+            mod _puroro {
+                #[allow(unused)]
+                pub(crate) use ::puroro::*;
             }
             #(pub mod #submodule_idents;)*
             #(#struct_decls)*
@@ -181,14 +184,16 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
     fn gen_inline_code(&self) -> Result<TokenStream> {
         let header = if self.is_root()? {
             quote! {
-                pub mod _puroro_root {
-                    pub use super::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::*;
                 }
             }
         } else {
             quote! {
-                pub mod _puroro_root {
-                    pub use super::super::_puroro_root::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::super::_puroro_root::*;
                 }
             }
         };
@@ -240,8 +245,9 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         Ok(quote! {
             #header
-            pub mod _puroro {
-                pub use ::puroro::*;
+            mod _puroro {
+                #[allow(unused)]
+                pub(crate) use ::puroro::*;
             }
             #(pub mod #submodule_idents {
                 #submodule_contents
