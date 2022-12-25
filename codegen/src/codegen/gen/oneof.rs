@@ -123,7 +123,10 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
-        let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
+        let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
