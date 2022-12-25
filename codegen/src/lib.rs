@@ -17,6 +17,7 @@
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
 #![feature(is_some_and)]
+#![feature(result_flattening)]
 #![feature(try_find)]
 #![feature(trait_upcasting)]
 
@@ -26,7 +27,7 @@ mod error;
 #[cfg(debug_assertions)]
 mod syn {
     pub(crate) use ::syn::{
-        parse2, Arm, Expr, ExprMethodCall, Field, FieldValue, Ident, ImplItemMethod, Item,
+        parse2, Arm, Expr, ExprMethodCall, Field, FieldValue, File, Ident, ImplItemMethod, Item,
         ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
     };
     pub(crate) struct NamedField(::syn::Field);
@@ -50,6 +51,7 @@ mod syn {
     pub(crate) type ExprMethodCall = TokenStream;
     pub(crate) type Field = TokenStream;
     pub(crate) type FieldValue = TokenStream;
+    pub(crate) type File = TokenStream;
     pub(crate) type ImplItemMethod = TokenStream;
     pub(crate) type Item = TokenStream;
     pub(crate) type ItemImpl = TokenStream;

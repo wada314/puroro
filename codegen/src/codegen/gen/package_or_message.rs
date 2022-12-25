@@ -15,26 +15,28 @@
 use super::super::util::*;
 use super::super::{EnumExt, MessageExt, PackageOrMessage};
 use super::OneofExt;
+use crate::syn::{parse2, File, Path};
 use crate::Result;
+use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
-use itertools::Itertools;
+
 pub trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
     fn module_file_path(&self) -> Result<&str>;
     fn module_file_dir(&self) -> Result<&str>;
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
-    fn gen_module_file(&self) -> Result<TokenStream>;
+    fn gen_rust_module_path(&self) -> Result<Rc<Path>>;
+    fn gen_module_file(&self) -> Result<File>;
     fn gen_inline_code(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
     module_file_dir: OnceCell<String>,
-    rust_module_path: OnceCell<Rc<TokenStream>>,
+    rust_module_path: OnceCell<Rc<Path>>,
     module_name: OnceCell<String>,
     module_file_path: OnceCell<String>,
 }
@@ -92,28 +94,27 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .map(|s| s.as_str())
     }
 
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+    fn gen_rust_module_path(&self) -> Result<Rc<Path>> {
         self.cache()
             .get::<Cache>()?
             .rust_module_path
             .get_or_try_init(|| {
-                Ok(Rc::new(if let Some(parent) = self.parent()? {
+                let ts = if let Some(parent) = self.parent()? {
                     let parent_path = parent.gen_rust_module_path()?;
                     let ident = format_ident!(
                         "{}",
                         self.name()?.to_lower_snake_case().escape_rust_keywords()
                     );
-                    quote! {
-                        #parent_path :: #ident
-                    }
+                    quote! { #parent_path :: #ident }
                 } else {
                     quote! { self :: _puroro_root }
-                }))
+                };
+                Ok(Rc::new(parse2(ts)?))
             })
             .cloned()
     }
 
-    fn gen_module_file(&self) -> Result<TokenStream> {
+    fn gen_module_file(&self) -> Result<File> {
         let header = if self.is_root()? {
             quote! {
                 /// re-export puroro.
@@ -168,7 +169,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .map(|o| Ok(o.gen_union()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
-        Ok(quote! {
+        Ok(parse2(quote! {
             #header
             mod _puroro {
                 #[allow(unused)]
@@ -178,7 +179,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             #(#struct_decls)*
             #(#enum_decls)*
             #(#oneof_items)*
-        })
+        })?)
     }
 
     fn gen_inline_code(&self) -> Result<TokenStream> {

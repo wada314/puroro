@@ -20,10 +20,12 @@ use self::data::*;
 use self::gen::*;
 
 use crate::{ErrorKind, GeneratorError, Result};
+use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::CodeGeneratorResponse;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
 
@@ -55,26 +57,31 @@ pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = RootPackage::new(files);
-    let from_packages = root_package
-        .all_packages()?
-        .into_iter()
-        .chain(iter::once(Rc::clone(&root_package) as Rc<dyn Package>))
-        .map(|p| -> Result<_> { Ok((p.module_file_path()?.to_string(), p.gen_module_file()?)) });
-    let from_messages = root_package
-        .all_messages()?
-        .into_iter()
-        .filter_map(|m| match m.should_generate_module_file() {
-            Ok(true) => Some(Ok(m)),
-            Ok(false) => None,
-            Err(e) => Some(Err(e)),
-        })
-        .map(|rm| {
-            let m = rm?;
-            Ok((m.module_file_path()?.to_string(), m.gen_module_file()?))
-        });
 
-    from_packages
-        .chain(from_messages)
+    let file_generating_items =
+        iter::once(Ok(Rc::clone(&root_package) as Rc<dyn PackageOrMessage>))
+            .chain(
+                // Packages except root
+                root_package
+                    .all_packages()?
+                    .into_iter()
+                    .map(|p| Ok(p as Rc<dyn PackageOrMessage>)),
+            )
+            .chain(root_package.all_messages()?.into_iter().filter_map(|m| {
+                // messages which contains subitems
+                match m.should_generate_module_file() {
+                    Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
+                    Ok(false) => None,
+                    Err(e) => Some(Err(e)),
+                }
+            }));
+    file_generating_items
+        .map_ok(|item| {
+            let file_name = item.module_file_path()?.to_string();
+            let file_content = item.gen_module_file()?;
+            Ok((file_name, quote! { #file_content }))
+        })
+        .map(|rr| rr.flatten())
         .collect::<Result<Vec<_>>>()
 }
 
