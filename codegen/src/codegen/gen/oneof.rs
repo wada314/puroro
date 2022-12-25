@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
-use crate::syn::{parse2, Field, ImplItemMethod, Item, NamedField};
+use crate::syn::{parse2, Field, FieldValue, ImplItemMethod, Item, NamedField};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -35,7 +35,7 @@ pub trait OneofExt {
     fn gen_union(&self) -> Result<Vec<Item>>;
     fn gen_struct_field(&self) -> Result<Field>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
+    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
@@ -208,15 +208,15 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
+    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_struct_field_ident()?;
         let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
 
-        Ok(quote! {
+        Ok(parse2(quote! {
             #ident: <#message_module :: #union_ident as self::_puroro::internal::oneof_type::OneofUnion>
-                ::clone(&self.#ident, &self._bitfield),
-        })
+                ::clone(&self.#ident, &self._bitfield)
+        })?)
     }
 
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {

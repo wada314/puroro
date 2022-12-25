@@ -26,8 +26,8 @@ mod error;
 #[cfg(debug_assertions)]
 mod syn {
     pub(crate) use ::syn::{
-        parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Item, ItemImpl, Lifetime, Path,
-        PathSegment, Type,
+        parse2, Expr, ExprMethodCall, Field, FieldValue, Ident, ImplItemMethod, Item, ItemImpl,
+        Lifetime, Path, PathSegment, Type,
     };
     pub(crate) struct NamedField(::syn::Field);
     impl ::syn::parse::Parse for NamedField {
@@ -49,6 +49,7 @@ mod syn {
     pub(crate) type Expr = TokenStream;
     pub(crate) type ExprMethodCall = TokenStream;
     pub(crate) type Field = TokenStream;
+    pub(crate) type FieldValue = TokenStream;
     pub(crate) type ImplItemMethod = TokenStream;
     pub(crate) type Item = TokenStream;
     pub(crate) type ItemImpl = TokenStream;
