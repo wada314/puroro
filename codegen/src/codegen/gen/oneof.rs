@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
-use crate::syn::{parse2, Item};
+use crate::syn::{parse2, Field, Item, NamedField};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -33,7 +33,7 @@ pub trait OneofExt {
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
 
     fn gen_union(&self) -> Result<Vec<Item>>;
-    fn gen_struct_field_decl(&self) -> Result<TokenStream>;
+    fn gen_struct_field(&self) -> Result<Field>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
@@ -169,13 +169,14 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_struct_field_decl(&self) -> Result<TokenStream> {
+    fn gen_struct_field(&self) -> Result<Field> {
         let field_ident = self.gen_struct_field_ident()?;
         let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
-        Ok(quote! {
-            #field_ident: #message_module :: #union_ident,
-        })
+        Ok(parse2::<NamedField>(quote! {
+            #field_ident: #message_module :: #union_ident
+        })?
+        .into())
     }
 
     fn gen_struct_field_methods(&self) -> Result<TokenStream> {

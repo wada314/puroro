@@ -16,8 +16,8 @@
 #[error(r#"GeneratorError. kind="{kind}""#)]
 pub struct GeneratorError {
     #[from]
-    kind: ErrorKind,
-    backtrace: std::backtrace::Backtrace,
+    pub kind: ErrorKind,
+    pub backtrace: std::backtrace::Backtrace,
 }
 
 #[derive(Debug, ::thiserror::Error)]

@@ -72,7 +72,13 @@ pub fn puroro_inline(input: TokenStream) -> TokenStream {
         FileDescriptorSet::from_bytes_iter(f.bytes()).unwrap()
     };
 
-    let main_code = generate_tokens_for_inline(fd_set.file().into_iter()).unwrap();
+    let main_code = match generate_tokens_for_inline(fd_set.file().into_iter()) {
+        Ok(main_code) => main_code,
+        Err(e) => {
+            let message = format!("{}\n{}", e.to_string(), &e.backtrace);
+            return quote! { compile_error!(#message); }.into();
+        }
+    };
 
     let LineColumn { line, column } = Span::call_site().start();
     let wrapping_mod = format_ident!("_puroro_inline_{}_{}", line, column);
