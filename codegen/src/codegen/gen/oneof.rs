@@ -121,7 +121,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_union(&self) -> Result<TokenStream> {
         let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
-        let union_items = try_map_fields(self, |f| f.gen_union_item_decl())?;
+        let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
@@ -133,7 +133,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         Ok(quote! {
             pub union #union_ident {
                 _none: (),
-                #(#union_items)*
+                #(#union_items),*,
             }
 
             #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
@@ -355,7 +355,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
 
 fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
     let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
-    let union_items = try_map_fields(this, |f| f.gen_union_item_decl())?;
+    let union_items = try_map_fields(this, |f| f.gen_union_item_field())?;
     let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;

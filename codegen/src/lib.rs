@@ -25,19 +25,33 @@ mod error;
 
 #[cfg(debug_assertions)]
 mod syn {
-    pub(crate) use ::syn::{parse2, Ident, Lifetime, Path, Type};
+    pub(crate) use ::syn::{parse2, Field, Ident, Lifetime, Path, PathSegment, Type};
+    pub(crate) struct NamedField(::syn::Field);
+    impl ::syn::parse::Parse for NamedField {
+        fn parse(input: syn::parse::ParseStream) -> ::syn::Result<Self> {
+            Ok(NamedField(::syn::Field::parse_named(input)?))
+        }
+    }
+    impl ::std::convert::From<NamedField> for ::syn::Field {
+        fn from(value: NamedField) -> Self {
+            value.0
+        }
+    }
 }
 #[cfg(not(debug_assertions))]
 mod syn {
     use ::proc_macro2::TokenStream;
     use ::syn::parse::Result;
     pub(crate) type Type = TokenStream;
+    pub(crate) type Field = TokenStream;
     pub(crate) type Ident = TokenStream;
     pub(crate) type Lifetime = TokenStream;
     pub(crate) type Path = TokenStream;
+    pub(crate) type PathSegment = TokenStream;
     pub(crate) fn parse2(ts: TokenStream) -> Result<TokenStream> {
         Ok(ts)
     }
+    pub(crate) type NamedField = TokenStream;
 }
 
 pub use crate::error::{ErrorKind, GeneratorError};

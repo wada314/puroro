@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
 use super::field::gen_default_fn;
 use super::PackageOrMessageExt;
-use crate::syn::{parse2, Ident, Lifetime, Type};
+use crate::syn::{parse2, Field, Ident, Lifetime, NamedField, PathSegment, Type};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
@@ -34,7 +34,7 @@ pub trait OneofFieldExt {
 
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
-    fn gen_union_item_decl(&self) -> Result<TokenStream>;
+    fn gen_union_item_field(&self) -> Result<Rc<Field>>;
     fn gen_union_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_methods(&self) -> Result<TokenStream>;
     fn gen_struct_field_debug(&self) -> Result<TokenStream>;
@@ -114,13 +114,13 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
 
-    fn gen_union_item_decl(&self) -> Result<TokenStream> {
+    fn gen_union_item_field(&self) -> Result<Rc<Field>> {
         let ident = self.gen_union_item_ident()?;
-        let inner_type_name = {
+        let inner_type_name_segment: PathSegment = {
             use FieldType::*;
             use LengthDelimitedType::*;
             let r#type = self.r#type()?;
-            match r#type {
+            parse2(match r#type {
                 Variant(_) | Bits32(_) | Bits64(_) => {
                     let primitive = r#type.rust_type()?;
                     let tag = r#type.tag_type()?;
@@ -136,17 +136,20 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                         HeapMessageField::< #message_path >
                     }
                 }
-            }
+            })?
         };
-        let field_type = quote! {
+        let field_type: Type = parse2(quote! {
             ::std::mem::ManuallyDrop::<
-                self::_puroro::internal::oneof_field_type:: #inner_type_name
+                self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
             >
-        };
+        })?;
 
-        Ok(quote! {
-            #ident: #field_type,
-        })
+        Ok(Rc::new(
+            parse2::<NamedField>(quote! {
+                #ident: #field_type
+            })?
+            .into(),
+        ))
     }
 
     fn gen_union_methods(&self) -> Result<TokenStream> {
