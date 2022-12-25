@@ -15,12 +15,13 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
-use crate::syn::{parse2, Field, FieldValue, ImplItemMethod, Item, NamedField};
+use crate::syn::{parse2, Arm, Expr, Field, FieldValue, ImplItemMethod, Item, NamedField};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::Rc;
 
 pub trait OneofExt {
@@ -36,7 +37,7 @@ pub trait OneofExt {
     fn gen_struct_field(&self) -> Result<Field>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
-    fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_impl_message_deser_arms(&self, field_data_expr: &Expr) -> Result<Vec<Arm>>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
 }
@@ -219,7 +220,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         })?)
     }
 
-    fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_message_deser_arms(&self, field_data_expr: &Expr) -> Result<Vec<Arm>> {
         let field_ident = self.gen_struct_field_ident()?;
         let field_numbers = try_map_fields(self, |f| f.number())?;
 
@@ -227,13 +228,17 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
 
-        Ok(quote! {
-            #(#field_numbers => self.#field_ident.deser_from_iter(
-                &mut self._bitfield,
-                #field_data_ident,
-                #message_module::#case_ident::#case_names(()),
-            )?,)*
-        })
+        iter::zip(field_numbers.into_iter(), case_names.into_iter())
+            .map(|(field_number, case_name)| {
+                Ok(parse2(quote! {
+                    #field_number => self.#field_ident.deser_from_iter(
+                        &mut self._bitfield,
+                        #field_data_expr,
+                        #message_module::#case_ident::#case_name(()),
+                    )?,
+                })?)
+            })
+            .collect::<Result<Vec<_>>>()
     }
 
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {

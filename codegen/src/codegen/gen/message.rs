@@ -150,6 +150,7 @@ fn gen_struct_ident(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
 fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
     let ident = gen_struct_ident(this)?;
     let field_data_ident = quote! { field_data };
+    let field_data_expr = parse2(quote! { field_data })?;
     let out_ident = quote! { out };
     let field_deser_arms = this
         .fields()?
@@ -157,7 +158,11 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
         .collect::<Result<Vec<_>>>()?;
     let oneof_deser_arms = this
         .oneofs()?
-        .map(|o| o.gen_struct_field_deser_arms(&field_data_ident))
+        .map(|o| {
+            Ok(o.gen_struct_impl_message_deser_arms(&field_data_expr)?
+                .into_iter())
+        })
+        .flatten_ok()
         .collect::<Result<Vec<_>>>()?;
     let ser_fields = this
         .fields()?
