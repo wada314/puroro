@@ -38,7 +38,7 @@ pub trait OneofFieldExt {
 
     fn gen_union_item_field(&self) -> Result<Rc<Field>>;
     fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
 }
 
@@ -241,7 +241,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let oneof_struct_field_ident = self.oneof()?.gen_struct_field_ident()?;
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;

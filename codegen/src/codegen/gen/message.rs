@@ -96,14 +96,15 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let oneof_methods = self
             .oneofs()?
-            .map(|o| o.gen_struct_field_methods())
+            .map(|o| Ok(o.gen_struct_methods()?.into_iter()))
+            .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let oneofs = self.oneofs()?.collect::<Vec<_>>();
-        let oneof_fields_methods = oneofs
+        let oneof_field_methods = oneofs
             .iter()
             .map(|o| o.fields())
             .flatten_ok()
-            .map(|f| Ok(f?.gen_struct_field_methods()?.into_iter()))
+            .map(|f| Ok(f?.gen_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
@@ -123,7 +124,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             impl #ident {
                 #(#field_methods)*
                 #(#oneof_methods)*
-                #(#oneof_fields_methods)*
+                #(#oneof_field_methods)*
             }
 
             #message_impl

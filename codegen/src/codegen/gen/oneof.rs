@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
-use crate::syn::{parse2, Field, Item, NamedField};
+use crate::syn::{parse2, Field, ImplItemMethod, Item, NamedField};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, TokenStream};
@@ -34,7 +34,7 @@ pub trait OneofExt {
 
     fn gen_union(&self) -> Result<Vec<Item>>;
     fn gen_struct_field(&self) -> Result<Field>;
-    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
@@ -179,7 +179,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         .into())
     }
 
-    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
@@ -189,20 +189,23 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
 
-        Ok(quote! {
-            pub fn #getter_ident(&self) -> ::std::option::Option<
-                <#message_module::#union_ident as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<'_>
-            >
-            {
-                use self::_puroro::internal::oneof_type::OneofUnion as _;
-                self.#field_ident.case_ref(&self._bitfield)
-            }
-
-            pub fn #clear_ident(&mut self) {
-                use self::_puroro::internal::oneof_type::OneofUnion as _;
-                self.#field_ident.clear(&mut self._bitfield)
-            }
-        })
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_ident(&self) -> ::std::option::Option<
+                    <#message_module::#union_ident as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<'_>
+                >
+                {
+                    use self::_puroro::internal::oneof_type::OneofUnion as _;
+                    self.#field_ident.case_ref(&self._bitfield)
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    use self::_puroro::internal::oneof_type::OneofUnion as _;
+                    self.#field_ident.clear(&mut self._bitfield)
+                }
+            })?,
+        ])
     }
 
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
