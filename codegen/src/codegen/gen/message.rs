@@ -102,7 +102,8 @@ impl<T: ?Sized + Message> MessageExt for T {
             .iter()
             .map(|o| o.fields())
             .flatten_ok()
-            .map(|f| f?.gen_struct_field_methods())
+            .map(|f| Ok(f?.gen_struct_field_methods()?.into_iter()))
+            .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = gen_struct_message_impl(self)?;

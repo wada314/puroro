@@ -36,7 +36,7 @@ pub trait OneofFieldExt {
 
     fn gen_union_item_field(&self) -> Result<Rc<Field>>;
     fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
+    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_field_debug(&self) -> Result<TokenStream>;
 }
 
@@ -239,7 +239,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let oneof_struct_field_ident = self.oneof()?.gen_struct_field_ident()?;
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
@@ -267,28 +267,38 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         };
         let enum_item_ident = self.gen_case_enum_value_ident()?;
 
-        Ok(quote! {
-            pub fn #getter_ident(&self) -> #getter_type {
-                self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
-            }
-            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                self.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
-            }
-            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
-            }
-            pub fn #has_ident(&self) -> bool {
-                self.#getter_opt_ident().is_some()
-            }
-            pub fn #clear_ident(&mut self) {
-                #[allow(unused)] use ::std::option::Option::Some;
-                use self::_puroro::internal::oneof_type::OneofCase;
-                use self::_puroro::internal::oneof_type::OneofUnion;
-                if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
-                    self.#oneof_struct_field_ident.clear(&mut self._bitfield)
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_ident(&self) -> #getter_type {
+                    self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
                 }
-            }
-        })
+            })?,
+            parse2(quote! {
+                pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+                    self.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
+                }
+            })?,
+            parse2(quote! {
+                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                    self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
+                }
+            })?,
+            parse2(quote! {
+                pub fn #has_ident(&self) -> bool {
+                    self.#getter_opt_ident().is_some()
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    use self::_puroro::internal::oneof_type::OneofCase;
+                    use self::_puroro::internal::oneof_type::OneofUnion;
+                    if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
+                        self.#oneof_struct_field_ident.clear(&mut self._bitfield)
+                    }
+                }
+            })?,
+        ])
     }
 
     fn gen_struct_field_debug(&self) -> Result<TokenStream> {
