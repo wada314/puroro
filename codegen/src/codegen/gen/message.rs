@@ -272,13 +272,14 @@ fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStr
     let ident = gen_struct_ident(this)?;
     let rhs_ident = format_ident!("rhs");
     let rhs = quote! { #rhs_ident };
+    let rhs_expr = parse2(quote! { #rhs_ident })?;
     let field_cmps = this
         .fields()?
         .map(|f| f.gen_struct_field_partial_eq_cmp(&rhs))
         .collect::<Result<Vec<_>>>()?;
     let oneof_cmps = this
         .oneofs()?
-        .map(|o| o.gen_struct_field_partial_eq_cmp(&rhs))
+        .map(|o| o.gen_struct_impl_partial_eq_cmp(&rhs_expr))
         .collect::<Result<Vec<_>>>()?;
     Ok(quote! {
         impl ::std::cmp::PartialEq for #ident {
@@ -287,7 +288,7 @@ fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStr
 
                 true
                     #(#field_cmps)*
-                    #(#oneof_cmps)*
+                    #( && #oneof_cmps)*
             }
         }
     })

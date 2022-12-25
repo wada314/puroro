@@ -39,7 +39,7 @@ pub trait OneofExt {
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_struct_impl_message_deser_arms(&self, field_data_expr: &Expr) -> Result<Vec<Arm>>;
     fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
-    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
 #[derive(Debug, Default)]
@@ -251,14 +251,14 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         })?)
     }
 
-    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
-        Ok(quote! {
-            && self.#getter_ident() == #rhs_ident.#getter_ident()
-        })
+        Ok(parse2(quote! {
+            self.#getter_ident() == #rhs_expr.#getter_ident()
+        })?)
     }
 }
 
