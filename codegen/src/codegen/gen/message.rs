@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::super::{FieldExt, Message, PackageOrMessageExt};
 use super::{OneofExt, OneofFieldExt};
 use crate::syn;
-use crate::syn::{parse2, Expr, ItemImpl};
+use crate::syn::{parse2, Expr, Ident, ItemImpl};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -136,18 +136,17 @@ impl<T: ?Sized + Message> MessageExt for T {
     }
 }
 
-fn gen_struct_ident(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
-    let ident = format_ident!(
+fn gen_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
+    Ok(format_ident!(
         "{}",
         this.name()?
             .to_camel_case()
             .escape_rust_keywords()
             .to_string()
-    );
-    Ok(quote! { #ident })
+    ))
 }
 
-fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let field_data_ident = quote! { field_data };
     let field_data_expr = parse2(quote! { field_data })?;
@@ -174,7 +173,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
         .map(|o| o.gen_struct_impl_message_ser_stmt(&out_expr))
         .collect::<Result<Vec<_>>>()?;
 
-    Ok(quote! {
+    Ok(parse2(quote! {
         impl self::_puroro::Message for #ident {
             fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
                 let mut msg = <Self as ::std::default::Default>::default();
@@ -202,10 +201,10 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream
                 ::std::result::Result::Ok(())
             }
         }
-    })
+    })?)
 }
 
-fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let field_clones = this
         .fields()?
@@ -215,7 +214,7 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
         .oneofs()?
         .map(|o| o.gen_struct_impl_clone_field_value())
         .collect::<Result<Vec<_>>>()?;
-    Ok(quote! {
+    Ok(parse2(quote! {
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
                 Self {
@@ -225,7 +224,7 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> 
                 }
             }
         }
-    })
+    })?)
 }
 
 fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
