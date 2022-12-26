@@ -227,14 +227,14 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let oneof_idents = this
         .oneofs()?
         .map(|o| o.gen_struct_field_ident())
         .collect::<Result<Vec<_>>>()?;
     // We need to explicitly clear the oneof unions.
-    Ok(quote! {
+    Ok(parse2(quote! {
         impl ::std::ops::Drop for #ident {
             fn drop(&mut self) {
                 #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -242,7 +242,7 @@ fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
                 #(self.#oneof_idents.clear(&mut self._bitfield);)*
             }
         }
-    })
+    })?)
 }
 
 fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
@@ -267,7 +267,7 @@ fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStream> {
+fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let rhs_ident = format_ident!("rhs");
     let rhs = quote! { #rhs_ident };
@@ -280,7 +280,7 @@ fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStr
         .oneofs()?
         .map(|o| o.gen_struct_impl_partial_eq_cmp(&rhs_expr))
         .collect::<Result<Vec<_>>>()?;
-    Ok(quote! {
+    Ok(parse2(quote! {
         impl ::std::cmp::PartialEq for #ident {
             fn eq(&self, rhs: &Self) -> bool {
                 #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -290,5 +290,5 @@ fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<TokenStr
                     #( && #oneof_cmps)*
             }
         }
-    })
+    })?)
 }
