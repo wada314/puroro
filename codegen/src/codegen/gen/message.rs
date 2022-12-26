@@ -110,10 +110,10 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = gen_struct_message_impl(self)?;
-        let clone_impl = gen_struct_clone_impl(self)?;
-        let drop_impl = gen_struct_drop_impl(self)?;
-        let debug_impl = gen_struct_debug_impl(self)?;
-        let partial_eq_impl = gen_struct_partial_eq_impl(self)?;
+        let clone_impl = gen_struct_impl_clone(self)?;
+        let drop_impl = gen_struct_impl_drop(self)?;
+        let debug_impl = gen_struct_impl_debug(self)?;
+        let partial_eq_impl = gen_struct_impl_partial_eq(self)?;
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
@@ -205,11 +205,11 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+fn gen_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let field_clones = this
         .fields()?
-        .map(|f| f.gen_struct_field_clone_arm())
+        .map(|f| f.gen_struct_field_clone_field_value())
         .collect::<Result<Vec<_>>>()?;
     let oneof_clones = this
         .oneofs()?
@@ -219,7 +219,7 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
                 Self {
-                    #(#field_clones)*
+                    #(#field_clones,)*
                     #(#oneof_clones,)*
                     _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 }
@@ -228,7 +228,7 @@ fn gen_struct_clone_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+fn gen_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let oneof_idents = this
         .oneofs()?
@@ -246,7 +246,7 @@ fn gen_struct_drop_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+fn gen_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let mut fmt_body: Expr = parse2(quote! { fmt.debug_struct(stringify!(#ident)) })?;
 
@@ -268,7 +268,7 @@ fn gen_struct_debug_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_partial_eq_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+fn gen_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let rhs_ident = format_ident!("rhs");
     let rhs = quote! { #rhs_ident };
