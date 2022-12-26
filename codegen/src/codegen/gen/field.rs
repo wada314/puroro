@@ -17,7 +17,7 @@ use super::super::{
     Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldRule, FieldType, LengthDelimitedType,
     MessageExt, VariantType,
 };
-use crate::syn::{parse2, Expr, ExprMethodCall};
+use crate::syn::{parse2, Expr, ExprMethodCall, ImplItemMethod};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -32,7 +32,7 @@ pub trait FieldExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_struct_field_decl(&self) -> Result<TokenStream>;
-    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
+    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
@@ -106,7 +106,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             #ident: #r#type,
         })
     }
-    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.rule()? {
             FieldRule::Repeated => gen_struct_field_methods_for_repeated(self),
             _ => gen_struct_field_methods_for_non_repeated(self),
@@ -262,7 +262,9 @@ fn gen_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
         .cloned()
 }
 
-fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result<TokenStream> {
+fn gen_struct_field_methods_for_repeated(
+    this: &(impl ?Sized + Field),
+) -> Result<Vec<ImplItemMethod>> {
     debug_assert!(matches!(this.rule(), Ok(FieldRule::Repeated)));
     let getter_ident = format_ident!(
         "{}",
@@ -289,29 +291,37 @@ fn gen_struct_field_methods_for_repeated(this: &(impl ?Sized + Field)) -> Result
         _ => this.r#type()?.rust_type()?,
     };
     let mut_item_type = this.r#type()?.rust_type()?;
-    Ok(quote! {
-        pub fn #getter_ident(&self) -> &[#getter_item_type] {
-            use self::_puroro::internal::field_type::RepeatedFieldType;
-            <#field_type as RepeatedFieldType>::get_field(
-                &self.#field_ident, &self._bitfield,
-            )
-        }
-        pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
-            use self::_puroro::internal::field_type::RepeatedFieldType;
-            <#field_type as RepeatedFieldType>::mut_field(
-                &mut self.#field_ident, &mut self._bitfield,
-            )
-        }
-        pub fn #clear_ident(&mut self) {
-            use self::_puroro::internal::field_type::RepeatedFieldType;
-            <#field_type as RepeatedFieldType>::clear(
-                &mut self.#field_ident, &mut self._bitfield,
-            )
-        }
-    })
+    Ok(vec![
+        parse2(quote! {
+            pub fn #getter_ident(&self) -> &[#getter_item_type] {
+                use self::_puroro::internal::field_type::RepeatedFieldType;
+                <#field_type as RepeatedFieldType>::get_field(
+                    &self.#field_ident, &self._bitfield,
+                )
+            }
+        })?,
+        parse2(quote! {
+            pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
+                use self::_puroro::internal::field_type::RepeatedFieldType;
+                <#field_type as RepeatedFieldType>::mut_field(
+                    &mut self.#field_ident, &mut self._bitfield,
+                )
+            }
+        })?,
+        parse2(quote! {
+            pub fn #clear_ident(&mut self) {
+                use self::_puroro::internal::field_type::RepeatedFieldType;
+                <#field_type as RepeatedFieldType>::clear(
+                    &mut self.#field_ident, &mut self._bitfield,
+                )
+            }
+        })?,
+    ])
 }
 
-fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Result<TokenStream> {
+fn gen_struct_field_methods_for_non_repeated(
+    this: &(impl ?Sized + Field),
+) -> Result<Vec<ImplItemMethod>> {
     debug_assert!(matches!(
         this.rule(),
         Ok(FieldRule::Optional | FieldRule::Singular)
@@ -338,38 +348,48 @@ fn gen_struct_field_methods_for_non_repeated(this: &(impl ?Sized + Field)) -> Re
     });
     let getter_mut_type = this.r#type()?.rust_mut_ref_type()?;
     let default_fn = gen_default_fn(this)?;
-    Ok(quote! {
-        pub fn #getter_ident(&self) -> #getter_type {
-           use self::_puroro::internal::field_type::NonRepeatedFieldType;
-            <#field_type as NonRepeatedFieldType>::get_field(
-                &self.#field_ident, &self._bitfield, #default_fn,
-            )
-        }
-        pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-            use self::_puroro::internal::field_type::NonRepeatedFieldType;
-            <#field_type as NonRepeatedFieldType>::get_field_opt(
-                &self.#field_ident, &self._bitfield,
-            )
-        }
-        pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-            use self::_puroro::internal::field_type::NonRepeatedFieldType;
-            <#field_type as NonRepeatedFieldType>::mut_field(
-                &mut self.#field_ident, &mut self._bitfield, #default_fn,
-            )
-        }
-        pub fn #getter_has_ident(&self) -> bool {
-            use self::_puroro::internal::field_type::NonRepeatedFieldType;
-            <#field_type as NonRepeatedFieldType>::get_field_opt(
-                &self.#field_ident, &self._bitfield,
-            ).is_some()
-        }
-        pub fn #clear_ident(&mut self) {
-            use self::_puroro::internal::field_type::NonRepeatedFieldType;
-            <#field_type as NonRepeatedFieldType>::clear(
-                &mut self.#field_ident, &mut self._bitfield,
-            )
-        }
-    })
+    Ok(vec![
+        parse2(quote! {
+            pub fn #getter_ident(&self) -> #getter_type {
+               use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::get_field(
+                    &self.#field_ident, &self._bitfield, #default_fn,
+                )
+            }
+        })?,
+        parse2(quote! {
+            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::get_field_opt(
+                    &self.#field_ident, &self._bitfield,
+                )
+            }
+        })?,
+        parse2(quote! {
+            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::mut_field(
+                    &mut self.#field_ident, &mut self._bitfield, #default_fn,
+                )
+            }
+        })?,
+        parse2(quote! {
+            pub fn #getter_has_ident(&self) -> bool {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::get_field_opt(
+                    &self.#field_ident, &self._bitfield,
+                ).is_some()
+            }
+        })?,
+        parse2(quote! {
+            pub fn #clear_ident(&mut self) {
+                use self::_puroro::internal::field_type::NonRepeatedFieldType;
+                <#field_type as NonRepeatedFieldType>::clear(
+                    &mut self.#field_ident, &mut self._bitfield,
+                )
+            }
+        })?,
+    ])
 }
 
 pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<Expr> {

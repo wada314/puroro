@@ -92,7 +92,8 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let field_methods = self
             .fields()?
-            .map(|f| f.gen_struct_field_methods())
+            .map(|f| Ok(f.gen_struct_field_methods()?.into_iter()))
+            .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let oneof_methods = self
             .oneofs()?
