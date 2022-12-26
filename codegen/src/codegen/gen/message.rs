@@ -82,9 +82,9 @@ impl<T: ?Sized + Message> MessageExt for T {
 
     fn gen_struct(&self) -> Result<TokenStream> {
         let ident = gen_struct_ident(self)?;
-        let field_decls = self
+        let fields = self
             .fields()?
-            .map(|f| f.gen_struct_field_decl())
+            .map(|f| f.gen_struct_field())
             .collect::<Result<Vec<_>>>()?;
         let oneof_fields = self
             .oneofs()?
@@ -92,7 +92,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let field_methods = self
             .fields()?
-            .map(|f| Ok(f.gen_struct_field_methods()?.into_iter()))
+            .map(|f| Ok(f.gen_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let oneof_methods = self
@@ -117,7 +117,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         Ok(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
-                #(#field_decls)*
+                #(#fields,)*
                 #(#oneof_fields,)*
                 _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
             }

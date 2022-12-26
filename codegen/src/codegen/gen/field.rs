@@ -17,7 +17,7 @@ use super::super::{
     Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldRule, FieldType, LengthDelimitedType,
     MessageExt, VariantType,
 };
-use crate::syn::{parse2, Expr, ExprMethodCall, ImplItemMethod};
+use crate::syn::{parse2, Expr, ExprMethodCall, Field as SynField, ImplItemMethod, NamedField};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -31,8 +31,8 @@ pub trait FieldExt {
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
-    fn gen_struct_field_decl(&self) -> Result<TokenStream>;
-    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_struct_field(&self) -> Result<SynField>;
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
     fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
@@ -99,14 +99,15 @@ impl<T: ?Sized + Field> FieldExt for T {
         }
     }
 
-    fn gen_struct_field_decl(&self) -> Result<TokenStream> {
+    fn gen_struct_field(&self) -> Result<SynField> {
         let ident = gen_struct_field_ident(self)?;
         let r#type = gen_struct_field_type(self)?;
-        Ok(quote! {
-            #ident: #r#type,
-        })
+        Ok(parse2::<NamedField>(quote! {
+            #ident: #r#type
+        })?
+        .into())
     }
-    fn gen_struct_field_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.rule()? {
             FieldRule::Repeated => gen_struct_field_methods_for_repeated(self),
             _ => gen_struct_field_methods_for_non_repeated(self),
