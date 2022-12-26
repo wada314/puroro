@@ -149,13 +149,13 @@ fn gen_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
 
 fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
-    let field_data_ident = quote! { field_data };
+    let field_data_ident: Ident = parse2(quote! { field_data })?;
     let field_data_expr = parse2(quote! { field_data })?;
     let out_ident = quote! { out };
     let out_expr = parse2(quote! { out })?;
     let field_deser_arms = this
         .fields()?
-        .map(|f| f.gen_struct_field_deser_arm(&field_data_ident))
+        .map(|f| f.gen_struct_impl_deser_arm(&field_data_expr))
         .collect::<Result<Vec<_>>>()?;
     let oneof_deser_arms = this
         .oneofs()?
@@ -209,7 +209,7 @@ fn gen_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
     let field_clones = this
         .fields()?
-        .map(|f| f.gen_struct_field_clone_field_value())
+        .map(|f| f.gen_struct_impl_clone_field_value())
         .collect::<Result<Vec<_>>>()?;
     let oneof_clones = this
         .oneofs()?

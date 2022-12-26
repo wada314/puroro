@@ -17,7 +17,9 @@ use super::super::{
     Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldRule, FieldType, LengthDelimitedType,
     MessageExt, VariantType,
 };
-use crate::syn::{parse2, Expr, ExprMethodCall, Field as SynField, ImplItemMethod, NamedField, FieldValue};
+use crate::syn::{
+    parse2, Arm, Expr, ExprMethodCall, Field as SynField, FieldValue, ImplItemMethod, NamedField,
+};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -33,8 +35,8 @@ pub trait FieldExt {
 
     fn gen_struct_field(&self) -> Result<SynField>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_field_clone_field_value(&self) -> Result<FieldValue>;
-    fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
+    fn gen_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
     fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
     fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
@@ -113,24 +115,24 @@ impl<T: ?Sized + Field> FieldExt for T {
             _ => gen_struct_field_methods_for_non_repeated(self),
         }
     }
-    fn gen_struct_field_clone_field_value(&self) -> Result<FieldValue> {
+    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = gen_struct_field_ident(self)?;
         let r#type = gen_struct_field_type(self)?;
         Ok(parse2(quote! {
             #ident: <#r#type as ::std::clone::Clone>::clone(&self.#ident)
         })?)
     }
-    fn gen_struct_field_deser_arm(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
         let ident = gen_struct_field_ident(self)?;
         let number = self.number()?;
         let r#type = gen_struct_field_type(self)?;
-        Ok(quote! {
+        Ok(parse2(quote! {
             #number => <#r#type as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                 &mut self.#ident,
                 &mut self._bitfield,
-                #field_data_ident,
+                #field_data_expr,
             )?,
-        })
+        })?)
     }
     fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
         let ident = gen_struct_field_ident(self)?;
