@@ -157,7 +157,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             unsorted
         };
 
-        let content_items = gen_structs_enums_oneofs_in_module(self)?;
+        let content_items = gen_messages_enums_oneofs_in_module(self)?;
         Ok(parse2(quote! {
             #header
             mod _puroro {
@@ -218,7 +218,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .map(|(_, contents)| contents)
             .collect::<Vec<_>>();
 
-        let content_items = gen_structs_enums_oneofs_in_module(self)?;
+        let content_items = gen_messages_enums_oneofs_in_module(self)?;
 
         Ok(quote! {
             #header
@@ -234,10 +234,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
     }
 }
 
-fn gen_structs_enums_oneofs_in_module(
+fn gen_messages_enums_oneofs_in_module(
     this: &(impl ?Sized + PackageOrMessage),
 ) -> Result<Vec<Item>> {
-    let struct_items = this
+    let message_items = this
         .messages()?
         .map(|m| Ok(m.gen_struct()?.into_iter()))
         .flatten_ok();
@@ -250,7 +250,7 @@ fn gen_structs_enums_oneofs_in_module(
         .map(|o| Ok(o.gen_union()?.into_iter()))
         .flatten_ok();
 
-    struct_items
+    message_items
         .chain(enum_items)
         .chain(oneof_items)
         .collect::<Result<Vec<_>>>()
