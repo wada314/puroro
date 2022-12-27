@@ -19,11 +19,11 @@ use super::super::{
 };
 use crate::syn::{
     parse2, Arm, Expr, ExprMethodCall, Field as SynField, FieldValue, Ident, ImplItemMethod,
-    NamedField, Stmt,
+    NamedField, PathSegment, Stmt, Type,
 };
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::{Span, TokenStream};
+use ::proc_macro2::Span;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
@@ -57,7 +57,7 @@ struct Cache {
 
     // Generated tokens cache
     struct_field_ident: OnceCell<Rc<Ident>>,
-    struct_field_type: OnceCell<Rc<TokenStream>>,
+    struct_field_type: OnceCell<Rc<Type>>,
 }
 
 impl<T: ?Sized + Field> FieldExt for T {
@@ -200,7 +200,7 @@ fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<us
     Ok(alloc.maybe_optional)
 }
 
-fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<TokenStream>> {
+fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
     use FieldRule::*;
     use FieldType::*;
     use LengthDelimitedType::*;
@@ -211,7 +211,7 @@ fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<TokenStream>
             let primitive_type = this.r#type()?.rust_type()?;
             let tag_type = this.r#type()?.tag_type()?;
             let bitfield_index = bitfield_index_for_optional(this)?.unwrap_or(usize::MAX);
-            let type_name = match (this.rule()?, this.r#type()?) {
+            let type_name_segment: PathSegment = parse2(match (this.rule()?, this.r#type()?) {
                 (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
                     OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
                 },
@@ -245,10 +245,10 @@ fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<TokenStream>
                 (Repeated, LengthDelimited(Message(_))) => quote! {
                     RepeatedMessageField::<#primitive_type>
                 },
-            };
-            Ok(Rc::new(quote! {
-                self::_puroro::internal::field_type::#type_name
-            }))
+            })?;
+            Ok(Rc::new(parse2(quote! {
+                self::_puroro::internal::field_type::#type_name_segment
+            })?))
         })
         .cloned()
 }
