@@ -167,7 +167,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
         .collect::<Result<Vec<_>>>()?;
     let ser_fields = this
         .fields()?
-        .map(|f| f.gen_struct_field_ser(&out_ident))
+        .map(|f| f.gen_struct_impl_message_ser_stmt(&out_expr))
         .collect::<Result<Vec<_>>>()?;
     let ser_oneof_stmts = this
         .oneofs()?
