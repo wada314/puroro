@@ -40,7 +40,7 @@ pub trait FieldExt {
     fn gen_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
     fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
     fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
-    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -168,20 +168,20 @@ impl<T: ?Sized + Field> FieldExt for T {
             }
         })?)
     }
-    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {
-        Ok(match self.rule()? {
+    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+        Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
                 let getter_ident = format_ident!(
                     "{}",
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
-                quote! { && self.#getter_ident() == #rhs_ident.#getter_ident() }
+                quote! { self.#getter_ident() == #rhs_expr.#getter_ident() }
             }
             _ => {
                 let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
-                quote! { && self.#getter_opt_ident() == #rhs_ident.#getter_opt_ident() }
+                quote! { self.#getter_opt_ident() == #rhs_expr.#getter_opt_ident() }
             }
-        })
+        })?)
     }
 }
 

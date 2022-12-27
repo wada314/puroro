@@ -270,12 +270,10 @@ fn gen_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
 
 fn gen_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_struct_ident(this)?;
-    let rhs_ident = format_ident!("rhs");
-    let rhs = quote! { #rhs_ident };
-    let rhs_expr = parse2(quote! { #rhs_ident })?;
+    let rhs_expr = parse2(quote! { rhs })?;
     let field_cmps = this
         .fields()?
-        .map(|f| f.gen_struct_field_partial_eq_cmp(&rhs))
+        .map(|f| f.gen_struct_impl_partial_eq_cmp(&rhs_expr))
         .collect::<Result<Vec<_>>>()?;
     let oneof_cmps = this
         .oneofs()?
@@ -287,7 +285,7 @@ fn gen_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl
                 #[allow(unused)] use self::_puroro::internal::oneof_type::OneofUnion as _;
 
                 true
-                    #(#field_cmps)*
+                    #( && #field_cmps)*
                     #( && #oneof_cmps)*
             }
         }
