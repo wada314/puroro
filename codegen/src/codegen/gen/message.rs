@@ -15,25 +15,23 @@
 use super::super::util::*;
 use super::super::{FieldExt, Message, PackageOrMessageExt};
 use super::{OneofExt, OneofFieldExt};
-use crate::syn;
-use crate::syn::{parse2, Expr, Ident, ItemImpl};
+use crate::syn::{parse2, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
-    fn gen_rust_struct_type(&self) -> Result<Rc<syn::Type>>;
-    fn gen_struct(&self) -> Result<TokenStream>;
+    fn gen_rust_struct_type(&self) -> Result<Rc<Type>>;
+    fn gen_struct(&self) -> Result<Vec<Item>>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    rust_struct_type: OnceCell<Rc<syn::Type>>,
+    rust_struct_type: OnceCell<Rc<Type>>,
     bitfield_size: OnceCell<usize>,
 }
 impl<T: ?Sized + Message> MessageExt for T {
@@ -67,7 +65,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             .cloned()
     }
 
-    fn gen_rust_struct_type(&self) -> Result<Rc<syn::Type>> {
+    fn gen_rust_struct_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .rust_struct_type
@@ -75,12 +73,12 @@ impl<T: ?Sized + Message> MessageExt for T {
                 let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
                 let ident =
                     format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
-                Ok(Rc::new(syn::parse2(quote! { #parent :: #ident })?))
+                Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
             })
             .cloned()
     }
 
-    fn gen_struct(&self) -> Result<TokenStream> {
+    fn gen_struct(&self) -> Result<Vec<Item>> {
         let ident = gen_struct_ident(self)?;
         let fields = self
             .fields()?
@@ -114,26 +112,31 @@ impl<T: ?Sized + Message> MessageExt for T {
         let drop_impl = gen_struct_impl_drop(self)?;
         let debug_impl = gen_struct_impl_debug(self)?;
         let partial_eq_impl = gen_struct_impl_partial_eq(self)?;
-        Ok(quote! {
+
+        let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
                 #(#fields,)*
                 #(#oneof_fields,)*
                 _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
             }
-
+        })?;
+        let impl_struct = parse2(quote! {
             impl #ident {
                 #(#field_methods)*
                 #(#oneof_methods)*
                 #(#oneof_field_methods)*
             }
-
-            #message_impl
-            #clone_impl
-            #drop_impl
-            #debug_impl
-            #partial_eq_impl
-        })
+        })?;
+        Ok(vec![
+            item_struct,
+            impl_struct,
+            message_impl.into(),
+            clone_impl.into(),
+            drop_impl.into(),
+            debug_impl.into(),
+            partial_eq_impl.into(),
+        ])
     }
 }
 

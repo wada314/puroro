@@ -29,7 +29,7 @@ use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Syntax {
     Proto2,
     Proto3,
