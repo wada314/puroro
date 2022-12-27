@@ -15,11 +15,14 @@
 use super::super::util::*;
 use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
+use crate::syn::{
+    parse2, Arm, Expr, Field, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, NamedField, Stmt,
+};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::{Ident, TokenStream};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::Rc;
 
 pub trait OneofExt {
@@ -31,13 +34,13 @@ pub trait OneofExt {
     fn gen_union_ident(&self) -> Result<Rc<Ident>>;
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
 
-    fn gen_union(&self) -> Result<TokenStream>;
-    fn gen_struct_field_decl(&self) -> Result<TokenStream>;
-    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
-    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream>;
-    fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream>;
-    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream>;
-    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream>;
+    fn gen_union(&self) -> Result<Vec<Item>>;
+    fn gen_struct_field(&self) -> Result<Field>;
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
+    fn gen_struct_impl_message_deser_arms(&self, field_data_expr: &Expr) -> Result<Vec<Arm>>;
+    fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
+    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
 #[derive(Debug, Default)]
@@ -117,56 +120,68 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .cloned()
     }
 
-    fn gen_union(&self) -> Result<TokenStream> {
+    fn gen_union(&self) -> Result<Vec<Item>> {
         let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
-        let union_items = try_map_fields(self, |f| f.gen_union_item_decl())?;
+        let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
-        let union_methods = try_map_fields(self, |f| f.gen_union_methods())?;
+        let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
         let oneof_case_impl = gen_oneof_case_impl(self)?;
 
         // Union includes none case, where the case enum does not.
-        Ok(quote! {
-            pub union #union_ident {
-                _none: (),
-                #(#union_items)*
-            }
-
-            #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
-            pub enum #case_ident<
-                #(#item_type_names = (),)*
-            > {
-                #(#case_names(#item_type_names),)*
-            }
-
-            impl #union_ident {
-                #(#union_methods)*
-            }
-
-            #oneof_union_impl
-            #oneof_case_impl
-
-            impl ::std::default::Default for #union_ident {
-                fn default() -> Self {
-                    Self { _none: () }
+        Ok(vec![
+            parse2(quote! {
+                pub union #union_ident {
+                    _none: (),
+                    #(#union_items),*,
                 }
-            }
-        })
+            })?,
+            parse2(quote! {
+                #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
+                pub enum #case_ident<
+                    #(#item_type_names = (),)*
+                > {
+                    #(#case_names(#item_type_names),)*
+                }
+            })?,
+            parse2(quote! {
+                impl #union_ident {
+                    #(#union_methods)*
+                }
+            })?,
+            parse2(quote! {
+                #oneof_union_impl
+            })?,
+            parse2(quote! {
+                #oneof_case_impl
+            })?,
+            parse2(quote! {
+                impl ::std::default::Default for #union_ident {
+                    fn default() -> Self {
+                        Self { _none: () }
+                    }
+                }
+            })?,
+        ])
     }
 
-    fn gen_struct_field_decl(&self) -> Result<TokenStream> {
+    fn gen_struct_field(&self) -> Result<Field> {
         let field_ident = self.gen_struct_field_ident()?;
         let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
-        Ok(quote! {
-            #field_ident: #message_module :: #union_ident,
-        })
+        Ok(parse2::<NamedField>(quote! {
+            #field_ident: #message_module :: #union_ident
+        })?
+        .into())
     }
 
-    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
@@ -176,34 +191,37 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
 
-        Ok(quote! {
-            pub fn #getter_ident(&self) -> ::std::option::Option<
-                <#message_module::#union_ident as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<'_>
-            >
-            {
-                use self::_puroro::internal::oneof_type::OneofUnion as _;
-                self.#field_ident.case_ref(&self._bitfield)
-            }
-
-            pub fn #clear_ident(&mut self) {
-                use self::_puroro::internal::oneof_type::OneofUnion as _;
-                self.#field_ident.clear(&mut self._bitfield)
-            }
-        })
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_ident(&self) -> ::std::option::Option<
+                    <#message_module::#union_ident as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<'_>
+                >
+                {
+                    use self::_puroro::internal::oneof_type::OneofUnion as _;
+                    self.#field_ident.case_ref(&self._bitfield)
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    use self::_puroro::internal::oneof_type::OneofUnion as _;
+                    self.#field_ident.clear(&mut self._bitfield)
+                }
+            })?,
+        ])
     }
 
-    fn gen_struct_field_clone_arm(&self) -> Result<TokenStream> {
+    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_struct_field_ident()?;
         let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
 
-        Ok(quote! {
+        Ok(parse2(quote! {
             #ident: <#message_module :: #union_ident as self::_puroro::internal::oneof_type::OneofUnion>
-                ::clone(&self.#ident, &self._bitfield),
-        })
+                ::clone(&self.#ident, &self._bitfield)
+        })?)
     }
 
-    fn gen_struct_field_deser_arms(&self, field_data_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_message_deser_arms(&self, field_data_expr: &Expr) -> Result<Vec<Arm>> {
         let field_ident = self.gen_struct_field_ident()?;
         let field_numbers = try_map_fields(self, |f| f.number())?;
 
@@ -211,33 +229,37 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
 
-        Ok(quote! {
-            #(#field_numbers => self.#field_ident.deser_from_iter(
-                &mut self._bitfield,
-                #field_data_ident,
-                #message_module::#case_ident::#case_names(()),
-            )?,)*
-        })
+        iter::zip(field_numbers.into_iter(), case_names.into_iter())
+            .map(|(field_number, case_name)| {
+                Ok(parse2(quote! {
+                    #field_number => self.#field_ident.deser_from_iter(
+                        &mut self._bitfield,
+                        #field_data_expr,
+                        #message_module::#case_ident::#case_name(()),
+                    )?,
+                })?)
+            })
+            .collect::<Result<Vec<_>>>()
     }
 
-    fn gen_struct_field_ser(&self, out_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let field_ident = self.gen_struct_field_ident()?;
-        Ok(quote! {
+        Ok(parse2(quote! {
             self.#field_ident.ser_to_write(
                 &self._bitfield,
-                #out_ident
+                #out_expr
             )?;
-        })
+        })?)
     }
 
-    fn gen_struct_field_partial_eq_cmp(&self, rhs_ident: &TokenStream) -> Result<TokenStream> {
+    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
-        Ok(quote! {
-            && self.#getter_ident() == #rhs_ident.#getter_ident()
-        })
+        Ok(parse2(quote! {
+            self.#getter_ident() == #rhs_expr.#getter_ident()
+        })?)
     }
 }
 
@@ -248,7 +270,7 @@ where
     this.fields()?.map(f).collect::<Result<Vec<_>>>()
 }
 
-fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
+fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let union_ident = this.gen_union_ident()?;
     let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
     let union_item_idents = try_map_fields(this, |f| f.gen_union_item_ident())?;
@@ -256,12 +278,12 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let borrowed_types_a = try_map_fields(this, |f| {
-        f.gen_maybe_borrowed_type(Some(format_ident!("a")))
+        f.gen_maybe_borrowed_type(Some(parse2(quote! { 'a })?))
     })?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
 
-    Ok(quote! {
+    Ok(parse2(quote! {
         impl self::_puroro::internal::oneof_type::OneofUnion for #union_ident {
             type Case = self::#case_ident;
             type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>;
@@ -349,18 +371,18 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
                 Ok(())
             }
         }
-    })
+    })?)
 }
 
-fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
+fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
-    let union_items = try_map_fields(this, |f| f.gen_union_item_decl())?;
+    let union_items = try_map_fields(this, |f| f.gen_union_item_field())?;
     let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
 
-    Ok(quote! {
+    Ok(parse2(quote! {
         impl self::_puroro::internal::oneof_type::OneofCase for #case_ident {
             const BITFIELD_BEGIN: usize = #bitfield_begin;
             const BITFIELD_END: usize = #bitfield_end;
@@ -376,5 +398,5 @@ fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<TokenStream> {
                 }
             }
         }
-    })
+    })?)
 }

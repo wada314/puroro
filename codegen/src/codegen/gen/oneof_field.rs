@@ -16,9 +16,12 @@ use super::super::util::*;
 use super::super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
 use super::field::gen_default_fn;
 use super::PackageOrMessageExt;
+use crate::syn::{
+    parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
+    Type,
+};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::{Ident, TokenStream};
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
@@ -31,12 +34,12 @@ pub trait OneofFieldExt {
     fn gen_generic_type_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
 
-    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>>;
+    fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
-    fn gen_union_item_decl(&self) -> Result<TokenStream>;
-    fn gen_union_methods(&self) -> Result<TokenStream>;
-    fn gen_struct_field_methods(&self) -> Result<TokenStream>;
-    fn gen_struct_field_debug(&self) -> Result<TokenStream>;
+    fn gen_union_item_field(&self) -> Result<Rc<Field>>;
+    fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
 }
 
 #[derive(Debug, Default)]
@@ -109,17 +112,17 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ))
     }
 
-    fn gen_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
-        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?.clone())
+    fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
+        Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
 
-    fn gen_union_item_decl(&self) -> Result<TokenStream> {
+    fn gen_union_item_field(&self) -> Result<Rc<Field>> {
         let ident = self.gen_union_item_ident()?;
-        let inner_type_name = {
+        let inner_type_name_segment: PathSegment = {
             use FieldType::*;
             use LengthDelimitedType::*;
             let r#type = self.r#type()?;
-            match r#type {
+            parse2(match r#type {
                 Variant(_) | Bits32(_) | Bits64(_) => {
                     let primitive = r#type.rust_type()?;
                     let tag = r#type.tag_type()?;
@@ -130,38 +133,43 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 LengthDelimited(Bytes) => quote! { BytesField },
                 LengthDelimited(String) => quote! { StringField },
                 LengthDelimited(Message(m)) => {
-                    let message_path = m.try_upgrade()?.gen_rust_struct_path()?;
+                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
                     quote! {
                         HeapMessageField::< #message_path >
                     }
                 }
-            }
+            })?
         };
-        let field_type = quote! {
+        let field_type: Type = parse2(quote! {
             ::std::mem::ManuallyDrop::<
-                self::_puroro::internal::oneof_field_type:: #inner_type_name
+                self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
             >
-        };
+        })?;
 
-        Ok(quote! {
-            #ident: #field_type,
-        })
+        Ok(Rc::new(
+            parse2::<NamedField>(quote! {
+                #ident: #field_type
+            })?
+            .into(),
+        ))
     }
 
-    fn gen_union_methods(&self) -> Result<TokenStream> {
+    fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_union_getter_mut_ident()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
-                ::std::option::Option::< #borrowed_type >
-            }),
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
+                Rc::new(parse2(quote! {
+                    ::std::option::Option::< #borrowed_type >
+                })?)
+            }
             _ => Rc::clone(&borrowed_type),
         };
-        let getter_opt_type = quote! {
+        let getter_opt_type: Type = parse2(quote! {
             ::std::option::Option::< #borrowed_type >
-        };
+        })?;
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let union_ident = self.oneof()?.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
@@ -171,65 +179,69 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
         let default_fn = gen_default_fn(self)?;
 
-        Ok(quote! {
-            pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
-                #[allow(unused)] use ::std::option::Option::{None, Some};
-                #[allow(unused)] use ::std::default::Default;
-                use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
-                use ::std::ops::Deref as _;
-                use self::_puroro::internal::oneof_type::OneofCase as _;
+        Ok(vec![
+            parse2(quote! {
+                pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
+                    #[allow(unused)] use ::std::option::Option::{None, Some};
+                    #[allow(unused)] use ::std::default::Default;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                    use ::std::ops::Deref as _;
+                    use self::_puroro::internal::oneof_type::OneofCase as _;
 
-                let case_opt = self::#case_ident::from_bitslice(bits);
-                let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
-                    unsafe {
-                        self.#union_item_ident.deref()
-                    }
-                });
-                OneofFieldTypeOpt::get_field(item_opt, #default_fn)
-            }
-
-            pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
-                #[allow(unused)] use ::std::option::Option::{None, Some};
-                use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
-                use ::std::ops::Deref as _;
-                use self::_puroro::internal::oneof_type::OneofCase as _;
-
-                let case_opt = self::#case_ident::from_bitslice(bits);
-                let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
-                    unsafe {
-                        self.#union_item_ident.deref()
-                    }
-                });
-                OneofFieldTypeOpt::get_field_opt(item_opt)
-            }
-
-            pub(crate) fn #getter_mut_ident<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
-                #[allow(unused)] use ::std::option::Option::Some;
-                #[allow(unused)] use ::std::default::Default;
-                use ::std::mem::ManuallyDrop;
-                use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
-
-                let case_opt = self::#case_ident::from_bitslice(bits);
-                if let Some(self::#case_ident::#enum_item_ident(())) = case_opt {
-                    // The union is already set to the expected value. Do nothing.
-                } else {
-                    // Need to reset the union value to the expected field type.
-                    <Self as OneofUnion>::clear(self, bits);
-                    let index = self::#case_ident::into_u32(self::#case_ident::#enum_item_ident(()));
-                    bits.set_range(#bitfield_begin..#bitfield_end, index);
-                    *self = self::#union_ident {
-                        #union_item_ident: ManuallyDrop::new((#default_fn)())
-                    };
+                    let case_opt = self::#case_ident::from_bitslice(bits);
+                    let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                        unsafe {
+                            self.#union_item_ident.deref()
+                        }
+                    });
+                    OneofFieldTypeOpt::get_field(item_opt, #default_fn)
                 }
-                unsafe {
-                    &mut self.#union_item_ident
-                }.mut_field()
-            }
-        })
+            })?,
+            parse2(quote! {
+                pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
+                    #[allow(unused)] use ::std::option::Option::{None, Some};
+                    use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                    use ::std::ops::Deref as _;
+                    use self::_puroro::internal::oneof_type::OneofCase as _;
+
+                    let case_opt = self::#case_ident::from_bitslice(bits);
+                    let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                        unsafe {
+                            self.#union_item_ident.deref()
+                        }
+                    });
+                    OneofFieldTypeOpt::get_field_opt(item_opt)
+                }
+            })?,
+            parse2(quote! {
+                pub(crate) fn #getter_mut_ident<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    #[allow(unused)] use ::std::default::Default;
+                    use ::std::mem::ManuallyDrop;
+                    use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+
+                    let case_opt = self::#case_ident::from_bitslice(bits);
+                    if let Some(self::#case_ident::#enum_item_ident(())) = case_opt {
+                        // The union is already set to the expected value. Do nothing.
+                    } else {
+                        // Need to reset the union value to the expected field type.
+                        <Self as OneofUnion>::clear(self, bits);
+                        let index = self::#case_ident::into_u32(self::#case_ident::#enum_item_ident(()));
+                        bits.set_range(#bitfield_begin..#bitfield_end, index);
+                        *self = self::#union_ident {
+                            #union_item_ident: ManuallyDrop::new((#default_fn)())
+                        };
+                    }
+                    unsafe {
+                        &mut self.#union_item_ident
+                    }.mut_field()
+                }
+            })?,
+        ])
     }
 
-    fn gen_struct_field_methods(&self) -> Result<TokenStream> {
+    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let oneof_struct_field_ident = self.oneof()?.gen_struct_field_ident()?;
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
@@ -239,9 +251,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(quote! {
-                ::std::option::Option::< #borrowed_type >
-            }),
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
+                Rc::new(parse2(quote! {
+                    ::std::option::Option::< #borrowed_type >
+                })?)
+            }
             _ => Rc::clone(&borrowed_type),
         };
         let getter_opt_type = quote! {
@@ -255,35 +269,45 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         };
         let enum_item_ident = self.gen_case_enum_value_ident()?;
 
-        Ok(quote! {
-            pub fn #getter_ident(&self) -> #getter_type {
-                self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
-            }
-            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                self.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
-            }
-            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
-            }
-            pub fn #has_ident(&self) -> bool {
-                self.#getter_opt_ident().is_some()
-            }
-            pub fn #clear_ident(&mut self) {
-                #[allow(unused)] use ::std::option::Option::Some;
-                use self::_puroro::internal::oneof_type::OneofCase;
-                use self::_puroro::internal::oneof_type::OneofUnion;
-                if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
-                    self.#oneof_struct_field_ident.clear(&mut self._bitfield)
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_ident(&self) -> #getter_type {
+                    self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
                 }
-            }
-        })
+            })?,
+            parse2(quote! {
+                pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+                    self.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
+                }
+            })?,
+            parse2(quote! {
+                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                    self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
+                }
+            })?,
+            parse2(quote! {
+                pub fn #has_ident(&self) -> bool {
+                    self.#getter_opt_ident().is_some()
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    use self::_puroro::internal::oneof_type::OneofCase;
+                    use self::_puroro::internal::oneof_type::OneofUnion;
+                    if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
+                        self.#oneof_struct_field_ident.clear(&mut self._bitfield)
+                    }
+                }
+            })?,
+        ])
     }
 
-    fn gen_struct_field_debug(&self) -> Result<TokenStream> {
+    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
         let ident = self.gen_union_item_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
-        Ok(quote! {
-            .field(stringify!(#ident), &self.#getter_opt_ident())
-        })
+        Ok(parse2(quote! {
+            #receiver.field(stringify!(#ident), &self.#getter_opt_ident())
+        })?)
     }
 }

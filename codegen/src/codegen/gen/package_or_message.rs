@@ -15,25 +15,28 @@
 use super::super::util::*;
 use super::super::{EnumExt, MessageExt, PackageOrMessage};
 use super::OneofExt;
+use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
+use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
+
 pub trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
     fn module_file_path(&self) -> Result<&str>;
     fn module_file_dir(&self) -> Result<&str>;
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>>;
-    fn gen_module_file(&self) -> Result<TokenStream>;
+    fn gen_rust_module_path(&self) -> Result<Rc<Path>>;
+    fn gen_module_file(&self) -> Result<File>;
     fn gen_inline_code(&self) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
     module_file_dir: OnceCell<String>,
-    rust_module_path: OnceCell<Rc<TokenStream>>,
+    rust_module_path: OnceCell<Rc<Path>>,
     module_name: OnceCell<String>,
     module_file_path: OnceCell<String>,
 }
@@ -91,28 +94,27 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .map(|s| s.as_str())
     }
 
-    fn gen_rust_module_path(&self) -> Result<Rc<TokenStream>> {
+    fn gen_rust_module_path(&self) -> Result<Rc<Path>> {
         self.cache()
             .get::<Cache>()?
             .rust_module_path
             .get_or_try_init(|| {
-                Ok(Rc::new(if let Some(parent) = self.parent()? {
+                let ts = if let Some(parent) = self.parent()? {
                     let parent_path = parent.gen_rust_module_path()?;
                     let ident = format_ident!(
                         "{}",
                         self.name()?.to_lower_snake_case().escape_rust_keywords()
                     );
-                    quote! {
-                        #parent_path :: #ident
-                    }
+                    quote! { #parent_path :: #ident }
                 } else {
                     quote! { self :: _puroro_root }
-                }))
+                };
+                Ok(Rc::new(parse2(ts)?))
             })
             .cloned()
     }
 
-    fn gen_module_file(&self) -> Result<TokenStream> {
+    fn gen_module_file(&self) -> Result<File> {
         let header = if self.is_root()? {
             quote! {
                 /// re-export puroro.
@@ -122,14 +124,16 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
                 pub use ::puroro::*;
 
-                pub mod _puroro_root {
-                    pub use super::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::*;
                 }
             }
         } else {
             quote! {
-                pub mod _puroro_root {
-                    pub use super::super::_puroro_root::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::super::_puroro_root::*;
                 }
             }
         };
@@ -152,41 +156,32 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             unsorted.sort();
             unsorted
         };
-        let struct_decls = self
-            .messages()?
-            .map(|m| m.gen_struct())
-            .collect::<Result<Vec<_>>>()?;
-        let enum_decls = self
-            .enums()?
-            .map(|e| e.gen_enum())
-            .collect::<Result<Vec<_>>>()?;
-        let oneof_decls = self
-            .oneofs()?
-            .map(|o| o.gen_union())
-            .collect::<Result<Vec<_>>>()?;
-        Ok(quote! {
+
+        let content_items = gen_messages_enums_oneofs_in_module(self)?;
+        Ok(parse2(quote! {
             #header
-            pub mod _puroro {
-                pub use ::puroro::*;
+            mod _puroro {
+                #[allow(unused)]
+                pub(crate) use ::puroro::*;
             }
             #(pub mod #submodule_idents;)*
-            #(#struct_decls)*
-            #(#enum_decls)*
-            #(#oneof_decls)*
-        })
+            #(#content_items)*
+        })?)
     }
 
     fn gen_inline_code(&self) -> Result<TokenStream> {
         let header = if self.is_root()? {
             quote! {
-                pub mod _puroro_root {
-                    pub use super::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::*;
                 }
             }
         } else {
             quote! {
-                pub mod _puroro_root {
-                    pub use super::super::_puroro_root::*;
+                mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::super::_puroro_root::*;
                 }
             }
         };
@@ -223,29 +218,40 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .map(|(_, contents)| contents)
             .collect::<Vec<_>>();
 
-        let struct_decls = self
-            .messages()?
-            .map(|m| m.gen_struct())
-            .collect::<Result<Vec<_>>>()?;
-        let enum_decls = self
-            .enums()?
-            .map(|e| e.gen_enum())
-            .collect::<Result<Vec<_>>>()?;
-        let oneof_decls = self
-            .oneofs()?
-            .map(|o| o.gen_union())
-            .collect::<Result<Vec<_>>>()?;
+        let content_items = gen_messages_enums_oneofs_in_module(self)?;
+
         Ok(quote! {
             #header
-            pub mod _puroro {
-                pub use ::puroro::*;
+            mod _puroro {
+                #[allow(unused)]
+                pub(crate) use ::puroro::*;
             }
             #(pub mod #submodule_idents {
                 #submodule_contents
             })*
-            #(#struct_decls)*
-            #(#enum_decls)*
-            #(#oneof_decls)*
+            #(#content_items)*
         })
     }
+}
+
+fn gen_messages_enums_oneofs_in_module(
+    this: &(impl ?Sized + PackageOrMessage),
+) -> Result<Vec<Item>> {
+    let message_items = this
+        .messages()?
+        .map(|m| Ok(m.gen_struct()?.into_iter()))
+        .flatten_ok();
+    let enum_items = this
+        .enums()?
+        .map(|e| Ok(e.gen_enum()?.into_iter()))
+        .flatten_ok();
+    let oneof_items = this
+        .oneofs()?
+        .map(|o| Ok(o.gen_union()?.into_iter()))
+        .flatten_ok();
+
+    message_items
+        .chain(enum_items)
+        .chain(oneof_items)
+        .collect::<Result<Vec<_>>>()
 }

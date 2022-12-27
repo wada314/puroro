@@ -16,14 +16,13 @@ use super::super::util::*;
 use super::super::{
     Bits32Type, Bits64Type, EnumExt, FieldType, LengthDelimitedType, MessageExt, VariantType,
 };
+use crate::syn::{parse2, Lifetime, Type};
 use crate::Result;
-use ::proc_macro2::{Span, TokenStream};
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Ident, Lifetime};
 
 impl FieldType {
-    pub fn rust_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn rust_type(&self) -> Result<Rc<Type>> {
         use FieldType::*;
         match self {
             Variant(v) => v.rust_type(),
@@ -32,22 +31,22 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
-    pub fn rust_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
+    pub fn rust_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_maybe_borrowed_type(lt)
         } else {
             self.rust_type()
         }
     }
-    pub fn rust_mut_ref_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn rust_mut_ref_type(&self) -> Result<Rc<Type>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_mut_ref_type()
         } else {
             let raw_type = self.rust_type()?;
-            Ok(Rc::new(quote! { &mut #raw_type }))
+            Ok(Rc::new(parse2(quote! { &mut #raw_type })?))
         }
     }
-    pub fn tag_type(&self) -> Result<Rc<TokenStream>> {
+    pub fn tag_type(&self) -> Result<Rc<Type>> {
         use FieldType::*;
         match self {
             Variant(v) => v.tag_type(),
@@ -59,19 +58,20 @@ impl FieldType {
 }
 
 impl VariantType {
-    fn rust_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_type(&self) -> Result<Rc<Type>> {
         use VariantType::*;
-        Ok(match self {
-            Int32 | SInt32 => Rc::new(quote! { i32 }),
-            UInt32 => Rc::new(quote! { u32 }),
-            Int64 | SInt64 => Rc::new(quote! { i64 }),
-            UInt64 => Rc::new(quote! { u64 }),
-            Bool => Rc::new(quote! { bool }),
-            Enum2(e) => e.try_upgrade()?.gen_rust_enum_path()?,
-            Enum3(e) => e.try_upgrade()?.gen_rust_enum_path()?,
-        })
+        Ok(Rc::new(parse2(match self {
+            Int32 | SInt32 => quote! { i32 },
+            UInt32 => quote! { u32 },
+            Int64 | SInt64 => quote! { i64 },
+            UInt64 => quote! { u64 },
+            Bool => quote! { bool },
+            Enum2(e) | Enum3(e) => {
+                return Ok(e.try_upgrade()?.gen_rust_enum_type()?);
+            }
+        })?))
     }
-    fn tag_type(&self) -> Result<Rc<TokenStream>> {
+    fn tag_type(&self) -> Result<Rc<Type>> {
         use VariantType::*;
         let tag_name = match self {
             Int32 => quote! { Int32 },
@@ -90,104 +90,98 @@ impl VariantType {
                 quote! { Enum3 :: <#enum_path> }
             }
         };
-        Ok(Rc::new(quote! {
+        Ok(Rc::new(parse2(quote! {
             self::_puroro::tags::#tag_name
-        }))
+        })?))
     }
 }
 impl LengthDelimitedType {
-    fn rust_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_type(&self) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
-        Ok(match self {
-            String => Rc::new(quote! { ::std::string::String }),
-            Bytes => Rc::new(quote! { ::std::vec::Vec<u8> }),
-            Message(m) => m.try_upgrade()?.gen_rust_struct_path()?,
-        })
-    }
-    fn rust_maybe_borrowed_type(&self, lt: Option<Ident>) -> Result<Rc<TokenStream>> {
-        use LengthDelimitedType::*;
-        let lt = lt.map(|ident| Lifetime {
-            apostrophe: Span::call_site(),
-            ident,
-        });
-        Ok(match self {
-            String => Rc::new(quote! { &#lt str }),
-            Bytes => Rc::new(quote! { &#lt [u8] }),
+        Ok(Rc::new(parse2(match self {
+            String => quote! { ::std::string::String },
+            Bytes => quote! { ::std::vec::Vec<u8> },
             Message(m) => {
-                let path = m.try_upgrade()?.gen_rust_struct_path()?;
-                Rc::new(quote! {
-                    &#lt #path
-                })
+                return Ok(m.try_upgrade()?.gen_rust_struct_type()?);
             }
-        })
+        })?))
     }
-    fn rust_mut_ref_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
-        Ok(match self {
-            String => Rc::new(quote! { &mut ::std::string::String }),
-            Bytes => Rc::new(quote! { &mut ::std::vec::Vec::<u8> }),
+        Ok(Rc::new(parse2(match self {
+            String => quote! { &#lt str },
+            Bytes => quote! { &#lt [u8] },
             Message(m) => {
-                let path = m.try_upgrade()?.gen_rust_struct_path()?;
-                Rc::new(quote! {
-                    &mut #path
-                })
+                let ty = m.try_upgrade()?.gen_rust_struct_type()?;
+                quote! { &#lt #ty }
             }
-        })
+        })?))
     }
-    fn tag_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_mut_ref_type(&self) -> Result<Rc<Type>> {
+        use LengthDelimitedType::*;
+        Ok(Rc::new(parse2(match self {
+            String => quote! { &mut ::std::string::String },
+            Bytes => quote! { &mut ::std::vec::Vec::<u8> },
+            Message(m) => {
+                let ty = m.try_upgrade()?.gen_rust_struct_type()?;
+                quote! { &mut #ty }
+            }
+        })?))
+    }
+    fn tag_type(&self) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
         let tag_name = match self {
             String => quote! { String },
             Bytes => quote! { Bytes },
             Message(m) => {
-                let struct_path = m.try_upgrade()?.gen_rust_struct_path()?;
-                quote! { Message :: <#struct_path> }
+                let struct_type = m.try_upgrade()?.gen_rust_struct_type()?;
+                quote! { Message :: <#struct_type> }
             }
         };
-        Ok(Rc::new(quote! {
+        Ok(Rc::new(parse2(quote! {
             self::_puroro::tags::#tag_name
-        }))
+        })?))
     }
 }
 impl Bits32Type {
-    fn rust_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_type(&self) -> Result<Rc<Type>> {
         use Bits32Type::*;
-        Ok(Rc::new(match self {
+        Ok(Rc::new(parse2(match self {
             Fixed32 => quote! { u32 },
             SFixed32 => quote! { i32 },
             Float => quote! { f32 },
-        }))
+        })?))
     }
-    fn tag_type(&self) -> Result<Rc<TokenStream>> {
+    fn tag_type(&self) -> Result<Rc<Type>> {
         use Bits32Type::*;
         let tag_name = match self {
             Fixed32 => quote! { Fixed32 },
             SFixed32 => quote! { SFixed32 },
             Float => quote! { Float },
         };
-        Ok(Rc::new(quote! {
+        Ok(Rc::new(parse2(quote! {
             self::_puroro::tags::#tag_name
-        }))
+        })?))
     }
 }
 impl Bits64Type {
-    fn rust_type(&self) -> Result<Rc<TokenStream>> {
+    fn rust_type(&self) -> Result<Rc<Type>> {
         use Bits64Type::*;
-        Ok(Rc::new(match self {
+        Ok(Rc::new(parse2(match self {
             Fixed64 => quote! { u64 },
             SFixed64 => quote! { i64 },
             Double => quote! { f64 },
-        }))
+        })?))
     }
-    fn tag_type(&self) -> Result<Rc<TokenStream>> {
+    fn tag_type(&self) -> Result<Rc<Type>> {
         use Bits64Type::*;
         let tag_name = match self {
             Fixed64 => quote! { Fixed64 },
             SFixed64 => quote! { SFixed64 },
             Double => quote! { Double },
         };
-        Ok(Rc::new(quote! {
+        Ok(Rc::new(parse2(quote! {
             self::_puroro::tags::#tag_name
-        }))
+        })?))
     }
 }

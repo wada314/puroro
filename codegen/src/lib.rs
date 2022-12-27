@@ -13,14 +13,60 @@
 // limitations under the License.
 
 #![allow(incomplete_features)]
+#![feature(arc_unwrap_or_clone)]
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
 #![feature(is_some_and)]
+#![feature(result_flattening)]
 #![feature(try_find)]
 #![feature(trait_upcasting)]
 
 mod codegen;
 mod error;
+
+#[cfg(debug_assertions)]
+mod syn {
+    pub(crate) use ::syn::{
+        parse2, Arm, Expr, ExprMethodCall, Field, FieldValue, File, Ident, ImplItemMethod, Item,
+        ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
+    };
+    pub(crate) struct NamedField(::syn::Field);
+    impl ::syn::parse::Parse for NamedField {
+        fn parse(input: syn::parse::ParseStream) -> ::syn::Result<Self> {
+            Ok(NamedField(::syn::Field::parse_named(input)?))
+        }
+    }
+    impl ::std::convert::From<NamedField> for ::syn::Field {
+        fn from(value: NamedField) -> Self {
+            value.0
+        }
+    }
+}
+#[cfg(not(debug_assertions))]
+mod syn {
+    use ::proc_macro2::TokenStream;
+    use ::syn::parse::Result;
+    pub(crate) type Arm = TokenStream;
+    pub(crate) type Expr = TokenStream;
+    pub(crate) type ExprMethodCall = TokenStream;
+    pub(crate) type Field = TokenStream;
+    pub(crate) type FieldValue = TokenStream;
+    pub(crate) type File = TokenStream;
+    pub(crate) type ImplItemMethod = TokenStream;
+    pub(crate) type Item = TokenStream;
+    pub(crate) type ItemEnum = TokenStream;
+    pub(crate) type ItemImpl = TokenStream;
+    pub(crate) type Ident = TokenStream;
+    pub(crate) type Lifetime = TokenStream;
+    pub(crate) type Path = TokenStream;
+    pub(crate) type PathSegment = TokenStream;
+    pub(crate) type Stmt = TokenStream;
+    pub(crate) type Type = TokenStream;
+    pub(crate) fn parse2(ts: TokenStream) -> Result<TokenStream> {
+        Ok(ts)
+    }
+    pub(crate) type NamedField = TokenStream;
+}
 
 pub use crate::error::{ErrorKind, GeneratorError};
 pub type Result<T> = ::std::result::Result<T, GeneratorError>;
