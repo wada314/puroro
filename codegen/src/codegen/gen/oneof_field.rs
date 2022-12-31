@@ -184,7 +184,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
                     #[allow(unused)] use ::std::default::Default;
-                    use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
                     use self::_puroro::internal::oneof_type::OneofCase as _;
 
@@ -194,13 +194,13 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                             self.#union_item_ident.deref()
                         }
                     });
-                    OneofFieldTypeOpt::get_field_or_else(item_opt, #default_fn)
+                    OneofFieldType::get_field_or_else(item_opt, #default_fn)
                 }
             })?,
             parse2(quote! {
                 pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
-                    use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
                     use self::_puroro::internal::oneof_type::OneofCase as _;
 
@@ -210,7 +210,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                             self.#union_item_ident.deref()
                         }
                     });
-                    OneofFieldTypeOpt::get_field_opt(item_opt)
+                    OneofFieldType::get_field_opt(item_opt)
                 }
             })?,
             parse2(quote! {
@@ -235,7 +235,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     }
                     unsafe {
                         &mut self.#union_item_ident
-                    }.mut_field()
+                    }.get_field_mut()
                 }
             })?,
         ])
