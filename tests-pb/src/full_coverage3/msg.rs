@@ -28,7 +28,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -46,7 +46,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i32_unlabeled,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -72,7 +72,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -90,7 +90,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i32_optional,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -116,7 +116,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -134,7 +134,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::Int64,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i64_unlabeled,
             &mut self._bitfield,
             ::std::default::Default::default,

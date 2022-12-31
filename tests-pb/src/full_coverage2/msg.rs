@@ -27,7 +27,7 @@ impl Submsg {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i32_required,
             &self._bitfield,
             ::std::default::Default::default,
@@ -47,7 +47,7 @@ impl Submsg {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i32_required,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -76,7 +76,7 @@ impl Submsg {
             i64,
             self::_puroro::internal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i64_required,
             &self._bitfield,
             ::std::default::Default::default,
@@ -96,7 +96,7 @@ impl Submsg {
             i64,
             self::_puroro::internal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i64_required,
             &mut self._bitfield,
             ::std::default::Default::default,

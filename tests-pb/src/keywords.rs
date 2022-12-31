@@ -22,7 +22,7 @@ impl Msg {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.r#type,
             &self._bitfield,
             ::std::default::Default::default,
@@ -42,7 +42,7 @@ impl Msg {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.r#type,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -171,7 +171,7 @@ impl _Self {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.r#type,
             &self._bitfield,
             ::std::default::Default::default,
@@ -191,7 +191,7 @@ impl _Self {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.r#type,
             &mut self._bitfield,
             ::std::default::Default::default,

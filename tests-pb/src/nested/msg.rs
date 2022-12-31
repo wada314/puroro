@@ -20,7 +20,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.item_inner,
             &self._bitfield,
             ::std::default::Default::default,
@@ -38,7 +38,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.item_inner,
             &mut self._bitfield,
             ::std::default::Default::default,

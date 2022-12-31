@@ -8,20 +8,26 @@ mod _puroro {
 }
 #[derive(::std::default::Default)]
 pub struct Book {
-    title: self::_puroro::internal::field_type::SingularStringField,
+    title: self::_puroro::internal::field_type::SingularUnsizedField::<
+        ::std::string::String,
+        self::_puroro::internal::tags::String,
+    >,
     num_pages: self::_puroro::internal::field_type::SingularNumericalField::<
         u32,
-        self::_puroro::tags::UInt32,
+        self::_puroro::internal::tags::UInt32,
     >,
     author: self::_puroro::internal::field_type::SingularHeapMessageField::<
         self::_puroro_root::library::Author,
     >,
-    _bitfield: self::_puroro::bitvec::BitArray<0usize>,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<0usize>,
 }
 impl Book {
     pub fn title(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.title,
             &self._bitfield,
             ::std::default::Default::default,
@@ -29,14 +35,17 @@ impl Book {
     }
     pub fn title_opt(&self) -> ::std::option::Option::<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-            &self.title,
-            &self._bitfield,
-        )
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_opt(&self.title, &self._bitfield)
     }
     pub fn title_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.title,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -44,25 +53,25 @@ impl Book {
     }
     pub fn has_title(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-                &self.title,
-                &self._bitfield,
-            )
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_opt(&self.title, &self._bitfield)
             .is_some()
     }
     pub fn clear_title(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::clear(
-            &mut self.title,
-            &mut self._bitfield,
-        )
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::clear(&mut self.title, &mut self._bitfield)
     }
     pub fn num_pages(&self) -> u32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
-            self::_puroro::tags::UInt32,
-        > as NonRepeatedFieldType>::get_field(
+            self::_puroro::internal::tags::UInt32,
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.num_pages,
             &self._bitfield,
             ::std::default::Default::default,
@@ -72,15 +81,15 @@ impl Book {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
-            self::_puroro::tags::UInt32,
+            self::_puroro::internal::tags::UInt32,
         > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
     }
     pub fn num_pages_mut(&mut self) -> &mut u32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
-            self::_puroro::tags::UInt32,
-        > as NonRepeatedFieldType>::mut_field(
+            self::_puroro::internal::tags::UInt32,
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.num_pages,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -90,7 +99,7 @@ impl Book {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
-            self::_puroro::tags::UInt32,
+            self::_puroro::internal::tags::UInt32,
         > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
             .is_some()
     }
@@ -98,7 +107,7 @@ impl Book {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
-            self::_puroro::tags::UInt32,
+            self::_puroro::internal::tags::UInt32,
         > as NonRepeatedFieldType>::clear(&mut self.num_pages, &mut self._bitfield)
     }
     pub fn author(
@@ -107,7 +116,7 @@ impl Book {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::library::Author,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.author,
             &self._bitfield,
             ::std::default::Default::default,
@@ -125,7 +134,7 @@ impl Book {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::library::Author,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.author,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -164,7 +173,10 @@ impl self::_puroro::Message for Book {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    <self::_puroro::internal::field_type::SingularUnsizedField::<
+                        ::std::string::String,
+                        self::_puroro::internal::tags::String,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.title,
                         &mut self._bitfield,
                         field_data,
@@ -173,7 +185,7 @@ impl self::_puroro::Message for Book {
                 2i32 => {
                     <self::_puroro::internal::field_type::SingularNumericalField::<
                         u32,
-                        self::_puroro::tags::UInt32,
+                        self::_puroro::internal::tags::UInt32,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.num_pages,
                         &mut self._bitfield,
@@ -201,7 +213,10 @@ impl self::_puroro::Message for Book {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.title,
             &self._bitfield,
             1i32,
@@ -209,7 +224,7 @@ impl self::_puroro::Message for Book {
         )?;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
-            self::_puroro::tags::UInt32,
+            self::_puroro::internal::tags::UInt32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.num_pages,
             &self._bitfield,
@@ -230,12 +245,13 @@ impl self::_puroro::Message for Book {
 impl ::std::clone::Clone for Book {
     fn clone(&self) -> Self {
         Self {
-            title: <self::_puroro::internal::field_type::SingularStringField as ::std::clone::Clone>::clone(
-                &self.title,
-            ),
+            title: <self::_puroro::internal::field_type::SingularUnsizedField::<
+                ::std::string::String,
+                self::_puroro::internal::tags::String,
+            > as ::std::clone::Clone>::clone(&self.title),
             num_pages: <self::_puroro::internal::field_type::SingularNumericalField::<
                 u32,
-                self::_puroro::tags::UInt32,
+                self::_puroro::internal::tags::UInt32,
             > as ::std::clone::Clone>::clone(&self.num_pages),
             author: <self::_puroro::internal::field_type::SingularHeapMessageField::<
                 self::_puroro_root::library::Author,
@@ -273,13 +289,19 @@ impl ::std::cmp::PartialEq for Book {
 }
 #[derive(::std::default::Default)]
 pub struct Author {
-    name: self::_puroro::internal::field_type::SingularStringField,
-    _bitfield: self::_puroro::bitvec::BitArray<0usize>,
+    name: self::_puroro::internal::field_type::SingularUnsizedField::<
+        ::std::string::String,
+        self::_puroro::internal::tags::String,
+    >,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<0usize>,
 }
 impl Author {
     pub fn name(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
@@ -287,14 +309,17 @@ impl Author {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-            &self.name,
-            &self._bitfield,
-        )
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -302,18 +327,18 @@ impl Author {
     }
     pub fn has_name(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
-                &self.name,
-                &self._bitfield,
-            )
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
             .is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::clear(
-            &mut self.name,
-            &mut self._bitfield,
-        )
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Author {
@@ -335,7 +360,10 @@ impl self::_puroro::Message for Author {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    <self::_puroro::internal::field_type::SingularUnsizedField::<
+                        ::std::string::String,
+                        self::_puroro::internal::tags::String,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.name,
                         &mut self._bitfield,
                         field_data,
@@ -353,7 +381,10 @@ impl self::_puroro::Message for Author {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::SingularStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_puroro::internal::field_type::SingularUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.name,
             &self._bitfield,
             1i32,
@@ -365,9 +396,10 @@ impl self::_puroro::Message for Author {
 impl ::std::clone::Clone for Author {
     fn clone(&self) -> Self {
         Self {
-            name: <self::_puroro::internal::field_type::SingularStringField as ::std::clone::Clone>::clone(
-                &self.name,
-            ),
+            name: <self::_puroro::internal::field_type::SingularUnsizedField::<
+                ::std::string::String,
+                self::_puroro::internal::tags::String,
+            > as ::std::clone::Clone>::clone(&self.name),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
