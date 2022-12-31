@@ -18,7 +18,7 @@ pub mod source_code_info;
 pub mod uninterpreted_option;
 #[derive(::std::default::Default)]
 pub struct FileDescriptorSet {
-    file: self::_puroro::internal::field_type::RepeatedMessageField::<
+    file: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::FileDescriptorProto,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
@@ -26,23 +26,21 @@ pub struct FileDescriptorSet {
 impl FileDescriptorSet {
     pub fn file(&self) -> &[self::_puroro_root::google::protobuf::FileDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.file, &self._bitfield)
     }
     pub fn file_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::FileDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::FileDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.file, &mut self._bitfield)
     }
     pub fn clear_file(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.file, &mut self._bitfield)
     }
@@ -59,21 +57,18 @@ impl self::_puroro::Message for FileDescriptorSet {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                1i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::FileDescriptorProto,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.file,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                1i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::FileDescriptorProto,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.file,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -81,12 +76,11 @@ impl self::_puroro::Message for FileDescriptorSet {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.file,
@@ -100,7 +94,7 @@ impl self::_puroro::Message for FileDescriptorSet {
 impl ::std::clone::Clone for FileDescriptorSet {
     fn clone(&self) -> Self {
         Self {
-            file: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            file: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::FileDescriptorProto,
             > as ::std::clone::Clone>::clone(&self.file),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
@@ -132,36 +126,36 @@ impl ::std::cmp::PartialEq for FileDescriptorSet {
 }
 #[derive(::std::default::Default)]
 pub struct FileDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    package: self::_puroro::internal::field_type::OptionalStringField::<1usize>,
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    package: self::_puroro::internal::field_type::OptionalStringField<1usize>,
     dependency: self::_puroro::internal::field_type::RepeatedStringField,
-    public_dependency: self::_puroro::internal::field_type::RepeatedNumericalField::<
+    public_dependency: self::_puroro::internal::field_type::RepeatedNumericalField<
         i32,
         self::_puroro::tags::Int32,
     >,
-    weak_dependency: self::_puroro::internal::field_type::RepeatedNumericalField::<
+    weak_dependency: self::_puroro::internal::field_type::RepeatedNumericalField<
         i32,
         self::_puroro::tags::Int32,
     >,
-    message_type: self::_puroro::internal::field_type::RepeatedMessageField::<
+    message_type: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::DescriptorProto,
     >,
-    enum_type: self::_puroro::internal::field_type::RepeatedMessageField::<
+    enum_type: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::EnumDescriptorProto,
     >,
-    service: self::_puroro::internal::field_type::RepeatedMessageField::<
+    service: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::ServiceDescriptorProto,
     >,
-    extension: self::_puroro::internal::field_type::RepeatedMessageField::<
+    extension: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::FieldDescriptorProto,
     >,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::FileOptions,
     >,
-    source_code_info: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    source_code_info: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::SourceCodeInfo,
     >,
-    syntax: self::_puroro::internal::field_type::OptionalStringField::<2usize>,
+    syntax: self::_puroro::internal::field_type::OptionalStringField<2usize>,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl FileDescriptorProto {
@@ -169,13 +163,13 @@ impl FileDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -185,7 +179,7 @@ impl FileDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -208,13 +202,13 @@ impl FileDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.package,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn package_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn package_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
@@ -224,7 +218,7 @@ impl FileDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.package,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -245,16 +239,14 @@ impl FileDescriptorProto {
     }
     pub fn dependency(
         &self,
-    ) -> &[impl ::std::ops::Deref::<
-        Target = str,
-    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+    ) -> &[impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.dependency,
             &self._bitfield,
         )
     }
-    pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.dependency,
@@ -275,7 +267,7 @@ impl FileDescriptorProto {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.public_dependency, &self._bitfield)
     }
-    pub fn public_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn public_dependency_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
@@ -299,7 +291,7 @@ impl FileDescriptorProto {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.weak_dependency, &self._bitfield)
     }
-    pub fn weak_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn weak_dependency_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
@@ -316,107 +308,93 @@ impl FileDescriptorProto {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::clear(&mut self.weak_dependency, &mut self._bitfield)
     }
-    pub fn message_type(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::DescriptorProto] {
+    pub fn message_type(&self) -> &[self::_puroro_root::google::protobuf::DescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as RepeatedFieldType>::get_field(&self.message_type, &self._bitfield)
     }
     pub fn message_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_puroro_root::google::protobuf::DescriptorProto> {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::DescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.message_type, &mut self._bitfield)
     }
     pub fn clear_message_type(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.message_type, &mut self._bitfield)
     }
-    pub fn enum_type(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::EnumDescriptorProto] {
+    pub fn enum_type(&self) -> &[self::_puroro_root::google::protobuf::EnumDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.enum_type, &self._bitfield)
     }
     pub fn enum_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::EnumDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::EnumDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.enum_type, &mut self._bitfield)
     }
     pub fn clear_enum_type(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.enum_type, &mut self._bitfield)
     }
-    pub fn service(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::ServiceDescriptorProto] {
+    pub fn service(&self) -> &[self::_puroro_root::google::protobuf::ServiceDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::ServiceDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.service, &self._bitfield)
     }
     pub fn service_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::ServiceDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::ServiceDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::ServiceDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.service, &mut self._bitfield)
     }
     pub fn clear_service(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::ServiceDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.service, &mut self._bitfield)
     }
-    pub fn extension(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::FieldDescriptorProto] {
+    pub fn extension(&self) -> &[self::_puroro_root::google::protobuf::FieldDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.extension, &self._bitfield)
     }
     pub fn extension_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::FieldDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::FieldDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.extension, &mut self._bitfield)
     }
     pub fn clear_extension(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.extension, &mut self._bitfield)
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::FileOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::FileOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -424,19 +402,17 @@ impl FileDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::FileOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::FileOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FileOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::FileOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -444,24 +420,24 @@ impl FileDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FileOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FileOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
     pub fn source_code_info(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::SourceCodeInfo> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::SourceCodeInfo> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.source_code_info,
             &self._bitfield,
             ::std::default::Default::default,
@@ -469,22 +445,19 @@ impl FileDescriptorProto {
     }
     pub fn source_code_info_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::SourceCodeInfo> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::SourceCodeInfo> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.source_code_info,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.source_code_info, &self._bitfield)
     }
     pub fn source_code_info_mut(
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::SourceCodeInfo {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.source_code_info,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -492,34 +465,28 @@ impl FileDescriptorProto {
     }
     pub fn has_source_code_info(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.source_code_info,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.source_code_info, &self._bitfield)
+        .is_some()
     }
     pub fn clear_source_code_info(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.source_code_info,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.source_code_info, &mut self._bitfield)
     }
     pub fn syntax(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.syntax,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn syntax_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn syntax_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
@@ -529,7 +496,7 @@ impl FileDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.syntax,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -561,11 +528,10 @@ impl self::_puroro::Message for FileDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -682,8 +648,7 @@ impl self::_puroro::Message for FileDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -709,7 +674,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
             i32,
             self::_puroro::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -718,7 +683,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             10i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
             i32,
             self::_puroro::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -727,7 +692,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             11i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.message_type,
@@ -735,7 +700,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             4i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.enum_type,
@@ -743,7 +708,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             5i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::ServiceDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.service,
@@ -751,7 +716,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             6i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.extension,
@@ -759,7 +724,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             7i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FileOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -767,7 +732,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             8i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::SourceCodeInfo,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.source_code_info,
@@ -868,7 +833,8 @@ impl ::std::cmp::PartialEq for FileDescriptorProto {
             && self.public_dependency() == rhs.public_dependency()
             && self.weak_dependency() == rhs.weak_dependency()
             && self.message_type() == rhs.message_type()
-            && self.enum_type() == rhs.enum_type() && self.service() == rhs.service()
+            && self.enum_type() == rhs.enum_type()
+            && self.service() == rhs.service()
             && self.extension() == rhs.extension()
             && self.options_opt() == rhs.options_opt()
             && self.source_code_info_opt() == rhs.source_code_info_opt()
@@ -877,29 +843,29 @@ impl ::std::cmp::PartialEq for FileDescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct DescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    field: self::_puroro::internal::field_type::RepeatedMessageField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    field: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::FieldDescriptorProto,
     >,
-    extension: self::_puroro::internal::field_type::RepeatedMessageField::<
+    extension: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::FieldDescriptorProto,
     >,
-    nested_type: self::_puroro::internal::field_type::RepeatedMessageField::<
+    nested_type: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::DescriptorProto,
     >,
-    enum_type: self::_puroro::internal::field_type::RepeatedMessageField::<
+    enum_type: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::EnumDescriptorProto,
     >,
-    extension_range: self::_puroro::internal::field_type::RepeatedMessageField::<
+    extension_range: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange,
     >,
-    oneof_decl: self::_puroro::internal::field_type::RepeatedMessageField::<
+    oneof_decl: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::OneofDescriptorProto,
     >,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::MessageOptions,
     >,
-    reserved_range: self::_puroro::internal::field_type::RepeatedMessageField::<
+    reserved_range: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
     >,
     reserved_name: self::_puroro::internal::field_type::RepeatedStringField,
@@ -910,13 +876,13 @@ impl DescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -926,7 +892,7 @@ impl DescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -945,97 +911,83 @@ impl DescriptorProto {
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
     }
-    pub fn field(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::FieldDescriptorProto] {
+    pub fn field(&self) -> &[self::_puroro_root::google::protobuf::FieldDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.field, &self._bitfield)
     }
     pub fn field_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::FieldDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::FieldDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.field, &mut self._bitfield)
     }
     pub fn clear_field(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.field, &mut self._bitfield)
     }
-    pub fn extension(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::FieldDescriptorProto] {
+    pub fn extension(&self) -> &[self::_puroro_root::google::protobuf::FieldDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.extension, &self._bitfield)
     }
     pub fn extension_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::FieldDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::FieldDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.extension, &mut self._bitfield)
     }
     pub fn clear_extension(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.extension, &mut self._bitfield)
     }
-    pub fn nested_type(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::DescriptorProto] {
+    pub fn nested_type(&self) -> &[self::_puroro_root::google::protobuf::DescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as RepeatedFieldType>::get_field(&self.nested_type, &self._bitfield)
     }
     pub fn nested_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_puroro_root::google::protobuf::DescriptorProto> {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::DescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.nested_type, &mut self._bitfield)
     }
     pub fn clear_nested_type(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.nested_type, &mut self._bitfield)
     }
-    pub fn enum_type(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::EnumDescriptorProto] {
+    pub fn enum_type(&self) -> &[self::_puroro_root::google::protobuf::EnumDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.enum_type, &self._bitfield)
     }
     pub fn enum_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::EnumDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::EnumDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.enum_type, &mut self._bitfield)
     }
     pub fn clear_enum_type(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.enum_type, &mut self._bitfield)
     }
@@ -1043,60 +995,52 @@ impl DescriptorProto {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange,
         > as RepeatedFieldType>::get_field(&self.extension_range, &self._bitfield)
     }
     pub fn extension_range_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange>
+    {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange,
-        > as RepeatedFieldType>::mut_field(
-            &mut self.extension_range,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::mut_field(&mut self.extension_range, &mut self._bitfield)
     }
     pub fn clear_extension_range(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange,
         > as RepeatedFieldType>::clear(&mut self.extension_range, &mut self._bitfield)
     }
-    pub fn oneof_decl(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::OneofDescriptorProto] {
+    pub fn oneof_decl(&self) -> &[self::_puroro_root::google::protobuf::OneofDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::OneofDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.oneof_decl, &self._bitfield)
     }
     pub fn oneof_decl_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::OneofDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::OneofDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::OneofDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.oneof_decl, &mut self._bitfield)
     }
     pub fn clear_oneof_decl(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::OneofDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.oneof_decl, &mut self._bitfield)
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::MessageOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::MessageOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1104,19 +1048,17 @@ impl DescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::MessageOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::MessageOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MessageOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::MessageOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::MessageOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1124,14 +1066,14 @@ impl DescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MessageOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MessageOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
@@ -1139,40 +1081,35 @@ impl DescriptorProto {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
         > as RepeatedFieldType>::get_field(&self.reserved_range, &self._bitfield)
     }
     pub fn reserved_range_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange>
+    {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
         > as RepeatedFieldType>::mut_field(&mut self.reserved_range, &mut self._bitfield)
     }
     pub fn clear_reserved_range(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
         > as RepeatedFieldType>::clear(&mut self.reserved_range, &mut self._bitfield)
     }
     pub fn reserved_name(
         &self,
-    ) -> &[impl ::std::ops::Deref::<
-        Target = str,
-    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+    ) -> &[impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.reserved_name,
             &self._bitfield,
         )
     }
-    pub fn reserved_name_mut(
-        &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn reserved_name_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.reserved_name,
@@ -1199,11 +1136,10 @@ impl self::_puroro::Message for DescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -1300,8 +1236,7 @@ impl self::_puroro::Message for DescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -1313,7 +1248,7 @@ impl self::_puroro::Message for DescriptorProto {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.field,
@@ -1321,7 +1256,7 @@ impl self::_puroro::Message for DescriptorProto {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FieldDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.extension,
@@ -1329,7 +1264,7 @@ impl self::_puroro::Message for DescriptorProto {
             6i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::DescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.nested_type,
@@ -1337,7 +1272,7 @@ impl self::_puroro::Message for DescriptorProto {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.enum_type,
@@ -1345,7 +1280,7 @@ impl self::_puroro::Message for DescriptorProto {
             4i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ExtensionRange,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.extension_range,
@@ -1353,7 +1288,7 @@ impl self::_puroro::Message for DescriptorProto {
             5i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::OneofDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.oneof_decl,
@@ -1361,7 +1296,7 @@ impl self::_puroro::Message for DescriptorProto {
             8i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MessageOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -1369,7 +1304,7 @@ impl self::_puroro::Message for DescriptorProto {
             7i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::descriptor_proto::ReservedRange,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.reserved_range,
@@ -1452,7 +1387,8 @@ impl ::std::cmp::PartialEq for DescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        true && self.name_opt() == rhs.name_opt() && self.field() == rhs.field()
+        true && self.name_opt() == rhs.name_opt()
+            && self.field() == rhs.field()
             && self.extension() == rhs.extension()
             && self.nested_type() == rhs.nested_type()
             && self.enum_type() == rhs.enum_type()
@@ -1465,7 +1401,7 @@ impl ::std::cmp::PartialEq for DescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct ExtensionRangeOptions {
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
@@ -1475,31 +1411,25 @@ impl ExtensionRangeOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for ExtensionRangeOptions {
@@ -1514,21 +1444,18 @@ impl self::_puroro::Message for ExtensionRangeOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -1536,12 +1463,11 @@ impl self::_puroro::Message for ExtensionRangeOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -1555,9 +1481,11 @@ impl self::_puroro::Message for ExtensionRangeOptions {
 impl ::std::clone::Clone for ExtensionRangeOptions {
     fn clone(&self) -> Self {
         Self {
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -1574,7 +1502,10 @@ impl ::std::fmt::Debug for ExtensionRangeOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(ExtensionRangeOptions))
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -1587,39 +1518,39 @@ impl ::std::cmp::PartialEq for ExtensionRangeOptions {
 }
 #[derive(::std::default::Default)]
 pub struct FieldDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    number: self::_puroro::internal::field_type::OptionalNumericalField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    number: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         1usize,
     >,
-    label: self::_puroro::internal::field_type::OptionalNumericalField::<
+    label: self::_puroro::internal::field_type::OptionalNumericalField<
         self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-        self::_puroro::tags::Enum2::<
+        self::_puroro::tags::Enum2<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
         >,
         2usize,
     >,
-    r#type: self::_puroro::internal::field_type::OptionalNumericalField::<
+    r#type: self::_puroro::internal::field_type::OptionalNumericalField<
         self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-        self::_puroro::tags::Enum2::<
+        self::_puroro::tags::Enum2<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
         >,
         3usize,
     >,
-    type_name: self::_puroro::internal::field_type::OptionalStringField::<4usize>,
-    extendee: self::_puroro::internal::field_type::OptionalStringField::<5usize>,
-    default_value: self::_puroro::internal::field_type::OptionalStringField::<6usize>,
-    oneof_index: self::_puroro::internal::field_type::OptionalNumericalField::<
+    type_name: self::_puroro::internal::field_type::OptionalStringField<4usize>,
+    extendee: self::_puroro::internal::field_type::OptionalStringField<5usize>,
+    default_value: self::_puroro::internal::field_type::OptionalStringField<6usize>,
+    oneof_index: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         7usize,
     >,
-    json_name: self::_puroro::internal::field_type::OptionalStringField::<8usize>,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    json_name: self::_puroro::internal::field_type::OptionalStringField<8usize>,
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::FieldOptions,
     >,
-    proto3_optional: self::_puroro::internal::field_type::OptionalNumericalField::<
+    proto3_optional: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         9usize,
@@ -1631,13 +1562,13 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -1647,7 +1578,7 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1668,19 +1599,19 @@ impl FieldDescriptorProto {
     }
     pub fn number(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.number,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn number_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn number_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -1688,11 +1619,11 @@ impl FieldDescriptorProto {
     }
     pub fn number_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.number,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1700,32 +1631,30 @@ impl FieldDescriptorProto {
     }
     pub fn has_number(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.number, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_number(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::clear(&mut self.number, &mut self._bitfield)
     }
-    pub fn label(
-        &self,
-    ) -> self::_puroro_root::google::protobuf::field_descriptor_proto::Label {
+    pub fn label(&self) -> self::_puroro_root::google::protobuf::field_descriptor_proto::Label {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
             >,
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.label,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1733,13 +1662,12 @@ impl FieldDescriptorProto {
     }
     pub fn label_opt(
         &self,
-    ) -> ::std::option::Option::<
-        self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-    > {
+    ) -> ::std::option::Option<self::_puroro_root::google::protobuf::field_descriptor_proto::Label>
+    {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
             >,
             2usize,
@@ -1749,13 +1677,13 @@ impl FieldDescriptorProto {
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::field_descriptor_proto::Label {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
             >,
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.label,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1763,36 +1691,34 @@ impl FieldDescriptorProto {
     }
     pub fn has_label(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
             >,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.label, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_label(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
             >,
             2usize,
         > as NonRepeatedFieldType>::clear(&mut self.label, &mut self._bitfield)
     }
-    pub fn r#type(
-        &self,
-    ) -> self::_puroro_root::google::protobuf::field_descriptor_proto::Type {
+    pub fn r#type(&self) -> self::_puroro_root::google::protobuf::field_descriptor_proto::Type {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
             >,
             3usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.r#type,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1800,13 +1726,12 @@ impl FieldDescriptorProto {
     }
     pub fn type_opt(
         &self,
-    ) -> ::std::option::Option::<
-        self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-    > {
+    ) -> ::std::option::Option<self::_puroro_root::google::protobuf::field_descriptor_proto::Type>
+    {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
             >,
             3usize,
@@ -1816,13 +1741,13 @@ impl FieldDescriptorProto {
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::field_descriptor_proto::Type {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
             >,
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.r#type,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1830,20 +1755,20 @@ impl FieldDescriptorProto {
     }
     pub fn has_type(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
             >,
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.r#type, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_type(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
             >,
             3usize,
@@ -1853,13 +1778,13 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             4usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.type_name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn type_name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn type_name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             4usize,
@@ -1869,7 +1794,7 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             4usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.type_name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1892,13 +1817,13 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             5usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.extendee,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn extendee_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn extendee_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             5usize,
@@ -1908,7 +1833,7 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             5usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.extendee,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1931,13 +1856,13 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             6usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.default_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn default_value_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn default_value_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             6usize,
@@ -1947,7 +1872,7 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             6usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.default_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -1968,19 +1893,19 @@ impl FieldDescriptorProto {
     }
     pub fn oneof_index(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             7usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.oneof_index,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn oneof_index_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn oneof_index_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             7usize,
@@ -1988,11 +1913,11 @@ impl FieldDescriptorProto {
     }
     pub fn oneof_index_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             7usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.oneof_index,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2000,16 +1925,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_oneof_index(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             7usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.oneof_index, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_oneof_index(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             7usize,
@@ -2019,13 +1944,13 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             8usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.json_name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn json_name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn json_name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             8usize,
@@ -2035,7 +1960,7 @@ impl FieldDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             8usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.json_name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2056,11 +1981,11 @@ impl FieldDescriptorProto {
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::FieldOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::FieldOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -2068,19 +1993,17 @@ impl FieldDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::FieldOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::FieldOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FieldOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::FieldOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::FieldOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2088,32 +2011,32 @@ impl FieldDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FieldOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FieldOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
     pub fn proto3_optional(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.proto3_optional,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn proto3_optional_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn proto3_optional_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
@@ -2121,11 +2044,11 @@ impl FieldDescriptorProto {
     }
     pub fn proto3_optional_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.proto3_optional,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2133,16 +2056,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_proto3_optional(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.proto3_optional, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_proto3_optional(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
@@ -2161,11 +2084,10 @@ impl self::_puroro::Message for FieldDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -2287,8 +2209,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -2300,7 +2221,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -2310,9 +2231,9 @@ impl self::_puroro::Message for FieldDescriptorProto {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Label,
             >,
             2usize,
@@ -2322,9 +2243,9 @@ impl self::_puroro::Message for FieldDescriptorProto {
             4i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::field_descriptor_proto::Type,
             >,
             3usize,
@@ -2358,7 +2279,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
             7i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             7usize,
@@ -2376,7 +2297,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
             10i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::FieldOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -2384,7 +2305,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
             8i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
@@ -2483,7 +2404,8 @@ impl ::std::cmp::PartialEq for FieldDescriptorProto {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
         true && self.name_opt() == rhs.name_opt()
             && self.number_opt() == rhs.number_opt()
-            && self.label_opt() == rhs.label_opt() && self.type_opt() == rhs.type_opt()
+            && self.label_opt() == rhs.label_opt()
+            && self.type_opt() == rhs.type_opt()
             && self.type_name_opt() == rhs.type_name_opt()
             && self.extendee_opt() == rhs.extendee_opt()
             && self.default_value_opt() == rhs.default_value_opt()
@@ -2495,8 +2417,8 @@ impl ::std::cmp::PartialEq for FieldDescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct OneofDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::OneofOptions,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -2506,13 +2428,13 @@ impl OneofDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -2522,7 +2444,7 @@ impl OneofDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2543,11 +2465,11 @@ impl OneofDescriptorProto {
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::OneofOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::OneofOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -2555,19 +2477,17 @@ impl OneofDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::OneofOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::OneofOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::OneofOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::OneofOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::OneofOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2575,14 +2495,14 @@ impl OneofDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::OneofOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::OneofOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
@@ -2599,11 +2519,10 @@ impl self::_puroro::Message for OneofDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -2630,8 +2549,7 @@ impl self::_puroro::Message for OneofDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -2643,7 +2561,7 @@ impl self::_puroro::Message for OneofDescriptorProto {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::OneofOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -2688,20 +2606,19 @@ impl ::std::cmp::PartialEq for OneofDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        true && self.name_opt() == rhs.name_opt()
-            && self.options_opt() == rhs.options_opt()
+        true && self.name_opt() == rhs.name_opt() && self.options_opt() == rhs.options_opt()
     }
 }
 #[derive(::std::default::Default)]
 pub struct EnumDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    value: self::_puroro::internal::field_type::RepeatedMessageField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    value: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::EnumValueDescriptorProto,
     >,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::EnumOptions,
     >,
-    reserved_range: self::_puroro::internal::field_type::RepeatedMessageField::<
+    reserved_range: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
     >,
     reserved_name: self::_puroro::internal::field_type::RepeatedStringField,
@@ -2712,13 +2629,13 @@ impl EnumDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -2728,7 +2645,7 @@ impl EnumDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2747,37 +2664,33 @@ impl EnumDescriptorProto {
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
     }
-    pub fn value(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::EnumValueDescriptorProto] {
+    pub fn value(&self) -> &[self::_puroro_root::google::protobuf::EnumValueDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumValueDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.value, &self._bitfield)
     }
     pub fn value_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::EnumValueDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::EnumValueDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumValueDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.value, &mut self._bitfield)
     }
     pub fn clear_value(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumValueDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.value, &mut self._bitfield)
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::EnumOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::EnumOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -2785,19 +2698,17 @@ impl EnumDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::EnumOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::EnumOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::EnumOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::EnumOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -2805,14 +2716,14 @@ impl EnumDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
@@ -2820,40 +2731,36 @@ impl EnumDescriptorProto {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
         > as RepeatedFieldType>::get_field(&self.reserved_range, &self._bitfield)
     }
     pub fn reserved_range_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
+    ) -> &mut ::std::vec::Vec<
         self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
     > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
         > as RepeatedFieldType>::mut_field(&mut self.reserved_range, &mut self._bitfield)
     }
     pub fn clear_reserved_range(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
         > as RepeatedFieldType>::clear(&mut self.reserved_range, &mut self._bitfield)
     }
     pub fn reserved_name(
         &self,
-    ) -> &[impl ::std::ops::Deref::<
-        Target = str,
-    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+    ) -> &[impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.reserved_name,
             &self._bitfield,
         )
     }
-    pub fn reserved_name_mut(
-        &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn reserved_name_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.reserved_name,
@@ -2880,11 +2787,10 @@ impl self::_puroro::Message for EnumDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -2936,8 +2842,7 @@ impl self::_puroro::Message for EnumDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -2949,7 +2854,7 @@ impl self::_puroro::Message for EnumDescriptorProto {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::EnumValueDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.value,
@@ -2957,7 +2862,7 @@ impl self::_puroro::Message for EnumDescriptorProto {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -2965,7 +2870,7 @@ impl self::_puroro::Message for EnumDescriptorProto {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.reserved_range,
@@ -3028,7 +2933,8 @@ impl ::std::cmp::PartialEq for EnumDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        true && self.name_opt() == rhs.name_opt() && self.value() == rhs.value()
+        true && self.name_opt() == rhs.name_opt()
+            && self.value() == rhs.value()
             && self.options_opt() == rhs.options_opt()
             && self.reserved_range() == rhs.reserved_range()
             && self.reserved_name() == rhs.reserved_name()
@@ -3036,13 +2942,13 @@ impl ::std::cmp::PartialEq for EnumDescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct EnumValueDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    number: self::_puroro::internal::field_type::OptionalNumericalField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    number: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         1usize,
     >,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::EnumValueOptions,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -3052,13 +2958,13 @@ impl EnumValueDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -3068,7 +2974,7 @@ impl EnumValueDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3089,19 +2995,19 @@ impl EnumValueDescriptorProto {
     }
     pub fn number(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.number,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn number_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn number_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -3109,11 +3015,11 @@ impl EnumValueDescriptorProto {
     }
     pub fn number_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.number,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3121,16 +3027,16 @@ impl EnumValueDescriptorProto {
     }
     pub fn has_number(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.number, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_number(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -3138,13 +3044,11 @@ impl EnumValueDescriptorProto {
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::EnumValueOptions,
-    > {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::EnumValueOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -3152,21 +3056,17 @@ impl EnumValueDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::EnumValueOptions,
-    > {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::EnumValueOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumValueOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::EnumValueOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::EnumValueOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3174,14 +3074,14 @@ impl EnumValueDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumValueOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumValueOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
@@ -3198,11 +3098,10 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -3240,8 +3139,7 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -3253,7 +3151,7 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -3263,7 +3161,7 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::EnumValueOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -3321,11 +3219,11 @@ impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct ServiceDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    method: self::_puroro::internal::field_type::RepeatedMessageField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    method: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::MethodDescriptorProto,
     >,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::ServiceOptions,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -3335,13 +3233,13 @@ impl ServiceDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -3351,7 +3249,7 @@ impl ServiceDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3370,37 +3268,33 @@ impl ServiceDescriptorProto {
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
     }
-    pub fn method(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::MethodDescriptorProto] {
+    pub fn method(&self) -> &[self::_puroro_root::google::protobuf::MethodDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::MethodDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.method, &self._bitfield)
     }
     pub fn method_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::MethodDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::MethodDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::MethodDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.method, &mut self._bitfield)
     }
     pub fn clear_method(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::MethodDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.method, &mut self._bitfield)
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::ServiceOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::ServiceOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -3408,19 +3302,17 @@ impl ServiceDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::ServiceOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::ServiceOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::ServiceOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::ServiceOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::ServiceOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3428,14 +3320,14 @@ impl ServiceDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::ServiceOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::ServiceOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
@@ -3452,11 +3344,10 @@ impl self::_puroro::Message for ServiceDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -3492,8 +3383,7 @@ impl self::_puroro::Message for ServiceDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -3505,7 +3395,7 @@ impl self::_puroro::Message for ServiceDescriptorProto {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::MethodDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.method,
@@ -3513,7 +3403,7 @@ impl self::_puroro::Message for ServiceDescriptorProto {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::ServiceOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -3562,24 +3452,25 @@ impl ::std::cmp::PartialEq for ServiceDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        true && self.name_opt() == rhs.name_opt() && self.method() == rhs.method()
+        true && self.name_opt() == rhs.name_opt()
+            && self.method() == rhs.method()
             && self.options_opt() == rhs.options_opt()
     }
 }
 #[derive(::std::default::Default)]
 pub struct MethodDescriptorProto {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    input_type: self::_puroro::internal::field_type::OptionalStringField::<1usize>,
-    output_type: self::_puroro::internal::field_type::OptionalStringField::<2usize>,
-    options: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    input_type: self::_puroro::internal::field_type::OptionalStringField<1usize>,
+    output_type: self::_puroro::internal::field_type::OptionalStringField<2usize>,
+    options: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::MethodOptions,
     >,
-    client_streaming: self::_puroro::internal::field_type::OptionalNumericalField::<
+    client_streaming: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         3usize,
     >,
-    server_streaming: self::_puroro::internal::field_type::OptionalNumericalField::<
+    server_streaming: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         4usize,
@@ -3591,13 +3482,13 @@ impl MethodDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -3607,7 +3498,7 @@ impl MethodDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3630,13 +3521,13 @@ impl MethodDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.input_type,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn input_type_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn input_type_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
@@ -3646,7 +3537,7 @@ impl MethodDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.input_type,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3669,13 +3560,13 @@ impl MethodDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.output_type,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn output_type_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn output_type_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
@@ -3685,7 +3576,7 @@ impl MethodDescriptorProto {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.output_type,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3706,11 +3597,11 @@ impl MethodDescriptorProto {
     }
     pub fn options(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::MethodOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::MethodOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.options,
             &self._bitfield,
             ::std::default::Default::default,
@@ -3718,19 +3609,17 @@ impl MethodDescriptorProto {
     }
     pub fn options_opt(
         &self,
-    ) -> ::std::option::Option::<&self::_puroro_root::google::protobuf::MethodOptions> {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::MethodOptions> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MethodOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
     }
-    pub fn options_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::MethodOptions {
+    pub fn options_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::MethodOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.options,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -3738,47 +3627,44 @@ impl MethodDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MethodOptions,
         > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MethodOptions,
         > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
     }
     pub fn client_streaming(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.client_streaming,
             &self._bitfield,
             || false,
         )
     }
-    pub fn client_streaming_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn client_streaming_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.client_streaming,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.client_streaming, &self._bitfield)
     }
     pub fn client_streaming_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.client_streaming,
             &mut self._bitfield,
             || false,
@@ -3786,57 +3672,48 @@ impl MethodDescriptorProto {
     }
     pub fn has_client_streaming(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.client_streaming,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.client_streaming, &self._bitfield)
+        .is_some()
     }
     pub fn clear_client_streaming(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.client_streaming,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.client_streaming, &mut self._bitfield)
     }
     pub fn server_streaming(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.server_streaming,
             &self._bitfield,
             || false,
         )
     }
-    pub fn server_streaming_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn server_streaming_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.server_streaming,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.server_streaming, &self._bitfield)
     }
     pub fn server_streaming_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.server_streaming,
             &mut self._bitfield,
             || false,
@@ -3844,26 +3721,20 @@ impl MethodDescriptorProto {
     }
     pub fn has_server_streaming(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.server_streaming,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.server_streaming, &self._bitfield)
+        .is_some()
     }
     pub fn clear_server_streaming(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.server_streaming,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.server_streaming, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for MethodDescriptorProto {
@@ -3878,11 +3749,10 @@ impl self::_puroro::Message for MethodDescriptorProto {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -3949,8 +3819,7 @@ impl self::_puroro::Message for MethodDescriptorProto {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -3978,7 +3847,7 @@ impl self::_puroro::Message for MethodDescriptorProto {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::MethodOptions,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.options,
@@ -3986,7 +3855,7 @@ impl self::_puroro::Message for MethodDescriptorProto {
             4i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -3996,7 +3865,7 @@ impl self::_puroro::Message for MethodDescriptorProto {
             5i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
@@ -4073,79 +3942,69 @@ impl ::std::cmp::PartialEq for MethodDescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct FileOptions {
-    java_package: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    java_outer_classname: self::_puroro::internal::field_type::OptionalStringField::<
-        1usize,
-    >,
-    java_multiple_files: self::_puroro::internal::field_type::OptionalNumericalField::<
+    java_package: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    java_outer_classname: self::_puroro::internal::field_type::OptionalStringField<1usize>,
+    java_multiple_files: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         2usize,
     >,
-    java_generate_equals_and_hash: self::_puroro::internal::field_type::OptionalNumericalField::<
+    java_generate_equals_and_hash: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         3usize,
     >,
-    java_string_check_utf8: self::_puroro::internal::field_type::OptionalNumericalField::<
+    java_string_check_utf8: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         4usize,
     >,
-    optimize_for: self::_puroro::internal::field_type::OptionalNumericalField::<
+    optimize_for: self::_puroro::internal::field_type::OptionalNumericalField<
         self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-        self::_puroro::tags::Enum2::<
+        self::_puroro::tags::Enum2<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
         >,
         5usize,
     >,
-    go_package: self::_puroro::internal::field_type::OptionalStringField::<6usize>,
-    cc_generic_services: self::_puroro::internal::field_type::OptionalNumericalField::<
+    go_package: self::_puroro::internal::field_type::OptionalStringField<6usize>,
+    cc_generic_services: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         7usize,
     >,
-    java_generic_services: self::_puroro::internal::field_type::OptionalNumericalField::<
+    java_generic_services: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         8usize,
     >,
-    py_generic_services: self::_puroro::internal::field_type::OptionalNumericalField::<
+    py_generic_services: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         9usize,
     >,
-    php_generic_services: self::_puroro::internal::field_type::OptionalNumericalField::<
+    php_generic_services: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         10usize,
     >,
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         11usize,
     >,
-    cc_enable_arenas: self::_puroro::internal::field_type::OptionalNumericalField::<
+    cc_enable_arenas: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         12usize,
     >,
-    objc_class_prefix: self::_puroro::internal::field_type::OptionalStringField::<
-        13usize,
-    >,
-    csharp_namespace: self::_puroro::internal::field_type::OptionalStringField::<
-        14usize,
-    >,
-    swift_prefix: self::_puroro::internal::field_type::OptionalStringField::<15usize>,
-    php_class_prefix: self::_puroro::internal::field_type::OptionalStringField::<
-        16usize,
-    >,
-    php_namespace: self::_puroro::internal::field_type::OptionalStringField::<17usize>,
-    php_metadata_namespace: self::_puroro::internal::field_type::OptionalStringField::<
-        18usize,
-    >,
-    ruby_package: self::_puroro::internal::field_type::OptionalStringField::<19usize>,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    objc_class_prefix: self::_puroro::internal::field_type::OptionalStringField<13usize>,
+    csharp_namespace: self::_puroro::internal::field_type::OptionalStringField<14usize>,
+    swift_prefix: self::_puroro::internal::field_type::OptionalStringField<15usize>,
+    php_class_prefix: self::_puroro::internal::field_type::OptionalStringField<16usize>,
+    php_namespace: self::_puroro::internal::field_type::OptionalStringField<17usize>,
+    php_metadata_namespace: self::_puroro::internal::field_type::OptionalStringField<18usize>,
+    ruby_package: self::_puroro::internal::field_type::OptionalStringField<19usize>,
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -4155,13 +4014,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.java_package,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn java_package_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn java_package_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -4171,7 +4030,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.java_package,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4194,13 +4053,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.java_outer_classname,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn java_outer_classname_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn java_outer_classname_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
@@ -4213,7 +4072,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.java_outer_classname,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4240,34 +4099,31 @@ impl FileOptions {
     }
     pub fn java_multiple_files(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.java_multiple_files,
             &self._bitfield,
             || false,
         )
     }
-    pub fn java_multiple_files_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn java_multiple_files_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.java_multiple_files,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.java_multiple_files, &self._bitfield)
     }
     pub fn java_multiple_files_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.java_multiple_files,
             &mut self._bitfield,
             || false,
@@ -4275,42 +4131,36 @@ impl FileOptions {
     }
     pub fn has_java_multiple_files(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.java_multiple_files,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.java_multiple_files, &self._bitfield)
+        .is_some()
     }
     pub fn clear_java_multiple_files(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.java_multiple_files,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.java_multiple_files, &mut self._bitfield)
     }
     pub fn java_generate_equals_and_hash(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.java_generate_equals_and_hash,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn java_generate_equals_and_hash_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn java_generate_equals_and_hash_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -4321,11 +4171,11 @@ impl FileOptions {
     }
     pub fn java_generate_equals_and_hash_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.java_generate_equals_and_hash,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4333,19 +4183,19 @@ impl FileOptions {
     }
     pub fn has_java_generate_equals_and_hash(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.java_generate_equals_and_hash,
-                &self._bitfield,
-            )
-            .is_some()
+            &self.java_generate_equals_and_hash,
+            &self._bitfield,
+        )
+        .is_some()
     }
     pub fn clear_java_generate_equals_and_hash(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -4356,34 +4206,33 @@ impl FileOptions {
     }
     pub fn java_string_check_utf8(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.java_string_check_utf8,
             &self._bitfield,
             || false,
         )
     }
-    pub fn java_string_check_utf8_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn java_string_check_utf8_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.java_string_check_utf8,
-            &self._bitfield,
+            &self.java_string_check_utf8, &self._bitfield
         )
     }
     pub fn java_string_check_utf8_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.java_string_check_utf8,
             &mut self._bitfield,
             || false,
@@ -4391,38 +4240,34 @@ impl FileOptions {
     }
     pub fn has_java_string_check_utf8(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.java_string_check_utf8,
-                &self._bitfield,
-            )
-            .is_some()
+            &self.java_string_check_utf8, &self._bitfield
+        )
+        .is_some()
     }
     pub fn clear_java_string_check_utf8(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.java_string_check_utf8,
-            &mut self._bitfield,
+            &mut self.java_string_check_utf8, &mut self._bitfield
         )
     }
-    pub fn optimize_for(
-        &self,
-    ) -> self::_puroro_root::google::protobuf::file_options::OptimizeMode {
+    pub fn optimize_for(&self) -> self::_puroro_root::google::protobuf::file_options::OptimizeMode {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::file_options::OptimizeMode,
             >,
             5usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.optimize_for,
             &self._bitfield,
             || self::_puroro_root::google::protobuf::file_options::OptimizeMode::Speed,
@@ -4430,13 +4275,12 @@ impl FileOptions {
     }
     pub fn optimize_for_opt(
         &self,
-    ) -> ::std::option::Option::<
-        self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-    > {
+    ) -> ::std::option::Option<self::_puroro_root::google::protobuf::file_options::OptimizeMode>
+    {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::file_options::OptimizeMode,
             >,
             5usize,
@@ -4446,13 +4290,13 @@ impl FileOptions {
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::file_options::OptimizeMode {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::file_options::OptimizeMode,
             >,
             5usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.optimize_for,
             &mut self._bitfield,
             || self::_puroro_root::google::protobuf::file_options::OptimizeMode::Speed,
@@ -4460,20 +4304,20 @@ impl FileOptions {
     }
     pub fn has_optimize_for(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::file_options::OptimizeMode,
             >,
             5usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.optimize_for, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_optimize_for(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::file_options::OptimizeMode,
             >,
             5usize,
@@ -4483,13 +4327,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             6usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.go_package,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn go_package_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn go_package_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             6usize,
@@ -4499,7 +4343,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             6usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.go_package,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4520,34 +4364,31 @@ impl FileOptions {
     }
     pub fn cc_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             7usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.cc_generic_services,
             &self._bitfield,
             || false,
         )
     }
-    pub fn cc_generic_services_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn cc_generic_services_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             7usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.cc_generic_services,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.cc_generic_services, &self._bitfield)
     }
     pub fn cc_generic_services_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             7usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.cc_generic_services,
             &mut self._bitfield,
             || false,
@@ -4555,57 +4396,50 @@ impl FileOptions {
     }
     pub fn has_cc_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             7usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.cc_generic_services,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.cc_generic_services, &self._bitfield)
+        .is_some()
     }
     pub fn clear_cc_generic_services(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             7usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.cc_generic_services,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.cc_generic_services, &mut self._bitfield)
     }
     pub fn java_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             8usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.java_generic_services,
             &self._bitfield,
             || false,
         )
     }
-    pub fn java_generic_services_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn java_generic_services_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             8usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.java_generic_services,
-            &self._bitfield,
+            &self.java_generic_services, &self._bitfield
         )
     }
     pub fn java_generic_services_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             8usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.java_generic_services,
             &mut self._bitfield,
             || false,
@@ -4613,57 +4447,52 @@ impl FileOptions {
     }
     pub fn has_java_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             8usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.java_generic_services,
-                &self._bitfield,
-            )
-            .is_some()
+            &self.java_generic_services, &self._bitfield
+        )
+        .is_some()
     }
     pub fn clear_java_generic_services(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             8usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.java_generic_services,
-            &mut self._bitfield,
+            &mut self.java_generic_services, &mut self._bitfield
         )
     }
     pub fn py_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.py_generic_services,
             &self._bitfield,
             || false,
         )
     }
-    pub fn py_generic_services_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn py_generic_services_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.py_generic_services,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.py_generic_services, &self._bitfield)
     }
     pub fn py_generic_services_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.py_generic_services,
             &mut self._bitfield,
             || false,
@@ -4671,57 +4500,50 @@ impl FileOptions {
     }
     pub fn has_py_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.py_generic_services,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.py_generic_services, &self._bitfield)
+        .is_some()
     }
     pub fn clear_py_generic_services(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.py_generic_services,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.py_generic_services, &mut self._bitfield)
     }
     pub fn php_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             10usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.php_generic_services,
             &self._bitfield,
             || false,
         )
     }
-    pub fn php_generic_services_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn php_generic_services_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             10usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.php_generic_services,
-            &self._bitfield,
+            &self.php_generic_services, &self._bitfield
         )
     }
     pub fn php_generic_services_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             10usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.php_generic_services,
             &mut self._bitfield,
             || false,
@@ -4729,42 +4551,38 @@ impl FileOptions {
     }
     pub fn has_php_generic_services(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             10usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.php_generic_services,
-                &self._bitfield,
-            )
-            .is_some()
+            &self.php_generic_services, &self._bitfield
+        )
+        .is_some()
     }
     pub fn clear_php_generic_services(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             10usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.php_generic_services,
-            &mut self._bitfield,
+            &mut self.php_generic_services, &mut self._bitfield
         )
     }
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             11usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             11usize,
@@ -4772,11 +4590,11 @@ impl FileOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             11usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -4784,16 +4602,16 @@ impl FileOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             11usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             11usize,
@@ -4801,34 +4619,31 @@ impl FileOptions {
     }
     pub fn cc_enable_arenas(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             12usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.cc_enable_arenas,
             &self._bitfield,
             || true,
         )
     }
-    pub fn cc_enable_arenas_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn cc_enable_arenas_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             12usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.cc_enable_arenas,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.cc_enable_arenas, &self._bitfield)
     }
     pub fn cc_enable_arenas_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             12usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.cc_enable_arenas,
             &mut self._bitfield,
             || true,
@@ -4836,38 +4651,32 @@ impl FileOptions {
     }
     pub fn has_cc_enable_arenas(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             12usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.cc_enable_arenas,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.cc_enable_arenas, &self._bitfield)
+        .is_some()
     }
     pub fn clear_cc_enable_arenas(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             12usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.cc_enable_arenas,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.cc_enable_arenas, &mut self._bitfield)
     }
     pub fn objc_class_prefix(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             13usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.objc_class_prefix,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn objc_class_prefix_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn objc_class_prefix_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             13usize,
@@ -4880,7 +4689,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             13usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.objc_class_prefix,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4909,13 +4718,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             14usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.csharp_namespace,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn csharp_namespace_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn csharp_namespace_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             14usize,
@@ -4928,7 +4737,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             14usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.csharp_namespace,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4957,13 +4766,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             15usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.swift_prefix,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn swift_prefix_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn swift_prefix_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             15usize,
@@ -4973,7 +4782,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             15usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.swift_prefix,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -4996,13 +4805,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             16usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.php_class_prefix,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn php_class_prefix_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn php_class_prefix_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             16usize,
@@ -5015,7 +4824,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             16usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.php_class_prefix,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -5044,13 +4853,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             17usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.php_namespace,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn php_namespace_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn php_namespace_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             17usize,
@@ -5060,7 +4869,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             17usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.php_namespace,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -5083,13 +4892,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             18usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.php_metadata_namespace,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn php_metadata_namespace_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn php_metadata_namespace_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             18usize,
@@ -5102,7 +4911,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             18usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.php_metadata_namespace,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -5131,13 +4940,13 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             19usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.ruby_package,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn ruby_package_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn ruby_package_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             19usize,
@@ -5147,7 +4956,7 @@ impl FileOptions {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             19usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.ruby_package,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -5170,31 +4979,25 @@ impl FileOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for FileOptions {
@@ -5209,11 +5012,10 @@ impl self::_puroro::Message for FileOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -5433,8 +5235,7 @@ impl self::_puroro::Message for FileOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -5454,7 +5255,7 @@ impl self::_puroro::Message for FileOptions {
             8i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
@@ -5464,7 +5265,7 @@ impl self::_puroro::Message for FileOptions {
             10i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -5474,7 +5275,7 @@ impl self::_puroro::Message for FileOptions {
             20i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
@@ -5484,9 +5285,9 @@ impl self::_puroro::Message for FileOptions {
             27i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::file_options::OptimizeMode,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::file_options::OptimizeMode,
             >,
             5usize,
@@ -5504,7 +5305,7 @@ impl self::_puroro::Message for FileOptions {
             11i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             7usize,
@@ -5514,7 +5315,7 @@ impl self::_puroro::Message for FileOptions {
             16i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             8usize,
@@ -5524,7 +5325,7 @@ impl self::_puroro::Message for FileOptions {
             17i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             9usize,
@@ -5534,7 +5335,7 @@ impl self::_puroro::Message for FileOptions {
             18i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             10usize,
@@ -5544,7 +5345,7 @@ impl self::_puroro::Message for FileOptions {
             42i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             11usize,
@@ -5554,7 +5355,7 @@ impl self::_puroro::Message for FileOptions {
             23i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             12usize,
@@ -5620,7 +5421,7 @@ impl self::_puroro::Message for FileOptions {
             45i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -5736,8 +5537,14 @@ impl ::std::fmt::Debug for FileOptions {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(FileOptions))
             .field(stringify!(java_package), &self.java_package_opt())
-            .field(stringify!(java_outer_classname), &self.java_outer_classname_opt())
-            .field(stringify!(java_multiple_files), &self.java_multiple_files_opt())
+            .field(
+                stringify!(java_outer_classname),
+                &self.java_outer_classname_opt(),
+            )
+            .field(
+                stringify!(java_multiple_files),
+                &self.java_multiple_files_opt(),
+            )
             .field(
                 stringify!(java_generate_equals_and_hash),
                 &self.java_generate_equals_and_hash_opt(),
@@ -5748,10 +5555,22 @@ impl ::std::fmt::Debug for FileOptions {
             )
             .field(stringify!(optimize_for), &self.optimize_for_opt())
             .field(stringify!(go_package), &self.go_package_opt())
-            .field(stringify!(cc_generic_services), &self.cc_generic_services_opt())
-            .field(stringify!(java_generic_services), &self.java_generic_services_opt())
-            .field(stringify!(py_generic_services), &self.py_generic_services_opt())
-            .field(stringify!(php_generic_services), &self.php_generic_services_opt())
+            .field(
+                stringify!(cc_generic_services),
+                &self.cc_generic_services_opt(),
+            )
+            .field(
+                stringify!(java_generic_services),
+                &self.java_generic_services_opt(),
+            )
+            .field(
+                stringify!(py_generic_services),
+                &self.py_generic_services_opt(),
+            )
+            .field(
+                stringify!(php_generic_services),
+                &self.php_generic_services_opt(),
+            )
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(cc_enable_arenas), &self.cc_enable_arenas_opt())
             .field(stringify!(objc_class_prefix), &self.objc_class_prefix_opt())
@@ -5764,7 +5583,10 @@ impl ::std::fmt::Debug for FileOptions {
                 &self.php_metadata_namespace_opt(),
             )
             .field(stringify!(ruby_package), &self.ruby_package_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -5775,8 +5597,7 @@ impl ::std::cmp::PartialEq for FileOptions {
         true && self.java_package_opt() == rhs.java_package_opt()
             && self.java_outer_classname_opt() == rhs.java_outer_classname_opt()
             && self.java_multiple_files_opt() == rhs.java_multiple_files_opt()
-            && self.java_generate_equals_and_hash_opt()
-                == rhs.java_generate_equals_and_hash_opt()
+            && self.java_generate_equals_and_hash_opt() == rhs.java_generate_equals_and_hash_opt()
             && self.java_string_check_utf8_opt() == rhs.java_string_check_utf8_opt()
             && self.optimize_for_opt() == rhs.optimize_for_opt()
             && self.go_package_opt() == rhs.go_package_opt()
@@ -5798,27 +5619,27 @@ impl ::std::cmp::PartialEq for FileOptions {
 }
 #[derive(::std::default::Default)]
 pub struct MessageOptions {
-    message_set_wire_format: self::_puroro::internal::field_type::OptionalNumericalField::<
+    message_set_wire_format: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         0usize,
     >,
-    no_standard_descriptor_accessor: self::_puroro::internal::field_type::OptionalNumericalField::<
+    no_standard_descriptor_accessor: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         1usize,
     >,
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         2usize,
     >,
-    map_entry: self::_puroro::internal::field_type::OptionalNumericalField::<
+    map_entry: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         3usize,
     >,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -5826,34 +5647,33 @@ pub struct MessageOptions {
 impl MessageOptions {
     pub fn message_set_wire_format(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.message_set_wire_format,
             &self._bitfield,
             || false,
         )
     }
-    pub fn message_set_wire_format_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn message_set_wire_format_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.message_set_wire_format,
-            &self._bitfield,
+            &self.message_set_wire_format, &self._bitfield
         )
     }
     pub fn message_set_wire_format_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.message_set_wire_format,
             &mut self._bitfield,
             || false,
@@ -5861,42 +5681,40 @@ impl MessageOptions {
     }
     pub fn has_message_set_wire_format(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.message_set_wire_format,
-                &self._bitfield,
-            )
-            .is_some()
+            &self.message_set_wire_format, &self._bitfield
+        )
+        .is_some()
     }
     pub fn clear_message_set_wire_format(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.message_set_wire_format,
-            &mut self._bitfield,
+            &mut self.message_set_wire_format, &mut self._bitfield
         )
     }
     pub fn no_standard_descriptor_accessor(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.no_standard_descriptor_accessor,
             &self._bitfield,
             || false,
         )
     }
-    pub fn no_standard_descriptor_accessor_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn no_standard_descriptor_accessor_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -5907,11 +5725,11 @@ impl MessageOptions {
     }
     pub fn no_standard_descriptor_accessor_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.no_standard_descriptor_accessor,
             &mut self._bitfield,
             || false,
@@ -5919,19 +5737,19 @@ impl MessageOptions {
     }
     pub fn has_no_standard_descriptor_accessor(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.no_standard_descriptor_accessor,
-                &self._bitfield,
-            )
-            .is_some()
+            &self.no_standard_descriptor_accessor,
+            &self._bitfield,
+        )
+        .is_some()
     }
     pub fn clear_no_standard_descriptor_accessor(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -5942,19 +5760,17 @@ impl MessageOptions {
     }
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
@@ -5962,11 +5778,11 @@ impl MessageOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -5974,16 +5790,16 @@ impl MessageOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
@@ -5991,19 +5807,19 @@ impl MessageOptions {
     }
     pub fn map_entry(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.map_entry,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn map_entry_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn map_entry_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -6011,11 +5827,11 @@ impl MessageOptions {
     }
     pub fn map_entry_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.map_entry,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -6023,16 +5839,16 @@ impl MessageOptions {
     }
     pub fn has_map_entry(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.map_entry, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_map_entry(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -6042,31 +5858,25 @@ impl MessageOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for MessageOptions {
@@ -6081,65 +5891,54 @@ impl self::_puroro::Message for MessageOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                1i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.message_set_wire_format,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                2i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        1usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.no_standard_descriptor_accessor,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                3i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        2usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.deprecated,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                7i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        3usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.map_entry,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                1i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    0usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.message_set_wire_format,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                2i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    1usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.no_standard_descriptor_accessor,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                3i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    2usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.deprecated,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                7i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    3usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.map_entry,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -6147,12 +5946,11 @@ impl self::_puroro::Message for MessageOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -6162,7 +5960,7 @@ impl self::_puroro::Message for MessageOptions {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -6172,7 +5970,7 @@ impl self::_puroro::Message for MessageOptions {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             2usize,
@@ -6182,7 +5980,7 @@ impl self::_puroro::Message for MessageOptions {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -6192,7 +5990,7 @@ impl self::_puroro::Message for MessageOptions {
             7i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -6206,29 +6004,36 @@ impl self::_puroro::Message for MessageOptions {
 impl ::std::clone::Clone for MessageOptions {
     fn clone(&self) -> Self {
         Self {
-            message_set_wire_format: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            message_set_wire_format: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 0usize,
-            > as ::std::clone::Clone>::clone(&self.message_set_wire_format),
-            no_standard_descriptor_accessor: <self::_puroro::internal::field_type::OptionalNumericalField::<
-                bool,
-                self::_puroro::tags::Bool,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.no_standard_descriptor_accessor),
-            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            > as ::std::clone::Clone>::clone(
+                &self.message_set_wire_format
+            ),
+            no_standard_descriptor_accessor:
+                <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    1usize,
+                > as ::std::clone::Clone>::clone(
+                    &self.no_standard_descriptor_accessor
+                ),
+            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 2usize,
             > as ::std::clone::Clone>::clone(&self.deprecated),
-            map_entry: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            map_entry: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 3usize,
             > as ::std::clone::Clone>::clone(&self.map_entry),
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -6255,7 +6060,10 @@ impl ::std::fmt::Debug for MessageOptions {
             )
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(map_entry), &self.map_entry_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -6273,41 +6081,37 @@ impl ::std::cmp::PartialEq for MessageOptions {
 }
 #[derive(::std::default::Default)]
 pub struct FieldOptions {
-    ctype: self::_puroro::internal::field_type::OptionalNumericalField::<
+    ctype: self::_puroro::internal::field_type::OptionalNumericalField<
         self::_puroro_root::google::protobuf::field_options::CType,
-        self::_puroro::tags::Enum2::<
-            self::_puroro_root::google::protobuf::field_options::CType,
-        >,
+        self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
         0usize,
     >,
-    packed: self::_puroro::internal::field_type::OptionalNumericalField::<
+    packed: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         1usize,
     >,
-    jstype: self::_puroro::internal::field_type::OptionalNumericalField::<
+    jstype: self::_puroro::internal::field_type::OptionalNumericalField<
         self::_puroro_root::google::protobuf::field_options::JSType,
-        self::_puroro::tags::Enum2::<
-            self::_puroro_root::google::protobuf::field_options::JSType,
-        >,
+        self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
         2usize,
     >,
-    lazy: self::_puroro::internal::field_type::OptionalNumericalField::<
+    lazy: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         3usize,
     >,
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         4usize,
     >,
-    weak: self::_puroro::internal::field_type::OptionalNumericalField::<
+    weak: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         5usize,
     >,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -6315,43 +6119,31 @@ pub struct FieldOptions {
 impl FieldOptions {
     pub fn ctype(&self) -> self::_puroro_root::google::protobuf::field_options::CType {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::CType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::CType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.ctype,
-            &self._bitfield,
-            || self::_puroro_root::google::protobuf::field_options::CType::String,
-        )
+        > as NonRepeatedFieldType>::get_field_or_else(&self.ctype, &self._bitfield, || {
+            self::_puroro_root::google::protobuf::field_options::CType::String
+        })
     }
     pub fn ctype_opt(
         &self,
-    ) -> ::std::option::Option::<
-        self::_puroro_root::google::protobuf::field_options::CType,
-    > {
+    ) -> ::std::option::Option<self::_puroro_root::google::protobuf::field_options::CType> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::CType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::CType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.ctype, &self._bitfield)
     }
-    pub fn ctype_mut(
-        &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::field_options::CType {
+    pub fn ctype_mut(&mut self) -> &mut self::_puroro_root::google::protobuf::field_options::CType {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::CType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::CType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.ctype,
             &mut self._bitfield,
             || self::_puroro_root::google::protobuf::field_options::CType::String,
@@ -6359,40 +6151,36 @@ impl FieldOptions {
     }
     pub fn has_ctype(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::CType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::CType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.ctype, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_ctype(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::CType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::CType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.ctype, &mut self._bitfield)
     }
     pub fn packed(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.packed,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn packed_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn packed_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -6400,11 +6188,11 @@ impl FieldOptions {
     }
     pub fn packed_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.packed,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -6412,16 +6200,16 @@ impl FieldOptions {
     }
     pub fn has_packed(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.packed, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_packed(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -6429,29 +6217,21 @@ impl FieldOptions {
     }
     pub fn jstype(&self) -> self::_puroro_root::google::protobuf::field_options::JSType {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::JSType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::JSType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
             2usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.jstype,
-            &self._bitfield,
-            || self::_puroro_root::google::protobuf::field_options::JSType::JsNormal,
-        )
+        > as NonRepeatedFieldType>::get_field_or_else(&self.jstype, &self._bitfield, || {
+            self::_puroro_root::google::protobuf::field_options::JSType::JsNormal
+        })
     }
     pub fn jstype_opt(
         &self,
-    ) -> ::std::option::Option::<
-        self::_puroro_root::google::protobuf::field_options::JSType,
-    > {
+    ) -> ::std::option::Option<self::_puroro_root::google::protobuf::field_options::JSType> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::JSType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::JSType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.jstype, &self._bitfield)
     }
@@ -6459,13 +6239,11 @@ impl FieldOptions {
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::field_options::JSType {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::JSType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::JSType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.jstype,
             &mut self._bitfield,
             || self::_puroro_root::google::protobuf::field_options::JSType::JsNormal,
@@ -6473,36 +6251,32 @@ impl FieldOptions {
     }
     pub fn has_jstype(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::JSType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::JSType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.jstype, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_jstype(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::JSType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::JSType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
             2usize,
         > as NonRepeatedFieldType>::clear(&mut self.jstype, &mut self._bitfield)
     }
     pub fn lazy(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::get_field(&self.lazy, &self._bitfield, || false)
+        > as NonRepeatedFieldType>::get_field_or_else(&self.lazy, &self._bitfield, || false)
     }
-    pub fn lazy_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn lazy_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -6510,28 +6284,26 @@ impl FieldOptions {
     }
     pub fn lazy_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
-            &mut self.lazy,
-            &mut self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_mut(
+            &mut self.lazy, &mut self._bitfield, || false
         )
     }
     pub fn has_lazy(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.lazy, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_lazy(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -6539,19 +6311,17 @@ impl FieldOptions {
     }
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
@@ -6559,11 +6329,11 @@ impl FieldOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -6571,16 +6341,16 @@ impl FieldOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
@@ -6588,15 +6358,15 @@ impl FieldOptions {
     }
     pub fn weak(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             5usize,
-        > as NonRepeatedFieldType>::get_field(&self.weak, &self._bitfield, || false)
+        > as NonRepeatedFieldType>::get_field_or_else(&self.weak, &self._bitfield, || false)
     }
-    pub fn weak_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn weak_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             5usize,
@@ -6604,28 +6374,26 @@ impl FieldOptions {
     }
     pub fn weak_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             5usize,
-        > as NonRepeatedFieldType>::mut_field(
-            &mut self.weak,
-            &mut self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_mut(
+            &mut self.weak, &mut self._bitfield, || false
         )
     }
     pub fn has_weak(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             5usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.weak, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_weak(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             5usize,
@@ -6635,31 +6403,25 @@ impl FieldOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for FieldOptions {
@@ -6674,91 +6436,76 @@ impl self::_puroro::Message for FieldOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                1i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                1i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    self::_puroro_root::google::protobuf::field_options::CType,
+                    self::_puroro::tags::Enum2<
                         self::_puroro_root::google::protobuf::field_options::CType,
-                        self::_puroro::tags::Enum2::<
-                            self::_puroro_root::google::protobuf::field_options::CType,
-                        >,
-                        0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.ctype,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                2i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        1usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.packed,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                6i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                    >,
+                    0usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.ctype,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                2i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    1usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.packed,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                6i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    self::_puroro_root::google::protobuf::field_options::JSType,
+                    self::_puroro::tags::Enum2<
                         self::_puroro_root::google::protobuf::field_options::JSType,
-                        self::_puroro::tags::Enum2::<
-                            self::_puroro_root::google::protobuf::field_options::JSType,
-                        >,
-                        2usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.jstype,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                5i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        3usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.lazy,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                3i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        4usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.deprecated,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                10i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        5usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.weak,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                    >,
+                    2usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.jstype,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                5i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    3usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.lazy,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                3i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    4usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.deprecated,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                10i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    5usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.weak,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -6766,16 +6513,13 @@ impl self::_puroro::Message for FieldOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::CType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::CType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::CType>,
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.ctype,
@@ -6783,7 +6527,7 @@ impl self::_puroro::Message for FieldOptions {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -6793,11 +6537,9 @@ impl self::_puroro::Message for FieldOptions {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::field_options::JSType,
-            self::_puroro::tags::Enum2::<
-                self::_puroro_root::google::protobuf::field_options::JSType,
-            >,
+            self::_puroro::tags::Enum2<self::_puroro_root::google::protobuf::field_options::JSType>,
             2usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.jstype,
@@ -6805,7 +6547,7 @@ impl self::_puroro::Message for FieldOptions {
             6i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             3usize,
@@ -6815,7 +6557,7 @@ impl self::_puroro::Message for FieldOptions {
             5i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             4usize,
@@ -6825,7 +6567,7 @@ impl self::_puroro::Message for FieldOptions {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             5usize,
@@ -6835,7 +6577,7 @@ impl self::_puroro::Message for FieldOptions {
             10i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -6849,43 +6591,45 @@ impl self::_puroro::Message for FieldOptions {
 impl ::std::clone::Clone for FieldOptions {
     fn clone(&self) -> Self {
         Self {
-            ctype: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            ctype: <self::_puroro::internal::field_type::OptionalNumericalField<
                 self::_puroro_root::google::protobuf::field_options::CType,
-                self::_puroro::tags::Enum2::<
+                self::_puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::field_options::CType,
                 >,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.ctype),
-            packed: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            packed: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.packed),
-            jstype: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            jstype: <self::_puroro::internal::field_type::OptionalNumericalField<
                 self::_puroro_root::google::protobuf::field_options::JSType,
-                self::_puroro::tags::Enum2::<
+                self::_puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::field_options::JSType,
                 >,
                 2usize,
             > as ::std::clone::Clone>::clone(&self.jstype),
-            lazy: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            lazy: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 3usize,
             > as ::std::clone::Clone>::clone(&self.lazy),
-            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 4usize,
             > as ::std::clone::Clone>::clone(&self.deprecated),
-            weak: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            weak: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 5usize,
             > as ::std::clone::Clone>::clone(&self.weak),
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -6908,7 +6652,10 @@ impl ::std::fmt::Debug for FieldOptions {
             .field(stringify!(lazy), &self.lazy_opt())
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(weak), &self.weak_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -6918,7 +6665,8 @@ impl ::std::cmp::PartialEq for FieldOptions {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
         true && self.ctype_opt() == rhs.ctype_opt()
             && self.packed_opt() == rhs.packed_opt()
-            && self.jstype_opt() == rhs.jstype_opt() && self.lazy_opt() == rhs.lazy_opt()
+            && self.jstype_opt() == rhs.jstype_opt()
+            && self.lazy_opt() == rhs.lazy_opt()
             && self.deprecated_opt() == rhs.deprecated_opt()
             && self.weak_opt() == rhs.weak_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
@@ -6926,7 +6674,7 @@ impl ::std::cmp::PartialEq for FieldOptions {
 }
 #[derive(::std::default::Default)]
 pub struct OneofOptions {
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
@@ -6936,31 +6684,25 @@ impl OneofOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for OneofOptions {
@@ -6975,21 +6717,18 @@ impl self::_puroro::Message for OneofOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -6997,12 +6736,11 @@ impl self::_puroro::Message for OneofOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -7016,9 +6754,11 @@ impl self::_puroro::Message for OneofOptions {
 impl ::std::clone::Clone for OneofOptions {
     fn clone(&self) -> Self {
         Self {
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -7035,7 +6775,10 @@ impl ::std::fmt::Debug for OneofOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(OneofOptions))
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -7048,17 +6791,17 @@ impl ::std::cmp::PartialEq for OneofOptions {
 }
 #[derive(::std::default::Default)]
 pub struct EnumOptions {
-    allow_alias: self::_puroro::internal::field_type::OptionalNumericalField::<
+    allow_alias: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         0usize,
     >,
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         1usize,
     >,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -7066,19 +6809,19 @@ pub struct EnumOptions {
 impl EnumOptions {
     pub fn allow_alias(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.allow_alias,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn allow_alias_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn allow_alias_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7086,11 +6829,11 @@ impl EnumOptions {
     }
     pub fn allow_alias_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.allow_alias,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -7098,16 +6841,16 @@ impl EnumOptions {
     }
     pub fn has_allow_alias(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.allow_alias, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_allow_alias(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7115,19 +6858,17 @@ impl EnumOptions {
     }
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -7135,11 +6876,11 @@ impl EnumOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -7147,16 +6888,16 @@ impl EnumOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -7166,31 +6907,25 @@ impl EnumOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for EnumOptions {
@@ -7205,43 +6940,36 @@ impl self::_puroro::Message for EnumOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                2i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.allow_alias,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                3i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        1usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.deprecated,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                2i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    0usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.allow_alias,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                3i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    1usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.deprecated,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -7249,12 +6977,11 @@ impl self::_puroro::Message for EnumOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7264,7 +6991,7 @@ impl self::_puroro::Message for EnumOptions {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             1usize,
@@ -7274,7 +7001,7 @@ impl self::_puroro::Message for EnumOptions {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -7288,19 +7015,21 @@ impl self::_puroro::Message for EnumOptions {
 impl ::std::clone::Clone for EnumOptions {
     fn clone(&self) -> Self {
         Self {
-            allow_alias: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            allow_alias: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.allow_alias),
-            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.deprecated),
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -7319,7 +7048,10 @@ impl ::std::fmt::Debug for EnumOptions {
         fmt.debug_struct(stringify!(EnumOptions))
             .field(stringify!(allow_alias), &self.allow_alias_opt())
             .field(stringify!(deprecated), &self.deprecated_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -7334,12 +7066,12 @@ impl ::std::cmp::PartialEq for EnumOptions {
 }
 #[derive(::std::default::Default)]
 pub struct EnumValueOptions {
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         0usize,
     >,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -7347,19 +7079,17 @@ pub struct EnumValueOptions {
 impl EnumValueOptions {
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7367,11 +7097,11 @@ impl EnumValueOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -7379,16 +7109,16 @@ impl EnumValueOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7398,31 +7128,25 @@ impl EnumValueOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for EnumValueOptions {
@@ -7437,32 +7161,27 @@ impl self::_puroro::Message for EnumValueOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                1i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.deprecated,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                1i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    0usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.deprecated,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -7470,12 +7189,11 @@ impl self::_puroro::Message for EnumValueOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7485,7 +7203,7 @@ impl self::_puroro::Message for EnumValueOptions {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -7499,14 +7217,16 @@ impl self::_puroro::Message for EnumValueOptions {
 impl ::std::clone::Clone for EnumValueOptions {
     fn clone(&self) -> Self {
         Self {
-            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.deprecated),
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -7524,7 +7244,10 @@ impl ::std::fmt::Debug for EnumValueOptions {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(EnumValueOptions))
             .field(stringify!(deprecated), &self.deprecated_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -7538,12 +7261,12 @@ impl ::std::cmp::PartialEq for EnumValueOptions {
 }
 #[derive(::std::default::Default)]
 pub struct ServiceOptions {
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         0usize,
     >,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -7551,19 +7274,17 @@ pub struct ServiceOptions {
 impl ServiceOptions {
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7571,11 +7292,11 @@ impl ServiceOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -7583,16 +7304,16 @@ impl ServiceOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7602,31 +7323,25 @@ impl ServiceOptions {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for ServiceOptions {
@@ -7641,32 +7356,27 @@ impl self::_puroro::Message for ServiceOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                33i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.deprecated,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                33i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    0usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.deprecated,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -7674,12 +7384,11 @@ impl self::_puroro::Message for ServiceOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7689,7 +7398,7 @@ impl self::_puroro::Message for ServiceOptions {
             33i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -7703,14 +7412,16 @@ impl self::_puroro::Message for ServiceOptions {
 impl ::std::clone::Clone for ServiceOptions {
     fn clone(&self) -> Self {
         Self {
-            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.deprecated),
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -7728,7 +7439,10 @@ impl ::std::fmt::Debug for ServiceOptions {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(ServiceOptions))
             .field(stringify!(deprecated), &self.deprecated_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -7742,19 +7456,19 @@ impl ::std::cmp::PartialEq for ServiceOptions {
 }
 #[derive(::std::default::Default)]
 pub struct MethodOptions {
-    deprecated: self::_puroro::internal::field_type::OptionalNumericalField::<
+    deprecated: self::_puroro::internal::field_type::OptionalNumericalField<
         bool,
         self::_puroro::tags::Bool,
         0usize,
     >,
-    idempotency_level: self::_puroro::internal::field_type::OptionalNumericalField::<
+    idempotency_level: self::_puroro::internal::field_type::OptionalNumericalField<
         self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-        self::_puroro::tags::Enum2::<
+        self::_puroro::tags::Enum2<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
         >,
         1usize,
     >,
-    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField::<
+    uninterpreted_option: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::UninterpretedOption,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -7762,19 +7476,17 @@ pub struct MethodOptions {
 impl MethodOptions {
     pub fn deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
-            &self.deprecated,
-            &self._bitfield,
-            || false,
+        > as NonRepeatedFieldType>::get_field_or_else(
+            &self.deprecated, &self._bitfield, || false
         )
     }
-    pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
+    pub fn deprecated_opt(&self) -> ::std::option::Option<bool> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7782,11 +7494,11 @@ impl MethodOptions {
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.deprecated,
             &mut self._bitfield,
             || false,
@@ -7794,16 +7506,16 @@ impl MethodOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.deprecated, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7813,13 +7525,13 @@ impl MethodOptions {
         &self,
     ) -> self::_puroro_root::google::protobuf::method_options::IdempotencyLevel {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
             >,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.idempotency_level,
             &self._bitfield,
             || {
@@ -7829,32 +7541,28 @@ impl MethodOptions {
     }
     pub fn idempotency_level_opt(
         &self,
-    ) -> ::std::option::Option::<
-        self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-    > {
+    ) -> ::std::option::Option<self::_puroro_root::google::protobuf::method_options::IdempotencyLevel>
+    {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
             >,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.idempotency_level,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.idempotency_level, &self._bitfield)
     }
     pub fn idempotency_level_mut(
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::method_options::IdempotencyLevel {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
             >,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.idempotency_level,
             &mut self._bitfield,
             || {
@@ -7864,60 +7572,48 @@ impl MethodOptions {
     }
     pub fn has_idempotency_level(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
             >,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.idempotency_level,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.idempotency_level, &self._bitfield)
+        .is_some()
     }
     pub fn clear_idempotency_level(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
             >,
             1usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.idempotency_level,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.idempotency_level, &mut self._bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_puroro_root::google::protobuf::UninterpretedOption] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::get_field(&self.uninterpreted_option, &self._bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::UninterpretedOption,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::UninterpretedOption> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as RepeatedFieldType>::mut_field(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
+            &mut self.uninterpreted_option, &mut self._bitfield
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
-            &mut self.uninterpreted_option,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.uninterpreted_option, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for MethodOptions {
@@ -7932,45 +7628,38 @@ impl self::_puroro::Message for MethodOptions {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                33i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
-                        bool,
-                        self::_puroro::tags::Bool,
-                        0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.deprecated,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                34i32 => {
-                    <self::_puroro::internal::field_type::OptionalNumericalField::<
+                33i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    bool,
+                    self::_puroro::tags::Bool,
+                    0usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.deprecated,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                34i32 => <self::_puroro::internal::field_type::OptionalNumericalField<
+                    self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
+                    self::_puroro::tags::Enum2<
                         self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-                        self::_puroro::tags::Enum2::<
-                            self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-                        >,
-                        1usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.idempotency_level,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
-                999i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::UninterpretedOption,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.uninterpreted_option,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                    >,
+                    1usize,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.idempotency_level,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
+                999i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::UninterpretedOption,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.uninterpreted_option,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -7978,12 +7667,11 @@ impl self::_puroro::Message for MethodOptions {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             bool,
             self::_puroro::tags::Bool,
             0usize,
@@ -7993,9 +7681,9 @@ impl self::_puroro::Message for MethodOptions {
             33i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_puroro::tags::Enum2::<
+            self::_puroro::tags::Enum2<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
             >,
             1usize,
@@ -8005,7 +7693,7 @@ impl self::_puroro::Message for MethodOptions {
             34i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::UninterpretedOption,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.uninterpreted_option,
@@ -8019,21 +7707,23 @@ impl self::_puroro::Message for MethodOptions {
 impl ::std::clone::Clone for MethodOptions {
     fn clone(&self) -> Self {
         Self {
-            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            deprecated: <self::_puroro::internal::field_type::OptionalNumericalField<
                 bool,
                 self::_puroro::tags::Bool,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.deprecated),
-            idempotency_level: <self::_puroro::internal::field_type::OptionalNumericalField::<
+            idempotency_level: <self::_puroro::internal::field_type::OptionalNumericalField<
                 self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
-                self::_puroro::tags::Enum2::<
+                self::_puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::method_options::IdempotencyLevel,
                 >,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.idempotency_level),
-            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            uninterpreted_option: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::UninterpretedOption,
-            > as ::std::clone::Clone>::clone(&self.uninterpreted_option),
+            > as ::std::clone::Clone>::clone(
+                &self.uninterpreted_option
+            ),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -8052,7 +7742,10 @@ impl ::std::fmt::Debug for MethodOptions {
         fmt.debug_struct(stringify!(MethodOptions))
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(idempotency_level), &self.idempotency_level_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
+            .field(
+                stringify!(uninterpreted_option),
+                &self.uninterpreted_option(),
+            )
             .finish()
     }
 }
@@ -8067,51 +7760,48 @@ impl ::std::cmp::PartialEq for MethodOptions {
 }
 #[derive(::std::default::Default)]
 pub struct UninterpretedOption {
-    name: self::_puroro::internal::field_type::RepeatedMessageField::<
+    name: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
     >,
-    identifier_value: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    positive_int_value: self::_puroro::internal::field_type::OptionalNumericalField::<
+    identifier_value: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    positive_int_value: self::_puroro::internal::field_type::OptionalNumericalField<
         u64,
         self::_puroro::tags::UInt64,
         1usize,
     >,
-    negative_int_value: self::_puroro::internal::field_type::OptionalNumericalField::<
+    negative_int_value: self::_puroro::internal::field_type::OptionalNumericalField<
         i64,
         self::_puroro::tags::Int64,
         2usize,
     >,
-    double_value: self::_puroro::internal::field_type::OptionalNumericalField::<
+    double_value: self::_puroro::internal::field_type::OptionalNumericalField<
         f64,
         self::_puroro::tags::Double,
         3usize,
     >,
-    string_value: self::_puroro::internal::field_type::OptionalBytesField::<4usize>,
-    aggregate_value: self::_puroro::internal::field_type::OptionalStringField::<5usize>,
+    string_value: self::_puroro::internal::field_type::OptionalBytesField<4usize>,
+    aggregate_value: self::_puroro::internal::field_type::OptionalStringField<5usize>,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl UninterpretedOption {
-    pub fn name(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::uninterpreted_option::NamePart] {
+    pub fn name(&self) -> &[self::_puroro_root::google::protobuf::uninterpreted_option::NamePart] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
         > as RepeatedFieldType>::get_field(&self.name, &self._bitfield)
     }
     pub fn name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::uninterpreted_option::NamePart>
+    {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
         > as RepeatedFieldType>::mut_field(&mut self.name, &mut self._bitfield)
     }
     pub fn clear_name(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
         > as RepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
     }
@@ -8119,13 +7809,13 @@ impl UninterpretedOption {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.identifier_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn identifier_value_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn identifier_value_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -8138,7 +7828,7 @@ impl UninterpretedOption {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.identifier_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -8165,34 +7855,31 @@ impl UninterpretedOption {
     }
     pub fn positive_int_value(&self) -> u64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.positive_int_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn positive_int_value_opt(&self) -> ::std::option::Option::<u64> {
+    pub fn positive_int_value_opt(&self) -> ::std::option::Option<u64> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.positive_int_value,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.positive_int_value, &self._bitfield)
     }
     pub fn positive_int_value_mut(&mut self) -> &mut u64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.positive_int_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -8200,57 +7887,48 @@ impl UninterpretedOption {
     }
     pub fn has_positive_int_value(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.positive_int_value,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.positive_int_value, &self._bitfield)
+        .is_some()
     }
     pub fn clear_positive_int_value(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.positive_int_value,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.positive_int_value, &mut self._bitfield)
     }
     pub fn negative_int_value(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i64,
             self::_puroro::tags::Int64,
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.negative_int_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn negative_int_value_opt(&self) -> ::std::option::Option::<i64> {
+    pub fn negative_int_value_opt(&self) -> ::std::option::Option<i64> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i64,
             self::_puroro::tags::Int64,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.negative_int_value,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.negative_int_value, &self._bitfield)
     }
     pub fn negative_int_value_mut(&mut self) -> &mut i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i64,
             self::_puroro::tags::Int64,
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.negative_int_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -8258,42 +7936,36 @@ impl UninterpretedOption {
     }
     pub fn has_negative_int_value(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i64,
             self::_puroro::tags::Int64,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.negative_int_value,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.negative_int_value, &self._bitfield)
+        .is_some()
     }
     pub fn clear_negative_int_value(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i64,
             self::_puroro::tags::Int64,
             2usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.negative_int_value,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.negative_int_value, &mut self._bitfield)
     }
     pub fn double_value(&self) -> f64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             f64,
             self::_puroro::tags::Double,
             3usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.double_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn double_value_opt(&self) -> ::std::option::Option::<f64> {
+    pub fn double_value_opt(&self) -> ::std::option::Option<f64> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             f64,
             self::_puroro::tags::Double,
             3usize,
@@ -8301,11 +7973,11 @@ impl UninterpretedOption {
     }
     pub fn double_value_mut(&mut self) -> &mut f64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             f64,
             self::_puroro::tags::Double,
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.double_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -8313,16 +7985,16 @@ impl UninterpretedOption {
     }
     pub fn has_double_value(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             f64,
             self::_puroro::tags::Double,
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.double_value, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_double_value(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             f64,
             self::_puroro::tags::Double,
             3usize,
@@ -8332,23 +8004,23 @@ impl UninterpretedOption {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalBytesField::<
             4usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.string_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn string_value_opt(&self) -> ::std::option::Option::<&[u8]> {
+    pub fn string_value_opt(&self) -> ::std::option::Option<&[u8]> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalBytesField::<
             4usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.string_value, &self._bitfield)
     }
-    pub fn string_value_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
+    pub fn string_value_mut(&mut self) -> &mut ::std::vec::Vec<u8> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalBytesField::<
             4usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.string_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -8371,13 +8043,13 @@ impl UninterpretedOption {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             5usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.aggregate_value,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn aggregate_value_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn aggregate_value_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             5usize,
@@ -8387,7 +8059,7 @@ impl UninterpretedOption {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             5usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.aggregate_value,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -8419,11 +8091,10 @@ impl self::_puroro::Message for UninterpretedOption {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 2i32 => {
                     <self::_puroro::internal::field_type::RepeatedMessageField::<
@@ -8501,12 +8172,11 @@ impl self::_puroro::Message for UninterpretedOption {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::uninterpreted_option::NamePart,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.name,
@@ -8522,7 +8192,7 @@ impl self::_puroro::Message for UninterpretedOption {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
@@ -8532,7 +8202,7 @@ impl self::_puroro::Message for UninterpretedOption {
             4i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i64,
             self::_puroro::tags::Int64,
             2usize,
@@ -8542,7 +8212,7 @@ impl self::_puroro::Message for UninterpretedOption {
             5i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             f64,
             self::_puroro::tags::Double,
             3usize,
@@ -8619,8 +8289,14 @@ impl ::std::fmt::Debug for UninterpretedOption {
         fmt.debug_struct(stringify!(UninterpretedOption))
             .field(stringify!(name), &self.name())
             .field(stringify!(identifier_value), &self.identifier_value_opt())
-            .field(stringify!(positive_int_value), &self.positive_int_value_opt())
-            .field(stringify!(negative_int_value), &self.negative_int_value_opt())
+            .field(
+                stringify!(positive_int_value),
+                &self.positive_int_value_opt(),
+            )
+            .field(
+                stringify!(negative_int_value),
+                &self.negative_int_value_opt(),
+            )
             .field(stringify!(double_value), &self.double_value_opt())
             .field(stringify!(string_value), &self.string_value_opt())
             .field(stringify!(aggregate_value), &self.aggregate_value_opt())
@@ -8642,33 +8318,30 @@ impl ::std::cmp::PartialEq for UninterpretedOption {
 }
 #[derive(::std::default::Default)]
 pub struct SourceCodeInfo {
-    location: self::_puroro::internal::field_type::RepeatedMessageField::<
+    location: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::source_code_info::Location,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
 }
 impl SourceCodeInfo {
-    pub fn location(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::source_code_info::Location] {
+    pub fn location(&self) -> &[self::_puroro_root::google::protobuf::source_code_info::Location] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::source_code_info::Location,
         > as RepeatedFieldType>::get_field(&self.location, &self._bitfield)
     }
     pub fn location_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::source_code_info::Location,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::source_code_info::Location>
+    {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::source_code_info::Location,
         > as RepeatedFieldType>::mut_field(&mut self.location, &mut self._bitfield)
     }
     pub fn clear_location(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::source_code_info::Location,
         > as RepeatedFieldType>::clear(&mut self.location, &mut self._bitfield)
     }
@@ -8685,21 +8358,18 @@ impl self::_puroro::Message for SourceCodeInfo {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                1i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::source_code_info::Location,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.location,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                1i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::source_code_info::Location,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.location,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -8707,12 +8377,11 @@ impl self::_puroro::Message for SourceCodeInfo {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::source_code_info::Location,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.location,
@@ -8726,7 +8395,7 @@ impl self::_puroro::Message for SourceCodeInfo {
 impl ::std::clone::Clone for SourceCodeInfo {
     fn clone(&self) -> Self {
         Self {
-            location: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            location: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::source_code_info::Location,
             > as ::std::clone::Clone>::clone(&self.location),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
@@ -8758,7 +8427,7 @@ impl ::std::cmp::PartialEq for SourceCodeInfo {
 }
 #[derive(::std::default::Default)]
 pub struct GeneratedCodeInfo {
-    annotation: self::_puroro::internal::field_type::RepeatedMessageField::<
+    annotation: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::generated_code_info::Annotation,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<0usize>,
@@ -8768,23 +8437,22 @@ impl GeneratedCodeInfo {
         &self,
     ) -> &[self::_puroro_root::google::protobuf::generated_code_info::Annotation] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::generated_code_info::Annotation,
         > as RepeatedFieldType>::get_field(&self.annotation, &self._bitfield)
     }
     pub fn annotation_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::generated_code_info::Annotation,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::generated_code_info::Annotation>
+    {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::generated_code_info::Annotation,
         > as RepeatedFieldType>::mut_field(&mut self.annotation, &mut self._bitfield)
     }
     pub fn clear_annotation(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::generated_code_info::Annotation,
         > as RepeatedFieldType>::clear(&mut self.annotation, &mut self._bitfield)
     }
@@ -8801,21 +8469,18 @@ impl self::_puroro::Message for GeneratedCodeInfo {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
-                1i32 => {
-                    <self::_puroro::internal::field_type::RepeatedMessageField::<
-                        self::_puroro_root::google::protobuf::generated_code_info::Annotation,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
-                        &mut self.annotation,
-                        &mut self._bitfield,
-                        field_data,
-                    )?
-                }
+                1i32 => <self::_puroro::internal::field_type::RepeatedMessageField<
+                    self::_puroro_root::google::protobuf::generated_code_info::Annotation,
+                > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    &mut self.annotation,
+                    &mut self._bitfield,
+                    field_data,
+                )?,
                 _ => todo!(),
             }
         }
@@ -8823,12 +8488,11 @@ impl self::_puroro::Message for GeneratedCodeInfo {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::generated_code_info::Annotation,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.annotation,
@@ -8842,7 +8506,7 @@ impl self::_puroro::Message for GeneratedCodeInfo {
 impl ::std::clone::Clone for GeneratedCodeInfo {
     fn clone(&self) -> Self {
         Self {
-            annotation: <self::_puroro::internal::field_type::RepeatedMessageField::<
+            annotation: <self::_puroro::internal::field_type::RepeatedMessageField<
                 self::_puroro_root::google::protobuf::generated_code_info::Annotation,
             > as ::std::clone::Clone>::clone(&self.annotation),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),

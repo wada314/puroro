@@ -46,23 +46,12 @@ where
         self.0.clear()
     }
 }
-
-impl RepeatedFieldType for RepeatedStringField {
-    type ScalarType = String;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
-        self.0.as_slice()
-    }
-    type ContainerType = Vec<Self::ScalarType>;
-    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
-        &mut self.0
-    }
-    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0.clear()
-    }
-}
-
-impl RepeatedFieldType for RepeatedBytesField {
-    type ScalarType = Vec<u8>;
+impl<RustType, ProtoType> RepeatedFieldType for RepeatedUnsizedField<RustType, ProtoType>
+where
+    RustType: PartialEq + Default + Clone,
+    ProtoType: tags::UnsizedType<RustType = RustType>,
+{
+    type ScalarType = RustType;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }

@@ -8,10 +8,10 @@ mod _puroro {
 }
 #[derive(::std::default::Default)]
 pub struct File {
-    name: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    insertion_point: self::_puroro::internal::field_type::OptionalStringField::<1usize>,
-    content: self::_puroro::internal::field_type::OptionalStringField::<2usize>,
-    generated_code_info: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    name: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    insertion_point: self::_puroro::internal::field_type::OptionalStringField<1usize>,
+    content: self::_puroro::internal::field_type::OptionalStringField<2usize>,
+    generated_code_info: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::GeneratedCodeInfo,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -21,13 +21,13 @@ impl File {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn name_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn name_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -37,7 +37,7 @@ impl File {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -60,13 +60,13 @@ impl File {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.insertion_point,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn insertion_point_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn insertion_point_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
@@ -76,7 +76,7 @@ impl File {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.insertion_point,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -99,13 +99,13 @@ impl File {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.content,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn content_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn content_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
@@ -115,7 +115,7 @@ impl File {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.content,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -136,13 +136,11 @@ impl File {
     }
     pub fn generated_code_info(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-    > {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::GeneratedCodeInfo> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.generated_code_info,
             &self._bitfield,
             ::std::default::Default::default,
@@ -150,24 +148,19 @@ impl File {
     }
     pub fn generated_code_info_opt(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-    > {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::GeneratedCodeInfo> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.generated_code_info,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.generated_code_info, &self._bitfield)
     }
     pub fn generated_code_info_mut(
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::GeneratedCodeInfo {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.generated_code_info,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -175,22 +168,16 @@ impl File {
     }
     pub fn has_generated_code_info(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.generated_code_info,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.generated_code_info, &self._bitfield)
+        .is_some()
     }
     pub fn clear_generated_code_info(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.generated_code_info,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.generated_code_info, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for File {
@@ -205,11 +192,10 @@ impl self::_puroro::Message for File {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -254,8 +240,7 @@ impl self::_puroro::Message for File {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -283,7 +268,7 @@ impl self::_puroro::Message for File {
             15i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::GeneratedCodeInfo,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.generated_code_info,
@@ -328,7 +313,10 @@ impl ::std::fmt::Debug for File {
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(insertion_point), &self.insertion_point_opt())
             .field(stringify!(content), &self.content_opt())
-            .field(stringify!(generated_code_info), &self.generated_code_info_opt())
+            .field(
+                stringify!(generated_code_info),
+                &self.generated_code_info_opt(),
+            )
             .finish()
     }
 }
@@ -361,7 +349,7 @@ impl ::std::default::Default for Feature {
         Self::FeatureNone
     }
 }
-impl ::std::convert::From::<Feature> for i32 {
+impl ::std::convert::From<Feature> for i32 {
     fn from(val: Feature) -> i32 {
         match val {
             Feature::FeatureNone => 0i32,
@@ -369,17 +357,13 @@ impl ::std::convert::From::<Feature> for i32 {
         }
     }
 }
-impl ::std::convert::TryFrom::<i32> for Feature {
+impl ::std::convert::TryFrom<i32> for Feature {
     type Error = self::_puroro::PuroroError;
     fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
         match val {
             0i32 => ::std::result::Result::Ok(self::Feature::FeatureNone),
             1i32 => ::std::result::Result::Ok(self::Feature::FeatureProto3Optional),
-            _ => {
-                ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
-                )?
-            }
+            _ => ::std::result::Result::Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
         }
     }
 }

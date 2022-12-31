@@ -8,18 +8,16 @@ mod _puroro {
 }
 #[derive(::std::default::Default)]
 pub struct Location {
-    path: self::_puroro::internal::field_type::RepeatedNumericalField::<
+    path: self::_puroro::internal::field_type::RepeatedNumericalField<
         i32,
         self::_puroro::tags::Int32,
     >,
-    span: self::_puroro::internal::field_type::RepeatedNumericalField::<
+    span: self::_puroro::internal::field_type::RepeatedNumericalField<
         i32,
         self::_puroro::tags::Int32,
     >,
-    leading_comments: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    trailing_comments: self::_puroro::internal::field_type::OptionalStringField::<
-        1usize,
-    >,
+    leading_comments: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    trailing_comments: self::_puroro::internal::field_type::OptionalStringField<1usize>,
     leading_detached_comments: self::_puroro::internal::field_type::RepeatedStringField,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
@@ -31,7 +29,7 @@ impl Location {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.path, &self._bitfield)
     }
-    pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn path_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
@@ -52,7 +50,7 @@ impl Location {
             self::_puroro::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.span, &self._bitfield)
     }
-    pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn span_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
@@ -70,13 +68,13 @@ impl Location {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.leading_comments,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn leading_comments_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn leading_comments_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -89,7 +87,7 @@ impl Location {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.leading_comments,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -118,13 +116,13 @@ impl Location {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.trailing_comments,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn trailing_comments_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn trailing_comments_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
@@ -137,7 +135,7 @@ impl Location {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.trailing_comments,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -164,18 +162,14 @@ impl Location {
     }
     pub fn leading_detached_comments(
         &self,
-    ) -> &[impl ::std::ops::Deref::<
-        Target = str,
-    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+    ) -> &[impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.leading_detached_comments,
             &self._bitfield,
         )
     }
-    pub fn leading_detached_comments_mut(
-        &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn leading_detached_comments_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.leading_detached_comments,
@@ -202,11 +196,10 @@ impl self::_puroro::Message for Location {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::RepeatedNumericalField::<
@@ -260,12 +253,11 @@ impl self::_puroro::Message for Location {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
             i32,
             self::_puroro::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -274,7 +266,7 @@ impl self::_puroro::Message for Location {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedNumericalField::<
+        <self::_puroro::internal::field_type::RepeatedNumericalField<
             i32,
             self::_puroro::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
@@ -359,7 +351,8 @@ impl ::std::cmp::PartialEq for Location {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        true && self.path() == rhs.path() && self.span() == rhs.span()
+        true && self.path() == rhs.path()
+            && self.span() == rhs.span()
             && self.leading_comments_opt() == rhs.leading_comments_opt()
             && self.trailing_comments_opt() == rhs.trailing_comments_opt()
             && self.leading_detached_comments() == rhs.leading_detached_comments()

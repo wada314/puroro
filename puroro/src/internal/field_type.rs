@@ -33,18 +33,14 @@ pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usi
 pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
-pub struct SingularStringField(String);
+pub struct SingularUnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
-pub struct OptionalStringField<const BITFIELD_INDEX: usize>(String);
+pub struct OptionalUnsizedField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+    RustType,
+    PhantomData<ProtoType>,
+);
 #[derive(Default, Clone)]
-pub struct RepeatedStringField(Vec<String>);
-
-#[derive(Default, Clone)]
-pub struct SingularBytesField(Vec<u8>);
-#[derive(Default, Clone)]
-pub struct OptionalBytesField<const BITFIELD_INDEX: usize>(Vec<u8>);
-#[derive(Default, Clone)]
-pub struct RepeatedBytesField(Vec<Vec<u8>>);
+pub struct RepeatedUnsizedField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);

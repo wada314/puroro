@@ -85,11 +85,14 @@ pub enum NumericalWireType {
     Bits64([u8; 8]),
 }
 pub trait UnsizedType {
-    type RustType;
-    type RustRefType<'a>
+    type RustType: for<'a> From<Self::DefaultValueType<'a>>;
+    type RustRefType<'a>: From<Self::DefaultValueType<'a>>
     where
         Self: 'a;
     type RustMutType<'a>
+    where
+        Self: 'a;
+    type DefaultValueType<'a>
     where
         Self: 'a;
     fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_>;
@@ -288,6 +291,7 @@ impl UnsizedType for String {
     type RustMutType<'a> =&'a mut ::std::string::String
     where
         Self: 'a;
+    type DefaultValueType<'a> = &'a str;
 
     fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_> {
         val
@@ -311,6 +315,7 @@ impl UnsizedType for Bytes {
     type RustMutType<'a> = &'a mut Vec<u8>
     where
         Self: 'a;
+    type DefaultValueType<'a> = &'a [u8];
 
     fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_> {
         val

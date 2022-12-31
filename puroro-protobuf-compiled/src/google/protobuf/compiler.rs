@@ -9,40 +9,40 @@ mod _puroro {
 pub mod code_generator_response;
 #[derive(::std::default::Default)]
 pub struct Version {
-    major: self::_puroro::internal::field_type::OptionalNumericalField::<
+    major: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         0usize,
     >,
-    minor: self::_puroro::internal::field_type::OptionalNumericalField::<
+    minor: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         1usize,
     >,
-    patch: self::_puroro::internal::field_type::OptionalNumericalField::<
+    patch: self::_puroro::internal::field_type::OptionalNumericalField<
         i32,
         self::_puroro::tags::Int32,
         2usize,
     >,
-    suffix: self::_puroro::internal::field_type::OptionalStringField::<3usize>,
+    suffix: self::_puroro::internal::field_type::OptionalStringField<3usize>,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
 }
 impl Version {
     pub fn major(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.major,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn major_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn major_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0usize,
@@ -50,11 +50,11 @@ impl Version {
     }
     pub fn major_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.major,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -62,16 +62,16 @@ impl Version {
     }
     pub fn has_major(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.major, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_major(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0usize,
@@ -79,19 +79,19 @@ impl Version {
     }
     pub fn minor(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.minor,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn minor_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn minor_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -99,11 +99,11 @@ impl Version {
     }
     pub fn minor_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.minor,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -111,16 +111,16 @@ impl Version {
     }
     pub fn has_minor(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.minor, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_minor(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -128,19 +128,19 @@ impl Version {
     }
     pub fn patch(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.patch,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn patch_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn patch_opt(&self) -> ::std::option::Option<i32> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             2usize,
@@ -148,11 +148,11 @@ impl Version {
     }
     pub fn patch_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.patch,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -160,16 +160,16 @@ impl Version {
     }
     pub fn has_patch(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.patch, &self._bitfield)
-            .is_some()
+        .is_some()
     }
     pub fn clear_patch(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             2usize,
@@ -179,13 +179,13 @@ impl Version {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             3usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.suffix,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn suffix_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn suffix_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             3usize,
@@ -195,7 +195,7 @@ impl Version {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             3usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.suffix,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -227,11 +227,10 @@ impl self::_puroro::Message for Version {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalNumericalField::<
@@ -282,12 +281,11 @@ impl self::_puroro::Message for Version {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             0usize,
@@ -297,7 +295,7 @@ impl self::_puroro::Message for Version {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             1usize,
@@ -307,7 +305,7 @@ impl self::_puroro::Message for Version {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             i32,
             self::_puroro::tags::Int32,
             2usize,
@@ -377,18 +375,19 @@ impl ::std::cmp::PartialEq for Version {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
         true && self.major_opt() == rhs.major_opt()
-            && self.minor_opt() == rhs.minor_opt() && self.patch_opt() == rhs.patch_opt()
+            && self.minor_opt() == rhs.minor_opt()
+            && self.patch_opt() == rhs.patch_opt()
             && self.suffix_opt() == rhs.suffix_opt()
     }
 }
 #[derive(::std::default::Default)]
 pub struct CodeGeneratorRequest {
     file_to_generate: self::_puroro::internal::field_type::RepeatedStringField,
-    parameter: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    proto_file: self::_puroro::internal::field_type::RepeatedMessageField::<
+    parameter: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    proto_file: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::FileDescriptorProto,
     >,
-    compiler_version: self::_puroro::internal::field_type::SingularHeapMessageField::<
+    compiler_version: self::_puroro::internal::field_type::SingularHeapMessageField<
         self::_puroro_root::google::protobuf::compiler::Version,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -396,18 +395,14 @@ pub struct CodeGeneratorRequest {
 impl CodeGeneratorRequest {
     pub fn file_to_generate(
         &self,
-    ) -> &[impl ::std::ops::Deref::<
-        Target = str,
-    > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+    ) -> &[impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
             &self.file_to_generate,
             &self._bitfield,
         )
     }
-    pub fn file_to_generate_mut(
-        &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn file_to_generate_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
             &mut self.file_to_generate,
@@ -425,13 +420,13 @@ impl CodeGeneratorRequest {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.parameter,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn parameter_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn parameter_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -441,7 +436,7 @@ impl CodeGeneratorRequest {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.parameter,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -460,39 +455,33 @@ impl CodeGeneratorRequest {
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.parameter, &mut self._bitfield)
     }
-    pub fn proto_file(
-        &self,
-    ) -> &[self::_puroro_root::google::protobuf::FileDescriptorProto] {
+    pub fn proto_file(&self) -> &[self::_puroro_root::google::protobuf::FileDescriptorProto] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::get_field(&self.proto_file, &self._bitfield)
     }
     pub fn proto_file_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_puroro_root::google::protobuf::FileDescriptorProto,
-    > {
+    ) -> &mut ::std::vec::Vec<self::_puroro_root::google::protobuf::FileDescriptorProto> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::mut_field(&mut self.proto_file, &mut self._bitfield)
     }
     pub fn clear_proto_file(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::clear(&mut self.proto_file, &mut self._bitfield)
     }
     pub fn compiler_version(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::compiler::Version,
-    > {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::compiler::Version> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::compiler::Version,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.compiler_version,
             &self._bitfield,
             ::std::default::Default::default,
@@ -500,24 +489,19 @@ impl CodeGeneratorRequest {
     }
     pub fn compiler_version_opt(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::compiler::Version,
-    > {
+    ) -> ::std::option::Option<&self::_puroro_root::google::protobuf::compiler::Version> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::compiler::Version,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.compiler_version,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.compiler_version, &self._bitfield)
     }
     pub fn compiler_version_mut(
         &mut self,
     ) -> &mut self::_puroro_root::google::protobuf::compiler::Version {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::compiler::Version,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.compiler_version,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -525,22 +509,16 @@ impl CodeGeneratorRequest {
     }
     pub fn has_compiler_version(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::compiler::Version,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.compiler_version,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.compiler_version, &self._bitfield)
+        .is_some()
     }
     pub fn clear_compiler_version(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::compiler::Version,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.compiler_version,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.compiler_version, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for CodeGeneratorRequest {
@@ -555,11 +533,10 @@ impl self::_puroro::Message for CodeGeneratorRequest {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
@@ -602,8 +579,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -621,7 +597,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::FileDescriptorProto,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.proto_file,
@@ -629,7 +605,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             15i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField<
             self::_puroro_root::google::protobuf::compiler::Version,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.compiler_version,
@@ -690,13 +666,13 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
 }
 #[derive(::std::default::Default)]
 pub struct CodeGeneratorResponse {
-    error: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    supported_features: self::_puroro::internal::field_type::OptionalNumericalField::<
+    error: self::_puroro::internal::field_type::OptionalStringField<0usize>,
+    supported_features: self::_puroro::internal::field_type::OptionalNumericalField<
         u64,
         self::_puroro::tags::UInt64,
         1usize,
     >,
-    file: self::_puroro::internal::field_type::RepeatedMessageField::<
+    file: self::_puroro::internal::field_type::RepeatedMessageField<
         self::_puroro_root::google::protobuf::compiler::code_generator_response::File,
     >,
     _bitfield: self::_puroro::bitvec::BitArray<1usize>,
@@ -706,13 +682,13 @@ impl CodeGeneratorResponse {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.error,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn error_opt(&self) -> ::std::option::Option::<&str> {
+    pub fn error_opt(&self) -> ::std::option::Option<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
@@ -722,7 +698,7 @@ impl CodeGeneratorResponse {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.error,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -743,34 +719,31 @@ impl CodeGeneratorResponse {
     }
     pub fn supported_features(&self) -> u64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.supported_features,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn supported_features_opt(&self) -> ::std::option::Option::<u64> {
+    pub fn supported_features_opt(&self) -> ::std::option::Option<u64> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.supported_features,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.supported_features, &self._bitfield)
     }
     pub fn supported_features_mut(&mut self) -> &mut u64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.supported_features,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -778,48 +751,42 @@ impl CodeGeneratorResponse {
     }
     pub fn has_supported_features(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.supported_features,
-                &self._bitfield,
-            )
-            .is_some()
+        > as NonRepeatedFieldType>::get_field_opt(&self.supported_features, &self._bitfield)
+        .is_some()
     }
     pub fn clear_supported_features(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.supported_features,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.supported_features, &mut self._bitfield)
     }
     pub fn file(
         &self,
     ) -> &[self::_puroro_root::google::protobuf::compiler::code_generator_response::File] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::compiler::code_generator_response::File,
         > as RepeatedFieldType>::get_field(&self.file, &self._bitfield)
     }
     pub fn file_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
+    ) -> &mut ::std::vec::Vec<
         self::_puroro_root::google::protobuf::compiler::code_generator_response::File,
     > {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::compiler::code_generator_response::File,
         > as RepeatedFieldType>::mut_field(&mut self.file, &mut self._bitfield)
     }
     pub fn clear_file(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::compiler::code_generator_response::File,
         > as RepeatedFieldType>::clear(&mut self.file, &mut self._bitfield)
     }
@@ -836,11 +803,10 @@ impl self::_puroro::Message for CodeGeneratorResponse {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+        use self::_puroro::internal::ser::FieldData;
+        while let Some((number, field_data)) = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalStringField::<
@@ -878,8 +844,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
-        #[allow(unused)]
-        out: &mut W,
+        #[allow(unused)] out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
@@ -891,7 +856,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalNumericalField::<
+        <self::_puroro::internal::field_type::OptionalNumericalField<
             u64,
             self::_puroro::tags::UInt64,
             1usize,
@@ -901,7 +866,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedMessageField::<
+        <self::_puroro::internal::field_type::RepeatedMessageField<
             self::_puroro_root::google::protobuf::compiler::code_generator_response::File,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.file,
@@ -943,7 +908,10 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         fmt.debug_struct(stringify!(CodeGeneratorResponse))
             .field(stringify!(error), &self.error_opt())
-            .field(stringify!(supported_features), &self.supported_features_opt())
+            .field(
+                stringify!(supported_features),
+                &self.supported_features_opt(),
+            )
             .field(stringify!(file), &self.file())
             .finish()
     }

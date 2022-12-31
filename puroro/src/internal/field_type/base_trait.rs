@@ -253,16 +253,19 @@ where
     }
 }
 
-impl FieldType for SingularStringField {
+impl<RustType, ProtoType> FieldType for SingularUnsizedField<RustType, ProtoType>
+where
+    RustType: Default + PartialEq,
+    ProtoType: tags::UnsizedType<RustType = RustType>,
+{
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
         iter: I,
     ) -> Result<()> {
-        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-        let s = String::from_utf8(vec)?;
-        if !s.is_empty() {
-            self.0 = s
+        let val = ProtoType::from_bytes_iter(iter)?;
+        if val != RustType::default() {
+            self.0 = val
         }
         Ok(())
     }
@@ -273,21 +276,24 @@ impl FieldType for SingularStringField {
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        if !self.0.is_empty() {
-            ser_bytes_shared(self.0.as_bytes(), number, out)?;
+        if self.0 != RustType::default() {
+            ser_bytes_shared(ProtoType::to_bytes_slice(&self.0)?, number, out)?;
         }
         Ok(())
     }
 }
 
-impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_INDEX> {
+impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
+    for OptionalUnsizedField<RustType, ProtoType, BITFIELD_INDEX>
+where
+    ProtoType: tags::UnsizedType<RustType = RustType>,
+{
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
         iter: I,
     ) -> Result<()> {
-        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-        self.0 = String::from_utf8(vec)?;
+        self.0 = ProtoType::from_bytes_iter(iter)?;
         bitvec.set(BITFIELD_INDEX, true);
         Ok(())
     }
@@ -299,20 +305,22 @@ impl<const BITFIELD_INDEX: usize> FieldType for OptionalStringField<BITFIELD_IND
         out: &mut W,
     ) -> Result<()> {
         if bitvec.get(BITFIELD_INDEX) {
-            ser_bytes_shared(self.0.as_bytes(), number, out)?;
+            ser_bytes_shared(ProtoType::to_bytes_slice(&self.0)?, number, out)?;
         }
         Ok(())
     }
 }
 
-impl FieldType for RepeatedStringField {
+impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType>
+where
+    ProtoType: tags::UnsizedType<RustType = RustType>,
+{
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
         iter: I,
     ) -> Result<()> {
-        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-        self.0.push(String::from_utf8(vec)?);
+        self.0.push(ProtoType::from_bytes_iter(iter)?);
         Ok(())
     }
 
@@ -322,82 +330,8 @@ impl FieldType for RepeatedStringField {
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        for s in &self.0 {
-            ser_bytes_shared(s.as_bytes(), number, out)?;
-        }
-        Ok(())
-    }
-}
-
-impl FieldType for SingularBytesField {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: I,
-    ) -> Result<()> {
-        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-        if !vec.is_empty() {
-            self.0 = vec
-        }
-        Ok(())
-    }
-
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        _bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        if !self.0.is_empty() {
-            ser_bytes_shared(self.0.as_slice(), number, out)?;
-        }
-        Ok(())
-    }
-}
-
-impl<const BITFIELD_INDEX: usize> FieldType for OptionalBytesField<BITFIELD_INDEX> {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        iter: I,
-    ) -> Result<()> {
-        self.0 = iter.collect::<IoResult<Vec<u8>>>()?;
-        bitvec.set(BITFIELD_INDEX, true);
-        Ok(())
-    }
-
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        if bitvec.get(BITFIELD_INDEX) {
-            ser_bytes_shared(self.0.as_slice(), number, out)?;
-        }
-        Ok(())
-    }
-}
-
-impl FieldType for RepeatedBytesField {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: I,
-    ) -> Result<()> {
-        let vec = iter.collect::<IoResult<Vec<u8>>>()?;
-        self.0.push(vec);
-        Ok(())
-    }
-
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        _bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        for v in &self.0 {
-            ser_bytes_shared(v.as_slice(), number, out)?;
+        for val in &self.0 {
+            ser_bytes_shared(ProtoType::to_bytes_slice(val)?, number, out)?;
         }
         Ok(())
     }

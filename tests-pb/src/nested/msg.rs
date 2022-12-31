@@ -20,7 +20,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.item_inner,
             &self._bitfield,
             ::std::default::Default::default,
@@ -45,7 +45,7 @@ impl Submsg {
         )
     }
     pub fn has_item_inner(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
+        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,

@@ -54,7 +54,7 @@ pub trait OneofFieldType {
     where
         Self: 'a;
 
-    /// An getter type, which overrides `Self::GetterOptType`'s `None` case
+    /// A getter type, which overrides `Self::GetterOptType`'s `None` case
     /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
     /// this benefit so it's still an optional type.
     /// int32 => i32
@@ -161,7 +161,7 @@ where
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
         Self: 'a;
-    type DefaultValueType<'a> = ProtoType::RustRefType<'a>
+    type DefaultValueType<'a> = ProtoType::DefaultValueType<'a>
     where
         Self: 'a;
     type GetterOrElseType<'a> = ProtoType::RustRefType<'a>
@@ -181,7 +181,7 @@ where
         self_opt: Option<&'a Self>,
         f: F,
     ) -> Self::GetterOrElseType<'a> {
-        Self::get_field_opt(self_opt).unwrap_or_else(f)
+        Self::get_field_opt(self_opt).unwrap_or_else(|| f().into())
     }
     fn get_field_mut(&mut self) -> Self::GetterMutType<'_> {
         ProtoType::as_mut(&mut self.0)
