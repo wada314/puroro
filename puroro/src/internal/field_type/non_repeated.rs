@@ -29,11 +29,9 @@ pub trait NonRepeatedFieldType: FieldType {
 
     /// A default field type which can be defined in proto2.
     /// int32 => i32
-    /// String => &'a str
+    /// String => &'static str
     /// Message => unreachable!()
-    type DefaultValueType<'a>
-    where
-        Self: 'a;
+    type DefaultValueType;
 
     /// A getter type, which overrides `Self::GetterOptType`'s `None` case
     /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
@@ -53,13 +51,13 @@ pub trait NonRepeatedFieldType: FieldType {
     where
         Self: 'a;
 
-    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
         bitvec: &B,
         default: F,
     ) -> Self::GetterOrElseType<'a>;
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::GetterOptType<'_>;
-    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
         bitvec: &mut B,
         default: F,
@@ -75,15 +73,13 @@ where
     type GetterOptType<'a> = Option<RustType>
     where
         Self: 'a;
-    type DefaultValueType<'a> = RustType
-    where
-        Self: 'a;
+    type DefaultValueType = RustType;
     type GetterOrElseType<'a> = RustType
     where
         Self: 'a;
     type GetterMutType<'a> = &'a mut RustType where Self: 'a;
 
-    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
         bitvec: &B,
         default: F,
@@ -97,7 +93,7 @@ where
             Some(self.0.clone())
         }
     }
-    fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
         _bitvec: &mut B,
         _default: D,
@@ -119,15 +115,13 @@ where
     type GetterOptType<'a> = Option<RustType>
     where
         Self: 'a;
-    type DefaultValueType<'a> = RustType
-    where
-        Self: 'a;
+    type DefaultValueType = RustType;
     type GetterOrElseType<'a> = RustType
     where
         Self: 'a;
     type GetterMutType<'a> = &'a mut RustType where Self: 'a;
 
-    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
         bitvec: &B,
         default: F,
@@ -137,7 +131,7 @@ where
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::GetterOptType<'_> {
         bitvec.get(BITFIELD_INDEX).then_some(self.0.clone())
     }
-    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
         bitvec: &mut B,
         default: F,
@@ -161,15 +155,13 @@ where
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
         Self: 'a;
-    type DefaultValueType<'a> = ProtoType::DefaultValueType<'a>
-    where
-        Self: 'a;
+    type DefaultValueType = ProtoType::DefaultValueType;
     type GetterOrElseType<'a> = ProtoType::RustRefType<'a>
     where
         Self: 'a;
     type GetterMutType<'a> = ProtoType::RustMutType<'a> where Self: 'a;
 
-    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
         bitvec: &B,
         default: F,
@@ -184,7 +176,7 @@ where
             Some(ProtoType::as_ref(&self.0))
         }
     }
-    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
         bitvec: &mut B,
         default: F,
@@ -205,15 +197,13 @@ where
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
         Self: 'a;
-    type DefaultValueType<'a> = ProtoType::DefaultValueType<'a>
-    where
-        Self: 'a;
+    type DefaultValueType = ProtoType::DefaultValueType;
     type GetterOrElseType<'a> = ProtoType::RustRefType<'a>
     where
         Self: 'a;
     type GetterMutType<'a> = ProtoType::RustMutType<'a> where Self: 'a;
 
-    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
         bitvec: &B,
         default: F,
@@ -226,7 +216,7 @@ where
             .get(BITFIELD_INDEX)
             .then_some(ProtoType::as_ref(&self.0))
     }
-    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
         bitvec: &mut B,
         default: F,
@@ -247,27 +237,26 @@ impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
 where
     M: Message + Default,
 {
-    type DefaultValueType<'a> = ()
+    type GetterOptType<'a> = Option<&'a M>
     where
         Self: 'a;
+    type DefaultValueType = ();
     type GetterOrElseType<'a> = Option<&'a M>
     where
         Self: 'a;
-    fn get_field_or_else<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType<'a>>(
+    type GetterMutType<'a> = &'a mut M where Self: 'a;
+
+    fn get_field_or_else<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a self,
         bitvec: &B,
         _default: D,
     ) -> Self::GetterOrElseType<'a> {
         self.get_field_opt(bitvec)
     }
-    type GetterOptType<'a> = Option<&'a M>
-    where
-        Self: 'a;
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
         self.0.as_deref()
     }
-    type GetterMutType<'a> = &'a mut M where Self: 'a;
-    fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
         _bitvec: &mut B,
         _default: D,

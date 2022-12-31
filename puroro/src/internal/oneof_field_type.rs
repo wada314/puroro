@@ -50,9 +50,7 @@ pub trait OneofFieldType {
     /// int32 => i32
     /// String => &'a str
     /// Message => unreachable!()
-    type DefaultValueType<'a>
-    where
-        Self: 'a;
+    type DefaultValueType;
 
     /// A getter type, which overrides `Self::GetterOptType`'s `None` case
     /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
@@ -74,7 +72,7 @@ pub trait OneofFieldType {
 
     fn get_field(&self) -> Self::GetterType<'_>;
     fn get_field_opt(self_opt: Option<&Self>) -> Self::GetterOptType<'_>;
-    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType>(
         self_opt: Option<&'a Self>,
         f: F,
     ) -> Self::GetterOrElseType<'a>;
@@ -98,9 +96,7 @@ where
     type GetterOptType<'a> = Option<RustType>
     where
         Self: 'a;
-    type DefaultValueType<'a> = RustType
-    where
-        Self: 'a;
+    type DefaultValueType = RustType;
     type GetterOrElseType<'a> = RustType
     where
         Self: 'a;
@@ -114,7 +110,7 @@ where
     fn get_field_opt(self_opt: Option<&Self>) -> Self::GetterOptType<'_> {
         self_opt.map(|f| f.get_field())
     }
-    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType>(
         self_opt: Option<&'a Self>,
         f: F,
     ) -> Self::GetterOrElseType<'a> {
@@ -161,9 +157,7 @@ where
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
         Self: 'a;
-    type DefaultValueType<'a> = ProtoType::DefaultValueType<'a>
-    where
-        Self: 'a;
+    type DefaultValueType = ProtoType::DefaultValueType;
     type GetterOrElseType<'a> = ProtoType::RustRefType<'a>
     where
         Self: 'a;
@@ -177,7 +171,7 @@ where
     fn get_field_opt(self_opt: Option<&Self>) -> Self::GetterOptType<'_> {
         self_opt.map(|f| f.get_field())
     }
-    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType>(
         self_opt: Option<&'a Self>,
         f: F,
     ) -> Self::GetterOrElseType<'a> {
@@ -211,9 +205,7 @@ impl<M: Message + Default> OneofFieldType for HeapMessageField<M> {
     type GetterOptType<'a> = Option<&'a M>
     where
         Self: 'a;
-    type DefaultValueType<'a> = M
-    where
-        Self: 'a;
+    type DefaultValueType = ();
     type GetterOrElseType<'a> = Option<&'a M>
     where
         Self: 'a;
@@ -227,7 +219,7 @@ impl<M: Message + Default> OneofFieldType for HeapMessageField<M> {
     fn get_field_opt(self_opt: Option<&Self>) -> Self::GetterOptType<'_> {
         self_opt.map(|f| f.get_field())
     }
-    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType<'a>>(
+    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType>(
         self_opt: Option<&'a Self>,
         _: F,
     ) -> Self::GetterOrElseType<'a> {
