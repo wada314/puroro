@@ -149,7 +149,7 @@ where
 impl<RustType, ProtoType> OneofFieldType for UnsizedField<RustType, ProtoType>
 where
     RustType: Clone,
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType: 'static + tags::UnsizedType<RustType = RustType>,
 {
     type GetterType<'a> = ProtoType::RustRefType<'a>
     where
@@ -175,7 +175,7 @@ where
         self_opt: Option<&'a Self>,
         f: F,
     ) -> Self::GetterOrElseType<'a> {
-        Self::get_field_opt(self_opt).unwrap_or_else(|| f().into())
+        Self::get_field_opt(self_opt).unwrap_or_else(|| ProtoType::default_to_ref(f()))
     }
     fn get_field_mut(&mut self) -> Self::GetterMutType<'_> {
         ProtoType::as_mut(&mut self.0)

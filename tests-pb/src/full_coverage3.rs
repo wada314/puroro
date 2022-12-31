@@ -201,7 +201,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -226,7 +226,7 @@ impl Msg {
         )
     }
     pub fn has_i32_unlabeled(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
@@ -246,7 +246,7 @@ impl Msg {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -273,7 +273,7 @@ impl Msg {
         )
     }
     pub fn has_i32_optional(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
@@ -315,7 +315,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             f32,
             self::_puroro::internal::tags::Float,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.float_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -340,7 +340,7 @@ impl Msg {
         )
     }
     pub fn has_float_unlabeled(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             f32,
             self::_puroro::internal::tags::Float,
@@ -360,7 +360,7 @@ impl Msg {
             f32,
             self::_puroro::internal::tags::Float,
             1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.float_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -387,7 +387,7 @@ impl Msg {
         )
     }
     pub fn has_float_optional(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             f32,
             self::_puroro::internal::tags::Float,
@@ -426,7 +426,7 @@ impl Msg {
     }
     pub fn bytes_unlabeled(&self) -> &[u8] {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularBytesField as NonRepeatedFieldType>::get_field_or_else(
+        <self::_puroro::internal::field_type::SingularBytesField as NonRepeatedFieldType>::get_field(
             &self.bytes_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -448,7 +448,7 @@ impl Msg {
         )
     }
     pub fn has_bytes_unlabeled(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;get_field_mut
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularBytesField as NonRepeatedFieldType>::get_field_opt(
                 &self.bytes_unlabeled,
                 &self._bitfield,
@@ -466,7 +466,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalBytesField::<
             2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.bytes_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -489,7 +489,7 @@ impl Msg {
         )
     }
     pub fn has_bytes_optional(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalBytesField::<
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.bytes_optional, &self._bitfield)
@@ -528,7 +528,7 @@ impl Msg {
     }
     pub fn string_unlabeled(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_or_else(
+        <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field(
             &self.string_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -550,7 +550,7 @@ impl Msg {
         )
     }
     pub fn has_string_unlabeled(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;get_field_mut
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularStringField as NonRepeatedFieldType>::get_field_opt(
                 &self.string_unlabeled,
                 &self._bitfield,
@@ -568,7 +568,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.string_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -591,7 +591,7 @@ impl Msg {
         )
     }
     pub fn has_string_optional(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalStringField::<
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.string_optional, &self._bitfield)
@@ -637,7 +637,7 @@ impl Msg {
             self::_puroro::internal::tags::Enum3::<
                 self::_puroro_root::full_coverage3::Enum,
             >,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.enum_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -670,7 +670,7 @@ impl Msg {
         )
     }
     pub fn has_enum_unlabeled(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             self::_puroro_root::full_coverage3::Enum,
             self::_puroro::internal::tags::Enum3::<
@@ -696,7 +696,7 @@ impl Msg {
                 self::_puroro_root::full_coverage3::Enum,
             >,
             4usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.enum_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -731,7 +731,7 @@ impl Msg {
         )
     }
     pub fn has_enum_optional(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             self::_puroro_root::full_coverage3::Enum,
             self::_puroro::internal::tags::Enum3::<
@@ -786,7 +786,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::full_coverage3::msg::Submsg,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.submsg_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -820,7 +820,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::full_coverage3::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.submsg_unlabelget_field_mut
+                &self.submsg_unlabeled,
                 &self._bitfield,
             )
             .is_some()
@@ -840,7 +840,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::full_coverage3::msg::Submsg,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.submsg_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -875,7 +875,7 @@ impl Msg {
     }
     pub fn clear_submsg_optional(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::figet_field_mut:SingularHeapMessageField::<
+        <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::full_coverage3::msg::Submsg,
         > as NonRepeatedFieldType>::clear(&mut self.submsg_optional, &mut self._bitfield)
     }
@@ -907,7 +907,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -944,7 +944,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_mutt self.i64_unlabeled, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.i64_unlabeled, &mut self._bitfield)
     }
     pub fn i64_optional(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -952,7 +952,7 @@ impl Msg {
             i64,
             self::_puroro::internal::tags::Int64,
             5usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i64_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -991,7 +991,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::internal:get_field_mutt64,
+            self::_puroro::internal::tags::Int64,
             5usize,
         > as NonRepeatedFieldType>::clear(&mut self.i64_optional, &mut self._bitfield)
     }
@@ -1021,7 +1021,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
             self::_puroro::internal::tags::UInt32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.u32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1058,7 +1058,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
             self::_puroro::internal::tags::UInt32,
-        > as NonRepeatedFieldType>::get_field_mutt self.u32_unlabeled, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.u32_unlabeled, &mut self._bitfield)
     }
     pub fn u32_optional(&self) -> u32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -1066,7 +1066,7 @@ impl Msg {
             u32,
             self::_puroro::internal::tags::UInt32,
             6usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.u32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1105,7 +1105,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             u32,
-            self::_puroro::internal:get_field_mutnt32,
+            self::_puroro::internal::tags::UInt32,
             6usize,
         > as NonRepeatedFieldType>::clear(&mut self.u32_optional, &mut self._bitfield)
     }
@@ -1135,7 +1135,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u64,
             self::_puroro::internal::tags::UInt64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.u64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1172,7 +1172,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u64,
             self::_puroro::internal::tags::UInt64,
-        > as NonRepeatedFieldType>::get_field_mutt self.u64_unlabeled, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.u64_unlabeled, &mut self._bitfield)
     }
     pub fn u64_optional(&self) -> u64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -1180,7 +1180,7 @@ impl Msg {
             u64,
             self::_puroro::internal::tags::UInt64,
             7usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.u64_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1219,7 +1219,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             u64,
-            self::_puroro::internal:get_field_mutnt64,
+            self::_puroro::internal::tags::UInt64,
             7usize,
         > as NonRepeatedFieldType>::clear(&mut self.u64_optional, &mut self._bitfield)
     }
@@ -1249,7 +1249,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::SInt32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.s32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1286,7 +1286,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::SInt32,
-        > as NonRepeatedFieldType>::get_field_mutt self.s32_unlabeled, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.s32_unlabeled, &mut self._bitfield)
     }
     pub fn s32_optional(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -1294,7 +1294,7 @@ impl Msg {
             i32,
             self::_puroro::internal::tags::SInt32,
             8usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.s32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1333,7 +1333,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::internal:get_field_mutnt32,
+            self::_puroro::internal::tags::SInt32,
             8usize,
         > as NonRepeatedFieldType>::clear(&mut self.s32_optional, &mut self._bitfield)
     }
@@ -1363,7 +1363,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::SInt64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.s64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1400,7 +1400,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::SInt64,
-        > as NonRepeatedFieldType>::get_field_mutt self.s64_unlabeled, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.s64_unlabeled, &mut self._bitfield)
     }
     pub fn s64_optional(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -1408,7 +1408,7 @@ impl Msg {
             i64,
             self::_puroro::internal::tags::SInt64,
             9usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.s64_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1447,7 +1447,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::internal:get_field_mutnt64,
+            self::_puroro::internal::tags::SInt64,
             9usize,
         > as NonRepeatedFieldType>::clear(&mut self.s64_optional, &mut self._bitfield)
     }
@@ -1477,7 +1477,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
             self::_puroro::internal::tags::Fixed32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.fixed32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1517,7 +1517,7 @@ impl Msg {
     }
     pub fn clear_fixed32_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::figet_field_mut:SingularNumericalField::<
+        <self::_puroro::internal::field_type::SingularNumericalField::<
             u32,
             self::_puroro::internal::tags::Fixed32,
         > as NonRepeatedFieldType>::clear(
@@ -1531,7 +1531,7 @@ impl Msg {
             u32,
             self::_puroro::internal::tags::Fixed32,
             10usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.fixed32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1573,7 +1573,7 @@ impl Msg {
             .is_some()
     }
     pub fn clear_fixed32_optional(&mut self) {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             u32,
             self::_puroro::internal::tags::Fixed32,
@@ -1612,7 +1612,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             u64,
             self::_puroro::internal::tags::Fixed64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.fixed64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1652,7 +1652,7 @@ impl Msg {
     }
     pub fn clear_fixed64_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::figet_field_mut:SingularNumericalField::<
+        <self::_puroro::internal::field_type::SingularNumericalField::<
             u64,
             self::_puroro::internal::tags::Fixed64,
         > as NonRepeatedFieldType>::clear(
@@ -1666,7 +1666,7 @@ impl Msg {
             u64,
             self::_puroro::internal::tags::Fixed64,
             11usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.fixed64_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1708,7 +1708,7 @@ impl Msg {
             .is_some()
     }
     pub fn clear_fixed64_optional(&mut self) {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             u64,
             self::_puroro::internal::tags::Fixed64,
@@ -1747,7 +1747,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::SFixed32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.sfixed32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1787,7 +1787,7 @@ impl Msg {
     }
     pub fn clear_sfixed32_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::figet_field_mut:SingularNumericalField::<
+        <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::SFixed32,
         > as NonRepeatedFieldType>::clear(
@@ -1801,7 +1801,7 @@ impl Msg {
             i32,
             self::_puroro::internal::tags::SFixed32,
             12usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.sfixed32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1843,7 +1843,7 @@ impl Msg {
             .is_some()
     }
     pub fn clear_sfixed32_optional(&mut self) {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::internal::tags::SFixed32,
@@ -1882,7 +1882,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::SFixed64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.sfixed64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1922,7 +1922,7 @@ impl Msg {
     }
     pub fn clear_sfixed64_unlabeled(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::figet_field_mut:SingularNumericalField::<
+        <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::SFixed64,
         > as NonRepeatedFieldType>::clear(
@@ -1936,7 +1936,7 @@ impl Msg {
             i64,
             self::_puroro::internal::tags::SFixed64,
             13usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.sfixed64_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -1978,7 +1978,7 @@ impl Msg {
             .is_some()
     }
     pub fn clear_sfixed64_optional(&mut self) {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
             self::_puroro::internal::tags::SFixed64,
@@ -2017,7 +2017,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             f64,
             self::_puroro::internal::tags::Double,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.f64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -2054,7 +2054,7 @@ impl Msg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             f64,
             self::_puroro::internal::tags::Double,
-        > as NonRepeatedFieldType>::get_field_mutt self.f64_unlabeled, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.f64_unlabeled, &mut self._bitfield)
     }
     pub fn f64_optional(&self) -> f64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
@@ -2062,7 +2062,7 @@ impl Msg {
             f64,
             self::_puroro::internal::tags::Double,
             14usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.f64_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -2101,7 +2101,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             f64,
-            self::_puroro::internal:get_field_mutuble,
+            self::_puroro::internal::tags::Double,
             14usize,
         > as NonRepeatedFieldType>::clear(&mut self.f64_optional, &mut self._bitfield)
     }

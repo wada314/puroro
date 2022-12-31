@@ -28,7 +28,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i32_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -53,7 +53,7 @@ impl Submsg {
         )
     }
     pub fn has_i32_unlabeled(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
@@ -72,7 +72,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i32_optional,
             &self._bitfield,
             ::std::default::Default::default,
@@ -97,7 +97,7 @@ impl Submsg {
         )
     }
     pub fn has_i32_optional(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
@@ -116,7 +116,7 @@ impl Submsg {
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.i64_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -141,7 +141,7 @@ impl Submsg {
         )
     }
     pub fn has_i64_unlabeled(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
             self::_puroro::internal::tags::Int64,

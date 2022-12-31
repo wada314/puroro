@@ -149,8 +149,8 @@ where
 
 impl<ProtoType> NonRepeatedFieldType for SingularUnsizedField<ProtoType::RustType, ProtoType>
 where
+    ProtoType: 'static + tags::UnsizedType,
     ProtoType::RustType: Default + PartialEq,
-    ProtoType: tags::UnsizedType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
@@ -167,7 +167,7 @@ where
         default: F,
     ) -> Self::GetterOrElseType<'a> {
         self.get_field_opt(bitvec)
-            .unwrap_or_else(|| default().into())
+            .unwrap_or_else(|| ProtoType::default_to_ref(default()))
     }
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
         if self.0 == ProtoType::RustType::default() {
@@ -178,8 +178,8 @@ where
     }
     fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,
-        bitvec: &mut B,
-        default: F,
+        _bitvec: &mut B,
+        _default: F,
     ) -> Self::GetterMutType<'a> {
         ProtoType::as_mut(&mut self.0)
     }
@@ -191,8 +191,8 @@ where
 impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
     for OptionalUnsizedField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
+    ProtoType: 'static + tags::UnsizedType,
     ProtoType::RustType: Default + PartialEq,
-    ProtoType: tags::UnsizedType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
@@ -209,7 +209,7 @@ where
         default: F,
     ) -> Self::GetterOrElseType<'a> {
         self.get_field_opt(bitvec)
-            .unwrap_or_else(|| default().into())
+            .unwrap_or_else(|| ProtoType::default_to_ref(default()))
     }
     fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::GetterOptType<'_> {
         bitvec
@@ -222,7 +222,7 @@ where
         default: F,
     ) -> Self::GetterMutType<'a> {
         if !bitvec.get(BITFIELD_INDEX) {
-            self.0 = default().into();
+            self.0 = ProtoType::default_to_value(default());
             bitvec.set(BITFIELD_INDEX, true);
         }
         ProtoType::as_mut(&mut self.0)

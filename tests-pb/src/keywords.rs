@@ -22,7 +22,7 @@ impl Msg {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.r#type,
             &self._bitfield,
             ::std::default::Default::default,
@@ -49,7 +49,7 @@ impl Msg {
         )
     }
     pub fn has_type(&self) -> bool {
-        use self::_puroro::internal:get_field_mutpe::NonRepeatedFieldType;
+        use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
@@ -171,7 +171,7 @@ impl _Self {
             i32,
             self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        > as NonRepeatedFieldType>::get_field(
             &self.r#type,
             &self._bitfield,
             ::std::default::Default::default,
@@ -211,7 +211,7 @@ impl _Self {
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
             self::_puroro::internal::tags::Int32,
-            0usize,get_field_mut
+            0usize,
         > as NonRepeatedFieldType>::clear(&mut self.r#type, &mut self._bitfield)
     }
 }
