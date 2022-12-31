@@ -65,19 +65,19 @@ pub trait NonRepeatedFieldType: FieldType {
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 
-impl<RustType, ProtoType> NonRepeatedFieldType for SingularNumericalField<RustType, ProtoType>
+impl<ProtoType> NonRepeatedFieldType for SingularNumericalField<ProtoType::RustType, ProtoType>
 where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::NumericalType<RustType = RustType>,
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::NumericalType,
 {
-    type GetterOptType<'a> = Option<RustType>
+    type GetterOptType<'a> = Option<ProtoType::RustType>
     where
         Self: 'a;
-    type DefaultValueType = RustType;
-    type GetterOrElseType<'a> = RustType
+    type DefaultValueType = ProtoType::RustType;
+    type GetterOrElseType<'a> = ProtoType::RustType
     where
         Self: 'a;
-    type GetterMutType<'a> = &'a mut RustType where Self: 'a;
+    type GetterMutType<'a> = &'a mut ProtoType::RustType where Self: 'a;
 
     fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
@@ -87,7 +87,7 @@ where
         self.get_field_opt(bitvec).unwrap_or_else(default)
     }
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
-        if self.0 == RustType::default() {
+        if self.0 == ProtoType::RustType::default() {
             None
         } else {
             Some(self.0.clone())
@@ -102,24 +102,24 @@ where
     }
 
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0 = RustType::default();
+        self.0 = ProtoType::RustType::default();
     }
 }
 
-impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
-    for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
+impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
+    for OptionalNumericalField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
-    RustType: Clone,
-    ProtoType: tags::NumericalType<RustType = RustType>,
+    ProtoType::RustType: Clone,
+    ProtoType: tags::NumericalType,
 {
-    type GetterOptType<'a> = Option<RustType>
+    type GetterOptType<'a> = Option<ProtoType::RustType>
     where
         Self: 'a;
-    type DefaultValueType = RustType;
-    type GetterOrElseType<'a> = RustType
+    type DefaultValueType = ProtoType::RustType;
+    type GetterOrElseType<'a> = ProtoType::RustType
     where
         Self: 'a;
-    type GetterMutType<'a> = &'a mut RustType where Self: 'a;
+    type GetterMutType<'a> = &'a mut ProtoType::RustType where Self: 'a;
 
     fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
         &'a self,
@@ -147,10 +147,10 @@ where
     }
 }
 
-impl<RustType, ProtoType> NonRepeatedFieldType for SingularUnsizedField<RustType, ProtoType>
+impl<ProtoType> NonRepeatedFieldType for SingularUnsizedField<ProtoType::RustType, ProtoType>
 where
-    RustType: Default + PartialEq,
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType::RustType: Default + PartialEq,
+    ProtoType: tags::UnsizedType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
@@ -170,7 +170,7 @@ where
             .unwrap_or_else(|| default().into())
     }
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
-        if self.0 == RustType::default() {
+        if self.0 == ProtoType::RustType::default() {
             None
         } else {
             Some(ProtoType::as_ref(&self.0))
@@ -184,15 +184,15 @@ where
         ProtoType::as_mut(&mut self.0)
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0 = RustType::default();
+        self.0 = ProtoType::RustType::default();
     }
 }
 
-impl<RustType, ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
-    for OptionalUnsizedField<RustType, ProtoType, BITFIELD_INDEX>
+impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
+    for OptionalUnsizedField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
-    RustType: Default + PartialEq,
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType::RustType: Default + PartialEq,
+    ProtoType: tags::UnsizedType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
@@ -229,7 +229,7 @@ where
     }
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
         bitvec.set(BITFIELD_INDEX, false);
-        self.0 = RustType::default();
+        self.0 = ProtoType::RustType::default();
     }
 }
 

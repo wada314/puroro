@@ -25,12 +25,12 @@ pub trait RepeatedFieldType: FieldType {
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 
-impl<RustType, ProtoType> RepeatedFieldType for RepeatedNumericalField<RustType, ProtoType>
+impl<ProtoType> RepeatedFieldType for RepeatedNumericalField<ProtoType::RustType, ProtoType>
 where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::NumericalType<RustType = RustType>,
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::NumericalType,
 {
-    type ScalarType = RustType;
+    type ScalarType = ProtoType::RustType;
 
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
@@ -46,12 +46,12 @@ where
         self.0.clear()
     }
 }
-impl<RustType, ProtoType> RepeatedFieldType for RepeatedUnsizedField<RustType, ProtoType>
+impl<ProtoType> RepeatedFieldType for RepeatedUnsizedField<ProtoType::RustType, ProtoType>
 where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::UnsizedType,
 {
-    type ScalarType = RustType;
+    type ScalarType = ProtoType::RustType;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
