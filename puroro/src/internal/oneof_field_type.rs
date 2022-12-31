@@ -22,10 +22,7 @@ use ::std::marker::PhantomData;
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
-pub struct BytesField(Vec<u8>);
-
-#[derive(Default, Clone)]
-pub struct StringField(String);
+pub struct UnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
 pub struct HeapMessageField<M>(Box<M>);
@@ -153,25 +150,29 @@ where
     }
 }
 
-impl OneofFieldType for BytesField {
-    type GetterType<'a> = &'a [u8]
+impl<RustType, ProtoType> OneofFieldType for UnsizedField<RustType, ProtoType>
+where
+    RustType: Clone,
+    ProtoType: tags::UnsizedType<RustType = RustType>,
+{
+    type GetterType<'a> = ProtoType::RustRefType<'a>
     where
         Self: 'a;
-    type GetterOptType<'a> = Option<&'a [u8]>
+    type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
         Self: 'a;
-    type DefaultValueType<'a> = &'a [u8]
+    type DefaultValueType<'a> = ProtoType::RustRefType<'a>
     where
         Self: 'a;
-    type GetterOrElseType<'a> = &'a [u8]
+    type GetterOrElseType<'a> = ProtoType::RustRefType<'a>
     where
         Self: 'a;
-    type GetterMutType<'a> = &'a mut Vec<u8>
+    type GetterMutType<'a> = ProtoType::RustMutType<'a>
     where
         Self: 'a;
 
     fn get_field(&self) -> Self::GetterType<'_> {
-        self.0.as_ref()
+        ProtoType::as_ref(&self.0)
     }
     fn get_field_opt(self_opt: Option<&Self>) -> Self::GetterOptType<'_> {
         self_opt.map(|f| f.get_field())
@@ -183,7 +184,7 @@ impl OneofFieldType for BytesField {
         Self::get_field_opt(self_opt).unwrap_or_else(f)
     }
     fn get_field_mut(&mut self) -> Self::GetterMutType<'_> {
-        &mut self.0
+        ProtoType::as_mut(&mut self.0)
     }
 
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
@@ -191,7 +192,7 @@ impl OneofFieldType for BytesField {
         field_data: FieldData<I>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = field_data {
-            self.0 = iter.collect::<IoResult<Vec<u8>>>()?;
+            self.0 = ProtoType::from_bytes_iter(iter)?;
             Ok(())
         } else {
             Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
@@ -199,57 +200,7 @@ impl OneofFieldType for BytesField {
     }
 
     fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
-        ser_bytes_shared(self.0.as_slice(), number, out)
-    }
-}
-
-impl OneofFieldType for StringField {
-    type GetterType<'a> = &'a str
-    where
-        Self: 'a;
-    type GetterOptType<'a> = Option<&'a str>
-    where
-        Self: 'a;
-    type DefaultValueType<'a> = &'a str
-    where
-        Self: 'a;
-    type GetterOrElseType<'a> = &'a str
-    where
-        Self: 'a;
-    type GetterMutType<'a> = &'a mut String
-    where
-        Self: 'a;
-
-    fn get_field(&self) -> Self::GetterType<'_> {
-        self.0.as_str()
-    }
-    fn get_field_opt(self_opt: Option<&Self>) -> Self::GetterOptType<'_> {
-        self_opt.map(|f| f.get_field())
-    }
-    fn get_field_or_else<'a, F: FnOnce() -> Self::DefaultValueType<'a>>(
-        self_opt: Option<&'a Self>,
-        f: F,
-    ) -> Self::GetterOrElseType<'a> {
-        Self::get_field_opt(self_opt).unwrap_or_else(f)
-    }
-    fn get_field_mut(&mut self) -> Self::GetterMutType<'_> {
-        &mut self.0
-    }
-
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
-        &mut self,
-        field_data: FieldData<I>,
-    ) -> Result<()> {
-        if let FieldData::LengthDelimited(iter) = field_data {
-            self.0 = String::from_utf8(iter.collect::<IoResult<Vec<u8>>>()?)?;
-            Ok(())
-        } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
-        }
-    }
-
-    fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()> {
-        ser_bytes_shared(self.0.as_bytes(), number, out)
+        ser_bytes_shared(ProtoType::to_bytes_slice(&self.0)?, number, out)
     }
 }
 

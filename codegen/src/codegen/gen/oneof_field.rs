@@ -123,6 +123,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             use LengthDelimitedType::*;
             let r#type = self.r#type()?;
             parse2(match r#type {
+                LengthDelimited(Message(m)) => {
+                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                    quote! {
+                        HeapMessageField::< #message_path >
+                    }
+                }
                 Variant(_) | Bits32(_) | Bits64(_) => {
                     let primitive = r#type.rust_type()?;
                     let tag = r#type.tag_type()?;
@@ -130,12 +136,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                         NumericalField::<#primitive, #tag>
                     }
                 }
-                LengthDelimited(Bytes) => quote! { BytesField },
-                LengthDelimited(String) => quote! { StringField },
-                LengthDelimited(Message(m)) => {
-                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                LengthDelimited(_) => {
+                    let owned_type = r#type.rust_type()?;
+                    let tag = r#type.tag_type()?;
                     quote! {
-                        HeapMessageField::< #message_path >
+                        UnsizedField::<#owned_type, #tag>
                     }
                 }
             })?

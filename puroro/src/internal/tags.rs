@@ -15,6 +15,7 @@
 //! Typetags for Proto field types.
 
 use crate::{ErrorKind, PuroroError, Result};
+use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
 // Variants
@@ -82,6 +83,19 @@ pub enum NumericalWireType {
     Variant([u8; 8]),
     Bits32([u8; 4]),
     Bits64([u8; 8]),
+}
+pub trait UnsizedType {
+    type RustType;
+    type RustRefType<'a>
+    where
+        Self: 'a;
+    type RustMutType<'a>
+    where
+        Self: 'a;
+    fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_>;
+    fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_>;
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType>;
+    fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]>;
 }
 
 // Trait impls
@@ -264,6 +278,51 @@ impl NumericalType for SFixed64 {
     }
     fn to_wire_type(val: Self::RustType) -> Result<NumericalWireType> {
         Ok(NumericalWireType::Bits64(i64::to_le_bytes(val)))
+    }
+}
+impl UnsizedType for String {
+    type RustType = ::std::string::String;
+    type RustRefType<'a> = &'a str
+    where
+        Self: 'a;
+    type RustMutType<'a> =&'a mut ::std::string::String
+    where
+        Self: 'a;
+
+    fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_> {
+        val
+    }
+    fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_> {
+        val
+    }
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType> {
+        let bytes = bytes.collect::<IoResult<Vec<_>>>()?;
+        Ok(::std::string::String::from_utf8(bytes)?)
+    }
+    fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]> {
+        Ok(val.as_bytes())
+    }
+}
+impl UnsizedType for Bytes {
+    type RustType = Vec<u8>;
+    type RustRefType<'a> = &'a [u8]
+    where
+        Self: 'a;
+    type RustMutType<'a> = &'a mut Vec<u8>
+    where
+        Self: 'a;
+
+    fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_> {
+        val
+    }
+    fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_> {
+        val
+    }
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType> {
+        Ok(bytes.collect::<IoResult<Vec<_>>>()?)
+    }
+    fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]> {
+        Ok(val.as_slice())
     }
 }
 
