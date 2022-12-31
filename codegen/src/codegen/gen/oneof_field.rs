@@ -194,7 +194,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                             self.#union_item_ident.deref()
                         }
                     });
-                    OneofFieldTypeOpt::get_field(item_opt, #default_fn)
+                    OneofFieldTypeOpt::get_field_or_else(item_opt, #default_fn)
                 }
             })?,
             parse2(quote! {

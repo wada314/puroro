@@ -52,7 +52,10 @@ pub trait OneofFieldTypeOpt<'a> {
     type GetterType;
     type DefaultValueType;
     fn get_field_opt(self) -> Self::OptGetterType;
-    fn get_field<D: FnOnce() -> Self::DefaultValueType>(self, default: D) -> Self::GetterType;
+    fn get_field_or_else<D: FnOnce() -> Self::DefaultValueType>(
+        self,
+        default: D,
+    ) -> Self::GetterType;
 }
 
 impl<RustType, ProtoType> OneofFieldType for NumericalField<RustType, ProtoType>
@@ -209,7 +212,10 @@ impl<'a, T: OneofFieldTypeOptForNonMessageType> OneofFieldTypeOpt<'a> for T {
     fn get_field_opt(self) -> Self::OptGetterType {
         <T as OneofFieldTypeOptForNonMessageType>::get_field_opt(self)
     }
-    fn get_field<D: FnOnce() -> Self::DefaultValueType>(self, default: D) -> Self::GetterType {
+    fn get_field_or_else<D: FnOnce() -> Self::DefaultValueType>(
+        self,
+        default: D,
+    ) -> Self::GetterType {
         <T as OneofFieldTypeOptForNonMessageType>::get_field_opt(self).unwrap_or_else(default)
     }
 }
@@ -247,7 +253,10 @@ impl<'a, M: Message + Default> OneofFieldTypeOpt<'a> for Option<&'a HeapMessageF
     fn get_field_opt(self) -> Self::OptGetterType {
         self.map(|f| f.get_field())
     }
-    fn get_field<D: FnOnce() -> Self::DefaultValueType>(self, _default: D) -> Self::GetterType {
+    fn get_field_or_else<D: FnOnce() -> Self::DefaultValueType>(
+        self,
+        _default: D,
+    ) -> Self::GetterType {
         self.get_field_opt()
     }
 }
