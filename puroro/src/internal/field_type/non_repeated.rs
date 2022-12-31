@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use super::*;
-use crate::bitvec::BitSlice;
-use crate::tags;
+use crate::internal::bitvec::BitSlice;
+use crate::internal::tags;
 use crate::Message;
 
 pub trait NonRepeatedFieldType: FieldType {

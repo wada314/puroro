@@ -13,12 +13,12 @@
 // limitations under the License.
 
 use super::*;
-use crate::bitvec::BitSlice;
+use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{
     ser_bytes_shared, ser_numerical_shared, ser_wire_and_number, FieldData, WireType,
 };
+use crate::internal::tags;
 use crate::internal::variant::Variant;
-use crate::tags;
 use crate::Message;
 use crate::{ErrorKind, Result};
 use ::std::io::{Result as IoResult, Write};

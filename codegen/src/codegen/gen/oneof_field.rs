@@ -181,7 +181,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         Ok(vec![
             parse2(quote! {
-                pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
+                pub(crate) fn #getter_ident<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
                     #[allow(unused)] use ::std::default::Default;
                     use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -198,7 +198,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 }
             })?,
             parse2(quote! {
-                pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
+                pub(crate) fn #getter_opt_ident<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
                     use self::_puroro::internal::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
@@ -214,7 +214,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 }
             })?,
             parse2(quote! {
-                pub(crate) fn #getter_mut_ident<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
+                pub(crate) fn #getter_mut_ident<B: self::_puroro::internal::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
                     #[allow(unused)] use ::std::option::Option::Some;
                     #[allow(unused)] use ::std::default::Default;
                     use ::std::mem::ManuallyDrop;

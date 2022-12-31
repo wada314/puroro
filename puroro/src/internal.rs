@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod bitvec;
 pub mod field_type;
-pub mod oneof_type;
 pub mod oneof_field_type;
+pub mod oneof_type;
 pub mod ser;
+pub mod tags;
 pub mod utils;
 pub mod variant;

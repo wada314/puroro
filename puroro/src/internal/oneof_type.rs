@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::bitvec::BitSlice;
+use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::FieldData;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};

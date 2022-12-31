@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use crate::internal::ser::{ser_bytes_shared, ser_numerical_shared, FieldData, WireType};
-use crate::{tags, Message};
-use crate::{ErrorKind, Result};
+use crate::internal::tags;
+use crate::{ErrorKind, Message, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 

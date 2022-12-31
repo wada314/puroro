@@ -16,11 +16,9 @@
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
 
-pub mod bitvec;
 mod error;
 pub mod internal;
 pub mod message;
-pub mod tags;
 
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;

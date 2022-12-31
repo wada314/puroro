@@ -118,7 +118,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             pub struct #ident {
                 #(#fields,)*
                 #(#oneof_fields,)*
-                _bitfield: self::_puroro::bitvec::BitArray<#bitfield_size_in_u32_array>,
+                _bitfield: self::_puroro::internal::bitvec::BitArray<#bitfield_size_in_u32_array>,
             }
         })?;
         let impl_struct = parse2(quote! {

@@ -10,24 +10,24 @@ mod _puroro {
 pub struct Submsg {
     i32_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
         i32,
-        self::_puroro::tags::Int32,
+        self::_puroro::internal::tags::Int32,
     >,
     i32_optional: self::_puroro::internal::field_type::SingularNumericalField::<
         i32,
-        self::_puroro::tags::Int32,
+        self::_puroro::internal::tags::Int32,
     >,
     i64_unlabeled: self::_puroro::internal::field_type::SingularNumericalField::<
         i64,
-        self::_puroro::tags::Int64,
+        self::_puroro::internal::tags::Int64,
     >,
-    _bitfield: self::_puroro::bitvec::BitArray<0usize>,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<0usize>,
 }
 impl Submsg {
     pub fn i32_unlabeled(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::get_field(
             &self.i32_unlabeled,
             &self._bitfield,
@@ -38,14 +38,14 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_unlabeled, &self._bitfield)
     }
     pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::mut_field(
             &mut self.i32_unlabeled,
             &mut self._bitfield,
@@ -56,7 +56,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_unlabeled, &self._bitfield)
             .is_some()
     }
@@ -64,14 +64,14 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::clear(&mut self.i32_unlabeled, &mut self._bitfield)
     }
     pub fn i32_optional(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::get_field(
             &self.i32_optional,
             &self._bitfield,
@@ -82,14 +82,14 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_optional, &self._bitfield)
     }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::mut_field(
             &mut self.i32_optional,
             &mut self._bitfield,
@@ -100,7 +100,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_optional, &self._bitfield)
             .is_some()
     }
@@ -108,14 +108,14 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as NonRepeatedFieldType>::clear(&mut self.i32_optional, &mut self._bitfield)
     }
     pub fn i64_unlabeled(&self) -> i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
         > as NonRepeatedFieldType>::get_field(
             &self.i64_unlabeled,
             &self._bitfield,
@@ -126,14 +126,14 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
         > as NonRepeatedFieldType>::get_field_opt(&self.i64_unlabeled, &self._bitfield)
     }
     pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
         > as NonRepeatedFieldType>::mut_field(
             &mut self.i64_unlabeled,
             &mut self._bitfield,
@@ -144,7 +144,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
         > as NonRepeatedFieldType>::get_field_opt(&self.i64_unlabeled, &self._bitfield)
             .is_some()
     }
@@ -152,7 +152,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
         > as NonRepeatedFieldType>::clear(&mut self.i64_unlabeled, &mut self._bitfield)
     }
 }
@@ -177,7 +177,7 @@ impl self::_puroro::Message for Submsg {
                 1i32 => {
                     <self::_puroro::internal::field_type::SingularNumericalField::<
                         i32,
-                        self::_puroro::tags::Int32,
+                        self::_puroro::internal::tags::Int32,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.i32_unlabeled,
                         &mut self._bitfield,
@@ -187,7 +187,7 @@ impl self::_puroro::Message for Submsg {
                 2i32 => {
                     <self::_puroro::internal::field_type::SingularNumericalField::<
                         i32,
-                        self::_puroro::tags::Int32,
+                        self::_puroro::internal::tags::Int32,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.i32_optional,
                         &mut self._bitfield,
@@ -197,7 +197,7 @@ impl self::_puroro::Message for Submsg {
                 101i32 => {
                     <self::_puroro::internal::field_type::SingularNumericalField::<
                         i64,
-                        self::_puroro::tags::Int64,
+                        self::_puroro::internal::tags::Int64,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.i64_unlabeled,
                         &mut self._bitfield,
@@ -218,7 +218,7 @@ impl self::_puroro::Message for Submsg {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.i32_unlabeled,
             &self._bitfield,
@@ -227,7 +227,7 @@ impl self::_puroro::Message for Submsg {
         )?;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.i32_optional,
             &self._bitfield,
@@ -236,7 +236,7 @@ impl self::_puroro::Message for Submsg {
         )?;
         <self::_puroro::internal::field_type::SingularNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.i64_unlabeled,
             &self._bitfield,
@@ -251,15 +251,15 @@ impl ::std::clone::Clone for Submsg {
         Self {
             i32_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
                 i32,
-                self::_puroro::tags::Int32,
+                self::_puroro::internal::tags::Int32,
             > as ::std::clone::Clone>::clone(&self.i32_unlabeled),
             i32_optional: <self::_puroro::internal::field_type::SingularNumericalField::<
                 i32,
-                self::_puroro::tags::Int32,
+                self::_puroro::internal::tags::Int32,
             > as ::std::clone::Clone>::clone(&self.i32_optional),
             i64_unlabeled: <self::_puroro::internal::field_type::SingularNumericalField::<
                 i64,
-                self::_puroro::tags::Int64,
+                self::_puroro::internal::tags::Int64,
             > as ::std::clone::Clone>::clone(&self.i64_unlabeled),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
