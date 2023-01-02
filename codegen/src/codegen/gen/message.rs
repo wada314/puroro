@@ -42,7 +42,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             .get_or_try_init(|| {
                 let mut tail = 0;
 
-                // bits for each field
+                // bits for each (non-oneof) fields
                 for field in self.fields()? {
                     if let Some(next_tail) = field.maybe_allocated_bitfield_tail()? {
                         tail = next_tail;

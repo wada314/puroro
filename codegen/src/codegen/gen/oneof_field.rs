@@ -28,10 +28,11 @@ use ::std::rc::Rc;
 
 pub trait OneofFieldExt {
     fn gen_union_field_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_union_field_type(&self) -> Result<Rc<Type>>;
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_generic_type_param_ident(&self) -> Result<Ident>;
+    fn gen_union_generic_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
 
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
@@ -45,6 +46,7 @@ pub trait OneofFieldExt {
 #[derive(Debug, Default)]
 struct Cache {
     union_field_ident: OnceCell<Rc<Ident>>,
+    union_field_type: OnceCell<Rc<Type>>,
     union_gettr_ident: OnceCell<Rc<Ident>>,
     union_gettr_opt_ident: OnceCell<Rc<Ident>>,
     union_gettr_mut_ident: OnceCell<Rc<Ident>>,
@@ -63,6 +65,45 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
+    fn gen_union_field_type(&self) -> Result<Rc<Type>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_field_type
+            .get_or_try_init(|| {
+                let inner_type_name_segment: PathSegment = {
+                    use FieldType::*;
+                    use LengthDelimitedType::*;
+                    let r#type = self.r#type()?;
+                    parse2(match r#type {
+                        LengthDelimited(Message(m)) => {
+                            let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                            quote! {
+                                HeapMessageField::< #message_path >
+                            }
+                        }
+                        Variant(_) | Bits32(_) | Bits64(_) => {
+                            let primitive = r#type.rust_type()?;
+                            let tag = r#type.tag_type()?;
+                            quote! {
+                                NumericalField::<#primitive, #tag>
+                            }
+                        }
+                        LengthDelimited(_) => {
+                            let owned_type = r#type.rust_type()?;
+                            let tag = r#type.tag_type()?;
+                            quote! {
+                                UnsizedField::<#owned_type, #tag>
+                            }
+                        }
+                    })?
+                };
+                Ok(Rc::new(parse2(quote! {
+                    self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
+                })?))
+            })
+            .cloned()
+    }
+
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
@@ -99,9 +140,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_generic_type_param_ident(&self) -> Result<Ident> {
+    fn gen_union_generic_param_ident(&self) -> Result<Ident> {
         Ok(format_ident!(
-            "{}",
+            "T{}",
             self.name()?.to_camel_case().escape_rust_keywords()
         ))
     }
@@ -118,37 +159,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
     fn gen_union_field(&self) -> Result<Rc<Field>> {
         let ident = self.gen_union_field_ident()?;
-        let inner_type_name_segment: PathSegment = {
-            use FieldType::*;
-            use LengthDelimitedType::*;
-            let r#type = self.r#type()?;
-            parse2(match r#type {
-                LengthDelimited(Message(m)) => {
-                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
-                    quote! {
-                        HeapMessageField::< #message_path >
-                    }
-                }
-                Variant(_) | Bits32(_) | Bits64(_) => {
-                    let primitive = r#type.rust_type()?;
-                    let tag = r#type.tag_type()?;
-                    quote! {
-                        NumericalField::<#primitive, #tag>
-                    }
-                }
-                LengthDelimited(_) => {
-                    let owned_type = r#type.rust_type()?;
-                    let tag = r#type.tag_type()?;
-                    quote! {
-                        UnsizedField::<#owned_type, #tag>
-                    }
-                }
-            })?
-        };
+        let field_inner_type = self.gen_union_field_type()?;
         let field_type: Type = parse2(quote! {
-            ::std::mem::ManuallyDrop::<
-                self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
-            >
+            ::std::mem::ManuallyDrop::<#field_inner_type>
         })?;
 
         Ok(Rc::new(
