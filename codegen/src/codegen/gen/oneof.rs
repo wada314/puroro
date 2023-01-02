@@ -34,7 +34,7 @@ pub trait OneofExt {
     fn gen_union_ident(&self) -> Result<Rc<Ident>>;
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
 
-    fn gen_union(&self) -> Result<Vec<Item>>;
+    fn gen_oneof_items(&self) -> Result<Vec<Item>>;
     fn gen_struct_field(&self) -> Result<Field>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
@@ -120,7 +120,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .cloned()
     }
 
-    fn gen_union(&self) -> Result<Vec<Item>> {
+    fn gen_oneof_items(&self) -> Result<Vec<Item>> {
         let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
         let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
