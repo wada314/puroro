@@ -184,10 +184,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
     fn gen_struct_field(&self) -> Result<Field> {
         let field_ident = self.gen_struct_field_ident()?;
-        let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = self.gen_union_ident()?;
+        let generic_params = self
+            .fields()?
+            .map(|f| f.gen_union_field_type())
+            .collect::<Result<Vec<_>>>()?;
+        let field_type = self.gen_union_type(generic_params.iter().cloned())?;
         Ok(parse2::<NamedField>(quote! {
-            #field_ident: #message_module :: #union_ident
+            #field_ident: #field_type
         })?
         .into())
     }
