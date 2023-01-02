@@ -27,7 +27,7 @@ use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub trait OneofFieldExt {
-    fn gen_union_item_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_union_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
@@ -36,7 +36,7 @@ pub trait OneofFieldExt {
 
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
-    fn gen_union_item_field(&self) -> Result<Rc<Field>>;
+    fn gen_union_field(&self) -> Result<Rc<Field>>;
     fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
@@ -44,17 +44,17 @@ pub trait OneofFieldExt {
 
 #[derive(Debug, Default)]
 struct Cache {
-    union_item_ident: OnceCell<Rc<Ident>>,
+    union_field_ident: OnceCell<Rc<Ident>>,
     union_gettr_ident: OnceCell<Rc<Ident>>,
     union_gettr_opt_ident: OnceCell<Rc<Ident>>,
     union_gettr_mut_ident: OnceCell<Rc<Ident>>,
 }
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
-    fn gen_union_item_ident(&self) -> Result<Rc<Ident>> {
+    fn gen_union_field_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
-            .union_item_ident
+            .union_field_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}",
@@ -116,8 +116,8 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
 
-    fn gen_union_item_field(&self) -> Result<Rc<Field>> {
-        let ident = self.gen_union_item_ident()?;
+    fn gen_union_field(&self) -> Result<Rc<Field>> {
+        let ident = self.gen_union_field_ident()?;
         let inner_type_name_segment: PathSegment = {
             use FieldType::*;
             use LengthDelimitedType::*;
@@ -178,7 +178,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let union_ident = self.oneof()?.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
-        let union_item_ident = self.gen_union_item_ident()?;
+        let union_item_ident = self.gen_union_field_ident()?;
         let enum_item_ident = self.gen_case_enum_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
@@ -309,7 +309,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     }
 
     fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
-        let ident = self.gen_union_item_ident()?;
+        let ident = self.gen_union_field_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
         Ok(parse2(quote! {
             #receiver.field(stringify!(#ident), &self.#getter_opt_ident())

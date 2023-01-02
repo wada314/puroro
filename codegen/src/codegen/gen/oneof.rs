@@ -123,7 +123,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_oneof_items(&self) -> Result<Vec<Item>> {
         let union_ident = self.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
-        let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
+        let union_fields = try_map_fields(self, |f| f.gen_union_field())?;
         let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
         let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
             .into_iter()
@@ -139,7 +139,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             parse2(quote! {
                 pub union #union_ident {
                     _none: (),
-                    #(#union_items),*,
+                    #(#union_fields),*,
                 }
             })?,
             parse2(quote! {
@@ -273,7 +273,7 @@ where
 fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let union_ident = this.gen_union_ident()?;
     let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
-    let union_item_idents = try_map_fields(this, |f| f.gen_union_item_ident())?;
+    let union_item_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
     let getter_mut_idents = try_map_fields(this, |f| f.gen_union_getter_mut_ident())?;
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
@@ -376,7 +376,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
 
 fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
-    let union_items = try_map_fields(this, |f| f.gen_union_item_field())?;
+    let union_items = try_map_fields(this, |f| f.gen_union_field())?;
     let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
