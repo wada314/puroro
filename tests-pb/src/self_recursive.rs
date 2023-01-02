@@ -11,7 +11,7 @@ pub struct Msg {
     recursive_unlabeled: self::_puroro::internal::field_type::SingularHeapMessageField::<
         self::_puroro_root::self_recursive::Msg,
     >,
-    _bitfield: self::_puroro::bitvec::BitArray<0usize>,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<0usize>,
 }
 impl Msg {
     pub fn recursive_unlabeled(
@@ -20,7 +20,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.recursive_unlabeled,
             &self._bitfield,
             ::std::default::Default::default,
@@ -43,7 +43,7 @@ impl Msg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::SingularHeapMessageField::<
             self::_puroro_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.recursive_unlabeled,
             &mut self._bitfield,
             ::std::default::Default::default,

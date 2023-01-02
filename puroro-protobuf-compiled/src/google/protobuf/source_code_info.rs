@@ -10,67 +10,78 @@ mod _puroro {
 pub struct Location {
     path: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i32,
-        self::_puroro::tags::Int32,
+        self::_puroro::internal::tags::Int32,
     >,
     span: self::_puroro::internal::field_type::RepeatedNumericalField::<
         i32,
-        self::_puroro::tags::Int32,
+        self::_puroro::internal::tags::Int32,
     >,
-    leading_comments: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
-    trailing_comments: self::_puroro::internal::field_type::OptionalStringField::<
+    leading_comments: self::_puroro::internal::field_type::OptionalUnsizedField::<
+        ::std::string::String,
+        self::_puroro::internal::tags::String,
+        0usize,
+    >,
+    trailing_comments: self::_puroro::internal::field_type::OptionalUnsizedField::<
+        ::std::string::String,
+        self::_puroro::internal::tags::String,
         1usize,
     >,
-    leading_detached_comments: self::_puroro::internal::field_type::RepeatedStringField,
-    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
+    leading_detached_comments: self::_puroro::internal::field_type::RepeatedUnsizedField::<
+        ::std::string::String,
+        self::_puroro::internal::tags::String,
+    >,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<1usize>,
 }
 impl Location {
     pub fn path(&self) -> &[i32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.path, &self._bitfield)
     }
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
-        > as RepeatedFieldType>::mut_field(&mut self.path, &mut self._bitfield)
+            self::_puroro::internal::tags::Int32,
+        > as RepeatedFieldType>::get_field_mut(&mut self.path, &mut self._bitfield)
     }
     pub fn clear_path(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as RepeatedFieldType>::clear(&mut self.path, &mut self._bitfield)
     }
     pub fn span(&self) -> &[i32] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as RepeatedFieldType>::get_field(&self.span, &self._bitfield)
     }
     pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
-        > as RepeatedFieldType>::mut_field(&mut self.span, &mut self._bitfield)
+            self::_puroro::internal::tags::Int32,
+        > as RepeatedFieldType>::get_field_mut(&mut self.span, &mut self._bitfield)
     }
     pub fn clear_span(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as RepeatedFieldType>::clear(&mut self.span, &mut self._bitfield)
     }
     pub fn leading_comments(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.leading_comments,
             &self._bitfield,
             ::std::default::Default::default,
@@ -78,7 +89,9 @@ impl Location {
     }
     pub fn leading_comments_opt(&self) -> ::std::option::Option::<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.leading_comments,
@@ -87,9 +100,11 @@ impl Location {
     }
     pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.leading_comments,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -97,7 +112,9 @@ impl Location {
     }
     pub fn has_leading_comments(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.leading_comments,
@@ -107,7 +124,9 @@ impl Location {
     }
     pub fn clear_leading_comments(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.leading_comments,
@@ -116,9 +135,11 @@ impl Location {
     }
     pub fn trailing_comments(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.trailing_comments,
             &self._bitfield,
             ::std::default::Default::default,
@@ -126,7 +147,9 @@ impl Location {
     }
     pub fn trailing_comments_opt(&self) -> ::std::option::Option::<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.trailing_comments,
@@ -135,9 +158,11 @@ impl Location {
     }
     pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.trailing_comments,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -145,7 +170,9 @@ impl Location {
     }
     pub fn has_trailing_comments(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.trailing_comments,
@@ -155,7 +182,9 @@ impl Location {
     }
     pub fn clear_trailing_comments(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.trailing_comments,
@@ -168,7 +197,10 @@ impl Location {
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::get_field(
+        <self::_puroro::internal::field_type::RepeatedUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as RepeatedFieldType>::get_field(
             &self.leading_detached_comments,
             &self._bitfield,
         )
@@ -177,14 +209,20 @@ impl Location {
         &mut self,
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::mut_field(
+        <self::_puroro::internal::field_type::RepeatedUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as RepeatedFieldType>::get_field_mut(
             &mut self.leading_detached_comments,
             &mut self._bitfield,
         )
     }
     pub fn clear_leading_detached_comments(&mut self) {
         use self::_puroro::internal::field_type::RepeatedFieldType;
-        <self::_puroro::internal::field_type::RepeatedStringField as RepeatedFieldType>::clear(
+        <self::_puroro::internal::field_type::RepeatedUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as RepeatedFieldType>::clear(
             &mut self.leading_detached_comments,
             &mut self._bitfield,
         )
@@ -211,7 +249,7 @@ impl self::_puroro::Message for Location {
                 1i32 => {
                     <self::_puroro::internal::field_type::RepeatedNumericalField::<
                         i32,
-                        self::_puroro::tags::Int32,
+                        self::_puroro::internal::tags::Int32,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.path,
                         &mut self._bitfield,
@@ -221,7 +259,7 @@ impl self::_puroro::Message for Location {
                 2i32 => {
                     <self::_puroro::internal::field_type::RepeatedNumericalField::<
                         i32,
-                        self::_puroro::tags::Int32,
+                        self::_puroro::internal::tags::Int32,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.span,
                         &mut self._bitfield,
@@ -229,7 +267,9 @@ impl self::_puroro::Message for Location {
                     )?
                 }
                 3i32 => {
-                    <self::_puroro::internal::field_type::OptionalStringField::<
+                    <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                        ::std::string::String,
+                        self::_puroro::internal::tags::String,
                         0usize,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.leading_comments,
@@ -238,7 +278,9 @@ impl self::_puroro::Message for Location {
                     )?
                 }
                 4i32 => {
-                    <self::_puroro::internal::field_type::OptionalStringField::<
+                    <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                        ::std::string::String,
+                        self::_puroro::internal::tags::String,
                         1usize,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.trailing_comments,
@@ -247,7 +289,10 @@ impl self::_puroro::Message for Location {
                     )?
                 }
                 6i32 => {
-                    <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    <self::_puroro::internal::field_type::RepeatedUnsizedField::<
+                        ::std::string::String,
+                        self::_puroro::internal::tags::String,
+                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.leading_detached_comments,
                         &mut self._bitfield,
                         field_data,
@@ -267,7 +312,7 @@ impl self::_puroro::Message for Location {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.path,
             &self._bitfield,
@@ -276,14 +321,16 @@ impl self::_puroro::Message for Location {
         )?;
         <self::_puroro::internal::field_type::RepeatedNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.span,
             &self._bitfield,
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.leading_comments,
@@ -291,7 +338,9 @@ impl self::_puroro::Message for Location {
             3i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             1usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.trailing_comments,
@@ -299,7 +348,10 @@ impl self::_puroro::Message for Location {
             4i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::RepeatedStringField as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_puroro::internal::field_type::RepeatedUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
+        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.leading_detached_comments,
             &self._bitfield,
             6i32,
@@ -313,21 +365,26 @@ impl ::std::clone::Clone for Location {
         Self {
             path: <self::_puroro::internal::field_type::RepeatedNumericalField::<
                 i32,
-                self::_puroro::tags::Int32,
+                self::_puroro::internal::tags::Int32,
             > as ::std::clone::Clone>::clone(&self.path),
             span: <self::_puroro::internal::field_type::RepeatedNumericalField::<
                 i32,
-                self::_puroro::tags::Int32,
+                self::_puroro::internal::tags::Int32,
             > as ::std::clone::Clone>::clone(&self.span),
-            leading_comments: <self::_puroro::internal::field_type::OptionalStringField::<
+            leading_comments: <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_puroro::internal::tags::String,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.leading_comments),
-            trailing_comments: <self::_puroro::internal::field_type::OptionalStringField::<
+            trailing_comments: <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_puroro::internal::tags::String,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.trailing_comments),
-            leading_detached_comments: <self::_puroro::internal::field_type::RepeatedStringField as ::std::clone::Clone>::clone(
-                &self.leading_detached_comments,
-            ),
+            leading_detached_comments: <self::_puroro::internal::field_type::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_puroro::internal::tags::String,
+            > as ::std::clone::Clone>::clone(&self.leading_detached_comments),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }

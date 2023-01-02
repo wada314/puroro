@@ -10,24 +10,24 @@ mod _puroro {
 pub struct Submsg {
     i32_required: self::_puroro::internal::field_type::OptionalNumericalField::<
         i32,
-        self::_puroro::tags::Int32,
+        self::_puroro::internal::tags::Int32,
         0usize,
     >,
     i64_required: self::_puroro::internal::field_type::OptionalNumericalField::<
         i64,
-        self::_puroro::tags::Int64,
+        self::_puroro::internal::tags::Int64,
         1usize,
     >,
-    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<1usize>,
 }
 impl Submsg {
     pub fn i32_required(&self) -> i32 {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i32_required,
             &self._bitfield,
             ::std::default::Default::default,
@@ -37,7 +37,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
     }
@@ -45,9 +45,9 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i32_required,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -57,7 +57,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
             .is_some()
@@ -66,7 +66,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.i32_required, &mut self._bitfield)
     }
@@ -74,9 +74,9 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.i64_required,
             &self._bitfield,
             ::std::default::Default::default,
@@ -86,7 +86,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
     }
@@ -94,9 +94,9 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.i64_required,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -106,7 +106,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
             .is_some()
@@ -115,7 +115,7 @@ impl Submsg {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
             1usize,
         > as NonRepeatedFieldType>::clear(&mut self.i64_required, &mut self._bitfield)
     }
@@ -141,7 +141,7 @@ impl self::_puroro::Message for Submsg {
                 1i32 => {
                     <self::_puroro::internal::field_type::OptionalNumericalField::<
                         i32,
-                        self::_puroro::tags::Int32,
+                        self::_puroro::internal::tags::Int32,
                         0usize,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.i32_required,
@@ -152,7 +152,7 @@ impl self::_puroro::Message for Submsg {
                 101i32 => {
                     <self::_puroro::internal::field_type::OptionalNumericalField::<
                         i64,
-                        self::_puroro::tags::Int64,
+                        self::_puroro::internal::tags::Int64,
                         1usize,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.i64_required,
@@ -174,7 +174,7 @@ impl self::_puroro::Message for Submsg {
         use self::_puroro::internal::oneof_type::OneofUnion as _;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i32,
-            self::_puroro::tags::Int32,
+            self::_puroro::internal::tags::Int32,
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.i32_required,
@@ -184,7 +184,7 @@ impl self::_puroro::Message for Submsg {
         )?;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             i64,
-            self::_puroro::tags::Int64,
+            self::_puroro::internal::tags::Int64,
             1usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.i64_required,
@@ -200,12 +200,12 @@ impl ::std::clone::Clone for Submsg {
         Self {
             i32_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
                 i32,
-                self::_puroro::tags::Int32,
+                self::_puroro::internal::tags::Int32,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.i32_required),
             i64_required: <self::_puroro::internal::field_type::OptionalNumericalField::<
                 i64,
-                self::_puroro::tags::Int64,
+                self::_puroro::internal::tags::Int64,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.i64_required),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),

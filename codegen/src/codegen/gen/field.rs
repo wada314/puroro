@@ -212,6 +212,12 @@ fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
             let tag_type = this.r#type()?.tag_type()?;
             let bitfield_index = bitfield_index_for_optional(this)?.unwrap_or(usize::MAX);
             let type_name_segment: PathSegment = parse2(match (this.rule()?, this.r#type()?) {
+                (Optional | Singular, LengthDelimited(Message(_))) => quote! {
+                    SingularHeapMessageField::<#primitive_type>
+                },
+                (Repeated, LengthDelimited(Message(_))) => quote! {
+                    RepeatedMessageField::<#primitive_type>
+                },
                 (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
                     OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
                 },
@@ -221,29 +227,14 @@ fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
                 (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
                     RepeatedNumericalField::<#primitive_type, #tag_type>
                 },
-                (Optional, LengthDelimited(String)) => quote! {
-                    OptionalStringField::<#bitfield_index>
+                (Optional, LengthDelimited(_)) => quote! {
+                    OptionalUnsizedField::<#primitive_type, #tag_type, #bitfield_index>
                 },
-                (Singular, LengthDelimited(String)) => quote! {
-                    SingularStringField
+                (Singular, LengthDelimited(_)) => quote! {
+                    SingularUnsizedField::<#primitive_type, #tag_type>
                 },
-                (Repeated, LengthDelimited(String)) => quote! {
-                    RepeatedStringField
-                },
-                (Optional, LengthDelimited(Bytes)) => quote! {
-                    OptionalBytesField::<#bitfield_index>
-                },
-                (Singular, LengthDelimited(Bytes)) => quote! {
-                    SingularBytesField
-                },
-                (Repeated, LengthDelimited(Bytes)) => quote! {
-                    RepeatedBytesField
-                },
-                (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                    SingularHeapMessageField::<#primitive_type>
-                },
-                (Repeated, LengthDelimited(Message(_))) => quote! {
-                    RepeatedMessageField::<#primitive_type>
+                (Repeated, LengthDelimited(_)) => quote! {
+                    RepeatedUnsizedField::<#primitive_type, #tag_type>
                 },
             })?;
             Ok(Rc::new(parse2(quote! {
@@ -307,7 +298,7 @@ fn gen_struct_field_methods_for_repeated(
         parse2(quote! {
             pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                 use self::_puroro::internal::field_type::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::mut_field(
+                <#field_type as RepeatedFieldType>::get_field_mut(
                     &mut self.#field_ident, &mut self._bitfield,
                 )
             }
@@ -356,7 +347,7 @@ fn gen_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #getter_ident(&self) -> #getter_type {
                use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field(
+                <#field_type as NonRepeatedFieldType>::get_field_or_else(
                     &self.#field_ident, &self._bitfield, #default_fn,
                 )
             }
@@ -372,7 +363,7 @@ fn gen_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                 use self::_puroro::internal::field_type::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::mut_field(
+                <#field_type as NonRepeatedFieldType>::get_field_mut(
                     &mut self.#field_ident, &mut self._bitfield, #default_fn,
                 )
             }

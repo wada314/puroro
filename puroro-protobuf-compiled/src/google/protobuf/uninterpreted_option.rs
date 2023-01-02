@@ -8,20 +8,26 @@ mod _puroro {
 }
 #[derive(::std::default::Default)]
 pub struct NamePart {
-    name_part: self::_puroro::internal::field_type::OptionalStringField::<0usize>,
+    name_part: self::_puroro::internal::field_type::OptionalUnsizedField::<
+        ::std::string::String,
+        self::_puroro::internal::tags::String,
+        0usize,
+    >,
     is_extension: self::_puroro::internal::field_type::OptionalNumericalField::<
         bool,
-        self::_puroro::tags::Bool,
+        self::_puroro::internal::tags::Bool,
         1usize,
     >,
-    _bitfield: self::_puroro::bitvec::BitArray<1usize>,
+    _bitfield: self::_puroro::internal::bitvec::BitArray<1usize>,
 }
 impl NamePart {
     pub fn name_part(&self) -> &str {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.name_part,
             &self._bitfield,
             ::std::default::Default::default,
@@ -29,15 +35,19 @@ impl NamePart {
     }
     pub fn name_part_opt(&self) -> ::std::option::Option::<&str> {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.name_part, &self._bitfield)
     }
     pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name_part,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -45,14 +55,18 @@ impl NamePart {
     }
     pub fn has_name_part(&self) -> bool {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.name_part, &self._bitfield)
             .is_some()
     }
     pub fn clear_name_part(&mut self) {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.name_part, &mut self._bitfield)
     }
@@ -60,9 +74,9 @@ impl NamePart {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
-            self::_puroro::tags::Bool,
+            self::_puroro::internal::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::get_field(
+        > as NonRepeatedFieldType>::get_field_or_else(
             &self.is_extension,
             &self._bitfield,
             ::std::default::Default::default,
@@ -72,7 +86,7 @@ impl NamePart {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
-            self::_puroro::tags::Bool,
+            self::_puroro::internal::tags::Bool,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.is_extension, &self._bitfield)
     }
@@ -80,9 +94,9 @@ impl NamePart {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
-            self::_puroro::tags::Bool,
+            self::_puroro::internal::tags::Bool,
             1usize,
-        > as NonRepeatedFieldType>::mut_field(
+        > as NonRepeatedFieldType>::get_field_mut(
             &mut self.is_extension,
             &mut self._bitfield,
             ::std::default::Default::default,
@@ -92,7 +106,7 @@ impl NamePart {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
-            self::_puroro::tags::Bool,
+            self::_puroro::internal::tags::Bool,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.is_extension, &self._bitfield)
             .is_some()
@@ -101,7 +115,7 @@ impl NamePart {
         use self::_puroro::internal::field_type::NonRepeatedFieldType;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
-            self::_puroro::tags::Bool,
+            self::_puroro::internal::tags::Bool,
             1usize,
         > as NonRepeatedFieldType>::clear(&mut self.is_extension, &mut self._bitfield)
     }
@@ -125,7 +139,9 @@ impl self::_puroro::Message for NamePart {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_puroro::internal::field_type::OptionalStringField::<
+                    <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                        ::std::string::String,
+                        self::_puroro::internal::tags::String,
                         0usize,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.name_part,
@@ -136,7 +152,7 @@ impl self::_puroro::Message for NamePart {
                 2i32 => {
                     <self::_puroro::internal::field_type::OptionalNumericalField::<
                         bool,
-                        self::_puroro::tags::Bool,
+                        self::_puroro::internal::tags::Bool,
                         1usize,
                     > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
                         &mut self.is_extension,
@@ -156,7 +172,9 @@ impl self::_puroro::Message for NamePart {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalStringField::<
+        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_puroro::internal::tags::String,
             0usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.name_part,
@@ -166,7 +184,7 @@ impl self::_puroro::Message for NamePart {
         )?;
         <self::_puroro::internal::field_type::OptionalNumericalField::<
             bool,
-            self::_puroro::tags::Bool,
+            self::_puroro::internal::tags::Bool,
             1usize,
         > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
             &self.is_extension,
@@ -180,12 +198,14 @@ impl self::_puroro::Message for NamePart {
 impl ::std::clone::Clone for NamePart {
     fn clone(&self) -> Self {
         Self {
-            name_part: <self::_puroro::internal::field_type::OptionalStringField::<
+            name_part: <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_puroro::internal::tags::String,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.name_part),
             is_extension: <self::_puroro::internal::field_type::OptionalNumericalField::<
                 bool,
-                self::_puroro::tags::Bool,
+                self::_puroro::internal::tags::Bool,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.is_extension),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),

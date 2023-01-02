@@ -123,6 +123,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             use LengthDelimitedType::*;
             let r#type = self.r#type()?;
             parse2(match r#type {
+                LengthDelimited(Message(m)) => {
+                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                    quote! {
+                        HeapMessageField::< #message_path >
+                    }
+                }
                 Variant(_) | Bits32(_) | Bits64(_) => {
                     let primitive = r#type.rust_type()?;
                     let tag = r#type.tag_type()?;
@@ -130,12 +136,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                         NumericalField::<#primitive, #tag>
                     }
                 }
-                LengthDelimited(Bytes) => quote! { BytesField },
-                LengthDelimited(String) => quote! { StringField },
-                LengthDelimited(Message(m)) => {
-                    let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                LengthDelimited(_) => {
+                    let owned_type = r#type.rust_type()?;
+                    let tag = r#type.tag_type()?;
                     quote! {
-                        HeapMessageField::< #message_path >
+                        UnsizedField::<#owned_type, #tag>
                     }
                 }
             })?
@@ -181,10 +186,10 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         Ok(vec![
             parse2(quote! {
-                pub(crate) fn #getter_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
+                pub(crate) fn #getter_ident<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
                     #[allow(unused)] use ::std::default::Default;
-                    use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
                     use self::_puroro::internal::oneof_type::OneofCase as _;
 
@@ -194,13 +199,13 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                             self.#union_item_ident.deref()
                         }
                     });
-                    OneofFieldTypeOpt::get_field(item_opt, #default_fn)
+                    OneofFieldType::get_field_or_else(item_opt, #default_fn)
                 }
             })?,
             parse2(quote! {
-                pub(crate) fn #getter_opt_ident<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
+                pub(crate) fn #getter_opt_ident<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
-                    use self::_puroro::internal::oneof_field_type::OneofFieldTypeOpt;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
                     use self::_puroro::internal::oneof_type::OneofCase as _;
 
@@ -210,11 +215,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                             self.#union_item_ident.deref()
                         }
                     });
-                    OneofFieldTypeOpt::get_field_opt(item_opt)
+                    OneofFieldType::get_field_opt(item_opt)
                 }
             })?,
             parse2(quote! {
-                pub(crate) fn #getter_mut_ident<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
+                pub(crate) fn #getter_mut_ident<B: self::_puroro::internal::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
                     #[allow(unused)] use ::std::option::Option::Some;
                     #[allow(unused)] use ::std::default::Default;
                     use ::std::mem::ManuallyDrop;
@@ -235,7 +240,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     }
                     unsafe {
                         &mut self.#union_item_ident
-                    }.mut_field()
+                    }.get_field_mut()
                 }
             })?,
         ])

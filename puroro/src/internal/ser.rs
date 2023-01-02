@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::tags;
 use crate::internal::variant::Variant;
-use crate::tags;
 use crate::{ErrorKind, PuroroError, Result};
 use ::std::convert::TryFrom;
 use ::std::io::{Result as IoResult, Write};

@@ -13,24 +13,24 @@
 // limitations under the License.
 
 use super::*;
-use crate::bitvec::BitSlice;
-use crate::tags;
+use crate::internal::bitvec::BitSlice;
+use crate::internal::tags;
 use crate::Message;
 
 pub trait RepeatedFieldType: FieldType {
     type ScalarType;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
     type ContainerType;
-    fn mut_field<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
+    fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }
 
-impl<RustType, ProtoType> RepeatedFieldType for RepeatedNumericalField<RustType, ProtoType>
+impl<ProtoType> RepeatedFieldType for RepeatedNumericalField<ProtoType::RustType, ProtoType>
 where
-    RustType: PartialEq + Default + Clone,
-    ProtoType: tags::NumericalType<RustType = RustType>,
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::NumericalType,
 {
-    type ScalarType = RustType;
+    type ScalarType = ProtoType::RustType;
 
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
@@ -38,7 +38,7 @@ where
 
     type ContainerType = Vec<Self::ScalarType>;
 
-    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
 
@@ -46,28 +46,17 @@ where
         self.0.clear()
     }
 }
-
-impl RepeatedFieldType for RepeatedStringField {
-    type ScalarType = String;
+impl<ProtoType> RepeatedFieldType for RepeatedUnsizedField<ProtoType::RustType, ProtoType>
+where
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::UnsizedType,
+{
+    type ScalarType = ProtoType::RustType;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
     type ContainerType = Vec<Self::ScalarType>;
-    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
-        &mut self.0
-    }
-    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0.clear()
-    }
-}
-
-impl RepeatedFieldType for RepeatedBytesField {
-    type ScalarType = Vec<u8>;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
-        self.0.as_slice()
-    }
-    type ContainerType = Vec<Self::ScalarType>;
-    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
@@ -83,7 +72,7 @@ impl<M: Message + Default + Clone> RepeatedFieldType for RepeatedMessageField<M>
 
     type ContainerType = Vec<Self::ScalarType>;
 
-    fn mut_field<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
 

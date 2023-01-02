@@ -288,7 +288,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
             type Case = self::#case_ident;
             type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>;
 
-            fn case_ref<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B)
+            fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B)
                 -> ::std::option::Option<Self::CaseRef<'_>>
             {
                 use self::_puroro::internal::oneof_type::OneofCase;
@@ -305,7 +305,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 })
             }
 
-            fn clear<B: self::_puroro::bitvec::BitSlice>(&mut self, bits: &mut B) {
+            fn clear<B: self::_puroro::internal::bitvec::BitSlice>(&mut self, bits: &mut B) {
                 use self::_puroro::internal::oneof_type::OneofCase;
                 use ::std::mem::ManuallyDrop;
                 #[allow(unused)] use ::std::option::Option::Some;
@@ -318,7 +318,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 bits.set_range(#bitfield_begin..#bitfield_end, 0);
             }
 
-            fn clone<B: self::_puroro::bitvec::BitSlice>(&self, bits: &B) -> Self {
+            fn clone<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> Self {
                 use self::_puroro::internal::oneof_type::OneofCase;
                 #[allow(unused)] use ::std::option::Option::Some;
                 #[allow(unused)] use ::std::clone::Clone;
@@ -338,7 +338,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
             ) -> self::_puroro::Result<()>
             where
                 I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-                B: self::_puroro::bitvec::BitSlice,
+                B: self::_puroro::internal::bitvec::BitSlice,
             {
                 use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 #[allow(unused)] use ::std::result::Result::Ok;
@@ -354,7 +354,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
             fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
             where
                 W: ::std::io::Write,
-                B: self::_puroro::bitvec::BitSlice
+                B: self::_puroro::internal::bitvec::BitSlice
             {
                 #[allow(unused)] use ::std::option::Option::Some;
                 #[allow(unused)] use ::std::result::Result::Ok;
