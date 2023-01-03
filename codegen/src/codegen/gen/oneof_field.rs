@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::field::gen_default_fn;
 use super::PackageOrMessageExt;
-use super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField};
+use super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField, PURORO_INTERNAL};
 use crate::syn::{
     parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
     Type,
@@ -147,7 +147,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     })?
                 };
                 Ok(Rc::new(parse2(quote! {
-                    self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
+                    #PURORO_INTERNAL::oneof_field_type:: #inner_type_name_segment
                 })?))
             })
             .cloned()
@@ -178,15 +178,15 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         let generic_param_type_ident = self.gen_union_generic_param_ident()?;
         let getter_type: Type = parse2(quote! {
-            <#generic_param_type_ident as self::_puroro::internal::oneof_field_type::OneofFieldType>
+            <#generic_param_type_ident as #PURORO_INTERNAL::oneof_field_type::OneofFieldType>
                 ::GetterOrElseType<'_>
         })?;
         let getter_opt_type: Type = parse2(quote! {
-            <#generic_param_type_ident as self::_puroro::internal::oneof_field_type::OneofFieldType>
+            <#generic_param_type_ident as #PURORO_INTERNAL::oneof_field_type::OneofFieldType>
                 ::GetterOptType<'_>
         })?;
         let getter_mut_type: Type = parse2(quote! {
-            <#generic_param_type_ident as self::_puroro::internal::oneof_field_type::OneofFieldType>
+            <#generic_param_type_ident as #PURORO_INTERNAL::oneof_field_type::OneofFieldType>
                 ::GetterMutType<'_>
         })?;
 
@@ -200,12 +200,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         Ok(vec![
             parse2(quote! {
-                pub(crate) fn #getter_ident<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
+                pub(crate) fn #getter_ident<B: #PURORO_INTERNAL::bitvec::BitSlice>(&self, bits: &B) -> #getter_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
                     #[allow(unused)] use ::std::default::Default;
-                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
+                    use #PURORO_INTERNAL::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
-                    use self::_puroro::internal::oneof_type::OneofCase as _;
+                    use #PURORO_INTERNAL::oneof_type::OneofCase as _;
 
                     let case_opt = self::#case_ident::from_bitslice(bits);
                     let field_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
@@ -217,11 +217,11 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 }
             })?,
             parse2(quote! {
-                pub(crate) fn #getter_opt_ident<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
+                pub(crate) fn #getter_opt_ident<B: #PURORO_INTERNAL::bitvec::BitSlice>(&self, bits: &B) -> #getter_opt_type {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
-                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
+                    use #PURORO_INTERNAL::oneof_field_type::OneofFieldType;
                     use ::std::ops::Deref as _;
-                    use self::_puroro::internal::oneof_type::OneofCase as _;
+                    use #PURORO_INTERNAL::oneof_type::OneofCase as _;
 
                     let case_opt = self::#case_ident::from_bitslice(bits);
                     let field_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
@@ -233,13 +233,13 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 }
             })?,
             parse2(quote! {
-                pub(crate) fn #getter_mut_ident<B: self::_puroro::internal::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
+                pub(crate) fn #getter_mut_ident<B: #PURORO_INTERNAL::bitvec::BitSlice>(&mut self, bits: &mut B) -> #getter_mut_type {
                     #[allow(unused)] use ::std::option::Option::Some;
                     #[allow(unused)] use ::std::default::Default;
                     use ::std::mem::ManuallyDrop;
                     use ::std::ops::DerefMut as _;
-                    use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
+                    use #PURORO_INTERNAL::oneof_type::{OneofCase as _, OneofUnion};
+                    use #PURORO_INTERNAL::oneof_field_type::OneofFieldType;
 
                     let case_opt = self::#case_ident::from_bitslice(bits);
                     if let Some(self::#case_ident::#enum_item_ident(())) = case_opt {
@@ -314,8 +314,8 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     #[allow(unused)] use ::std::option::Option::Some;
-                    use self::_puroro::internal::oneof_type::OneofCase;
-                    use self::_puroro::internal::oneof_type::OneofUnion;
+                    use #PURORO_INTERNAL::oneof_type::OneofCase;
+                    use #PURORO_INTERNAL::oneof_type::OneofUnion;
                     if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
                         self.#oneof_struct_field_ident.clear(&mut self._bitfield)
                     }

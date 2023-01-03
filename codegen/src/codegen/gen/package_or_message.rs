@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{EnumExt, MessageExt, OneofExt, PackageOrMessage};
+use super::{
+    EnumExt, MessageExt, OneofExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_ROOT,
+    PURORO_ROOT_IDENT,
+};
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
 use ::itertools::Itertools;
@@ -106,7 +109,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                     );
                     quote! { #parent_path :: #ident }
                 } else {
-                    quote! { self :: _puroro_root }
+                    quote! { #PURORO_ROOT }
                 };
                 Ok(Rc::new(parse2(ts)?))
             })
@@ -123,16 +126,16 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
                 pub use ::puroro::*;
 
-                mod _puroro_root {
+                mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
                     pub(crate) use super::*;
                 }
             }
         } else {
             quote! {
-                mod _puroro_root {
+                mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
-                    pub(crate) use super::super::_puroro_root::*;
+                    pub(crate) use super::super::#PURORO_ROOT_IDENT::*;
                 }
             }
         };
@@ -163,6 +166,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 #[allow(unused)]
                 pub(crate) use ::puroro::*;
             }
+            mod #PURORO_INTERNAL_IDENT {
+                #[allow(unused)]
+                pub(crate) use ::puroro::internal::*;
+            }
             #(pub mod #submodule_idents;)*
             #(#content_items)*
         })?)
@@ -171,16 +178,16 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
     fn gen_inline_code(&self) -> Result<TokenStream> {
         let header = if self.is_root()? {
             quote! {
-                mod _puroro_root {
+                mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
                     pub(crate) use super::*;
                 }
             }
         } else {
             quote! {
-                mod _puroro_root {
+                mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
-                    pub(crate) use super::super::_puroro_root::*;
+                    pub(crate) use super::super::#PURORO_ROOT_IDENT::*;
                 }
             }
         };
@@ -224,6 +231,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             mod _puroro {
                 #[allow(unused)]
                 pub(crate) use ::puroro::*;
+            }
+            mod #PURORO_INTERNAL_IDENT {
+                #[allow(unused)]
+                pub(crate) use ::puroro::internal::*;
             }
             #(pub mod #submodule_idents {
                 #submodule_contents
