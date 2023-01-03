@@ -151,6 +151,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .collect::<Vec<_>>();
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
         let generic_params = try_map_fields(self, |f| f.gen_union_generic_param_ident())?;
+        let generic_param_bounds =
+            try_map_fields(self, |f| f.gen_union_generic_param_where_bounds())?;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
         let oneof_case_impl = gen_oneof_case_impl(self)?;
@@ -173,9 +175,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             })?,
             parse2(quote! {
                 impl< #(#generic_params),* > #union_ident< #(#generic_params),* >
-                where #(
-                    #generic_params: _puroro::internal::oneof_field_type::OneofFieldType,
-                )*
+                where
+                    #(#generic_param_bounds,)*
                 {
                     #(#union_methods)*
                 }
@@ -314,15 +315,14 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let generic_params = try_map_fields(this, |f| f.gen_union_generic_param_ident())?;
+    let generic_param_bounds = try_map_fields(this, |f| f.gen_union_generic_param_where_bounds())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
 
     Ok(parse2(quote! {
         impl< #(#generic_params),* > #PURORO_INTERNAL::oneof_type::OneofUnion
         for #union_ident< #(#generic_params),* >
-        where #(
-            #generic_params: _puroro::internal::oneof_field_type::OneofFieldType,
-        )*
+        where #( #generic_param_bounds, )*
         {
             type Case = self::#case_ident;
             type CaseRef<'a> = self::#case_ident::<#(

@@ -22,6 +22,7 @@ use crate::syn::{
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
+use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
@@ -32,6 +33,8 @@ pub trait OneofFieldExt {
     fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_generic_param_ident(&self) -> Result<Ident>;
+    // `syn::PredicateType` does not impl `syn::parse::Parse`...
+    fn gen_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
 
     fn gen_union_field_type(&self) -> Result<Rc<Type>>;
@@ -50,6 +53,7 @@ struct Cache {
     union_gettr_ident: OnceCell<Rc<Ident>>,
     union_gettr_opt_ident: OnceCell<Rc<Ident>>,
     union_gettr_mut_ident: OnceCell<Rc<Ident>>,
+    union_generic_param_where_bounds: OnceCell<Rc<TokenStream>>,
 }
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
@@ -106,6 +110,18 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             "T{}",
             self.name()?.to_camel_case().escape_rust_keywords()
         ))
+    }
+    fn gen_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_generic_param_where_bounds
+            .get_or_try_init(|| {
+                let ident = self.gen_union_generic_param_ident()?;
+                Ok(Rc::new(quote! {
+                    #ident: #PURORO_INTERNAL::oneof_field_type::OneofFieldType
+                }))
+            })
+            .cloned()
     }
     fn gen_case_enum_value_ident(&self) -> Result<Ident> {
         Ok(format_ident!(

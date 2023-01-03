@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    EnumExt, MessageExt, OneofExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_ROOT,
-    PURORO_ROOT_IDENT,
+    EnumExt, MessageExt, OneofExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT,
+    PURORO_ROOT, PURORO_ROOT_IDENT,
 };
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
@@ -162,7 +162,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
         let content_items = gen_messages_enums_oneofs_in_module(self)?;
         Ok(parse2(quote! {
             #header
-            mod _puroro {
+            mod #PURORO_LIB_IDENT {
                 #[allow(unused)]
                 pub(crate) use ::puroro::*;
             }
@@ -228,7 +228,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
 
         Ok(quote! {
             #header
-            mod _puroro {
+            mod #PURORO_LIB_IDENT {
                 #[allow(unused)]
                 pub(crate) use ::puroro::*;
             }
