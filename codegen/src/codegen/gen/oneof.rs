@@ -335,7 +335,6 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
             {
                 use self::_puroro::internal::oneof_type::OneofCase;
                 use ::std::mem::ManuallyDrop;
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 use ::std::ops::Deref as _;
                 let case_opt = <self::#case_ident as OneofCase>::from_bitslice(bits);
                 case_opt.map(|case| {
@@ -382,7 +381,6 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 B: self::_puroro::internal::bitvec::BitSlice,
             {
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 #[allow(unused)] use ::std::result::Result::Ok;
                 match case {
                     #(Self::Case::#case_names(_) => {
@@ -401,7 +399,6 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 #[allow(unused)] use ::std::option::Option::Some;
                 #[allow(unused)] use ::std::result::Result::Ok;
                 use self::_puroro::internal::oneof_type::OneofCase as _;
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 match self::#case_ident::from_bitslice(bitvec) {
                     #(Some(self::#case_ident::#case_names(_)) => {
                         unsafe { &self.#union_item_idents }.ser_to_write(

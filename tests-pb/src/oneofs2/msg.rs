@@ -35,9 +35,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32(())))
+        let field_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32(())))
             .then(|| { unsafe { self.g1_int32.deref() } });
-        OneofFieldType::get_field_or_else(item_opt, ::std::default::Default::default)
+        OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
     pub(crate) fn g1_int32_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -51,9 +51,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32(())))
+        let field_opt = matches!(case_opt, Some(self::GroupOneCase::G1Int32(())))
             .then(|| { unsafe { self.g1_int32.deref() } });
-        OneofFieldType::get_field_opt(item_opt)
+        OneofFieldType::get_field_opt(field_opt)
     }
     pub(crate) fn g1_int32_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
@@ -66,8 +66,9 @@ where
         #[allow(unused)]
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
+        use ::std::ops::DerefMut as _;
         use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
         let case_opt = self::GroupOneCase::from_bitslice(bits);
         if let Some(self::GroupOneCase::G1Int32(())) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
@@ -77,7 +78,8 @@ where
                 g1_int32: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
-        unsafe { &mut self.g1_int32 }.get_field_mut()
+        let field_mut = unsafe { self.g1_int32.deref_mut() };
+        OneofFieldType::get_field_mut(field_mut)
     }
     pub(crate) fn g1_string<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -93,9 +95,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
+        let field_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
             .then(|| { unsafe { self.g1_string.deref() } });
-        OneofFieldType::get_field_or_else(item_opt, ::std::default::Default::default)
+        OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
     pub(crate) fn g1_string_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -109,9 +111,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupOneCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
+        let field_opt = matches!(case_opt, Some(self::GroupOneCase::G1String(())))
             .then(|| { unsafe { self.g1_string.deref() } });
-        OneofFieldType::get_field_opt(item_opt)
+        OneofFieldType::get_field_opt(field_opt)
     }
     pub(crate) fn g1_string_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
@@ -124,8 +126,9 @@ where
         #[allow(unused)]
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
+        use ::std::ops::DerefMut as _;
         use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
         let case_opt = self::GroupOneCase::from_bitslice(bits);
         if let Some(self::GroupOneCase::G1String(())) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
@@ -135,7 +138,8 @@ where
                 g1_string: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
-        unsafe { &mut self.g1_string }.get_field_mut()
+        let field_mut = unsafe { self.g1_string.deref_mut() };
+        OneofFieldType::get_field_mut(field_mut)
     }
 }
 impl<TG1Int32, TG1String> self::_puroro::internal::oneof_type::OneofUnion
@@ -162,7 +166,6 @@ where
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
         use self::_puroro::internal::oneof_type::OneofCase;
         use ::std::mem::ManuallyDrop;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         use ::std::ops::Deref as _;
         let case_opt = <self::GroupOneCase as OneofCase>::from_bitslice(bits);
         case_opt
@@ -227,7 +230,6 @@ where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         B: self::_puroro::internal::bitvec::BitSlice,
     {
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         #[allow(unused)]
         use ::std::result::Result::Ok;
         match case {
@@ -252,7 +254,6 @@ where
         #[allow(unused)]
         use ::std::result::Result::Ok;
         use self::_puroro::internal::oneof_type::OneofCase as _;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         match self::GroupOneCase::from_bitslice(bitvec) {
             Some(self::GroupOneCase::G1Int32(_)) => {
                 unsafe { &self.g1_int32 }.ser_to_write(1i32, out)?;
@@ -319,9 +320,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32(())))
+        let field_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32(())))
             .then(|| { unsafe { self.g2_f32.deref() } });
-        OneofFieldType::get_field_or_else(item_opt, ::std::default::Default::default)
+        OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
     pub(crate) fn g2_f32_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -335,9 +336,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32(())))
+        let field_opt = matches!(case_opt, Some(self::GroupTwoCase::G2F32(())))
             .then(|| { unsafe { self.g2_f32.deref() } });
-        OneofFieldType::get_field_opt(item_opt)
+        OneofFieldType::get_field_opt(field_opt)
     }
     pub(crate) fn g2_f32_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
@@ -350,8 +351,9 @@ where
         #[allow(unused)]
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
+        use ::std::ops::DerefMut as _;
         use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
         if let Some(self::GroupTwoCase::G2F32(())) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
@@ -361,7 +363,8 @@ where
                 g2_f32: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
-        unsafe { &mut self.g2_f32 }.get_field_mut()
+        let field_mut = unsafe { self.g2_f32.deref_mut() };
+        OneofFieldType::get_field_mut(field_mut)
     }
     pub(crate) fn g2_string<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -377,9 +380,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String(())))
+        let field_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String(())))
             .then(|| { unsafe { self.g2_string.deref() } });
-        OneofFieldType::get_field_or_else(item_opt, ::std::default::Default::default)
+        OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
     pub(crate) fn g2_string_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -393,9 +396,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String(())))
+        let field_opt = matches!(case_opt, Some(self::GroupTwoCase::G2String(())))
             .then(|| { unsafe { self.g2_string.deref() } });
-        OneofFieldType::get_field_opt(item_opt)
+        OneofFieldType::get_field_opt(field_opt)
     }
     pub(crate) fn g2_string_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
@@ -408,8 +411,9 @@ where
         #[allow(unused)]
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
+        use ::std::ops::DerefMut as _;
         use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
         if let Some(self::GroupTwoCase::G2String(())) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
@@ -419,7 +423,8 @@ where
                 g2_string: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
-        unsafe { &mut self.g2_string }.get_field_mut()
+        let field_mut = unsafe { self.g2_string.deref_mut() };
+        OneofFieldType::get_field_mut(field_mut)
     }
     pub(crate) fn g2_submsg<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -435,9 +440,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
+        let field_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
             .then(|| { unsafe { self.g2_submsg.deref() } });
-        OneofFieldType::get_field_or_else(item_opt, ::std::default::Default::default)
+        OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
     pub(crate) fn g2_submsg_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -451,9 +456,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
+        let field_opt = matches!(case_opt, Some(self::GroupTwoCase::G2Submsg(())))
             .then(|| { unsafe { self.g2_submsg.deref() } });
-        OneofFieldType::get_field_opt(item_opt)
+        OneofFieldType::get_field_opt(field_opt)
     }
     pub(crate) fn g2_submsg_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
@@ -466,8 +471,9 @@ where
         #[allow(unused)]
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
+        use ::std::ops::DerefMut as _;
         use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
         let case_opt = self::GroupTwoCase::from_bitslice(bits);
         if let Some(self::GroupTwoCase::G2Submsg(())) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
@@ -477,7 +483,8 @@ where
                 g2_submsg: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
-        unsafe { &mut self.g2_submsg }.get_field_mut()
+        let field_mut = unsafe { self.g2_submsg.deref_mut() };
+        OneofFieldType::get_field_mut(field_mut)
     }
 }
 impl<TG2F32, TG2String, TG2Submsg> self::_puroro::internal::oneof_type::OneofUnion
@@ -508,7 +515,6 @@ where
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
         use self::_puroro::internal::oneof_type::OneofCase;
         use ::std::mem::ManuallyDrop;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         use ::std::ops::Deref as _;
         let case_opt = <self::GroupTwoCase as OneofCase>::from_bitslice(bits);
         case_opt
@@ -586,7 +592,6 @@ where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         B: self::_puroro::internal::bitvec::BitSlice,
     {
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         #[allow(unused)]
         use ::std::result::Result::Ok;
         match case {
@@ -615,7 +620,6 @@ where
         #[allow(unused)]
         use ::std::result::Result::Ok;
         use self::_puroro::internal::oneof_type::OneofCase as _;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         match self::GroupTwoCase::from_bitslice(bitvec) {
             Some(self::GroupTwoCase::G2F32(_)) => {
                 unsafe { &self.g2_f32 }.ser_to_write(3i32, out)?;
@@ -682,9 +686,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupThreeCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
+        let field_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
             .then(|| { unsafe { self.g3_int32.deref() } });
-        OneofFieldType::get_field_or_else(item_opt, ::std::default::Default::default)
+        OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
     pub(crate) fn g3_int32_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
@@ -698,9 +702,9 @@ where
         use ::std::ops::Deref as _;
         use self::_puroro::internal::oneof_type::OneofCase as _;
         let case_opt = self::GroupThreeCase::from_bitslice(bits);
-        let item_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
+        let field_opt = matches!(case_opt, Some(self::GroupThreeCase::G3Int32(())))
             .then(|| { unsafe { self.g3_int32.deref() } });
-        OneofFieldType::get_field_opt(item_opt)
+        OneofFieldType::get_field_opt(field_opt)
     }
     pub(crate) fn g3_int32_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
@@ -713,8 +717,9 @@ where
         #[allow(unused)]
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
+        use ::std::ops::DerefMut as _;
         use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+        use self::_puroro::internal::oneof_field_type::OneofFieldType;
         let case_opt = self::GroupThreeCase::from_bitslice(bits);
         if let Some(self::GroupThreeCase::G3Int32(())) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
@@ -726,7 +731,8 @@ where
                 g3_int32: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
-        unsafe { &mut self.g3_int32 }.get_field_mut()
+        let field_mut = unsafe { self.g3_int32.deref_mut() };
+        OneofFieldType::get_field_mut(field_mut)
     }
 }
 impl<TG3Int32> self::_puroro::internal::oneof_type::OneofUnion for GroupThree<TG3Int32>
@@ -748,7 +754,6 @@ where
     ) -> ::std::option::Option<Self::CaseRef<'_>> {
         use self::_puroro::internal::oneof_type::OneofCase;
         use ::std::mem::ManuallyDrop;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         use ::std::ops::Deref as _;
         let case_opt = <self::GroupThreeCase as OneofCase>::from_bitslice(bits);
         case_opt
@@ -800,7 +805,6 @@ where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         B: self::_puroro::internal::bitvec::BitSlice,
     {
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         #[allow(unused)]
         use ::std::result::Result::Ok;
         match case {
@@ -821,7 +825,6 @@ where
         #[allow(unused)]
         use ::std::result::Result::Ok;
         use self::_puroro::internal::oneof_type::OneofCase as _;
-        use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
         match self::GroupThreeCase::from_bitslice(bitvec) {
             Some(self::GroupThreeCase::G3Int32(_)) => {
                 unsafe { &self.g3_int32 }.ser_to_write(6i32, out)?;

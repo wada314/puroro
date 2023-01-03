@@ -192,7 +192,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
         let union_ident = self.oneof()?.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
-        let union_item_ident = self.gen_union_field_ident()?;
+        let union_field_ident = self.gen_union_field_ident()?;
         let enum_item_ident = self.gen_case_enum_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
@@ -208,12 +208,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     use self::_puroro::internal::oneof_type::OneofCase as _;
 
                     let case_opt = self::#case_ident::from_bitslice(bits);
-                    let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                    let field_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
                         unsafe {
-                            self.#union_item_ident.deref()
+                            self.#union_field_ident.deref()
                         }
                     });
-                    OneofFieldType::get_field_or_else(item_opt, #default_fn)
+                    OneofFieldType::get_field_or_else(field_opt, #default_fn)
                 }
             })?,
             parse2(quote! {
@@ -224,12 +224,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     use self::_puroro::internal::oneof_type::OneofCase as _;
 
                     let case_opt = self::#case_ident::from_bitslice(bits);
-                    let item_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                    let field_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
                         unsafe {
-                            self.#union_item_ident.deref()
+                            self.#union_field_ident.deref()
                         }
                     });
-                    OneofFieldType::get_field_opt(item_opt)
+                    OneofFieldType::get_field_opt(field_opt)
                 }
             })?,
             parse2(quote! {
@@ -237,8 +237,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     #[allow(unused)] use ::std::option::Option::Some;
                     #[allow(unused)] use ::std::default::Default;
                     use ::std::mem::ManuallyDrop;
+                    use ::std::ops::DerefMut as _;
                     use self::_puroro::internal::oneof_type::{OneofCase as _, OneofUnion};
-                    use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
+                    use self::_puroro::internal::oneof_field_type::OneofFieldType;
 
                     let case_opt = self::#case_ident::from_bitslice(bits);
                     if let Some(self::#case_ident::#enum_item_ident(())) = case_opt {
@@ -249,12 +250,13 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                         let index = self::#case_ident::into_u32(self::#case_ident::#enum_item_ident(()));
                         bits.set_range(#bitfield_begin..#bitfield_end, index);
                         *self = self::#union_ident {
-                            #union_item_ident: ManuallyDrop::new((#default_fn)())
+                            #union_field_ident: ManuallyDrop::new((#default_fn)())
                         };
                     }
-                    unsafe {
-                        &mut self.#union_item_ident
-                    }.get_field_mut()
+                    let field_mut = unsafe {
+                        self.#union_field_ident.deref_mut()
+                    };
+                    OneofFieldType::get_field_mut(field_mut)
                 }
             })?,
         ])
