@@ -32,7 +32,7 @@ pub trait OneofFieldExt {
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_generic_param_ident(&self) -> Result<Ident>;
+    fn gen_union_generic_param_ident(&self) -> Result<Rc<Ident>>;
     // `syn::PredicateType` does not impl `syn::parse::Parse`...
     fn gen_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
@@ -50,9 +50,10 @@ pub trait OneofFieldExt {
 struct Cache {
     union_field_ident: OnceCell<Rc<Ident>>,
     union_field_type: OnceCell<Rc<Type>>,
-    union_gettr_ident: OnceCell<Rc<Ident>>,
-    union_gettr_opt_ident: OnceCell<Rc<Ident>>,
-    union_gettr_mut_ident: OnceCell<Rc<Ident>>,
+    union_getter_ident: OnceCell<Rc<Ident>>,
+    union_getter_opt_ident: OnceCell<Rc<Ident>>,
+    union_getter_mut_ident: OnceCell<Rc<Ident>>,
+    union_generic_param_ident: OnceCell<Rc<Ident>>,
     union_generic_param_where_bounds: OnceCell<Rc<TokenStream>>,
 }
 
@@ -72,7 +73,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
-            .union_gettr_ident
+            .union_getter_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}",
@@ -84,7 +85,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
-            .union_gettr_opt_ident
+            .union_getter_opt_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}_opt",
@@ -96,7 +97,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
-            .union_gettr_mut_ident
+            .union_getter_mut_ident
             .get_or_try_init(|| {
                 Ok(Rc::new(format_ident!(
                     "{}_mut",
@@ -105,11 +106,17 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_generic_param_ident(&self) -> Result<Ident> {
-        Ok(format_ident!(
-            "T{}",
-            self.name()?.to_camel_case().escape_rust_keywords()
-        ))
+    fn gen_union_generic_param_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_generic_param_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "T{}",
+                    self.name()?.to_camel_case().escape_rust_keywords()
+                )))
+            })
+            .cloned()
     }
     fn gen_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>> {
         self.cache()
