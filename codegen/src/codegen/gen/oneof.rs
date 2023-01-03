@@ -308,7 +308,7 @@ fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
 fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let union_ident = this.gen_union_ident()?;
     let case_ident = gen_case_ident(this)?;
-    let union_item_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
+    let union_field_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
     let getter_mut_idents = try_map_fields(this, |f| f.gen_union_getter_mut_ident())?;
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
@@ -340,7 +340,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 case_opt.map(|case| {
                     match case {
                         #(self::#case_ident::#case_names(_) => self::#case_ident::#case_names(
-                            ManuallyDrop::deref(unsafe { &self.#union_item_idents }).get_field()
+                            ManuallyDrop::deref(unsafe { &self.#union_field_idents }).get_field()
                         ),)*
                     }
                 })
@@ -352,7 +352,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 #[allow(unused)] use ::std::option::Option::Some;
                 match <self::#case_ident as OneofCase>::from_bitslice(bits) {
                     #(Some(self::#case_ident::#case_names(())) => {
-                        unsafe { ManuallyDrop::take(&mut self.#union_item_idents) };
+                        unsafe { ManuallyDrop::take(&mut self.#union_field_idents) };
                     })*
                     _ => ()
                 }
@@ -365,7 +365,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 #[allow(unused)] use ::std::clone::Clone;
                 match <self::#case_ident as OneofCase>::from_bitslice(bits) {
                     #(Some(self::#case_ident::#case_names(())) => Self {
-                        #union_item_idents: Clone::clone(unsafe { &self.#union_item_idents }),
+                        #union_field_idents: Clone::clone(unsafe { &self.#union_field_idents }),
                     },)*
                     _ => Self { _none: (), },
                 }
@@ -385,7 +385,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 match case {
                     #(Self::Case::#case_names(_) => {
                         let _ = <Self>::#getter_mut_idents(self, bitvec);
-                        unsafe { &mut self.#union_item_idents }.deser_from_iter(field_data)?;
+                        unsafe { &mut self.#union_field_idents }.deser_from_iter(field_data)?;
                     })*
                 }
                 Ok(())
@@ -401,7 +401,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 use self::_puroro::internal::oneof_type::OneofCase as _;
                 match self::#case_ident::from_bitslice(bitvec) {
                     #(Some(self::#case_ident::#case_names(_)) => {
-                        unsafe { &self.#union_item_idents }.ser_to_write(
+                        unsafe { &self.#union_field_idents }.ser_to_write(
                             #field_numbers, out,
                         )?;
                     })*
@@ -415,8 +415,8 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
 
 fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let case_ident = gen_case_ident(this)?;
-    let union_items = try_map_fields(this, |f| f.gen_union_field())?;
-    let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
+    let union_fields = try_map_fields(this, |f| f.gen_union_field())?;
+    let item_indices = (1..=(union_fields.len() as u32)).collect::<Vec<_>>();
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
