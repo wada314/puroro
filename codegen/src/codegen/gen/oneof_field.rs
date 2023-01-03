@@ -28,13 +28,13 @@ use ::std::rc::Rc;
 
 pub trait OneofFieldExt {
     fn gen_union_field_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_field_type(&self) -> Result<Rc<Type>>;
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
     fn gen_union_generic_param_ident(&self) -> Result<Ident>;
     fn gen_case_enum_value_ident(&self) -> Result<Ident>;
 
+    fn gen_union_field_type(&self) -> Result<Rc<Type>>;
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
     fn gen_union_field(&self) -> Result<Rc<Field>>;
@@ -65,45 +65,6 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_field_type(&self) -> Result<Rc<Type>> {
-        self.cache()
-            .get::<Cache>()?
-            .union_field_type
-            .get_or_try_init(|| {
-                let inner_type_name_segment: PathSegment = {
-                    use FieldType::*;
-                    use LengthDelimitedType::*;
-                    let r#type = self.r#type()?;
-                    parse2(match r#type {
-                        LengthDelimited(Message(m)) => {
-                            let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
-                            quote! {
-                                HeapMessageField::< #message_path >
-                            }
-                        }
-                        Variant(_) | Bits32(_) | Bits64(_) => {
-                            let primitive = r#type.rust_type()?;
-                            let tag = r#type.tag_type()?;
-                            quote! {
-                                NumericalField::<#primitive, #tag>
-                            }
-                        }
-                        LengthDelimited(_) => {
-                            let owned_type = r#type.rust_type()?;
-                            let tag = r#type.tag_type()?;
-                            quote! {
-                                UnsizedField::<#owned_type, #tag>
-                            }
-                        }
-                    })?
-                };
-                Ok(Rc::new(parse2(quote! {
-                    self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
-                })?))
-            })
-            .cloned()
-    }
-
     fn gen_union_getter_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
@@ -153,6 +114,44 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ))
     }
 
+    fn gen_union_field_type(&self) -> Result<Rc<Type>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_field_type
+            .get_or_try_init(|| {
+                let inner_type_name_segment: PathSegment = {
+                    use FieldType::*;
+                    use LengthDelimitedType::*;
+                    let r#type = self.r#type()?;
+                    parse2(match r#type {
+                        LengthDelimited(Message(m)) => {
+                            let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                            quote! {
+                                HeapMessageField::< #message_path >
+                            }
+                        }
+                        Variant(_) | Bits32(_) | Bits64(_) => {
+                            let primitive = r#type.rust_type()?;
+                            let tag = r#type.tag_type()?;
+                            quote! {
+                                NumericalField::<#primitive, #tag>
+                            }
+                        }
+                        LengthDelimited(_) => {
+                            let owned_type = r#type.rust_type()?;
+                            let tag = r#type.tag_type()?;
+                            quote! {
+                                UnsizedField::<#owned_type, #tag>
+                            }
+                        }
+                    })?
+                };
+                Ok(Rc::new(parse2(quote! {
+                    self::_puroro::internal::oneof_field_type:: #inner_type_name_segment
+                })?))
+            })
+            .cloned()
+    }
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
