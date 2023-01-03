@@ -171,7 +171,11 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 }
             })?,
             parse2(quote! {
-                impl< #(#generic_params),* > #union_ident< #(#generic_params),* > {
+                impl< #(#generic_params),* > #union_ident< #(#generic_params),* >
+                where #(
+                    #generic_params: _puroro::internal::oneof_field_type::OneofFieldType,
+                )*
+                {
                     #(#union_methods)*
                 }
             })?,
@@ -234,12 +238,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_struct_field_ident()?;
-        let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = self.gen_union_ident()?;
-
         Ok(parse2(quote! {
-            #ident: <#message_module :: #union_ident as self::_puroro::internal::oneof_type::OneofUnion>
-                ::clone(&self.#ident, &self._bitfield)
+            #ident: self::_puroro::internal::oneof_type::OneofUnion::clone(&self.#ident, &self._bitfield)
         })?)
     }
 
@@ -322,9 +322,13 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     Ok(parse2(quote! {
         impl< #(#generic_params),* > self::_puroro::internal::oneof_type::OneofUnion
         for #union_ident< #(#generic_params),* >
+        where #(
+            #generic_params: _puroro::internal::oneof_field_type::OneofFieldType,
+        )*
         {
             type Case = self::#case_ident;
-            type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>;
+            type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>
+                where Self: 'a;
 
             fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B)
                 -> ::std::option::Option<Self::CaseRef<'_>>

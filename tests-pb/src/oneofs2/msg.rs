@@ -8,25 +8,19 @@ mod _puroro {
 }
 pub union GroupOne<TG1Int32, TG1String> {
     _none: (),
-    g1_int32: ::std::mem::ManuallyDrop::<
-        self::_puroro::internal::oneof_field_type::NumericalField::<
-            i32,
-            self::_puroro::internal::tags::Int32,
-        >,
-    >,
-    g1_string: ::std::mem::ManuallyDrop::<
-        self::_puroro::internal::oneof_field_type::UnsizedField::<
-            ::std::string::String,
-            self::_puroro::internal::tags::String,
-        >,
-    >,
+    g1_int32: ::std::mem::ManuallyDrop::<TG1Int32>,
+    g1_string: ::std::mem::ManuallyDrop::<TG1String>,
 }
 #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
 pub enum GroupOneCase<TG1Int32 = (), TG1String = ()> {
     G1Int32(TG1Int32),
     G1String(TG1String),
 }
-impl<TG1Int32, TG1String> GroupOne<TG1Int32, TG1String> {
+impl<TG1Int32, TG1String> GroupOne<TG1Int32, TG1String>
+where
+    TG1Int32: _puroro::internal::oneof_field_type::OneofFieldType,
+    TG1String: _puroro::internal::oneof_field_type::OneofFieldType,
+{
     pub(crate) fn g1_int32<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -133,9 +127,13 @@ impl<TG1Int32, TG1String> GroupOne<TG1Int32, TG1String> {
     }
 }
 impl<TG1Int32, TG1String> self::_puroro::internal::oneof_type::OneofUnion
-for GroupOne<TG1Int32, TG1String> {
+for GroupOne<TG1Int32, TG1String>
+where
+    TG1Int32: _puroro::internal::oneof_field_type::OneofFieldType,
+    TG1String: _puroro::internal::oneof_field_type::OneofFieldType,
+{
     type Case = self::GroupOneCase;
-    type CaseRef<'a> = self::GroupOneCase::<i32, &'a str>;
+    type CaseRef<'a> where Self: 'a = self::GroupOneCase::<i32, &'a str>;
     fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -269,23 +267,9 @@ impl<TG1Int32, TG1String> ::std::default::Default for GroupOne<TG1Int32, TG1Stri
 }
 pub union GroupTwo<TG2F32, TG2String, TG2Submsg> {
     _none: (),
-    g2_f32: ::std::mem::ManuallyDrop::<
-        self::_puroro::internal::oneof_field_type::NumericalField::<
-            f32,
-            self::_puroro::internal::tags::Float,
-        >,
-    >,
-    g2_string: ::std::mem::ManuallyDrop::<
-        self::_puroro::internal::oneof_field_type::UnsizedField::<
-            ::std::string::String,
-            self::_puroro::internal::tags::String,
-        >,
-    >,
-    g2_submsg: ::std::mem::ManuallyDrop::<
-        self::_puroro::internal::oneof_field_type::HeapMessageField::<
-            self::_puroro_root::oneofs2::Submsg,
-        >,
-    >,
+    g2_f32: ::std::mem::ManuallyDrop::<TG2F32>,
+    g2_string: ::std::mem::ManuallyDrop::<TG2String>,
+    g2_submsg: ::std::mem::ManuallyDrop::<TG2Submsg>,
 }
 #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
 pub enum GroupTwoCase<TG2F32 = (), TG2String = (), TG2Submsg = ()> {
@@ -293,7 +277,12 @@ pub enum GroupTwoCase<TG2F32 = (), TG2String = (), TG2Submsg = ()> {
     G2String(TG2String),
     G2Submsg(TG2Submsg),
 }
-impl<TG2F32, TG2String, TG2Submsg> GroupTwo<TG2F32, TG2String, TG2Submsg> {
+impl<TG2F32, TG2String, TG2Submsg> GroupTwo<TG2F32, TG2String, TG2Submsg>
+where
+    TG2F32: _puroro::internal::oneof_field_type::OneofFieldType,
+    TG2String: _puroro::internal::oneof_field_type::OneofFieldType,
+    TG2Submsg: _puroro::internal::oneof_field_type::OneofFieldType,
+{
     pub(crate) fn g2_f32<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -452,13 +441,17 @@ impl<TG2F32, TG2String, TG2Submsg> GroupTwo<TG2F32, TG2String, TG2Submsg> {
     }
 }
 impl<TG2F32, TG2String, TG2Submsg> self::_puroro::internal::oneof_type::OneofUnion
-for GroupTwo<TG2F32, TG2String, TG2Submsg> {
+for GroupTwo<TG2F32, TG2String, TG2Submsg>
+where
+    TG2F32: _puroro::internal::oneof_field_type::OneofFieldType,
+    TG2String: _puroro::internal::oneof_field_type::OneofFieldType,
+    TG2Submsg: _puroro::internal::oneof_field_type::OneofFieldType,
+{
     type Case = self::GroupTwoCase;
-    type CaseRef<'a> = self::GroupTwoCase::<
-        f32,
-        &'a str,
-        &'a self::_puroro_root::oneofs2::Submsg,
-    >;
+    type CaseRef<'a>
+    where
+        Self: 'a,
+    = self::GroupTwoCase::<f32, &'a str, &'a self::_puroro_root::oneofs2::Submsg>;
     fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -615,18 +608,16 @@ for GroupTwo<TG2F32, TG2String, TG2Submsg> {
 }
 pub union GroupThree<TG3Int32> {
     _none: (),
-    g3_int32: ::std::mem::ManuallyDrop::<
-        self::_puroro::internal::oneof_field_type::NumericalField::<
-            i32,
-            self::_puroro::internal::tags::Int32,
-        >,
-    >,
+    g3_int32: ::std::mem::ManuallyDrop::<TG3Int32>,
 }
 #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
 pub enum GroupThreeCase<TG3Int32 = ()> {
     G3Int32(TG3Int32),
 }
-impl<TG3Int32> GroupThree<TG3Int32> {
+impl<TG3Int32> GroupThree<TG3Int32>
+where
+    TG3Int32: _puroro::internal::oneof_field_type::OneofFieldType,
+{
     pub(crate) fn g3_int32<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -682,9 +673,12 @@ impl<TG3Int32> GroupThree<TG3Int32> {
         unsafe { &mut self.g3_int32 }.get_field_mut()
     }
 }
-impl<TG3Int32> self::_puroro::internal::oneof_type::OneofUnion for GroupThree<TG3Int32> {
+impl<TG3Int32> self::_puroro::internal::oneof_type::OneofUnion for GroupThree<TG3Int32>
+where
+    TG3Int32: _puroro::internal::oneof_field_type::OneofFieldType,
+{
     type Case = self::GroupThreeCase;
-    type CaseRef<'a> = self::GroupThreeCase::<i32>;
+    type CaseRef<'a> where Self: 'a = self::GroupThreeCase::<i32>;
     fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,

@@ -309,15 +309,15 @@ impl self::_puroro::Message for Msg {
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         Self {
-            group_one: <self::_puroro_root::oneofs2::msg::GroupOne as self::_puroro::internal::oneof_type::OneofUnion>::clone(
+            group_one: self::_puroro::internal::oneof_type::OneofUnion::clone(
                 &self.group_one,
                 &self._bitfield,
             ),
-            group_two: <self::_puroro_root::oneofs2::msg::GroupTwo as self::_puroro::internal::oneof_type::OneofUnion>::clone(
+            group_two: self::_puroro::internal::oneof_type::OneofUnion::clone(
                 &self.group_two,
                 &self._bitfield,
             ),
-            group_three: <self::_puroro_root::oneofs2::msg::GroupThree as self::_puroro::internal::oneof_type::OneofUnion>::clone(
+            group_three: self::_puroro::internal::oneof_type::OneofUnion::clone(
                 &self.group_three,
                 &self._bitfield,
             ),

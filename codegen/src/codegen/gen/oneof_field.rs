@@ -158,9 +158,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
 
     fn gen_union_field(&self) -> Result<Rc<Field>> {
         let ident = self.gen_union_field_ident()?;
-        let field_inner_type = self.gen_union_field_type()?;
+        let field_inner_type_ident = self.gen_union_generic_param_ident()?;
         let field_type: Type = parse2(quote! {
-            ::std::mem::ManuallyDrop::<#field_inner_type>
+            ::std::mem::ManuallyDrop::< #field_inner_type_ident >
         })?;
 
         Ok(Rc::new(

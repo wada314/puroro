@@ -27,7 +27,7 @@ pub struct UnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
 pub struct HeapMessageField<M>(Box<M>);
 
-pub trait OneofFieldType {
+pub trait OneofFieldType: Default + Clone {
     /// A non-optional getter type, which is mainly used in the case enum's
     /// value type.
     /// int32 => i32
@@ -50,7 +50,7 @@ pub trait OneofFieldType {
     /// int32 => i32
     /// String => &'a str
     /// Message => unreachable!()
-    type DefaultValueType;
+    type DefaultValueType: Default;
 
     /// A getter type, which overrides `Self::GetterOptType`'s `None` case
     /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
@@ -87,8 +87,8 @@ pub trait OneofFieldType {
 
 impl<RustType, ProtoType> OneofFieldType for NumericalField<RustType, ProtoType>
 where
-    RustType: Clone,
-    ProtoType: tags::NumericalType<RustType = RustType>,
+    RustType: Clone + Default,
+    ProtoType: tags::NumericalType<RustType = RustType> + Default + Clone,
 {
     type GetterType<'a> = RustType
     where
@@ -148,8 +148,8 @@ where
 
 impl<RustType, ProtoType> OneofFieldType for UnsizedField<RustType, ProtoType>
 where
-    RustType: Clone,
-    ProtoType: 'static + tags::UnsizedType<RustType = RustType>,
+    RustType: Clone + Default,
+    ProtoType: 'static + tags::UnsizedType<RustType = RustType> + Default + Clone,
 {
     type GetterType<'a> = ProtoType::RustRefType<'a>
     where
@@ -198,7 +198,10 @@ where
     }
 }
 
-impl<M: Message + Default> OneofFieldType for HeapMessageField<M> {
+impl<M: Message + Default> OneofFieldType for HeapMessageField<M>
+where
+    M: Default + Clone,
+{
     type GetterType<'a> = &'a M
     where
         Self: 'a;
