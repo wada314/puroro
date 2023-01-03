@@ -12,22 +12,22 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct EnumReservedRange {
-    start: self::_pinternal::field_type::OptionalNumericalField::<
+    start: self::_pinternal::OptionalNumericalField::<
         i32,
         self::_pinternal::tags::Int32,
         0usize,
     >,
-    end: self::_pinternal::field_type::OptionalNumericalField::<
+    end: self::_pinternal::OptionalNumericalField::<
         i32,
         self::_pinternal::tags::Int32,
         1usize,
     >,
-    _bitfield: self::_pinternal::bitvec::BitArray<1usize>,
+    _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl EnumReservedRange {
     pub fn start(&self) -> i32 {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
@@ -38,16 +38,16 @@ impl EnumReservedRange {
         )
     }
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
     }
     pub fn start_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
@@ -58,8 +58,8 @@ impl EnumReservedRange {
         )
     }
     pub fn has_start(&self) -> bool {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
@@ -67,16 +67,16 @@ impl EnumReservedRange {
             .is_some()
     }
     pub fn clear_start(&mut self) {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.start, &mut self._bitfield)
     }
     pub fn end(&self) -> i32 {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             1usize,
@@ -87,16 +87,16 @@ impl EnumReservedRange {
         )
     }
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
     }
     pub fn end_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             1usize,
@@ -107,8 +107,8 @@ impl EnumReservedRange {
         )
     }
     pub fn has_end(&self) -> bool {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             1usize,
@@ -116,8 +116,8 @@ impl EnumReservedRange {
             .is_some()
     }
     pub fn clear_end(&mut self) {
-        use self::_pinternal::field_type::NonRepeatedFieldType;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             1usize,
@@ -138,27 +138,27 @@ impl self::_puroro::Message for EnumReservedRange {
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
-        use self::_pinternal::oneof_type::OneofUnion as _;
+        use self::_pinternal::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::field_type::OptionalNumericalField::<
+                    <self::_pinternal::OptionalNumericalField::<
                         i32,
                         self::_pinternal::tags::Int32,
                         0usize,
-                    > as self::_pinternal::field_type::FieldType>::deser_from_iter(
+                    > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.start,
                         &mut self._bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::field_type::OptionalNumericalField::<
+                    <self::_pinternal::OptionalNumericalField::<
                         i32,
                         self::_pinternal::tags::Int32,
                         1usize,
-                    > as self::_pinternal::field_type::FieldType>::deser_from_iter(
+                    > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.end,
                         &mut self._bitfield,
                         field_data,
@@ -175,22 +175,22 @@ impl self::_puroro::Message for EnumReservedRange {
         out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
-        use self::_pinternal::oneof_type::OneofUnion as _;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        use self::_pinternal::OneofUnion as _;
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as self::_pinternal::field_type::FieldType>::ser_to_write(
+        > as self::_pinternal::FieldType>::ser_to_write(
             &self.start,
             &self._bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::field_type::OptionalNumericalField::<
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as self::_pinternal::field_type::FieldType>::ser_to_write(
+        > as self::_pinternal::FieldType>::ser_to_write(
             &self.end,
             &self._bitfield,
             2i32,
@@ -202,12 +202,12 @@ impl self::_puroro::Message for EnumReservedRange {
 impl ::std::clone::Clone for EnumReservedRange {
     fn clone(&self) -> Self {
         Self {
-            start: <self::_pinternal::field_type::OptionalNumericalField::<
+            start: <self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.start),
-            end: <self::_pinternal::field_type::OptionalNumericalField::<
+            end: <self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 1usize,
@@ -219,7 +219,7 @@ impl ::std::clone::Clone for EnumReservedRange {
 impl ::std::ops::Drop for EnumReservedRange {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::oneof_type::OneofUnion as _;
+        use self::_pinternal::OneofUnion as _;
     }
 }
 impl ::std::fmt::Debug for EnumReservedRange {
@@ -236,7 +236,7 @@ impl ::std::fmt::Debug for EnumReservedRange {
 impl ::std::cmp::PartialEq for EnumReservedRange {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
-        use self::_pinternal::oneof_type::OneofUnion as _;
+        use self::_pinternal::OneofUnion as _;
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
     }
 }

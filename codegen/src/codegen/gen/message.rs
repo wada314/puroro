@@ -119,7 +119,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             pub struct #ident {
                 #(#fields,)*
                 #(#oneof_fields,)*
-                _bitfield: #PURORO_INTERNAL::bitvec::BitArray<#bitfield_size_in_u32_array>,
+                _bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -188,7 +188,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
 
             fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> #PURORO_LIB::Result<()> {
                 use #PURORO_INTERNAL::ser::FieldData;
-                #[allow(unused)] use #PURORO_INTERNAL::oneof_type::OneofUnion as _;
+                #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
                 while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
                     match number {
                         #(#field_deser_arms)*
@@ -200,7 +200,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
             }
 
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
-                #[allow(unused)] use #PURORO_INTERNAL::oneof_type::OneofUnion as _;
+                #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
                 #(#ser_fields)*
                 #(#ser_oneof_stmts)*
                 ::std::result::Result::Ok(())
@@ -242,7 +242,7 @@ fn gen_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     Ok(parse2(quote! {
         impl ::std::ops::Drop for #ident {
             fn drop(&mut self) {
-                #[allow(unused)] use #PURORO_INTERNAL::oneof_type::OneofUnion as _;
+                #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
 
                 #(self.#oneof_idents.clear(&mut self._bitfield);)*
             }
@@ -286,7 +286,7 @@ fn gen_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl
     Ok(parse2(quote! {
         impl ::std::cmp::PartialEq for #ident {
             fn eq(&self, rhs: &Self) -> bool {
-                #[allow(unused)] use #PURORO_INTERNAL::oneof_type::OneofUnion as _;
+                #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
 
                 true
                     #( && #field_cmps)*
