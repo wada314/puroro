@@ -33,3 +33,29 @@ pub use self::oneof::*;
 pub use self::oneof_field::*;
 pub use self::package::*;
 pub use self::package_or_message::*;
+
+use crate::{ErrorKind, GeneratorError, Result};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Syntax {
+    Proto2,
+    Proto3,
+}
+impl TryFrom<&str> for Syntax {
+    type Error = GeneratorError;
+    fn try_from(value: &str) -> Result<Self> {
+        Ok(match value {
+            "" | "proto2" => Syntax::Proto2,
+            "proto3" => Syntax::Proto3,
+            _ => Err(ErrorKind::UnknownProtoSyntax {
+                name: value.to_string(),
+            })?,
+        })
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum MessageOrEnum<M, E> {
+    Message(M),
+    Enum(E),
+}

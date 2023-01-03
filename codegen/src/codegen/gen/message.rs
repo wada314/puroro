@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{FieldExt, Message, PackageOrMessageExt};
+use super::{FieldExt, Message, PackageOrMessageExt};
 use super::{OneofExt, OneofFieldExt};
 use crate::syn::{parse2, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;

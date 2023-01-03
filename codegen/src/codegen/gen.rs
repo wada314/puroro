@@ -27,3 +27,5 @@ pub use self::message::*;
 pub use self::oneof::*;
 pub use self::oneof_field::*;
 pub use self::package_or_message::*;
+
+use super::data::*;

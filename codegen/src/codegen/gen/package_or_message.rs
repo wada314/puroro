@@ -13,8 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{EnumExt, MessageExt, PackageOrMessage};
-use super::OneofExt;
+use super::{EnumExt, MessageExt, OneofExt, PackageOrMessage};
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
 use ::itertools::Itertools;

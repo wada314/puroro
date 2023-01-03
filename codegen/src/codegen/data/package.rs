@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
+use super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;

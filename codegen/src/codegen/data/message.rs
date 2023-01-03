@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{
+use super::{
     Enum, EnumImpl, Field, FieldImpl, InputFile, Oneof, OneofImpl, Package, PackageOrMessage,
     RootPackage,
 };

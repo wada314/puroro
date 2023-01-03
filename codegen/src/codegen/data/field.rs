@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::{AnonymousCache, WeakExt};
-use super::super::{FieldRule, FieldType, Message};
+use super::{FieldRule, FieldType, Message};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
