@@ -313,9 +313,6 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let generic_params = try_map_fields(this, |f| f.gen_union_generic_param_ident())?;
-    let borrowed_types_a = try_map_fields(this, |f| {
-        f.gen_maybe_borrowed_type(Some(parse2(quote! { 'a })?))
-    })?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
 
@@ -327,8 +324,11 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
         )*
         {
             type Case = self::#case_ident;
-            type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>
-                where Self: 'a;
+            type CaseRef<'a> = self::#case_ident::<#(
+                <#generic_params as self::_puroro::internal::oneof_field_type::OneofFieldType>
+                    ::GetterType<'a>
+            ),*>
+            where Self: 'a;
 
             fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B)
                 -> ::std::option::Option<Self::CaseRef<'_>>

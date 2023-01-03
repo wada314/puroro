@@ -145,7 +145,17 @@ where
     TG1String: _puroro::internal::oneof_field_type::OneofFieldType,
 {
     type Case = self::GroupOneCase;
-    type CaseRef<'a> where Self: 'a = self::GroupOneCase::<i32, &'a str>;
+    type CaseRef<'a>
+    where
+        Self: 'a,
+    = self::GroupOneCase::<
+        <TG1Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterType<
+            'a,
+        >,
+        <TG1String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterType<
+            'a,
+        >,
+    >;
     fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -481,7 +491,17 @@ where
     type CaseRef<'a>
     where
         Self: 'a,
-    = self::GroupTwoCase::<f32, &'a str, &'a self::_puroro_root::oneofs2::Submsg>;
+    = self::GroupTwoCase::<
+        <TG2F32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterType<
+            'a,
+        >,
+        <TG2String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterType<
+            'a,
+        >,
+        <TG2Submsg as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterType<
+            'a,
+        >,
+    >;
     fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
@@ -714,7 +734,14 @@ where
     TG3Int32: _puroro::internal::oneof_field_type::OneofFieldType,
 {
     type Case = self::GroupThreeCase;
-    type CaseRef<'a> where Self: 'a = self::GroupThreeCase::<i32>;
+    type CaseRef<'a>
+    where
+        Self: 'a,
+    = self::GroupThreeCase::<
+        <TG3Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterType<
+            'a,
+        >,
+    >;
     fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
