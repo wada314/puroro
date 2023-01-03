@@ -175,19 +175,21 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let getter_ident = self.gen_union_getter_ident()?;
         let getter_opt_ident = self.gen_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_union_getter_mut_ident()?;
-        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
-        let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
-                Rc::new(parse2(quote! {
-                    ::std::option::Option::< #borrowed_type >
-                })?)
-            }
-            _ => Rc::clone(&borrowed_type),
-        };
-        let getter_opt_type: Type = parse2(quote! {
-            ::std::option::Option::< #borrowed_type >
+
+        let generic_param_type_ident = self.gen_union_generic_param_ident()?;
+        let getter_type: Type = parse2(quote! {
+            <#generic_param_type_ident as self::_puroro::internal::oneof_field_type::OneofFieldType>
+                ::GetterOrElseType<'_>
         })?;
-        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
+        let getter_opt_type: Type = parse2(quote! {
+            <#generic_param_type_ident as self::_puroro::internal::oneof_field_type::OneofFieldType>
+                ::GetterOptType<'_>
+        })?;
+        let getter_mut_type: Type = parse2(quote! {
+            <#generic_param_type_ident as self::_puroro::internal::oneof_field_type::OneofFieldType>
+                ::GetterMutType<'_>
+        })?;
+
         let union_ident = self.oneof()?.gen_union_ident()?;
         let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
         let union_item_ident = self.gen_union_field_ident()?;

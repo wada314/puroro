@@ -24,7 +24,9 @@ where
     pub(crate) fn g1_int32<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> i32 {
+    ) -> <TG1Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOrElseType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -40,7 +42,9 @@ where
     pub(crate) fn g1_int32_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<i32> {
+    ) -> <TG1Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOptType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -54,7 +58,9 @@ where
     pub(crate) fn g1_int32_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> &mut i32 {
+    ) -> <TG1Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterMutType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
@@ -76,7 +82,9 @@ where
     pub(crate) fn g1_string<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> &str {
+    ) -> <TG1String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOrElseType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -92,7 +100,9 @@ where
     pub(crate) fn g1_string_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<&str> {
+    ) -> <TG1String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOptType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -106,7 +116,9 @@ where
     pub(crate) fn g1_string_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> &mut ::std::string::String {
+    ) -> <TG1String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterMutType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
@@ -286,7 +298,9 @@ where
     pub(crate) fn g2_f32<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> f32 {
+    ) -> <TG2F32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOrElseType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -302,7 +316,9 @@ where
     pub(crate) fn g2_f32_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<f32> {
+    ) -> <TG2F32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOptType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -316,7 +332,9 @@ where
     pub(crate) fn g2_f32_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> &mut f32 {
+    ) -> <TG2F32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterMutType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
@@ -338,7 +356,9 @@ where
     pub(crate) fn g2_string<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> &str {
+    ) -> <TG2String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOrElseType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -354,7 +374,9 @@ where
     pub(crate) fn g2_string_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<&str> {
+    ) -> <TG2String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOptType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -368,7 +390,9 @@ where
     pub(crate) fn g2_string_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> &mut ::std::string::String {
+    ) -> <TG2String as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterMutType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
@@ -390,7 +414,9 @@ where
     pub(crate) fn g2_submsg<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<&self::_puroro_root::oneofs2::Submsg> {
+    ) -> <TG2Submsg as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOrElseType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -406,7 +432,9 @@ where
     pub(crate) fn g2_submsg_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<&self::_puroro_root::oneofs2::Submsg> {
+    ) -> <TG2Submsg as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOptType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -420,7 +448,9 @@ where
     pub(crate) fn g2_submsg_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> &mut self::_puroro_root::oneofs2::Submsg {
+    ) -> <TG2Submsg as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterMutType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
@@ -621,7 +651,9 @@ where
     pub(crate) fn g3_int32<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> i32 {
+    ) -> <TG3Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOrElseType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -637,7 +669,9 @@ where
     pub(crate) fn g3_int32_opt<B: self::_puroro::internal::bitvec::BitSlice>(
         &self,
         bits: &B,
-    ) -> ::std::option::Option::<i32> {
+    ) -> <TG3Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterOptType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_puroro::internal::oneof_field_type::OneofFieldType;
@@ -651,7 +685,9 @@ where
     pub(crate) fn g3_int32_mut<B: self::_puroro::internal::bitvec::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> &mut i32 {
+    ) -> <TG3Int32 as self::_puroro::internal::oneof_field_type::OneofFieldType>::GetterMutType<
+        '_,
+    > {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
