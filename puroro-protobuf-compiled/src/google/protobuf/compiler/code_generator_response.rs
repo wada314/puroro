@@ -1,39 +1,43 @@
-mod _puroro_root {
+mod _root {
     #[allow(unused)]
-    pub(crate) use super::super::_puroro_root::*;
+    pub(crate) use super::super::_root::*;
 }
 mod _puroro {
     #[allow(unused)]
     pub(crate) use ::puroro::*;
 }
+mod _pinternal {
+    #[allow(unused)]
+    pub(crate) use ::puroro::internal::*;
+}
 #[derive(::std::default::Default)]
 pub struct File {
-    name: self::_puroro::internal::field_type::OptionalUnsizedField::<
+    name: self::_pinternal::OptionalUnsizedField::<
         ::std::string::String,
-        self::_puroro::internal::tags::String,
+        self::_pinternal::tags::String,
         0usize,
     >,
-    insertion_point: self::_puroro::internal::field_type::OptionalUnsizedField::<
+    insertion_point: self::_pinternal::OptionalUnsizedField::<
         ::std::string::String,
-        self::_puroro::internal::tags::String,
+        self::_pinternal::tags::String,
         1usize,
     >,
-    content: self::_puroro::internal::field_type::OptionalUnsizedField::<
+    content: self::_pinternal::OptionalUnsizedField::<
         ::std::string::String,
-        self::_puroro::internal::tags::String,
+        self::_pinternal::tags::String,
         2usize,
     >,
-    generated_code_info: self::_puroro::internal::field_type::SingularHeapMessageField::<
-        self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+    generated_code_info: self::_pinternal::SingularHeapMessageField::<
+        self::_root::google::protobuf::GeneratedCodeInfo,
     >,
-    _bitfield: self::_puroro::internal::bitvec::BitArray<1usize>,
+    _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl File {
     pub fn name(&self) -> &str {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.name,
@@ -42,18 +46,18 @@ impl File {
         )
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.name,
@@ -62,27 +66,27 @@ impl File {
         )
     }
     pub fn has_name(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
             .is_some()
     }
     pub fn clear_name(&mut self) {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
     }
     pub fn insertion_point(&self) -> &str {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.insertion_point,
@@ -91,18 +95,18 @@ impl File {
         )
     }
     pub fn insertion_point_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.insertion_point, &self._bitfield)
     }
     pub fn insertion_point_mut(&mut self) -> &mut ::std::string::String {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.insertion_point,
@@ -111,27 +115,27 @@ impl File {
         )
     }
     pub fn has_insertion_point(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.insertion_point, &self._bitfield)
             .is_some()
     }
     pub fn clear_insertion_point(&mut self) {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::clear(&mut self.insertion_point, &mut self._bitfield)
     }
     pub fn content(&self) -> &str {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.content,
@@ -140,18 +144,18 @@ impl File {
         )
     }
     pub fn content_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.content, &self._bitfield)
     }
     pub fn content_mut(&mut self) -> &mut ::std::string::String {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.content,
@@ -160,30 +164,28 @@ impl File {
         )
     }
     pub fn has_content(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(&self.content, &self._bitfield)
             .is_some()
     }
     pub fn clear_content(&mut self) {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::clear(&mut self.content, &mut self._bitfield)
     }
     pub fn generated_code_info(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-    > {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+    ) -> ::std::option::Option::<&self::_root::google::protobuf::GeneratedCodeInfo> {
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.generated_code_info,
             &self._bitfield,
@@ -192,12 +194,10 @@ impl File {
     }
     pub fn generated_code_info_opt(
         &self,
-    ) -> ::std::option::Option::<
-        &self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-    > {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+    ) -> ::std::option::Option::<&self::_root::google::protobuf::GeneratedCodeInfo> {
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.generated_code_info,
             &self._bitfield,
@@ -205,10 +205,10 @@ impl File {
     }
     pub fn generated_code_info_mut(
         &mut self,
-    ) -> &mut self::_puroro_root::google::protobuf::GeneratedCodeInfo {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+    ) -> &mut self::_root::google::protobuf::GeneratedCodeInfo {
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.generated_code_info,
             &mut self._bitfield,
@@ -216,9 +216,9 @@ impl File {
         )
     }
     pub fn has_generated_code_info(&self) -> bool {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.generated_code_info,
                 &self._bitfield,
@@ -226,9 +226,9 @@ impl File {
             .is_some()
     }
     pub fn clear_generated_code_info(&mut self) {
-        use self::_puroro::internal::field_type::NonRepeatedFieldType;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::clear(
             &mut self.generated_code_info,
             &mut self._bitfield,
@@ -247,49 +247,49 @@ impl self::_puroro::Message for File {
         &mut self,
         mut iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_puroro::internal::ser::FieldData;
+        use self::_pinternal::ser::FieldData;
         #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        use self::_pinternal::OneofUnion as _;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                    <self::_pinternal::OptionalUnsizedField::<
                         ::std::string::String,
-                        self::_puroro::internal::tags::String,
+                        self::_pinternal::tags::String,
                         0usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.name,
                         &mut self._bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                    <self::_pinternal::OptionalUnsizedField::<
                         ::std::string::String,
-                        self::_puroro::internal::tags::String,
+                        self::_pinternal::tags::String,
                         1usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.insertion_point,
                         &mut self._bitfield,
                         field_data,
                     )?
                 }
                 15i32 => {
-                    <self::_puroro::internal::field_type::OptionalUnsizedField::<
+                    <self::_pinternal::OptionalUnsizedField::<
                         ::std::string::String,
-                        self::_puroro::internal::tags::String,
+                        self::_pinternal::tags::String,
                         2usize,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.content,
                         &mut self._bitfield,
                         field_data,
                     )?
                 }
                 16i32 => {
-                    <self::_puroro::internal::field_type::SingularHeapMessageField::<
-                        self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-                    > as self::_puroro::internal::field_type::FieldType>::deser_from_iter(
+                    <self::_pinternal::SingularHeapMessageField::<
+                        self::_root::google::protobuf::GeneratedCodeInfo,
+                    > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.generated_code_info,
                         &mut self._bitfield,
                         field_data,
@@ -306,40 +306,40 @@ impl self::_puroro::Message for File {
         out: &mut W,
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion as _;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        use self::_pinternal::OneofUnion as _;
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             0usize,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        > as self::_pinternal::FieldType>::ser_to_write(
             &self.name,
             &self._bitfield,
             1i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             1usize,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        > as self::_pinternal::FieldType>::ser_to_write(
             &self.insertion_point,
             &self._bitfield,
             2i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::OptionalUnsizedField::<
+        <self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
-            self::_puroro::internal::tags::String,
+            self::_pinternal::tags::String,
             2usize,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        > as self::_pinternal::FieldType>::ser_to_write(
             &self.content,
             &self._bitfield,
             15i32,
             out,
         )?;
-        <self::_puroro::internal::field_type::SingularHeapMessageField::<
-            self::_puroro_root::google::protobuf::GeneratedCodeInfo,
-        > as self::_puroro::internal::field_type::FieldType>::ser_to_write(
+        <self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
+        > as self::_pinternal::FieldType>::ser_to_write(
             &self.generated_code_info,
             &self._bitfield,
             16i32,
@@ -351,23 +351,23 @@ impl self::_puroro::Message for File {
 impl ::std::clone::Clone for File {
     fn clone(&self) -> Self {
         Self {
-            name: <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            name: <self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
-                self::_puroro::internal::tags::String,
+                self::_pinternal::tags::String,
                 0usize,
             > as ::std::clone::Clone>::clone(&self.name),
-            insertion_point: <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            insertion_point: <self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
-                self::_puroro::internal::tags::String,
+                self::_pinternal::tags::String,
                 1usize,
             > as ::std::clone::Clone>::clone(&self.insertion_point),
-            content: <self::_puroro::internal::field_type::OptionalUnsizedField::<
+            content: <self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
-                self::_puroro::internal::tags::String,
+                self::_pinternal::tags::String,
                 2usize,
             > as ::std::clone::Clone>::clone(&self.content),
-            generated_code_info: <self::_puroro::internal::field_type::SingularHeapMessageField::<
-                self::_puroro_root::google::protobuf::GeneratedCodeInfo,
+            generated_code_info: <self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::GeneratedCodeInfo,
             > as ::std::clone::Clone>::clone(&self.generated_code_info),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
@@ -376,7 +376,7 @@ impl ::std::clone::Clone for File {
 impl ::std::ops::Drop for File {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        use self::_pinternal::OneofUnion as _;
     }
 }
 impl ::std::fmt::Debug for File {
@@ -395,7 +395,7 @@ impl ::std::fmt::Debug for File {
 impl ::std::cmp::PartialEq for File {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
-        use self::_puroro::internal::oneof_type::OneofUnion as _;
+        use self::_pinternal::OneofUnion as _;
         true && self.name_opt() == rhs.name_opt()
             && self.insertion_point_opt() == rhs.insertion_point_opt()
             && self.content_opt() == rhs.content_opt()

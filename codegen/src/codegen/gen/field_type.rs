@@ -13,8 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{
+use super::{
     Bits32Type, Bits64Type, EnumExt, FieldType, LengthDelimitedType, MessageExt, VariantType,
+    PURORO_INTERNAL,
 };
 use crate::syn::{parse2, Lifetime, Type};
 use crate::Result;
@@ -91,7 +92,7 @@ impl VariantType {
             }
         };
         Ok(Rc::new(parse2(quote! {
-            self::_puroro::internal::tags::#tag_name
+            #PURORO_INTERNAL::tags::#tag_name
         })?))
     }
 }
@@ -139,7 +140,7 @@ impl LengthDelimitedType {
             }
         };
         Ok(Rc::new(parse2(quote! {
-            self::_puroro::internal::tags::#tag_name
+            #PURORO_INTERNAL::tags::#tag_name
         })?))
     }
 }
@@ -160,7 +161,7 @@ impl Bits32Type {
             Float => quote! { Float },
         };
         Ok(Rc::new(parse2(quote! {
-            self::_puroro::internal::tags::#tag_name
+            #PURORO_INTERNAL::tags::#tag_name
         })?))
     }
 }
@@ -181,7 +182,7 @@ impl Bits64Type {
             Double => quote! { Double },
         };
         Ok(Rc::new(parse2(quote! {
-            self::_puroro::internal::tags::#tag_name
+            #PURORO_INTERNAL::tags::#tag_name
         })?))
     }
 }

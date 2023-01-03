@@ -18,7 +18,7 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::super::util::*;
-use super::super::{Enum, PackageOrMessageExt, Syntax};
+use super::{Enum, PackageOrMessageExt, Syntax, PURORO_LIB};
 use crate::syn;
 use crate::syn::{parse2, Item, ItemEnum, Path, Type};
 use crate::{ErrorKind, Result};
@@ -171,11 +171,11 @@ fn gen_enum_try_from_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
     let value_numbers = this.values()?.map(|(_, number)| number).collect::<Vec<_>>();
     Ok(parse2(quote! {
         impl ::std::convert::TryFrom::<i32> for #ident {
-            type Error = self::_puroro::PuroroError;
+            type Error = #PURORO_LIB::PuroroError;
             fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
                 match val {
                     #(#value_numbers => ::std::result::Result::Ok(self::#ident::#value_idents),)*
-                    _ => ::std::result::Result::Err(self::_puroro::ErrorKind::UnknownEnumVariant(val))?,
+                    _ => ::std::result::Result::Err(#PURORO_LIB::ErrorKind::UnknownEnumVariant(val))?,
                 }
             }
         }

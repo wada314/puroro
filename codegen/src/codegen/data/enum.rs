@@ -18,7 +18,7 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::super::util::*;
-use super::super::{InputFile, PackageOrMessage, Syntax};
+use super::{InputFile, PackageOrMessage, Syntax};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 use ::std::fmt::Debug;

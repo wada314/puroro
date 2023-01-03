@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Message, OneofField, OneofFieldImpl};
+use super::{Message, OneofField, OneofFieldImpl};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescriptorProto};
 use ::std::fmt::Debug;

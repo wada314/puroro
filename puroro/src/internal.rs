@@ -20,3 +20,12 @@ pub mod ser;
 pub mod tags;
 pub mod utils;
 pub mod variant;
+
+pub use self::bitvec::{BitArray, BitSlice};
+pub use self::field_type::{
+    FieldType, NonRepeatedFieldType, OptionalNumericalField, OptionalUnsizedField,
+    RepeatedFieldType, RepeatedMessageField, RepeatedNumericalField, RepeatedUnsizedField,
+    SingularHeapMessageField, SingularNumericalField, SingularUnsizedField,
+};
+pub use self::oneof_field_type::{HeapMessageField, NumericalField, OneofFieldType, UnsizedField};
+pub use self::oneof_type::{OneofCase, OneofUnion};

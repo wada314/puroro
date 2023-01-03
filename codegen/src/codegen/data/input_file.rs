@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
+use super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{

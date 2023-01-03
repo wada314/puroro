@@ -16,10 +16,10 @@ mod data;
 mod gen;
 mod util;
 
-use self::data::*;
-use self::gen::*;
+use self::data::{PackageOrMessage, RootPackage};
+use self::gen::PackageOrMessageExt as _;
 
-use crate::{ErrorKind, GeneratorError, Result};
+use crate::Result;
 use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
@@ -28,30 +28,6 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Syntax {
-    Proto2,
-    Proto3,
-}
-impl TryFrom<&str> for Syntax {
-    type Error = GeneratorError;
-    fn try_from(value: &str) -> Result<Self> {
-        Ok(match value {
-            "" | "proto2" => Syntax::Proto2,
-            "proto3" => Syntax::Proto3,
-            _ => Err(ErrorKind::UnknownProtoSyntax {
-                name: value.to_string(),
-            })?,
-        })
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum MessageOrEnum<M, E> {
-    Message(M),
-    Enum(E),
-}
 
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::super::{Enum, Message, MessageOrEnum, Oneof, Package, RootPackage};
+use super::{Enum, Message, MessageOrEnum, Oneof, Package, RootPackage};
 use crate::{ErrorKind, Result};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
