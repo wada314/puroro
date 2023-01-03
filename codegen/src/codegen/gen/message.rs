@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{FieldExt, Message, OneofExt, OneofFieldExt, PackageOrMessageExt, PURORO_INTERNAL};
+use super::{
+    FieldExt, Message, OneofExt, OneofFieldExt, PackageOrMessageExt, PURORO_INTERNAL, PURORO_LIB,
+};
 use crate::syn::{parse2, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;
 use ::itertools::Itertools;
@@ -177,14 +179,14 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
         .collect::<Result<Vec<_>>>()?;
 
     Ok(parse2(quote! {
-        impl self::_puroro::Message for #ident {
-            fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> self::_puroro::Result<Self> {
+        impl #PURORO_LIB::Message for #ident {
+            fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> #PURORO_LIB::Result<Self> {
                 let mut msg = <Self as ::std::default::Default>::default();
                 msg.merge_from_bytes_iter(iter)?;
                 ::std::result::Result::Ok(msg)
             }
 
-            fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> self::_puroro::Result<()> {
+            fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> #PURORO_LIB::Result<()> {
                 use #PURORO_INTERNAL::ser::FieldData;
                 #[allow(unused)] use #PURORO_INTERNAL::oneof_type::OneofUnion as _;
                 while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
@@ -197,7 +199,7 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
                 ::std::result::Result::Ok(())
             }
 
-            fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> self::_puroro::Result<()> {
+            fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
                 #[allow(unused)] use #PURORO_INTERNAL::oneof_type::OneofUnion as _;
                 #(#ser_fields)*
                 #(#ser_oneof_stmts)*

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{MessageExt, Oneof, OneofField, OneofFieldExt, PackageOrMessageExt, PURORO_INTERNAL};
+use super::{
+    MessageExt, Oneof, OneofField, OneofFieldExt, PackageOrMessageExt, PURORO_INTERNAL, PURORO_LIB,
+};
 use crate::syn::{
     parse2, Arm, Expr, Field, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, NamedField, Stmt,
     Type,
@@ -374,7 +376,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 bitvec: &mut B,
                 field_data: #PURORO_INTERNAL::ser::FieldData<I>,
                 case: Self::Case,
-            ) -> self::_puroro::Result<()>
+            ) -> #PURORO_LIB::Result<()>
             where
                 I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 B: #PURORO_INTERNAL::bitvec::BitSlice,
@@ -389,7 +391,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 Ok(())
             }
 
-            fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> self::_puroro::Result<()>
+            fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> #PURORO_LIB::Result<()>
             where
                 W: ::std::io::Write,
                 B: #PURORO_INTERNAL::bitvec::BitSlice
