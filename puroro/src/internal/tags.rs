@@ -92,7 +92,7 @@ pub trait UnsizedType {
     type RustMutType<'a>
     where
         Self: 'a;
-    type DefaultValueType;
+    type DefaultValueType: Default;
     fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_>;
     fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_>;
     fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustType;

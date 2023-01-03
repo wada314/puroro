@@ -17,6 +17,7 @@ use super::super::{MessageExt, Oneof, OneofField};
 use super::{OneofFieldExt, PackageOrMessageExt};
 use crate::syn::{
     parse2, Arm, Expr, Field, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, NamedField, Stmt,
+    Type,
 };
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -33,8 +34,10 @@ pub trait OneofExt {
 
     fn gen_union_ident(&self) -> Result<Rc<Ident>>;
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+    fn gen_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
 
-    fn gen_union(&self) -> Result<Vec<Item>>;
+    fn gen_oneof_items(&self) -> Result<Vec<Item>>;
     fn gen_struct_field(&self) -> Result<Field>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
@@ -46,6 +49,7 @@ pub trait OneofExt {
 #[derive(Debug, Default)]
 struct Cache {
     union_ident: OnceCell<Rc<Ident>>,
+    case_ident: OnceCell<Rc<Ident>>,
     struct_field_ident: OnceCell<Rc<Ident>>,
     allocated_bitfield: OnceCell<OneofBitfieldAllocation>,
 }
@@ -120,16 +124,32 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .cloned()
     }
 
-    fn gen_union(&self) -> Result<Vec<Item>> {
+    fn gen_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+        let message_module = self.message()?.gen_rust_module_path()?;
         let union_ident = self.gen_union_ident()?;
-        let case_ident = format_ident!("{}Case", self.name()?.to_camel_case());
-        let union_items = try_map_fields(self, |f| f.gen_union_item_field())?;
-        let item_type_names = try_map_fields(self, |f| f.gen_generic_type_param_ident())?;
+        Ok(Rc::new(parse2(quote! {
+            #message_module :: #union_ident :: < #(#generics),* >
+        })?))
+    }
+
+    fn gen_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+        let message_module = self.message()?.gen_rust_module_path()?;
+        let case_ident = gen_case_ident(self)?;
+        Ok(Rc::new(parse2(quote! {
+            #message_module :: #case_ident :: < #(#generics),* >
+        })?))
+    }
+
+    fn gen_oneof_items(&self) -> Result<Vec<Item>> {
+        let union_ident = self.gen_union_ident()?;
+        let case_ident = gen_case_ident(self)?;
+        let union_fields = try_map_fields(self, |f| f.gen_union_field())?;
         let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
+        let generic_params = try_map_fields(self, |f| f.gen_union_generic_param_ident())?;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
         let oneof_case_impl = gen_oneof_case_impl(self)?;
@@ -137,21 +157,25 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         // Union includes none case, where the case enum does not.
         Ok(vec![
             parse2(quote! {
-                pub union #union_ident {
+                pub union #union_ident < #(#generic_params),* > {
                     _none: (),
-                    #(#union_items),*,
+                    #(#union_fields),*,
                 }
             })?,
             parse2(quote! {
                 #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
                 pub enum #case_ident<
-                    #(#item_type_names = (),)*
+                    #(#generic_params = (),)*
                 > {
-                    #(#case_names(#item_type_names),)*
+                    #(#case_names(#generic_params),)*
                 }
             })?,
             parse2(quote! {
-                impl #union_ident {
+                impl< #(#generic_params),* > #union_ident< #(#generic_params),* >
+                where #(
+                    #generic_params: _puroro::internal::oneof_field_type::OneofFieldType,
+                )*
+                {
                     #(#union_methods)*
                 }
             })?,
@@ -162,7 +186,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #oneof_case_impl
             })?,
             parse2(quote! {
-                impl ::std::default::Default for #union_ident {
+                impl< #(#generic_params),* > ::std::default::Default for #union_ident< #(#generic_params),* >
+                {
                     fn default() -> Self {
                         Self { _none: () }
                     }
@@ -173,10 +198,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
     fn gen_struct_field(&self) -> Result<Field> {
         let field_ident = self.gen_struct_field_ident()?;
-        let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = self.gen_union_ident()?;
+        let generic_params = self
+            .fields()?
+            .map(|f| f.gen_union_field_type())
+            .collect::<Result<Vec<_>>>()?;
+        let field_type = self.gen_union_type(generic_params.iter().cloned())?;
         Ok(parse2::<NamedField>(quote! {
-            #field_ident: #message_module :: #union_ident
+            #field_ident: #field_type
         })?
         .into())
     }
@@ -188,15 +216,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         );
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_struct_field_ident()?;
-        let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = self.gen_union_ident()?;
+
+        let getter_case_generic_params = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
+        let getter_type = self.gen_case_type(getter_case_generic_params.iter().cloned())?;
 
         Ok(vec![
             parse2(quote! {
-                pub fn #getter_ident(&self) -> ::std::option::Option<
-                    <#message_module::#union_ident as self::_puroro::internal::oneof_type::OneofUnion>::CaseRef<'_>
-                >
-                {
+                pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
                     use self::_puroro::internal::oneof_type::OneofUnion as _;
                     self.#field_ident.case_ref(&self._bitfield)
                 }
@@ -212,12 +238,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_struct_field_ident()?;
-        let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = self.gen_union_ident()?;
-
         Ok(parse2(quote! {
-            #ident: <#message_module :: #union_ident as self::_puroro::internal::oneof_type::OneofUnion>
-                ::clone(&self.#ident, &self._bitfield)
+            #ident: self::_puroro::internal::oneof_type::OneofUnion::clone(&self.#ident, &self._bitfield)
         })?)
     }
 
@@ -270,36 +292,55 @@ where
     this.fields()?.map(f).collect::<Result<Vec<_>>>()
 }
 
+fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
+    this.cache()
+        .get::<Cache>()?
+        .case_ident
+        .get_or_try_init(|| {
+            Ok(Rc::new(format_ident!(
+                "{}Case",
+                this.name()?.to_camel_case()
+            )))
+        })
+        .cloned()
+}
+
 fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let union_ident = this.gen_union_ident()?;
-    let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
-    let union_item_idents = try_map_fields(this, |f| f.gen_union_item_ident())?;
+    let case_ident = gen_case_ident(this)?;
+    let union_field_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
     let getter_mut_idents = try_map_fields(this, |f| f.gen_union_getter_mut_ident())?;
     let field_numbers = try_map_fields(this, |f| f.number())?;
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
-    let borrowed_types_a = try_map_fields(this, |f| {
-        f.gen_maybe_borrowed_type(Some(parse2(quote! { 'a })?))
-    })?;
+    let generic_params = try_map_fields(this, |f| f.gen_union_generic_param_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
 
     Ok(parse2(quote! {
-        impl self::_puroro::internal::oneof_type::OneofUnion for #union_ident {
+        impl< #(#generic_params),* > self::_puroro::internal::oneof_type::OneofUnion
+        for #union_ident< #(#generic_params),* >
+        where #(
+            #generic_params: _puroro::internal::oneof_field_type::OneofFieldType,
+        )*
+        {
             type Case = self::#case_ident;
-            type CaseRef<'a> = self::#case_ident::<#(#borrowed_types_a,)*>;
+            type CaseRef<'a> = self::#case_ident::<#(
+                <#generic_params as self::_puroro::internal::oneof_field_type::OneofFieldType>
+                    ::GetterType<'a>
+            ),*>
+            where Self: 'a;
 
             fn case_ref<B: self::_puroro::internal::bitvec::BitSlice>(&self, bits: &B)
                 -> ::std::option::Option<Self::CaseRef<'_>>
             {
                 use self::_puroro::internal::oneof_type::OneofCase;
                 use ::std::mem::ManuallyDrop;
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 use ::std::ops::Deref as _;
                 let case_opt = <self::#case_ident as OneofCase>::from_bitslice(bits);
                 case_opt.map(|case| {
                     match case {
                         #(self::#case_ident::#case_names(_) => self::#case_ident::#case_names(
-                            ManuallyDrop::deref(unsafe { &self.#union_item_idents }).get_field()
+                            ManuallyDrop::deref(unsafe { &self.#union_field_idents }).get_field()
                         ),)*
                     }
                 })
@@ -311,7 +352,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 #[allow(unused)] use ::std::option::Option::Some;
                 match <self::#case_ident as OneofCase>::from_bitslice(bits) {
                     #(Some(self::#case_ident::#case_names(())) => {
-                        unsafe { ManuallyDrop::take(&mut self.#union_item_idents) };
+                        unsafe { ManuallyDrop::take(&mut self.#union_field_idents) };
                     })*
                     _ => ()
                 }
@@ -324,7 +365,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 #[allow(unused)] use ::std::clone::Clone;
                 match <self::#case_ident as OneofCase>::from_bitslice(bits) {
                     #(Some(self::#case_ident::#case_names(())) => Self {
-                        #union_item_idents: Clone::clone(unsafe { &self.#union_item_idents }),
+                        #union_field_idents: Clone::clone(unsafe { &self.#union_field_idents }),
                     },)*
                     _ => Self { _none: (), },
                 }
@@ -340,12 +381,11 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 B: self::_puroro::internal::bitvec::BitSlice,
             {
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 #[allow(unused)] use ::std::result::Result::Ok;
                 match case {
                     #(Self::Case::#case_names(_) => {
                         let _ = <Self>::#getter_mut_idents(self, bitvec);
-                        unsafe { &mut self.#union_item_idents }.deser_from_iter(field_data)?;
+                        unsafe { &mut self.#union_field_idents }.deser_from_iter(field_data)?;
                     })*
                 }
                 Ok(())
@@ -359,10 +399,9 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
                 #[allow(unused)] use ::std::option::Option::Some;
                 #[allow(unused)] use ::std::result::Result::Ok;
                 use self::_puroro::internal::oneof_type::OneofCase as _;
-                use self::_puroro::internal::oneof_field_type::OneofFieldType as _;
                 match self::#case_ident::from_bitslice(bitvec) {
                     #(Some(self::#case_ident::#case_names(_)) => {
-                        unsafe { &self.#union_item_idents }.ser_to_write(
+                        unsafe { &self.#union_field_idents }.ser_to_write(
                             #field_numbers, out,
                         )?;
                     })*
@@ -375,9 +414,9 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
 }
 
 fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
-    let case_ident = format_ident!("{}Case", this.name()?.to_camel_case());
-    let union_items = try_map_fields(this, |f| f.gen_union_item_field())?;
-    let item_indices = (1..=(union_items.len() as u32)).collect::<Vec<_>>();
+    let case_ident = gen_case_ident(this)?;
+    let union_fields = try_map_fields(this, |f| f.gen_union_field())?;
+    let item_indices = (1..=(union_fields.len() as u32)).collect::<Vec<_>>();
     let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
