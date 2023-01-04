@@ -276,8 +276,7 @@ fn gen_messages_enums_oneofs_in_module(
                     }
                 })?),
                 Ok(parse2::<Item>(quote! {
-                    // Hide temporarily to find bugs
-                    // pub use self::_case::*;
+                    pub use self::_case::*;
                 })?),
             ]
             .into_iter())
