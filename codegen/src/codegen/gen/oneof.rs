@@ -38,7 +38,9 @@ pub trait OneofExt {
     fn gen_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
     fn gen_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
 
-    fn gen_oneof_items(&self) -> Result<Vec<Item>>;
+    fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
+    fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
+
     fn gen_struct_field(&self) -> Result<Field>;
     fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
@@ -141,21 +143,18 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         })?))
     }
 
-    fn gen_oneof_items(&self) -> Result<Vec<Item>> {
+    fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {
         let union_ident = self.gen_union_ident()?;
-        let case_ident = gen_case_ident(self)?;
         let union_fields = try_map_fields(self, |f| f.gen_union_field())?;
         let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
         let generic_params = try_map_fields(self, |f| f.gen_union_generic_param_ident())?;
         let generic_param_bounds =
             try_map_fields(self, |f| f.gen_union_generic_param_where_bounds())?;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
-        let oneof_case_impl = gen_oneof_case_impl(self)?;
 
         // Union includes none case, where the case enum does not.
         Ok(vec![
@@ -163,14 +162,6 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 pub union #union_ident < #(#generic_params),* > {
                     _none: (),
                     #(#union_fields),*,
-                }
-            })?,
-            parse2(quote! {
-                #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
-                pub enum #case_ident<
-                    #(#generic_params = (),)*
-                > {
-                    #(#case_names(#generic_params),)*
                 }
             })?,
             parse2(quote! {
@@ -185,15 +176,35 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #oneof_union_impl
             })?,
             parse2(quote! {
-                #oneof_case_impl
-            })?,
-            parse2(quote! {
                 impl< #(#generic_params),* > ::std::default::Default for #union_ident< #(#generic_params),* >
                 {
                     fn default() -> Self {
                         Self { _none: () }
                     }
                 }
+            })?,
+        ])
+    }
+
+    fn gen_oneof_case_items(&self) -> Result<Vec<Item>> {
+        let case_ident = gen_case_ident(self)?;
+        let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
+        let generic_params = try_map_fields(self, |f| f.gen_union_generic_param_ident())?;
+
+        let oneof_case_impl = gen_oneof_case_impl(self)?;
+
+        // Union includes none case, where the case enum does not.
+        Ok(vec![
+            parse2(quote! {
+                #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
+                pub enum #case_ident<
+                    #(#generic_params = (),)*
+                > {
+                    #(#case_names(#generic_params),)*
+                }
+            })?,
+            parse2(quote! {
+                #oneof_case_impl
             })?,
         ])
     }

@@ -24,6 +24,7 @@ use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::Rc;
 
 pub trait PackageOrMessageExt {
@@ -255,13 +256,39 @@ fn gen_messages_enums_oneofs_in_module(
         .enums()?
         .map(|e| Ok(e.gen_enum()?.into_iter()))
         .flatten_ok();
-    let oneof_items = this
+    let oneof_union_items = this
         .oneofs()?
-        .map(|o| Ok(o.gen_oneof_items()?.into_iter()))
+        .map(|o| Ok(o.gen_oneof_union_items()?.into_iter()))
         .flatten_ok();
+
+    // Oneof cases are imported into separte module to avoid name conflict.
+    let oneof_case_in_module_items = this
+        .oneofs()?
+        .map(|o| Ok(o.gen_oneof_case_items()?.into_iter()))
+        .flatten_ok()
+        .collect::<Result<Vec<_>>>()?;
+    let oneof_case_items: Box<dyn Iterator<Item = Result<Item>>> =
+        if oneof_case_in_module_items.is_empty() {
+            Box::new(iter::empty())
+        } else {
+            Box::new(
+                [
+                    Ok(parse2::<Item>(quote! {
+                        pub mod _case {
+                            #(#oneof_case_in_module_items)*
+                        }
+                    })?),
+                    Ok(parse2::<Item>(quote! {
+                        pub use self::_case::*;
+                    })?),
+                ]
+                .into_iter(),
+            )
+        };
 
     message_items
         .chain(enum_items)
-        .chain(oneof_items)
+        .chain(oneof_union_items)
+        .chain(oneof_case_items)
         .collect::<Result<Vec<_>>>()
 }
