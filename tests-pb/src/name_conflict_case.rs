@@ -22,7 +22,7 @@ impl Message {
     pub fn test(
         &self,
     ) -> ::std::option::Option<
-        self::_root::name_conflict_case::message::TestCase::<i32>,
+        self::_root::name_conflict_case::message::_case::TestCase::<i32>,
     > {
         use self::_pinternal::OneofUnion as _;
         self.test.case_ref(&self._bitfield)
@@ -48,8 +48,9 @@ impl Message {
         use ::std::option::Option::Some;
         use self::_pinternal::OneofCase;
         use self::_pinternal::OneofUnion;
-        if let Some(self::_root::name_conflict_case::message::TestCase::ThisIsOneof(_))
-            = OneofCase::from_bitslice(&self._bitfield) {
+        if let Some(
+            self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(_),
+        ) = OneofCase::from_bitslice(&self._bitfield) {
             self.test.clear(&mut self._bitfield)
         }
     }
@@ -78,7 +79,7 @@ impl self::_puroro::Message for Message {
                         .deser_from_iter(
                             &mut self._bitfield,
                             field_data,
-                            self::_root::name_conflict_case::message::TestCase::ThisIsOneof(()),
+                            self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(()),
                         )?
                 }
                 _ => todo!(),

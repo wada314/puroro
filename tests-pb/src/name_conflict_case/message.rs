@@ -165,6 +165,7 @@ pub union Test<TThisIsOneof> {
 }
 impl<TThisIsOneof> Test<TThisIsOneof>
 where
+    Self: self::_pinternal::OneofUnion,
     TThisIsOneof: self::_pinternal::OneofFieldType,
 {
     pub(crate) fn this_is_oneof<B: self::_pinternal::BitSlice>(
@@ -177,9 +178,12 @@ where
         use ::std::default::Default;
         use self::_pinternal::OneofFieldType;
         use ::std::ops::Deref as _;
-        use self::_pinternal::OneofCase as _;
-        let case_opt = self::TestCase::from_bitslice(bits);
-        let field_opt = matches!(case_opt, Some(self::TestCase::ThisIsOneof(())))
+        use self::_pinternal::OneofCase;
+        let case_opt = OneofCase::from_bitslice(bits);
+        let field_opt = matches!(
+            case_opt, Some(self::_root::name_conflict_case::message::_case::TestCase:: <
+            > ::ThisIsOneof(()))
+        )
             .then(|| { unsafe { self.this_is_oneof.deref() } });
         OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
@@ -191,9 +195,12 @@ where
         use ::std::option::Option::{None, Some};
         use self::_pinternal::OneofFieldType;
         use ::std::ops::Deref as _;
-        use self::_pinternal::OneofCase as _;
-        let case_opt = self::TestCase::from_bitslice(bits);
-        let field_opt = matches!(case_opt, Some(self::TestCase::ThisIsOneof(())))
+        use self::_pinternal::OneofCase;
+        let case_opt = OneofCase::from_bitslice(bits);
+        let field_opt = matches!(
+            case_opt, Some(self::_root::name_conflict_case::message::_case::TestCase:: <
+            > ::ThisIsOneof(()))
+        )
             .then(|| { unsafe { self.this_is_oneof.deref() } });
         OneofFieldType::get_field_opt(field_opt)
     }
@@ -207,12 +214,16 @@ where
         use ::std::default::Default;
         use ::std::mem::ManuallyDrop;
         use ::std::ops::DerefMut as _;
-        use self::_pinternal::{OneofCase as _, OneofUnion};
+        use self::_pinternal::{OneofCase, OneofUnion};
         use self::_pinternal::OneofFieldType;
-        let case_opt = self::TestCase::from_bitslice(bits);
-        if let Some(self::TestCase::ThisIsOneof(())) = case_opt {} else {
+        let case_opt = OneofCase::from_bitslice(bits);
+        if let Some(
+            self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(()),
+        ) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
-            let index = self::TestCase::into_u32(self::TestCase::ThisIsOneof(()));
+            let index = OneofCase::into_u32(
+                self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(()),
+            );
             bits.set_range(0usize..2usize, index);
             *self = self::Test {
                 this_is_oneof: ManuallyDrop::new((::std::default::Default::default)()),
@@ -226,8 +237,13 @@ impl<TThisIsOneof> self::_pinternal::OneofUnion for Test<TThisIsOneof>
 where
     TThisIsOneof: self::_pinternal::OneofFieldType,
 {
-    type Case = self::TestCase;
-    type CaseRef<'a> where Self: 'a = self::TestCase::<TThisIsOneof::GetterType<'a>>;
+    type Case = self::_root::name_conflict_case::message::_case::TestCase;
+    type CaseRef<'a>
+    where
+        Self: 'a,
+    = self::_root::name_conflict_case::message::_case::TestCase::<
+        <TThisIsOneof as self::_pinternal::OneofFieldType>::GetterType::<'a>,
+    >;
     fn case_ref<B: self::_pinternal::BitSlice>(
         &self,
         bits: &B,
@@ -235,12 +251,12 @@ where
         use self::_pinternal::OneofCase;
         use ::std::mem::ManuallyDrop;
         use ::std::ops::Deref as _;
-        let case_opt = <self::TestCase as OneofCase>::from_bitslice(bits);
+        let case_opt = OneofCase::from_bitslice(bits);
         case_opt
             .map(|case| {
                 match case {
-                    self::TestCase::ThisIsOneof(_) => {
-                        self::TestCase::ThisIsOneof(
+                    Self::Case::ThisIsOneof(_) => {
+                        Self::CaseRef::ThisIsOneof(
                             ManuallyDrop::deref(unsafe { &self.this_is_oneof })
                                 .get_field(),
                         )
@@ -253,8 +269,8 @@ where
         use ::std::mem::ManuallyDrop;
         #[allow(unused)]
         use ::std::option::Option::Some;
-        match <self::TestCase as OneofCase>::from_bitslice(bits) {
-            Some(self::TestCase::ThisIsOneof(())) => {
+        match OneofCase::from_bitslice(bits) {
+            Some(Self::Case::ThisIsOneof(())) => {
                 unsafe { ManuallyDrop::take(&mut self.this_is_oneof) };
             }
             _ => {}
@@ -267,8 +283,8 @@ where
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::clone::Clone;
-        match <self::TestCase as OneofCase>::from_bitslice(bits) {
-            Some(self::TestCase::ThisIsOneof(())) => {
+        match OneofCase::from_bitslice(bits) {
+            Some(Self::Case::ThisIsOneof(())) => {
                 Self {
                     this_is_oneof: Clone::clone(unsafe { &self.this_is_oneof }),
                 }
@@ -305,9 +321,9 @@ where
         use ::std::option::Option::Some;
         #[allow(unused)]
         use ::std::result::Result::Ok;
-        use self::_pinternal::OneofCase as _;
-        match self::TestCase::from_bitslice(bitvec) {
-            Some(self::TestCase::ThisIsOneof(_)) => {
+        use self::_pinternal::OneofCase;
+        match OneofCase::from_bitslice(bitvec) {
+            Some(Self::Case::ThisIsOneof(_)) => {
                 unsafe { &self.this_is_oneof }.ser_to_write(1i32, out)?;
             }
             _ => {}
