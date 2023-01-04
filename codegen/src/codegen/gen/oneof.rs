@@ -131,14 +131,14 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {
         let union_ident = gen_union_ident(self)?;
-        let union_fields = try_map_fields(self, |f| f.gen_union_field())?;
-        let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
+        let union_fields = try_map_fields(self, |f| f.gen_oneof_union_field())?;
+        let union_methods = try_map_fields(self, |f| Ok(f.gen_oneof_union_methods()?.into_iter()))?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        let generic_params = try_map_fields(self, |f| f.gen_union_generic_param_ident())?;
+        let generic_params = try_map_fields(self, |f| f.gen_oneof_union_generic_param_ident())?;
         let generic_param_bounds =
-            try_map_fields(self, |f| f.gen_union_generic_param_where_bounds())?;
+            try_map_fields(self, |f| f.gen_oneof_union_generic_param_where_bounds())?;
 
         let oneof_union_impl = gen_oneof_union_impl(self)?;
 
@@ -175,8 +175,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
     fn gen_oneof_case_items(&self) -> Result<Vec<Item>> {
         let case_ident = gen_case_ident(self)?;
-        let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
-        let generic_params = try_map_fields(self, |f| f.gen_union_generic_param_ident())?;
+        let case_names = try_map_fields(self, |f| f.gen_oneof_case_value_ident())?;
+        let generic_params = try_map_fields(self, |f| f.gen_oneof_union_generic_param_ident())?;
 
         let oneof_case_impl = gen_oneof_case_impl(self)?;
 
@@ -200,7 +200,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let field_ident = self.gen_struct_field_ident()?;
         let generic_params = self
             .fields()?
-            .map(|f| f.gen_union_field_type())
+            .map(|f| f.gen_oneof_union_field_type())
             .collect::<Result<Vec<_>>>()?;
         let field_type = self.gen_oneof_union_type(generic_params.iter().cloned())?;
         Ok(parse2::<NamedField>(quote! {
@@ -248,7 +248,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let field_numbers = try_map_fields(self, |f| f.number())?;
 
         let case_type = self.gen_oneof_case_type(iter::empty())?;
-        let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
+        let case_names = try_map_fields(self, |f| f.gen_oneof_case_value_ident())?;
 
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
@@ -319,12 +319,13 @@ fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
 
 fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let union_ident = gen_union_ident(this)?;
-    let union_field_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
-    let getter_mut_idents = try_map_fields(this, |f| f.gen_union_getter_mut_ident())?;
+    let union_field_idents = try_map_fields(this, |f| f.gen_oneof_union_field_ident())?;
+    let getter_mut_idents = try_map_fields(this, |f| f.gen_oneof_union_getter_mut_ident())?;
     let field_numbers = try_map_fields(this, |f| f.number())?;
-    let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
-    let generic_params = try_map_fields(this, |f| f.gen_union_generic_param_ident())?;
-    let generic_param_bounds = try_map_fields(this, |f| f.gen_union_generic_param_where_bounds())?;
+    let case_names = try_map_fields(this, |f| f.gen_oneof_case_value_ident())?;
+    let generic_params = try_map_fields(this, |f| f.gen_oneof_union_generic_param_ident())?;
+    let generic_param_bounds =
+        try_map_fields(this, |f| f.gen_oneof_union_generic_param_where_bounds())?;
 
     let case_ref_generic_params = generic_params
         .iter()
@@ -434,9 +435,9 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
 
 fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let case_ident = gen_case_ident(this)?;
-    let union_fields = try_map_fields(this, |f| f.gen_union_field())?;
+    let union_fields = try_map_fields(this, |f| f.gen_oneof_union_field())?;
     let item_indices = (1..=(union_fields.len() as u32)).collect::<Vec<_>>();
-    let case_names = try_map_fields(this, |f| f.gen_case_enum_value_ident())?;
+    let case_names = try_map_fields(this, |f| f.gen_oneof_case_value_ident())?;
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;
 

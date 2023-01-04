@@ -26,8 +26,8 @@ use ::std::rc::Rc;
 
 pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
-    fn gen_rust_struct_type(&self) -> Result<Rc<Type>>;
-    fn gen_struct(&self) -> Result<Vec<Item>>;
+    fn gen_message_struct_type(&self) -> Result<Rc<Type>>;
+    fn gen_message_struct_items(&self) -> Result<Vec<Item>>;
 }
 
 #[derive(Debug, Default)]
@@ -66,7 +66,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             .cloned()
     }
 
-    fn gen_rust_struct_type(&self) -> Result<Rc<Type>> {
+    fn gen_message_struct_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .rust_struct_type
@@ -79,8 +79,8 @@ impl<T: ?Sized + Message> MessageExt for T {
             .cloned()
     }
 
-    fn gen_struct(&self) -> Result<Vec<Item>> {
-        let ident = gen_struct_ident(self)?;
+    fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
+        let ident = gen_message_struct_ident(self)?;
         let fields = self
             .fields()?
             .map(|f| f.gen_struct_field())
@@ -104,15 +104,15 @@ impl<T: ?Sized + Message> MessageExt for T {
             .iter()
             .map(|o| o.fields())
             .flatten_ok()
-            .map(|f| Ok(f?.gen_struct_methods()?.into_iter()))
+            .map(|f| Ok(f?.gen_message_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
-        let message_impl = gen_struct_message_impl(self)?;
-        let clone_impl = gen_struct_impl_clone(self)?;
-        let drop_impl = gen_struct_impl_drop(self)?;
-        let debug_impl = gen_struct_impl_debug(self)?;
-        let partial_eq_impl = gen_struct_impl_partial_eq(self)?;
+        let message_impl = gen_message_struct_message_impl(self)?;
+        let clone_impl = gen_message_struct_impl_clone(self)?;
+        let drop_impl = gen_message_struct_impl_drop(self)?;
+        let debug_impl = gen_message_struct_impl_debug(self)?;
+        let partial_eq_impl = gen_message_struct_impl_partial_eq(self)?;
 
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
@@ -141,7 +141,7 @@ impl<T: ?Sized + Message> MessageExt for T {
     }
 }
 
-fn gen_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
+fn gen_message_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
     Ok(format_ident!(
         "{}",
         this.name()?
@@ -151,8 +151,8 @@ fn gen_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
     ))
 }
 
-fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
-    let ident = gen_struct_ident(this)?;
+fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+    let ident = gen_message_struct_ident(this)?;
     let field_data_ident: Ident = parse2(quote! { field_data })?;
     let field_data_expr = parse2(quote! { field_data })?;
     let out_ident = quote! { out };
@@ -209,8 +209,8 @@ fn gen_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
-    let ident = gen_struct_ident(this)?;
+fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+    let ident = gen_message_struct_ident(this)?;
     let field_clones = this
         .fields()?
         .map(|f| f.gen_struct_impl_clone_field_value())
@@ -232,8 +232,8 @@ fn gen_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
-    let ident = gen_struct_ident(this)?;
+fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+    let ident = gen_message_struct_ident(this)?;
     let oneof_idents = this
         .oneofs()?
         .map(|o| o.gen_struct_field_ident())
@@ -250,8 +250,8 @@ fn gen_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
-    let ident = gen_struct_ident(this)?;
+fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+    let ident = gen_message_struct_ident(this)?;
     let mut fmt_body: Expr = parse2(quote! { fmt.debug_struct(stringify!(#ident)) })?;
 
     for field in this.fields()? {
@@ -259,7 +259,9 @@ fn gen_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     }
     for oneof in this.oneofs()? {
         for field in oneof.fields()? {
-            fmt_body = field.gen_struct_impl_debug_method_call(fmt_body)?.into();
+            fmt_body = field
+                .gen_message_struct_impl_debug_method_call(fmt_body)?
+                .into();
         }
     }
 
@@ -272,8 +274,8 @@ fn gen_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     })?)
 }
 
-fn gen_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
-    let ident = gen_struct_ident(this)?;
+fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
+    let ident = gen_message_struct_ident(this)?;
     let rhs_expr = parse2(quote! { rhs })?;
     let field_cmps = this
         .fields()?

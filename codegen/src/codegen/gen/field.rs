@@ -281,7 +281,7 @@ fn gen_struct_field_methods_for_repeated(
                 ::std::cmp::PartialEq
         })?),
         FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-            m.try_upgrade()?.gen_rust_struct_type()?
+            m.try_upgrade()?.gen_message_struct_type()?
         }
         _ => this.r#type()?.rust_type()?,
     };

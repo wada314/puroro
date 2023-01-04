@@ -249,7 +249,7 @@ fn gen_messages_enums_oneofs_in_module(
 ) -> Result<Vec<Item>> {
     let message_items = this
         .messages()?
-        .map(|m| Ok(m.gen_struct()?.into_iter()))
+        .map(|m| Ok(m.gen_message_struct_items()?.into_iter()))
         .flatten_ok();
     let enum_items = this
         .enums()?
