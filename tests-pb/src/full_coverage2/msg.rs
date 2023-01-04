@@ -241,3 +241,21 @@ impl ::std::cmp::PartialEq for Submsg {
             && self.i64_required_opt() == rhs.i64_required_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    pub struct SubmsgFields {
+        pub foo: i32,
+    }
+}
+pub use self::_fields::*;

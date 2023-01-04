@@ -159,6 +159,24 @@ impl ::std::cmp::PartialEq for TestCase {
         true && self.this_is_message_opt() == rhs.this_is_message_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    pub struct TestCaseFields {
+        pub foo: i32,
+    }
+}
+pub use self::_fields::*;
 pub union Test<TThisIsOneof> {
     _none: (),
     this_is_oneof: ::std::mem::ManuallyDrop::<TThisIsOneof>,

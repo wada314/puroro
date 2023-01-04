@@ -28,6 +28,7 @@ pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
     fn gen_message_struct_type(&self) -> Result<Rc<Type>>;
     fn gen_message_struct_items(&self) -> Result<Vec<Item>>;
+    fn gen_fields_struct_items(&self) -> Result<Vec<Item>>;
 }
 
 #[derive(Debug, Default)]
@@ -139,6 +140,15 @@ impl<T: ?Sized + Message> MessageExt for T {
             partial_eq_impl.into(),
         ])
     }
+
+    fn gen_fields_struct_items(&self) -> Result<Vec<Item>> {
+        let ident = gen_fields_struct_ident(self)?;
+        Ok(vec![parse2(quote! {
+            pub struct #ident {
+                pub foo: i32,
+            }
+        })?])
+    }
 }
 
 fn gen_message_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
@@ -148,6 +158,13 @@ fn gen_message_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
             .to_camel_case()
             .escape_rust_keywords()
             .to_string()
+    ))
+}
+
+fn gen_fields_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
+    Ok(format_ident!(
+        "{}Fields",
+        this.name()?.to_camel_case().to_string()
     ))
 }
 

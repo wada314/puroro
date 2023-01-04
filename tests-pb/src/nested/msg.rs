@@ -150,6 +150,24 @@ impl ::std::cmp::PartialEq for Submsg {
         true && self.item_inner_opt() == rhs.item_inner_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    pub struct SubmsgFields {
+        pub foo: i32,
+    }
+}
+pub use self::_fields::*;
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

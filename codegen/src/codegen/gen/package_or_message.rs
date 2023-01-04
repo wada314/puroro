@@ -247,7 +247,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
 fn gen_messages_enums_oneofs_in_module(
     this: &(impl ?Sized + PackageOrMessage),
 ) -> Result<Vec<Item>> {
-    let message_items = this
+    let message_struct_items = this
         .messages()?
         .map(|m| Ok(m.gen_message_struct_items()?.into_iter()))
         .flatten_ok();
@@ -259,6 +259,31 @@ fn gen_messages_enums_oneofs_in_module(
         .oneofs()?
         .map(|o| Ok(o.gen_oneof_union_items()?.into_iter()))
         .flatten_ok();
+
+    // Message fields structs are imported into separte module to avoid name conflict.
+    let fields_struct_in_module_items = this
+        .messages()?
+        .map(|m| Ok(m.gen_fields_struct_items()?.into_iter()))
+        .flatten_ok()
+        .collect::<Result<Vec<_>>>()?;
+    let fields_struct_items = (!fields_struct_in_module_items.is_empty())
+        .then(|| -> Result<_> {
+            Ok([
+                Ok(parse2::<Item>(quote! {
+                    pub mod _fields {
+                        #SUBMODULE_HEADER
+                        #(#fields_struct_in_module_items)*
+                    }
+                })?),
+                Ok(parse2::<Item>(quote! {
+                    pub use self::_fields::*;
+                })?),
+            ]
+            .into_iter())
+        })
+        .transpose()?
+        .into_iter()
+        .flatten();
 
     // Oneof cases are imported into separte module to avoid name conflict.
     let oneof_case_in_module_items = this
@@ -285,7 +310,8 @@ fn gen_messages_enums_oneofs_in_module(
         .into_iter()
         .flatten();
 
-    message_items
+    message_struct_items
+        .chain(fields_struct_items)
         .chain(enum_items)
         .chain(oneof_union_items)
         .chain(oneof_case_items)

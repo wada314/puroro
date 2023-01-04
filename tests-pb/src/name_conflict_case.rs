@@ -130,3 +130,21 @@ impl ::std::cmp::PartialEq for Message {
         true && self.test() == rhs.test()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    pub struct MessageFields {
+        pub foo: i32,
+    }
+}
+pub use self::_fields::*;

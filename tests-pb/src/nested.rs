@@ -151,3 +151,21 @@ impl ::std::cmp::PartialEq for Msg {
         true && self.item_outer_opt() == rhs.item_outer_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    pub struct MsgFields {
+        pub foo: i32,
+    }
+}
+pub use self::_fields::*;
