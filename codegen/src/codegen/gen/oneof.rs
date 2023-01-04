@@ -17,8 +17,8 @@ use super::{
     MessageExt, Oneof, OneofField, OneofFieldExt, PackageOrMessageExt, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
-    parse2, Arm, Expr, Field, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, NamedField, Path,
-    Stmt, Type,
+    parse2, Arm, Expr, Field, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, NamedField, Stmt,
+    Type,
 };
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -320,7 +320,6 @@ fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
 
 fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
     let union_ident = this.gen_union_ident()?;
-    let case_ident = gen_case_ident(this)?;
     let union_field_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
     let getter_mut_idents = try_map_fields(this, |f| f.gen_union_getter_mut_ident())?;
     let field_numbers = try_map_fields(this, |f| f.number())?;

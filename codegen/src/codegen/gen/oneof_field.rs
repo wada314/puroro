@@ -14,7 +14,6 @@
 
 use super::super::util::*;
 use super::field::gen_default_fn;
-use super::PackageOrMessageExt;
 use super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField, PURORO_INTERNAL};
 use crate::syn::{
     parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
