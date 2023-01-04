@@ -34,13 +34,13 @@ pub trait FieldExt {
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
-    fn gen_struct_field(&self) -> Result<SynField>;
-    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
-    fn gen_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
-    fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
-    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
-    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
+    fn gen_message_struct_field(&self) -> Result<SynField>;
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
+    fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
+    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
+    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -102,31 +102,31 @@ impl<T: ?Sized + Field> FieldExt for T {
         }
     }
 
-    fn gen_struct_field(&self) -> Result<SynField> {
-        let ident = gen_struct_field_ident(self)?;
-        let r#type = gen_struct_field_type(self)?;
+    fn gen_message_struct_field(&self) -> Result<SynField> {
+        let ident = gen_message_struct_field_ident(self)?;
+        let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2::<NamedField>(quote! {
             #ident: #r#type
         })?
         .into())
     }
-    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.rule()? {
-            FieldRule::Repeated => gen_struct_field_methods_for_repeated(self),
-            _ => gen_struct_field_methods_for_non_repeated(self),
+            FieldRule::Repeated => gen_message_struct_field_methods_for_repeated(self),
+            _ => gen_message_struct_field_methods_for_non_repeated(self),
         }
     }
-    fn gen_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
-        let ident = gen_struct_field_ident(self)?;
-        let r#type = gen_struct_field_type(self)?;
+    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
+        let ident = gen_message_struct_field_ident(self)?;
+        let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2(quote! {
             #ident: <#r#type as ::std::clone::Clone>::clone(&self.#ident)
         })?)
     }
-    fn gen_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
-        let ident = gen_struct_field_ident(self)?;
+    fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
+        let ident = gen_message_struct_field_ident(self)?;
         let number = self.number()?;
-        let r#type = gen_struct_field_type(self)?;
+        let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2(quote! {
             #number => <#r#type as #PURORO_INTERNAL::FieldType>::deser_from_iter(
                 &mut self.#ident,
@@ -135,10 +135,10 @@ impl<T: ?Sized + Field> FieldExt for T {
             )?,
         })?)
     }
-    fn gen_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
-        let ident = gen_struct_field_ident(self)?;
+    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+        let ident = gen_message_struct_field_ident(self)?;
         let number = self.number()?;
-        let r#type = gen_struct_field_type(self)?;
+        let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2(quote! {
             <#r#type as #PURORO_INTERNAL::FieldType>::ser_to_write(
                 &self.#ident,
@@ -148,8 +148,8 @@ impl<T: ?Sized + Field> FieldExt for T {
             )?;
         })?)
     }
-    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
-        let ident = gen_struct_field_ident(self)?;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
+        let ident = gen_message_struct_field_ident(self)?;
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
                 let getter_ident = format_ident!(
@@ -168,7 +168,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             }
         })?)
     }
-    fn gen_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
                 let getter_ident = format_ident!(
@@ -200,7 +200,7 @@ fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<us
     Ok(alloc.maybe_optional)
 }
 
-fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
+fn gen_message_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
     use FieldRule::*;
     use FieldType::*;
     use LengthDelimitedType::*;
@@ -244,7 +244,7 @@ fn gen_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
         .cloned()
 }
 
-fn gen_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
+fn gen_message_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
         .struct_field_ident
@@ -257,7 +257,7 @@ fn gen_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
         .cloned()
 }
 
-fn gen_struct_field_methods_for_repeated(
+fn gen_message_struct_field_methods_for_repeated(
     this: &(impl ?Sized + Field),
 ) -> Result<Vec<ImplItemMethod>> {
     debug_assert!(matches!(this.rule(), Ok(FieldRule::Repeated)));
@@ -267,8 +267,8 @@ fn gen_struct_field_methods_for_repeated(
     );
     let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
-    let field_ident = gen_struct_field_ident(this)?;
-    let field_type = gen_struct_field_type(this)?;
+    let field_ident = gen_message_struct_field_ident(this)?;
+    let field_type = gen_message_struct_field_type(this)?;
     let getter_item_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
             impl ::std::ops::Deref::<Target = str> +
@@ -314,7 +314,7 @@ fn gen_struct_field_methods_for_repeated(
     ])
 }
 
-fn gen_struct_field_methods_for_non_repeated(
+fn gen_message_struct_field_methods_for_non_repeated(
     this: &(impl ?Sized + Field),
 ) -> Result<Vec<ImplItemMethod>> {
     debug_assert!(matches!(
@@ -329,8 +329,8 @@ fn gen_struct_field_methods_for_non_repeated(
     let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
     let getter_has_ident = format_ident!("has_{}", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
-    let field_ident = gen_struct_field_ident(this)?;
-    let field_type = gen_struct_field_type(this)?;
+    let field_ident = gen_message_struct_field_ident(this)?;
+    let field_type = gen_message_struct_field_type(this)?;
     let borrowed_type = this.r#type()?.rust_maybe_borrowed_type(None)?;
     let getter_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(parse2(quote! {

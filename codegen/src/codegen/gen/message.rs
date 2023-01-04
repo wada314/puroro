@@ -83,7 +83,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         let ident = gen_message_struct_ident(self)?;
         let fields = self
             .fields()?
-            .map(|f| f.gen_struct_field())
+            .map(|f| f.gen_message_struct_field())
             .collect::<Result<Vec<_>>>()?;
         let oneof_fields = self
             .oneofs()?
@@ -91,7 +91,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let field_methods = self
             .fields()?
-            .map(|f| Ok(f.gen_struct_methods()?.into_iter()))
+            .map(|f| Ok(f.gen_message_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let oneof_methods = self
@@ -159,7 +159,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
     let out_expr = parse2(quote! { out })?;
     let field_deser_arms = this
         .fields()?
-        .map(|f| f.gen_struct_impl_deser_arm(&field_data_expr))
+        .map(|f| f.gen_message_struct_impl_deser_arm(&field_data_expr))
         .collect::<Result<Vec<_>>>()?;
     let oneof_deser_arms = this
         .oneofs()?
@@ -173,7 +173,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
         .collect::<Result<Vec<_>>>()?;
     let ser_fields = this
         .fields()?
-        .map(|f| f.gen_struct_impl_message_ser_stmt(&out_expr))
+        .map(|f| f.gen_message_struct_impl_message_ser_stmt(&out_expr))
         .collect::<Result<Vec<_>>>()?;
     let ser_oneof_stmts = this
         .oneofs()?
@@ -215,7 +215,7 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
     let ident = gen_message_struct_ident(this)?;
     let field_clones = this
         .fields()?
-        .map(|f| f.gen_struct_impl_clone_field_value())
+        .map(|f| f.gen_message_struct_impl_clone_field_value())
         .collect::<Result<Vec<_>>>()?;
     let oneof_clones = this
         .oneofs()?
@@ -257,7 +257,9 @@ fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemI
     let mut fmt_body: Expr = parse2(quote! { fmt.debug_struct(stringify!(#ident)) })?;
 
     for field in this.fields()? {
-        fmt_body = field.gen_struct_impl_debug_method_call(fmt_body)?.into();
+        fmt_body = field
+            .gen_message_struct_impl_debug_method_call(fmt_body)?
+            .into();
     }
     for oneof in this.oneofs()? {
         for field in oneof.fields()? {
@@ -281,7 +283,7 @@ fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<
     let rhs_expr = parse2(quote! { rhs })?;
     let field_cmps = this
         .fields()?
-        .map(|f| f.gen_struct_impl_partial_eq_cmp(&rhs_expr))
+        .map(|f| f.gen_message_struct_impl_partial_eq_cmp(&rhs_expr))
         .collect::<Result<Vec<_>>>()?;
     let oneof_cmps = this
         .oneofs()?
