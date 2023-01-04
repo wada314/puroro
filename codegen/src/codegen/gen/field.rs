@@ -440,7 +440,7 @@ pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<Expr> {
                 // Enum. Need to generate the value name.
                 FieldType::Variant(VariantType::Enum2(e) | VariantType::Enum3(e)) => {
                     let e = e.try_upgrade()?;
-                    let enum_path = e.gen_rust_enum_path()?;
+                    let enum_path = e.gen_enum_path()?;
                     let enum_value_ident = format_ident!(
                         "{}",
                         default_value_string.to_camel_case().escape_rust_keywords()

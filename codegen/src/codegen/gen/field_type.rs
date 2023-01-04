@@ -68,7 +68,7 @@ impl VariantType {
             UInt64 => quote! { u64 },
             Bool => quote! { bool },
             Enum2(e) | Enum3(e) => {
-                return Ok(e.try_upgrade()?.gen_rust_enum_type()?);
+                return Ok(e.try_upgrade()?.gen_enum_type()?);
             }
         })?))
     }
@@ -83,11 +83,11 @@ impl VariantType {
             UInt64 => quote! { UInt64 },
             Bool => quote! { Bool },
             Enum2(e) => {
-                let enum_path = e.try_upgrade()?.gen_rust_enum_path()?;
+                let enum_path = e.try_upgrade()?.gen_enum_path()?;
                 quote! { Enum2 :: <#enum_path> }
             }
             Enum3(e) => {
-                let enum_path = e.try_upgrade()?.gen_rust_enum_path()?;
+                let enum_path = e.try_upgrade()?.gen_enum_path()?;
                 quote! { Enum3 :: <#enum_path> }
             }
         };

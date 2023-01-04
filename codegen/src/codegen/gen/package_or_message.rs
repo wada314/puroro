@@ -253,7 +253,7 @@ fn gen_messages_enums_oneofs_in_module(
         .flatten_ok();
     let enum_items = this
         .enums()?
-        .map(|e| Ok(e.gen_enum()?.into_iter()))
+        .map(|e| Ok(e.gen_enum_items()?.into_iter()))
         .flatten_ok();
     let oneof_union_items = this
         .oneofs()?

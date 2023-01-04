@@ -29,19 +29,19 @@ use ::std::rc::Rc;
 use ::syn::ItemImpl;
 
 pub trait EnumExt {
-    fn gen_enum(&self) -> Result<Vec<Item>>;
-    fn gen_rust_enum_path(&self) -> Result<Rc<syn::Path>>;
-    fn gen_rust_enum_type(&self) -> Result<Rc<syn::Type>>;
+    fn gen_enum_items(&self) -> Result<Vec<Item>>;
+    fn gen_enum_path(&self) -> Result<Rc<syn::Path>>;
+    fn gen_enum_type(&self) -> Result<Rc<syn::Type>>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    rust_enum_path: OnceCell<Rc<Path>>,
-    rust_enum_type: OnceCell<Rc<Type>>,
+    enum_path: OnceCell<Rc<Path>>,
+    enum_type: OnceCell<Rc<Type>>,
 }
 
 impl<T: ?Sized + Enum> EnumExt for T {
-    fn gen_enum(&self) -> Result<Vec<Item>> {
+    fn gen_enum_items(&self) -> Result<Vec<Item>> {
         let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
         let value_idents = self
             .values()?
@@ -90,10 +90,10 @@ impl<T: ?Sized + Enum> EnumExt for T {
         ])
     }
 
-    fn gen_rust_enum_path(&self) -> Result<Rc<syn::Path>> {
+    fn gen_enum_path(&self) -> Result<Rc<syn::Path>> {
         self.cache()
             .get::<Cache>()?
-            .rust_enum_path
+            .enum_path
             .get_or_try_init(|| {
                 let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
                 let parent = self.parent()?.gen_rust_module_path()?;
@@ -102,12 +102,12 @@ impl<T: ?Sized + Enum> EnumExt for T {
             .cloned()
     }
 
-    fn gen_rust_enum_type(&self) -> Result<Rc<syn::Type>> {
+    fn gen_enum_type(&self) -> Result<Rc<syn::Type>> {
         self.cache()
             .get::<Cache>()?
-            .rust_enum_type
+            .enum_type
             .get_or_try_init(|| {
-                let path = self.gen_rust_enum_path()?;
+                let path = self.gen_enum_path()?;
                 Ok(Rc::new(syn::parse2(quote! { #path })?))
             })
             .cloned()
