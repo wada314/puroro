@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     EnumExt, MessageExt, OneofExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT,
-    PURORO_ROOT, PURORO_ROOT_IDENT,
+    PURORO_ROOT, PURORO_ROOT_IDENT, SUBMODULE_HEADER,
 };
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
@@ -271,6 +271,7 @@ fn gen_messages_enums_oneofs_in_module(
             Ok([
                 Ok(parse2::<Item>(quote! {
                     pub mod _case {
+                        #SUBMODULE_HEADER
                         #(#oneof_case_in_module_items)*
                     }
                 })?),
