@@ -285,7 +285,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     }
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
-        let oneof_struct_field_ident = self.oneof()?.gen_struct_field_ident()?;
+        let oneof_struct_field_ident = self.oneof()?.gen_message_struct_field_ident()?;
         let getter_ident = self.gen_oneof_union_getter_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
