@@ -66,15 +66,15 @@ gen_global_constants! {
     const SUBMODULE_HEADER: SubmoduleHeader = quote! {
         mod #PURORO_ROOT_IDENT {
             #[allow(unused)]
-            use super::super::#PURORO_ROOT_IDENT::*;
+            pub use super::super::#PURORO_ROOT_IDENT::*;
         }
         mod #PURORO_LIB_IDENT {
             #[allow(unused)]
-            use ::puroro::*;
+            pub use ::puroro::*;
         }
         mod #PURORO_INTERNAL_IDENT {
             #[allow(unused)]
-            use ::puroro::internal::*;
+            pub use ::puroro::internal::*;
         }
     };
 }
