@@ -33,10 +33,9 @@ pub trait OneofExt {
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
-    fn gen_union_ident(&self) -> Result<Rc<Ident>>;
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
-    fn gen_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+    fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+    fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
     fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
@@ -101,19 +100,6 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .tail)
     }
 
-    fn gen_union_ident(&self) -> Result<Rc<Ident>> {
-        self.cache()
-            .get::<Cache>()?
-            .union_ident
-            .get_or_try_init(|| {
-                Ok(Rc::new(format_ident!(
-                    "{}",
-                    self.name()?.to_camel_case().escape_rust_keywords()
-                )))
-            })
-            .cloned()
-    }
-
     fn gen_struct_field_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
@@ -127,15 +113,15 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .cloned()
     }
 
-    fn gen_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+    fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
         let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = self.gen_union_ident()?;
+        let union_ident = gen_union_ident(self)?;
         Ok(Rc::new(parse2(quote! {
             #message_module :: #union_ident :: < #(#generics),* >
         })?))
     }
 
-    fn gen_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+    fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
         let message_module = self.message()?.gen_rust_module_path()?;
         let case_ident = gen_case_ident(self)?;
         Ok(Rc::new(parse2(quote! {
@@ -144,7 +130,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     }
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {
-        let union_ident = self.gen_union_ident()?;
+        let union_ident = gen_union_ident(self)?;
         let union_fields = try_map_fields(self, |f| f.gen_union_field())?;
         let union_methods = try_map_fields(self, |f| Ok(f.gen_union_methods()?.into_iter()))?
             .into_iter()
@@ -216,7 +202,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .fields()?
             .map(|f| f.gen_union_field_type())
             .collect::<Result<Vec<_>>>()?;
-        let field_type = self.gen_union_type(generic_params.iter().cloned())?;
+        let field_type = self.gen_oneof_union_type(generic_params.iter().cloned())?;
         Ok(parse2::<NamedField>(quote! {
             #field_ident: #field_type
         })?
@@ -232,7 +218,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let field_ident = self.gen_struct_field_ident()?;
 
         let getter_case_generic_params = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
-        let getter_type = self.gen_case_type(getter_case_generic_params.iter().cloned())?;
+        let getter_type = self.gen_oneof_case_type(getter_case_generic_params.iter().cloned())?;
 
         Ok(vec![
             parse2(quote! {
@@ -261,7 +247,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let field_ident = self.gen_struct_field_ident()?;
         let field_numbers = try_map_fields(self, |f| f.number())?;
 
-        let case_type = self.gen_case_type(iter::empty())?;
+        let case_type = self.gen_oneof_case_type(iter::empty())?;
         let case_names = try_map_fields(self, |f| f.gen_case_enum_value_ident())?;
 
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
@@ -305,6 +291,19 @@ where
     this.fields()?.map(f).collect::<Result<Vec<_>>>()
 }
 
+fn gen_union_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
+    this.cache()
+        .get::<Cache>()?
+        .union_ident
+        .get_or_try_init(|| {
+            Ok(Rc::new(format_ident!(
+                "{}",
+                this.name()?.to_camel_case().escape_rust_keywords()
+            )))
+        })
+        .cloned()
+}
+
 fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
@@ -319,7 +318,7 @@ fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
 }
 
 fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
-    let union_ident = this.gen_union_ident()?;
+    let union_ident = gen_union_ident(this)?;
     let union_field_idents = try_map_fields(this, |f| f.gen_union_field_ident())?;
     let getter_mut_idents = try_map_fields(this, |f| f.gen_union_getter_mut_ident())?;
     let field_numbers = try_map_fields(this, |f| f.number())?;
@@ -335,8 +334,8 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
             })?))
         })
         .collect::<Result<Vec<_>>>()?;
-    let case_type = this.gen_case_type(iter::empty())?;
-    let case_ref_type = this.gen_case_type(case_ref_generic_params.into_iter())?;
+    let case_type = this.gen_oneof_case_type(iter::empty())?;
+    let case_ref_type = this.gen_oneof_case_type(case_ref_generic_params.into_iter())?;
 
     let bitfield_begin = this.bitfield_index_for_oneof()?.0;
     let bitfield_end = this.bitfield_index_for_oneof()?.1;

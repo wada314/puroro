@@ -213,8 +213,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 ::GetterMutType<'_>
         })?;
 
-        let union_ident = self.oneof()?.gen_union_ident()?;
-        let case_type = self.oneof()?.gen_case_type(iter::empty())?;
+        let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
         let union_field_ident = self.gen_union_field_ident()?;
         let enum_item_ident = self.gen_case_enum_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
@@ -272,7 +271,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                         <Self as OneofUnion>::clear(self, bits);
                         let index = OneofCase::into_u32(#case_type::#enum_item_ident(()));
                         bits.set_range(#bitfield_begin..#bitfield_end, index);
-                        *self = self::#union_ident {
+                        *self = Self {
                             #union_field_ident: ManuallyDrop::new((#default_fn)())
                         };
                     }
@@ -293,7 +292,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
 
-        let case_type = self.oneof()?.gen_case_type(iter::empty())?;
+        let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {

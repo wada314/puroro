@@ -225,7 +225,7 @@ where
                 self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(()),
             );
             bits.set_range(0usize..2usize, index);
-            *self = self::Test {
+            *self = Self {
                 this_is_oneof: ManuallyDrop::new((::std::default::Default::default)()),
             };
         }
