@@ -14,7 +14,6 @@
 
 use super::super::util::*;
 use super::field::gen_default_fn;
-use super::PackageOrMessageExt;
 use super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField, PURORO_INTERNAL};
 use crate::syn::{
     parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
@@ -25,25 +24,26 @@ use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::iter;
 use ::std::rc::Rc;
 
 pub trait OneofFieldExt {
-    fn gen_union_field_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_getter_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_union_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_oneof_union_field_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_oneof_union_getter_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_oneof_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_oneof_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_oneof_union_generic_param_ident(&self) -> Result<Rc<Ident>>;
     // `syn::PredicateType` does not impl `syn::parse::Parse`...
-    fn gen_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>>;
-    fn gen_case_enum_value_ident(&self) -> Result<Ident>;
+    fn gen_oneof_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>>;
+    fn gen_oneof_case_value_ident(&self) -> Result<Ident>;
 
-    fn gen_union_field_type(&self) -> Result<Rc<Type>>;
+    fn gen_oneof_union_field_type(&self) -> Result<Rc<Type>>;
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
-    fn gen_union_field(&self) -> Result<Rc<Field>>;
-    fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
+    fn gen_oneof_union_field(&self) -> Result<Rc<Field>>;
+    fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
 }
 
 #[derive(Debug, Default)]
@@ -58,7 +58,7 @@ struct Cache {
 }
 
 impl<T: ?Sized + OneofField> OneofFieldExt for T {
-    fn gen_union_field_ident(&self) -> Result<Rc<Ident>> {
+    fn gen_oneof_union_field_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_field_ident
@@ -70,7 +70,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_getter_ident(&self) -> Result<Rc<Ident>> {
+    fn gen_oneof_union_getter_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_getter_ident
@@ -82,7 +82,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_getter_opt_ident(&self) -> Result<Rc<Ident>> {
+    fn gen_oneof_union_getter_opt_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_getter_opt_ident
@@ -94,7 +94,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
+    fn gen_oneof_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_getter_mut_ident
@@ -106,7 +106,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_generic_param_ident(&self) -> Result<Rc<Ident>> {
+    fn gen_oneof_union_generic_param_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_generic_param_ident
@@ -118,26 +118,26 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>> {
+    fn gen_oneof_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>> {
         self.cache()
             .get::<Cache>()?
             .union_generic_param_where_bounds
             .get_or_try_init(|| {
-                let ident = self.gen_union_generic_param_ident()?;
+                let ident = self.gen_oneof_union_generic_param_ident()?;
                 Ok(Rc::new(quote! {
                     #ident: #PURORO_INTERNAL::OneofFieldType
                 }))
             })
             .cloned()
     }
-    fn gen_case_enum_value_ident(&self) -> Result<Ident> {
+    fn gen_oneof_case_value_ident(&self) -> Result<Ident> {
         Ok(format_ident!(
             "{}",
             self.name()?.to_camel_case().escape_rust_keywords()
         ))
     }
 
-    fn gen_union_field_type(&self) -> Result<Rc<Type>> {
+    fn gen_oneof_union_field_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .union_field_type
@@ -148,7 +148,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     let r#type = self.r#type()?;
                     parse2(match r#type {
                         LengthDelimited(Message(m)) => {
-                            let message_path = m.try_upgrade()?.gen_rust_struct_type()?;
+                            let message_path = m.try_upgrade()?.gen_message_struct_type()?;
                             quote! {
                                 HeapMessageField::< #message_path >
                             }
@@ -179,9 +179,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
 
-    fn gen_union_field(&self) -> Result<Rc<Field>> {
-        let ident = self.gen_union_field_ident()?;
-        let field_inner_type_ident = self.gen_union_generic_param_ident()?;
+    fn gen_oneof_union_field(&self) -> Result<Rc<Field>> {
+        let ident = self.gen_oneof_union_field_ident()?;
+        let field_inner_type_ident = self.gen_oneof_union_generic_param_ident()?;
         let field_type: Type = parse2(quote! {
             ::std::mem::ManuallyDrop::< #field_inner_type_ident >
         })?;
@@ -194,12 +194,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ))
     }
 
-    fn gen_union_methods(&self) -> Result<Vec<ImplItemMethod>> {
-        let getter_ident = self.gen_union_getter_ident()?;
-        let getter_opt_ident = self.gen_union_getter_opt_ident()?;
-        let getter_mut_ident = self.gen_union_getter_mut_ident()?;
+    fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        let getter_ident = self.gen_oneof_union_getter_ident()?;
+        let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
+        let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
 
-        let generic_param_type_ident = self.gen_union_generic_param_ident()?;
+        let generic_param_type_ident = self.gen_oneof_union_generic_param_ident()?;
         let getter_type: Type = parse2(quote! {
             <#generic_param_type_ident as #PURORO_INTERNAL::OneofFieldType>
                 ::GetterOrElseType<'_>
@@ -213,10 +213,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                 ::GetterMutType<'_>
         })?;
 
-        let union_ident = self.oneof()?.gen_union_ident()?;
-        let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
-        let union_field_ident = self.gen_union_field_ident()?;
-        let enum_item_ident = self.gen_case_enum_value_ident()?;
+        let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
+        let union_field_ident = self.gen_oneof_union_field_ident()?;
+        let enum_item_ident = self.gen_oneof_case_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
         let default_fn = gen_default_fn(self)?;
@@ -228,10 +227,10 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     #[allow(unused)] use ::std::default::Default;
                     use #PURORO_INTERNAL::OneofFieldType;
                     use ::std::ops::Deref as _;
-                    use #PURORO_INTERNAL::OneofCase as _;
+                    use #PURORO_INTERNAL::OneofCase;
 
-                    let case_opt = self::#case_ident::from_bitslice(bits);
-                    let field_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                    let case_opt = OneofCase::from_bitslice(bits);
+                    let field_opt = matches!(case_opt, Some(#case_type::#enum_item_ident(()))).then(|| {
                         unsafe {
                             self.#union_field_ident.deref()
                         }
@@ -244,10 +243,10 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     #[allow(unused)] use ::std::option::Option::{None, Some};
                     use #PURORO_INTERNAL::OneofFieldType;
                     use ::std::ops::Deref as _;
-                    use #PURORO_INTERNAL::OneofCase as _;
+                    use #PURORO_INTERNAL::OneofCase;
 
-                    let case_opt = self::#case_ident::from_bitslice(bits);
-                    let field_opt = matches!(case_opt, Some(self::#case_ident::#enum_item_ident(()))).then(|| {
+                    let case_opt = OneofCase::from_bitslice(bits);
+                    let field_opt = matches!(case_opt, Some(#case_type::#enum_item_ident(()))).then(|| {
                         unsafe {
                             self.#union_field_ident.deref()
                         }
@@ -261,18 +260,18 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     #[allow(unused)] use ::std::default::Default;
                     use ::std::mem::ManuallyDrop;
                     use ::std::ops::DerefMut as _;
-                    use #PURORO_INTERNAL::{OneofCase as _, OneofUnion};
+                    use #PURORO_INTERNAL::{OneofCase, OneofUnion};
                     use #PURORO_INTERNAL::OneofFieldType;
 
-                    let case_opt = self::#case_ident::from_bitslice(bits);
-                    if let Some(self::#case_ident::#enum_item_ident(())) = case_opt {
+                    let case_opt = OneofCase::from_bitslice(bits);
+                    if let Some(#case_type::#enum_item_ident(())) = case_opt {
                         // The union is already set to the expected value. Do nothing.
                     } else {
                         // Need to reset the union value to the expected field type.
                         <Self as OneofUnion>::clear(self, bits);
-                        let index = self::#case_ident::into_u32(self::#case_ident::#enum_item_ident(()));
+                        let index = OneofCase::into_u32(#case_type::#enum_item_ident(()));
                         bits.set_range(#bitfield_begin..#bitfield_end, index);
-                        *self = self::#union_ident {
+                        *self = Self {
                             #union_field_ident: ManuallyDrop::new((#default_fn)())
                         };
                     }
@@ -285,14 +284,15 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
-        let oneof_struct_field_ident = self.oneof()?.gen_struct_field_ident()?;
-        let getter_ident = self.gen_union_getter_ident()?;
-        let getter_opt_ident = self.gen_union_getter_opt_ident()?;
-        let getter_mut_ident = self.gen_union_getter_mut_ident()?;
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        let oneof_struct_field_ident = self.oneof()?.gen_message_struct_field_ident()?;
+        let getter_ident = self.gen_oneof_union_getter_ident()?;
+        let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
+        let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
         let has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
 
+        let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
@@ -306,12 +306,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             ::std::option::Option::< #borrowed_type >
         };
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
-        let case_ident = format_ident!("{}Case", self.oneof()?.name()?.to_camel_case());
-        let case_path = {
-            let module_path = self.oneof()?.message()?.gen_rust_module_path()?;
-            quote! { #module_path :: #case_ident }
-        };
-        let enum_item_ident = self.gen_case_enum_value_ident()?;
+        let enum_item_ident = self.gen_oneof_case_value_ident()?;
 
         Ok(vec![
             parse2(quote! {
@@ -339,7 +334,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     #[allow(unused)] use ::std::option::Option::Some;
                     use #PURORO_INTERNAL::OneofCase;
                     use #PURORO_INTERNAL::OneofUnion;
-                    if let Some(#case_path::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
+                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
                         self.#oneof_struct_field_ident.clear(&mut self._bitfield)
                     }
                 }
@@ -347,9 +342,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
-        let ident = self.gen_union_field_ident()?;
-        let getter_opt_ident = self.gen_union_getter_opt_ident()?;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
+        let ident = self.gen_oneof_union_field_ident()?;
+        let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         Ok(parse2(quote! {
             #receiver.field(stringify!(#ident), &self.#getter_opt_ident())
         })?)

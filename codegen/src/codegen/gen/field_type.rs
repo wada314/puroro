@@ -68,7 +68,7 @@ impl VariantType {
             UInt64 => quote! { u64 },
             Bool => quote! { bool },
             Enum2(e) | Enum3(e) => {
-                return Ok(e.try_upgrade()?.gen_rust_enum_type()?);
+                return Ok(e.try_upgrade()?.gen_enum_type()?);
             }
         })?))
     }
@@ -83,11 +83,11 @@ impl VariantType {
             UInt64 => quote! { UInt64 },
             Bool => quote! { Bool },
             Enum2(e) => {
-                let enum_path = e.try_upgrade()?.gen_rust_enum_path()?;
+                let enum_path = e.try_upgrade()?.gen_enum_path()?;
                 quote! { Enum2 :: <#enum_path> }
             }
             Enum3(e) => {
-                let enum_path = e.try_upgrade()?.gen_rust_enum_path()?;
+                let enum_path = e.try_upgrade()?.gen_enum_path()?;
                 quote! { Enum3 :: <#enum_path> }
             }
         };
@@ -103,7 +103,7 @@ impl LengthDelimitedType {
             String => quote! { ::std::string::String },
             Bytes => quote! { ::std::vec::Vec<u8> },
             Message(m) => {
-                return Ok(m.try_upgrade()?.gen_rust_struct_type()?);
+                return Ok(m.try_upgrade()?.gen_message_struct_type()?);
             }
         })?))
     }
@@ -113,7 +113,7 @@ impl LengthDelimitedType {
             String => quote! { &#lt str },
             Bytes => quote! { &#lt [u8] },
             Message(m) => {
-                let ty = m.try_upgrade()?.gen_rust_struct_type()?;
+                let ty = m.try_upgrade()?.gen_message_struct_type()?;
                 quote! { &#lt #ty }
             }
         })?))
@@ -124,7 +124,7 @@ impl LengthDelimitedType {
             String => quote! { &mut ::std::string::String },
             Bytes => quote! { &mut ::std::vec::Vec::<u8> },
             Message(m) => {
-                let ty = m.try_upgrade()?.gen_rust_struct_type()?;
+                let ty = m.try_upgrade()?.gen_message_struct_type()?;
                 quote! { &mut #ty }
             }
         })?))
@@ -135,7 +135,7 @@ impl LengthDelimitedType {
             String => quote! { String },
             Bytes => quote! { Bytes },
             Message(m) => {
-                let struct_type = m.try_upgrade()?.gen_rust_struct_type()?;
+                let struct_type = m.try_upgrade()?.gen_message_struct_type()?;
                 quote! { Message :: <#struct_type> }
             }
         };

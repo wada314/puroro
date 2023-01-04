@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     EnumExt, MessageExt, OneofExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT,
-    PURORO_ROOT, PURORO_ROOT_IDENT,
+    PURORO_ROOT, PURORO_ROOT_IDENT, SUBMODULE_HEADER,
 };
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
@@ -249,19 +249,45 @@ fn gen_messages_enums_oneofs_in_module(
 ) -> Result<Vec<Item>> {
     let message_items = this
         .messages()?
-        .map(|m| Ok(m.gen_struct()?.into_iter()))
+        .map(|m| Ok(m.gen_message_struct_items()?.into_iter()))
         .flatten_ok();
     let enum_items = this
         .enums()?
-        .map(|e| Ok(e.gen_enum()?.into_iter()))
+        .map(|e| Ok(e.gen_enum_items()?.into_iter()))
         .flatten_ok();
-    let oneof_items = this
+    let oneof_union_items = this
         .oneofs()?
-        .map(|o| Ok(o.gen_oneof_items()?.into_iter()))
+        .map(|o| Ok(o.gen_oneof_union_items()?.into_iter()))
         .flatten_ok();
+
+    // Oneof cases are imported into separte module to avoid name conflict.
+    let oneof_case_in_module_items = this
+        .oneofs()?
+        .map(|o| Ok(o.gen_oneof_case_items()?.into_iter()))
+        .flatten_ok()
+        .collect::<Result<Vec<_>>>()?;
+    let oneof_case_items = (!oneof_case_in_module_items.is_empty())
+        .then(|| -> Result<_> {
+            Ok([
+                Ok(parse2::<Item>(quote! {
+                    pub mod _case {
+                        #SUBMODULE_HEADER
+                        #(#oneof_case_in_module_items)*
+                    }
+                })?),
+                Ok(parse2::<Item>(quote! {
+                    pub use self::_case::*;
+                })?),
+            ]
+            .into_iter())
+        })
+        .transpose()?
+        .into_iter()
+        .flatten();
 
     message_items
         .chain(enum_items)
-        .chain(oneof_items)
+        .chain(oneof_union_items)
+        .chain(oneof_case_items)
         .collect::<Result<Vec<_>>>()
 }

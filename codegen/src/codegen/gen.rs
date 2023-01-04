@@ -63,4 +63,18 @@ gen_global_constants! {
     const PURORO_ROOT: PuroroRoot = quote! { self :: #PURORO_ROOT_IDENT };
     const PURORO_LIB_IDENT: PuroroLibIdent = format_ident!("_puroro");
     const PURORO_LIB: PuroroLib = quote! { self :: #PURORO_LIB_IDENT };
+    const SUBMODULE_HEADER: SubmoduleHeader = quote! {
+        mod #PURORO_ROOT_IDENT {
+            #[allow(unused)]
+            pub use super::super::#PURORO_ROOT_IDENT::*;
+        }
+        mod #PURORO_LIB_IDENT {
+            #[allow(unused)]
+            pub use ::puroro::*;
+        }
+        mod #PURORO_INTERNAL_IDENT {
+            #[allow(unused)]
+            pub use ::puroro::internal::*;
+        }
+    };
 }
