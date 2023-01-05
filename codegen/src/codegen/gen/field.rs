@@ -60,7 +60,6 @@ struct Cache {
 
     // Generated tokens cache
     message_struct_field_ident: OnceCell<Rc<Ident>>,
-    message_struct_field_type: OnceCell<Rc<Type>>,
     fields_struct_generic_param_ident: OnceCell<Rc<Ident>>,
     fields_struct_field_type: OnceCell<Rc<Type>>,
 }
