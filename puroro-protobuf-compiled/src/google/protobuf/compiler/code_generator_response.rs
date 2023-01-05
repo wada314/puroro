@@ -12,23 +12,25 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct File {
-    name: self::_pinternal::OptionalUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
-        0usize,
-    >,
-    insertion_point: self::_pinternal::OptionalUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
-        1usize,
-    >,
-    content: self::_pinternal::OptionalUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
-        2usize,
-    >,
-    generated_code_info: self::_pinternal::SingularHeapMessageField::<
-        self::_root::google::protobuf::GeneratedCodeInfo,
+    fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
+        self::_pinternal::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+            0usize,
+        >,
+        self::_pinternal::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+            1usize,
+        >,
+        self::_pinternal::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+            2usize,
+        >,
+        self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::GeneratedCodeInfo,
+        >,
     >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
@@ -40,7 +42,7 @@ impl File {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.name,
+            &self.fields.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -51,7 +53,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self._bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -60,7 +62,7 @@ impl File {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.name,
+            &mut self.fields.name,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -71,7 +73,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self._bitfield)
             .is_some()
     }
     pub fn clear_name(&mut self) {
@@ -80,7 +82,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self._bitfield)
     }
     pub fn insertion_point(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
@@ -89,7 +91,7 @@ impl File {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.insertion_point,
+            &self.fields.insertion_point,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -100,7 +102,10 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.insertion_point, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.fields.insertion_point,
+            &self._bitfield,
+        )
     }
     pub fn insertion_point_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -109,7 +114,7 @@ impl File {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.insertion_point,
+            &mut self.fields.insertion_point,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -120,7 +125,10 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.insertion_point, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.fields.insertion_point,
+                &self._bitfield,
+            )
             .is_some()
     }
     pub fn clear_insertion_point(&mut self) {
@@ -129,7 +137,10 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.insertion_point, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(
+            &mut self.fields.insertion_point,
+            &mut self._bitfield,
+        )
     }
     pub fn content(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
@@ -138,7 +149,7 @@ impl File {
             self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.content,
+            &self.fields.content,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -149,7 +160,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.content, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.content, &self._bitfield)
     }
     pub fn content_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -158,7 +169,7 @@ impl File {
             self::_pinternal::tags::String,
             2usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.content,
+            &mut self.fields.content,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -169,7 +180,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.content, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.content, &self._bitfield)
             .is_some()
     }
     pub fn clear_content(&mut self) {
@@ -178,7 +189,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.content, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.content, &mut self._bitfield)
     }
     pub fn generated_code_info(
         &self,
@@ -187,7 +198,7 @@ impl File {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.generated_code_info,
+            &self.fields.generated_code_info,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -199,7 +210,7 @@ impl File {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.generated_code_info,
+            &self.fields.generated_code_info,
             &self._bitfield,
         )
     }
@@ -210,7 +221,7 @@ impl File {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.generated_code_info,
+            &mut self.fields.generated_code_info,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -220,7 +231,7 @@ impl File {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.generated_code_info,
+                &self.fields.generated_code_info,
                 &self._bitfield,
             )
             .is_some()
@@ -230,7 +241,7 @@ impl File {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::clear(
-            &mut self.generated_code_info,
+            &mut self.fields.generated_code_info,
             &mut self._bitfield,
         )
     }
@@ -259,7 +270,7 @@ impl self::_puroro::Message for File {
                         self::_pinternal::tags::String,
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.name,
+                        &mut self.fields.name,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -270,7 +281,7 @@ impl self::_puroro::Message for File {
                         self::_pinternal::tags::String,
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.insertion_point,
+                        &mut self.fields.insertion_point,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -281,7 +292,7 @@ impl self::_puroro::Message for File {
                         self::_pinternal::tags::String,
                         2usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.content,
+                        &mut self.fields.content,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -290,7 +301,7 @@ impl self::_puroro::Message for File {
                     <self::_pinternal::SingularHeapMessageField::<
                         self::_root::google::protobuf::GeneratedCodeInfo,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.generated_code_info,
+                        &mut self.fields.generated_code_info,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -312,7 +323,7 @@ impl self::_puroro::Message for File {
             self::_pinternal::tags::String,
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.name,
+            &self.fields.name,
             &self._bitfield,
             1i32,
             out,
@@ -322,7 +333,7 @@ impl self::_puroro::Message for File {
             self::_pinternal::tags::String,
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.insertion_point,
+            &self.fields.insertion_point,
             &self._bitfield,
             2i32,
             out,
@@ -332,7 +343,7 @@ impl self::_puroro::Message for File {
             self::_pinternal::tags::String,
             2usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.content,
+            &self.fields.content,
             &self._bitfield,
             15i32,
             out,
@@ -340,7 +351,7 @@ impl self::_puroro::Message for File {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.generated_code_info,
+            &self.fields.generated_code_info,
             &self._bitfield,
             16i32,
             out,
@@ -351,24 +362,26 @@ impl self::_puroro::Message for File {
 impl ::std::clone::Clone for File {
     fn clone(&self) -> Self {
         Self {
-            name: <self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.name),
-            insertion_point: <self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.insertion_point),
-            content: <self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                2usize,
-            > as ::std::clone::Clone>::clone(&self.content),
-            generated_code_info: <self::_pinternal::SingularHeapMessageField::<
-                self::_root::google::protobuf::GeneratedCodeInfo,
-            > as ::std::clone::Clone>::clone(&self.generated_code_info),
+            fields: self::_fields::FileFields {
+                name: <self::_pinternal::OptionalUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                    0usize,
+                > as ::std::clone::Clone>::clone(&self.fields.name),
+                insertion_point: <self::_pinternal::OptionalUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                    1usize,
+                > as ::std::clone::Clone>::clone(&self.fields.insertion_point),
+                content: <self::_pinternal::OptionalUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                    2usize,
+                > as ::std::clone::Clone>::clone(&self.fields.content),
+                generated_code_info: <self::_pinternal::SingularHeapMessageField::<
+                    self::_root::google::protobuf::GeneratedCodeInfo,
+                > as ::std::clone::Clone>::clone(&self.fields.generated_code_info),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -402,6 +415,28 @@ impl ::std::cmp::PartialEq for File {
             && self.generated_code_info_opt() == rhs.generated_code_info_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct FileFields<TName, TInsertionPoint, TContent, TGeneratedCodeInfo> {
+        pub name: TName,
+        pub insertion_point: TInsertionPoint,
+        pub content: TContent,
+        pub generated_code_info: TGeneratedCodeInfo,
+    }
+}
+pub use self::_fields::*;
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

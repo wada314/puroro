@@ -12,21 +12,23 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Location {
-    path: self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
-    span: self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
-    leading_comments: self::_pinternal::OptionalUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
-        0usize,
-    >,
-    trailing_comments: self::_pinternal::OptionalUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
-        1usize,
-    >,
-    leading_detached_comments: self::_pinternal::RepeatedUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
+    fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields<
+        self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
+        self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
+        self::_pinternal::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+            0usize,
+        >,
+        self::_pinternal::OptionalUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+            1usize,
+        >,
+        self::_pinternal::RepeatedUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+        >,
     >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
@@ -36,42 +38,48 @@ impl Location {
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.path, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.path, &self._bitfield)
     }
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(&mut self.path, &mut self._bitfield)
+        > as RepeatedFieldType>::get_field_mut(
+            &mut self.fields.path,
+            &mut self._bitfield,
+        )
     }
     pub fn clear_path(&mut self) {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(&mut self.path, &mut self._bitfield)
+        > as RepeatedFieldType>::clear(&mut self.fields.path, &mut self._bitfield)
     }
     pub fn span(&self) -> &[i32] {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.span, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.span, &self._bitfield)
     }
     pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(&mut self.span, &mut self._bitfield)
+        > as RepeatedFieldType>::get_field_mut(
+            &mut self.fields.span,
+            &mut self._bitfield,
+        )
     }
     pub fn clear_span(&mut self) {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(&mut self.span, &mut self._bitfield)
+        > as RepeatedFieldType>::clear(&mut self.fields.span, &mut self._bitfield)
     }
     pub fn leading_comments(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
@@ -80,7 +88,7 @@ impl Location {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.leading_comments,
+            &self.fields.leading_comments,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -92,7 +100,7 @@ impl Location {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.leading_comments,
+            &self.fields.leading_comments,
             &self._bitfield,
         )
     }
@@ -103,7 +111,7 @@ impl Location {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.leading_comments,
+            &mut self.fields.leading_comments,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -115,7 +123,7 @@ impl Location {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.leading_comments,
+                &self.fields.leading_comments,
                 &self._bitfield,
             )
             .is_some()
@@ -127,7 +135,7 @@ impl Location {
             self::_pinternal::tags::String,
             0usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.leading_comments,
+            &mut self.fields.leading_comments,
             &mut self._bitfield,
         )
     }
@@ -138,7 +146,7 @@ impl Location {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.trailing_comments,
+            &self.fields.trailing_comments,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -150,7 +158,7 @@ impl Location {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.trailing_comments,
+            &self.fields.trailing_comments,
             &self._bitfield,
         )
     }
@@ -161,7 +169,7 @@ impl Location {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.trailing_comments,
+            &mut self.fields.trailing_comments,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -173,7 +181,7 @@ impl Location {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.trailing_comments,
+                &self.fields.trailing_comments,
                 &self._bitfield,
             )
             .is_some()
@@ -185,7 +193,7 @@ impl Location {
             self::_pinternal::tags::String,
             1usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.trailing_comments,
+            &mut self.fields.trailing_comments,
             &mut self._bitfield,
         )
     }
@@ -199,7 +207,7 @@ impl Location {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::get_field(
-            &self.leading_detached_comments,
+            &self.fields.leading_detached_comments,
             &self._bitfield,
         )
     }
@@ -211,7 +219,7 @@ impl Location {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::get_field_mut(
-            &mut self.leading_detached_comments,
+            &mut self.fields.leading_detached_comments,
             &mut self._bitfield,
         )
     }
@@ -221,7 +229,7 @@ impl Location {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::clear(
-            &mut self.leading_detached_comments,
+            &mut self.fields.leading_detached_comments,
             &mut self._bitfield,
         )
     }
@@ -249,7 +257,7 @@ impl self::_puroro::Message for Location {
                         i32,
                         self::_pinternal::tags::Int32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.path,
+                        &mut self.fields.path,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -259,7 +267,7 @@ impl self::_puroro::Message for Location {
                         i32,
                         self::_pinternal::tags::Int32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.span,
+                        &mut self.fields.span,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -270,7 +278,7 @@ impl self::_puroro::Message for Location {
                         self::_pinternal::tags::String,
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.leading_comments,
+                        &mut self.fields.leading_comments,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -281,7 +289,7 @@ impl self::_puroro::Message for Location {
                         self::_pinternal::tags::String,
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.trailing_comments,
+                        &mut self.fields.trailing_comments,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -291,7 +299,7 @@ impl self::_puroro::Message for Location {
                         ::std::string::String,
                         self::_pinternal::tags::String,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.leading_detached_comments,
+                        &mut self.fields.leading_detached_comments,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -312,7 +320,7 @@ impl self::_puroro::Message for Location {
             i32,
             self::_pinternal::tags::Int32,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.path,
+            &self.fields.path,
             &self._bitfield,
             1i32,
             out,
@@ -321,7 +329,7 @@ impl self::_puroro::Message for Location {
             i32,
             self::_pinternal::tags::Int32,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.span,
+            &self.fields.span,
             &self._bitfield,
             2i32,
             out,
@@ -331,7 +339,7 @@ impl self::_puroro::Message for Location {
             self::_pinternal::tags::String,
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.leading_comments,
+            &self.fields.leading_comments,
             &self._bitfield,
             3i32,
             out,
@@ -341,7 +349,7 @@ impl self::_puroro::Message for Location {
             self::_pinternal::tags::String,
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.trailing_comments,
+            &self.fields.trailing_comments,
             &self._bitfield,
             4i32,
             out,
@@ -350,7 +358,7 @@ impl self::_puroro::Message for Location {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.leading_detached_comments,
+            &self.fields.leading_detached_comments,
             &self._bitfield,
             6i32,
             out,
@@ -361,28 +369,30 @@ impl self::_puroro::Message for Location {
 impl ::std::clone::Clone for Location {
     fn clone(&self) -> Self {
         Self {
-            path: <self::_pinternal::RepeatedNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            > as ::std::clone::Clone>::clone(&self.path),
-            span: <self::_pinternal::RepeatedNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            > as ::std::clone::Clone>::clone(&self.span),
-            leading_comments: <self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.leading_comments),
-            trailing_comments: <self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.trailing_comments),
-            leading_detached_comments: <self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-            > as ::std::clone::Clone>::clone(&self.leading_detached_comments),
+            fields: self::_fields::LocationFields {
+                path: <self::_pinternal::RepeatedNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                > as ::std::clone::Clone>::clone(&self.fields.path),
+                span: <self::_pinternal::RepeatedNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                > as ::std::clone::Clone>::clone(&self.fields.span),
+                leading_comments: <self::_pinternal::OptionalUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                    0usize,
+                > as ::std::clone::Clone>::clone(&self.fields.leading_comments),
+                trailing_comments: <self::_pinternal::OptionalUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                    1usize,
+                > as ::std::clone::Clone>::clone(&self.fields.trailing_comments),
+                leading_detached_comments: <self::_pinternal::RepeatedUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                > as ::std::clone::Clone>::clone(&self.fields.leading_detached_comments),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -420,3 +430,32 @@ impl ::std::cmp::PartialEq for Location {
             && self.leading_detached_comments() == rhs.leading_detached_comments()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct LocationFields<
+        TPath,
+        TSpan,
+        TLeadingComments,
+        TTrailingComments,
+        TLeadingDetachedComments,
+    > {
+        pub path: TPath,
+        pub span: TSpan,
+        pub leading_comments: TLeadingComments,
+        pub trailing_comments: TTrailingComments,
+        pub leading_detached_comments: TLeadingDetachedComments,
+    }
+}
+pub use self::_fields::*;

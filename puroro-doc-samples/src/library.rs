@@ -12,15 +12,14 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Book {
-    title: self::_pinternal::SingularUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
+    fields: self::_root::library::_fields::BookFields<
+        self::_pinternal::SingularUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+        >,
+        self::_pinternal::SingularNumericalField::<u32, self::_pinternal::tags::UInt32>,
+        self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
     >,
-    num_pages: self::_pinternal::SingularNumericalField::<
-        u32,
-        self::_pinternal::tags::UInt32,
-    >,
-    author: self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
     _bitfield: self::_pinternal::BitArray<0usize>,
 }
 impl Book {
@@ -30,7 +29,7 @@ impl Book {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.title,
+            &self.fields.title,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -40,7 +39,7 @@ impl Book {
         <self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as NonRepeatedFieldType>::get_field_opt(&self.title, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.title, &self._bitfield)
     }
     pub fn title_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -48,7 +47,7 @@ impl Book {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.title,
+            &mut self.fields.title,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -58,7 +57,7 @@ impl Book {
         <self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as NonRepeatedFieldType>::get_field_opt(&self.title, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.title, &self._bitfield)
             .is_some()
     }
     pub fn clear_title(&mut self) {
@@ -66,7 +65,7 @@ impl Book {
         <self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as NonRepeatedFieldType>::clear(&mut self.title, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.title, &mut self._bitfield)
     }
     pub fn num_pages(&self) -> u32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -74,7 +73,7 @@ impl Book {
             u32,
             self::_pinternal::tags::UInt32,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.num_pages,
+            &self.fields.num_pages,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -84,7 +83,10 @@ impl Book {
         <self::_pinternal::SingularNumericalField::<
             u32,
             self::_pinternal::tags::UInt32,
-        > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.fields.num_pages,
+            &self._bitfield,
+        )
     }
     pub fn num_pages_mut(&mut self) -> &mut u32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -92,7 +94,7 @@ impl Book {
             u32,
             self::_pinternal::tags::UInt32,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.num_pages,
+            &mut self.fields.num_pages,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -102,7 +104,10 @@ impl Book {
         <self::_pinternal::SingularNumericalField::<
             u32,
             self::_pinternal::tags::UInt32,
-        > as NonRepeatedFieldType>::get_field_opt(&self.num_pages, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.fields.num_pages,
+                &self._bitfield,
+            )
             .is_some()
     }
     pub fn clear_num_pages(&mut self) {
@@ -110,14 +115,17 @@ impl Book {
         <self::_pinternal::SingularNumericalField::<
             u32,
             self::_pinternal::tags::UInt32,
-        > as NonRepeatedFieldType>::clear(&mut self.num_pages, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(
+            &mut self.fields.num_pages,
+            &mut self._bitfield,
+        )
     }
     pub fn author(&self) -> ::std::option::Option::<&self::_root::library::Author> {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::library::Author,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.author,
+            &self.fields.author,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -126,14 +134,14 @@ impl Book {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::library::Author,
-        > as NonRepeatedFieldType>::get_field_opt(&self.author, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.author, &self._bitfield)
     }
     pub fn author_mut(&mut self) -> &mut self::_root::library::Author {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::library::Author,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.author,
+            &mut self.fields.author,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -142,14 +150,14 @@ impl Book {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::library::Author,
-        > as NonRepeatedFieldType>::get_field_opt(&self.author, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.author, &self._bitfield)
             .is_some()
     }
     pub fn clear_author(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::library::Author,
-        > as NonRepeatedFieldType>::clear(&mut self.author, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.author, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Book {
@@ -175,7 +183,7 @@ impl self::_puroro::Message for Book {
                         ::std::string::String,
                         self::_pinternal::tags::String,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.title,
+                        &mut self.fields.title,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -185,7 +193,7 @@ impl self::_puroro::Message for Book {
                         u32,
                         self::_pinternal::tags::UInt32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.num_pages,
+                        &mut self.fields.num_pages,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -194,7 +202,7 @@ impl self::_puroro::Message for Book {
                     <self::_pinternal::SingularHeapMessageField::<
                         self::_root::library::Author,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.author,
+                        &mut self.fields.author,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -215,7 +223,7 @@ impl self::_puroro::Message for Book {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.title,
+            &self.fields.title,
             &self._bitfield,
             1i32,
             out,
@@ -224,7 +232,7 @@ impl self::_puroro::Message for Book {
             u32,
             self::_pinternal::tags::UInt32,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.num_pages,
+            &self.fields.num_pages,
             &self._bitfield,
             2i32,
             out,
@@ -232,7 +240,7 @@ impl self::_puroro::Message for Book {
         <self::_pinternal::SingularHeapMessageField::<
             self::_root::library::Author,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.author,
+            &self.fields.author,
             &self._bitfield,
             3i32,
             out,
@@ -243,17 +251,19 @@ impl self::_puroro::Message for Book {
 impl ::std::clone::Clone for Book {
     fn clone(&self) -> Self {
         Self {
-            title: <self::_pinternal::SingularUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-            > as ::std::clone::Clone>::clone(&self.title),
-            num_pages: <self::_pinternal::SingularNumericalField::<
-                u32,
-                self::_pinternal::tags::UInt32,
-            > as ::std::clone::Clone>::clone(&self.num_pages),
-            author: <self::_pinternal::SingularHeapMessageField::<
-                self::_root::library::Author,
-            > as ::std::clone::Clone>::clone(&self.author),
+            fields: self::_fields::BookFields {
+                title: <self::_pinternal::SingularUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                > as ::std::clone::Clone>::clone(&self.fields.title),
+                num_pages: <self::_pinternal::SingularNumericalField::<
+                    u32,
+                    self::_pinternal::tags::UInt32,
+                > as ::std::clone::Clone>::clone(&self.fields.num_pages),
+                author: <self::_pinternal::SingularHeapMessageField::<
+                    self::_root::library::Author,
+                > as ::std::clone::Clone>::clone(&self.fields.author),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -287,9 +297,11 @@ impl ::std::cmp::PartialEq for Book {
 }
 #[derive(::std::default::Default)]
 pub struct Author {
-    name: self::_pinternal::SingularUnsizedField::<
-        ::std::string::String,
-        self::_pinternal::tags::String,
+    fields: self::_root::library::_fields::AuthorFields<
+        self::_pinternal::SingularUnsizedField::<
+            ::std::string::String,
+            self::_pinternal::tags::String,
+        >,
     >,
     _bitfield: self::_pinternal::BitArray<0usize>,
 }
@@ -300,7 +312,7 @@ impl Author {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.name,
+            &self.fields.name,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -310,7 +322,7 @@ impl Author {
         <self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self._bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -318,7 +330,7 @@ impl Author {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.name,
+            &mut self.fields.name,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -328,7 +340,7 @@ impl Author {
         <self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as NonRepeatedFieldType>::get_field_opt(&self.name, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self._bitfield)
             .is_some()
     }
     pub fn clear_name(&mut self) {
@@ -336,7 +348,7 @@ impl Author {
         <self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as NonRepeatedFieldType>::clear(&mut self.name, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for Author {
@@ -362,7 +374,7 @@ impl self::_puroro::Message for Author {
                         ::std::string::String,
                         self::_pinternal::tags::String,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.name,
+                        &mut self.fields.name,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -383,7 +395,7 @@ impl self::_puroro::Message for Author {
             ::std::string::String,
             self::_pinternal::tags::String,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.name,
+            &self.fields.name,
             &self._bitfield,
             1i32,
             out,
@@ -394,10 +406,12 @@ impl self::_puroro::Message for Author {
 impl ::std::clone::Clone for Author {
     fn clone(&self) -> Self {
         Self {
-            name: <self::_pinternal::SingularUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-            > as ::std::clone::Clone>::clone(&self.name),
+            fields: self::_fields::AuthorFields {
+                name: <self::_pinternal::SingularUnsizedField::<
+                    ::std::string::String,
+                    self::_pinternal::tags::String,
+                > as ::std::clone::Clone>::clone(&self.fields.name),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -425,3 +439,28 @@ impl ::std::cmp::PartialEq for Author {
         true && self.name_opt() == rhs.name_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct BookFields<TTitle, TNumPages, TAuthor> {
+        pub title: TTitle,
+        pub num_pages: TNumPages,
+        pub author: TAuthor,
+    }
+    #[derive(::std::default::Default)]
+    pub struct AuthorFields<TName> {
+        pub name: TName,
+    }
+}
+pub use self::_fields::*;

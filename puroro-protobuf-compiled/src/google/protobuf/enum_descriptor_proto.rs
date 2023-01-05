@@ -12,15 +12,17 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct EnumReservedRange {
-    start: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        0usize,
-    >,
-    end: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        1usize,
+    fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
+        >,
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            1usize,
+        >,
     >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
@@ -32,7 +34,7 @@ impl EnumReservedRange {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.start,
+            &self.fields.start,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -43,7 +45,7 @@ impl EnumReservedRange {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.start, &self._bitfield)
     }
     pub fn start_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -52,7 +54,7 @@ impl EnumReservedRange {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.start,
+            &mut self.fields.start,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -63,7 +65,7 @@ impl EnumReservedRange {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.start, &self._bitfield)
             .is_some()
     }
     pub fn clear_start(&mut self) {
@@ -72,7 +74,7 @@ impl EnumReservedRange {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.start, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.start, &mut self._bitfield)
     }
     pub fn end(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -81,7 +83,7 @@ impl EnumReservedRange {
             self::_pinternal::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.end,
+            &self.fields.end,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -92,7 +94,7 @@ impl EnumReservedRange {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.end, &self._bitfield)
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -101,7 +103,7 @@ impl EnumReservedRange {
             self::_pinternal::tags::Int32,
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.end,
+            &mut self.fields.end,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -112,7 +114,7 @@ impl EnumReservedRange {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.end, &self._bitfield)
             .is_some()
     }
     pub fn clear_end(&mut self) {
@@ -121,7 +123,7 @@ impl EnumReservedRange {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.end, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.end, &mut self._bitfield)
     }
 }
 impl self::_puroro::Message for EnumReservedRange {
@@ -148,7 +150,7 @@ impl self::_puroro::Message for EnumReservedRange {
                         self::_pinternal::tags::Int32,
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.start,
+                        &mut self.fields.start,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -159,7 +161,7 @@ impl self::_puroro::Message for EnumReservedRange {
                         self::_pinternal::tags::Int32,
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.end,
+                        &mut self.fields.end,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -181,7 +183,7 @@ impl self::_puroro::Message for EnumReservedRange {
             self::_pinternal::tags::Int32,
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.start,
+            &self.fields.start,
             &self._bitfield,
             1i32,
             out,
@@ -191,7 +193,7 @@ impl self::_puroro::Message for EnumReservedRange {
             self::_pinternal::tags::Int32,
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.end,
+            &self.fields.end,
             &self._bitfield,
             2i32,
             out,
@@ -202,16 +204,18 @@ impl self::_puroro::Message for EnumReservedRange {
 impl ::std::clone::Clone for EnumReservedRange {
     fn clone(&self) -> Self {
         Self {
-            start: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.start),
-            end: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.end),
+            fields: self::_fields::EnumReservedRangeFields {
+                start: <self::_pinternal::OptionalNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                    0usize,
+                > as ::std::clone::Clone>::clone(&self.fields.start),
+                end: <self::_pinternal::OptionalNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                    1usize,
+                > as ::std::clone::Clone>::clone(&self.fields.end),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -240,3 +244,23 @@ impl ::std::cmp::PartialEq for EnumReservedRange {
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct EnumReservedRangeFields<TStart, TEnd> {
+        pub start: TStart,
+        pub end: TEnd,
+    }
+}
+pub use self::_fields::*;
