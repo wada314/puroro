@@ -13,10 +13,7 @@ mod _pinternal {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    item_outer: self::_pinternal::SingularNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-    >,
+    fields: self::_root::nested::_fields::MsgFields,
     _bitfield: self::_pinternal::BitArray<0usize>,
 }
 impl Msg {

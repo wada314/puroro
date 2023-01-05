@@ -12,16 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    i32_required: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        0usize,
-    >,
-    i64_required: self::_pinternal::OptionalNumericalField::<
-        i64,
-        self::_pinternal::tags::Int64,
-        1usize,
-    >,
+    fields: self::_root::full_coverage2::msg::_fields::SubmsgFields,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Submsg {

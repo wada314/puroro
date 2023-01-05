@@ -26,14 +26,18 @@ use ::std::rc::Rc;
 
 pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
+
     fn gen_message_struct_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_type(&self) -> Result<Rc<Type>>;
+
     fn gen_message_struct_items(&self) -> Result<Vec<Item>>;
     fn gen_fields_struct_items(&self) -> Result<Vec<Item>>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    rust_struct_type: OnceCell<Rc<Type>>,
+    message_struct_type: OnceCell<Rc<Type>>,
+    fields_struct_type: OnceCell<Rc<Type>>,
     bitfield_size: OnceCell<usize>,
 }
 impl<T: ?Sized + Message> MessageExt for T {
@@ -70,18 +74,31 @@ impl<T: ?Sized + Message> MessageExt for T {
     fn gen_message_struct_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
-            .rust_struct_type
+            .message_struct_type
             .get_or_try_init(|| {
                 let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
-                let ident =
-                    format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
+                let ident = gen_message_struct_ident(self)?;
                 Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
+            })
+            .cloned()
+    }
+
+    fn gen_fields_struct_type(&self) -> Result<Rc<Type>> {
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_type
+            .get_or_try_init(|| {
+                let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
+                let ident = gen_fields_struct_ident(self)?;
+                Ok(Rc::new(parse2(quote! { #parent :: _fields :: #ident })?))
             })
             .cloned()
     }
 
     fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = gen_message_struct_ident(self)?;
+        let fields_struct_type = self.gen_fields_struct_type()?;
+
         let fields = self
             .fields()?
             .map(|f| f.gen_message_struct_field())
@@ -118,8 +135,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
-                #(#fields,)*
-                #(#oneof_fields,)*
+                fields: #fields_struct_type,
                 _bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
             }
         })?;
