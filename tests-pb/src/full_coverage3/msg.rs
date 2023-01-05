@@ -309,8 +309,10 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
-    pub struct SubmsgFields {
-        pub foo: i32,
+    pub struct SubmsgFields<TI32Unlabeled, TI32Optional, TI64Unlabeled> {
+        pub i32_unlabeled: TI32Unlabeled,
+        pub i32_optional: TI32Optional,
+        pub i64_unlabeled: TI64Unlabeled,
     }
 }
 pub use self::_fields::*;

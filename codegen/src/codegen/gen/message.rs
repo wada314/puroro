@@ -143,9 +143,25 @@ impl<T: ?Sized + Message> MessageExt for T {
 
     fn gen_fields_struct_items(&self) -> Result<Vec<Item>> {
         let ident = gen_fields_struct_ident(self)?;
+        let generics_for_fields = self
+            .fields()?
+            .map(|f| f.gen_fields_struct_generic_param_ident());
+        let generics_for_oneofs = self
+            .oneofs()?
+            .map(|o| o.gen_fields_struct_generic_param_ident());
+        let generics = generics_for_fields
+            .chain(generics_for_oneofs)
+            .collect::<Result<Vec<_>>>()?;
+
+        let fields_for_fields = self.fields()?.map(|f| f.gen_fields_struct_field());
+        let fields_for_oneofs = self.oneofs()?.map(|o| o.gen_fields_struct_field());
+        let fields = fields_for_fields
+            .chain(fields_for_oneofs)
+            .collect::<Result<Vec<_>>>()?;
+
         Ok(vec![parse2(quote! {
-            pub struct #ident {
-                pub foo: i32,
+            pub struct #ident <#(#generics),*> {
+                #(#fields,)*
             }
         })?])
     }

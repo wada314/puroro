@@ -321,11 +321,11 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
-    pub struct MsgFields {
-        pub foo: i32,
+    pub struct MsgFields<TType> {
+        pub r#type: TType,
     }
-    pub struct SelfFields {
-        pub foo: i32,
+    pub struct SelfFields<TType> {
+        pub r#type: TType,
     }
 }
 pub use self::_fields::*;

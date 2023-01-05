@@ -16,11 +16,11 @@ syntax = "proto2";
 package name_conflict_case;
 
 message Message {
-    message TestCase {
-        optional int32 this_is_message = 1;
+    message ConflictCase {
+        optional int32 this_is_message_field = 1;
     }
-    oneof test {
-        int32 this_is_oneof = 1;
+    oneof conflict {
+        int32 this_is_oneof_field = 1;
     }
 }
 

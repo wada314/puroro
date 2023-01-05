@@ -36,6 +36,8 @@ pub trait OneofExt {
     fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
     fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field(&self) -> Result<Field>;
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
     fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
@@ -56,6 +58,7 @@ struct Cache {
     union_ident: OnceCell<Rc<Ident>>,
     case_ident: OnceCell<Rc<Ident>>,
     struct_field_ident: OnceCell<Rc<Ident>>,
+    fields_struct_generic_param_ident: OnceCell<Rc<Ident>>,
     allocated_bitfield: OnceCell<OneofBitfieldAllocation>,
 }
 
@@ -130,6 +133,23 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         Ok(Rc::new(parse2(quote! {
             #message_module :: _case :: #case_ident :: < #(#generics),* >
         })?))
+    }
+
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_generic_param_ident
+            .get_or_try_init(|| Ok(Rc::new(format_ident!("T{}", self.name()?.to_camel_case()))))
+            .cloned()
+    }
+
+    fn gen_fields_struct_field(&self) -> Result<Field> {
+        let field_ident = self.gen_message_struct_field_ident()?;
+        let type_name = self.gen_fields_struct_generic_param_ident()?;
+        Ok(parse2::<NamedField>(quote! {
+            pub #field_ident: #type_name
+        })?
+        .into())
     }
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {

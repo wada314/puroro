@@ -254,8 +254,9 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
-    pub struct SubmsgFields {
-        pub foo: i32,
+    pub struct SubmsgFields<TI32Required, TI64Required> {
+        pub i32_required: TI32Required,
+        pub i64_required: TI64Required,
     }
 }
 pub use self::_fields::*;

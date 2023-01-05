@@ -11,66 +11,75 @@ mod _pinternal {
     pub(crate) use ::puroro::internal::*;
 }
 #[derive(::std::default::Default)]
-pub struct TestCase {
-    this_is_message: self::_pinternal::OptionalNumericalField::<
+pub struct ConflictCase {
+    this_is_message_field: self::_pinternal::OptionalNumericalField::<
         i32,
         self::_pinternal::tags::Int32,
         0usize,
     >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
-impl TestCase {
-    pub fn this_is_message(&self) -> i32 {
+impl ConflictCase {
+    pub fn this_is_message_field(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.this_is_message,
+            &self.this_is_message_field,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn this_is_message_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn this_is_message_field_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.this_is_message, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.this_is_message_field,
+            &self._bitfield,
+        )
     }
-    pub fn this_is_message_mut(&mut self) -> &mut i32 {
+    pub fn this_is_message_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.this_is_message,
+            &mut self.this_is_message_field,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn has_this_is_message(&self) -> bool {
+    pub fn has_this_is_message_field(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.this_is_message, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.this_is_message_field,
+                &self._bitfield,
+            )
             .is_some()
     }
-    pub fn clear_this_is_message(&mut self) {
+    pub fn clear_this_is_message_field(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
         <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.this_is_message, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(
+            &mut self.this_is_message_field,
+            &mut self._bitfield,
+        )
     }
 }
-impl self::_puroro::Message for TestCase {
+impl self::_puroro::Message for ConflictCase {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -94,7 +103,7 @@ impl self::_puroro::Message for TestCase {
                         self::_pinternal::tags::Int32,
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.this_is_message,
+                        &mut self.this_is_message_field,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -116,7 +125,7 @@ impl self::_puroro::Message for TestCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.this_is_message,
+            &self.this_is_message_field,
             &self._bitfield,
             1i32,
             out,
@@ -124,39 +133,39 @@ impl self::_puroro::Message for TestCase {
         ::std::result::Result::Ok(())
     }
 }
-impl ::std::clone::Clone for TestCase {
+impl ::std::clone::Clone for ConflictCase {
     fn clone(&self) -> Self {
         Self {
-            this_is_message: <self::_pinternal::OptionalNumericalField::<
+            this_is_message_field: <self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
-            > as ::std::clone::Clone>::clone(&self.this_is_message),
+            > as ::std::clone::Clone>::clone(&self.this_is_message_field),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
 }
-impl ::std::ops::Drop for TestCase {
+impl ::std::ops::Drop for ConflictCase {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
     }
 }
-impl ::std::fmt::Debug for TestCase {
+impl ::std::fmt::Debug for ConflictCase {
     fn fmt(
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(TestCase))
-            .field(stringify!(this_is_message), &self.this_is_message_opt())
+        fmt.debug_struct(stringify!(ConflictCase))
+            .field(stringify!(this_is_message_field), &self.this_is_message_field_opt())
             .finish()
     }
 }
-impl ::std::cmp::PartialEq for TestCase {
+impl ::std::cmp::PartialEq for ConflictCase {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        true && self.this_is_message_opt() == rhs.this_is_message_opt()
+        true && self.this_is_message_field_opt() == rhs.this_is_message_field_opt()
     }
 }
 pub mod _fields {
@@ -172,24 +181,24 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
-    pub struct TestCaseFields {
-        pub foo: i32,
+    pub struct ConflictCaseFields<TThisIsMessageField> {
+        pub this_is_message_field: TThisIsMessageField,
     }
 }
 pub use self::_fields::*;
-pub union Test<TThisIsOneof> {
+pub union Conflict<TThisIsOneofField> {
     _none: (),
-    this_is_oneof: ::std::mem::ManuallyDrop::<TThisIsOneof>,
+    this_is_oneof_field: ::std::mem::ManuallyDrop::<TThisIsOneofField>,
 }
-impl<TThisIsOneof> Test<TThisIsOneof>
+impl<TThisIsOneofField> Conflict<TThisIsOneofField>
 where
     Self: self::_pinternal::OneofUnion,
-    TThisIsOneof: self::_pinternal::OneofFieldType,
+    TThisIsOneofField: self::_pinternal::OneofFieldType,
 {
-    pub(crate) fn this_is_oneof<B: self::_pinternal::BitSlice>(
+    pub(crate) fn this_is_oneof_field<B: self::_pinternal::BitSlice>(
         &self,
         bits: &B,
-    ) -> <TThisIsOneof as self::_pinternal::OneofFieldType>::GetterOrElseType<'_> {
+    ) -> <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterOrElseType<'_> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         #[allow(unused)]
@@ -199,16 +208,17 @@ where
         use self::_pinternal::OneofCase;
         let case_opt = OneofCase::from_bitslice(bits);
         let field_opt = matches!(
-            case_opt, Some(self::_root::name_conflict_case::message::_case::TestCase:: <
-            > ::ThisIsOneof(()))
+            case_opt,
+            Some(self::_root::name_conflict_case::message::_case::ConflictCase:: < >
+            ::ThisIsOneofField(()))
         )
-            .then(|| { unsafe { self.this_is_oneof.deref() } });
+            .then(|| { unsafe { self.this_is_oneof_field.deref() } });
         OneofFieldType::get_field_or_else(field_opt, ::std::default::Default::default)
     }
-    pub(crate) fn this_is_oneof_opt<B: self::_pinternal::BitSlice>(
+    pub(crate) fn this_is_oneof_field_opt<B: self::_pinternal::BitSlice>(
         &self,
         bits: &B,
-    ) -> <TThisIsOneof as self::_pinternal::OneofFieldType>::GetterOptType<'_> {
+    ) -> <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterOptType<'_> {
         #[allow(unused)]
         use ::std::option::Option::{None, Some};
         use self::_pinternal::OneofFieldType;
@@ -216,16 +226,17 @@ where
         use self::_pinternal::OneofCase;
         let case_opt = OneofCase::from_bitslice(bits);
         let field_opt = matches!(
-            case_opt, Some(self::_root::name_conflict_case::message::_case::TestCase:: <
-            > ::ThisIsOneof(()))
+            case_opt,
+            Some(self::_root::name_conflict_case::message::_case::ConflictCase:: < >
+            ::ThisIsOneofField(()))
         )
-            .then(|| { unsafe { self.this_is_oneof.deref() } });
+            .then(|| { unsafe { self.this_is_oneof_field.deref() } });
         OneofFieldType::get_field_opt(field_opt)
     }
-    pub(crate) fn this_is_oneof_mut<B: self::_pinternal::BitSlice>(
+    pub(crate) fn this_is_oneof_field_mut<B: self::_pinternal::BitSlice>(
         &mut self,
         bits: &mut B,
-    ) -> <TThisIsOneof as self::_pinternal::OneofFieldType>::GetterMutType<'_> {
+    ) -> <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterMutType<'_> {
         #[allow(unused)]
         use ::std::option::Option::Some;
         #[allow(unused)]
@@ -236,31 +247,35 @@ where
         use self::_pinternal::OneofFieldType;
         let case_opt = OneofCase::from_bitslice(bits);
         if let Some(
-            self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(()),
+            self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(
+                (),
+            ),
         ) = case_opt {} else {
             <Self as OneofUnion>::clear(self, bits);
             let index = OneofCase::into_u32(
-                self::_root::name_conflict_case::message::_case::TestCase::ThisIsOneof(()),
+                self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
             );
             bits.set_range(0usize..2usize, index);
             *self = Self {
-                this_is_oneof: ManuallyDrop::new((::std::default::Default::default)()),
+                this_is_oneof_field: ManuallyDrop::new(
+                    (::std::default::Default::default)(),
+                ),
             };
         }
-        let field_mut = unsafe { self.this_is_oneof.deref_mut() };
+        let field_mut = unsafe { self.this_is_oneof_field.deref_mut() };
         OneofFieldType::get_field_mut(field_mut)
     }
 }
-impl<TThisIsOneof> self::_pinternal::OneofUnion for Test<TThisIsOneof>
+impl<TThisIsOneofField> self::_pinternal::OneofUnion for Conflict<TThisIsOneofField>
 where
-    TThisIsOneof: self::_pinternal::OneofFieldType,
+    TThisIsOneofField: self::_pinternal::OneofFieldType,
 {
-    type Case = self::_root::name_conflict_case::message::_case::TestCase;
+    type Case = self::_root::name_conflict_case::message::_case::ConflictCase;
     type CaseRef<'a>
     where
         Self: 'a,
-    = self::_root::name_conflict_case::message::_case::TestCase::<
-        <TThisIsOneof as self::_pinternal::OneofFieldType>::GetterType::<'a>,
+    = self::_root::name_conflict_case::message::_case::ConflictCase::<
+        <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterType::<'a>,
     >;
     fn case_ref<B: self::_pinternal::BitSlice>(
         &self,
@@ -273,9 +288,9 @@ where
         case_opt
             .map(|case| {
                 match case {
-                    Self::Case::ThisIsOneof(_) => {
-                        Self::CaseRef::ThisIsOneof(
-                            ManuallyDrop::deref(unsafe { &self.this_is_oneof })
+                    Self::Case::ThisIsOneofField(_) => {
+                        Self::CaseRef::ThisIsOneofField(
+                            ManuallyDrop::deref(unsafe { &self.this_is_oneof_field })
                                 .get_field(),
                         )
                     }
@@ -288,8 +303,8 @@ where
         #[allow(unused)]
         use ::std::option::Option::Some;
         match OneofCase::from_bitslice(bits) {
-            Some(Self::Case::ThisIsOneof(())) => {
-                unsafe { ManuallyDrop::take(&mut self.this_is_oneof) };
+            Some(Self::Case::ThisIsOneofField(())) => {
+                unsafe { ManuallyDrop::take(&mut self.this_is_oneof_field) };
             }
             _ => {}
         }
@@ -302,9 +317,11 @@ where
         #[allow(unused)]
         use ::std::clone::Clone;
         match OneofCase::from_bitslice(bits) {
-            Some(Self::Case::ThisIsOneof(())) => {
+            Some(Self::Case::ThisIsOneofField(())) => {
                 Self {
-                    this_is_oneof: Clone::clone(unsafe { &self.this_is_oneof }),
+                    this_is_oneof_field: Clone::clone(unsafe {
+                        &self.this_is_oneof_field
+                    }),
                 }
             }
             _ => Self { _none: () },
@@ -323,9 +340,9 @@ where
         #[allow(unused)]
         use ::std::result::Result::Ok;
         match case {
-            Self::Case::ThisIsOneof(_) => {
-                let _ = <Self>::this_is_oneof_mut(self, bitvec);
-                unsafe { &mut self.this_is_oneof }.deser_from_iter(field_data)?;
+            Self::Case::ThisIsOneofField(_) => {
+                let _ = <Self>::this_is_oneof_field_mut(self, bitvec);
+                unsafe { &mut self.this_is_oneof_field }.deser_from_iter(field_data)?;
             }
         }
         Ok(())
@@ -341,15 +358,15 @@ where
         use ::std::result::Result::Ok;
         use self::_pinternal::OneofCase;
         match OneofCase::from_bitslice(bitvec) {
-            Some(Self::Case::ThisIsOneof(_)) => {
-                unsafe { &self.this_is_oneof }.ser_to_write(1i32, out)?;
+            Some(Self::Case::ThisIsOneofField(_)) => {
+                unsafe { &self.this_is_oneof_field }.ser_to_write(1i32, out)?;
             }
             _ => {}
         }
         Ok(())
     }
 }
-impl<TThisIsOneof> ::std::default::Default for Test<TThisIsOneof> {
+impl<TThisIsOneofField> ::std::default::Default for Conflict<TThisIsOneofField> {
     fn default() -> Self {
         Self { _none: () }
     }
@@ -368,21 +385,21 @@ pub mod _case {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
-    pub enum TestCase<TThisIsOneof = ()> {
-        ThisIsOneof(TThisIsOneof),
+    pub enum ConflictCase<TThisIsOneofField = ()> {
+        ThisIsOneofField(TThisIsOneofField),
     }
-    impl self::_pinternal::OneofCase for TestCase {
+    impl self::_pinternal::OneofCase for ConflictCase {
         const BITFIELD_BEGIN: usize = 0usize;
         const BITFIELD_END: usize = 2usize;
         fn from_u32(x: u32) -> ::std::option::Option<Self> {
             match x {
-                1u32 => ::std::option::Option::Some(Self::ThisIsOneof(())),
+                1u32 => ::std::option::Option::Some(Self::ThisIsOneofField(())),
                 _ => ::std::option::Option::None,
             }
         }
         fn into_u32(self) -> u32 {
             match self {
-                Self::ThisIsOneof(_) => 1u32,
+                Self::ThisIsOneofField(_) => 1u32,
             }
         }
     }

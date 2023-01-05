@@ -164,8 +164,8 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
-    pub struct MsgFields {
-        pub foo: i32,
+    pub struct MsgFields<TItemOuter> {
+        pub item_outer: TItemOuter,
     }
 }
 pub use self::_fields::*;

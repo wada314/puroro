@@ -34,6 +34,9 @@ pub trait FieldExt {
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field(&self) -> Result<SynField>;
+
     fn gen_message_struct_field(&self) -> Result<SynField>;
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
@@ -56,8 +59,9 @@ struct Cache {
     allocated_bitfield: OnceCell<FieldBitfieldAllocation>,
 
     // Generated tokens cache
-    struct_field_ident: OnceCell<Rc<Ident>>,
-    struct_field_type: OnceCell<Rc<Type>>,
+    message_struct_field_ident: OnceCell<Rc<Ident>>,
+    message_struct_field_type: OnceCell<Rc<Type>>,
+    fields_struct_generic_param_ident: OnceCell<Rc<Ident>>,
 }
 
 impl<T: ?Sized + Field> FieldExt for T {
@@ -100,6 +104,23 @@ impl<T: ?Sized + Field> FieldExt for T {
                 detail: "Tried to assign the field's bitfield twice.".to_string(),
             })?,
         }
+    }
+
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_generic_param_ident
+            .get_or_try_init(|| Ok(Rc::new(format_ident!("T{}", self.name()?.to_camel_case()))))
+            .cloned()
+    }
+
+    fn gen_fields_struct_field(&self) -> Result<SynField> {
+        let field_ident = gen_message_struct_field_ident(self)?;
+        let type_name = self.gen_fields_struct_generic_param_ident()?;
+        Ok(parse2::<NamedField>(quote! {
+            pub #field_ident: #type_name
+        })?
+        .into())
     }
 
     fn gen_message_struct_field(&self) -> Result<SynField> {
@@ -206,7 +227,7 @@ fn gen_message_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type
     use LengthDelimitedType::*;
     this.cache()
         .get::<Cache>()?
-        .struct_field_type
+        .message_struct_field_type
         .get_or_try_init(|| {
             let primitive_type = this.r#type()?.rust_type()?;
             let tag_type = this.r#type()?.tag_type()?;
@@ -247,7 +268,7 @@ fn gen_message_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type
 fn gen_message_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
-        .struct_field_ident
+        .message_struct_field_ident
         .get_or_try_init(|| {
             Ok(Rc::new(format_ident!(
                 "{}",
