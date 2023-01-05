@@ -35,9 +35,9 @@ pub trait FieldExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<SynField>;
 
-    fn gen_message_struct_field(&self) -> Result<SynField>;
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
@@ -62,6 +62,7 @@ struct Cache {
     message_struct_field_ident: OnceCell<Rc<Ident>>,
     message_struct_field_type: OnceCell<Rc<Type>>,
     fields_struct_generic_param_ident: OnceCell<Rc<Ident>>,
+    fields_struct_field_type: OnceCell<Rc<Type>>,
 }
 
 impl<T: ?Sized + Field> FieldExt for T {
@@ -114,6 +115,51 @@ impl<T: ?Sized + Field> FieldExt for T {
             .cloned()
     }
 
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+        use FieldRule::*;
+        use FieldType::*;
+        use LengthDelimitedType::*;
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_field_type
+            .get_or_try_init(|| {
+                let primitive_type = self.r#type()?.rust_type()?;
+                let tag_type = self.r#type()?.tag_type()?;
+                let bitfield_index = bitfield_index_for_optional(self)?.unwrap_or(usize::MAX);
+                let type_name_segment: PathSegment =
+                    parse2(match (self.rule()?, self.r#type()?) {
+                        (Optional | Singular, LengthDelimited(Message(_))) => quote! {
+                            SingularHeapMessageField::<#primitive_type>
+                        },
+                        (Repeated, LengthDelimited(Message(_))) => quote! {
+                            RepeatedMessageField::<#primitive_type>
+                        },
+                        (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
+                            OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
+                        },
+                        (Singular, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
+                            SingularNumericalField::<#primitive_type, #tag_type>
+                        },
+                        (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
+                            RepeatedNumericalField::<#primitive_type, #tag_type>
+                        },
+                        (Optional, LengthDelimited(_)) => quote! {
+                            OptionalUnsizedField::<#primitive_type, #tag_type, #bitfield_index>
+                        },
+                        (Singular, LengthDelimited(_)) => quote! {
+                            SingularUnsizedField::<#primitive_type, #tag_type>
+                        },
+                        (Repeated, LengthDelimited(_)) => quote! {
+                            RepeatedUnsizedField::<#primitive_type, #tag_type>
+                        },
+                    })?;
+                Ok(Rc::new(parse2(quote! {
+                    #PURORO_INTERNAL::#type_name_segment
+                })?))
+            })
+            .cloned()
+    }
+
     fn gen_fields_struct_field(&self) -> Result<SynField> {
         let field_ident = gen_fields_struct_field_ident(self)?;
         let type_name = self.gen_fields_struct_generic_param_ident()?;
@@ -123,14 +169,6 @@ impl<T: ?Sized + Field> FieldExt for T {
         .into())
     }
 
-    fn gen_message_struct_field(&self) -> Result<SynField> {
-        let ident = gen_fields_struct_field_ident(self)?;
-        let r#type = gen_message_struct_field_type(self)?;
-        Ok(parse2::<NamedField>(quote! {
-            #ident: #r#type
-        })?
-        .into())
-    }
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.rule()? {
             FieldRule::Repeated => gen_message_struct_field_methods_for_repeated(self),

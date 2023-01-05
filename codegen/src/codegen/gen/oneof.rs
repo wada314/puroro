@@ -34,15 +34,17 @@ pub trait OneofExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>>;
+
     fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
     fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<Field>;
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
     fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
 
-    fn gen_message_struct_field(&self) -> Result<Field>;
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_message_struct_impl_message_deser_arms(
@@ -219,17 +221,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_message_struct_field(&self) -> Result<Field> {
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
         let field_ident = self.gen_message_struct_field_ident()?;
         let generic_params = self
             .fields()?
             .map(|f| f.gen_oneof_union_field_type())
             .collect::<Result<Vec<_>>>()?;
-        let field_type = self.gen_oneof_union_type(generic_params.iter().cloned())?;
-        Ok(parse2::<NamedField>(quote! {
-            #field_ident: #field_type
-        })?
-        .into())
+        self.gen_oneof_union_type(generic_params.iter().cloned())
     }
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {

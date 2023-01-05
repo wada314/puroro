@@ -28,7 +28,7 @@ pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
 
     fn gen_message_struct_type(&self) -> Result<Rc<Type>>;
-    fn gen_fields_struct_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
 
     fn gen_message_struct_items(&self) -> Result<Vec<Item>>;
     fn gen_fields_struct_items(&self) -> Result<Vec<Item>>;
@@ -37,7 +37,6 @@ pub trait MessageExt: Debug {
 #[derive(Debug, Default)]
 struct Cache {
     message_struct_type: OnceCell<Rc<Type>>,
-    fields_struct_type: OnceCell<Rc<Type>>,
     bitfield_size: OnceCell<usize>,
 }
 impl<T: ?Sized + Message> MessageExt for T {
@@ -83,30 +82,24 @@ impl<T: ?Sized + Message> MessageExt for T {
             .cloned()
     }
 
-    fn gen_fields_struct_type(&self) -> Result<Rc<Type>> {
-        self.cache()
-            .get::<Cache>()?
-            .fields_struct_type
-            .get_or_try_init(|| {
-                let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
-                let ident = gen_fields_struct_ident(self)?;
-                Ok(Rc::new(parse2(quote! { #parent :: _fields :: #ident })?))
-            })
-            .cloned()
+    fn gen_fields_struct_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+        let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
+        let ident = gen_fields_struct_ident(self)?;
+        let generics = generics.collect::<Vec<_>>();
+        Ok(Rc::new(parse2(
+            quote! { #parent :: _fields :: #ident < #(#generics,)* > },
+        )?))
     }
 
     fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = gen_message_struct_ident(self)?;
-        let fields_struct_type = self.gen_fields_struct_type()?;
+        let fields_type_for_fields = self.fields()?.map(|f| f.gen_fields_struct_field_type());
+        let fields_type_for_oneofs = self.oneofs()?.map(|o| o.gen_fields_struct_field_type());
+        let fields_types = fields_type_for_fields
+            .chain(fields_type_for_oneofs)
+            .collect::<Result<Vec<_>>>()?;
+        let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
 
-        let fields = self
-            .fields()?
-            .map(|f| f.gen_message_struct_field())
-            .collect::<Result<Vec<_>>>()?;
-        let oneof_fields = self
-            .oneofs()?
-            .map(|o| o.gen_message_struct_field())
-            .collect::<Result<Vec<_>>>()?;
         let field_methods = self
             .fields()?
             .map(|f| Ok(f.gen_message_struct_methods()?.into_iter()))

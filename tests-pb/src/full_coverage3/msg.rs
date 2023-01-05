@@ -12,7 +12,11 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    fields: self::_root::full_coverage3::msg::_fields::SubmsgFields,
+    fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
+        self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
+        self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
+        self::_pinternal::SingularNumericalField::<i64, self::_pinternal::tags::Int64>,
+    >,
     _bitfield: self::_pinternal::BitArray<0usize>,
 }
 impl Submsg {

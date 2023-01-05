@@ -12,7 +12,13 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct ConflictCase {
-    fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields,
+    fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
+        >,
+    >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl ConflictCase {

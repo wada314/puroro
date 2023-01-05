@@ -12,7 +12,9 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::self_recursive::_fields::MsgFields,
+    fields: self::_root::self_recursive::_fields::MsgFields<
+        self::_pinternal::SingularHeapMessageField::<self::_root::self_recursive::Msg>,
+    >,
     _bitfield: self::_pinternal::BitArray<0usize>,
 }
 impl Msg {

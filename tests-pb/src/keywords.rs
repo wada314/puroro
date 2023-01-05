@@ -12,7 +12,13 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::keywords::_fields::MsgFields,
+    fields: self::_root::keywords::_fields::MsgFields<
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
+        >,
+    >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Msg {
@@ -157,7 +163,13 @@ impl ::std::cmp::PartialEq for Msg {
 }
 #[derive(::std::default::Default)]
 pub struct _Self {
-    fields: self::_root::keywords::_fields::SelfFields,
+    fields: self::_root::keywords::_fields::SelfFields<
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
+        >,
+    >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl _Self {

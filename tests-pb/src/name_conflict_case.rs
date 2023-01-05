@@ -13,7 +13,11 @@ mod _pinternal {
 pub mod message;
 #[derive(::std::default::Default)]
 pub struct Message {
-    fields: self::_root::name_conflict_case::_fields::MessageFields,
+    fields: self::_root::name_conflict_case::_fields::MessageFields<
+        self::_root::name_conflict_case::message::Conflict::<
+            self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,
+        >,
+    >,
     _bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Message {
