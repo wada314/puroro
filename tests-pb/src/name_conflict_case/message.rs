@@ -276,12 +276,11 @@ where
     TThisIsOneofField: self::_pinternal::OneofFieldType,
 {
     type Case = self::_root::name_conflict_case::message::_case::ConflictCase;
-    type CaseRef<'a>
-    where
-        Self: 'a,
-    = self::_root::name_conflict_case::message::_case::ConflictCase::<
+    type CaseRef<'a> = self::_root::name_conflict_case::message::_case::ConflictCase::<
         <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterType::<'a>,
-    >;
+    >
+    where
+        Self: 'a;
     fn case_ref<B: self::_pinternal::BitSlice>(
         &self,
         bits: &B,
