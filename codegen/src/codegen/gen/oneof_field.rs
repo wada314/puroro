@@ -311,17 +311,17 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_ident(&self) -> #getter_type {
-                    self.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
+                    self.fields.#oneof_struct_field_ident.#getter_ident(&self._bitfield)
                 }
             })?,
             parse2(quote! {
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                    self.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
+                    self.fields.#oneof_struct_field_ident.#getter_opt_ident(&self._bitfield)
                 }
             })?,
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                    self.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
+                    self.fields.#oneof_struct_field_ident.#getter_mut_ident(&mut self._bitfield)
                 }
             })?,
             parse2(quote! {
@@ -335,7 +335,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
                     use #PURORO_INTERNAL::OneofCase;
                     use #PURORO_INTERNAL::OneofUnion;
                     if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(&self._bitfield) {
-                        self.#oneof_struct_field_ident.clear(&mut self._bitfield)
+                        self.fields.#oneof_struct_field_ident.clear(&mut self._bitfield)
                     }
                 }
             })?,

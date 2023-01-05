@@ -34,7 +34,7 @@ impl Submsg {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.i32_required,
+            &self.fields.i32_required,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -45,7 +45,10 @@ impl Submsg {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.fields.i32_required,
+            &self._bitfield,
+        )
     }
     pub fn i32_required_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -54,7 +57,7 @@ impl Submsg {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.i32_required,
+            &mut self.fields.i32_required,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -65,7 +68,10 @@ impl Submsg {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.i32_required, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.fields.i32_required,
+                &self._bitfield,
+            )
             .is_some()
     }
     pub fn clear_i32_required(&mut self) {
@@ -74,7 +80,10 @@ impl Submsg {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.i32_required, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(
+            &mut self.fields.i32_required,
+            &mut self._bitfield,
+        )
     }
     pub fn i64_required(&self) -> i64 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -83,7 +92,7 @@ impl Submsg {
             self::_pinternal::tags::Int64,
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.i64_required,
+            &self.fields.i64_required,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -94,7 +103,10 @@ impl Submsg {
             i64,
             self::_pinternal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.fields.i64_required,
+            &self._bitfield,
+        )
     }
     pub fn i64_required_mut(&mut self) -> &mut i64 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -103,7 +115,7 @@ impl Submsg {
             self::_pinternal::tags::Int64,
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.i64_required,
+            &mut self.fields.i64_required,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -114,7 +126,10 @@ impl Submsg {
             i64,
             self::_pinternal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.i64_required, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.fields.i64_required,
+                &self._bitfield,
+            )
             .is_some()
     }
     pub fn clear_i64_required(&mut self) {
@@ -123,7 +138,10 @@ impl Submsg {
             i64,
             self::_pinternal::tags::Int64,
             1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.i64_required, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(
+            &mut self.fields.i64_required,
+            &mut self._bitfield,
+        )
     }
 }
 impl self::_puroro::Message for Submsg {
@@ -150,7 +168,7 @@ impl self::_puroro::Message for Submsg {
                         self::_pinternal::tags::Int32,
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.i32_required,
+                        &mut self.fields.i32_required,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -161,7 +179,7 @@ impl self::_puroro::Message for Submsg {
                         self::_pinternal::tags::Int64,
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.i64_required,
+                        &mut self.fields.i64_required,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -183,7 +201,7 @@ impl self::_puroro::Message for Submsg {
             self::_pinternal::tags::Int32,
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.i32_required,
+            &self.fields.i32_required,
             &self._bitfield,
             1i32,
             out,
@@ -193,7 +211,7 @@ impl self::_puroro::Message for Submsg {
             self::_pinternal::tags::Int64,
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.i64_required,
+            &self.fields.i64_required,
             &self._bitfield,
             101i32,
             out,
@@ -204,16 +222,18 @@ impl self::_puroro::Message for Submsg {
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         Self {
-            i32_required: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.i32_required),
-            i64_required: <self::_pinternal::OptionalNumericalField::<
-                i64,
-                self::_pinternal::tags::Int64,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.i64_required),
+            fields: self::_fields::SubmsgFields {
+                i32_required: <self::_pinternal::OptionalNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                    0usize,
+                > as ::std::clone::Clone>::clone(&self.fields.i32_required),
+                i64_required: <self::_pinternal::OptionalNumericalField::<
+                    i64,
+                    self::_pinternal::tags::Int64,
+                    1usize,
+                > as ::std::clone::Clone>::clone(&self.fields.i64_required),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -256,6 +276,7 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
+    #[derive(::std::default::Default)]
     pub struct SubmsgFields<TI32Required, TI64Required> {
         pub i32_required: TI32Required,
         pub i64_required: TI64Required,

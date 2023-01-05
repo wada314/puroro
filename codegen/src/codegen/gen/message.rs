@@ -169,6 +169,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
 
         Ok(vec![parse2(quote! {
+            #[derive(::std::default::Default)]
             pub struct #ident <#(#generics),*> {
                 #(#fields,)*
             }
@@ -255,6 +256,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
 
 fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_message_struct_ident(this)?;
+    let fields_ident = gen_fields_struct_ident(this)?;
     let field_clones = this
         .fields()?
         .map(|f| f.gen_message_struct_impl_clone_field_value())
@@ -267,8 +269,10 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
                 Self {
-                    #(#field_clones,)*
-                    #(#oneof_clones,)*
+                    fields: self::_fields::#fields_ident {
+                        #(#field_clones,)*
+                        #(#oneof_clones,)*
+                    },
                     _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 }
             }
@@ -288,7 +292,7 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
             fn drop(&mut self) {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
 
-                #(self.#oneof_idents.clear(&mut self._bitfield);)*
+                #(self.fields.#oneof_idents.clear(&mut self._bitfield);)*
             }
         }
     })?)

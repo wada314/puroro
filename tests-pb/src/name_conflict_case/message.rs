@@ -29,7 +29,7 @@ impl ConflictCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.this_is_message_field,
+            &self.fields.this_is_message_field,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -41,7 +41,7 @@ impl ConflictCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.this_is_message_field,
+            &self.fields.this_is_message_field,
             &self._bitfield,
         )
     }
@@ -52,7 +52,7 @@ impl ConflictCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.this_is_message_field,
+            &mut self.fields.this_is_message_field,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -64,7 +64,7 @@ impl ConflictCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.this_is_message_field,
+                &self.fields.this_is_message_field,
                 &self._bitfield,
             )
             .is_some()
@@ -76,7 +76,7 @@ impl ConflictCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.this_is_message_field,
+            &mut self.fields.this_is_message_field,
             &mut self._bitfield,
         )
     }
@@ -105,7 +105,7 @@ impl self::_puroro::Message for ConflictCase {
                         self::_pinternal::tags::Int32,
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.this_is_message_field,
+                        &mut self.fields.this_is_message_field,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -127,7 +127,7 @@ impl self::_puroro::Message for ConflictCase {
             self::_pinternal::tags::Int32,
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.this_is_message_field,
+            &self.fields.this_is_message_field,
             &self._bitfield,
             1i32,
             out,
@@ -138,11 +138,13 @@ impl self::_puroro::Message for ConflictCase {
 impl ::std::clone::Clone for ConflictCase {
     fn clone(&self) -> Self {
         Self {
-            this_is_message_field: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.this_is_message_field),
+            fields: self::_fields::ConflictCaseFields {
+                this_is_message_field: <self::_pinternal::OptionalNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                    0usize,
+                > as ::std::clone::Clone>::clone(&self.fields.this_is_message_field),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -183,6 +185,7 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
+    #[derive(::std::default::Default)]
     pub struct ConflictCaseFields<TThisIsMessageField> {
         pub this_is_message_field: TThisIsMessageField,
     }

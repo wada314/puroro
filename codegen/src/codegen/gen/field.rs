@@ -179,7 +179,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         let ident = gen_fields_struct_field_ident(self)?;
         let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2(quote! {
-            #ident: <#r#type as ::std::clone::Clone>::clone(&self.#ident)
+            #ident: <#r#type as ::std::clone::Clone>::clone(&self.fields.#ident)
         })?)
     }
     fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
@@ -188,7 +188,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2(quote! {
             #number => <#r#type as #PURORO_INTERNAL::FieldType>::deser_from_iter(
-                &mut self.#ident,
+                &mut self.fields.#ident,
                 &mut self._bitfield,
                 #field_data_expr,
             )?,
@@ -200,7 +200,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         let r#type = gen_message_struct_field_type(self)?;
         Ok(parse2(quote! {
             <#r#type as #PURORO_INTERNAL::FieldType>::ser_to_write(
-                &self.#ident,
+                &self.fields.#ident,
                 &self._bitfield,
                 #number,
                 #out_expr,
@@ -350,7 +350,7 @@ fn gen_message_struct_field_methods_for_repeated(
             pub fn #getter_ident(&self) -> &[#getter_item_type] {
                 use #PURORO_INTERNAL::RepeatedFieldType;
                 <#field_type as RepeatedFieldType>::get_field(
-                    &self.#field_ident, &self._bitfield,
+                    &self.fields.#field_ident, &self._bitfield,
                 )
             }
         })?,
@@ -358,7 +358,7 @@ fn gen_message_struct_field_methods_for_repeated(
             pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                 use #PURORO_INTERNAL::RepeatedFieldType;
                 <#field_type as RepeatedFieldType>::get_field_mut(
-                    &mut self.#field_ident, &mut self._bitfield,
+                    &mut self.fields.#field_ident, &mut self._bitfield,
                 )
             }
         })?,
@@ -366,7 +366,7 @@ fn gen_message_struct_field_methods_for_repeated(
             pub fn #clear_ident(&mut self) {
                 use #PURORO_INTERNAL::RepeatedFieldType;
                 <#field_type as RepeatedFieldType>::clear(
-                    &mut self.#field_ident, &mut self._bitfield,
+                    &mut self.fields.#field_ident, &mut self._bitfield,
                 )
             }
         })?,
@@ -407,7 +407,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
             pub fn #getter_ident(&self) -> #getter_type {
                use #PURORO_INTERNAL::NonRepeatedFieldType;
                 <#field_type as NonRepeatedFieldType>::get_field_or_else(
-                    &self.#field_ident, &self._bitfield, #default_fn,
+                    &self.fields.#field_ident, &self._bitfield, #default_fn,
                 )
             }
         })?,
@@ -415,7 +415,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
             pub fn #getter_opt_ident(&self) -> #getter_opt_type {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
                 <#field_type as NonRepeatedFieldType>::get_field_opt(
-                    &self.#field_ident, &self._bitfield,
+                    &self.fields.#field_ident, &self._bitfield,
                 )
             }
         })?,
@@ -423,7 +423,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
             pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
                 <#field_type as NonRepeatedFieldType>::get_field_mut(
-                    &mut self.#field_ident, &mut self._bitfield, #default_fn,
+                    &mut self.fields.#field_ident, &mut self._bitfield, #default_fn,
                 )
             }
         })?,
@@ -431,7 +431,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
             pub fn #getter_has_ident(&self) -> bool {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
                 <#field_type as NonRepeatedFieldType>::get_field_opt(
-                    &self.#field_ident, &self._bitfield,
+                    &self.fields.#field_ident, &self._bitfield,
                 ).is_some()
             }
         })?,
@@ -439,7 +439,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
             pub fn #clear_ident(&mut self) {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
                 <#field_type as NonRepeatedFieldType>::clear(
-                    &mut self.#field_ident, &mut self._bitfield,
+                    &mut self.fields.#field_ident, &mut self._bitfield,
                 )
             }
         })?,

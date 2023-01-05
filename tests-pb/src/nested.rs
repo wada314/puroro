@@ -25,7 +25,7 @@ impl Msg {
             i32,
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.item_outer,
+            &self.fields.item_outer,
             &self._bitfield,
             ::std::default::Default::default,
         )
@@ -35,7 +35,10 @@ impl Msg {
         <self::_pinternal::SingularNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(&self.item_outer, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+            &self.fields.item_outer,
+            &self._bitfield,
+        )
     }
     pub fn item_outer_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -43,7 +46,7 @@ impl Msg {
             i32,
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.item_outer,
+            &mut self.fields.item_outer,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
@@ -53,7 +56,10 @@ impl Msg {
         <self::_pinternal::SingularNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(&self.item_outer, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(
+                &self.fields.item_outer,
+                &self._bitfield,
+            )
             .is_some()
     }
     pub fn clear_item_outer(&mut self) {
@@ -61,7 +67,10 @@ impl Msg {
         <self::_pinternal::SingularNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::clear(&mut self.item_outer, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(
+            &mut self.fields.item_outer,
+            &mut self._bitfield,
+        )
     }
 }
 impl self::_puroro::Message for Msg {
@@ -87,7 +96,7 @@ impl self::_puroro::Message for Msg {
                         i32,
                         self::_pinternal::tags::Int32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.item_outer,
+                        &mut self.fields.item_outer,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -108,7 +117,7 @@ impl self::_puroro::Message for Msg {
             i32,
             self::_pinternal::tags::Int32,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.item_outer,
+            &self.fields.item_outer,
             &self._bitfield,
             1i32,
             out,
@@ -119,10 +128,12 @@ impl self::_puroro::Message for Msg {
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         Self {
-            item_outer: <self::_pinternal::SingularNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            > as ::std::clone::Clone>::clone(&self.item_outer),
+            fields: self::_fields::MsgFields {
+                item_outer: <self::_pinternal::SingularNumericalField::<
+                    i32,
+                    self::_pinternal::tags::Int32,
+                > as ::std::clone::Clone>::clone(&self.fields.item_outer),
+            },
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
@@ -163,6 +174,7 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
+    #[derive(::std::default::Default)]
     pub struct MsgFields<TItemOuter> {
         pub item_outer: TItemOuter,
     }

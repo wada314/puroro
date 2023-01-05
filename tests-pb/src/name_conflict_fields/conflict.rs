@@ -11,68 +11,77 @@ mod _pinternal {
     pub(crate) use ::puroro::internal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg {
-    fields: self::_root::nested::msg::_fields::SubmsgFields<
-        self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
-    >,
-    _bitfield: self::_pinternal::BitArray<0usize>,
-}
-impl Submsg {
-    pub fn item_inner(&self) -> i32 {
-        use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
+pub struct ConflictFields {
+    fields: self::_root::name_conflict_fields::conflict::_fields::ConflictFieldsFields<
+        self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
+            0usize,
+        >,
+    >,
+    _bitfield: self::_pinternal::BitArray<1usize>,
+}
+impl ConflictFields {
+    pub fn this_is_child_message_field(&self) -> i32 {
+        use self::_pinternal::NonRepeatedFieldType;
+        <self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
-            &self.fields.item_inner,
+            &self.this_is_child_message_field,
             &self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn item_inner_opt(&self) -> ::std::option::Option::<i32> {
+    pub fn this_is_child_message_field_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
+            0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.item_inner,
+            &self.this_is_child_message_field,
             &self._bitfield,
         )
     }
-    pub fn item_inner_mut(&mut self) -> &mut i32 {
+    pub fn this_is_child_message_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
+            0usize,
         > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.fields.item_inner,
+            &mut self.this_is_child_message_field,
             &mut self._bitfield,
             ::std::default::Default::default,
         )
     }
-    pub fn has_item_inner(&self) -> bool {
+    pub fn has_this_is_child_message_field(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
+            0usize,
         > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.item_inner,
+                &self.this_is_child_message_field,
                 &self._bitfield,
             )
             .is_some()
     }
-    pub fn clear_item_inner(&mut self) {
+    pub fn clear_this_is_child_message_field(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
+            0usize,
         > as NonRepeatedFieldType>::clear(
-            &mut self.fields.item_inner,
+            &mut self.this_is_child_message_field,
             &mut self._bitfield,
         )
     }
 }
-impl self::_puroro::Message for Submsg {
+impl self::_puroro::Message for ConflictFields {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -91,11 +100,12 @@ impl self::_puroro::Message for Submsg {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::SingularNumericalField::<
+                    <self::_pinternal::OptionalNumericalField::<
                         i32,
                         self::_pinternal::tags::Int32,
+                        0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.fields.item_inner,
+                        &mut self.this_is_child_message_field,
                         &mut self._bitfield,
                         field_data,
                     )?
@@ -112,11 +122,12 @@ impl self::_puroro::Message for Submsg {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::SingularNumericalField::<
+        <self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
+            0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
-            &self.fields.item_inner,
+            &self.this_is_child_message_field,
             &self._bitfield,
             1i32,
             out,
@@ -124,40 +135,44 @@ impl self::_puroro::Message for Submsg {
         ::std::result::Result::Ok(())
     }
 }
-impl ::std::clone::Clone for Submsg {
+impl ::std::clone::Clone for ConflictFields {
     fn clone(&self) -> Self {
         Self {
-            fields: self::_fields::SubmsgFields {
-                item_inner: <self::_pinternal::SingularNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.item_inner),
-            },
+            this_is_child_message_field: <self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            > as ::std::clone::Clone>::clone(&self.this_is_child_message_field),
             _bitfield: ::std::clone::Clone::clone(&self._bitfield),
         }
     }
 }
-impl ::std::ops::Drop for Submsg {
+impl ::std::ops::Drop for ConflictFields {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
     }
 }
-impl ::std::fmt::Debug for Submsg {
+impl ::std::fmt::Debug for ConflictFields {
     fn fmt(
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Submsg))
-            .field(stringify!(item_inner), &self.item_inner_opt())
+        fmt.debug_struct(stringify!(ConflictFields))
+            .field(
+                stringify!(this_is_child_message_field),
+                &self.this_is_child_message_field_opt(),
+            )
             .finish()
     }
 }
-impl ::std::cmp::PartialEq for Submsg {
+impl ::std::cmp::PartialEq for ConflictFields {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        true && self.item_inner_opt() == rhs.item_inner_opt()
+        true
+            && self.this_is_child_message_field_opt()
+                == rhs.this_is_child_message_field_opt()
     }
 }
 pub mod _fields {
@@ -173,44 +188,8 @@ pub mod _fields {
         #[allow(unused)]
         pub use ::puroro::internal::*;
     }
-    #[derive(::std::default::Default)]
-    pub struct SubmsgFields<TItemInner> {
-        pub item_inner: TItemInner,
+    pub struct ConflictFieldsFields<TThisIsChildMessageField> {
+        pub this_is_child_message_field: TThisIsChildMessageField,
     }
 }
 pub use self::_fields::*;
-#[derive(
-    ::std::clone::Clone,
-    ::std::marker::Copy,
-    ::std::cmp::PartialEq,
-    ::std::cmp::Eq,
-    ::std::cmp::PartialOrd,
-    ::std::cmp::Ord,
-    ::std::hash::Hash,
-    ::std::fmt::Debug,
-)]
-pub enum Enum {
-    MyValue,
-    _None(i32),
-}
-impl ::std::default::Default for Enum {
-    fn default() -> Self {
-        Self::MyValue
-    }
-}
-impl ::std::convert::From::<Enum> for i32 {
-    fn from(val: Enum) -> i32 {
-        match val {
-            Enum::MyValue => 0i32,
-            self::Enum::_None(i) => i,
-        }
-    }
-}
-impl ::std::convert::From::<i32> for Enum {
-    fn from(val: i32) -> Self {
-        match val {
-            0i32 => self::Enum::MyValue,
-            _ => Enum::_None(val),
-        }
-    }
-}
