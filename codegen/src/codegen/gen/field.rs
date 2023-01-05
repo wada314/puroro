@@ -177,7 +177,7 @@ impl<T: ?Sized + Field> FieldExt for T {
     }
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = gen_fields_struct_field_ident(self)?;
-        let r#type = gen_message_struct_field_type(self)?;
+        let r#type = self.gen_fields_struct_field_type()?;
         Ok(parse2(quote! {
             #ident: <#r#type as ::std::clone::Clone>::clone(&self.fields.#ident)
         })?)
@@ -185,7 +185,7 @@ impl<T: ?Sized + Field> FieldExt for T {
     fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
         let ident = gen_fields_struct_field_ident(self)?;
         let number = self.number()?;
-        let r#type = gen_message_struct_field_type(self)?;
+        let r#type = self.gen_fields_struct_field_type()?;
         Ok(parse2(quote! {
             #number => <#r#type as #PURORO_INTERNAL::FieldType>::deser_from_iter(
                 &mut self.fields.#ident,
@@ -197,7 +197,7 @@ impl<T: ?Sized + Field> FieldExt for T {
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let ident = gen_fields_struct_field_ident(self)?;
         let number = self.number()?;
-        let r#type = gen_message_struct_field_type(self)?;
+        let r#type = self.gen_fields_struct_field_type()?;
         Ok(parse2(quote! {
             <#r#type as #PURORO_INTERNAL::FieldType>::ser_to_write(
                 &self.fields.#ident,
@@ -259,50 +259,6 @@ fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<us
     Ok(alloc.maybe_optional)
 }
 
-fn gen_message_struct_field_type(this: &(impl ?Sized + Field)) -> Result<Rc<Type>> {
-    use FieldRule::*;
-    use FieldType::*;
-    use LengthDelimitedType::*;
-    this.cache()
-        .get::<Cache>()?
-        .message_struct_field_type
-        .get_or_try_init(|| {
-            let primitive_type = this.r#type()?.rust_type()?;
-            let tag_type = this.r#type()?.tag_type()?;
-            let bitfield_index = bitfield_index_for_optional(this)?.unwrap_or(usize::MAX);
-            let type_name_segment: PathSegment = parse2(match (this.rule()?, this.r#type()?) {
-                (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                    SingularHeapMessageField::<#primitive_type>
-                },
-                (Repeated, LengthDelimited(Message(_))) => quote! {
-                    RepeatedMessageField::<#primitive_type>
-                },
-                (Optional, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                    OptionalNumericalField::<#primitive_type, #tag_type, #bitfield_index>
-                },
-                (Singular, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                    SingularNumericalField::<#primitive_type, #tag_type>
-                },
-                (Repeated, Variant(_) | Bits32(_) | Bits64(_)) => quote! {
-                    RepeatedNumericalField::<#primitive_type, #tag_type>
-                },
-                (Optional, LengthDelimited(_)) => quote! {
-                    OptionalUnsizedField::<#primitive_type, #tag_type, #bitfield_index>
-                },
-                (Singular, LengthDelimited(_)) => quote! {
-                    SingularUnsizedField::<#primitive_type, #tag_type>
-                },
-                (Repeated, LengthDelimited(_)) => quote! {
-                    RepeatedUnsizedField::<#primitive_type, #tag_type>
-                },
-            })?;
-            Ok(Rc::new(parse2(quote! {
-                #PURORO_INTERNAL::#type_name_segment
-            })?))
-        })
-        .cloned()
-}
-
 fn gen_fields_struct_field_ident(this: &(impl ?Sized + Field)) -> Result<Rc<Ident>> {
     this.cache()
         .get::<Cache>()?
@@ -327,7 +283,7 @@ fn gen_message_struct_field_methods_for_repeated(
     let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
     let field_ident = gen_fields_struct_field_ident(this)?;
-    let field_type = gen_message_struct_field_type(this)?;
+    let field_type = this.gen_fields_struct_field_type()?;
     let getter_item_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
             impl ::std::ops::Deref::<Target = str> +
@@ -389,7 +345,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
     let getter_has_ident = format_ident!("has_{}", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
     let field_ident = gen_fields_struct_field_ident(this)?;
-    let field_type = gen_message_struct_field_type(this)?;
+    let field_type = this.gen_fields_struct_field_type()?;
     let borrowed_type = this.r#type()?.rust_maybe_borrowed_type(None)?;
     let getter_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(parse2(quote! {
