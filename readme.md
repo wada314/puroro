@@ -76,13 +76,15 @@ your own crate. Congraturations!
 # subcrates
 - puroro -- The crate that the library user need to import
 - codegen -- Generate rust code from the given .proto files info
+- inline -- Provides a proc macro to directly write proto code in rust code.
+Currently only used by testing purpose, not published.
 - plugin -- A protoc compiler plugin
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
 - protobuf -- A git submodule of Google's official protobuf repository
   - When you cloned & checkout the puroro repository, remember to run `git submodule init` and
    `git submodule update` to download this directory.
-- puroro-protobuf-compiled -- Compiled .rs files from protobuf crate so that puroro-plugin crate can use it
+- puroro-protobuf-compiled -- Compiled .rs files from protobuf crate so that puroro-plugin crate can use it.
 - puroro-protobuf-compiler -- A crate which only contains build.rs that generates the ...-compiled crate.
 
 # TODOs
@@ -106,24 +108,13 @@ your own crate. Congraturations!
     - [ ] Nightly / stable features
         - [ ] Support stable (not using nightly features)
     - [ ] Message traits
-        - [ ] Mutable interface trait
-        - [ ] (More) Repeated field interface trait
-        - [ ] Map interface trait
     - [ ] Keep unknown fields
     - [ ] Deserializer from a slice
     - [ ] Serializer performance improvement
     - [ ] Custom deserializer (?)
     - [ ] Required field checker
-    - [ ] Other implementations
-        - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
-        - [ ] SliceView -- A viewer over a `&[u8]` slice, without allocating any extra memories
-        - [ ] Empty(Unit) -- `()`, which only returns default values
-        - [ ] Merged -- `(T, U)`
-        - [ ] Either -- `::either::Either<T, U>`
-        - [ ] Option -- `Option<T>`
-    - [ ] Support the `allocator_api`. Waiting for the `String` support
+    - [ ] Support the `allocator_api`.
     - [ ] RPCs / services
-    - [ ] Deserializer vulnerbility: Need to limit the recursion depth
     - [ ] Get multiple fields mutable references at once
     - [ ] An open struct for each message type so that the user can construct the message instance easily using struct initializer syntax and `..Default::default()` syntax.
-    - [ ] proc_macro to generate the message inline. For testing purpose.
+    - [x] proc_macro to generate the message inline. For testing purpose.

@@ -1,4 +1,7 @@
 
+# v 0.8.0
+- Mostly internal code refactoring.
+
 # v 0.7.0
 - Refactored the code generator so that it generates `TokenStream` instead of `String`.
 
