@@ -48,6 +48,7 @@ pub trait OneofExt {
         field_data_expr: &Expr,
     ) -> Result<Vec<Arm>>;
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
     fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
@@ -258,6 +259,12 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 #out_expr
             )?;
         })?)
+    }
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
+        for field in self.fields()? {
+            field.gen_message_struct_impl_debug_method_call(receiver)?;
+        }
+        Ok(())
     }
 
     fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {

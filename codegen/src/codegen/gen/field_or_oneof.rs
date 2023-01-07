@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{FieldExt, FieldOrOneof, FieldOrOneofCase, OneofExt};
 use crate::syn::{
-    parse2, Arm, Expr, Field as SynField, Ident, ImplItemMethod, NamedField, Stmt, Type,
+    parse2, Arm, Expr, Field as SynField, FieldValue, Ident, ImplItemMethod, NamedField, Stmt, Type,
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -36,6 +36,8 @@ pub trait FieldOrOneofExt {
         field_data_expr: &Expr,
     ) -> Result<Vec<Arm>>;
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
+    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
 }
 
 #[derive(Debug, Default)]
@@ -116,6 +118,24 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             }
             FieldOrOneofCase::Oneof(o) => {
                 OneofExt::gen_message_struct_impl_message_ser_stmt(o, out_expr)
+            }
+        }
+    }
+
+    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => FieldExt::gen_message_struct_impl_clone_field_value(f),
+            FieldOrOneofCase::Oneof(o) => OneofExt::gen_message_struct_impl_clone_field_value(o),
+        }
+    }
+
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => {
+                FieldExt::gen_message_struct_impl_debug_method_call(f, receiver)
+            }
+            FieldOrOneofCase::Oneof(o) => {
+                OneofExt::gen_message_struct_impl_debug_method_call(o, receiver)
             }
         }
     }

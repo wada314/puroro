@@ -233,21 +233,16 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
 fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_message_struct_ident(this)?;
     let fields_ident = gen_fields_struct_ident(this)?;
-    let field_clones = this
-        .fields()?
-        .map(|f| f.gen_message_struct_impl_clone_field_value())
-        .collect::<Result<Vec<_>>>()?;
-    let oneof_clones = this
-        .oneofs()?
-        .map(|o| o.gen_message_struct_impl_clone_field_value())
+    let field_values = this
+        .fields_or_oneofs()?
+        .map(|fo| fo.gen_message_struct_impl_clone_field_value())
         .collect::<Result<Vec<_>>>()?;
     Ok(parse2(quote! {
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
                 Self {
                     fields: self::_fields::#fields_ident {
-                        #(#field_clones,)*
-                        #(#oneof_clones,)*
+                        #(#field_values,)*
                     },
                     bitfield: ::std::clone::Clone::clone(&self.bitfield),
                 }
@@ -277,18 +272,8 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
 fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_message_struct_ident(this)?;
     let mut fmt_body: Expr = parse2(quote! { fmt.debug_struct(stringify!(#ident)) })?;
-
-    for field in this.fields()? {
-        fmt_body = field
-            .gen_message_struct_impl_debug_method_call(fmt_body)?
-            .into();
-    }
-    for oneof in this.oneofs()? {
-        for field in oneof.fields()? {
-            fmt_body = field
-                .gen_message_struct_impl_debug_method_call(fmt_body)?
-                .into();
-        }
+    for field_or_oneof in this.fields_or_oneofs()? {
+        field_or_oneof.gen_message_struct_impl_debug_method_call(&mut fmt_body)?;
     }
 
     Ok(parse2(quote! {
