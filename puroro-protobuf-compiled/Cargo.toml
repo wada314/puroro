@@ -1,6 +1,6 @@
 [package]
 name = "puroro-protobuf-compiled"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/wada314/puroro"
@@ -9,6 +9,6 @@ description = "A compiled Google Protocol Buffer's interface proto. Normal user 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro = { path = "../puroro", version = "0.7.0" }
+puroro = { path = "../puroro", version = "0.8.0" }
 
 [lib]
