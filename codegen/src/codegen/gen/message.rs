@@ -14,7 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    FieldExt, Message, OneofExt, OneofFieldExt, PackageOrMessageExt, PURORO_INTERNAL, PURORO_LIB,
+    FieldExt, FieldOrOneofExt, Message, OneofExt, OneofFieldExt, PackageOrMessageExt,
+    PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;
@@ -284,7 +285,7 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
     let ident = gen_message_struct_ident(this)?;
     let oneof_idents = this
         .oneofs()?
-        .map(|o| o.gen_message_struct_field_ident())
+        .map(|o| o.gen_fields_struct_field_ident())
         .collect::<Result<Vec<_>>>()?;
     // We need to explicitly clear the oneof unions.
     Ok(parse2(quote! {

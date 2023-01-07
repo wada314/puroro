@@ -13,38 +13,67 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{Enum, FieldOrOneof, PackageOrMessageExt, Syntax, PURORO_LIB};
-use crate::syn;
-use crate::syn::{parse2, Field as SynField, Ident, Item, ItemEnum, NamedField, Path, Type};
-use crate::{ErrorKind, Result};
+use super::{FieldExt, FieldOrOneof, OneofExt};
+use crate::syn::{parse2, Field as SynField, Ident, NamedField, Type};
+use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
-use ::syn::ItemImpl;
 
 pub trait FieldOrOneofExt {
-    fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<SynField>;
 }
 
-impl<T: FieldOrOneof> FieldOrOneofExt for T {
-    fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>> {
-        todo!()
+#[derive(Debug, Default)]
+struct Cache {
+    fields_struct_field_ident: OnceCell<Rc<Ident>>,
+    fields_struct_generic_param_ident: OnceCell<Rc<Ident>>,
+    fields_struct_field_type: OnceCell<Rc<Type>>,
+}
+
+impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
+    fn gen_fields_struct_field_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_field_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}",
+                    self.name()?.to_lower_snake_case().escape_rust_keywords()
+                )))
+            })
+            .cloned()
     }
 
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>> {
-        todo!()
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_generic_param_ident
+            .get_or_try_init(|| Ok(Rc::new(format_ident!("T{}", self.name()?.to_camel_case()))))
+            .cloned()
     }
 
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
-        todo!()
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_field_type
+            .get_or_try_init(|| match self.either() {
+                crate::codegen::data::FieldOrOneofCase::Field(f) => {
+                    f.gen_fields_struct_field_type_impl()
+                }
+                crate::codegen::data::FieldOrOneofCase::Oneof(o) => {
+                    o.gen_fields_struct_field_type_impl()
+                }
+            })
+            .cloned()
     }
 
     fn gen_fields_struct_field(&self) -> Result<SynField> {
-        let field_ident = self.gen_message_struct_field_ident()?;
+        let field_ident = self.gen_fields_struct_field_ident()?;
         let type_name = self.gen_fields_struct_generic_param_ident()?;
         Ok(parse2::<NamedField>(quote! {
             pub #field_ident: #type_name
