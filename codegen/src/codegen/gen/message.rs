@@ -94,10 +94,9 @@ impl<T: ?Sized + Message> MessageExt for T {
 
     fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = gen_message_struct_ident(self)?;
-        let fields_type_for_fields = self.fields()?.map(|f| f.gen_fields_struct_field_type());
-        let fields_type_for_oneofs = self.oneofs()?.map(|o| o.gen_fields_struct_field_type());
-        let fields_types = fields_type_for_fields
-            .chain(fields_type_for_oneofs)
+        let fields_types = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_fields_struct_field_type())
             .collect::<Result<Vec<_>>>()?;
         let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
 

@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::{FieldExt, FieldOrOneof, OneofExt};
-use crate::syn::{parse2, Field as SynField, Ident, NamedField, Type};
+use crate::syn::{parse2, Field as SynField, Ident, ImplItemMethod, NamedField, Type};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
@@ -26,6 +26,8 @@ pub trait FieldOrOneofExt {
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<SynField>;
+
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
 }
 
 #[derive(Debug, Default)]
@@ -79,5 +81,12 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             pub #field_ident: #type_name
         })?
         .into())
+    }
+
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        match self.either() {
+            crate::codegen::data::FieldOrOneofCase::Field(f) => todo!(),
+            crate::codegen::data::FieldOrOneofCase::Oneof(o) => todo!(),
+        }
     }
 }
