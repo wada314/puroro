@@ -288,13 +288,9 @@ fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemI
 fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_message_struct_ident(this)?;
     let rhs_expr = parse2(quote! { rhs })?;
-    let field_cmps = this
-        .fields()?
-        .map(|f| f.gen_message_struct_impl_partial_eq_cmp(&rhs_expr))
-        .collect::<Result<Vec<_>>>()?;
-    let oneof_cmps = this
-        .oneofs()?
-        .map(|o| o.gen_message_struct_impl_partial_eq_cmp(&rhs_expr))
+    let cmp_exprs = this
+        .fields_or_oneofs()?
+        .map(|fo| fo.gen_message_struct_impl_partial_eq_cmp(&rhs_expr))
         .collect::<Result<Vec<_>>>()?;
     Ok(parse2(quote! {
         impl ::std::cmp::PartialEq for #ident {
@@ -302,8 +298,7 @@ fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
 
                 true
-                    #( && #field_cmps)*
-                    #( && #oneof_cmps)*
+                    #( && #cmp_exprs)*
             }
         }
     })?)

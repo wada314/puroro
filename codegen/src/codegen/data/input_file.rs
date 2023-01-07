@@ -136,13 +136,17 @@ impl InputFileFake {
 }
 
 #[cfg(test)]
-impl InputFile for InputFileFake {
+impl DataTypeBase for InputFileFake {
     fn cache(&self) -> &AnonymousCache {
         unimplemented!()
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
+
+#[cfg(test)]
+impl InputFile for InputFileFake {
     fn syntax(&self) -> Result<Syntax> {
         unimplemented!()
     }

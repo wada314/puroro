@@ -38,6 +38,7 @@ pub trait FieldOrOneofExt {
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
+    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
 #[derive(Debug, Default)]
@@ -136,6 +137,17 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             }
             FieldOrOneofCase::Oneof(o) => {
                 OneofExt::gen_message_struct_impl_debug_method_call(o, receiver)
+            }
+        }
+    }
+
+    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => {
+                FieldExt::gen_message_struct_impl_partial_eq_cmp(f, rhs_expr)
+            }
+            FieldOrOneofCase::Oneof(o) => {
+                OneofExt::gen_message_struct_impl_partial_eq_cmp(o, rhs_expr)
             }
         }
     }
