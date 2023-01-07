@@ -32,7 +32,7 @@ pub struct File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl File {
     pub fn name(&self) -> &str {
@@ -43,7 +43,7 @@ impl File {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.name,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -53,7 +53,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -63,7 +63,7 @@ impl File {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.name,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -73,7 +73,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
             .is_some()
     }
     pub fn clear_name(&mut self) {
@@ -82,7 +82,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn insertion_point(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
@@ -92,7 +92,7 @@ impl File {
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.insertion_point,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -104,7 +104,7 @@ impl File {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.insertion_point,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn insertion_point_mut(&mut self) -> &mut ::std::string::String {
@@ -115,7 +115,7 @@ impl File {
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.insertion_point,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -127,7 +127,7 @@ impl File {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.insertion_point,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -139,7 +139,7 @@ impl File {
             1usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.insertion_point,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn content(&self) -> &str {
@@ -150,7 +150,7 @@ impl File {
             2usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.content,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -160,7 +160,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.content, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.content, &self.bitfield)
     }
     pub fn content_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -170,7 +170,7 @@ impl File {
             2usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.content,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -180,7 +180,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.content, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.content, &self.bitfield)
             .is_some()
     }
     pub fn clear_content(&mut self) {
@@ -189,7 +189,7 @@ impl File {
             ::std::string::String,
             self::_pinternal::tags::String,
             2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.content, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.content, &mut self.bitfield)
     }
     pub fn generated_code_info(
         &self,
@@ -199,7 +199,7 @@ impl File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.generated_code_info,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -211,7 +211,7 @@ impl File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.generated_code_info,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn generated_code_info_mut(
@@ -222,7 +222,7 @@ impl File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.generated_code_info,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -232,7 +232,7 @@ impl File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.generated_code_info,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -242,7 +242,7 @@ impl File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.generated_code_info,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -271,7 +271,7 @@ impl self::_puroro::Message for File {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.name,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -282,7 +282,7 @@ impl self::_puroro::Message for File {
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.insertion_point,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -293,7 +293,7 @@ impl self::_puroro::Message for File {
                         2usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.content,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -302,7 +302,7 @@ impl self::_puroro::Message for File {
                         self::_root::google::protobuf::GeneratedCodeInfo,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.generated_code_info,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -324,7 +324,7 @@ impl self::_puroro::Message for File {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.name,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -334,7 +334,7 @@ impl self::_puroro::Message for File {
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.insertion_point,
-            &self._bitfield,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -344,7 +344,7 @@ impl self::_puroro::Message for File {
             2usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.content,
-            &self._bitfield,
+            &self.bitfield,
             15i32,
             out,
         )?;
@@ -352,7 +352,7 @@ impl self::_puroro::Message for File {
             self::_root::google::protobuf::GeneratedCodeInfo,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.generated_code_info,
-            &self._bitfield,
+            &self.bitfield,
             16i32,
             out,
         )?;
@@ -382,7 +382,7 @@ impl ::std::clone::Clone for File {
                     self::_root::google::protobuf::GeneratedCodeInfo,
                 > as ::std::clone::Clone>::clone(&self.fields.generated_code_info),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

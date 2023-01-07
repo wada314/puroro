@@ -129,7 +129,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             #[derive(::std::default::Default)]
             pub struct #ident {
                 fields: #fields_struct_type,
-                _bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
+                bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -273,7 +273,7 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
                         #(#field_clones,)*
                         #(#oneof_clones,)*
                     },
-                    _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                    bitfield: ::std::clone::Clone::clone(&self.bitfield),
                 }
             }
         }
@@ -292,7 +292,7 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
             fn drop(&mut self) {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
 
-                #(self.fields.#oneof_idents.clear(&mut self._bitfield);)*
+                #(self.fields.#oneof_idents.clear(&mut self.bitfield);)*
             }
         }
     })?)

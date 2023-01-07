@@ -19,7 +19,7 @@ pub struct ConflictCase {
             0usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl ConflictCase {
     pub fn this_is_message_field(&self) -> i32 {
@@ -30,7 +30,7 @@ impl ConflictCase {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.this_is_message_field,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -42,7 +42,7 @@ impl ConflictCase {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.this_is_message_field,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn this_is_message_field_mut(&mut self) -> &mut i32 {
@@ -53,7 +53,7 @@ impl ConflictCase {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.this_is_message_field,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -65,7 +65,7 @@ impl ConflictCase {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.this_is_message_field,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -77,7 +77,7 @@ impl ConflictCase {
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.this_is_message_field,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -106,7 +106,7 @@ impl self::_puroro::Message for ConflictCase {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.this_is_message_field,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -128,7 +128,7 @@ impl self::_puroro::Message for ConflictCase {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.this_is_message_field,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -145,7 +145,7 @@ impl ::std::clone::Clone for ConflictCase {
                     0usize,
                 > as ::std::clone::Clone>::clone(&self.fields.this_is_message_field),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

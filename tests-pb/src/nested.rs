@@ -16,7 +16,7 @@ pub struct Msg {
     fields: self::_root::nested::_fields::MsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
-    _bitfield: self::_pinternal::BitArray<0usize>,
+    bitfield: self::_pinternal::BitArray<0usize>,
 }
 impl Msg {
     pub fn item_outer(&self) -> i32 {
@@ -26,7 +26,7 @@ impl Msg {
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.item_outer,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -37,7 +37,7 @@ impl Msg {
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.item_outer,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn item_outer_mut(&mut self) -> &mut i32 {
@@ -47,7 +47,7 @@ impl Msg {
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.item_outer,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -58,7 +58,7 @@ impl Msg {
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.item_outer,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -69,7 +69,7 @@ impl Msg {
             self::_pinternal::tags::Int32,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.item_outer,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -97,7 +97,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Int32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.item_outer,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -118,7 +118,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Int32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.item_outer,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -134,7 +134,7 @@ impl ::std::clone::Clone for Msg {
                     self::_pinternal::tags::Int32,
                 > as ::std::clone::Clone>::clone(&self.fields.item_outer),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

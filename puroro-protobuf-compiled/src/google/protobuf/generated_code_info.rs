@@ -30,7 +30,7 @@ pub struct Annotation {
             2usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Annotation {
     pub fn path(&self) -> &[i32] {
@@ -38,24 +38,21 @@ impl Annotation {
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.fields.path, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.path, &self.bitfield)
     }
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.path,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::get_field_mut(&mut self.fields.path, &mut self.bitfield)
     }
     pub fn clear_path(&mut self) {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(&mut self.fields.path, &mut self._bitfield)
+        > as RepeatedFieldType>::clear(&mut self.fields.path, &mut self.bitfield)
     }
     pub fn source_file(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
@@ -65,7 +62,7 @@ impl Annotation {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.source_file,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -77,7 +74,7 @@ impl Annotation {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.source_file,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn source_file_mut(&mut self) -> &mut ::std::string::String {
@@ -88,7 +85,7 @@ impl Annotation {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.source_file,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -100,7 +97,7 @@ impl Annotation {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.source_file,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -112,7 +109,7 @@ impl Annotation {
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.source_file,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn begin(&self) -> i32 {
@@ -123,7 +120,7 @@ impl Annotation {
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.begin,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -133,7 +130,7 @@ impl Annotation {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.begin, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.begin, &self.bitfield)
     }
     pub fn begin_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -143,7 +140,7 @@ impl Annotation {
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.begin,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -153,7 +150,7 @@ impl Annotation {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.begin, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.begin, &self.bitfield)
             .is_some()
     }
     pub fn clear_begin(&mut self) {
@@ -162,7 +159,7 @@ impl Annotation {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.begin, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.begin, &mut self.bitfield)
     }
     pub fn end(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -172,7 +169,7 @@ impl Annotation {
             2usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.end,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -182,7 +179,7 @@ impl Annotation {
             i32,
             self::_pinternal::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.end, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.end, &self.bitfield)
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -192,7 +189,7 @@ impl Annotation {
             2usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.end,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -202,7 +199,7 @@ impl Annotation {
             i32,
             self::_pinternal::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.end, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.end, &self.bitfield)
             .is_some()
     }
     pub fn clear_end(&mut self) {
@@ -211,7 +208,7 @@ impl Annotation {
             i32,
             self::_pinternal::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.end, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.end, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Annotation {
@@ -238,7 +235,7 @@ impl self::_puroro::Message for Annotation {
                         self::_pinternal::tags::Int32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.path,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -249,7 +246,7 @@ impl self::_puroro::Message for Annotation {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.source_file,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -260,7 +257,7 @@ impl self::_puroro::Message for Annotation {
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.begin,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -271,7 +268,7 @@ impl self::_puroro::Message for Annotation {
                         2usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.end,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -292,7 +289,7 @@ impl self::_puroro::Message for Annotation {
             self::_pinternal::tags::Int32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.path,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -302,7 +299,7 @@ impl self::_puroro::Message for Annotation {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.source_file,
-            &self._bitfield,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -312,7 +309,7 @@ impl self::_puroro::Message for Annotation {
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.begin,
-            &self._bitfield,
+            &self.bitfield,
             3i32,
             out,
         )?;
@@ -322,7 +319,7 @@ impl self::_puroro::Message for Annotation {
             2usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.end,
-            &self._bitfield,
+            &self.bitfield,
             4i32,
             out,
         )?;
@@ -353,7 +350,7 @@ impl ::std::clone::Clone for Annotation {
                     2usize,
                 > as ::std::clone::Clone>::clone(&self.fields.end),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

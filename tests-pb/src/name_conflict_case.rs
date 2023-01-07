@@ -18,7 +18,7 @@ pub struct Message {
             self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Message {
     pub fn conflict(
@@ -27,20 +27,20 @@ impl Message {
         self::_root::name_conflict_case::message::_case::ConflictCase::<i32>,
     > {
         use self::_pinternal::OneofUnion as _;
-        self.fields.conflict.case_ref(&self._bitfield)
+        self.fields.conflict.case_ref(&self.bitfield)
     }
     pub fn clear_conflict(&mut self) {
         use self::_pinternal::OneofUnion as _;
-        self.fields.conflict.clear(&mut self._bitfield)
+        self.fields.conflict.clear(&mut self.bitfield)
     }
     pub fn this_is_oneof_field(&self) -> i32 {
-        self.fields.conflict.this_is_oneof_field(&self._bitfield)
+        self.fields.conflict.this_is_oneof_field(&self.bitfield)
     }
     pub fn this_is_oneof_field_opt(&self) -> ::std::option::Option::<i32> {
-        self.fields.conflict.this_is_oneof_field_opt(&self._bitfield)
+        self.fields.conflict.this_is_oneof_field_opt(&self.bitfield)
     }
     pub fn this_is_oneof_field_mut(&mut self) -> &mut i32 {
-        self.fields.conflict.this_is_oneof_field_mut(&mut self._bitfield)
+        self.fields.conflict.this_is_oneof_field_mut(&mut self.bitfield)
     }
     pub fn has_this_is_oneof_field(&self) -> bool {
         self.this_is_oneof_field_opt().is_some()
@@ -54,8 +54,8 @@ impl Message {
             self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(
                 _,
             ),
-        ) = OneofCase::from_bitslice(&self._bitfield) {
-            self.fields.conflict.clear(&mut self._bitfield)
+        ) = OneofCase::from_bitslice(&self.bitfield) {
+            self.fields.conflict.clear(&mut self.bitfield)
         }
     }
 }
@@ -82,7 +82,7 @@ impl self::_puroro::Message for Message {
                         .fields
                         .conflict
                         .deser_from_iter(
-                            &mut self._bitfield,
+                            &mut self.bitfield,
                             field_data,
                             self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
                         )?
@@ -99,7 +99,7 @@ impl self::_puroro::Message for Message {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        self.fields.conflict.ser_to_write(&self._bitfield, out)?;
+        self.fields.conflict.ser_to_write(&self.bitfield, out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -109,10 +109,10 @@ impl ::std::clone::Clone for Message {
             fields: self::_fields::MessageFields {
                 conflict: self::_pinternal::OneofUnion::clone(
                     &self.fields.conflict,
-                    &self._bitfield,
+                    &self.bitfield,
                 ),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -120,7 +120,7 @@ impl ::std::ops::Drop for Message {
     fn drop(&mut self) {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        self.fields.conflict.clear(&mut self._bitfield);
+        self.fields.conflict.clear(&mut self.bitfield);
     }
 }
 impl ::std::fmt::Debug for Message {

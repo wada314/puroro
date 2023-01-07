@@ -204,7 +204,7 @@ pub struct Msg {
         >,
         self::_pinternal::RepeatedNumericalField::<f64, self::_pinternal::tags::Double>,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Msg {
     pub fn i32_required(&self) -> i32 {
@@ -215,7 +215,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.i32_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -227,7 +227,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.i32_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn i32_required_mut(&mut self) -> &mut i32 {
@@ -238,7 +238,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.i32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -250,7 +250,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.i32_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -262,7 +262,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.i32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn i32_optional(&self) -> i32 {
@@ -273,7 +273,7 @@ impl Msg {
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.i32_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -285,7 +285,7 @@ impl Msg {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.i32_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
@@ -296,7 +296,7 @@ impl Msg {
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.i32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -308,7 +308,7 @@ impl Msg {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.i32_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -320,7 +320,7 @@ impl Msg {
             1usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.i32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn i32_repeated(&self) -> &[i32] {
@@ -328,7 +328,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.fields.i32_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.i32_repeated, &self.bitfield)
     }
     pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
@@ -337,7 +337,7 @@ impl Msg {
             self::_pinternal::tags::Int32,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.i32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_i32_repeated(&mut self) {
@@ -345,10 +345,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.i32_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.i32_repeated, &mut self.bitfield)
     }
     pub fn float_required(&self) -> f32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -358,7 +355,7 @@ impl Msg {
             2usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.float_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -370,7 +367,7 @@ impl Msg {
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.float_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn float_required_mut(&mut self) -> &mut f32 {
@@ -381,7 +378,7 @@ impl Msg {
             2usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.float_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -393,7 +390,7 @@ impl Msg {
             2usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.float_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -405,7 +402,7 @@ impl Msg {
             2usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.float_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn float_optional(&self) -> f32 {
@@ -416,7 +413,7 @@ impl Msg {
             3usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.float_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -428,7 +425,7 @@ impl Msg {
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.float_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn float_optional_mut(&mut self) -> &mut f32 {
@@ -439,7 +436,7 @@ impl Msg {
             3usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.float_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -451,7 +448,7 @@ impl Msg {
             3usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.float_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -463,7 +460,7 @@ impl Msg {
             3usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.float_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn float_repeated(&self) -> &[f32] {
@@ -471,7 +468,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             f32,
             self::_pinternal::tags::Float,
-        > as RepeatedFieldType>::get_field(&self.fields.float_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.float_repeated, &self.bitfield)
     }
     pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f32> {
         use self::_pinternal::RepeatedFieldType;
@@ -480,7 +477,7 @@ impl Msg {
             self::_pinternal::tags::Float,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.float_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_float_repeated(&mut self) {
@@ -490,7 +487,7 @@ impl Msg {
             self::_pinternal::tags::Float,
         > as RepeatedFieldType>::clear(
             &mut self.fields.float_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn bytes_required(&self) -> &[u8] {
@@ -501,7 +498,7 @@ impl Msg {
             4usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.bytes_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -513,7 +510,7 @@ impl Msg {
             4usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.bytes_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn bytes_required_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
@@ -524,7 +521,7 @@ impl Msg {
             4usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.bytes_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -536,7 +533,7 @@ impl Msg {
             4usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.bytes_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -548,7 +545,7 @@ impl Msg {
             4usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.bytes_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn bytes_optional(&self) -> &[u8] {
@@ -559,7 +556,7 @@ impl Msg {
             5usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.bytes_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -571,7 +568,7 @@ impl Msg {
             5usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.bytes_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn bytes_optional_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
@@ -582,7 +579,7 @@ impl Msg {
             5usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.bytes_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -594,7 +591,7 @@ impl Msg {
             5usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.bytes_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -606,7 +603,7 @@ impl Msg {
             5usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.bytes_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn bytes_repeated(
@@ -618,7 +615,7 @@ impl Msg {
         <self::_pinternal::RepeatedUnsizedField::<
             ::std::vec::Vec<u8>,
             self::_pinternal::tags::Bytes,
-        > as RepeatedFieldType>::get_field(&self.fields.bytes_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.bytes_repeated, &self.bitfield)
     }
     pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<::std::vec::Vec<u8>> {
         use self::_pinternal::RepeatedFieldType;
@@ -627,7 +624,7 @@ impl Msg {
             self::_pinternal::tags::Bytes,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.bytes_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_bytes_repeated(&mut self) {
@@ -637,7 +634,7 @@ impl Msg {
             self::_pinternal::tags::Bytes,
         > as RepeatedFieldType>::clear(
             &mut self.fields.bytes_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn string_required(&self) -> &str {
@@ -648,7 +645,7 @@ impl Msg {
             6usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.string_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -660,7 +657,7 @@ impl Msg {
             6usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.string_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn string_required_mut(&mut self) -> &mut ::std::string::String {
@@ -671,7 +668,7 @@ impl Msg {
             6usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.string_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -683,7 +680,7 @@ impl Msg {
             6usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.string_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -695,7 +692,7 @@ impl Msg {
             6usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.string_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn string_optional(&self) -> &str {
@@ -706,7 +703,7 @@ impl Msg {
             7usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.string_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -718,7 +715,7 @@ impl Msg {
             7usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.string_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn string_optional_mut(&mut self) -> &mut ::std::string::String {
@@ -729,7 +726,7 @@ impl Msg {
             7usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.string_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -741,7 +738,7 @@ impl Msg {
             7usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.string_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -753,7 +750,7 @@ impl Msg {
             7usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.string_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn string_repeated(
@@ -765,7 +762,7 @@ impl Msg {
         <self::_pinternal::RepeatedUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field(&self.fields.string_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.string_repeated, &self.bitfield)
     }
     pub fn string_repeated_mut(
         &mut self,
@@ -776,7 +773,7 @@ impl Msg {
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.string_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_string_repeated(&mut self) {
@@ -786,7 +783,7 @@ impl Msg {
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::clear(
             &mut self.fields.string_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn enum_required(&self) -> self::_root::full_coverage2::Enum {
@@ -797,7 +794,7 @@ impl Msg {
             8usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.enum_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -811,7 +808,7 @@ impl Msg {
             8usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.enum_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn enum_required_mut(&mut self) -> &mut self::_root::full_coverage2::Enum {
@@ -822,7 +819,7 @@ impl Msg {
             8usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.enum_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -834,7 +831,7 @@ impl Msg {
             8usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.enum_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -846,7 +843,7 @@ impl Msg {
             8usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.enum_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn enum_optional(&self) -> self::_root::full_coverage2::Enum {
@@ -857,7 +854,7 @@ impl Msg {
             9usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.enum_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -871,7 +868,7 @@ impl Msg {
             9usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.enum_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn enum_optional_mut(&mut self) -> &mut self::_root::full_coverage2::Enum {
@@ -882,7 +879,7 @@ impl Msg {
             9usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.enum_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -894,7 +891,7 @@ impl Msg {
             9usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.enum_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -906,7 +903,7 @@ impl Msg {
             9usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.enum_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn enum_repeated(&self) -> &[self::_root::full_coverage2::Enum] {
@@ -914,7 +911,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             self::_root::full_coverage2::Enum,
             self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
-        > as RepeatedFieldType>::get_field(&self.fields.enum_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.enum_repeated, &self.bitfield)
     }
     pub fn enum_repeated_mut(
         &mut self,
@@ -925,7 +922,7 @@ impl Msg {
             self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.enum_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_enum_repeated(&mut self) {
@@ -935,7 +932,7 @@ impl Msg {
             self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
         > as RepeatedFieldType>::clear(
             &mut self.fields.enum_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn submsg_required(
@@ -946,7 +943,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.submsg_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -958,7 +955,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.submsg_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn submsg_required_mut(
@@ -969,7 +966,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.submsg_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -979,7 +976,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.submsg_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -989,7 +986,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.submsg_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn submsg_optional(
@@ -1000,7 +997,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.submsg_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1012,7 +1009,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.submsg_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn submsg_optional_mut(
@@ -1023,7 +1020,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.submsg_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1033,7 +1030,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.submsg_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1043,14 +1040,14 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.submsg_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn submsg_repeated(&self) -> &[self::_root::full_coverage2::msg::Submsg] {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedMessageField::<
             self::_root::full_coverage2::msg::Submsg,
-        > as RepeatedFieldType>::get_field(&self.fields.submsg_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.submsg_repeated, &self.bitfield)
     }
     pub fn submsg_repeated_mut(
         &mut self,
@@ -1060,7 +1057,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.submsg_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_submsg_repeated(&mut self) {
@@ -1069,7 +1066,7 @@ impl Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as RepeatedFieldType>::clear(
             &mut self.fields.submsg_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn i64_required(&self) -> i64 {
@@ -1080,7 +1077,7 @@ impl Msg {
             10usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.i64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1092,7 +1089,7 @@ impl Msg {
             10usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.i64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn i64_required_mut(&mut self) -> &mut i64 {
@@ -1103,7 +1100,7 @@ impl Msg {
             10usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.i64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1115,7 +1112,7 @@ impl Msg {
             10usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.i64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1127,7 +1124,7 @@ impl Msg {
             10usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.i64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn i64_optional(&self) -> i64 {
@@ -1138,7 +1135,7 @@ impl Msg {
             11usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.i64_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1150,7 +1147,7 @@ impl Msg {
             11usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.i64_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn i64_optional_mut(&mut self) -> &mut i64 {
@@ -1161,7 +1158,7 @@ impl Msg {
             11usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.i64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1173,7 +1170,7 @@ impl Msg {
             11usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.i64_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1185,7 +1182,7 @@ impl Msg {
             11usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.i64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn i64_repeated(&self) -> &[i64] {
@@ -1193,7 +1190,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i64,
             self::_pinternal::tags::Int64,
-        > as RepeatedFieldType>::get_field(&self.fields.i64_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.i64_repeated, &self.bitfield)
     }
     pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::RepeatedFieldType;
@@ -1202,7 +1199,7 @@ impl Msg {
             self::_pinternal::tags::Int64,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.i64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_i64_repeated(&mut self) {
@@ -1210,10 +1207,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i64,
             self::_pinternal::tags::Int64,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.i64_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.i64_repeated, &mut self.bitfield)
     }
     pub fn u32_required(&self) -> u32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -1223,7 +1217,7 @@ impl Msg {
             12usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.u32_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1235,7 +1229,7 @@ impl Msg {
             12usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.u32_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn u32_required_mut(&mut self) -> &mut u32 {
@@ -1246,7 +1240,7 @@ impl Msg {
             12usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.u32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1258,7 +1252,7 @@ impl Msg {
             12usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.u32_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1270,7 +1264,7 @@ impl Msg {
             12usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.u32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn u32_optional(&self) -> u32 {
@@ -1281,7 +1275,7 @@ impl Msg {
             13usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.u32_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1293,7 +1287,7 @@ impl Msg {
             13usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.u32_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn u32_optional_mut(&mut self) -> &mut u32 {
@@ -1304,7 +1298,7 @@ impl Msg {
             13usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.u32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1316,7 +1310,7 @@ impl Msg {
             13usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.u32_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1328,7 +1322,7 @@ impl Msg {
             13usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.u32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn u32_repeated(&self) -> &[u32] {
@@ -1336,7 +1330,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             u32,
             self::_pinternal::tags::UInt32,
-        > as RepeatedFieldType>::get_field(&self.fields.u32_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.u32_repeated, &self.bitfield)
     }
     pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
         use self::_pinternal::RepeatedFieldType;
@@ -1345,7 +1339,7 @@ impl Msg {
             self::_pinternal::tags::UInt32,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.u32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_u32_repeated(&mut self) {
@@ -1353,10 +1347,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             u32,
             self::_pinternal::tags::UInt32,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.u32_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.u32_repeated, &mut self.bitfield)
     }
     pub fn u64_required(&self) -> u64 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -1366,7 +1357,7 @@ impl Msg {
             14usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.u64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1378,7 +1369,7 @@ impl Msg {
             14usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.u64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn u64_required_mut(&mut self) -> &mut u64 {
@@ -1389,7 +1380,7 @@ impl Msg {
             14usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.u64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1401,7 +1392,7 @@ impl Msg {
             14usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.u64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1413,7 +1404,7 @@ impl Msg {
             14usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.u64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn u64_optional(&self) -> u64 {
@@ -1424,7 +1415,7 @@ impl Msg {
             15usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.u64_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1436,7 +1427,7 @@ impl Msg {
             15usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.u64_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn u64_optional_mut(&mut self) -> &mut u64 {
@@ -1447,7 +1438,7 @@ impl Msg {
             15usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.u64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1459,7 +1450,7 @@ impl Msg {
             15usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.u64_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1471,7 +1462,7 @@ impl Msg {
             15usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.u64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn u64_repeated(&self) -> &[u64] {
@@ -1479,7 +1470,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             u64,
             self::_pinternal::tags::UInt64,
-        > as RepeatedFieldType>::get_field(&self.fields.u64_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.u64_repeated, &self.bitfield)
     }
     pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
         use self::_pinternal::RepeatedFieldType;
@@ -1488,7 +1479,7 @@ impl Msg {
             self::_pinternal::tags::UInt64,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.u64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_u64_repeated(&mut self) {
@@ -1496,10 +1487,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             u64,
             self::_pinternal::tags::UInt64,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.u64_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.u64_repeated, &mut self.bitfield)
     }
     pub fn s32_required(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -1509,7 +1497,7 @@ impl Msg {
             16usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.s32_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1521,7 +1509,7 @@ impl Msg {
             16usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.s32_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn s32_required_mut(&mut self) -> &mut i32 {
@@ -1532,7 +1520,7 @@ impl Msg {
             16usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.s32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1544,7 +1532,7 @@ impl Msg {
             16usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.s32_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1556,7 +1544,7 @@ impl Msg {
             16usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.s32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn s32_optional(&self) -> i32 {
@@ -1567,7 +1555,7 @@ impl Msg {
             17usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.s32_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1579,7 +1567,7 @@ impl Msg {
             17usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.s32_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn s32_optional_mut(&mut self) -> &mut i32 {
@@ -1590,7 +1578,7 @@ impl Msg {
             17usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.s32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1602,7 +1590,7 @@ impl Msg {
             17usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.s32_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1614,7 +1602,7 @@ impl Msg {
             17usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.s32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn s32_repeated(&self) -> &[i32] {
@@ -1622,7 +1610,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::SInt32,
-        > as RepeatedFieldType>::get_field(&self.fields.s32_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.s32_repeated, &self.bitfield)
     }
     pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
@@ -1631,7 +1619,7 @@ impl Msg {
             self::_pinternal::tags::SInt32,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.s32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_s32_repeated(&mut self) {
@@ -1639,10 +1627,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i32,
             self::_pinternal::tags::SInt32,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.s32_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.s32_repeated, &mut self.bitfield)
     }
     pub fn s64_required(&self) -> i64 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -1652,7 +1637,7 @@ impl Msg {
             18usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.s64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1664,7 +1649,7 @@ impl Msg {
             18usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.s64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn s64_required_mut(&mut self) -> &mut i64 {
@@ -1675,7 +1660,7 @@ impl Msg {
             18usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.s64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1687,7 +1672,7 @@ impl Msg {
             18usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.s64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1699,7 +1684,7 @@ impl Msg {
             18usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.s64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn s64_optional(&self) -> i64 {
@@ -1710,7 +1695,7 @@ impl Msg {
             19usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.s64_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1722,7 +1707,7 @@ impl Msg {
             19usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.s64_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn s64_optional_mut(&mut self) -> &mut i64 {
@@ -1733,7 +1718,7 @@ impl Msg {
             19usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.s64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1745,7 +1730,7 @@ impl Msg {
             19usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.s64_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1757,7 +1742,7 @@ impl Msg {
             19usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.s64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn s64_repeated(&self) -> &[i64] {
@@ -1765,7 +1750,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i64,
             self::_pinternal::tags::SInt64,
-        > as RepeatedFieldType>::get_field(&self.fields.s64_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.s64_repeated, &self.bitfield)
     }
     pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::RepeatedFieldType;
@@ -1774,7 +1759,7 @@ impl Msg {
             self::_pinternal::tags::SInt64,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.s64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_s64_repeated(&mut self) {
@@ -1782,10 +1767,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             i64,
             self::_pinternal::tags::SInt64,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.s64_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.s64_repeated, &mut self.bitfield)
     }
     pub fn fixed32_required(&self) -> u32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -1795,7 +1777,7 @@ impl Msg {
             20usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.fixed32_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1807,7 +1789,7 @@ impl Msg {
             20usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.fixed32_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn fixed32_required_mut(&mut self) -> &mut u32 {
@@ -1818,7 +1800,7 @@ impl Msg {
             20usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.fixed32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1830,7 +1812,7 @@ impl Msg {
             20usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.fixed32_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1842,7 +1824,7 @@ impl Msg {
             20usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.fixed32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn fixed32_optional(&self) -> u32 {
@@ -1853,7 +1835,7 @@ impl Msg {
             21usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.fixed32_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1865,7 +1847,7 @@ impl Msg {
             21usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.fixed32_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn fixed32_optional_mut(&mut self) -> &mut u32 {
@@ -1876,7 +1858,7 @@ impl Msg {
             21usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.fixed32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1888,7 +1870,7 @@ impl Msg {
             21usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.fixed32_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1900,7 +1882,7 @@ impl Msg {
             21usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.fixed32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn fixed32_repeated(&self) -> &[u32] {
@@ -1908,10 +1890,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             u32,
             self::_pinternal::tags::Fixed32,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.fixed32_repeated,
-            &self._bitfield,
-        )
+        > as RepeatedFieldType>::get_field(&self.fields.fixed32_repeated, &self.bitfield)
     }
     pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
         use self::_pinternal::RepeatedFieldType;
@@ -1920,7 +1899,7 @@ impl Msg {
             self::_pinternal::tags::Fixed32,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.fixed32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_fixed32_repeated(&mut self) {
@@ -1930,7 +1909,7 @@ impl Msg {
             self::_pinternal::tags::Fixed32,
         > as RepeatedFieldType>::clear(
             &mut self.fields.fixed32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn fixed64_required(&self) -> u64 {
@@ -1941,7 +1920,7 @@ impl Msg {
             22usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.fixed64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1953,7 +1932,7 @@ impl Msg {
             22usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.fixed64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn fixed64_required_mut(&mut self) -> &mut u64 {
@@ -1964,7 +1943,7 @@ impl Msg {
             22usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.fixed64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -1976,7 +1955,7 @@ impl Msg {
             22usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.fixed64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -1988,7 +1967,7 @@ impl Msg {
             22usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.fixed64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn fixed64_optional(&self) -> u64 {
@@ -1999,7 +1978,7 @@ impl Msg {
             23usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.fixed64_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2011,7 +1990,7 @@ impl Msg {
             23usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.fixed64_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn fixed64_optional_mut(&mut self) -> &mut u64 {
@@ -2022,7 +2001,7 @@ impl Msg {
             23usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.fixed64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2034,7 +2013,7 @@ impl Msg {
             23usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.fixed64_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2046,7 +2025,7 @@ impl Msg {
             23usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.fixed64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn fixed64_repeated(&self) -> &[u64] {
@@ -2054,10 +2033,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             u64,
             self::_pinternal::tags::Fixed64,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.fixed64_repeated,
-            &self._bitfield,
-        )
+        > as RepeatedFieldType>::get_field(&self.fields.fixed64_repeated, &self.bitfield)
     }
     pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
         use self::_pinternal::RepeatedFieldType;
@@ -2066,7 +2042,7 @@ impl Msg {
             self::_pinternal::tags::Fixed64,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.fixed64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_fixed64_repeated(&mut self) {
@@ -2076,7 +2052,7 @@ impl Msg {
             self::_pinternal::tags::Fixed64,
         > as RepeatedFieldType>::clear(
             &mut self.fields.fixed64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn sfixed32_required(&self) -> i32 {
@@ -2087,7 +2063,7 @@ impl Msg {
             24usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.sfixed32_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2099,7 +2075,7 @@ impl Msg {
             24usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.sfixed32_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn sfixed32_required_mut(&mut self) -> &mut i32 {
@@ -2110,7 +2086,7 @@ impl Msg {
             24usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.sfixed32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2122,7 +2098,7 @@ impl Msg {
             24usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.sfixed32_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2134,7 +2110,7 @@ impl Msg {
             24usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.sfixed32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn sfixed32_optional(&self) -> i32 {
@@ -2145,7 +2121,7 @@ impl Msg {
             25usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.sfixed32_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2157,7 +2133,7 @@ impl Msg {
             25usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.sfixed32_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn sfixed32_optional_mut(&mut self) -> &mut i32 {
@@ -2168,7 +2144,7 @@ impl Msg {
             25usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.sfixed32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2180,7 +2156,7 @@ impl Msg {
             25usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.sfixed32_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2192,7 +2168,7 @@ impl Msg {
             25usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.sfixed32_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn sfixed32_repeated(&self) -> &[i32] {
@@ -2202,7 +2178,7 @@ impl Msg {
             self::_pinternal::tags::SFixed32,
         > as RepeatedFieldType>::get_field(
             &self.fields.sfixed32_repeated,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
@@ -2212,7 +2188,7 @@ impl Msg {
             self::_pinternal::tags::SFixed32,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.sfixed32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_sfixed32_repeated(&mut self) {
@@ -2222,7 +2198,7 @@ impl Msg {
             self::_pinternal::tags::SFixed32,
         > as RepeatedFieldType>::clear(
             &mut self.fields.sfixed32_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn sfixed64_required(&self) -> i64 {
@@ -2233,7 +2209,7 @@ impl Msg {
             26usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.sfixed64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2245,7 +2221,7 @@ impl Msg {
             26usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.sfixed64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn sfixed64_required_mut(&mut self) -> &mut i64 {
@@ -2256,7 +2232,7 @@ impl Msg {
             26usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.sfixed64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2268,7 +2244,7 @@ impl Msg {
             26usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.sfixed64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2280,7 +2256,7 @@ impl Msg {
             26usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.sfixed64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn sfixed64_optional(&self) -> i64 {
@@ -2291,7 +2267,7 @@ impl Msg {
             27usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.sfixed64_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2303,7 +2279,7 @@ impl Msg {
             27usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.sfixed64_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn sfixed64_optional_mut(&mut self) -> &mut i64 {
@@ -2314,7 +2290,7 @@ impl Msg {
             27usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.sfixed64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2326,7 +2302,7 @@ impl Msg {
             27usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.sfixed64_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2338,7 +2314,7 @@ impl Msg {
             27usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.sfixed64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn sfixed64_repeated(&self) -> &[i64] {
@@ -2348,7 +2324,7 @@ impl Msg {
             self::_pinternal::tags::SFixed64,
         > as RepeatedFieldType>::get_field(
             &self.fields.sfixed64_repeated,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
@@ -2358,7 +2334,7 @@ impl Msg {
             self::_pinternal::tags::SFixed64,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.sfixed64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_sfixed64_repeated(&mut self) {
@@ -2368,7 +2344,7 @@ impl Msg {
             self::_pinternal::tags::SFixed64,
         > as RepeatedFieldType>::clear(
             &mut self.fields.sfixed64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn f64_required(&self) -> f64 {
@@ -2379,7 +2355,7 @@ impl Msg {
             28usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.f64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2391,7 +2367,7 @@ impl Msg {
             28usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.f64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn f64_required_mut(&mut self) -> &mut f64 {
@@ -2402,7 +2378,7 @@ impl Msg {
             28usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.f64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2414,7 +2390,7 @@ impl Msg {
             28usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.f64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2426,7 +2402,7 @@ impl Msg {
             28usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.f64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn f64_optional(&self) -> f64 {
@@ -2437,7 +2413,7 @@ impl Msg {
             29usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.f64_optional,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2449,7 +2425,7 @@ impl Msg {
             29usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.f64_optional,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn f64_optional_mut(&mut self) -> &mut f64 {
@@ -2460,7 +2436,7 @@ impl Msg {
             29usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.f64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -2472,7 +2448,7 @@ impl Msg {
             29usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.f64_optional,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -2484,7 +2460,7 @@ impl Msg {
             29usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.f64_optional,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn f64_repeated(&self) -> &[f64] {
@@ -2492,7 +2468,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             f64,
             self::_pinternal::tags::Double,
-        > as RepeatedFieldType>::get_field(&self.fields.f64_repeated, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.f64_repeated, &self.bitfield)
     }
     pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f64> {
         use self::_pinternal::RepeatedFieldType;
@@ -2501,7 +2477,7 @@ impl Msg {
             self::_pinternal::tags::Double,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.f64_repeated,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_f64_repeated(&mut self) {
@@ -2509,10 +2485,7 @@ impl Msg {
         <self::_pinternal::RepeatedNumericalField::<
             f64,
             self::_pinternal::tags::Double,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.f64_repeated,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::clear(&mut self.fields.f64_repeated, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Msg {
@@ -2540,7 +2513,7 @@ impl self::_puroro::Message for Msg {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i32_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2551,7 +2524,7 @@ impl self::_puroro::Message for Msg {
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i32_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2561,7 +2534,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Int32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i32_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2572,7 +2545,7 @@ impl self::_puroro::Message for Msg {
                         2usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.float_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2583,7 +2556,7 @@ impl self::_puroro::Message for Msg {
                         3usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.float_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2593,7 +2566,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Float,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.float_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2604,7 +2577,7 @@ impl self::_puroro::Message for Msg {
                         4usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.bytes_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2615,7 +2588,7 @@ impl self::_puroro::Message for Msg {
                         5usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.bytes_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2625,7 +2598,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Bytes,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.bytes_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2636,7 +2609,7 @@ impl self::_puroro::Message for Msg {
                         6usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.string_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2647,7 +2620,7 @@ impl self::_puroro::Message for Msg {
                         7usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.string_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2657,7 +2630,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::String,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.string_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2670,7 +2643,7 @@ impl self::_puroro::Message for Msg {
                         8usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.enum_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2683,7 +2656,7 @@ impl self::_puroro::Message for Msg {
                         9usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.enum_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2695,7 +2668,7 @@ impl self::_puroro::Message for Msg {
                         >,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.enum_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2704,7 +2677,7 @@ impl self::_puroro::Message for Msg {
                         self::_root::full_coverage2::msg::Submsg,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.submsg_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2713,7 +2686,7 @@ impl self::_puroro::Message for Msg {
                         self::_root::full_coverage2::msg::Submsg,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.submsg_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2722,7 +2695,7 @@ impl self::_puroro::Message for Msg {
                         self::_root::full_coverage2::msg::Submsg,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.submsg_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2733,7 +2706,7 @@ impl self::_puroro::Message for Msg {
                         10usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2744,7 +2717,7 @@ impl self::_puroro::Message for Msg {
                         11usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i64_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2754,7 +2727,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Int64,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i64_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2765,7 +2738,7 @@ impl self::_puroro::Message for Msg {
                         12usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.u32_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2776,7 +2749,7 @@ impl self::_puroro::Message for Msg {
                         13usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.u32_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2786,7 +2759,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::UInt32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.u32_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2797,7 +2770,7 @@ impl self::_puroro::Message for Msg {
                         14usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.u64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2808,7 +2781,7 @@ impl self::_puroro::Message for Msg {
                         15usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.u64_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2818,7 +2791,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::UInt64,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.u64_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2829,7 +2802,7 @@ impl self::_puroro::Message for Msg {
                         16usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.s32_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2840,7 +2813,7 @@ impl self::_puroro::Message for Msg {
                         17usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.s32_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2850,7 +2823,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::SInt32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.s32_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2861,7 +2834,7 @@ impl self::_puroro::Message for Msg {
                         18usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.s64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2872,7 +2845,7 @@ impl self::_puroro::Message for Msg {
                         19usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.s64_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2882,7 +2855,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::SInt64,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.s64_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2893,7 +2866,7 @@ impl self::_puroro::Message for Msg {
                         20usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.fixed32_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2904,7 +2877,7 @@ impl self::_puroro::Message for Msg {
                         21usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.fixed32_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2914,7 +2887,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Fixed32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.fixed32_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2925,7 +2898,7 @@ impl self::_puroro::Message for Msg {
                         22usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.fixed64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2936,7 +2909,7 @@ impl self::_puroro::Message for Msg {
                         23usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.fixed64_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2946,7 +2919,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Fixed64,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.fixed64_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2957,7 +2930,7 @@ impl self::_puroro::Message for Msg {
                         24usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.sfixed32_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2968,7 +2941,7 @@ impl self::_puroro::Message for Msg {
                         25usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.sfixed32_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2978,7 +2951,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::SFixed32,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.sfixed32_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -2989,7 +2962,7 @@ impl self::_puroro::Message for Msg {
                         26usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.sfixed64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -3000,7 +2973,7 @@ impl self::_puroro::Message for Msg {
                         27usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.sfixed64_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -3010,7 +2983,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::SFixed64,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.sfixed64_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -3021,7 +2994,7 @@ impl self::_puroro::Message for Msg {
                         28usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.f64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -3032,7 +3005,7 @@ impl self::_puroro::Message for Msg {
                         29usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.f64_optional,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -3042,7 +3015,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::tags::Double,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.f64_repeated,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -3064,7 +3037,7 @@ impl self::_puroro::Message for Msg {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i32_required,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -3074,7 +3047,7 @@ impl self::_puroro::Message for Msg {
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i32_optional,
-            &self._bitfield,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -3083,7 +3056,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Int32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i32_repeated,
-            &self._bitfield,
+            &self.bitfield,
             3i32,
             out,
         )?;
@@ -3093,7 +3066,7 @@ impl self::_puroro::Message for Msg {
             2usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.float_required,
-            &self._bitfield,
+            &self.bitfield,
             11i32,
             out,
         )?;
@@ -3103,7 +3076,7 @@ impl self::_puroro::Message for Msg {
             3usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.float_optional,
-            &self._bitfield,
+            &self.bitfield,
             12i32,
             out,
         )?;
@@ -3112,7 +3085,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Float,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.float_repeated,
-            &self._bitfield,
+            &self.bitfield,
             13i32,
             out,
         )?;
@@ -3122,7 +3095,7 @@ impl self::_puroro::Message for Msg {
             4usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.bytes_required,
-            &self._bitfield,
+            &self.bitfield,
             21i32,
             out,
         )?;
@@ -3132,7 +3105,7 @@ impl self::_puroro::Message for Msg {
             5usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.bytes_optional,
-            &self._bitfield,
+            &self.bitfield,
             22i32,
             out,
         )?;
@@ -3141,7 +3114,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Bytes,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.bytes_repeated,
-            &self._bitfield,
+            &self.bitfield,
             23i32,
             out,
         )?;
@@ -3151,7 +3124,7 @@ impl self::_puroro::Message for Msg {
             6usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.string_required,
-            &self._bitfield,
+            &self.bitfield,
             31i32,
             out,
         )?;
@@ -3161,7 +3134,7 @@ impl self::_puroro::Message for Msg {
             7usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.string_optional,
-            &self._bitfield,
+            &self.bitfield,
             32i32,
             out,
         )?;
@@ -3170,7 +3143,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::String,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.string_repeated,
-            &self._bitfield,
+            &self.bitfield,
             33i32,
             out,
         )?;
@@ -3180,7 +3153,7 @@ impl self::_puroro::Message for Msg {
             8usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.enum_required,
-            &self._bitfield,
+            &self.bitfield,
             41i32,
             out,
         )?;
@@ -3190,7 +3163,7 @@ impl self::_puroro::Message for Msg {
             9usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.enum_optional,
-            &self._bitfield,
+            &self.bitfield,
             42i32,
             out,
         )?;
@@ -3199,7 +3172,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.enum_repeated,
-            &self._bitfield,
+            &self.bitfield,
             43i32,
             out,
         )?;
@@ -3207,7 +3180,7 @@ impl self::_puroro::Message for Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.submsg_required,
-            &self._bitfield,
+            &self.bitfield,
             51i32,
             out,
         )?;
@@ -3215,7 +3188,7 @@ impl self::_puroro::Message for Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.submsg_optional,
-            &self._bitfield,
+            &self.bitfield,
             52i32,
             out,
         )?;
@@ -3223,7 +3196,7 @@ impl self::_puroro::Message for Msg {
             self::_root::full_coverage2::msg::Submsg,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.submsg_repeated,
-            &self._bitfield,
+            &self.bitfield,
             53i32,
             out,
         )?;
@@ -3233,7 +3206,7 @@ impl self::_puroro::Message for Msg {
             10usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i64_required,
-            &self._bitfield,
+            &self.bitfield,
             101i32,
             out,
         )?;
@@ -3243,7 +3216,7 @@ impl self::_puroro::Message for Msg {
             11usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i64_optional,
-            &self._bitfield,
+            &self.bitfield,
             102i32,
             out,
         )?;
@@ -3252,7 +3225,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Int64,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i64_repeated,
-            &self._bitfield,
+            &self.bitfield,
             103i32,
             out,
         )?;
@@ -3262,7 +3235,7 @@ impl self::_puroro::Message for Msg {
             12usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.u32_required,
-            &self._bitfield,
+            &self.bitfield,
             111i32,
             out,
         )?;
@@ -3272,7 +3245,7 @@ impl self::_puroro::Message for Msg {
             13usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.u32_optional,
-            &self._bitfield,
+            &self.bitfield,
             112i32,
             out,
         )?;
@@ -3281,7 +3254,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::UInt32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.u32_repeated,
-            &self._bitfield,
+            &self.bitfield,
             113i32,
             out,
         )?;
@@ -3291,7 +3264,7 @@ impl self::_puroro::Message for Msg {
             14usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.u64_required,
-            &self._bitfield,
+            &self.bitfield,
             121i32,
             out,
         )?;
@@ -3301,7 +3274,7 @@ impl self::_puroro::Message for Msg {
             15usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.u64_optional,
-            &self._bitfield,
+            &self.bitfield,
             122i32,
             out,
         )?;
@@ -3310,7 +3283,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::UInt64,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.u64_repeated,
-            &self._bitfield,
+            &self.bitfield,
             123i32,
             out,
         )?;
@@ -3320,7 +3293,7 @@ impl self::_puroro::Message for Msg {
             16usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.s32_required,
-            &self._bitfield,
+            &self.bitfield,
             131i32,
             out,
         )?;
@@ -3330,7 +3303,7 @@ impl self::_puroro::Message for Msg {
             17usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.s32_optional,
-            &self._bitfield,
+            &self.bitfield,
             132i32,
             out,
         )?;
@@ -3339,7 +3312,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::SInt32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.s32_repeated,
-            &self._bitfield,
+            &self.bitfield,
             133i32,
             out,
         )?;
@@ -3349,7 +3322,7 @@ impl self::_puroro::Message for Msg {
             18usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.s64_required,
-            &self._bitfield,
+            &self.bitfield,
             141i32,
             out,
         )?;
@@ -3359,7 +3332,7 @@ impl self::_puroro::Message for Msg {
             19usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.s64_optional,
-            &self._bitfield,
+            &self.bitfield,
             142i32,
             out,
         )?;
@@ -3368,7 +3341,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::SInt64,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.s64_repeated,
-            &self._bitfield,
+            &self.bitfield,
             143i32,
             out,
         )?;
@@ -3378,7 +3351,7 @@ impl self::_puroro::Message for Msg {
             20usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.fixed32_required,
-            &self._bitfield,
+            &self.bitfield,
             151i32,
             out,
         )?;
@@ -3388,7 +3361,7 @@ impl self::_puroro::Message for Msg {
             21usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.fixed32_optional,
-            &self._bitfield,
+            &self.bitfield,
             152i32,
             out,
         )?;
@@ -3397,7 +3370,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Fixed32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.fixed32_repeated,
-            &self._bitfield,
+            &self.bitfield,
             153i32,
             out,
         )?;
@@ -3407,7 +3380,7 @@ impl self::_puroro::Message for Msg {
             22usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.fixed64_required,
-            &self._bitfield,
+            &self.bitfield,
             161i32,
             out,
         )?;
@@ -3417,7 +3390,7 @@ impl self::_puroro::Message for Msg {
             23usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.fixed64_optional,
-            &self._bitfield,
+            &self.bitfield,
             162i32,
             out,
         )?;
@@ -3426,7 +3399,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Fixed64,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.fixed64_repeated,
-            &self._bitfield,
+            &self.bitfield,
             163i32,
             out,
         )?;
@@ -3436,7 +3409,7 @@ impl self::_puroro::Message for Msg {
             24usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.sfixed32_required,
-            &self._bitfield,
+            &self.bitfield,
             171i32,
             out,
         )?;
@@ -3446,7 +3419,7 @@ impl self::_puroro::Message for Msg {
             25usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.sfixed32_optional,
-            &self._bitfield,
+            &self.bitfield,
             172i32,
             out,
         )?;
@@ -3455,7 +3428,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::SFixed32,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.sfixed32_repeated,
-            &self._bitfield,
+            &self.bitfield,
             173i32,
             out,
         )?;
@@ -3465,7 +3438,7 @@ impl self::_puroro::Message for Msg {
             26usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.sfixed64_required,
-            &self._bitfield,
+            &self.bitfield,
             181i32,
             out,
         )?;
@@ -3475,7 +3448,7 @@ impl self::_puroro::Message for Msg {
             27usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.sfixed64_optional,
-            &self._bitfield,
+            &self.bitfield,
             182i32,
             out,
         )?;
@@ -3484,7 +3457,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::SFixed64,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.sfixed64_repeated,
-            &self._bitfield,
+            &self.bitfield,
             183i32,
             out,
         )?;
@@ -3494,7 +3467,7 @@ impl self::_puroro::Message for Msg {
             28usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.f64_required,
-            &self._bitfield,
+            &self.bitfield,
             191i32,
             out,
         )?;
@@ -3504,7 +3477,7 @@ impl self::_puroro::Message for Msg {
             29usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.f64_optional,
-            &self._bitfield,
+            &self.bitfield,
             192i32,
             out,
         )?;
@@ -3513,7 +3486,7 @@ impl self::_puroro::Message for Msg {
             self::_pinternal::tags::Double,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.f64_repeated,
-            &self._bitfield,
+            &self.bitfield,
             193i32,
             out,
         )?;
@@ -3744,7 +3717,7 @@ impl ::std::clone::Clone for Msg {
                     self::_pinternal::tags::Double,
                 > as ::std::clone::Clone>::clone(&self.fields.f64_repeated),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

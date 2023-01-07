@@ -24,7 +24,7 @@ pub struct Submsg {
             1usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Submsg {
     pub fn i32_required(&self) -> i32 {
@@ -35,7 +35,7 @@ impl Submsg {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.i32_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -47,7 +47,7 @@ impl Submsg {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.i32_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn i32_required_mut(&mut self) -> &mut i32 {
@@ -58,7 +58,7 @@ impl Submsg {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.i32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -70,7 +70,7 @@ impl Submsg {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.i32_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -82,7 +82,7 @@ impl Submsg {
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.i32_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn i64_required(&self) -> i64 {
@@ -93,7 +93,7 @@ impl Submsg {
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.i64_required,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -105,7 +105,7 @@ impl Submsg {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.i64_required,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn i64_required_mut(&mut self) -> &mut i64 {
@@ -116,7 +116,7 @@ impl Submsg {
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.i64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -128,7 +128,7 @@ impl Submsg {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.i64_required,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -140,7 +140,7 @@ impl Submsg {
             1usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.i64_required,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -169,7 +169,7 @@ impl self::_puroro::Message for Submsg {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i32_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -180,7 +180,7 @@ impl self::_puroro::Message for Submsg {
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.i64_required,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -202,7 +202,7 @@ impl self::_puroro::Message for Submsg {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i32_required,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -212,7 +212,7 @@ impl self::_puroro::Message for Submsg {
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.i64_required,
-            &self._bitfield,
+            &self.bitfield,
             101i32,
             out,
         )?;
@@ -234,7 +234,7 @@ impl ::std::clone::Clone for Submsg {
                     1usize,
                 > as ::std::clone::Clone>::clone(&self.fields.i64_required),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

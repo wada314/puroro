@@ -19,7 +19,7 @@ pub struct Msg {
             0usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Msg {
     pub fn r#type(&self) -> i32 {
@@ -30,7 +30,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.r#type,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -40,7 +40,7 @@ impl Msg {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self.bitfield)
     }
     pub fn type_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -50,7 +50,7 @@ impl Msg {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.r#type,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -60,7 +60,7 @@ impl Msg {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self.bitfield)
             .is_some()
     }
     pub fn clear_type(&mut self) {
@@ -69,7 +69,7 @@ impl Msg {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.r#type, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.r#type, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Msg {
@@ -97,7 +97,7 @@ impl self::_puroro::Message for Msg {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.r#type,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -119,7 +119,7 @@ impl self::_puroro::Message for Msg {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.r#type,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -136,7 +136,7 @@ impl ::std::clone::Clone for Msg {
                     0usize,
                 > as ::std::clone::Clone>::clone(&self.fields.r#type),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -172,7 +172,7 @@ pub struct _Self {
             0usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl _Self {
     pub fn r#type(&self) -> i32 {
@@ -183,7 +183,7 @@ impl _Self {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.r#type,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -193,7 +193,7 @@ impl _Self {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self.bitfield)
     }
     pub fn type_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -203,7 +203,7 @@ impl _Self {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.r#type,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -213,7 +213,7 @@ impl _Self {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self.bitfield)
             .is_some()
     }
     pub fn clear_type(&mut self) {
@@ -222,7 +222,7 @@ impl _Self {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.r#type, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.r#type, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for _Self {
@@ -250,7 +250,7 @@ impl self::_puroro::Message for _Self {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.r#type,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -272,7 +272,7 @@ impl self::_puroro::Message for _Self {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.r#type,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -289,7 +289,7 @@ impl ::std::clone::Clone for _Self {
                     0usize,
                 > as ::std::clone::Clone>::clone(&self.fields.r#type),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

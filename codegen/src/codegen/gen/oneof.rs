@@ -244,13 +244,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             parse2(quote! {
                 pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
                     use #PURORO_INTERNAL::OneofUnion as _;
-                    self.fields.#field_ident.case_ref(&self._bitfield)
+                    self.fields.#field_ident.case_ref(&self.bitfield)
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::OneofUnion as _;
-                    self.fields.#field_ident.clear(&mut self._bitfield)
+                    self.fields.#field_ident.clear(&mut self.bitfield)
                 }
             })?,
         ])
@@ -259,7 +259,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_message_struct_field_ident()?;
         Ok(parse2(quote! {
-            #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, &self._bitfield)
+            #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, &self.bitfield)
         })?)
     }
 
@@ -277,7 +277,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
                     #field_number => self.fields.#field_ident.deser_from_iter(
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         #field_data_expr,
                         #case_type::#case_name(()),
                     )?,
@@ -290,7 +290,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let field_ident = self.gen_message_struct_field_ident()?;
         Ok(parse2(quote! {
             self.fields.#field_ident.ser_to_write(
-                &self._bitfield,
+                &self.bitfield,
                 #out_expr
             )?;
         })?)

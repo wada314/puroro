@@ -19,7 +19,7 @@ pub struct Conflict {
             0usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Conflict {
     pub fn this_is_original_message_field(&self) -> i32 {
@@ -30,7 +30,7 @@ impl Conflict {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.this_is_original_message_field,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -42,7 +42,7 @@ impl Conflict {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.this_is_original_message_field,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn this_is_original_message_field_mut(&mut self) -> &mut i32 {
@@ -53,7 +53,7 @@ impl Conflict {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.this_is_original_message_field,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -65,7 +65,7 @@ impl Conflict {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.this_is_original_message_field,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -77,7 +77,7 @@ impl Conflict {
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.this_is_original_message_field,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -106,7 +106,7 @@ impl self::_puroro::Message for Conflict {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.this_is_original_message_field,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -128,7 +128,7 @@ impl self::_puroro::Message for Conflict {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.this_is_original_message_field,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -147,7 +147,7 @@ impl ::std::clone::Clone for Conflict {
                     &self.fields.this_is_original_message_field,
                 ),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -188,7 +188,7 @@ pub struct ConflictFields {
             0usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl ConflictFields {
     pub fn this_is_fields_message_field(&self) -> i32 {
@@ -199,7 +199,7 @@ impl ConflictFields {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.this_is_fields_message_field,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -211,7 +211,7 @@ impl ConflictFields {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.this_is_fields_message_field,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn this_is_fields_message_field_mut(&mut self) -> &mut i32 {
@@ -222,7 +222,7 @@ impl ConflictFields {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.this_is_fields_message_field,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -234,7 +234,7 @@ impl ConflictFields {
             0usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.this_is_fields_message_field,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -246,7 +246,7 @@ impl ConflictFields {
             0usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.this_is_fields_message_field,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -275,7 +275,7 @@ impl self::_puroro::Message for ConflictFields {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.this_is_fields_message_field,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -297,7 +297,7 @@ impl self::_puroro::Message for ConflictFields {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.this_is_fields_message_field,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -316,7 +316,7 @@ impl ::std::clone::Clone for ConflictFields {
                     &self.fields.this_is_fields_message_field,
                 ),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }

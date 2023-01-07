@@ -35,7 +35,7 @@ pub struct Version {
             3usize,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl Version {
     pub fn major(&self) -> i32 {
@@ -46,7 +46,7 @@ impl Version {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.major,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -56,7 +56,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.major, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.major, &self.bitfield)
     }
     pub fn major_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -66,7 +66,7 @@ impl Version {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.major,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -76,7 +76,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.major, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.major, &self.bitfield)
             .is_some()
     }
     pub fn clear_major(&mut self) {
@@ -85,7 +85,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.major, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.major, &mut self.bitfield)
     }
     pub fn minor(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -95,7 +95,7 @@ impl Version {
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.minor,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -105,7 +105,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.minor, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.minor, &self.bitfield)
     }
     pub fn minor_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -115,7 +115,7 @@ impl Version {
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.minor,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -125,7 +125,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.minor, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.minor, &self.bitfield)
             .is_some()
     }
     pub fn clear_minor(&mut self) {
@@ -134,7 +134,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.minor, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.minor, &mut self.bitfield)
     }
     pub fn patch(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -144,7 +144,7 @@ impl Version {
             2usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.patch,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -154,7 +154,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.patch, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.patch, &self.bitfield)
     }
     pub fn patch_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -164,7 +164,7 @@ impl Version {
             2usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.patch,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -174,7 +174,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.patch, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.patch, &self.bitfield)
             .is_some()
     }
     pub fn clear_patch(&mut self) {
@@ -183,7 +183,7 @@ impl Version {
             i32,
             self::_pinternal::tags::Int32,
             2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.patch, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.patch, &mut self.bitfield)
     }
     pub fn suffix(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
@@ -193,7 +193,7 @@ impl Version {
             3usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.suffix,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -203,7 +203,7 @@ impl Version {
             ::std::string::String,
             self::_pinternal::tags::String,
             3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.suffix, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.suffix, &self.bitfield)
     }
     pub fn suffix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -213,7 +213,7 @@ impl Version {
             3usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.suffix,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -223,7 +223,7 @@ impl Version {
             ::std::string::String,
             self::_pinternal::tags::String,
             3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.suffix, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.suffix, &self.bitfield)
             .is_some()
     }
     pub fn clear_suffix(&mut self) {
@@ -232,7 +232,7 @@ impl Version {
             ::std::string::String,
             self::_pinternal::tags::String,
             3usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.suffix, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.suffix, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Version {
@@ -260,7 +260,7 @@ impl self::_puroro::Message for Version {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.major,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -271,7 +271,7 @@ impl self::_puroro::Message for Version {
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.minor,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -282,7 +282,7 @@ impl self::_puroro::Message for Version {
                         2usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.patch,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -293,7 +293,7 @@ impl self::_puroro::Message for Version {
                         3usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.suffix,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -315,7 +315,7 @@ impl self::_puroro::Message for Version {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.major,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -325,7 +325,7 @@ impl self::_puroro::Message for Version {
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.minor,
-            &self._bitfield,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -335,7 +335,7 @@ impl self::_puroro::Message for Version {
             2usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.patch,
-            &self._bitfield,
+            &self.bitfield,
             3i32,
             out,
         )?;
@@ -345,7 +345,7 @@ impl self::_puroro::Message for Version {
             3usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.suffix,
-            &self._bitfield,
+            &self.bitfield,
             4i32,
             out,
         )?;
@@ -377,7 +377,7 @@ impl ::std::clone::Clone for Version {
                     3usize,
                 > as ::std::clone::Clone>::clone(&self.fields.suffix),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -428,7 +428,7 @@ pub struct CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl CodeGeneratorRequest {
     pub fn file_to_generate(
@@ -440,10 +440,7 @@ impl CodeGeneratorRequest {
         <self::_pinternal::RepeatedUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.file_to_generate,
-            &self._bitfield,
-        )
+        > as RepeatedFieldType>::get_field(&self.fields.file_to_generate, &self.bitfield)
     }
     pub fn file_to_generate_mut(
         &mut self,
@@ -454,7 +451,7 @@ impl CodeGeneratorRequest {
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.file_to_generate,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_file_to_generate(&mut self) {
@@ -464,7 +461,7 @@ impl CodeGeneratorRequest {
             self::_pinternal::tags::String,
         > as RepeatedFieldType>::clear(
             &mut self.fields.file_to_generate,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn parameter(&self) -> &str {
@@ -475,7 +472,7 @@ impl CodeGeneratorRequest {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.parameter,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -485,10 +482,7 @@ impl CodeGeneratorRequest {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.parameter,
-            &self._bitfield,
-        )
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.parameter, &self.bitfield)
     }
     pub fn parameter_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -498,7 +492,7 @@ impl CodeGeneratorRequest {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.parameter,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -508,10 +502,7 @@ impl CodeGeneratorRequest {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.parameter,
-                &self._bitfield,
-            )
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.parameter, &self.bitfield)
             .is_some()
     }
     pub fn clear_parameter(&mut self) {
@@ -520,16 +511,13 @@ impl CodeGeneratorRequest {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.parameter,
-            &mut self._bitfield,
-        )
+        > as NonRepeatedFieldType>::clear(&mut self.fields.parameter, &mut self.bitfield)
     }
     pub fn proto_file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::FileDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.proto_file, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.proto_file, &self.bitfield)
     }
     pub fn proto_file_mut(
         &mut self,
@@ -539,14 +527,14 @@ impl CodeGeneratorRequest {
             self::_root::google::protobuf::FileDescriptorProto,
         > as RepeatedFieldType>::get_field_mut(
             &mut self.fields.proto_file,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn clear_proto_file(&mut self) {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::FileDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.proto_file, &mut self._bitfield)
+        > as RepeatedFieldType>::clear(&mut self.fields.proto_file, &mut self.bitfield)
     }
     pub fn compiler_version(
         &self,
@@ -556,7 +544,7 @@ impl CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.compiler_version,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -568,7 +556,7 @@ impl CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.compiler_version,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn compiler_version_mut(
@@ -579,7 +567,7 @@ impl CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.compiler_version,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -589,7 +577,7 @@ impl CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.compiler_version,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -599,7 +587,7 @@ impl CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.compiler_version,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
 }
@@ -627,7 +615,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                         self::_pinternal::tags::String,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.file_to_generate,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -638,7 +626,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.parameter,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -647,7 +635,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                         self::_root::google::protobuf::FileDescriptorProto,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.proto_file,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -656,7 +644,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                         self::_root::google::protobuf::compiler::Version,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.compiler_version,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -677,7 +665,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             self::_pinternal::tags::String,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.file_to_generate,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -687,7 +675,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.parameter,
-            &self._bitfield,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -695,7 +683,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             self::_root::google::protobuf::FileDescriptorProto,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.proto_file,
-            &self._bitfield,
+            &self.bitfield,
             15i32,
             out,
         )?;
@@ -703,7 +691,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.compiler_version,
-            &self._bitfield,
+            &self.bitfield,
             3i32,
             out,
         )?;
@@ -730,7 +718,7 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
                     self::_root::google::protobuf::compiler::Version,
                 > as ::std::clone::Clone>::clone(&self.fields.compiler_version),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -780,7 +768,7 @@ pub struct CodeGeneratorResponse {
             self::_root::google::protobuf::compiler::code_generator_response::File,
         >,
     >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl CodeGeneratorResponse {
     pub fn error(&self) -> &str {
@@ -791,7 +779,7 @@ impl CodeGeneratorResponse {
             0usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.error,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -801,7 +789,7 @@ impl CodeGeneratorResponse {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.error, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.error, &self.bitfield)
     }
     pub fn error_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
@@ -811,7 +799,7 @@ impl CodeGeneratorResponse {
             0usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.error,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -821,7 +809,7 @@ impl CodeGeneratorResponse {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.error, &self._bitfield)
+        > as NonRepeatedFieldType>::get_field_opt(&self.fields.error, &self.bitfield)
             .is_some()
     }
     pub fn clear_error(&mut self) {
@@ -830,7 +818,7 @@ impl CodeGeneratorResponse {
             ::std::string::String,
             self::_pinternal::tags::String,
             0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.error, &mut self._bitfield)
+        > as NonRepeatedFieldType>::clear(&mut self.fields.error, &mut self.bitfield)
     }
     pub fn supported_features(&self) -> u64 {
         use self::_pinternal::NonRepeatedFieldType;
@@ -840,7 +828,7 @@ impl CodeGeneratorResponse {
             1usize,
         > as NonRepeatedFieldType>::get_field_or_else(
             &self.fields.supported_features,
-            &self._bitfield,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -852,7 +840,7 @@ impl CodeGeneratorResponse {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
             &self.fields.supported_features,
-            &self._bitfield,
+            &self.bitfield,
         )
     }
     pub fn supported_features_mut(&mut self) -> &mut u64 {
@@ -863,7 +851,7 @@ impl CodeGeneratorResponse {
             1usize,
         > as NonRepeatedFieldType>::get_field_mut(
             &mut self.fields.supported_features,
-            &mut self._bitfield,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -875,7 +863,7 @@ impl CodeGeneratorResponse {
             1usize,
         > as NonRepeatedFieldType>::get_field_opt(
                 &self.fields.supported_features,
-                &self._bitfield,
+                &self.bitfield,
             )
             .is_some()
     }
@@ -887,7 +875,7 @@ impl CodeGeneratorResponse {
             1usize,
         > as NonRepeatedFieldType>::clear(
             &mut self.fields.supported_features,
-            &mut self._bitfield,
+            &mut self.bitfield,
         )
     }
     pub fn file(
@@ -896,7 +884,7 @@ impl CodeGeneratorResponse {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::compiler::code_generator_response::File,
-        > as RepeatedFieldType>::get_field(&self.fields.file, &self._bitfield)
+        > as RepeatedFieldType>::get_field(&self.fields.file, &self.bitfield)
     }
     pub fn file_mut(
         &mut self,
@@ -906,16 +894,13 @@ impl CodeGeneratorResponse {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::compiler::code_generator_response::File,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.file,
-            &mut self._bitfield,
-        )
+        > as RepeatedFieldType>::get_field_mut(&mut self.fields.file, &mut self.bitfield)
     }
     pub fn clear_file(&mut self) {
         use self::_pinternal::RepeatedFieldType;
         <self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::compiler::code_generator_response::File,
-        > as RepeatedFieldType>::clear(&mut self.fields.file, &mut self._bitfield)
+        > as RepeatedFieldType>::clear(&mut self.fields.file, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for CodeGeneratorResponse {
@@ -943,7 +928,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
                         0usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.error,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -954,7 +939,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
                         1usize,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.supported_features,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -963,7 +948,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
                         self::_root::google::protobuf::compiler::code_generator_response::File,
                     > as self::_pinternal::FieldType>::deser_from_iter(
                         &mut self.fields.file,
-                        &mut self._bitfield,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -985,7 +970,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
             0usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.error,
-            &self._bitfield,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -995,7 +980,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
             1usize,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.supported_features,
-            &self._bitfield,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -1003,7 +988,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
             self::_root::google::protobuf::compiler::code_generator_response::File,
         > as self::_pinternal::FieldType>::ser_to_write(
             &self.fields.file,
-            &self._bitfield,
+            &self.bitfield,
             15i32,
             out,
         )?;
@@ -1028,7 +1013,7 @@ impl ::std::clone::Clone for CodeGeneratorResponse {
                     self::_root::google::protobuf::compiler::code_generator_response::File,
                 > as ::std::clone::Clone>::clone(&self.fields.file),
             },
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
