@@ -35,53 +35,31 @@ pub struct Location {
 impl Location {
     pub fn path(&self) -> &[i32] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.fields.path, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.path, &self.bitfield)
     }
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(&mut self.fields.path, &mut self.bitfield)
+        RepeatedFieldType::get_field_mut(&mut self.fields.path, &mut self.bitfield)
     }
     pub fn clear_path(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(&mut self.fields.path, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.path, &mut self.bitfield)
     }
     pub fn span(&self) -> &[i32] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.fields.span, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.span, &self.bitfield)
     }
     pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(&mut self.fields.span, &mut self.bitfield)
+        RepeatedFieldType::get_field_mut(&mut self.fields.span, &mut self.bitfield)
     }
     pub fn clear_span(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(&mut self.fields.span, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.span, &mut self.bitfield)
     }
     pub fn leading_comments(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.leading_comments,
             &self.bitfield,
             ::std::default::Default::default,
@@ -89,22 +67,14 @@ impl Location {
     }
     pub fn leading_comments_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.leading_comments,
             &self.bitfield,
         )
     }
     pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.leading_comments,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -112,11 +82,7 @@ impl Location {
     }
     pub fn has_leading_comments(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.leading_comments,
                 &self.bitfield,
             )
@@ -124,22 +90,14 @@ impl Location {
     }
     pub fn clear_leading_comments(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.leading_comments,
             &mut self.bitfield,
         )
     }
     pub fn trailing_comments(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.trailing_comments,
             &self.bitfield,
             ::std::default::Default::default,
@@ -147,22 +105,14 @@ impl Location {
     }
     pub fn trailing_comments_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.trailing_comments,
             &self.bitfield,
         )
     }
     pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.trailing_comments,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -170,11 +120,7 @@ impl Location {
     }
     pub fn has_trailing_comments(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.trailing_comments,
                 &self.bitfield,
             )
@@ -182,11 +128,7 @@ impl Location {
     }
     pub fn clear_trailing_comments(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.trailing_comments,
             &mut self.bitfield,
         )
@@ -197,10 +139,7 @@ impl Location {
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field(
+        RepeatedFieldType::get_field(
             &self.fields.leading_detached_comments,
             &self.bitfield,
         )
@@ -209,20 +148,14 @@ impl Location {
         &mut self,
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.leading_detached_comments,
             &mut self.bitfield,
         )
     }
     pub fn clear_leading_detached_comments(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.leading_detached_comments,
             &mut self.bitfield,
         )
@@ -247,52 +180,35 @@ impl self::_puroro::Message for Location {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::RepeatedNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.path,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::RepeatedNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.span,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.leading_comments,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.trailing_comments,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::RepeatedUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.leading_detached_comments,
                         &mut self.bitfield,
                         field_data,
@@ -310,48 +226,31 @@ impl self::_puroro::Message for Location {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.path,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.span,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.leading_comments,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.trailing_comments,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.leading_detached_comments,
             &self.bitfield,
             6i32,
@@ -364,28 +263,17 @@ impl ::std::clone::Clone for Location {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::LocationFields {
-                path: <self::_pinternal::RepeatedNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.path),
-                span: <self::_pinternal::RepeatedNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.span),
-                leading_comments: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.leading_comments),
-                trailing_comments: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.trailing_comments),
-                leading_detached_comments: <self::_pinternal::RepeatedUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                > as ::std::clone::Clone>::clone(&self.fields.leading_detached_comments),
+                path: ::std::clone::Clone::clone(&self.fields.path),
+                span: ::std::clone::Clone::clone(&self.fields.span),
+                leading_comments: ::std::clone::Clone::clone(
+                    &self.fields.leading_comments,
+                ),
+                trailing_comments: ::std::clone::Clone::clone(
+                    &self.fields.trailing_comments,
+                ),
+                leading_detached_comments: ::std::clone::Clone::clone(
+                    &self.fields.leading_detached_comments,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }

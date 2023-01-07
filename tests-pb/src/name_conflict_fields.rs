@@ -24,11 +24,7 @@ pub struct Conflict {
 impl Conflict {
     pub fn this_is_original_message_field(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.this_is_original_message_field,
             &self.bitfield,
             ::std::default::Default::default,
@@ -36,22 +32,14 @@ impl Conflict {
     }
     pub fn this_is_original_message_field_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.this_is_original_message_field,
             &self.bitfield,
         )
     }
     pub fn this_is_original_message_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.this_is_original_message_field,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -59,11 +47,7 @@ impl Conflict {
     }
     pub fn has_this_is_original_message_field(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.this_is_original_message_field,
                 &self.bitfield,
             )
@@ -71,11 +55,7 @@ impl Conflict {
     }
     pub fn clear_this_is_original_message_field(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.this_is_original_message_field,
             &mut self.bitfield,
         )
@@ -100,11 +80,7 @@ impl self::_puroro::Message for Conflict {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.this_is_original_message_field,
                         &mut self.bitfield,
                         field_data,
@@ -122,11 +98,7 @@ impl self::_puroro::Message for Conflict {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.this_is_original_message_field,
             &self.bitfield,
             1i32,
@@ -139,11 +111,7 @@ impl ::std::clone::Clone for Conflict {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::ConflictFields {
-                this_is_original_message_field: <self::_pinternal::OptionalNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                    0usize,
-                > as ::std::clone::Clone>::clone(
+                this_is_original_message_field: ::std::clone::Clone::clone(
                     &self.fields.this_is_original_message_field,
                 ),
             },
@@ -193,11 +161,7 @@ pub struct ConflictFields {
 impl ConflictFields {
     pub fn this_is_fields_message_field(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.this_is_fields_message_field,
             &self.bitfield,
             ::std::default::Default::default,
@@ -205,22 +169,14 @@ impl ConflictFields {
     }
     pub fn this_is_fields_message_field_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.this_is_fields_message_field,
             &self.bitfield,
         )
     }
     pub fn this_is_fields_message_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.this_is_fields_message_field,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -228,11 +184,7 @@ impl ConflictFields {
     }
     pub fn has_this_is_fields_message_field(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.this_is_fields_message_field,
                 &self.bitfield,
             )
@@ -240,11 +192,7 @@ impl ConflictFields {
     }
     pub fn clear_this_is_fields_message_field(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.this_is_fields_message_field,
             &mut self.bitfield,
         )
@@ -269,11 +217,7 @@ impl self::_puroro::Message for ConflictFields {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.this_is_fields_message_field,
                         &mut self.bitfield,
                         field_data,
@@ -291,11 +235,7 @@ impl self::_puroro::Message for ConflictFields {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.this_is_fields_message_field,
             &self.bitfield,
             1i32,
@@ -308,11 +248,7 @@ impl ::std::clone::Clone for ConflictFields {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::ConflictFieldsFields {
-                this_is_fields_message_field: <self::_pinternal::OptionalNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                    0usize,
-                > as ::std::clone::Clone>::clone(
+                this_is_fields_message_field: ::std::clone::Clone::clone(
                     &self.fields.this_is_fields_message_field,
                 ),
             },

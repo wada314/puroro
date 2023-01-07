@@ -176,17 +176,15 @@ impl<T: ?Sized + Field> FieldExt for T {
     }
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = gen_fields_struct_field_ident(self)?;
-        let r#type = self.gen_fields_struct_field_type()?;
         Ok(parse2(quote! {
-            #ident: <#r#type as ::std::clone::Clone>::clone(&self.fields.#ident)
+            #ident: ::std::clone::Clone::clone(&self.fields.#ident)
         })?)
     }
     fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
         let ident = gen_fields_struct_field_ident(self)?;
         let number = self.number()?;
-        let r#type = self.gen_fields_struct_field_type()?;
         Ok(parse2(quote! {
-            #number => <#r#type as #PURORO_INTERNAL::FieldType>::deser_from_iter(
+            #number => #PURORO_INTERNAL::FieldType::deser_from_iter(
                 &mut self.fields.#ident,
                 &mut self.bitfield,
                 #field_data_expr,
@@ -196,9 +194,8 @@ impl<T: ?Sized + Field> FieldExt for T {
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let ident = gen_fields_struct_field_ident(self)?;
         let number = self.number()?;
-        let r#type = self.gen_fields_struct_field_type()?;
         Ok(parse2(quote! {
-            <#r#type as #PURORO_INTERNAL::FieldType>::ser_to_write(
+            #PURORO_INTERNAL::FieldType::ser_to_write(
                 &self.fields.#ident,
                 &self.bitfield,
                 #number,
@@ -282,7 +279,6 @@ fn gen_message_struct_field_methods_for_repeated(
     let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
     let field_ident = gen_fields_struct_field_ident(this)?;
-    let field_type = this.gen_fields_struct_field_type()?;
     let getter_item_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
             impl ::std::ops::Deref::<Target = str> +
@@ -304,7 +300,7 @@ fn gen_message_struct_field_methods_for_repeated(
         parse2(quote! {
             pub fn #getter_ident(&self) -> &[#getter_item_type] {
                 use #PURORO_INTERNAL::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::get_field(
+                RepeatedFieldType::get_field(
                     &self.fields.#field_ident, &self.bitfield,
                 )
             }
@@ -312,7 +308,7 @@ fn gen_message_struct_field_methods_for_repeated(
         parse2(quote! {
             pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                 use #PURORO_INTERNAL::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::get_field_mut(
+                RepeatedFieldType::get_field_mut(
                     &mut self.fields.#field_ident, &mut self.bitfield,
                 )
             }
@@ -320,7 +316,7 @@ fn gen_message_struct_field_methods_for_repeated(
         parse2(quote! {
             pub fn #clear_ident(&mut self) {
                 use #PURORO_INTERNAL::RepeatedFieldType;
-                <#field_type as RepeatedFieldType>::clear(
+                RepeatedFieldType::clear(
                     &mut self.fields.#field_ident, &mut self.bitfield,
                 )
             }
@@ -344,7 +340,6 @@ fn gen_message_struct_field_methods_for_non_repeated(
     let getter_has_ident = format_ident!("has_{}", this.name()?.to_lower_snake_case());
     let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
     let field_ident = gen_fields_struct_field_ident(this)?;
-    let field_type = this.gen_fields_struct_field_type()?;
     let borrowed_type = this.r#type()?.rust_maybe_borrowed_type(None)?;
     let getter_type = match this.r#type()? {
         FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(parse2(quote! {
@@ -361,7 +356,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #getter_ident(&self) -> #getter_type {
                use #PURORO_INTERNAL::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field_or_else(
+                NonRepeatedFieldType::get_field_or_else(
                     &self.fields.#field_ident, &self.bitfield, #default_fn,
                 )
             }
@@ -369,7 +364,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #getter_opt_ident(&self) -> #getter_opt_type {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field_opt(
+                NonRepeatedFieldType::get_field_opt(
                     &self.fields.#field_ident, &self.bitfield,
                 )
             }
@@ -377,7 +372,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field_mut(
+                NonRepeatedFieldType::get_field_mut(
                     &mut self.fields.#field_ident, &mut self.bitfield, #default_fn,
                 )
             }
@@ -385,7 +380,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #getter_has_ident(&self) -> bool {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::get_field_opt(
+                NonRepeatedFieldType::get_field_opt(
                     &self.fields.#field_ident, &self.bitfield,
                 ).is_some()
             }
@@ -393,7 +388,7 @@ fn gen_message_struct_field_methods_for_non_repeated(
         parse2(quote! {
             pub fn #clear_ident(&mut self) {
                 use #PURORO_INTERNAL::NonRepeatedFieldType;
-                <#field_type as NonRepeatedFieldType>::clear(
+                NonRepeatedFieldType::clear(
                     &mut self.fields.#field_ident, &mut self.bitfield,
                 )
             }

@@ -29,11 +29,7 @@ pub struct NamePart {
 impl NamePart {
     pub fn name_part(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name_part,
             &self.bitfield,
             ::std::default::Default::default,
@@ -41,19 +37,11 @@ impl NamePart {
     }
     pub fn name_part_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name_part, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name_part, &self.bitfield)
     }
     pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name_part,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -61,28 +49,16 @@ impl NamePart {
     }
     pub fn has_name_part(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name_part, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name_part, &self.bitfield)
             .is_some()
     }
     pub fn clear_name_part(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name_part, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name_part, &mut self.bitfield)
     }
     pub fn is_extension(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.is_extension,
             &self.bitfield,
             ::std::default::Default::default,
@@ -90,22 +66,11 @@ impl NamePart {
     }
     pub fn is_extension_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.is_extension,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.is_extension, &self.bitfield)
     }
     pub fn is_extension_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.is_extension,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -113,26 +78,12 @@ impl NamePart {
     }
     pub fn has_is_extension(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.is_extension,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.is_extension, &self.bitfield)
             .is_some()
     }
     pub fn clear_is_extension(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.is_extension,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.is_extension, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for NamePart {
@@ -154,22 +105,14 @@ impl self::_puroro::Message for NamePart {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name_part,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.is_extension,
                         &mut self.bitfield,
                         field_data,
@@ -187,21 +130,13 @@ impl self::_puroro::Message for NamePart {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name_part,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.is_extension,
             &self.bitfield,
             2i32,
@@ -214,16 +149,8 @@ impl ::std::clone::Clone for NamePart {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::NamePartFields {
-                name_part: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name_part),
-                is_extension: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.is_extension),
+                name_part: ::std::clone::Clone::clone(&self.fields.name_part),
+                is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }

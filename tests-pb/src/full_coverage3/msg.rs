@@ -22,10 +22,7 @@ pub struct Submsg {
 impl Submsg {
     pub fn i32_unlabeled(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.i32_unlabeled,
             &self.bitfield,
             ::std::default::Default::default,
@@ -33,20 +30,11 @@ impl Submsg {
     }
     pub fn i32_unlabeled_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.i32_unlabeled,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.i32_unlabeled, &self.bitfield)
     }
     pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.i32_unlabeled,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -54,31 +42,16 @@ impl Submsg {
     }
     pub fn has_i32_unlabeled(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.i32_unlabeled,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.i32_unlabeled, &self.bitfield)
             .is_some()
     }
     pub fn clear_i32_unlabeled(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.i32_unlabeled,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.i32_unlabeled, &mut self.bitfield)
     }
     pub fn i32_optional(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.i32_optional,
             &self.bitfield,
             ::std::default::Default::default,
@@ -86,20 +59,11 @@ impl Submsg {
     }
     pub fn i32_optional_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.i32_optional,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.i32_optional, &self.bitfield)
     }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.i32_optional,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -107,31 +71,16 @@ impl Submsg {
     }
     pub fn has_i32_optional(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.i32_optional,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.i32_optional, &self.bitfield)
             .is_some()
     }
     pub fn clear_i32_optional(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.i32_optional,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.i32_optional, &mut self.bitfield)
     }
     pub fn i64_unlabeled(&self) -> i64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.i64_unlabeled,
             &self.bitfield,
             ::std::default::Default::default,
@@ -139,20 +88,11 @@ impl Submsg {
     }
     pub fn i64_unlabeled_opt(&self) -> ::std::option::Option::<i64> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.i64_unlabeled,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.i64_unlabeled, &self.bitfield)
     }
     pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.i64_unlabeled,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -160,24 +100,12 @@ impl Submsg {
     }
     pub fn has_i64_unlabeled(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.i64_unlabeled,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.i64_unlabeled, &self.bitfield)
             .is_some()
     }
     pub fn clear_i64_unlabeled(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.i64_unlabeled,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.i64_unlabeled, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Submsg {
@@ -199,30 +127,21 @@ impl self::_puroro::Message for Submsg {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::SingularNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.i32_unlabeled,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::SingularNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.i32_optional,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 101i32 => {
-                    <self::_pinternal::SingularNumericalField::<
-                        i64,
-                        self::_pinternal::tags::Int64,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.i64_unlabeled,
                         &mut self.bitfield,
                         field_data,
@@ -240,28 +159,19 @@ impl self::_puroro::Message for Submsg {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.i32_unlabeled,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.i32_optional,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::SingularNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.i64_unlabeled,
             &self.bitfield,
             101i32,
@@ -274,18 +184,9 @@ impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::SubmsgFields {
-                i32_unlabeled: <self::_pinternal::SingularNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.i32_unlabeled),
-                i32_optional: <self::_pinternal::SingularNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.i32_optional),
-                i64_unlabeled: <self::_pinternal::SingularNumericalField::<
-                    i64,
-                    self::_pinternal::tags::Int64,
-                > as ::std::clone::Clone>::clone(&self.fields.i64_unlabeled),
+                i32_unlabeled: ::std::clone::Clone::clone(&self.fields.i32_unlabeled),
+                i32_optional: ::std::clone::Clone::clone(&self.fields.i32_optional),
+                i64_unlabeled: ::std::clone::Clone::clone(&self.fields.i64_unlabeled),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }

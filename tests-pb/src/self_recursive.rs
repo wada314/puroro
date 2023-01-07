@@ -22,9 +22,7 @@ impl Msg {
         &self,
     ) -> ::std::option::Option::<&self::_root::self_recursive::Msg> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.recursive_unlabeled,
             &self.bitfield,
             ::std::default::Default::default,
@@ -34,18 +32,14 @@ impl Msg {
         &self,
     ) -> ::std::option::Option::<&self::_root::self_recursive::Msg> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.recursive_unlabeled,
             &self.bitfield,
         )
     }
     pub fn recursive_unlabeled_mut(&mut self) -> &mut self::_root::self_recursive::Msg {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.recursive_unlabeled,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -53,9 +47,7 @@ impl Msg {
     }
     pub fn has_recursive_unlabeled(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.recursive_unlabeled,
                 &self.bitfield,
             )
@@ -63,9 +55,7 @@ impl Msg {
     }
     pub fn clear_recursive_unlabeled(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::self_recursive::Msg,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.recursive_unlabeled,
             &mut self.bitfield,
         )
@@ -90,9 +80,7 @@ impl self::_puroro::Message for Msg {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::self_recursive::Msg,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.recursive_unlabeled,
                         &mut self.bitfield,
                         field_data,
@@ -110,9 +98,7 @@ impl self::_puroro::Message for Msg {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::self_recursive::Msg,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.recursive_unlabeled,
             &self.bitfield,
             1i32,
@@ -125,9 +111,9 @@ impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::MsgFields {
-                recursive_unlabeled: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::self_recursive::Msg,
-                > as ::std::clone::Clone>::clone(&self.fields.recursive_unlabeled),
+                recursive_unlabeled: ::std::clone::Clone::clone(
+                    &self.fields.recursive_unlabeled,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }

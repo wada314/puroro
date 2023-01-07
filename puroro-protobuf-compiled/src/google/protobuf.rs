@@ -32,23 +32,17 @@ pub struct FileDescriptorSet {
 impl FileDescriptorSet {
     pub fn file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FileDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.file, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.file, &self.bitfield)
     }
     pub fn file_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FileDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(&mut self.fields.file, &mut self.bitfield)
+        RepeatedFieldType::get_field_mut(&mut self.fields.file, &mut self.bitfield)
     }
     pub fn clear_file(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FileDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.file, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.file, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for FileDescriptorSet {
@@ -70,9 +64,7 @@ impl self::_puroro::Message for FileDescriptorSet {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::FileDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.file,
                         &mut self.bitfield,
                         field_data,
@@ -90,9 +82,7 @@ impl self::_puroro::Message for FileDescriptorSet {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FileDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.file,
             &self.bitfield,
             1i32,
@@ -105,9 +95,7 @@ impl ::std::clone::Clone for FileDescriptorSet {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::FileDescriptorSetFields {
-                file: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::FileDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.file),
+                file: ::std::clone::Clone::clone(&self.fields.file),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -184,11 +172,7 @@ pub struct FileDescriptorProto {
 impl FileDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -196,19 +180,11 @@ impl FileDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -216,28 +192,15 @@ impl FileDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn package(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.package,
             &self.bitfield,
             ::std::default::Default::default,
@@ -245,19 +208,11 @@ impl FileDescriptorProto {
     }
     pub fn package_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.package, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.package, &self.bitfield)
     }
     pub fn package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.package,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -265,20 +220,12 @@ impl FileDescriptorProto {
     }
     pub fn has_package(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.package, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.package, &self.bitfield)
             .is_some()
     }
     pub fn clear_package(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.package, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.package, &mut self.bitfield)
     }
     pub fn dependency(
         &self,
@@ -286,184 +233,110 @@ impl FileDescriptorProto {
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field(&self.fields.dependency, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.dependency, &self.bitfield)
     }
     pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.dependency,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.dependency, &mut self.bitfield)
     }
     pub fn clear_dependency(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::clear(&mut self.fields.dependency, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.dependency, &mut self.bitfield)
     }
     pub fn public_dependency(&self) -> &[i32] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.public_dependency,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.public_dependency, &self.bitfield)
     }
     pub fn public_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.public_dependency,
             &mut self.bitfield,
         )
     }
     pub fn clear_public_dependency(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.public_dependency,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.public_dependency, &mut self.bitfield)
     }
     pub fn weak_dependency(&self) -> &[i32] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field(&self.fields.weak_dependency, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.weak_dependency, &self.bitfield)
     }
     pub fn weak_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.weak_dependency,
             &mut self.bitfield,
         )
     }
     pub fn clear_weak_dependency(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.weak_dependency,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.weak_dependency, &mut self.bitfield)
     }
     pub fn message_type(&self) -> &[self::_root::google::protobuf::DescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.message_type, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.message_type, &self.bitfield)
     }
     pub fn message_type_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.message_type,
             &mut self.bitfield,
         )
     }
     pub fn clear_message_type(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.message_type, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.message_type, &mut self.bitfield)
     }
     pub fn enum_type(&self) -> &[self::_root::google::protobuf::EnumDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.enum_type, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.enum_type, &self.bitfield)
     }
     pub fn enum_type_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.enum_type,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.enum_type, &mut self.bitfield)
     }
     pub fn clear_enum_type(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.enum_type, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.enum_type, &mut self.bitfield)
     }
     pub fn service(&self) -> &[self::_root::google::protobuf::ServiceDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::ServiceDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.service, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.service, &self.bitfield)
     }
     pub fn service_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::ServiceDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::ServiceDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.service,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.service, &mut self.bitfield)
     }
     pub fn clear_service(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::ServiceDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.service, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.service, &mut self.bitfield)
     }
     pub fn extension(&self) -> &[self::_root::google::protobuf::FieldDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.extension, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.extension, &self.bitfield)
     }
     pub fn extension_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.extension,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.extension, &mut self.bitfield)
     }
     pub fn clear_extension(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.extension, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.extension, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::FileOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -473,15 +346,11 @@ impl FileDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::FileOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::FileOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -489,24 +358,18 @@ impl FileDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FileOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
     pub fn source_code_info(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::SourceCodeInfo> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.source_code_info,
             &self.bitfield,
             ::std::default::Default::default,
@@ -516,9 +379,7 @@ impl FileDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::SourceCodeInfo> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.source_code_info,
             &self.bitfield,
         )
@@ -527,9 +388,7 @@ impl FileDescriptorProto {
         &mut self,
     ) -> &mut self::_root::google::protobuf::SourceCodeInfo {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.source_code_info,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -537,9 +396,7 @@ impl FileDescriptorProto {
     }
     pub fn has_source_code_info(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.source_code_info,
                 &self.bitfield,
             )
@@ -547,20 +404,14 @@ impl FileDescriptorProto {
     }
     pub fn clear_source_code_info(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::SourceCodeInfo,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.source_code_info,
             &mut self.bitfield,
         )
     }
     pub fn syntax(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.syntax,
             &self.bitfield,
             ::std::default::Default::default,
@@ -568,19 +419,11 @@ impl FileDescriptorProto {
     }
     pub fn syntax_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.syntax, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.syntax, &self.bitfield)
     }
     pub fn syntax_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.syntax,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -588,20 +431,12 @@ impl FileDescriptorProto {
     }
     pub fn has_syntax(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.syntax, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.syntax, &self.bitfield)
             .is_some()
     }
     pub fn clear_syntax(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.syntax, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.syntax, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for FileDescriptorProto {
@@ -623,117 +458,84 @@ impl self::_puroro::Message for FileDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.package,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::RepeatedUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.dependency,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 10i32 => {
-                    <self::_pinternal::RepeatedNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.public_dependency,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 11i32 => {
-                    <self::_pinternal::RepeatedNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.weak_dependency,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::DescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.message_type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::EnumDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.enum_type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::ServiceDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.service,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 7i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::FieldDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.extension,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 8i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::FileOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 9i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::SourceCodeInfo,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.source_code_info,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 12i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.syntax,
                         &mut self.bitfield,
                         field_data,
@@ -751,106 +553,73 @@ impl self::_puroro::Message for FileDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.package,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.dependency,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.public_dependency,
             &self.bitfield,
             10i32,
             out,
         )?;
-        <self::_pinternal::RepeatedNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.weak_dependency,
             &self.bitfield,
             11i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.message_type,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.enum_type,
             &self.bitfield,
             5i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::ServiceDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.service,
             &self.bitfield,
             6i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.extension,
             &self.bitfield,
             7i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FileOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             8i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::SourceCodeInfo,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.source_code_info,
             &self.bitfield,
             9i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.syntax,
             &self.bitfield,
             12i32,
@@ -863,51 +632,24 @@ impl ::std::clone::Clone for FileDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::FileDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                package: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.package),
-                dependency: <self::_pinternal::RepeatedUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                > as ::std::clone::Clone>::clone(&self.fields.dependency),
-                public_dependency: <self::_pinternal::RepeatedNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.public_dependency),
-                weak_dependency: <self::_pinternal::RepeatedNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                > as ::std::clone::Clone>::clone(&self.fields.weak_dependency),
-                message_type: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::DescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.message_type),
-                enum_type: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::EnumDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.enum_type),
-                service: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::ServiceDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.service),
-                extension: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::FieldDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.extension),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::FileOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
-                source_code_info: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::SourceCodeInfo,
-                > as ::std::clone::Clone>::clone(&self.fields.source_code_info),
-                syntax: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.syntax),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                package: ::std::clone::Clone::clone(&self.fields.package),
+                dependency: ::std::clone::Clone::clone(&self.fields.dependency),
+                public_dependency: ::std::clone::Clone::clone(
+                    &self.fields.public_dependency,
+                ),
+                weak_dependency: ::std::clone::Clone::clone(
+                    &self.fields.weak_dependency,
+                ),
+                message_type: ::std::clone::Clone::clone(&self.fields.message_type),
+                enum_type: ::std::clone::Clone::clone(&self.fields.enum_type),
+                service: ::std::clone::Clone::clone(&self.fields.service),
+                extension: ::std::clone::Clone::clone(&self.fields.extension),
+                options: ::std::clone::Clone::clone(&self.fields.options),
+                source_code_info: ::std::clone::Clone::clone(
+                    &self.fields.source_code_info,
+                ),
+                syntax: ::std::clone::Clone::clone(&self.fields.syntax),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -999,11 +741,7 @@ pub struct DescriptorProto {
 impl DescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -1011,19 +749,11 @@ impl DescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -1031,120 +761,76 @@ impl DescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn field(&self) -> &[self::_root::google::protobuf::FieldDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.field, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.field, &self.bitfield)
     }
     pub fn field_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.field,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.field, &mut self.bitfield)
     }
     pub fn clear_field(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.field, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.field, &mut self.bitfield)
     }
     pub fn extension(&self) -> &[self::_root::google::protobuf::FieldDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.extension, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.extension, &self.bitfield)
     }
     pub fn extension_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.extension,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.extension, &mut self.bitfield)
     }
     pub fn clear_extension(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.extension, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.extension, &mut self.bitfield)
     }
     pub fn nested_type(&self) -> &[self::_root::google::protobuf::DescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.nested_type, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.nested_type, &self.bitfield)
     }
     pub fn nested_type_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.nested_type,
             &mut self.bitfield,
         )
     }
     pub fn clear_nested_type(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.nested_type, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.nested_type, &mut self.bitfield)
     }
     pub fn enum_type(&self) -> &[self::_root::google::protobuf::EnumDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.enum_type, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.enum_type, &self.bitfield)
     }
     pub fn enum_type_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.enum_type,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.enum_type, &mut self.bitfield)
     }
     pub fn clear_enum_type(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.enum_type, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.enum_type, &mut self.bitfield)
     }
     pub fn extension_range(
         &self,
     ) -> &[self::_root::google::protobuf::descriptor_proto::ExtensionRange] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-        > as RepeatedFieldType>::get_field(&self.fields.extension_range, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.extension_range, &self.bitfield)
     }
     pub fn extension_range_mut(
         &mut self,
@@ -1152,52 +838,34 @@ impl DescriptorProto {
         self::_root::google::protobuf::descriptor_proto::ExtensionRange,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.extension_range,
             &mut self.bitfield,
         )
     }
     pub fn clear_extension_range(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.extension_range,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.extension_range, &mut self.bitfield)
     }
     pub fn oneof_decl(&self) -> &[self::_root::google::protobuf::OneofDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::OneofDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.oneof_decl, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.oneof_decl, &self.bitfield)
     }
     pub fn oneof_decl_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::OneofDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::OneofDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.oneof_decl,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.oneof_decl, &mut self.bitfield)
     }
     pub fn clear_oneof_decl(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::OneofDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.oneof_decl, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.oneof_decl, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::MessageOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -1207,15 +875,11 @@ impl DescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::MessageOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::MessageOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -1223,24 +887,18 @@ impl DescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MessageOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
     pub fn reserved_range(
         &self,
     ) -> &[self::_root::google::protobuf::descriptor_proto::ReservedRange] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ReservedRange,
-        > as RepeatedFieldType>::get_field(&self.fields.reserved_range, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.reserved_range, &self.bitfield)
     }
     pub fn reserved_range_mut(
         &mut self,
@@ -1248,21 +906,14 @@ impl DescriptorProto {
         self::_root::google::protobuf::descriptor_proto::ReservedRange,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ReservedRange,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.reserved_range,
             &mut self.bitfield,
         )
     }
     pub fn clear_reserved_range(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ReservedRange,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.reserved_range,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.reserved_range, &mut self.bitfield)
     }
     pub fn reserved_name(
         &self,
@@ -1270,32 +921,20 @@ impl DescriptorProto {
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field(&self.fields.reserved_name, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.reserved_name, &self.bitfield)
     }
     pub fn reserved_name_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.reserved_name,
             &mut self.bitfield,
         )
     }
     pub fn clear_reserved_name(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.reserved_name,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.reserved_name, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for DescriptorProto {
@@ -1317,93 +956,70 @@ impl self::_puroro::Message for DescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::FieldDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.field,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::FieldDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.extension,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::DescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.nested_type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::EnumDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.enum_type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.extension_range,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 8i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::OneofDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.oneof_decl,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 7i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::MessageOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 9i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::descriptor_proto::ReservedRange,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.reserved_range,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 10i32 => {
-                    <self::_pinternal::RepeatedUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.reserved_name,
                         &mut self.bitfield,
                         field_data,
@@ -1421,84 +1037,61 @@ impl self::_puroro::Message for DescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.field,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::FieldDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.extension,
             &self.bitfield,
             6i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::DescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.nested_type,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.enum_type,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.extension_range,
             &self.bitfield,
             5i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::OneofDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.oneof_decl,
             &self.bitfield,
             8i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MessageOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             7i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::descriptor_proto::ReservedRange,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.reserved_range,
             &self.bitfield,
             9i32,
             out,
         )?;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.reserved_name,
             &self.bitfield,
             10i32,
@@ -1511,39 +1104,18 @@ impl ::std::clone::Clone for DescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::DescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                field: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::FieldDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.field),
-                extension: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::FieldDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.extension),
-                nested_type: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::DescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.nested_type),
-                enum_type: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::EnumDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.enum_type),
-                extension_range: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-                > as ::std::clone::Clone>::clone(&self.fields.extension_range),
-                oneof_decl: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::OneofDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.oneof_decl),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::MessageOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
-                reserved_range: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::descriptor_proto::ReservedRange,
-                > as ::std::clone::Clone>::clone(&self.fields.reserved_range),
-                reserved_name: <self::_pinternal::RepeatedUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                > as ::std::clone::Clone>::clone(&self.fields.reserved_name),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                field: ::std::clone::Clone::clone(&self.fields.field),
+                extension: ::std::clone::Clone::clone(&self.fields.extension),
+                nested_type: ::std::clone::Clone::clone(&self.fields.nested_type),
+                enum_type: ::std::clone::Clone::clone(&self.fields.enum_type),
+                extension_range: ::std::clone::Clone::clone(
+                    &self.fields.extension_range,
+                ),
+                oneof_decl: ::std::clone::Clone::clone(&self.fields.oneof_decl),
+                options: ::std::clone::Clone::clone(&self.fields.options),
+                reserved_range: ::std::clone::Clone::clone(&self.fields.reserved_range),
+                reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -1603,29 +1175,20 @@ impl ExtensionRangeOptions {
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -1650,9 +1213,7 @@ impl self::_puroro::Message for ExtensionRangeOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -1670,9 +1231,7 @@ impl self::_puroro::Message for ExtensionRangeOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -1685,9 +1244,9 @@ impl ::std::clone::Clone for ExtensionRangeOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::ExtensionRangeOptionsFields {
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -1782,11 +1341,7 @@ pub struct FieldDescriptorProto {
 impl FieldDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -1794,19 +1349,11 @@ impl FieldDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -1814,28 +1361,15 @@ impl FieldDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn number(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.number,
             &self.bitfield,
             ::std::default::Default::default,
@@ -1843,19 +1377,11 @@ impl FieldDescriptorProto {
     }
     pub fn number_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.number, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.number, &self.bitfield)
     }
     pub fn number_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.number,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -1863,30 +1389,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_number(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.number, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.number, &self.bitfield)
             .is_some()
     }
     pub fn clear_number(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.number, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.number, &mut self.bitfield)
     }
     pub fn label(&self) -> self::_root::google::protobuf::field_descriptor_proto::Label {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Label,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Label,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.label,
             &self.bitfield,
             ::std::default::Default::default,
@@ -1898,25 +1410,13 @@ impl FieldDescriptorProto {
         self::_root::google::protobuf::field_descriptor_proto::Label,
     > {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Label,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Label,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.label, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.label, &self.bitfield)
     }
     pub fn label_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_descriptor_proto::Label {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Label,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Label,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.label,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -1924,34 +1424,15 @@ impl FieldDescriptorProto {
     }
     pub fn has_label(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Label,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Label,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.label, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.label, &self.bitfield).is_some()
     }
     pub fn clear_label(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Label,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Label,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.label, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.label, &mut self.bitfield)
     }
     pub fn r#type(&self) -> self::_root::google::protobuf::field_descriptor_proto::Type {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Type,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Type,
-            >,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.r#type,
             &self.bitfield,
             ::std::default::Default::default,
@@ -1963,25 +1444,13 @@ impl FieldDescriptorProto {
         self::_root::google::protobuf::field_descriptor_proto::Type,
     > {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Type,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Type,
-            >,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.r#type, &self.bitfield)
     }
     pub fn type_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_descriptor_proto::Type {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Type,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Type,
-            >,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.r#type,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -1989,32 +1458,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_type(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Type,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Type,
-            >,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.r#type, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.r#type, &self.bitfield)
             .is_some()
     }
     pub fn clear_type(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Type,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Type,
-            >,
-            3usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.r#type, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.r#type, &mut self.bitfield)
     }
     pub fn type_name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.type_name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2022,19 +1475,11 @@ impl FieldDescriptorProto {
     }
     pub fn type_name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.type_name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.type_name, &self.bitfield)
     }
     pub fn type_name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.type_name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2042,28 +1487,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_type_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.type_name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.type_name, &self.bitfield)
             .is_some()
     }
     pub fn clear_type_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            4usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.type_name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.type_name, &mut self.bitfield)
     }
     pub fn extendee(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.extendee,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2071,19 +1504,11 @@ impl FieldDescriptorProto {
     }
     pub fn extendee_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.extendee, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.extendee, &self.bitfield)
     }
     pub fn extendee_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.extendee,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2091,28 +1516,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_extendee(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.extendee, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.extendee, &self.bitfield)
             .is_some()
     }
     pub fn clear_extendee(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.extendee, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.extendee, &mut self.bitfield)
     }
     pub fn default_value(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.default_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2120,22 +1533,11 @@ impl FieldDescriptorProto {
     }
     pub fn default_value_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.default_value,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.default_value, &self.bitfield)
     }
     pub fn default_value_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.default_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2143,34 +1545,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_default_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.default_value,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.default_value, &self.bitfield)
             .is_some()
     }
     pub fn clear_default_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.default_value,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.default_value, &mut self.bitfield)
     }
     pub fn oneof_index(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.oneof_index,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2178,22 +1562,11 @@ impl FieldDescriptorProto {
     }
     pub fn oneof_index_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.oneof_index,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.oneof_index, &self.bitfield)
     }
     pub fn oneof_index_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.oneof_index,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2201,34 +1574,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_oneof_index(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.oneof_index,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.oneof_index, &self.bitfield)
             .is_some()
     }
     pub fn clear_oneof_index(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            7usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.oneof_index,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.oneof_index, &mut self.bitfield)
     }
     pub fn json_name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.json_name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2236,19 +1591,11 @@ impl FieldDescriptorProto {
     }
     pub fn json_name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.json_name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.json_name, &self.bitfield)
     }
     pub fn json_name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.json_name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2256,28 +1603,18 @@ impl FieldDescriptorProto {
     }
     pub fn has_json_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.json_name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.json_name, &self.bitfield)
             .is_some()
     }
     pub fn clear_json_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            8usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.json_name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.json_name, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::FieldOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2287,15 +1624,11 @@ impl FieldDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::FieldOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::FieldOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2303,24 +1636,16 @@ impl FieldDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FieldOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
     pub fn proto3_optional(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.proto3_optional,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2328,22 +1653,11 @@ impl FieldDescriptorProto {
     }
     pub fn proto3_optional_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.proto3_optional,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.proto3_optional, &self.bitfield)
     }
     pub fn proto3_optional_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.proto3_optional,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2351,26 +1665,12 @@ impl FieldDescriptorProto {
     }
     pub fn has_proto3_optional(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.proto3_optional,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.proto3_optional, &self.bitfield)
             .is_some()
     }
     pub fn clear_proto3_optional(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.proto3_optional,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.proto3_optional, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for FieldDescriptorProto {
@@ -2392,123 +1692,77 @@ impl self::_puroro::Message for FieldDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.number,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        self::_root::google::protobuf::field_descriptor_proto::Label,
-                        self::_pinternal::tags::Enum2::<
-                            self::_root::google::protobuf::field_descriptor_proto::Label,
-                        >,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.label,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        self::_root::google::protobuf::field_descriptor_proto::Type,
-                        self::_pinternal::tags::Enum2::<
-                            self::_root::google::protobuf::field_descriptor_proto::Type,
-                        >,
-                        3usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.r#type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        4usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.type_name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        5usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.extendee,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 7i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        6usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.default_value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 9i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        7usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.oneof_index,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 10i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        8usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.json_name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 8i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::FieldOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 17i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        9usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.proto3_optional,
                         &mut self.bitfield,
                         field_data,
@@ -2526,113 +1780,67 @@ impl self::_puroro::Message for FieldDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.number,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Label,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Label,
-            >,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.label,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_descriptor_proto::Type,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_descriptor_proto::Type,
-            >,
-            3usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.r#type,
             &self.bitfield,
             5i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            4usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.type_name,
             &self.bitfield,
             6i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.extendee,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.default_value,
             &self.bitfield,
             7i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            7usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.oneof_index,
             &self.bitfield,
             9i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            8usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.json_name,
             &self.bitfield,
             10i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::FieldOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             8i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.proto3_optional,
             &self.bitfield,
             17i32,
@@ -2645,63 +1853,17 @@ impl ::std::clone::Clone for FieldDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::FieldDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                number: <self::_pinternal::OptionalNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.number),
-                label: <self::_pinternal::OptionalNumericalField::<
-                    self::_root::google::protobuf::field_descriptor_proto::Label,
-                    self::_pinternal::tags::Enum2::<
-                        self::_root::google::protobuf::field_descriptor_proto::Label,
-                    >,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.label),
-                r#type: <self::_pinternal::OptionalNumericalField::<
-                    self::_root::google::protobuf::field_descriptor_proto::Type,
-                    self::_pinternal::tags::Enum2::<
-                        self::_root::google::protobuf::field_descriptor_proto::Type,
-                    >,
-                    3usize,
-                > as ::std::clone::Clone>::clone(&self.fields.r#type),
-                type_name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    4usize,
-                > as ::std::clone::Clone>::clone(&self.fields.type_name),
-                extendee: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    5usize,
-                > as ::std::clone::Clone>::clone(&self.fields.extendee),
-                default_value: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    6usize,
-                > as ::std::clone::Clone>::clone(&self.fields.default_value),
-                oneof_index: <self::_pinternal::OptionalNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                    7usize,
-                > as ::std::clone::Clone>::clone(&self.fields.oneof_index),
-                json_name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    8usize,
-                > as ::std::clone::Clone>::clone(&self.fields.json_name),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::FieldOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
-                proto3_optional: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    9usize,
-                > as ::std::clone::Clone>::clone(&self.fields.proto3_optional),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                number: ::std::clone::Clone::clone(&self.fields.number),
+                label: ::std::clone::Clone::clone(&self.fields.label),
+                r#type: ::std::clone::Clone::clone(&self.fields.r#type),
+                type_name: ::std::clone::Clone::clone(&self.fields.type_name),
+                extendee: ::std::clone::Clone::clone(&self.fields.extendee),
+                default_value: ::std::clone::Clone::clone(&self.fields.default_value),
+                oneof_index: ::std::clone::Clone::clone(&self.fields.oneof_index),
+                json_name: ::std::clone::Clone::clone(&self.fields.json_name),
+                options: ::std::clone::Clone::clone(&self.fields.options),
+                proto3_optional: ::std::clone::Clone::clone(&self.fields.proto3_optional),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -2766,11 +1928,7 @@ pub struct OneofDescriptorProto {
 impl OneofDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2778,19 +1936,11 @@ impl OneofDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2798,28 +1948,17 @@ impl OneofDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::OneofOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -2829,15 +1968,11 @@ impl OneofDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::OneofOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::OneofOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -2845,16 +1980,12 @@ impl OneofDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::OneofOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for OneofDescriptorProto {
@@ -2876,20 +2007,14 @@ impl self::_puroro::Message for OneofDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::OneofOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
@@ -2907,19 +2032,13 @@ impl self::_puroro::Message for OneofDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::OneofOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             2i32,
@@ -2932,14 +2051,8 @@ impl ::std::clone::Clone for OneofDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::OneofDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::OneofOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -2997,11 +2110,7 @@ pub struct EnumDescriptorProto {
 impl EnumDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3009,19 +2118,11 @@ impl EnumDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3029,26 +2130,15 @@ impl EnumDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn value(&self) -> &[self::_root::google::protobuf::EnumValueDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumValueDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.value, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.value, &self.bitfield)
     }
     pub fn value_mut(
         &mut self,
@@ -3056,26 +2146,17 @@ impl EnumDescriptorProto {
         self::_root::google::protobuf::EnumValueDescriptorProto,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumValueDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.value,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.value, &mut self.bitfield)
     }
     pub fn clear_value(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumValueDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.value, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.value, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::EnumOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3085,15 +2166,11 @@ impl EnumDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::EnumOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::EnumOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3101,24 +2178,18 @@ impl EnumDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
     pub fn reserved_range(
         &self,
     ) -> &[self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-        > as RepeatedFieldType>::get_field(&self.fields.reserved_range, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.reserved_range, &self.bitfield)
     }
     pub fn reserved_range_mut(
         &mut self,
@@ -3126,21 +2197,14 @@ impl EnumDescriptorProto {
         self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.reserved_range,
             &mut self.bitfield,
         )
     }
     pub fn clear_reserved_range(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.reserved_range,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.reserved_range, &mut self.bitfield)
     }
     pub fn reserved_name(
         &self,
@@ -3148,32 +2212,20 @@ impl EnumDescriptorProto {
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field(&self.fields.reserved_name, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.reserved_name, &self.bitfield)
     }
     pub fn reserved_name_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.reserved_name,
             &mut self.bitfield,
         )
     }
     pub fn clear_reserved_name(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as RepeatedFieldType>::clear(
-            &mut self.fields.reserved_name,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::clear(&mut self.fields.reserved_name, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for EnumDescriptorProto {
@@ -3195,48 +2247,35 @@ impl self::_puroro::Message for EnumDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::EnumValueDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::EnumOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.reserved_range,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::RepeatedUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.reserved_name,
                         &mut self.bitfield,
                         field_data,
@@ -3254,44 +2293,31 @@ impl self::_puroro::Message for EnumDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::EnumValueDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.value,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.reserved_range,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::RepeatedUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.reserved_name,
             &self.bitfield,
             5i32,
@@ -3304,24 +2330,11 @@ impl ::std::clone::Clone for EnumDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::EnumDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                value: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::EnumValueDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.value),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::EnumOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
-                reserved_range: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-                > as ::std::clone::Clone>::clone(&self.fields.reserved_range),
-                reserved_name: <self::_pinternal::RepeatedUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                > as ::std::clone::Clone>::clone(&self.fields.reserved_name),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                value: ::std::clone::Clone::clone(&self.fields.value),
+                options: ::std::clone::Clone::clone(&self.fields.options),
+                reserved_range: ::std::clone::Clone::clone(&self.fields.reserved_range),
+                reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -3379,11 +2392,7 @@ pub struct EnumValueDescriptorProto {
 impl EnumValueDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3391,19 +2400,11 @@ impl EnumValueDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3411,28 +2412,15 @@ impl EnumValueDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn number(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.number,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3440,19 +2428,11 @@ impl EnumValueDescriptorProto {
     }
     pub fn number_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.number, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.number, &self.bitfield)
     }
     pub fn number_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.number,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3460,28 +2440,18 @@ impl EnumValueDescriptorProto {
     }
     pub fn has_number(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.number, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.number, &self.bitfield)
             .is_some()
     }
     pub fn clear_number(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.number, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.number, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::EnumValueOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3491,17 +2461,13 @@ impl EnumValueDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::EnumValueOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::EnumValueOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3509,16 +2475,12 @@ impl EnumValueDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumValueOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for EnumValueDescriptorProto {
@@ -3540,31 +2502,21 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.number,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::EnumValueOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
@@ -3582,29 +2534,19 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.number,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::EnumValueOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             3i32,
@@ -3617,19 +2559,9 @@ impl ::std::clone::Clone for EnumValueDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::EnumValueDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                number: <self::_pinternal::OptionalNumericalField::<
-                    i32,
-                    self::_pinternal::tags::Int32,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.number),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::EnumValueOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                number: ::std::clone::Clone::clone(&self.fields.number),
+                options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -3682,11 +2614,7 @@ pub struct ServiceDescriptorProto {
 impl ServiceDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3694,19 +2622,11 @@ impl ServiceDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3714,51 +2634,31 @@ impl ServiceDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn method(&self) -> &[self::_root::google::protobuf::MethodDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::MethodDescriptorProto,
-        > as RepeatedFieldType>::get_field(&self.fields.method, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.method, &self.bitfield)
     }
     pub fn method_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::MethodDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::MethodDescriptorProto,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.method,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.method, &mut self.bitfield)
     }
     pub fn clear_method(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::MethodDescriptorProto,
-        > as RepeatedFieldType>::clear(&mut self.fields.method, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.method, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::ServiceOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3768,15 +2668,11 @@ impl ServiceDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::ServiceOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::ServiceOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3784,16 +2680,12 @@ impl ServiceDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ServiceOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for ServiceDescriptorProto {
@@ -3815,29 +2707,21 @@ impl self::_puroro::Message for ServiceDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::MethodDescriptorProto,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.method,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::ServiceOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
@@ -3855,27 +2739,19 @@ impl self::_puroro::Message for ServiceDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::MethodDescriptorProto,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.method,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ServiceOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             3i32,
@@ -3888,17 +2764,9 @@ impl ::std::clone::Clone for ServiceDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::ServiceDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                method: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::MethodDescriptorProto,
-                > as ::std::clone::Clone>::clone(&self.fields.method),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::ServiceOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                method: ::std::clone::Clone::clone(&self.fields.method),
+                options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -3967,11 +2835,7 @@ pub struct MethodDescriptorProto {
 impl MethodDescriptorProto {
     pub fn name(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.name,
             &self.bitfield,
             ::std::default::Default::default,
@@ -3979,19 +2843,11 @@ impl MethodDescriptorProto {
     }
     pub fn name_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -3999,28 +2855,15 @@ impl MethodDescriptorProto {
     }
     pub fn has_name(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.name, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.name, &self.bitfield).is_some()
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn input_type(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.input_type,
             &self.bitfield,
             ::std::default::Default::default,
@@ -4028,22 +2871,11 @@ impl MethodDescriptorProto {
     }
     pub fn input_type_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.input_type,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.input_type, &self.bitfield)
     }
     pub fn input_type_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.input_type,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -4051,34 +2883,16 @@ impl MethodDescriptorProto {
     }
     pub fn has_input_type(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.input_type,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.input_type, &self.bitfield)
             .is_some()
     }
     pub fn clear_input_type(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.input_type,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.input_type, &mut self.bitfield)
     }
     pub fn output_type(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.output_type,
             &self.bitfield,
             ::std::default::Default::default,
@@ -4086,22 +2900,11 @@ impl MethodDescriptorProto {
     }
     pub fn output_type_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.output_type,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.output_type, &self.bitfield)
     }
     pub fn output_type_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.output_type,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -4109,34 +2912,18 @@ impl MethodDescriptorProto {
     }
     pub fn has_output_type(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.output_type,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.output_type, &self.bitfield)
             .is_some()
     }
     pub fn clear_output_type(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.output_type,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.output_type, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::MethodOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.options,
             &self.bitfield,
             ::std::default::Default::default,
@@ -4146,15 +2933,11 @@ impl MethodDescriptorProto {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::MethodOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::MethodOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.options,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -4162,24 +2945,16 @@ impl MethodDescriptorProto {
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.options, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MethodOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.options, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
     pub fn client_streaming(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.client_streaming,
             &self.bitfield,
             || false,
@@ -4187,22 +2962,14 @@ impl MethodDescriptorProto {
     }
     pub fn client_streaming_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.client_streaming,
             &self.bitfield,
         )
     }
     pub fn client_streaming_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.client_streaming,
             &mut self.bitfield,
             || false,
@@ -4210,11 +2977,7 @@ impl MethodDescriptorProto {
     }
     pub fn has_client_streaming(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.client_streaming,
                 &self.bitfield,
             )
@@ -4222,22 +2985,14 @@ impl MethodDescriptorProto {
     }
     pub fn clear_client_streaming(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.client_streaming,
             &mut self.bitfield,
         )
     }
     pub fn server_streaming(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.server_streaming,
             &self.bitfield,
             || false,
@@ -4245,22 +3000,14 @@ impl MethodDescriptorProto {
     }
     pub fn server_streaming_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.server_streaming,
             &self.bitfield,
         )
     }
     pub fn server_streaming_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.server_streaming,
             &mut self.bitfield,
             || false,
@@ -4268,11 +3015,7 @@ impl MethodDescriptorProto {
     }
     pub fn has_server_streaming(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.server_streaming,
                 &self.bitfield,
             )
@@ -4280,11 +3023,7 @@ impl MethodDescriptorProto {
     }
     pub fn clear_server_streaming(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.server_streaming,
             &mut self.bitfield,
         )
@@ -4309,64 +3048,42 @@ impl self::_puroro::Message for MethodDescriptorProto {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.input_type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.output_type,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::MethodOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.options,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        3usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.client_streaming,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        4usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.server_streaming,
                         &mut self.bitfield,
                         field_data,
@@ -4384,59 +3101,37 @@ impl self::_puroro::Message for MethodDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.input_type,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.output_type,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::MethodOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.options,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.client_streaming,
             &self.bitfield,
             5i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.server_streaming,
             &self.bitfield,
             6i32,
@@ -4449,34 +3144,16 @@ impl ::std::clone::Clone for MethodDescriptorProto {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::MethodDescriptorProtoFields {
-                name: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                input_type: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.input_type),
-                output_type: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.output_type),
-                options: <self::_pinternal::SingularHeapMessageField::<
-                    self::_root::google::protobuf::MethodOptions,
-                > as ::std::clone::Clone>::clone(&self.fields.options),
-                client_streaming: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    3usize,
-                > as ::std::clone::Clone>::clone(&self.fields.client_streaming),
-                server_streaming: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    4usize,
-                > as ::std::clone::Clone>::clone(&self.fields.server_streaming),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                input_type: ::std::clone::Clone::clone(&self.fields.input_type),
+                output_type: ::std::clone::Clone::clone(&self.fields.output_type),
+                options: ::std::clone::Clone::clone(&self.fields.options),
+                client_streaming: ::std::clone::Clone::clone(
+                    &self.fields.client_streaming,
+                ),
+                server_streaming: ::std::clone::Clone::clone(
+                    &self.fields.server_streaming,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -4629,11 +3306,7 @@ pub struct FileOptions {
 impl FileOptions {
     pub fn java_package(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.java_package,
             &self.bitfield,
             ::std::default::Default::default,
@@ -4641,22 +3314,11 @@ impl FileOptions {
     }
     pub fn java_package_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.java_package,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.java_package, &self.bitfield)
     }
     pub fn java_package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.java_package,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -4664,34 +3326,16 @@ impl FileOptions {
     }
     pub fn has_java_package(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.java_package,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.java_package, &self.bitfield)
             .is_some()
     }
     pub fn clear_java_package(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.java_package,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.java_package, &mut self.bitfield)
     }
     pub fn java_outer_classname(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.java_outer_classname,
             &self.bitfield,
             ::std::default::Default::default,
@@ -4699,22 +3343,14 @@ impl FileOptions {
     }
     pub fn java_outer_classname_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.java_outer_classname,
             &self.bitfield,
         )
     }
     pub fn java_outer_classname_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.java_outer_classname,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -4722,11 +3358,7 @@ impl FileOptions {
     }
     pub fn has_java_outer_classname(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.java_outer_classname,
                 &self.bitfield,
             )
@@ -4734,22 +3366,14 @@ impl FileOptions {
     }
     pub fn clear_java_outer_classname(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.java_outer_classname,
             &mut self.bitfield,
         )
     }
     pub fn java_multiple_files(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.java_multiple_files,
             &self.bitfield,
             || false,
@@ -4757,22 +3381,14 @@ impl FileOptions {
     }
     pub fn java_multiple_files_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.java_multiple_files,
             &self.bitfield,
         )
     }
     pub fn java_multiple_files_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.java_multiple_files,
             &mut self.bitfield,
             || false,
@@ -4780,11 +3396,7 @@ impl FileOptions {
     }
     pub fn has_java_multiple_files(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.java_multiple_files,
                 &self.bitfield,
             )
@@ -4792,22 +3404,14 @@ impl FileOptions {
     }
     pub fn clear_java_multiple_files(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.java_multiple_files,
             &mut self.bitfield,
         )
     }
     pub fn java_generate_equals_and_hash(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.java_generate_equals_and_hash,
             &self.bitfield,
             ::std::default::Default::default,
@@ -4815,22 +3419,14 @@ impl FileOptions {
     }
     pub fn java_generate_equals_and_hash_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.java_generate_equals_and_hash,
             &self.bitfield,
         )
     }
     pub fn java_generate_equals_and_hash_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.java_generate_equals_and_hash,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -4838,11 +3434,7 @@ impl FileOptions {
     }
     pub fn has_java_generate_equals_and_hash(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.java_generate_equals_and_hash,
                 &self.bitfield,
             )
@@ -4850,22 +3442,14 @@ impl FileOptions {
     }
     pub fn clear_java_generate_equals_and_hash(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.java_generate_equals_and_hash,
             &mut self.bitfield,
         )
     }
     pub fn java_string_check_utf8(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.java_string_check_utf8,
             &self.bitfield,
             || false,
@@ -4873,22 +3457,14 @@ impl FileOptions {
     }
     pub fn java_string_check_utf8_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.java_string_check_utf8,
             &self.bitfield,
         )
     }
     pub fn java_string_check_utf8_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.java_string_check_utf8,
             &mut self.bitfield,
             || false,
@@ -4896,11 +3472,7 @@ impl FileOptions {
     }
     pub fn has_java_string_check_utf8(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.java_string_check_utf8,
                 &self.bitfield,
             )
@@ -4908,11 +3480,7 @@ impl FileOptions {
     }
     pub fn clear_java_string_check_utf8(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.java_string_check_utf8,
             &mut self.bitfield,
         )
@@ -4921,13 +3489,7 @@ impl FileOptions {
         &self,
     ) -> self::_root::google::protobuf::file_options::OptimizeMode {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::file_options::OptimizeMode,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::file_options::OptimizeMode,
-            >,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.optimize_for,
             &self.bitfield,
             || self::_root::google::protobuf::file_options::OptimizeMode::Speed,
@@ -4939,28 +3501,13 @@ impl FileOptions {
         self::_root::google::protobuf::file_options::OptimizeMode,
     > {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::file_options::OptimizeMode,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::file_options::OptimizeMode,
-            >,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.optimize_for,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.optimize_for, &self.bitfield)
     }
     pub fn optimize_for_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::file_options::OptimizeMode {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::file_options::OptimizeMode,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::file_options::OptimizeMode,
-            >,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.optimize_for,
             &mut self.bitfield,
             || self::_root::google::protobuf::file_options::OptimizeMode::Speed,
@@ -4968,38 +3515,16 @@ impl FileOptions {
     }
     pub fn has_optimize_for(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::file_options::OptimizeMode,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::file_options::OptimizeMode,
-            >,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.optimize_for,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.optimize_for, &self.bitfield)
             .is_some()
     }
     pub fn clear_optimize_for(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::file_options::OptimizeMode,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::file_options::OptimizeMode,
-            >,
-            5usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.optimize_for,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.optimize_for, &mut self.bitfield)
     }
     pub fn go_package(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.go_package,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5007,22 +3532,11 @@ impl FileOptions {
     }
     pub fn go_package_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.go_package,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.go_package, &self.bitfield)
     }
     pub fn go_package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.go_package,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5030,34 +3544,16 @@ impl FileOptions {
     }
     pub fn has_go_package(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.go_package,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.go_package, &self.bitfield)
             .is_some()
     }
     pub fn clear_go_package(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.go_package,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.go_package, &mut self.bitfield)
     }
     pub fn cc_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.cc_generic_services,
             &self.bitfield,
             || false,
@@ -5065,22 +3561,14 @@ impl FileOptions {
     }
     pub fn cc_generic_services_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.cc_generic_services,
             &self.bitfield,
         )
     }
     pub fn cc_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.cc_generic_services,
             &mut self.bitfield,
             || false,
@@ -5088,11 +3576,7 @@ impl FileOptions {
     }
     pub fn has_cc_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            7usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.cc_generic_services,
                 &self.bitfield,
             )
@@ -5100,22 +3584,14 @@ impl FileOptions {
     }
     pub fn clear_cc_generic_services(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            7usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.cc_generic_services,
             &mut self.bitfield,
         )
     }
     pub fn java_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.java_generic_services,
             &self.bitfield,
             || false,
@@ -5123,22 +3599,14 @@ impl FileOptions {
     }
     pub fn java_generic_services_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.java_generic_services,
             &self.bitfield,
         )
     }
     pub fn java_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.java_generic_services,
             &mut self.bitfield,
             || false,
@@ -5146,11 +3614,7 @@ impl FileOptions {
     }
     pub fn has_java_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            8usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.java_generic_services,
                 &self.bitfield,
             )
@@ -5158,22 +3622,14 @@ impl FileOptions {
     }
     pub fn clear_java_generic_services(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            8usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.java_generic_services,
             &mut self.bitfield,
         )
     }
     pub fn py_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.py_generic_services,
             &self.bitfield,
             || false,
@@ -5181,22 +3637,14 @@ impl FileOptions {
     }
     pub fn py_generic_services_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.py_generic_services,
             &self.bitfield,
         )
     }
     pub fn py_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.py_generic_services,
             &mut self.bitfield,
             || false,
@@ -5204,11 +3652,7 @@ impl FileOptions {
     }
     pub fn has_py_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.py_generic_services,
                 &self.bitfield,
             )
@@ -5216,22 +3660,14 @@ impl FileOptions {
     }
     pub fn clear_py_generic_services(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.py_generic_services,
             &mut self.bitfield,
         )
     }
     pub fn php_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            10usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.php_generic_services,
             &self.bitfield,
             || false,
@@ -5239,22 +3675,14 @@ impl FileOptions {
     }
     pub fn php_generic_services_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            10usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.php_generic_services,
             &self.bitfield,
         )
     }
     pub fn php_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            10usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.php_generic_services,
             &mut self.bitfield,
             || false,
@@ -5262,11 +3690,7 @@ impl FileOptions {
     }
     pub fn has_php_generic_services(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            10usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.php_generic_services,
                 &self.bitfield,
             )
@@ -5274,22 +3698,14 @@ impl FileOptions {
     }
     pub fn clear_php_generic_services(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            10usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.php_generic_services,
             &mut self.bitfield,
         )
     }
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            11usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -5297,22 +3713,11 @@ impl FileOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            11usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            11usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -5320,34 +3725,16 @@ impl FileOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            11usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            11usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn cc_enable_arenas(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            12usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.cc_enable_arenas,
             &self.bitfield,
             || true,
@@ -5355,22 +3742,14 @@ impl FileOptions {
     }
     pub fn cc_enable_arenas_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            12usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.cc_enable_arenas,
             &self.bitfield,
         )
     }
     pub fn cc_enable_arenas_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            12usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.cc_enable_arenas,
             &mut self.bitfield,
             || true,
@@ -5378,11 +3757,7 @@ impl FileOptions {
     }
     pub fn has_cc_enable_arenas(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            12usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.cc_enable_arenas,
                 &self.bitfield,
             )
@@ -5390,22 +3765,14 @@ impl FileOptions {
     }
     pub fn clear_cc_enable_arenas(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            12usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.cc_enable_arenas,
             &mut self.bitfield,
         )
     }
     pub fn objc_class_prefix(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            13usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.objc_class_prefix,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5413,22 +3780,14 @@ impl FileOptions {
     }
     pub fn objc_class_prefix_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            13usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.objc_class_prefix,
             &self.bitfield,
         )
     }
     pub fn objc_class_prefix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            13usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.objc_class_prefix,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5436,11 +3795,7 @@ impl FileOptions {
     }
     pub fn has_objc_class_prefix(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            13usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.objc_class_prefix,
                 &self.bitfield,
             )
@@ -5448,22 +3803,14 @@ impl FileOptions {
     }
     pub fn clear_objc_class_prefix(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            13usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.objc_class_prefix,
             &mut self.bitfield,
         )
     }
     pub fn csharp_namespace(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            14usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.csharp_namespace,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5471,22 +3818,14 @@ impl FileOptions {
     }
     pub fn csharp_namespace_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            14usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.csharp_namespace,
             &self.bitfield,
         )
     }
     pub fn csharp_namespace_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            14usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.csharp_namespace,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5494,11 +3833,7 @@ impl FileOptions {
     }
     pub fn has_csharp_namespace(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            14usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.csharp_namespace,
                 &self.bitfield,
             )
@@ -5506,22 +3841,14 @@ impl FileOptions {
     }
     pub fn clear_csharp_namespace(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            14usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.csharp_namespace,
             &mut self.bitfield,
         )
     }
     pub fn swift_prefix(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            15usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.swift_prefix,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5529,22 +3856,11 @@ impl FileOptions {
     }
     pub fn swift_prefix_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            15usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.swift_prefix,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.swift_prefix, &self.bitfield)
     }
     pub fn swift_prefix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            15usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.swift_prefix,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5552,34 +3868,16 @@ impl FileOptions {
     }
     pub fn has_swift_prefix(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            15usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.swift_prefix,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.swift_prefix, &self.bitfield)
             .is_some()
     }
     pub fn clear_swift_prefix(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            15usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.swift_prefix,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.swift_prefix, &mut self.bitfield)
     }
     pub fn php_class_prefix(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            16usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.php_class_prefix,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5587,22 +3885,14 @@ impl FileOptions {
     }
     pub fn php_class_prefix_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            16usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.php_class_prefix,
             &self.bitfield,
         )
     }
     pub fn php_class_prefix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            16usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.php_class_prefix,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5610,11 +3900,7 @@ impl FileOptions {
     }
     pub fn has_php_class_prefix(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            16usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.php_class_prefix,
                 &self.bitfield,
             )
@@ -5622,22 +3908,14 @@ impl FileOptions {
     }
     pub fn clear_php_class_prefix(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            16usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.php_class_prefix,
             &mut self.bitfield,
         )
     }
     pub fn php_namespace(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            17usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.php_namespace,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5645,22 +3923,11 @@ impl FileOptions {
     }
     pub fn php_namespace_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            17usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.php_namespace,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.php_namespace, &self.bitfield)
     }
     pub fn php_namespace_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            17usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.php_namespace,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5668,34 +3935,16 @@ impl FileOptions {
     }
     pub fn has_php_namespace(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            17usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.php_namespace,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.php_namespace, &self.bitfield)
             .is_some()
     }
     pub fn clear_php_namespace(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            17usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.php_namespace,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.php_namespace, &mut self.bitfield)
     }
     pub fn php_metadata_namespace(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            18usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.php_metadata_namespace,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5703,22 +3952,14 @@ impl FileOptions {
     }
     pub fn php_metadata_namespace_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            18usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.php_metadata_namespace,
             &self.bitfield,
         )
     }
     pub fn php_metadata_namespace_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            18usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.php_metadata_namespace,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5726,11 +3967,7 @@ impl FileOptions {
     }
     pub fn has_php_metadata_namespace(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            18usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.php_metadata_namespace,
                 &self.bitfield,
             )
@@ -5738,22 +3975,14 @@ impl FileOptions {
     }
     pub fn clear_php_metadata_namespace(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            18usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.php_metadata_namespace,
             &mut self.bitfield,
         )
     }
     pub fn ruby_package(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            19usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.ruby_package,
             &self.bitfield,
             ::std::default::Default::default,
@@ -5761,22 +3990,11 @@ impl FileOptions {
     }
     pub fn ruby_package_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            19usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.ruby_package,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.ruby_package, &self.bitfield)
     }
     pub fn ruby_package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            19usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.ruby_package,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -5784,54 +4002,31 @@ impl FileOptions {
     }
     pub fn has_ruby_package(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            19usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.ruby_package,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.ruby_package, &self.bitfield)
             .is_some()
     }
     pub fn clear_ruby_package(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            19usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.ruby_package,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.ruby_package, &mut self.bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -5856,231 +4051,147 @@ impl self::_puroro::Message for FileOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.java_package,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 8i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.java_outer_classname,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 10i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.java_multiple_files,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 20i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        3usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.java_generate_equals_and_hash,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 27i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        4usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.java_string_check_utf8,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 9i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        self::_root::google::protobuf::file_options::OptimizeMode,
-                        self::_pinternal::tags::Enum2::<
-                            self::_root::google::protobuf::file_options::OptimizeMode,
-                        >,
-                        5usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.optimize_for,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 11i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        6usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.go_package,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 16i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        7usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.cc_generic_services,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 17i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        8usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.java_generic_services,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 18i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        9usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.py_generic_services,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 42i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        10usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.php_generic_services,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 23i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        11usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 31i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        12usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.cc_enable_arenas,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 36i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        13usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.objc_class_prefix,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 37i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        14usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.csharp_namespace,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 39i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        15usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.swift_prefix,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 40i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        16usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.php_class_prefix,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 41i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        17usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.php_namespace,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 44i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        18usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.php_metadata_namespace,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 45i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        19usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.ruby_package,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -6098,211 +4209,127 @@ impl self::_puroro::Message for FileOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_package,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_outer_classname,
             &self.bitfield,
             8i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_multiple_files,
             &self.bitfield,
             10i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_generate_equals_and_hash,
             &self.bitfield,
             20i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_string_check_utf8,
             &self.bitfield,
             27i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::file_options::OptimizeMode,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::file_options::OptimizeMode,
-            >,
-            5usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.optimize_for,
             &self.bitfield,
             9i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            6usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.go_package,
             &self.bitfield,
             11i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            7usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.cc_generic_services,
             &self.bitfield,
             16i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            8usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_generic_services,
             &self.bitfield,
             17i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            9usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.py_generic_services,
             &self.bitfield,
             18i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            10usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.php_generic_services,
             &self.bitfield,
             42i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            11usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             23i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            12usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.cc_enable_arenas,
             &self.bitfield,
             31i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            13usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.objc_class_prefix,
             &self.bitfield,
             36i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            14usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.csharp_namespace,
             &self.bitfield,
             37i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            15usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.swift_prefix,
             &self.bitfield,
             39i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            16usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.php_class_prefix,
             &self.bitfield,
             40i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            17usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.php_namespace,
             &self.bitfield,
             41i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            18usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.php_metadata_namespace,
             &self.bitfield,
             44i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            19usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.ruby_package,
             &self.bitfield,
             45i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -6315,113 +4342,55 @@ impl ::std::clone::Clone for FileOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::FileOptionsFields {
-                java_package: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.java_package),
-                java_outer_classname: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.java_outer_classname),
-                java_multiple_files: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.java_multiple_files),
-                java_generate_equals_and_hash: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    3usize,
-                > as ::std::clone::Clone>::clone(
+                java_package: ::std::clone::Clone::clone(&self.fields.java_package),
+                java_outer_classname: ::std::clone::Clone::clone(
+                    &self.fields.java_outer_classname,
+                ),
+                java_multiple_files: ::std::clone::Clone::clone(
+                    &self.fields.java_multiple_files,
+                ),
+                java_generate_equals_and_hash: ::std::clone::Clone::clone(
                     &self.fields.java_generate_equals_and_hash,
                 ),
-                java_string_check_utf8: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    4usize,
-                > as ::std::clone::Clone>::clone(&self.fields.java_string_check_utf8),
-                optimize_for: <self::_pinternal::OptionalNumericalField::<
-                    self::_root::google::protobuf::file_options::OptimizeMode,
-                    self::_pinternal::tags::Enum2::<
-                        self::_root::google::protobuf::file_options::OptimizeMode,
-                    >,
-                    5usize,
-                > as ::std::clone::Clone>::clone(&self.fields.optimize_for),
-                go_package: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    6usize,
-                > as ::std::clone::Clone>::clone(&self.fields.go_package),
-                cc_generic_services: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    7usize,
-                > as ::std::clone::Clone>::clone(&self.fields.cc_generic_services),
-                java_generic_services: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    8usize,
-                > as ::std::clone::Clone>::clone(&self.fields.java_generic_services),
-                py_generic_services: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    9usize,
-                > as ::std::clone::Clone>::clone(&self.fields.py_generic_services),
-                php_generic_services: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    10usize,
-                > as ::std::clone::Clone>::clone(&self.fields.php_generic_services),
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    11usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                cc_enable_arenas: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    12usize,
-                > as ::std::clone::Clone>::clone(&self.fields.cc_enable_arenas),
-                objc_class_prefix: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    13usize,
-                > as ::std::clone::Clone>::clone(&self.fields.objc_class_prefix),
-                csharp_namespace: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    14usize,
-                > as ::std::clone::Clone>::clone(&self.fields.csharp_namespace),
-                swift_prefix: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    15usize,
-                > as ::std::clone::Clone>::clone(&self.fields.swift_prefix),
-                php_class_prefix: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    16usize,
-                > as ::std::clone::Clone>::clone(&self.fields.php_class_prefix),
-                php_namespace: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    17usize,
-                > as ::std::clone::Clone>::clone(&self.fields.php_namespace),
-                php_metadata_namespace: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    18usize,
-                > as ::std::clone::Clone>::clone(&self.fields.php_metadata_namespace),
-                ruby_package: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    19usize,
-                > as ::std::clone::Clone>::clone(&self.fields.ruby_package),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                java_string_check_utf8: ::std::clone::Clone::clone(
+                    &self.fields.java_string_check_utf8,
+                ),
+                optimize_for: ::std::clone::Clone::clone(&self.fields.optimize_for),
+                go_package: ::std::clone::Clone::clone(&self.fields.go_package),
+                cc_generic_services: ::std::clone::Clone::clone(
+                    &self.fields.cc_generic_services,
+                ),
+                java_generic_services: ::std::clone::Clone::clone(
+                    &self.fields.java_generic_services,
+                ),
+                py_generic_services: ::std::clone::Clone::clone(
+                    &self.fields.py_generic_services,
+                ),
+                php_generic_services: ::std::clone::Clone::clone(
+                    &self.fields.php_generic_services,
+                ),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                cc_enable_arenas: ::std::clone::Clone::clone(
+                    &self.fields.cc_enable_arenas,
+                ),
+                objc_class_prefix: ::std::clone::Clone::clone(
+                    &self.fields.objc_class_prefix,
+                ),
+                csharp_namespace: ::std::clone::Clone::clone(
+                    &self.fields.csharp_namespace,
+                ),
+                swift_prefix: ::std::clone::Clone::clone(&self.fields.swift_prefix),
+                php_class_prefix: ::std::clone::Clone::clone(
+                    &self.fields.php_class_prefix,
+                ),
+                php_namespace: ::std::clone::Clone::clone(&self.fields.php_namespace),
+                php_metadata_namespace: ::std::clone::Clone::clone(
+                    &self.fields.php_metadata_namespace,
+                ),
+                ruby_package: ::std::clone::Clone::clone(&self.fields.ruby_package),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -6532,11 +4501,7 @@ pub struct MessageOptions {
 impl MessageOptions {
     pub fn message_set_wire_format(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.message_set_wire_format,
             &self.bitfield,
             || false,
@@ -6544,22 +4509,14 @@ impl MessageOptions {
     }
     pub fn message_set_wire_format_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.message_set_wire_format,
             &self.bitfield,
         )
     }
     pub fn message_set_wire_format_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.message_set_wire_format,
             &mut self.bitfield,
             || false,
@@ -6567,11 +4524,7 @@ impl MessageOptions {
     }
     pub fn has_message_set_wire_format(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.message_set_wire_format,
                 &self.bitfield,
             )
@@ -6579,22 +4532,14 @@ impl MessageOptions {
     }
     pub fn clear_message_set_wire_format(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.message_set_wire_format,
             &mut self.bitfield,
         )
     }
     pub fn no_standard_descriptor_accessor(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.no_standard_descriptor_accessor,
             &self.bitfield,
             || false,
@@ -6602,22 +4547,14 @@ impl MessageOptions {
     }
     pub fn no_standard_descriptor_accessor_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.no_standard_descriptor_accessor,
             &self.bitfield,
         )
     }
     pub fn no_standard_descriptor_accessor_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.no_standard_descriptor_accessor,
             &mut self.bitfield,
             || false,
@@ -6625,11 +4562,7 @@ impl MessageOptions {
     }
     pub fn has_no_standard_descriptor_accessor(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.no_standard_descriptor_accessor,
                 &self.bitfield,
             )
@@ -6637,22 +4570,14 @@ impl MessageOptions {
     }
     pub fn clear_no_standard_descriptor_accessor(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.no_standard_descriptor_accessor,
             &mut self.bitfield,
         )
     }
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -6660,22 +4585,11 @@ impl MessageOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -6683,34 +4597,16 @@ impl MessageOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn map_entry(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.map_entry,
             &self.bitfield,
             ::std::default::Default::default,
@@ -6718,19 +4614,11 @@ impl MessageOptions {
     }
     pub fn map_entry_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.map_entry, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.map_entry, &self.bitfield)
     }
     pub fn map_entry_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.map_entry,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -6738,48 +4626,31 @@ impl MessageOptions {
     }
     pub fn has_map_entry(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.map_entry, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.map_entry, &self.bitfield)
             .is_some()
     }
     pub fn clear_map_entry(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.map_entry, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.map_entry, &mut self.bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -6804,53 +4675,35 @@ impl self::_puroro::Message for MessageOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.message_set_wire_format,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.no_standard_descriptor_accessor,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 7i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        3usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.map_entry,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -6868,49 +4721,31 @@ impl self::_puroro::Message for MessageOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.message_set_wire_format,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.no_standard_descriptor_accessor,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.map_entry,
             &self.bitfield,
             7i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -6923,31 +4758,17 @@ impl ::std::clone::Clone for MessageOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::MessageOptionsFields {
-                message_set_wire_format: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.message_set_wire_format),
-                no_standard_descriptor_accessor: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    1usize,
-                > as ::std::clone::Clone>::clone(
+                message_set_wire_format: ::std::clone::Clone::clone(
+                    &self.fields.message_set_wire_format,
+                ),
+                no_standard_descriptor_accessor: ::std::clone::Clone::clone(
                     &self.fields.no_standard_descriptor_accessor,
                 ),
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                map_entry: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    3usize,
-                > as ::std::clone::Clone>::clone(&self.fields.map_entry),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                map_entry: ::std::clone::Clone::clone(&self.fields.map_entry),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -7037,13 +4858,7 @@ pub struct FieldOptions {
 impl FieldOptions {
     pub fn ctype(&self) -> self::_root::google::protobuf::field_options::CType {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::CType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::CType,
-            >,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.ctype,
             &self.bitfield,
             || self::_root::google::protobuf::field_options::CType::String,
@@ -7053,25 +4868,13 @@ impl FieldOptions {
         &self,
     ) -> ::std::option::Option::<self::_root::google::protobuf::field_options::CType> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::CType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::CType,
-            >,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.ctype, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.ctype, &self.bitfield)
     }
     pub fn ctype_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_options::CType {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::CType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::CType,
-            >,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.ctype,
             &mut self.bitfield,
             || self::_root::google::protobuf::field_options::CType::String,
@@ -7079,32 +4882,15 @@ impl FieldOptions {
     }
     pub fn has_ctype(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::CType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::CType,
-            >,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.ctype, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.ctype, &self.bitfield).is_some()
     }
     pub fn clear_ctype(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::CType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::CType,
-            >,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.ctype, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.ctype, &mut self.bitfield)
     }
     pub fn packed(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.packed,
             &self.bitfield,
             ::std::default::Default::default,
@@ -7112,19 +4898,11 @@ impl FieldOptions {
     }
     pub fn packed_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.packed, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.packed, &self.bitfield)
     }
     pub fn packed_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.packed,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -7132,30 +4910,16 @@ impl FieldOptions {
     }
     pub fn has_packed(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.packed, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.packed, &self.bitfield)
             .is_some()
     }
     pub fn clear_packed(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.packed, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.packed, &mut self.bitfield)
     }
     pub fn jstype(&self) -> self::_root::google::protobuf::field_options::JSType {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::JSType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::JSType,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.jstype,
             &self.bitfield,
             || self::_root::google::protobuf::field_options::JSType::JsNormal,
@@ -7165,25 +4929,13 @@ impl FieldOptions {
         &self,
     ) -> ::std::option::Option::<self::_root::google::protobuf::field_options::JSType> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::JSType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::JSType,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.jstype, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.jstype, &self.bitfield)
     }
     pub fn jstype_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_options::JSType {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::JSType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::JSType,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.jstype,
             &mut self.bitfield,
             || self::_root::google::protobuf::field_options::JSType::JsNormal,
@@ -7191,32 +4943,16 @@ impl FieldOptions {
     }
     pub fn has_jstype(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::JSType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::JSType,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.jstype, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.jstype, &self.bitfield)
             .is_some()
     }
     pub fn clear_jstype(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::JSType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::JSType,
-            >,
-            2usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.jstype, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.jstype, &mut self.bitfield)
     }
     pub fn lazy(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.lazy,
             &self.bitfield,
             || false,
@@ -7224,19 +4960,11 @@ impl FieldOptions {
     }
     pub fn lazy_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.lazy, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.lazy, &self.bitfield)
     }
     pub fn lazy_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.lazy,
             &mut self.bitfield,
             || false,
@@ -7244,28 +4972,15 @@ impl FieldOptions {
     }
     pub fn has_lazy(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.lazy, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.lazy, &self.bitfield).is_some()
     }
     pub fn clear_lazy(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.lazy, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.lazy, &mut self.bitfield)
     }
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -7273,22 +4988,11 @@ impl FieldOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -7296,34 +5000,16 @@ impl FieldOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn weak(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.weak,
             &self.bitfield,
             || false,
@@ -7331,19 +5017,11 @@ impl FieldOptions {
     }
     pub fn weak_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.weak, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.weak, &self.bitfield)
     }
     pub fn weak_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.weak,
             &mut self.bitfield,
             || false,
@@ -7351,48 +5029,30 @@ impl FieldOptions {
     }
     pub fn has_weak(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.fields.weak, &self.bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.weak, &self.bitfield).is_some()
     }
     pub fn clear_weak(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            5usize,
-        > as NonRepeatedFieldType>::clear(&mut self.fields.weak, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.weak, &mut self.bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -7417,79 +5077,49 @@ impl self::_puroro::Message for FieldOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        self::_root::google::protobuf::field_options::CType,
-                        self::_pinternal::tags::Enum2::<
-                            self::_root::google::protobuf::field_options::CType,
-                        >,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.ctype,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.packed,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        self::_root::google::protobuf::field_options::JSType,
-                        self::_pinternal::tags::Enum2::<
-                            self::_root::google::protobuf::field_options::JSType,
-                        >,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.jstype,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        3usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.lazy,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        4usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 10i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        5usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.weak,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -7507,73 +5137,43 @@ impl self::_puroro::Message for FieldOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::CType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::CType,
-            >,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.ctype,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.packed,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::field_options::JSType,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::field_options::JSType,
-            >,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.jstype,
             &self.bitfield,
             6i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            3usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.lazy,
             &self.bitfield,
             5i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            4usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            5usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.weak,
             &self.bitfield,
             10i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -7586,43 +5186,15 @@ impl ::std::clone::Clone for FieldOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::FieldOptionsFields {
-                ctype: <self::_pinternal::OptionalNumericalField::<
-                    self::_root::google::protobuf::field_options::CType,
-                    self::_pinternal::tags::Enum2::<
-                        self::_root::google::protobuf::field_options::CType,
-                    >,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.ctype),
-                packed: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.packed),
-                jstype: <self::_pinternal::OptionalNumericalField::<
-                    self::_root::google::protobuf::field_options::JSType,
-                    self::_pinternal::tags::Enum2::<
-                        self::_root::google::protobuf::field_options::JSType,
-                    >,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.jstype),
-                lazy: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    3usize,
-                > as ::std::clone::Clone>::clone(&self.fields.lazy),
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    4usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                weak: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    5usize,
-                > as ::std::clone::Clone>::clone(&self.fields.weak),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                ctype: ::std::clone::Clone::clone(&self.fields.ctype),
+                packed: ::std::clone::Clone::clone(&self.fields.packed),
+                jstype: ::std::clone::Clone::clone(&self.fields.jstype),
+                lazy: ::std::clone::Clone::clone(&self.fields.lazy),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                weak: ::std::clone::Clone::clone(&self.fields.weak),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -7676,29 +5248,20 @@ impl OneofOptions {
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -7723,9 +5286,7 @@ impl self::_puroro::Message for OneofOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -7743,9 +5304,7 @@ impl self::_puroro::Message for OneofOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -7758,9 +5317,9 @@ impl ::std::clone::Clone for OneofOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::OneofOptionsFields {
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -7811,11 +5370,7 @@ pub struct EnumOptions {
 impl EnumOptions {
     pub fn allow_alias(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.allow_alias,
             &self.bitfield,
             ::std::default::Default::default,
@@ -7823,22 +5378,11 @@ impl EnumOptions {
     }
     pub fn allow_alias_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.allow_alias,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.allow_alias, &self.bitfield)
     }
     pub fn allow_alias_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.allow_alias,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -7846,34 +5390,16 @@ impl EnumOptions {
     }
     pub fn has_allow_alias(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.allow_alias,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.allow_alias, &self.bitfield)
             .is_some()
     }
     pub fn clear_allow_alias(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.allow_alias,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.allow_alias, &mut self.bitfield)
     }
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -7881,22 +5407,11 @@ impl EnumOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -7904,54 +5419,31 @@ impl EnumOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -7976,31 +5468,21 @@ impl self::_puroro::Message for EnumOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.allow_alias,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -8018,29 +5500,19 @@ impl self::_puroro::Message for EnumOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.allow_alias,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -8053,19 +5525,11 @@ impl ::std::clone::Clone for EnumOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::EnumOptionsFields {
-                allow_alias: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.allow_alias),
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                allow_alias: ::std::clone::Clone::clone(&self.fields.allow_alias),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -8115,11 +5579,7 @@ pub struct EnumValueOptions {
 impl EnumValueOptions {
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -8127,22 +5587,11 @@ impl EnumValueOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -8150,54 +5599,31 @@ impl EnumValueOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -8222,20 +5648,14 @@ impl self::_puroro::Message for EnumValueOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -8253,19 +5673,13 @@ impl self::_puroro::Message for EnumValueOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -8278,14 +5692,10 @@ impl ::std::clone::Clone for EnumValueOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::EnumValueOptionsFields {
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -8333,11 +5743,7 @@ pub struct ServiceOptions {
 impl ServiceOptions {
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -8345,22 +5751,11 @@ impl ServiceOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -8368,54 +5763,31 @@ impl ServiceOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn uninterpreted_option(
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -8440,20 +5812,14 @@ impl self::_puroro::Message for ServiceOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 33i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -8471,19 +5837,13 @@ impl self::_puroro::Message for ServiceOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             33i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -8496,14 +5856,10 @@ impl ::std::clone::Clone for ServiceOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::ServiceOptionsFields {
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -8558,11 +5914,7 @@ pub struct MethodOptions {
 impl MethodOptions {
     pub fn deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.deprecated,
             &self.bitfield,
             || false,
@@ -8570,22 +5922,11 @@ impl MethodOptions {
     }
     pub fn deprecated_opt(&self) -> ::std::option::Option::<bool> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.deprecated,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.deprecated,
             &mut self.bitfield,
             || false,
@@ -8593,38 +5934,18 @@ impl MethodOptions {
     }
     pub fn has_deprecated(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.deprecated,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.deprecated, &self.bitfield)
             .is_some()
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.deprecated,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.deprecated, &mut self.bitfield)
     }
     pub fn idempotency_level(
         &self,
     ) -> self::_root::google::protobuf::method_options::IdempotencyLevel {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::method_options::IdempotencyLevel,
-            >,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.idempotency_level,
             &self.bitfield,
             || {
@@ -8638,13 +5959,7 @@ impl MethodOptions {
         self::_root::google::protobuf::method_options::IdempotencyLevel,
     > {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::method_options::IdempotencyLevel,
-            >,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.idempotency_level,
             &self.bitfield,
         )
@@ -8653,13 +5968,7 @@ impl MethodOptions {
         &mut self,
     ) -> &mut self::_root::google::protobuf::method_options::IdempotencyLevel {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::method_options::IdempotencyLevel,
-            >,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.idempotency_level,
             &mut self.bitfield,
             || {
@@ -8669,13 +5978,7 @@ impl MethodOptions {
     }
     pub fn has_idempotency_level(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::method_options::IdempotencyLevel,
-            >,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.idempotency_level,
                 &self.bitfield,
             )
@@ -8683,13 +5986,7 @@ impl MethodOptions {
     }
     pub fn clear_idempotency_level(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::method_options::IdempotencyLevel,
-            >,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.idempotency_level,
             &mut self.bitfield,
         )
@@ -8698,29 +5995,20 @@ impl MethodOptions {
         &self,
     ) -> &[self::_root::google::protobuf::UninterpretedOption] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field(
-            &self.fields.uninterpreted_option,
-            &self.bitfield,
-        )
+        RepeatedFieldType::get_field(&self.fields.uninterpreted_option, &self.bitfield)
     }
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::get_field_mut(
+        RepeatedFieldType::get_field_mut(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as RepeatedFieldType>::clear(
+        RepeatedFieldType::clear(
             &mut self.fields.uninterpreted_option,
             &mut self.bitfield,
         )
@@ -8745,33 +6033,21 @@ impl self::_puroro::Message for MethodOptions {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 33i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        bool,
-                        self::_pinternal::tags::Bool,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.deprecated,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 34i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        self::_root::google::protobuf::method_options::IdempotencyLevel,
-                        self::_pinternal::tags::Enum2::<
-                            self::_root::google::protobuf::method_options::IdempotencyLevel,
-                        >,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.idempotency_level,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 999i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::UninterpretedOption,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.uninterpreted_option,
                         &mut self.bitfield,
                         field_data,
@@ -8789,31 +6065,19 @@ impl self::_puroro::Message for MethodOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            bool,
-            self::_pinternal::tags::Bool,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
             33i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            self::_root::google::protobuf::method_options::IdempotencyLevel,
-            self::_pinternal::tags::Enum2::<
-                self::_root::google::protobuf::method_options::IdempotencyLevel,
-            >,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.idempotency_level,
             &self.bitfield,
             34i32,
             out,
         )?;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::UninterpretedOption,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
@@ -8826,21 +6090,13 @@ impl ::std::clone::Clone for MethodOptions {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::MethodOptionsFields {
-                deprecated: <self::_pinternal::OptionalNumericalField::<
-                    bool,
-                    self::_pinternal::tags::Bool,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.deprecated),
-                idempotency_level: <self::_pinternal::OptionalNumericalField::<
-                    self::_root::google::protobuf::method_options::IdempotencyLevel,
-                    self::_pinternal::tags::Enum2::<
-                        self::_root::google::protobuf::method_options::IdempotencyLevel,
-                    >,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.idempotency_level),
-                uninterpreted_option: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::UninterpretedOption,
-                > as ::std::clone::Clone>::clone(&self.fields.uninterpreted_option),
+                deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                idempotency_level: ::std::clone::Clone::clone(
+                    &self.fields.idempotency_level,
+                ),
+                uninterpreted_option: ::std::clone::Clone::clone(
+                    &self.fields.uninterpreted_option,
+                ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -8917,9 +6173,7 @@ impl UninterpretedOption {
         &self,
     ) -> &[self::_root::google::protobuf::uninterpreted_option::NamePart] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::uninterpreted_option::NamePart,
-        > as RepeatedFieldType>::get_field(&self.fields.name, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.name, &self.bitfield)
     }
     pub fn name_mut(
         &mut self,
@@ -8927,23 +6181,15 @@ impl UninterpretedOption {
         self::_root::google::protobuf::uninterpreted_option::NamePart,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::uninterpreted_option::NamePart,
-        > as RepeatedFieldType>::get_field_mut(&mut self.fields.name, &mut self.bitfield)
+        RepeatedFieldType::get_field_mut(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::uninterpreted_option::NamePart,
-        > as RepeatedFieldType>::clear(&mut self.fields.name, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.name, &mut self.bitfield)
     }
     pub fn identifier_value(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.identifier_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -8951,22 +6197,14 @@ impl UninterpretedOption {
     }
     pub fn identifier_value_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.identifier_value,
             &self.bitfield,
         )
     }
     pub fn identifier_value_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.identifier_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -8974,11 +6212,7 @@ impl UninterpretedOption {
     }
     pub fn has_identifier_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.identifier_value,
                 &self.bitfield,
             )
@@ -8986,22 +6220,14 @@ impl UninterpretedOption {
     }
     pub fn clear_identifier_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.identifier_value,
             &mut self.bitfield,
         )
     }
     pub fn positive_int_value(&self) -> u64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            u64,
-            self::_pinternal::tags::UInt64,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.positive_int_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -9009,22 +6235,14 @@ impl UninterpretedOption {
     }
     pub fn positive_int_value_opt(&self) -> ::std::option::Option::<u64> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            u64,
-            self::_pinternal::tags::UInt64,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.positive_int_value,
             &self.bitfield,
         )
     }
     pub fn positive_int_value_mut(&mut self) -> &mut u64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            u64,
-            self::_pinternal::tags::UInt64,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.positive_int_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -9032,11 +6250,7 @@ impl UninterpretedOption {
     }
     pub fn has_positive_int_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            u64,
-            self::_pinternal::tags::UInt64,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.positive_int_value,
                 &self.bitfield,
             )
@@ -9044,22 +6258,14 @@ impl UninterpretedOption {
     }
     pub fn clear_positive_int_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            u64,
-            self::_pinternal::tags::UInt64,
-            1usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.positive_int_value,
             &mut self.bitfield,
         )
     }
     pub fn negative_int_value(&self) -> i64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.negative_int_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -9067,22 +6273,14 @@ impl UninterpretedOption {
     }
     pub fn negative_int_value_opt(&self) -> ::std::option::Option::<i64> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
             &self.fields.negative_int_value,
             &self.bitfield,
         )
     }
     pub fn negative_int_value_mut(&mut self) -> &mut i64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.negative_int_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -9090,11 +6288,7 @@ impl UninterpretedOption {
     }
     pub fn has_negative_int_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-            2usize,
-        > as NonRepeatedFieldType>::get_field_opt(
+        NonRepeatedFieldType::get_field_opt(
                 &self.fields.negative_int_value,
                 &self.bitfield,
             )
@@ -9102,22 +6296,14 @@ impl UninterpretedOption {
     }
     pub fn clear_negative_int_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-            2usize,
-        > as NonRepeatedFieldType>::clear(
+        NonRepeatedFieldType::clear(
             &mut self.fields.negative_int_value,
             &mut self.bitfield,
         )
     }
     pub fn double_value(&self) -> f64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            f64,
-            self::_pinternal::tags::Double,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.double_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -9125,22 +6311,11 @@ impl UninterpretedOption {
     }
     pub fn double_value_opt(&self) -> ::std::option::Option::<f64> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            f64,
-            self::_pinternal::tags::Double,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.double_value,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.double_value, &self.bitfield)
     }
     pub fn double_value_mut(&mut self) -> &mut f64 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            f64,
-            self::_pinternal::tags::Double,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.double_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -9148,34 +6323,16 @@ impl UninterpretedOption {
     }
     pub fn has_double_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            f64,
-            self::_pinternal::tags::Double,
-            3usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.double_value,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.double_value, &self.bitfield)
             .is_some()
     }
     pub fn clear_double_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            f64,
-            self::_pinternal::tags::Double,
-            3usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.double_value,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.double_value, &mut self.bitfield)
     }
     pub fn string_value(&self) -> &[u8] {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::vec::Vec<u8>,
-            self::_pinternal::tags::Bytes,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.string_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -9183,22 +6340,11 @@ impl UninterpretedOption {
     }
     pub fn string_value_opt(&self) -> ::std::option::Option::<&[u8]> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::vec::Vec<u8>,
-            self::_pinternal::tags::Bytes,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.string_value,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.string_value, &self.bitfield)
     }
     pub fn string_value_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::vec::Vec<u8>,
-            self::_pinternal::tags::Bytes,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.string_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -9206,34 +6352,16 @@ impl UninterpretedOption {
     }
     pub fn has_string_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::vec::Vec<u8>,
-            self::_pinternal::tags::Bytes,
-            4usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.string_value,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.string_value, &self.bitfield)
             .is_some()
     }
     pub fn clear_string_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::vec::Vec<u8>,
-            self::_pinternal::tags::Bytes,
-            4usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.string_value,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.string_value, &mut self.bitfield)
     }
     pub fn aggregate_value(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
+        NonRepeatedFieldType::get_field_or_else(
             &self.fields.aggregate_value,
             &self.bitfield,
             ::std::default::Default::default,
@@ -9241,22 +6369,11 @@ impl UninterpretedOption {
     }
     pub fn aggregate_value_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-            &self.fields.aggregate_value,
-            &self.bitfield,
-        )
+        NonRepeatedFieldType::get_field_opt(&self.fields.aggregate_value, &self.bitfield)
     }
     pub fn aggregate_value_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_mut(
+        NonRepeatedFieldType::get_field_mut(
             &mut self.fields.aggregate_value,
             &mut self.bitfield,
             ::std::default::Default::default,
@@ -9264,26 +6381,12 @@ impl UninterpretedOption {
     }
     pub fn has_aggregate_value(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::get_field_opt(
-                &self.fields.aggregate_value,
-                &self.bitfield,
-            )
+        NonRepeatedFieldType::get_field_opt(&self.fields.aggregate_value, &self.bitfield)
             .is_some()
     }
     pub fn clear_aggregate_value(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as NonRepeatedFieldType>::clear(
-            &mut self.fields.aggregate_value,
-            &mut self.bitfield,
-        )
+        NonRepeatedFieldType::clear(&mut self.fields.aggregate_value, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for UninterpretedOption {
@@ -9305,75 +6408,49 @@ impl self::_puroro::Message for UninterpretedOption {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 2i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::uninterpreted_option::NamePart,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.name,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.identifier_value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 4i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        u64,
-                        self::_pinternal::tags::UInt64,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.positive_int_value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 5i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i64,
-                        self::_pinternal::tags::Int64,
-                        2usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.negative_int_value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 6i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        f64,
-                        self::_pinternal::tags::Double,
-                        3usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.double_value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 7i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::vec::Vec<u8>,
-                        self::_pinternal::tags::Bytes,
-                        4usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.string_value,
                         &mut self.bitfield,
                         field_data,
                     )?
                 }
                 8i32 => {
-                    <self::_pinternal::OptionalUnsizedField::<
-                        ::std::string::String,
-                        self::_pinternal::tags::String,
-                        5usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.aggregate_value,
                         &mut self.bitfield,
                         field_data,
@@ -9391,69 +6468,43 @@ impl self::_puroro::Message for UninterpretedOption {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::uninterpreted_option::NamePart,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.identifier_value,
             &self.bitfield,
             3i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            u64,
-            self::_pinternal::tags::UInt64,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.positive_int_value,
             &self.bitfield,
             4i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            i64,
-            self::_pinternal::tags::Int64,
-            2usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.negative_int_value,
             &self.bitfield,
             5i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            f64,
-            self::_pinternal::tags::Double,
-            3usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.double_value,
             &self.bitfield,
             6i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::vec::Vec<u8>,
-            self::_pinternal::tags::Bytes,
-            4usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.string_value,
             &self.bitfield,
             7i32,
             out,
         )?;
-        <self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            5usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.aggregate_value,
             &self.bitfield,
             8i32,
@@ -9466,39 +6517,19 @@ impl ::std::clone::Clone for UninterpretedOption {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::UninterpretedOptionFields {
-                name: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::uninterpreted_option::NamePart,
-                > as ::std::clone::Clone>::clone(&self.fields.name),
-                identifier_value: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    0usize,
-                > as ::std::clone::Clone>::clone(&self.fields.identifier_value),
-                positive_int_value: <self::_pinternal::OptionalNumericalField::<
-                    u64,
-                    self::_pinternal::tags::UInt64,
-                    1usize,
-                > as ::std::clone::Clone>::clone(&self.fields.positive_int_value),
-                negative_int_value: <self::_pinternal::OptionalNumericalField::<
-                    i64,
-                    self::_pinternal::tags::Int64,
-                    2usize,
-                > as ::std::clone::Clone>::clone(&self.fields.negative_int_value),
-                double_value: <self::_pinternal::OptionalNumericalField::<
-                    f64,
-                    self::_pinternal::tags::Double,
-                    3usize,
-                > as ::std::clone::Clone>::clone(&self.fields.double_value),
-                string_value: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::vec::Vec<u8>,
-                    self::_pinternal::tags::Bytes,
-                    4usize,
-                > as ::std::clone::Clone>::clone(&self.fields.string_value),
-                aggregate_value: <self::_pinternal::OptionalUnsizedField::<
-                    ::std::string::String,
-                    self::_pinternal::tags::String,
-                    5usize,
-                > as ::std::clone::Clone>::clone(&self.fields.aggregate_value),
+                name: ::std::clone::Clone::clone(&self.fields.name),
+                identifier_value: ::std::clone::Clone::clone(
+                    &self.fields.identifier_value,
+                ),
+                positive_int_value: ::std::clone::Clone::clone(
+                    &self.fields.positive_int_value,
+                ),
+                negative_int_value: ::std::clone::Clone::clone(
+                    &self.fields.negative_int_value,
+                ),
+                double_value: ::std::clone::Clone::clone(&self.fields.double_value),
+                string_value: ::std::clone::Clone::clone(&self.fields.string_value),
+                aggregate_value: ::std::clone::Clone::clone(&self.fields.aggregate_value),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -9553,9 +6584,7 @@ impl SourceCodeInfo {
         &self,
     ) -> &[self::_root::google::protobuf::source_code_info::Location] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::source_code_info::Location,
-        > as RepeatedFieldType>::get_field(&self.fields.location, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.location, &self.bitfield)
     }
     pub fn location_mut(
         &mut self,
@@ -9563,18 +6592,11 @@ impl SourceCodeInfo {
         self::_root::google::protobuf::source_code_info::Location,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::source_code_info::Location,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.location,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.location, &mut self.bitfield)
     }
     pub fn clear_location(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::source_code_info::Location,
-        > as RepeatedFieldType>::clear(&mut self.fields.location, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.location, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for SourceCodeInfo {
@@ -9596,9 +6618,7 @@ impl self::_puroro::Message for SourceCodeInfo {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::source_code_info::Location,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.location,
                         &mut self.bitfield,
                         field_data,
@@ -9616,9 +6636,7 @@ impl self::_puroro::Message for SourceCodeInfo {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::source_code_info::Location,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.location,
             &self.bitfield,
             1i32,
@@ -9631,9 +6649,7 @@ impl ::std::clone::Clone for SourceCodeInfo {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::SourceCodeInfoFields {
-                location: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::source_code_info::Location,
-                > as ::std::clone::Clone>::clone(&self.fields.location),
+                location: ::std::clone::Clone::clone(&self.fields.location),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
@@ -9676,9 +6692,7 @@ impl GeneratedCodeInfo {
         &self,
     ) -> &[self::_root::google::protobuf::generated_code_info::Annotation] {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::generated_code_info::Annotation,
-        > as RepeatedFieldType>::get_field(&self.fields.annotation, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.annotation, &self.bitfield)
     }
     pub fn annotation_mut(
         &mut self,
@@ -9686,18 +6700,11 @@ impl GeneratedCodeInfo {
         self::_root::google::protobuf::generated_code_info::Annotation,
     > {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::generated_code_info::Annotation,
-        > as RepeatedFieldType>::get_field_mut(
-            &mut self.fields.annotation,
-            &mut self.bitfield,
-        )
+        RepeatedFieldType::get_field_mut(&mut self.fields.annotation, &mut self.bitfield)
     }
     pub fn clear_annotation(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::generated_code_info::Annotation,
-        > as RepeatedFieldType>::clear(&mut self.fields.annotation, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.annotation, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for GeneratedCodeInfo {
@@ -9719,9 +6726,7 @@ impl self::_puroro::Message for GeneratedCodeInfo {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::RepeatedMessageField::<
-                        self::_root::google::protobuf::generated_code_info::Annotation,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
+                    self::_pinternal::FieldType::deser_from_iter(
                         &mut self.fields.annotation,
                         &mut self.bitfield,
                         field_data,
@@ -9739,9 +6744,7 @@ impl self::_puroro::Message for GeneratedCodeInfo {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::RepeatedMessageField::<
-            self::_root::google::protobuf::generated_code_info::Annotation,
-        > as self::_pinternal::FieldType>::ser_to_write(
+        self::_pinternal::FieldType::ser_to_write(
             &self.fields.annotation,
             &self.bitfield,
             1i32,
@@ -9754,9 +6757,7 @@ impl ::std::clone::Clone for GeneratedCodeInfo {
     fn clone(&self) -> Self {
         Self {
             fields: self::_fields::GeneratedCodeInfoFields {
-                annotation: <self::_pinternal::RepeatedMessageField::<
-                    self::_root::google::protobuf::generated_code_info::Annotation,
-                > as ::std::clone::Clone>::clone(&self.fields.annotation),
+                annotation: ::std::clone::Clone::clone(&self.fields.annotation),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
