@@ -14,7 +14,9 @@
 
 use super::super::util::*;
 use super::{FieldExt, FieldOrOneof, FieldOrOneofCase, OneofExt};
-use crate::syn::{parse2, Arm, Expr, Field as SynField, Ident, ImplItemMethod, NamedField, Type};
+use crate::syn::{
+    parse2, Arm, Expr, Field as SynField, Ident, ImplItemMethod, NamedField, Stmt, Type,
+};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
@@ -33,6 +35,7 @@ pub trait FieldOrOneofExt {
         &self,
         field_data_expr: &Expr,
     ) -> Result<Vec<Arm>>;
+    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
 }
 
 #[derive(Debug, Default)]
@@ -97,11 +100,22 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
     ) -> Result<Vec<Arm>> {
         match self.either() {
             FieldOrOneofCase::Field(f) => {
-                let arm = FieldExt::gen_message_struct_impl_deser_arm(f, field_data_expr)?;
+                let arm = FieldExt::gen_message_struct_impl_message_deser_arm(f, field_data_expr)?;
                 Ok(vec![arm])
             }
             FieldOrOneofCase::Oneof(o) => {
                 OneofExt::gen_message_struct_impl_message_deser_arms(o, field_data_expr)
+            }
+        }
+    }
+
+    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => {
+                FieldExt::gen_message_struct_impl_message_ser_stmt(f, out_expr)
+            }
+            FieldOrOneofCase::Oneof(o) => {
+                OneofExt::gen_message_struct_impl_message_ser_stmt(o, out_expr)
             }
         }
     }

@@ -37,7 +37,7 @@ pub trait FieldExt {
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
-    fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
+    fn gen_message_struct_impl_message_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
     fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
     fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
@@ -148,7 +148,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             #ident: ::std::clone::Clone::clone(&self.fields.#ident)
         })?)
     }
-    fn gen_message_struct_impl_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
+    fn gen_message_struct_impl_message_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
         Ok(parse2(quote! {

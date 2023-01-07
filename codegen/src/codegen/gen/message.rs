@@ -196,13 +196,9 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
         })
         .flatten_ok()
         .collect::<Result<Vec<_>>>()?;
-    let ser_fields = this
-        .fields()?
-        .map(|f| f.gen_message_struct_impl_message_ser_stmt(&out_expr))
-        .collect::<Result<Vec<_>>>()?;
-    let ser_oneof_stmts = this
-        .oneofs()?
-        .map(|o| o.gen_message_struct_impl_message_ser_stmt(&out_expr))
+    let ser_stmts = this
+        .fields_or_oneofs()?
+        .map(|fo| fo.gen_message_struct_impl_message_ser_stmt(&out_expr))
         .collect::<Result<Vec<_>>>()?;
 
     Ok(parse2(quote! {
@@ -227,8 +223,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
 
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                #(#ser_fields)*
-                #(#ser_oneof_stmts)*
+                #(#ser_stmts)*
                 ::std::result::Result::Ok(())
             }
         }
