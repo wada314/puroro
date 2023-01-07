@@ -36,7 +36,7 @@ pub trait OneofExt {
     fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
     fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
 
-    fn gen_fields_struct_field_type_impl(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
     fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
@@ -185,7 +185,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_fields_struct_field_type_impl(&self) -> Result<Rc<Type>> {
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
         let generic_params = self
             .fields()?
             .map(|f| f.gen_oneof_union_field_type())

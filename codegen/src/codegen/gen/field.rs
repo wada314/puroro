@@ -33,7 +33,7 @@ pub trait FieldExt {
     fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
-    fn gen_fields_struct_field_type_impl(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
@@ -98,7 +98,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         }
     }
 
-    fn gen_fields_struct_field_type_impl(&self) -> Result<Rc<Type>> {
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
         use FieldRule::*;
         use FieldType::*;
         use LengthDelimitedType::*;

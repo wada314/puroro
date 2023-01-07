@@ -65,10 +65,10 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             .fields_struct_field_type
             .get_or_try_init(|| match self.either() {
                 crate::codegen::data::FieldOrOneofCase::Field(f) => {
-                    f.gen_fields_struct_field_type_impl()
+                    FieldExt::gen_fields_struct_field_type(f)
                 }
                 crate::codegen::data::FieldOrOneofCase::Oneof(o) => {
-                    o.gen_fields_struct_field_type_impl()
+                    OneofExt::gen_fields_struct_field_type(o)
                 }
             })
             .cloned()
@@ -85,8 +85,12 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.either() {
-            crate::codegen::data::FieldOrOneofCase::Field(f) => todo!(),
-            crate::codegen::data::FieldOrOneofCase::Oneof(o) => todo!(),
+            crate::codegen::data::FieldOrOneofCase::Field(f) => {
+                FieldExt::gen_message_struct_methods(f)
+            }
+            crate::codegen::data::FieldOrOneofCase::Oneof(o) => {
+                OneofExt::gen_message_struct_methods(o)
+            }
         }
     }
 }

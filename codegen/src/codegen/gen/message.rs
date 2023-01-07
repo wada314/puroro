@@ -100,14 +100,9 @@ impl<T: ?Sized + Message> MessageExt for T {
             .collect::<Result<Vec<_>>>()?;
         let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
 
-        let field_methods = self
-            .fields()?
-            .map(|f| Ok(f.gen_message_struct_methods()?.into_iter()))
-            .flatten_ok()
-            .collect::<Result<Vec<_>>>()?;
-        let oneof_methods = self
-            .oneofs()?
-            .map(|o| Ok(o.gen_message_struct_methods()?.into_iter()))
+        let fields_or_oneofs_methods = self
+            .fields_or_oneofs()?
+            .map(|fo| (Ok(fo.gen_message_struct_methods()?.into_iter())))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let oneofs = self.oneofs()?.collect::<Vec<_>>();
@@ -134,8 +129,7 @@ impl<T: ?Sized + Message> MessageExt for T {
         })?;
         let impl_struct = parse2(quote! {
             impl #ident {
-                #(#field_methods)*
-                #(#oneof_methods)*
+                #(#fields_or_oneofs_methods)*
                 #(#oneof_field_methods)*
             }
         })?;
