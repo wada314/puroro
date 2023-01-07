@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{FieldExt, FieldOrOneof, OneofExt};
-use crate::syn::{parse2, Field as SynField, Ident, ImplItemMethod, NamedField, Type};
+use super::{FieldExt, FieldOrOneof, FieldOrOneofCase, OneofExt};
+use crate::syn::{parse2, Arm, Expr, Field as SynField, Ident, ImplItemMethod, NamedField, Type};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
@@ -28,6 +28,11 @@ pub trait FieldOrOneofExt {
     fn gen_fields_struct_field(&self) -> Result<SynField>;
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
+
+    fn gen_message_struct_impl_message_deser_arms(
+        &self,
+        field_data_expr: &Expr,
+    ) -> Result<Vec<Arm>>;
 }
 
 #[derive(Debug, Default)]
@@ -64,12 +69,8 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             .get::<Cache>()?
             .fields_struct_field_type
             .get_or_try_init(|| match self.either() {
-                crate::codegen::data::FieldOrOneofCase::Field(f) => {
-                    FieldExt::gen_fields_struct_field_type(f)
-                }
-                crate::codegen::data::FieldOrOneofCase::Oneof(o) => {
-                    OneofExt::gen_fields_struct_field_type(o)
-                }
+                FieldOrOneofCase::Field(f) => FieldExt::gen_fields_struct_field_type(f),
+                FieldOrOneofCase::Oneof(o) => OneofExt::gen_fields_struct_field_type(o),
             })
             .cloned()
     }
@@ -85,11 +86,22 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.either() {
-            crate::codegen::data::FieldOrOneofCase::Field(f) => {
-                FieldExt::gen_message_struct_methods(f)
+            FieldOrOneofCase::Field(f) => FieldExt::gen_message_struct_methods(f),
+            FieldOrOneofCase::Oneof(o) => OneofExt::gen_message_struct_methods(o),
+        }
+    }
+
+    fn gen_message_struct_impl_message_deser_arms(
+        &self,
+        field_data_expr: &Expr,
+    ) -> Result<Vec<Arm>> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => {
+                let arm = FieldExt::gen_message_struct_impl_deser_arm(f, field_data_expr)?;
+                Ok(vec![arm])
             }
-            crate::codegen::data::FieldOrOneofCase::Oneof(o) => {
-                OneofExt::gen_message_struct_methods(o)
+            FieldOrOneofCase::Oneof(o) => {
+                OneofExt::gen_message_struct_impl_message_deser_arms(o, field_data_expr)
             }
         }
     }
