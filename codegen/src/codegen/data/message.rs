@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    Enum, EnumImpl, Field, FieldImpl, InputFile, Oneof, OneofImpl, Package, PackageOrMessage,
-    RootPackage,
+    DataTypeBase, Enum, EnumImpl, Field, FieldImpl, FieldOrOneof, InputFile, Oneof, OneofImpl,
+    Package, PackageOrMessage, PackageOrMessageCase, RootPackage,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -29,6 +29,7 @@ pub trait Message: Debug + PackageOrMessage {
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>>;
+    fn fields_or_oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();
@@ -150,13 +151,20 @@ impl MessageImpl {
     }
 }
 
-impl PackageOrMessage for MessageImpl {
+impl DataTypeBase for MessageImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
+
+impl PackageOrMessage for MessageImpl {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+        PackageOrMessageCase::Message(self)
+    }
+
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
@@ -186,5 +194,16 @@ impl Message for MessageImpl {
     }
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
+    }
+    fn fields_or_oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {
+        let fields = self
+            .fields
+            .iter()
+            .map(|f| f.clone() as Rc<dyn FieldOrOneof>);
+        let oneofs = self
+            .oneofs
+            .iter()
+            .map(|o| o.clone() as Rc<dyn FieldOrOneof>);
+        Ok(Box::new(fields.chain(oneofs)))
     }
 }

@@ -18,15 +18,13 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::super::util::*;
-use super::{InputFile, PackageOrMessage, Syntax};
+use super::{DataTypeBase, InputFile, PackageOrMessage, Syntax};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait Enum: Debug {
-    fn cache(&self) -> &AnonymousCache;
-    fn name(&self) -> &str;
+pub trait Enum: DataTypeBase + Debug {
     fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
     fn syntax(&self) -> Result<Syntax>;
@@ -62,13 +60,16 @@ impl EnumImpl {
     }
 }
 
-impl Enum for EnumImpl {
+impl DataTypeBase for EnumImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
-    fn name(&self) -> &str {
-        &self.name
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
     }
+}
+
+impl Enum for EnumImpl {
     fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>> {
         Ok(Box::new(self.values.iter().map(|(s, n)| (s.as_str(), *n))))
     }

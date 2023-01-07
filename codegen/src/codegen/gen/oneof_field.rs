@@ -14,7 +14,10 @@
 
 use super::super::util::*;
 use super::field::gen_default_fn;
-use super::{FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField, PURORO_INTERNAL};
+use super::{
+    FieldOrOneofExt, FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField,
+    PURORO_INTERNAL,
+};
 use crate::syn::{
     parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
     Type,
@@ -43,7 +46,7 @@ pub trait OneofFieldExt {
     fn gen_oneof_union_field(&self) -> Result<Rc<Field>>;
     fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall>;
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
 }
 
 #[derive(Debug, Default)]
@@ -285,7 +288,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     }
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
-        let oneof_struct_field_ident = self.oneof()?.gen_message_struct_field_ident()?;
+        let oneof_struct_field_ident = self.oneof()?.gen_fields_struct_field_ident()?;
         let getter_ident = self.gen_oneof_union_getter_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
@@ -342,11 +345,13 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: Expr) -> Result<ExprMethodCall> {
+    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
         let ident = self.gen_oneof_union_field_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
-        Ok(parse2(quote! {
+        let new_expr: ExprMethodCall = parse2(quote! {
             #receiver.field(stringify!(#ident), &self.#getter_opt_ident())
-        })?)
+        })?;
+        *receiver = new_expr.into();
+        Ok(())
     }
 }

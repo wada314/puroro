@@ -42,7 +42,7 @@ struct Cache {
 
 impl<T: ?Sized + Enum> EnumExt for T {
     fn gen_enum_items(&self) -> Result<Vec<Item>> {
-        let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+        let ident = format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
         let value_idents = self
             .values()?
             .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))
@@ -95,7 +95,8 @@ impl<T: ?Sized + Enum> EnumExt for T {
             .get::<Cache>()?
             .enum_path
             .get_or_try_init(|| {
-                let ident = format_ident!("{}", self.name().to_camel_case().escape_rust_keywords());
+                let ident =
+                    format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
                 let parent = self.parent()?.gen_rust_module_path()?;
                 Ok(Rc::new(syn::parse2(quote! { #parent :: #ident })?))
             })
@@ -115,7 +116,7 @@ impl<T: ?Sized + Enum> EnumExt for T {
 }
 
 fn gen_enum_into_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
-    let ident = format_ident!("{}", this.name().to_camel_case().escape_rust_keywords());
+    let ident = format_ident!("{}", this.name()?.to_camel_case().escape_rust_keywords());
     let syntax = this.syntax()?;
     let value_idents = this
         .values()?
@@ -143,7 +144,7 @@ fn gen_enum_into_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
 
 fn gen_enum_from_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
     debug_assert_eq!(this.syntax()?, Syntax::Proto3);
-    let ident = format_ident!("{}", this.name().to_camel_case().escape_rust_keywords());
+    let ident = format_ident!("{}", this.name()?.to_camel_case().escape_rust_keywords());
     let value_idents = this
         .values()?
         .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))
@@ -163,7 +164,7 @@ fn gen_enum_from_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
 
 fn gen_enum_try_from_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
     debug_assert_eq!(this.syntax()?, Syntax::Proto2);
-    let ident = format_ident!("{}", this.name().to_camel_case().escape_rust_keywords());
+    let ident = format_ident!("{}", this.name()?.to_camel_case().escape_rust_keywords());
     let value_idents = this
         .values()?
         .map(|(name, _)| format_ident!("{}", name.to_camel_case().escape_rust_keywords()))

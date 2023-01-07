@@ -13,14 +13,14 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{FieldBase, FieldOrOneof, FieldType, Message, Oneof};
+use super::{DataTypeBase, FieldBase, FieldType, Message, Oneof};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait OneofField: FieldBase + Debug {
+pub trait OneofField: FieldBase + DataTypeBase + Debug {
     fn oneof(&self) -> Result<Rc<dyn Oneof>>;
 }
 
@@ -36,15 +36,12 @@ pub struct OneofFieldImpl {
     default_value: Option<String>,
 }
 
-impl FieldOrOneof for OneofFieldImpl {
+impl DataTypeBase for OneofFieldImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
-    }
-    fn message(&self) -> Result<Rc<dyn Message>> {
-        Ok(self.oneof()?.message()?)
     }
 }
 
@@ -65,6 +62,9 @@ impl FieldBase for OneofFieldImpl {
     }
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
+    }
+    fn message(&self) -> Result<Rc<dyn Message>> {
+        Ok(self.oneof.try_upgrade()?.message()?)
     }
 }
 

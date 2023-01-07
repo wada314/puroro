@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{Enum, InputFile, InputFileImpl, Message, PackageOrMessage};
+use super::{
+    DataTypeBase, Enum, InputFile, InputFileImpl, Message, PackageOrMessage, PackageOrMessageCase,
+};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -22,7 +24,7 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub trait Package: Debug + PackageOrMessage {
+pub trait Package: PackageOrMessage + DataTypeBase + Debug {
     fn full_name(&self) -> Result<&str>;
     fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>>;
 }
@@ -211,13 +213,20 @@ impl NonRootPackage {
     }
 }
 
-impl PackageOrMessage for RootPackage {
+impl DataTypeBase for RootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok("".into())
     }
+}
+
+impl PackageOrMessage for RootPackage {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+        PackageOrMessageCase::Package(self)
+    }
+
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }
@@ -249,13 +258,20 @@ impl Package for RootPackage {
     }
 }
 
-impl PackageOrMessage for NonRootPackage {
+impl DataTypeBase for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
+
+impl PackageOrMessage for NonRootPackage {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+        PackageOrMessageCase::Package(self)
+    }
+
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }

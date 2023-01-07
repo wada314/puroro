@@ -36,7 +36,13 @@ pub use self::oneof_field::*;
 pub use self::package::*;
 pub use self::package_or_message::*;
 
+use super::util::AnonymousCache;
 use crate::{ErrorKind, GeneratorError, Result};
+
+pub trait DataTypeBase {
+    fn cache(&self) -> &AnonymousCache;
+    fn name(&self) -> Result<&str>;
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Syntax {
@@ -57,7 +63,19 @@ impl TryFrom<&str> for Syntax {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum MessageOrEnum<M, E> {
+pub enum PackageOrMessageCase<P, M> {
+    Package(P),
+    Message(M),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum MessageOrEnumCase<M, E> {
     Message(M),
     Enum(E),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum FieldOrOneofCase<F, O> {
+    Field(F),
+    Oneof(O),
 }

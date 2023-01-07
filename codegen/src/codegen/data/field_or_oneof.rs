@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::util::*;
-use super::Message;
-use crate::Result;
+use super::{DataTypeBase, Field, FieldOrOneofCase, Oneof};
 use ::std::fmt::Debug;
-use ::std::rc::Rc;
 
-pub trait FieldOrOneof: Debug {
-    fn cache(&self) -> &AnonymousCache;
-    fn name(&self) -> Result<&str>;
-    fn message(&self) -> Result<Rc<dyn Message>>;
+pub trait FieldOrOneof: DataTypeBase + Debug {
+    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof>;
 }

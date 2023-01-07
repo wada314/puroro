@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{Enum, Message, MessageOrEnum, Syntax};
+use super::{Enum, Message, MessageOrEnumCase, Syntax};
 use crate::{ErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 use ::std::rc::{Rc, Weak};
@@ -83,7 +83,7 @@ impl FieldType {
                 TypeSint64 => Variant(SInt64),
                 TypeBool => Variant(Bool),
                 TypeEnum => {
-                    if let Some(MessageOrEnum::Enum(e)) = maybe_m_or_e {
+                    if let Some(MessageOrEnumCase::Enum(e)) = maybe_m_or_e {
                         match syntax {
                             Syntax::Proto2 => Variant(Enum2(Rc::downgrade(&e))),
                             Syntax::Proto3 => Variant(Enum3(Rc::downgrade(&e))),
@@ -104,7 +104,7 @@ impl FieldType {
                 TypeBytes => LengthDelimited(Bytes),
                 TypeGroup => Err(ErrorKind::GroupNotSupported)?,
                 TypeMessage => {
-                    if let Some(MessageOrEnum::Message(m)) = maybe_m_or_e {
+                    if let Some(MessageOrEnumCase::Message(m)) = maybe_m_or_e {
                         LengthDelimited(Message(Rc::downgrade(&m)))
                     } else {
                         Err(ErrorKind::UnknownTypeName {
@@ -115,8 +115,8 @@ impl FieldType {
             })
         } else if let Some(m_or_e) = maybe_m_or_e {
             Ok(match m_or_e {
-                MessageOrEnum::Message(m) => LengthDelimited(Message(Rc::downgrade(&m))),
-                MessageOrEnum::Enum(e) => match syntax {
+                MessageOrEnumCase::Message(m) => LengthDelimited(Message(Rc::downgrade(&m))),
+                MessageOrEnumCase::Enum(e) => match syntax {
                     Syntax::Proto2 => Variant(Enum2(Rc::downgrade(&e))),
                     Syntax::Proto3 => Variant(Enum3(Rc::downgrade(&e))),
                 },

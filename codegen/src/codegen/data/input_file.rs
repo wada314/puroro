@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
+use super::{
+    DataTypeBase, Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax,
+};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -24,9 +26,7 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub trait InputFile: Debug {
-    fn cache(&self) -> &AnonymousCache;
-    fn name(&self) -> Result<&str>;
+pub trait InputFile: DataTypeBase + DataTypeBase + Debug {
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn Package>>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
@@ -92,14 +92,16 @@ impl InputFileImpl {
     }
 }
 
-impl InputFile for InputFileImpl {
+impl DataTypeBase for InputFileImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
 
+impl InputFile for InputFileImpl {
     fn syntax(&self) -> Result<Syntax> {
         self.syntax_cell
             .get_or_try_init(|| self.syntax.as_str().try_into())
@@ -134,13 +136,17 @@ impl InputFileFake {
 }
 
 #[cfg(test)]
-impl InputFile for InputFileFake {
+impl DataTypeBase for InputFileFake {
     fn cache(&self) -> &AnonymousCache {
         unimplemented!()
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
+
+#[cfg(test)]
+impl InputFile for InputFileFake {
     fn syntax(&self) -> Result<Syntax> {
         unimplemented!()
     }
