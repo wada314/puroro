@@ -13,13 +13,17 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{FieldOrOneof, Message, OneofField, OneofFieldImpl};
+use super::{
+    DataTypeBase, Field, FieldOrOneof, FieldOrOneofCase, Message, OneofField, OneofFieldImpl,
+};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait Oneof: FieldOrOneof + Debug {
+pub trait Oneof: FieldOrOneof + DataTypeBase + Debug {
+    fn name(&self) -> Result<&str>;
+    fn message(&self) -> Result<Rc<dyn Message>>;
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>>;
 }
 
@@ -58,20 +62,26 @@ impl OneofImpl {
     }
 }
 
-impl FieldOrOneof for OneofImpl {
+impl DataTypeBase for OneofImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
-    fn message(&self) -> Result<Rc<dyn Message>> {
-        Ok(self.message.try_upgrade()?)
-    }
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
+}
+
+impl FieldOrOneof for OneofImpl {
+    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof> {
+        FieldOrOneofCase::Oneof(self)
     }
 }
 
 impl Oneof for OneofImpl {
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
+    }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
+    fn message(&self) -> Result<Rc<dyn Message>> {
+        Ok(self.message.try_upgrade()?)
     }
 }

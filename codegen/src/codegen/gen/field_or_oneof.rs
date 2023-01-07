@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{DataTypeBase, Field, FieldOrOneofCase, Oneof};
+use super::super::util::*;
+use super::{Enum, PackageOrMessageExt, Syntax, PURORO_LIB};
+use crate::syn;
+use crate::syn::{parse2, Item, ItemEnum, Path, Type};
+use crate::{ErrorKind, Result};
+use ::once_cell::unsync::OnceCell;
+use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
+use ::std::rc::Rc;
+use ::syn::ItemImpl;
 
-pub trait FieldOrOneof: DataTypeBase + Debug {
-    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof>;
-}
+pub trait FieldOrOneofExt {}

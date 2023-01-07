@@ -39,18 +39,23 @@ pub fn generate_file_names_and_tokens<'a>(
             .chain(
                 // Packages except root
                 root_package
-                    .all_packages()?
+                    .all_child_packages()?
                     .into_iter()
                     .map(|p| Ok(p as Rc<dyn PackageOrMessage>)),
             )
-            .chain(root_package.all_messages()?.into_iter().filter_map(|m| {
-                // messages which contains subitems
-                match m.should_generate_module_file() {
-                    Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
-                    Ok(false) => None,
-                    Err(e) => Some(Err(e)),
-                }
-            }));
+            .chain(
+                root_package
+                    .all_child_messages()?
+                    .into_iter()
+                    .filter_map(|m| {
+                        // messages which contains subitems
+                        match m.should_generate_module_file() {
+                            Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
+                            Ok(false) => None,
+                            Err(e) => Some(Err(e)),
+                        }
+                    }),
+            );
     file_generating_items
         .map_ok(|item| {
             let file_name = item.module_file_path()?.to_string();

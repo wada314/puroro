@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::util::*;
-use super::{Enum, Message, MessageOrEnum, Oneof, Package, RootPackage};
+use super::{
+    DataTypeBase, Enum, Message, MessageOrEnumCase, Oneof, Package, PackageOrMessageCase,
+    RootPackage,
+};
 use crate::{ErrorKind, Result};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait PackageOrMessage: Debug {
-    fn cache(&self) -> &AnonymousCache;
+pub trait PackageOrMessage: DataTypeBase + Debug {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message>;
+
     fn name(&self) -> Result<&str>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
@@ -32,7 +35,7 @@ pub trait PackageOrMessage: Debug {
         Ok(self.parent()?.is_none())
     }
 
-    fn all_packages(&self) -> Result<Vec<Rc<dyn Package>>> {
+    fn all_child_packages(&self) -> Result<Vec<Rc<dyn Package>>> {
         let mut ret = Vec::new();
         let mut stack = self.subpackages()?.collect::<Vec<_>>();
         while let Some(p) = stack.pop() {
@@ -42,7 +45,7 @@ pub trait PackageOrMessage: Debug {
         Ok(ret)
     }
 
-    fn all_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
+    fn all_child_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
         let mut ret = self.messages()?.collect::<Vec<_>>();
         let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessage>);
         let packages_iter = self.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>);
@@ -58,7 +61,7 @@ pub trait PackageOrMessage: Debug {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnum<Rc<dyn Message>, Rc<dyn Enum>>> {
+    ) -> Result<MessageOrEnumCase<Rc<dyn Message>, Rc<dyn Enum>>> {
         if let Some(absolute_path) = type_name.strip_prefix('.') {
             return self.root_package()?.resolve_type_name(absolute_path);
         }
@@ -82,12 +85,12 @@ pub trait PackageOrMessage: Debug {
                 .messages()?
                 .try_find(|m| -> Result<_> { Ok(m.name()? == type_name) })?
             {
-                return Ok(MessageOrEnum::Message(m));
+                return Ok(MessageOrEnumCase::Message(m));
             } else if let Some(m) = self
                 .enums()?
                 .try_find(|e| -> Result<_> { Ok(e.name() == type_name) })?
             {
-                return Ok(MessageOrEnum::Enum(m));
+                return Ok(MessageOrEnumCase::Enum(m));
             }
         }
         Err(ErrorKind::UnknownTypeName {

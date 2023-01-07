@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax};
+use super::{
+    DataTypeBase, Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax,
+};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -24,8 +26,7 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub trait InputFile: Debug {
-    fn cache(&self) -> &AnonymousCache;
+pub trait InputFile: DataTypeBase + DataTypeBase + Debug {
     fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn Package>>;
@@ -92,10 +93,13 @@ impl InputFileImpl {
     }
 }
 
-impl InputFile for InputFileImpl {
+impl DataTypeBase for InputFileImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+}
+
+impl InputFile for InputFileImpl {
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::{AnonymousCache, WeakExt};
-use super::{FieldOrOneof, FieldRule, FieldType, Message};
+use super::{DataTypeBase, FieldOrOneof, FieldOrOneofCase, FieldRule, FieldType, Message, Oneof};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
@@ -22,15 +22,17 @@ use ::std::rc::{Rc, Weak};
 
 /// A field of message, regardless if it's directly under the message or
 /// the field under the `oneof`.
-pub trait FieldBase: FieldOrOneof + Debug {
+pub trait FieldBase: DataTypeBase + Debug {
     fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
     fn default_value(&self) -> Result<Option<&str>>;
+    fn name(&self) -> Result<&str>;
+    fn message(&self) -> Result<Rc<dyn Message>>;
 }
 
 /// A field of message, but not including the field belonging to an `oneof`.
 /// Proto3 optional field IS this type.
-pub trait Field: FieldBase + Debug {
+pub trait Field: FieldBase + FieldOrOneof + DataTypeBase + Debug {
     fn rule(&self) -> Result<FieldRule>;
 }
 
@@ -49,15 +51,15 @@ pub struct FieldImpl {
     default_value: Option<String>,
 }
 
-impl FieldOrOneof for FieldImpl {
+impl DataTypeBase for FieldImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
-    }
-    fn message(&self) -> Result<Rc<dyn Message>> {
-        Ok(self.message.try_upgrade()?)
+}
+
+impl FieldOrOneof for FieldImpl {
+    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof> {
+        FieldOrOneofCase::Field(self)
     }
 }
 
@@ -78,6 +80,12 @@ impl FieldBase for FieldImpl {
     }
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
+    }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
+    fn message(&self) -> Result<Rc<dyn Message>> {
+        Ok(self.message.try_upgrade()?)
     }
 }
 

@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    Enum, EnumImpl, Field, FieldImpl, InputFile, Oneof, OneofImpl, Package, PackageOrMessage,
-    RootPackage,
+    DataTypeBase, Enum, EnumImpl, Field, FieldImpl, InputFile, Oneof, OneofImpl, Package,
+    PackageOrMessage, PackageOrMessageCase, RootPackage,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{
@@ -150,10 +150,17 @@ impl MessageImpl {
     }
 }
 
-impl PackageOrMessage for MessageImpl {
+impl DataTypeBase for MessageImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+}
+
+impl PackageOrMessage for MessageImpl {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+        PackageOrMessageCase::Message(self)
+    }
+
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
@@ -172,6 +179,7 @@ impl PackageOrMessage for MessageImpl {
     fn root_package(&self) -> Result<Rc<RootPackage>> {
         self.parent.try_upgrade()?.root_package()
     }
+
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
         Ok(Some(self.parent.try_upgrade()?))
     }
