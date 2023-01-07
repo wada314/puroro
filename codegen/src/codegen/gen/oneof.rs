@@ -34,13 +34,17 @@ pub trait OneofExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>>;
+
     fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
     fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_field(&self) -> Result<Field>;
 
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
     fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
 
-    fn gen_message_struct_field(&self) -> Result<Field>;
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
     fn gen_message_struct_impl_message_deser_arms(
@@ -56,6 +60,7 @@ struct Cache {
     union_ident: OnceCell<Rc<Ident>>,
     case_ident: OnceCell<Rc<Ident>>,
     struct_field_ident: OnceCell<Rc<Ident>>,
+    fields_struct_generic_param_ident: OnceCell<Rc<Ident>>,
     allocated_bitfield: OnceCell<OneofBitfieldAllocation>,
 }
 
@@ -132,6 +137,23 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         })?))
     }
 
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .fields_struct_generic_param_ident
+            .get_or_try_init(|| Ok(Rc::new(format_ident!("T{}", self.name()?.to_camel_case()))))
+            .cloned()
+    }
+
+    fn gen_fields_struct_field(&self) -> Result<Field> {
+        let field_ident = self.gen_message_struct_field_ident()?;
+        let type_name = self.gen_fields_struct_generic_param_ident()?;
+        Ok(parse2::<NamedField>(quote! {
+            pub #field_ident: #type_name
+        })?
+        .into())
+    }
+
     fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {
         let union_ident = gen_union_ident(self)?;
         let union_fields = try_map_fields(self, |f| f.gen_oneof_union_field())?;
@@ -199,17 +221,12 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_message_struct_field(&self) -> Result<Field> {
-        let field_ident = self.gen_message_struct_field_ident()?;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
         let generic_params = self
             .fields()?
             .map(|f| f.gen_oneof_union_field_type())
             .collect::<Result<Vec<_>>>()?;
-        let field_type = self.gen_oneof_union_type(generic_params.iter().cloned())?;
-        Ok(parse2::<NamedField>(quote! {
-            #field_ident: #field_type
-        })?
-        .into())
+        self.gen_oneof_union_type(generic_params.iter().cloned())
     }
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
@@ -227,13 +244,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             parse2(quote! {
                 pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
                     use #PURORO_INTERNAL::OneofUnion as _;
-                    self.#field_ident.case_ref(&self._bitfield)
+                    self.fields.#field_ident.case_ref(&self.bitfield)
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::OneofUnion as _;
-                    self.#field_ident.clear(&mut self._bitfield)
+                    self.fields.#field_ident.clear(&mut self.bitfield)
                 }
             })?,
         ])
@@ -242,7 +259,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_message_struct_field_ident()?;
         Ok(parse2(quote! {
-            #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.#ident, &self._bitfield)
+            #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, &self.bitfield)
         })?)
     }
 
@@ -259,8 +276,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
-                    #field_number => self.#field_ident.deser_from_iter(
-                        &mut self._bitfield,
+                    #field_number => self.fields.#field_ident.deser_from_iter(
+                        &mut self.bitfield,
                         #field_data_expr,
                         #case_type::#case_name(()),
                     )?,
@@ -272,8 +289,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let field_ident = self.gen_message_struct_field_ident()?;
         Ok(parse2(quote! {
-            self.#field_ident.ser_to_write(
-                &self._bitfield,
+            self.fields.#field_ident.ser_to_write(
+                &self.bitfield,
                 #out_expr
             )?;
         })?)

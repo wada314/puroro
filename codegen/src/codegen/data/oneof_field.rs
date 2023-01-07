@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{FieldBase, FieldType, Message, Oneof};
+use super::{FieldBase, FieldOrOneof, FieldType, Message, Oneof};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
@@ -21,14 +21,12 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub trait OneofField: FieldBase + Debug {
-    fn cache(&self) -> &AnonymousCache;
     fn oneof(&self) -> Result<Rc<dyn Oneof>>;
 }
 
 #[derive(Debug)]
 pub struct OneofFieldImpl {
-    cache1: AnonymousCache,
-    cache2: AnonymousCache,
+    cache: AnonymousCache,
     oneof: Weak<dyn Oneof>,
     name: String,
     number: i32,
@@ -38,9 +36,9 @@ pub struct OneofFieldImpl {
     default_value: Option<String>,
 }
 
-impl FieldBase for OneofFieldImpl {
-    fn cache_base(&self) -> &AnonymousCache {
-        &self.cache1
+impl FieldOrOneof for OneofFieldImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
@@ -48,6 +46,9 @@ impl FieldBase for OneofFieldImpl {
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.oneof()?.message()?)
     }
+}
+
+impl FieldBase for OneofFieldImpl {
     fn number(&self) -> Result<i32> {
         Ok(self.number)
     }
@@ -68,9 +69,6 @@ impl FieldBase for OneofFieldImpl {
 }
 
 impl OneofField for OneofFieldImpl {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache2
-    }
     fn oneof(&self) -> Result<Rc<dyn Oneof>> {
         Ok(self.oneof.try_upgrade()?)
     }
@@ -79,8 +77,7 @@ impl OneofField for OneofFieldImpl {
 impl OneofFieldImpl {
     pub fn new(proto: &FieldDescriptorProto, oneof: Weak<dyn Oneof>) -> Rc<Self> {
         Rc::new(Self {
-            cache1: Default::default(),
-            cache2: Default::default(),
+            cache: Default::default(),
             oneof,
             name: proto.name().to_string(),
             number: proto.number(),

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::{AnonymousCache, WeakExt};
-use super::{FieldRule, FieldType, Message};
+use super::{FieldOrOneof, FieldRule, FieldType, Message};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
@@ -22,10 +22,7 @@ use ::std::rc::{Rc, Weak};
 
 /// A field of message, regardless if it's directly under the message or
 /// the field under the `oneof`.
-pub trait FieldBase: Debug {
-    fn cache_base(&self) -> &AnonymousCache;
-    fn name(&self) -> Result<&str>;
-    fn message(&self) -> Result<Rc<dyn Message>>;
+pub trait FieldBase: FieldOrOneof + Debug {
     fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
     fn default_value(&self) -> Result<Option<&str>>;
@@ -34,14 +31,12 @@ pub trait FieldBase: Debug {
 /// A field of message, but not including the field belonging to an `oneof`.
 /// Proto3 optional field IS this type.
 pub trait Field: FieldBase + Debug {
-    fn cache(&self) -> &AnonymousCache;
     fn rule(&self) -> Result<FieldRule>;
 }
 
 #[derive(Debug)]
 pub struct FieldImpl {
-    cache1: AnonymousCache,
-    cache2: AnonymousCache,
+    cache: AnonymousCache,
     name: String,
     message: Weak<dyn Message>,
     rule: OnceCell<FieldRule>,
@@ -54,9 +49,9 @@ pub struct FieldImpl {
     default_value: Option<String>,
 }
 
-impl FieldBase for FieldImpl {
-    fn cache_base(&self) -> &AnonymousCache {
-        &self.cache1
+impl FieldOrOneof for FieldImpl {
+    fn cache(&self) -> &AnonymousCache {
+        &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
@@ -64,6 +59,9 @@ impl FieldBase for FieldImpl {
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
     }
+}
+
+impl FieldBase for FieldImpl {
     fn number(&self) -> Result<i32> {
         Ok(self.number)
     }
@@ -84,9 +82,6 @@ impl FieldBase for FieldImpl {
 }
 
 impl Field for FieldImpl {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache2
-    }
     fn rule(&self) -> Result<FieldRule> {
         self.rule
             .get_or_try_init(|| {
@@ -104,8 +99,7 @@ impl Field for FieldImpl {
 impl FieldImpl {
     pub fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
         Rc::new(FieldImpl {
-            cache1: Default::default(),
-            cache2: Default::default(),
+            cache: Default::default(),
             name: proto.name().to_string(),
             message,
             rule: OnceCell::new(),

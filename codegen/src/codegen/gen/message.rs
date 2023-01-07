@@ -26,13 +26,17 @@ use ::std::rc::Rc;
 
 pub trait MessageExt: Debug {
     fn bitfield_size(&self) -> Result<usize>;
+
     fn gen_message_struct_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+
     fn gen_message_struct_items(&self) -> Result<Vec<Item>>;
+    fn gen_fields_struct_items(&self) -> Result<Vec<Item>>;
 }
 
 #[derive(Debug, Default)]
 struct Cache {
-    rust_struct_type: OnceCell<Rc<Type>>,
+    message_struct_type: OnceCell<Rc<Type>>,
     bitfield_size: OnceCell<usize>,
 }
 impl<T: ?Sized + Message> MessageExt for T {
@@ -69,26 +73,33 @@ impl<T: ?Sized + Message> MessageExt for T {
     fn gen_message_struct_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
-            .rust_struct_type
+            .message_struct_type
             .get_or_try_init(|| {
                 let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
-                let ident =
-                    format_ident!("{}", self.name()?.to_camel_case().escape_rust_keywords());
+                let ident = gen_message_struct_ident(self)?;
                 Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
             })
             .cloned()
     }
 
+    fn gen_fields_struct_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+        let parent = <Self as Message>::parent(self)?.gen_rust_module_path()?;
+        let ident = gen_fields_struct_ident(self)?;
+        let generics = generics.collect::<Vec<_>>();
+        Ok(Rc::new(parse2(
+            quote! { #parent :: _fields :: #ident < #(#generics,)* > },
+        )?))
+    }
+
     fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = gen_message_struct_ident(self)?;
-        let fields = self
-            .fields()?
-            .map(|f| f.gen_message_struct_field())
+        let fields_type_for_fields = self.fields()?.map(|f| f.gen_fields_struct_field_type());
+        let fields_type_for_oneofs = self.oneofs()?.map(|o| o.gen_fields_struct_field_type());
+        let fields_types = fields_type_for_fields
+            .chain(fields_type_for_oneofs)
             .collect::<Result<Vec<_>>>()?;
-        let oneof_fields = self
-            .oneofs()?
-            .map(|o| o.gen_message_struct_field())
-            .collect::<Result<Vec<_>>>()?;
+        let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
+
         let field_methods = self
             .fields()?
             .map(|f| Ok(f.gen_message_struct_methods()?.into_iter()))
@@ -117,9 +128,8 @@ impl<T: ?Sized + Message> MessageExt for T {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             pub struct #ident {
-                #(#fields,)*
-                #(#oneof_fields,)*
-                _bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
+                fields: #fields_struct_type,
+                bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -139,6 +149,32 @@ impl<T: ?Sized + Message> MessageExt for T {
             partial_eq_impl.into(),
         ])
     }
+
+    fn gen_fields_struct_items(&self) -> Result<Vec<Item>> {
+        let ident = gen_fields_struct_ident(self)?;
+        let generics_for_fields = self
+            .fields()?
+            .map(|f| f.gen_fields_struct_generic_param_ident());
+        let generics_for_oneofs = self
+            .oneofs()?
+            .map(|o| o.gen_fields_struct_generic_param_ident());
+        let generics = generics_for_fields
+            .chain(generics_for_oneofs)
+            .collect::<Result<Vec<_>>>()?;
+
+        let fields_for_fields = self.fields()?.map(|f| f.gen_fields_struct_field());
+        let fields_for_oneofs = self.oneofs()?.map(|o| o.gen_fields_struct_field());
+        let fields = fields_for_fields
+            .chain(fields_for_oneofs)
+            .collect::<Result<Vec<_>>>()?;
+
+        Ok(vec![parse2(quote! {
+            #[derive(::std::default::Default)]
+            pub struct #ident <#(#generics),*> {
+                #(#fields,)*
+            }
+        })?])
+    }
 }
 
 fn gen_message_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
@@ -148,6 +184,13 @@ fn gen_message_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
             .to_camel_case()
             .escape_rust_keywords()
             .to_string()
+    ))
+}
+
+fn gen_fields_struct_ident(this: &(impl ?Sized + Message)) -> Result<Ident> {
+    Ok(format_ident!(
+        "{}Fields",
+        this.name()?.to_camel_case().to_string()
     ))
 }
 
@@ -213,6 +256,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
 
 fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_message_struct_ident(this)?;
+    let fields_ident = gen_fields_struct_ident(this)?;
     let field_clones = this
         .fields()?
         .map(|f| f.gen_message_struct_impl_clone_field_value())
@@ -225,9 +269,11 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
                 Self {
-                    #(#field_clones,)*
-                    #(#oneof_clones,)*
-                    _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                    fields: self::_fields::#fields_ident {
+                        #(#field_clones,)*
+                        #(#oneof_clones,)*
+                    },
+                    bitfield: ::std::clone::Clone::clone(&self.bitfield),
                 }
             }
         }
@@ -246,7 +292,7 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
             fn drop(&mut self) {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
 
-                #(self.#oneof_idents.clear(&mut self._bitfield);)*
+                #(self.fields.#oneof_idents.clear(&mut self.bitfield);)*
             }
         }
     })?)

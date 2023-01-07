@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-syntax = "proto2";
-package name_conflict_case;
+use super::super::util::*;
+use super::Message;
+use crate::Result;
+use ::std::fmt::Debug;
+use ::std::rc::Rc;
 
-message Message {
-    message ConflictCase {
-        optional int32 this_is_message_field = 1;
-    }
-    oneof conflict {
-        int32 this_is_oneof_field = 1;
-    }
+pub trait FieldOrOneof: Debug {
+    fn cache(&self) -> &AnonymousCache;
+    fn name(&self) -> Result<&str>;
+    fn message(&self) -> Result<Rc<dyn Message>>;
 }
-

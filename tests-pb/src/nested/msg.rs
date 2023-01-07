@@ -12,56 +12,40 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    item_inner: self::_pinternal::SingularNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
+    fields: self::_root::nested::msg::_fields::SubmsgFields<
+        self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
-    _bitfield: self::_pinternal::BitArray<0usize>,
+    bitfield: self::_pinternal::BitArray<0usize>,
 }
 impl Submsg {
     pub fn item_inner(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_or_else(
-            &self.item_inner,
-            &self._bitfield,
+        NonRepeatedFieldType::get_field_or_else(
+            &self.fields.item_inner,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn item_inner_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(&self.item_inner, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.item_inner, &self.bitfield)
     }
     pub fn item_inner_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.item_inner,
-            &mut self._bitfield,
+        NonRepeatedFieldType::get_field_mut(
+            &mut self.fields.item_inner,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_item_inner(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::get_field_opt(&self.item_inner, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.item_inner, &self.bitfield)
             .is_some()
     }
     pub fn clear_item_inner(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as NonRepeatedFieldType>::clear(&mut self.item_inner, &mut self._bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.item_inner, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Submsg {
@@ -83,12 +67,9 @@ impl self::_puroro::Message for Submsg {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::SingularNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.item_inner,
-                        &mut self._bitfield,
+                    self::_pinternal::FieldType::deser_from_iter(
+                        &mut self.fields.item_inner,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -104,12 +85,9 @@ impl self::_puroro::Message for Submsg {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::SingularNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-        > as self::_pinternal::FieldType>::ser_to_write(
-            &self.item_inner,
-            &self._bitfield,
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.item_inner,
+            &self.bitfield,
             1i32,
             out,
         )?;
@@ -119,11 +97,10 @@ impl self::_puroro::Message for Submsg {
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         Self {
-            item_inner: <self::_pinternal::SingularNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            > as ::std::clone::Clone>::clone(&self.item_inner),
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            fields: self::_fields::SubmsgFields {
+                item_inner: ::std::clone::Clone::clone(&self.fields.item_inner),
+            },
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -150,6 +127,25 @@ impl ::std::cmp::PartialEq for Submsg {
         true && self.item_inner_opt() == rhs.item_inner_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct SubmsgFields<TItemInner> {
+        pub item_inner: TItemInner,
+    }
+}
+pub use self::_fields::*;
 #[derive(
     ::std::clone::Clone,
     ::std::marker::Copy,

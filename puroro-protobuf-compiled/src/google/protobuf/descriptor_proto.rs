@@ -12,129 +12,87 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct ExtensionRange {
-    start: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        0usize,
+    fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields<
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
+        >,
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            1usize,
+        >,
+        self::_pinternal::SingularHeapMessageField::<
+            self::_root::google::protobuf::ExtensionRangeOptions,
+        >,
     >,
-    end: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        1usize,
-    >,
-    options: self::_pinternal::SingularHeapMessageField::<
-        self::_root::google::protobuf::ExtensionRangeOptions,
-    >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl ExtensionRange {
     pub fn start(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
-            &self.start,
-            &self._bitfield,
+        NonRepeatedFieldType::get_field_or_else(
+            &self.fields.start,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.start, &self.bitfield)
     }
     pub fn start_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.start,
-            &mut self._bitfield,
+        NonRepeatedFieldType::get_field_mut(
+            &mut self.fields.start,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_start(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.start, &self.bitfield).is_some()
     }
     pub fn clear_start(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.start, &mut self._bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.start, &mut self.bitfield)
     }
     pub fn end(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
-            &self.end,
-            &self._bitfield,
+        NonRepeatedFieldType::get_field_or_else(
+            &self.fields.end,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.end, &self.bitfield)
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.end,
-            &mut self._bitfield,
+        NonRepeatedFieldType::get_field_mut(
+            &mut self.fields.end,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_end(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.end, &self.bitfield).is_some()
     }
     pub fn clear_end(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.end, &mut self._bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.end, &mut self.bitfield)
     }
     pub fn options(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::ExtensionRangeOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        > as NonRepeatedFieldType>::get_field_or_else(
-            &self.options,
-            &self._bitfield,
+        NonRepeatedFieldType::get_field_or_else(
+            &self.fields.options,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
@@ -142,34 +100,26 @@ impl ExtensionRange {
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::ExtensionRangeOptions> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
     }
     pub fn options_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::ExtensionRangeOptions {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.options,
-            &mut self._bitfield,
+        NonRepeatedFieldType::get_field_mut(
+            &mut self.fields.options,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_options(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        > as NonRepeatedFieldType>::get_field_opt(&self.options, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.options, &self.bitfield)
             .is_some()
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        > as NonRepeatedFieldType>::clear(&mut self.options, &mut self._bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.options, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for ExtensionRange {
@@ -191,33 +141,23 @@ impl self::_puroro::Message for ExtensionRange {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.start,
-                        &mut self._bitfield,
+                    self::_pinternal::FieldType::deser_from_iter(
+                        &mut self.fields.start,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.end,
-                        &mut self._bitfield,
+                    self::_pinternal::FieldType::deser_from_iter(
+                        &mut self.fields.end,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
                 3i32 => {
-                    <self::_pinternal::SingularHeapMessageField::<
-                        self::_root::google::protobuf::ExtensionRangeOptions,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.options,
-                        &mut self._bitfield,
+                    self::_pinternal::FieldType::deser_from_iter(
+                        &mut self.fields.options,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -233,31 +173,21 @@ impl self::_puroro::Message for ExtensionRange {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
-            &self.start,
-            &self._bitfield,
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.start,
+            &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
-            &self.end,
-            &self._bitfield,
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.end,
+            &self.bitfield,
             2i32,
             out,
         )?;
-        <self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        > as self::_pinternal::FieldType>::ser_to_write(
-            &self.options,
-            &self._bitfield,
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.options,
+            &self.bitfield,
             3i32,
             out,
         )?;
@@ -267,20 +197,12 @@ impl self::_puroro::Message for ExtensionRange {
 impl ::std::clone::Clone for ExtensionRange {
     fn clone(&self) -> Self {
         Self {
-            start: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.start),
-            end: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.end),
-            options: <self::_pinternal::SingularHeapMessageField::<
-                self::_root::google::protobuf::ExtensionRangeOptions,
-            > as ::std::clone::Clone>::clone(&self.options),
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            fields: self::_fields::ExtensionRangeFields {
+                start: ::std::clone::Clone::clone(&self.fields.start),
+                end: ::std::clone::Clone::clone(&self.fields.end),
+                options: ::std::clone::Clone::clone(&self.fields.options),
+            },
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -312,116 +234,76 @@ impl ::std::cmp::PartialEq for ExtensionRange {
 }
 #[derive(::std::default::Default)]
 pub struct ReservedRange {
-    start: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        0usize,
+    fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            0usize,
+        >,
+        self::_pinternal::OptionalNumericalField::<
+            i32,
+            self::_pinternal::tags::Int32,
+            1usize,
+        >,
     >,
-    end: self::_pinternal::OptionalNumericalField::<
-        i32,
-        self::_pinternal::tags::Int32,
-        1usize,
-    >,
-    _bitfield: self::_pinternal::BitArray<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
 }
 impl ReservedRange {
     pub fn start(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
-            &self.start,
-            &self._bitfield,
+        NonRepeatedFieldType::get_field_or_else(
+            &self.fields.start,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.start, &self.bitfield)
     }
     pub fn start_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.start,
-            &mut self._bitfield,
+        NonRepeatedFieldType::get_field_mut(
+            &mut self.fields.start,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_start(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.start, &self._bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.start, &self.bitfield).is_some()
     }
     pub fn clear_start(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as NonRepeatedFieldType>::clear(&mut self.start, &mut self._bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.start, &mut self.bitfield)
     }
     pub fn end(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_or_else(
-            &self.end,
-            &self._bitfield,
+        NonRepeatedFieldType::get_field_or_else(
+            &self.fields.end,
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.end, &self.bitfield)
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_mut(
-            &mut self.end,
-            &mut self._bitfield,
+        NonRepeatedFieldType::get_field_mut(
+            &mut self.fields.end,
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_end(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::get_field_opt(&self.end, &self._bitfield)
-            .is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.end, &self.bitfield).is_some()
     }
     pub fn clear_end(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as NonRepeatedFieldType>::clear(&mut self.end, &mut self._bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.end, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for ReservedRange {
@@ -443,24 +325,16 @@ impl self::_puroro::Message for ReservedRange {
             = FieldData::from_bytes_iter(iter.by_ref())? {
             match number {
                 1i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        0usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.start,
-                        &mut self._bitfield,
+                    self::_pinternal::FieldType::deser_from_iter(
+                        &mut self.fields.start,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
                 2i32 => {
-                    <self::_pinternal::OptionalNumericalField::<
-                        i32,
-                        self::_pinternal::tags::Int32,
-                        1usize,
-                    > as self::_pinternal::FieldType>::deser_from_iter(
-                        &mut self.end,
-                        &mut self._bitfield,
+                    self::_pinternal::FieldType::deser_from_iter(
+                        &mut self.fields.end,
+                        &mut self.bitfield,
                         field_data,
                     )?
                 }
@@ -476,23 +350,15 @@ impl self::_puroro::Message for ReservedRange {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
-            &self.start,
-            &self._bitfield,
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.start,
+            &self.bitfield,
             1i32,
             out,
         )?;
-        <self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        > as self::_pinternal::FieldType>::ser_to_write(
-            &self.end,
-            &self._bitfield,
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.end,
+            &self.bitfield,
             2i32,
             out,
         )?;
@@ -502,17 +368,11 @@ impl self::_puroro::Message for ReservedRange {
 impl ::std::clone::Clone for ReservedRange {
     fn clone(&self) -> Self {
         Self {
-            start: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                0usize,
-            > as ::std::clone::Clone>::clone(&self.start),
-            end: <self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                1usize,
-            > as ::std::clone::Clone>::clone(&self.end),
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            fields: self::_fields::ReservedRangeFields {
+                start: ::std::clone::Clone::clone(&self.fields.start),
+                end: ::std::clone::Clone::clone(&self.fields.end),
+            },
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
         }
     }
 }
@@ -540,3 +400,29 @@ impl ::std::cmp::PartialEq for ReservedRange {
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
     }
 }
+pub mod _fields {
+    mod _root {
+        #[allow(unused)]
+        pub use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub use ::puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub use ::puroro::internal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct ExtensionRangeFields<TStart, TEnd, TOptions> {
+        pub start: TStart,
+        pub end: TEnd,
+        pub options: TOptions,
+    }
+    #[derive(::std::default::Default)]
+    pub struct ReservedRangeFields<TStart, TEnd> {
+        pub start: TStart,
+        pub end: TEnd,
+    }
+}
+pub use self::_fields::*;

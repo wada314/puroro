@@ -13,14 +13,12 @@
 // limitations under the License.
 
 syntax = "proto2";
-package name_conflict_case;
+package name_conflict_fields;
 
-message Message {
-    message ConflictCase {
-        optional int32 this_is_message_field = 1;
-    }
-    oneof conflict {
-        int32 this_is_oneof_field = 1;
-    }
+message Conflict {
+    optional int32 this_is_original_message_field = 1;
 }
 
+message ConflictFields {
+    optional int32 this_is_fields_message_field = 1;
+}

@@ -13,16 +13,13 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{Message, OneofField, OneofFieldImpl};
+use super::{FieldOrOneof, Message, OneofField, OneofFieldImpl};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait Oneof: Debug {
-    fn cache(&self) -> &AnonymousCache;
-    fn message(&self) -> Result<Rc<dyn Message>>;
-    fn name(&self) -> Result<&str>;
+pub trait Oneof: FieldOrOneof + Debug {
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>>;
 }
 
@@ -61,7 +58,7 @@ impl OneofImpl {
     }
 }
 
-impl Oneof for OneofImpl {
+impl FieldOrOneof for OneofImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
@@ -71,6 +68,9 @@ impl Oneof for OneofImpl {
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
+
+impl Oneof for OneofImpl {
     fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
