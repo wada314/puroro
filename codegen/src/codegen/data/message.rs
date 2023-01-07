@@ -154,6 +154,9 @@ impl DataTypeBase for MessageImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
 }
 
 impl PackageOrMessage for MessageImpl {
@@ -161,9 +164,6 @@ impl PackageOrMessage for MessageImpl {
         PackageOrMessageCase::Message(self)
     }
 
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
-    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }

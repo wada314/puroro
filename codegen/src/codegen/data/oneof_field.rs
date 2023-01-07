@@ -40,6 +40,9 @@ impl DataTypeBase for OneofFieldImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
 }
 
 impl FieldBase for OneofFieldImpl {
@@ -59,9 +62,6 @@ impl FieldBase for OneofFieldImpl {
     }
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
-    }
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.oneof.try_upgrade()?.message()?)

@@ -23,7 +23,6 @@ use ::std::rc::Rc;
 pub trait PackageOrMessage: DataTypeBase + Debug {
     fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message>;
 
-    fn name(&self) -> Result<&str>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
@@ -88,7 +87,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
                 return Ok(MessageOrEnumCase::Message(m));
             } else if let Some(m) = self
                 .enums()?
-                .try_find(|e| -> Result<_> { Ok(e.name() == type_name) })?
+                .try_find(|e| -> Result<_> { Ok(e.name()? == type_name) })?
             {
                 return Ok(MessageOrEnumCase::Enum(m));
             }

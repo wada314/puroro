@@ -26,7 +26,6 @@ pub trait FieldBase: DataTypeBase + Debug {
     fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
     fn default_value(&self) -> Result<Option<&str>>;
-    fn name(&self) -> Result<&str>;
     fn message(&self) -> Result<Rc<dyn Message>>;
 }
 
@@ -55,6 +54,9 @@ impl DataTypeBase for FieldImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
 }
 
 impl FieldOrOneof for FieldImpl {
@@ -80,9 +82,6 @@ impl FieldBase for FieldImpl {
     }
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
-    }
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)

@@ -217,6 +217,9 @@ impl DataTypeBase for RootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+    fn name(&self) -> Result<&str> {
+        Ok("".into())
+    }
 }
 
 impl PackageOrMessage for RootPackage {
@@ -224,9 +227,6 @@ impl PackageOrMessage for RootPackage {
         PackageOrMessageCase::Package(self)
     }
 
-    fn name(&self) -> Result<&str> {
-        Ok("".into())
-    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }
@@ -262,6 +262,9 @@ impl DataTypeBase for NonRootPackage {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
 }
 
 impl PackageOrMessage for NonRootPackage {
@@ -269,9 +272,6 @@ impl PackageOrMessage for NonRootPackage {
         PackageOrMessageCase::Package(self)
     }
 
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
-    }
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }

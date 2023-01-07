@@ -27,7 +27,6 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 pub trait InputFile: DataTypeBase + DataTypeBase + Debug {
-    fn name(&self) -> Result<&str>;
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn Package>>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
@@ -97,13 +96,12 @@ impl DataTypeBase for InputFileImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
-}
-
-impl InputFile for InputFileImpl {
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
     }
+}
 
+impl InputFile for InputFileImpl {
     fn syntax(&self) -> Result<Syntax> {
         self.syntax_cell
             .get_or_try_init(|| self.syntax.as_str().try_into())

@@ -41,6 +41,7 @@ use crate::{ErrorKind, GeneratorError, Result};
 
 pub trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;
+    fn name(&self) -> Result<&str>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

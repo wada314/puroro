@@ -13,9 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{Enum, PackageOrMessageExt, Syntax, PURORO_LIB};
+use super::{Enum, FieldOrOneof, PackageOrMessageExt, Syntax, PURORO_LIB};
 use crate::syn;
-use crate::syn::{parse2, Item, ItemEnum, Path, Type};
+use crate::syn::{parse2, Field as SynField, Ident, Item, ItemEnum, NamedField, Path, Type};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
@@ -23,4 +23,32 @@ use ::std::fmt::Debug;
 use ::std::rc::Rc;
 use ::syn::ItemImpl;
 
-pub trait FieldOrOneofExt {}
+pub trait FieldOrOneofExt {
+    fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_field(&self) -> Result<SynField>;
+}
+
+impl<T: FieldOrOneof> FieldOrOneofExt for T {
+    fn gen_message_struct_field_ident(&self) -> Result<Rc<Ident>> {
+        todo!()
+    }
+
+    fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>> {
+        todo!()
+    }
+
+    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+        todo!()
+    }
+
+    fn gen_fields_struct_field(&self) -> Result<SynField> {
+        let field_ident = self.gen_message_struct_field_ident()?;
+        let type_name = self.gen_fields_struct_generic_param_ident()?;
+        Ok(parse2::<NamedField>(quote! {
+            pub #field_ident: #type_name
+        })?
+        .into())
+    }
+}

@@ -25,7 +25,6 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 pub trait Enum: DataTypeBase + Debug {
-    fn name(&self) -> &str;
     fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
     fn syntax(&self) -> Result<Syntax>;
@@ -65,12 +64,12 @@ impl DataTypeBase for EnumImpl {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
+    fn name(&self) -> Result<&str> {
+        Ok(&self.name)
+    }
 }
 
 impl Enum for EnumImpl {
-    fn name(&self) -> &str {
-        &self.name
-    }
     fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>> {
         Ok(Box::new(self.values.iter().map(|(s, n)| (s.as_str(), *n))))
     }
