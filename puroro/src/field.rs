@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub trait ToNumberOrUnit<T> {}
-pub trait ToStringOrUnit {}
-pub trait ToBytesOrUnit {}
-pub trait ToMessageOrUnit<M> {}
+pub trait UnitOrToField<T> {
+    fn ref_into_opt(&self) -> Option<T>;
+}
+
+pub trait UnitOrToNumber<T>: UnitOrToField<T> {}
+pub trait UnitOrToString {}
+pub trait UnitOrToBytes {}
+pub trait UnitOrToMessage<M> {}
