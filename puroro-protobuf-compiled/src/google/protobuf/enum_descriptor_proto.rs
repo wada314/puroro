@@ -192,7 +192,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct EnumReservedRangeFields<TStart, TEnd> {
+    pub struct EnumReservedRangeFields<TStart = (), TEnd = ()> {
         pub start: TStart,
         pub end: TEnd,
     }

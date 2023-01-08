@@ -233,7 +233,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct SubmsgFields<TI32Unlabeled, TI32Optional, TI64Unlabeled> {
+    pub struct SubmsgFields<TI32Unlabeled = (), TI32Optional = (), TI64Unlabeled = ()> {
         pub i32_unlabeled: TI32Unlabeled,
         pub i32_optional: TI32Optional,
         pub i64_unlabeled: TI64Unlabeled,

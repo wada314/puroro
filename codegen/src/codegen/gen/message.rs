@@ -157,7 +157,7 @@ impl<T: ?Sized + Message> MessageExt for T {
 
         Ok(vec![parse2(quote! {
             #[derive(::std::default::Default)]
-            pub struct #ident <#(#generics),*> {
+            pub struct #ident <#(#generics = ()),*> {
                 #(#fields,)*
             }
         })?])

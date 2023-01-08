@@ -327,11 +327,11 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct LocationFields<
-        TPath,
-        TSpan,
-        TLeadingComments,
-        TTrailingComments,
-        TLeadingDetachedComments,
+        TPath = (),
+        TSpan = (),
+        TLeadingComments = (),
+        TTrailingComments = (),
+        TLeadingDetachedComments = (),
     > {
         pub path: TPath,
         pub span: TSpan,

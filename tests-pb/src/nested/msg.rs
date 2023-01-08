@@ -141,7 +141,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct SubmsgFields<TItemInner> {
+    pub struct SubmsgFields<TItemInner = ()> {
         pub item_inner: TItemInner,
     }
 }

@@ -154,7 +154,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct MessageFields<TConflict> {
+    pub struct MessageFields<TConflict = ()> {
         pub conflict: TConflict,
     }
 }

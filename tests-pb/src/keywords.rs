@@ -266,11 +266,11 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct MsgFields<TType> {
+    pub struct MsgFields<TType = ()> {
         pub r#type: TType,
     }
     #[derive(::std::default::Default)]
-    pub struct SelfFields<TType> {
+    pub struct SelfFields<TType = ()> {
         pub r#type: TType,
     }
 }

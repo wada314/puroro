@@ -156,7 +156,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct MsgFields<TRecursiveUnlabeled> {
+    pub struct MsgFields<TRecursiveUnlabeled = ()> {
         pub recursive_unlabeled: TRecursiveUnlabeled,
     }
 }

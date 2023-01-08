@@ -6800,23 +6800,23 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct FileDescriptorSetFields<TFile> {
+    pub struct FileDescriptorSetFields<TFile = ()> {
         pub file: TFile,
     }
     #[derive(::std::default::Default)]
     pub struct FileDescriptorProtoFields<
-        TName,
-        TPackage,
-        TDependency,
-        TPublicDependency,
-        TWeakDependency,
-        TMessageType,
-        TEnumType,
-        TService,
-        TExtension,
-        TOptions,
-        TSourceCodeInfo,
-        TSyntax,
+        TName = (),
+        TPackage = (),
+        TDependency = (),
+        TPublicDependency = (),
+        TWeakDependency = (),
+        TMessageType = (),
+        TEnumType = (),
+        TService = (),
+        TExtension = (),
+        TOptions = (),
+        TSourceCodeInfo = (),
+        TSyntax = (),
     > {
         pub name: TName,
         pub package: TPackage,
@@ -6833,16 +6833,16 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct DescriptorProtoFields<
-        TName,
-        TField,
-        TExtension,
-        TNestedType,
-        TEnumType,
-        TExtensionRange,
-        TOneofDecl,
-        TOptions,
-        TReservedRange,
-        TReservedName,
+        TName = (),
+        TField = (),
+        TExtension = (),
+        TNestedType = (),
+        TEnumType = (),
+        TExtensionRange = (),
+        TOneofDecl = (),
+        TOptions = (),
+        TReservedRange = (),
+        TReservedName = (),
     > {
         pub name: TName,
         pub field: TField,
@@ -6856,22 +6856,22 @@ pub mod _fields {
         pub reserved_name: TReservedName,
     }
     #[derive(::std::default::Default)]
-    pub struct ExtensionRangeOptionsFields<TUninterpretedOption> {
+    pub struct ExtensionRangeOptionsFields<TUninterpretedOption = ()> {
         pub uninterpreted_option: TUninterpretedOption,
     }
     #[derive(::std::default::Default)]
     pub struct FieldDescriptorProtoFields<
-        TName,
-        TNumber,
-        TLabel,
-        TType,
-        TTypeName,
-        TExtendee,
-        TDefaultValue,
-        TOneofIndex,
-        TJsonName,
-        TOptions,
-        TProto3Optional,
+        TName = (),
+        TNumber = (),
+        TLabel = (),
+        TType = (),
+        TTypeName = (),
+        TExtendee = (),
+        TDefaultValue = (),
+        TOneofIndex = (),
+        TJsonName = (),
+        TOptions = (),
+        TProto3Optional = (),
     > {
         pub name: TName,
         pub number: TNumber,
@@ -6886,17 +6886,17 @@ pub mod _fields {
         pub proto3_optional: TProto3Optional,
     }
     #[derive(::std::default::Default)]
-    pub struct OneofDescriptorProtoFields<TName, TOptions> {
+    pub struct OneofDescriptorProtoFields<TName = (), TOptions = ()> {
         pub name: TName,
         pub options: TOptions,
     }
     #[derive(::std::default::Default)]
     pub struct EnumDescriptorProtoFields<
-        TName,
-        TValue,
-        TOptions,
-        TReservedRange,
-        TReservedName,
+        TName = (),
+        TValue = (),
+        TOptions = (),
+        TReservedRange = (),
+        TReservedName = (),
     > {
         pub name: TName,
         pub value: TValue,
@@ -6905,25 +6905,25 @@ pub mod _fields {
         pub reserved_name: TReservedName,
     }
     #[derive(::std::default::Default)]
-    pub struct EnumValueDescriptorProtoFields<TName, TNumber, TOptions> {
+    pub struct EnumValueDescriptorProtoFields<TName = (), TNumber = (), TOptions = ()> {
         pub name: TName,
         pub number: TNumber,
         pub options: TOptions,
     }
     #[derive(::std::default::Default)]
-    pub struct ServiceDescriptorProtoFields<TName, TMethod, TOptions> {
+    pub struct ServiceDescriptorProtoFields<TName = (), TMethod = (), TOptions = ()> {
         pub name: TName,
         pub method: TMethod,
         pub options: TOptions,
     }
     #[derive(::std::default::Default)]
     pub struct MethodDescriptorProtoFields<
-        TName,
-        TInputType,
-        TOutputType,
-        TOptions,
-        TClientStreaming,
-        TServerStreaming,
+        TName = (),
+        TInputType = (),
+        TOutputType = (),
+        TOptions = (),
+        TClientStreaming = (),
+        TServerStreaming = (),
     > {
         pub name: TName,
         pub input_type: TInputType,
@@ -6934,27 +6934,27 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct FileOptionsFields<
-        TJavaPackage,
-        TJavaOuterClassname,
-        TJavaMultipleFiles,
-        TJavaGenerateEqualsAndHash,
-        TJavaStringCheckUtf8,
-        TOptimizeFor,
-        TGoPackage,
-        TCcGenericServices,
-        TJavaGenericServices,
-        TPyGenericServices,
-        TPhpGenericServices,
-        TDeprecated,
-        TCcEnableArenas,
-        TObjcClassPrefix,
-        TCsharpNamespace,
-        TSwiftPrefix,
-        TPhpClassPrefix,
-        TPhpNamespace,
-        TPhpMetadataNamespace,
-        TRubyPackage,
-        TUninterpretedOption,
+        TJavaPackage = (),
+        TJavaOuterClassname = (),
+        TJavaMultipleFiles = (),
+        TJavaGenerateEqualsAndHash = (),
+        TJavaStringCheckUtf8 = (),
+        TOptimizeFor = (),
+        TGoPackage = (),
+        TCcGenericServices = (),
+        TJavaGenericServices = (),
+        TPyGenericServices = (),
+        TPhpGenericServices = (),
+        TDeprecated = (),
+        TCcEnableArenas = (),
+        TObjcClassPrefix = (),
+        TCsharpNamespace = (),
+        TSwiftPrefix = (),
+        TPhpClassPrefix = (),
+        TPhpNamespace = (),
+        TPhpMetadataNamespace = (),
+        TRubyPackage = (),
+        TUninterpretedOption = (),
     > {
         pub java_package: TJavaPackage,
         pub java_outer_classname: TJavaOuterClassname,
@@ -6980,11 +6980,11 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct MessageOptionsFields<
-        TMessageSetWireFormat,
-        TNoStandardDescriptorAccessor,
-        TDeprecated,
-        TMapEntry,
-        TUninterpretedOption,
+        TMessageSetWireFormat = (),
+        TNoStandardDescriptorAccessor = (),
+        TDeprecated = (),
+        TMapEntry = (),
+        TUninterpretedOption = (),
     > {
         pub message_set_wire_format: TMessageSetWireFormat,
         pub no_standard_descriptor_accessor: TNoStandardDescriptorAccessor,
@@ -6994,13 +6994,13 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct FieldOptionsFields<
-        TCtype,
-        TPacked,
-        TJstype,
-        TLazy,
-        TDeprecated,
-        TWeak,
-        TUninterpretedOption,
+        TCtype = (),
+        TPacked = (),
+        TJstype = (),
+        TLazy = (),
+        TDeprecated = (),
+        TWeak = (),
+        TUninterpretedOption = (),
     > {
         pub ctype: TCtype,
         pub packed: TPacked,
@@ -7011,30 +7011,34 @@ pub mod _fields {
         pub uninterpreted_option: TUninterpretedOption,
     }
     #[derive(::std::default::Default)]
-    pub struct OneofOptionsFields<TUninterpretedOption> {
+    pub struct OneofOptionsFields<TUninterpretedOption = ()> {
         pub uninterpreted_option: TUninterpretedOption,
     }
     #[derive(::std::default::Default)]
-    pub struct EnumOptionsFields<TAllowAlias, TDeprecated, TUninterpretedOption> {
+    pub struct EnumOptionsFields<
+        TAllowAlias = (),
+        TDeprecated = (),
+        TUninterpretedOption = (),
+    > {
         pub allow_alias: TAllowAlias,
         pub deprecated: TDeprecated,
         pub uninterpreted_option: TUninterpretedOption,
     }
     #[derive(::std::default::Default)]
-    pub struct EnumValueOptionsFields<TDeprecated, TUninterpretedOption> {
+    pub struct EnumValueOptionsFields<TDeprecated = (), TUninterpretedOption = ()> {
         pub deprecated: TDeprecated,
         pub uninterpreted_option: TUninterpretedOption,
     }
     #[derive(::std::default::Default)]
-    pub struct ServiceOptionsFields<TDeprecated, TUninterpretedOption> {
+    pub struct ServiceOptionsFields<TDeprecated = (), TUninterpretedOption = ()> {
         pub deprecated: TDeprecated,
         pub uninterpreted_option: TUninterpretedOption,
     }
     #[derive(::std::default::Default)]
     pub struct MethodOptionsFields<
-        TDeprecated,
-        TIdempotencyLevel,
-        TUninterpretedOption,
+        TDeprecated = (),
+        TIdempotencyLevel = (),
+        TUninterpretedOption = (),
     > {
         pub deprecated: TDeprecated,
         pub idempotency_level: TIdempotencyLevel,
@@ -7042,13 +7046,13 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct UninterpretedOptionFields<
-        TName,
-        TIdentifierValue,
-        TPositiveIntValue,
-        TNegativeIntValue,
-        TDoubleValue,
-        TStringValue,
-        TAggregateValue,
+        TName = (),
+        TIdentifierValue = (),
+        TPositiveIntValue = (),
+        TNegativeIntValue = (),
+        TDoubleValue = (),
+        TStringValue = (),
+        TAggregateValue = (),
     > {
         pub name: TName,
         pub identifier_value: TIdentifierValue,
@@ -7059,11 +7063,11 @@ pub mod _fields {
         pub aggregate_value: TAggregateValue,
     }
     #[derive(::std::default::Default)]
-    pub struct SourceCodeInfoFields<TLocation> {
+    pub struct SourceCodeInfoFields<TLocation = ()> {
         pub location: TLocation,
     }
     #[derive(::std::default::Default)]
-    pub struct GeneratedCodeInfoFields<TAnnotation> {
+    pub struct GeneratedCodeInfoFields<TAnnotation = ()> {
         pub annotation: TAnnotation,
     }
 }

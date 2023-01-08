@@ -414,13 +414,13 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct ExtensionRangeFields<TStart, TEnd, TOptions> {
+    pub struct ExtensionRangeFields<TStart = (), TEnd = (), TOptions = ()> {
         pub start: TStart,
         pub end: TEnd,
         pub options: TOptions,
     }
     #[derive(::std::default::Default)]
-    pub struct ReservedRangeFields<TStart, TEnd> {
+    pub struct ReservedRangeFields<TStart = (), TEnd = ()> {
         pub start: TStart,
         pub end: TEnd,
     }

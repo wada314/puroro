@@ -195,7 +195,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct NamePartFields<TNamePart, TIsExtension> {
+    pub struct NamePartFields<TNamePart = (), TIsExtension = ()> {
         pub name_part: TNamePart,
         pub is_extension: TIsExtension,
     }

@@ -311,7 +311,12 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct FileFields<TName, TInsertionPoint, TContent, TGeneratedCodeInfo> {
+    pub struct FileFields<
+        TName = (),
+        TInsertionPoint = (),
+        TContent = (),
+        TGeneratedCodeInfo = (),
+    > {
         pub name: TName,
         pub insertion_point: TInsertionPoint,
         pub content: TContent,

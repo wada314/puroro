@@ -354,13 +354,13 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct BookFields<TTitle, TNumPages, TAuthor> {
+    pub struct BookFields<TTitle = (), TNumPages = (), TAuthor = ()> {
         pub title: TTitle,
         pub num_pages: TNumPages,
         pub author: TAuthor,
     }
     #[derive(::std::default::Default)]
-    pub struct AuthorFields<TName> {
+    pub struct AuthorFields<TName = ()> {
         pub name: TName,
     }
 }

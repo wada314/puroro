@@ -195,7 +195,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct SubmsgFields<TI32Required, TI64Required> {
+    pub struct SubmsgFields<TI32Required = (), TI64Required = ()> {
         pub i32_required: TI32Required,
         pub i64_required: TI64Required,
     }

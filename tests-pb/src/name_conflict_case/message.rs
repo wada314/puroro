@@ -156,7 +156,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct ConflictCaseFields<TThisIsMessageField> {
+    pub struct ConflictCaseFields<TThisIsMessageField = ()> {
         pub this_is_message_field: TThisIsMessageField,
     }
 }

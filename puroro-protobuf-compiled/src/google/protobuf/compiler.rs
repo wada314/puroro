@@ -772,7 +772,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct VersionFields<TMajor, TMinor, TPatch, TSuffix> {
+    pub struct VersionFields<TMajor = (), TMinor = (), TPatch = (), TSuffix = ()> {
         pub major: TMajor,
         pub minor: TMinor,
         pub patch: TPatch,
@@ -780,10 +780,10 @@ pub mod _fields {
     }
     #[derive(::std::default::Default)]
     pub struct CodeGeneratorRequestFields<
-        TFileToGenerate,
-        TParameter,
-        TProtoFile,
-        TCompilerVersion,
+        TFileToGenerate = (),
+        TParameter = (),
+        TProtoFile = (),
+        TCompilerVersion = (),
     > {
         pub file_to_generate: TFileToGenerate,
         pub parameter: TParameter,
@@ -791,7 +791,11 @@ pub mod _fields {
         pub compiler_version: TCompilerVersion,
     }
     #[derive(::std::default::Default)]
-    pub struct CodeGeneratorResponseFields<TError, TSupportedFeatures, TFile> {
+    pub struct CodeGeneratorResponseFields<
+        TError = (),
+        TSupportedFeatures = (),
+        TFile = (),
+    > {
         pub error: TError,
         pub supported_features: TSupportedFeatures,
         pub file: TFile,

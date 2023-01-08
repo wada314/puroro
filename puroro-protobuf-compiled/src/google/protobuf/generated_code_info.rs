@@ -271,7 +271,7 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct AnnotationFields<TPath, TSourceFile, TBegin, TEnd> {
+    pub struct AnnotationFields<TPath = (), TSourceFile = (), TBegin = (), TEnd = ()> {
         pub path: TPath,
         pub source_file: TSourceFile,
         pub begin: TBegin,

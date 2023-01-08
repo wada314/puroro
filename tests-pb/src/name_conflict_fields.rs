@@ -298,11 +298,11 @@ pub mod _fields {
         pub use ::puroro::internal::*;
     }
     #[derive(::std::default::Default)]
-    pub struct ConflictFields<TThisIsOriginalMessageField> {
+    pub struct ConflictFields<TThisIsOriginalMessageField = ()> {
         pub this_is_original_message_field: TThisIsOriginalMessageField,
     }
     #[derive(::std::default::Default)]
-    pub struct ConflictFieldsFields<TThisIsFieldsMessageField> {
+    pub struct ConflictFieldsFields<TThisIsFieldsMessageField = ()> {
         pub this_is_fields_message_field: TThisIsFieldsMessageField,
     }
 }
