@@ -27,6 +27,7 @@ pub trait FieldOrOneofExt {
     fn gen_fields_struct_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<SynField>;
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
@@ -79,6 +80,13 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
                 FieldOrOneofCase::Oneof(o) => OneofExt::gen_fields_struct_field_type(o),
             })
             .cloned()
+    }
+
+    fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => FieldExt::gen_fields_struct_init_field_type(f),
+            FieldOrOneofCase::Oneof(o) => OneofExt::gen_fields_struct_init_field_type(o),
+        }
     }
 
     fn gen_fields_struct_field(&self) -> Result<SynField> {

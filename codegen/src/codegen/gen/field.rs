@@ -34,6 +34,7 @@ pub trait FieldExt {
     fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
 
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
+    fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>>;
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
@@ -135,6 +136,9 @@ impl<T: ?Sized + Field> FieldExt for T {
             #PURORO_INTERNAL::#type_name_segment
         })?))
     }
+    fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>> {
+        todo!()
+    }
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.rule()? {
@@ -193,6 +197,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         *receiver = new_expr.into();
         Ok(())
     }
+
     fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {

@@ -43,6 +43,8 @@ pub trait OneofFieldExt {
     fn gen_oneof_union_field_type(&self) -> Result<Rc<Type>>;
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
 
+    fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>>;
+
     fn gen_oneof_union_field(&self) -> Result<Rc<Field>>;
     fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
@@ -180,6 +182,10 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
     }
     fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
+    }
+
+    fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>> {
+        todo!()
     }
 
     fn gen_oneof_union_field(&self) -> Result<Rc<Field>> {
