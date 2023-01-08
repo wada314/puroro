@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub trait MaybeInitField<T> {
-    fn into_opt(self) -> Option<T>;
-}
+pub trait ToNumberOrUnit<T> {}
+pub trait ToStringOrUnit {}
+pub trait ToBytesOrUnit {}
+pub trait ToMessageOrUnit<M> {}
