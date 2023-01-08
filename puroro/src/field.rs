@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![doc = include_str!("lib.md")]
-#![feature(error_generic_member_access)]
-#![feature(provide_any)]
-
-mod error;
-pub mod field;
-pub mod internal;
-pub mod message;
-
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use crate::message::Message;
+pub trait MaybeInitField<T> {
+    fn into_opt(self) -> Option<T>;
+}
