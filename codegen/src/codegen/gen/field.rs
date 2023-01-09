@@ -137,7 +137,12 @@ impl<T: ?Sized + Field> FieldExt for T {
         })?))
     }
     fn gen_fields_struct_init_field_type(&self) -> Result<Rc<Type>> {
-        todo!()
+        match self.r#type()? {
+            FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
+                m.try_upgrade()?.gen_fields_struct_type_for_init_field()
+            }
+            _ => self.r#type()?.rust_type(),
+        }
     }
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {

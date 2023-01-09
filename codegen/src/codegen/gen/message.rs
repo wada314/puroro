@@ -30,6 +30,7 @@ pub trait MessageExt: Debug {
 
     fn gen_message_struct_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
+    fn gen_fields_struct_type_for_init_field(&self) -> Result<Rc<Type>>;
 
     fn gen_message_struct_items(&self) -> Result<Vec<Item>>;
     fn gen_fields_struct_items(&self) -> Result<Vec<Item>>;
@@ -90,6 +91,14 @@ impl<T: ?Sized + Message> MessageExt for T {
         Ok(Rc::new(parse2(
             quote! { #parent :: _fields :: #ident < #(#generics,)* > },
         )?))
+    }
+
+    fn gen_fields_struct_type_for_init_field(&self) -> Result<Rc<Type>> {
+        let generics = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_fields_struct_init_field_type())
+            .collect::<Result<Vec<_>>>()?;
+        self.gen_fields_struct_type(generics.into_iter())
     }
 
     fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
