@@ -19,6 +19,7 @@ pub struct Message {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Message {
     pub fn conflict(
@@ -113,6 +114,7 @@ impl ::std::clone::Clone for Message {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -128,9 +130,12 @@ impl ::std::fmt::Debug for Message {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Message))
-            .field(stringify!(this_is_oneof_field), &self.this_is_oneof_field_opt())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Message));
+        debug_struct
+            .field(stringify!(this_is_oneof_field), &self.this_is_oneof_field_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Message {
@@ -138,6 +143,7 @@ impl ::std::cmp::PartialEq for Message {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.conflict() == rhs.conflict()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

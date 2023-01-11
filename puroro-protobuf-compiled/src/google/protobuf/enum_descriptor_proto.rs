@@ -25,6 +25,7 @@ pub struct EnumReservedRange {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl EnumReservedRange {
     pub fn start(&self) -> i32 {
@@ -151,6 +152,7 @@ impl ::std::clone::Clone for EnumReservedRange {
                 end: ::std::clone::Clone::clone(&self.fields.end),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -165,10 +167,13 @@ impl ::std::fmt::Debug for EnumReservedRange {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(EnumReservedRange))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(EnumReservedRange));
+        debug_struct
             .field(stringify!(start), &self.start_opt())
-            .field(stringify!(end), &self.end_opt())
-            .finish()
+            .field(stringify!(end), &self.end_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for EnumReservedRange {
@@ -176,6 +181,7 @@ impl ::std::cmp::PartialEq for EnumReservedRange {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

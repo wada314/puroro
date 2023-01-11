@@ -31,6 +31,7 @@ pub struct Location {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Location {
     pub fn path(&self) -> &[i32] {
@@ -276,6 +277,7 @@ impl ::std::clone::Clone for Location {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -290,7 +292,9 @@ impl ::std::fmt::Debug for Location {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Location))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Location));
+        debug_struct
             .field(stringify!(path), &self.path())
             .field(stringify!(span), &self.span())
             .field(stringify!(leading_comments), &self.leading_comments_opt())
@@ -298,8 +302,9 @@ impl ::std::fmt::Debug for Location {
             .field(
                 stringify!(leading_detached_comments),
                 &self.leading_detached_comments(),
-            )
-            .finish()
+            );
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Location {
@@ -310,6 +315,7 @@ impl ::std::cmp::PartialEq for Location {
             && self.leading_comments_opt() == rhs.leading_comments_opt()
             && self.trailing_comments_opt() == rhs.trailing_comments_opt()
             && self.leading_detached_comments() == rhs.leading_detached_comments()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

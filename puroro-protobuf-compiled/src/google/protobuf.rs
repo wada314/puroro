@@ -28,6 +28,7 @@ pub struct FileDescriptorSet {
         >,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl FileDescriptorSet {
     pub fn file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
@@ -98,6 +99,7 @@ impl ::std::clone::Clone for FileDescriptorSet {
                 file: ::std::clone::Clone::clone(&self.fields.file),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -112,16 +114,18 @@ impl ::std::fmt::Debug for FileDescriptorSet {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(FileDescriptorSet))
-            .field(stringify!(file), &self.file())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(FileDescriptorSet));
+        debug_struct.field(stringify!(file), &self.file());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for FileDescriptorSet {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        true && self.file() == rhs.file()
+        true && self.file() == rhs.file() && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -168,6 +172,7 @@ pub struct FileDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl FileDescriptorProto {
     pub fn name(&self) -> &str {
@@ -652,6 +657,7 @@ impl ::std::clone::Clone for FileDescriptorProto {
                 syntax: ::std::clone::Clone::clone(&self.fields.syntax),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -666,7 +672,9 @@ impl ::std::fmt::Debug for FileDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(FileDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(FileDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(package), &self.package_opt())
             .field(stringify!(dependency), &self.dependency())
@@ -678,8 +686,9 @@ impl ::std::fmt::Debug for FileDescriptorProto {
             .field(stringify!(extension), &self.extension())
             .field(stringify!(options), &self.options_opt())
             .field(stringify!(source_code_info), &self.source_code_info_opt())
-            .field(stringify!(syntax), &self.syntax_opt())
-            .finish()
+            .field(stringify!(syntax), &self.syntax_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for FileDescriptorProto {
@@ -697,6 +706,7 @@ impl ::std::cmp::PartialEq for FileDescriptorProto {
             && self.options_opt() == rhs.options_opt()
             && self.source_code_info_opt() == rhs.source_code_info_opt()
             && self.syntax_opt() == rhs.syntax_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -737,6 +747,7 @@ pub struct DescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl DescriptorProto {
     pub fn name(&self) -> &str {
@@ -1118,6 +1129,7 @@ impl ::std::clone::Clone for DescriptorProto {
                 reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -1132,7 +1144,9 @@ impl ::std::fmt::Debug for DescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(DescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(DescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(field), &self.field())
             .field(stringify!(extension), &self.extension())
@@ -1142,8 +1156,9 @@ impl ::std::fmt::Debug for DescriptorProto {
             .field(stringify!(oneof_decl), &self.oneof_decl())
             .field(stringify!(options), &self.options_opt())
             .field(stringify!(reserved_range), &self.reserved_range())
-            .field(stringify!(reserved_name), &self.reserved_name())
-            .finish()
+            .field(stringify!(reserved_name), &self.reserved_name());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for DescriptorProto {
@@ -1159,6 +1174,7 @@ impl ::std::cmp::PartialEq for DescriptorProto {
             && self.options_opt() == rhs.options_opt()
             && self.reserved_range() == rhs.reserved_range()
             && self.reserved_name() == rhs.reserved_name()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -1169,6 +1185,7 @@ pub struct ExtensionRangeOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ExtensionRangeOptions {
     pub fn uninterpreted_option(
@@ -1249,6 +1266,7 @@ impl ::std::clone::Clone for ExtensionRangeOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -1263,9 +1281,12 @@ impl ::std::fmt::Debug for ExtensionRangeOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ExtensionRangeOptions))
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ExtensionRangeOptions));
+        debug_struct
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ExtensionRangeOptions {
@@ -1273,6 +1294,7 @@ impl ::std::cmp::PartialEq for ExtensionRangeOptions {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -1337,6 +1359,7 @@ pub struct FieldDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl FieldDescriptorProto {
     pub fn name(&self) -> &str {
@@ -1866,6 +1889,7 @@ impl ::std::clone::Clone for FieldDescriptorProto {
                 proto3_optional: ::std::clone::Clone::clone(&self.fields.proto3_optional),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -1880,7 +1904,9 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(FieldDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(FieldDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(number), &self.number_opt())
             .field(stringify!(label), &self.label_opt())
@@ -1891,8 +1917,9 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
             .field(stringify!(oneof_index), &self.oneof_index_opt())
             .field(stringify!(json_name), &self.json_name_opt())
             .field(stringify!(options), &self.options_opt())
-            .field(stringify!(proto3_optional), &self.proto3_optional_opt())
-            .finish()
+            .field(stringify!(proto3_optional), &self.proto3_optional_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for FieldDescriptorProto {
@@ -1909,6 +1936,7 @@ impl ::std::cmp::PartialEq for FieldDescriptorProto {
             && self.json_name_opt() == rhs.json_name_opt()
             && self.options_opt() == rhs.options_opt()
             && self.proto3_optional_opt() == rhs.proto3_optional_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -1924,6 +1952,7 @@ pub struct OneofDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl OneofDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2055,6 +2084,7 @@ impl ::std::clone::Clone for OneofDescriptorProto {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -2069,10 +2099,13 @@ impl ::std::fmt::Debug for OneofDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(OneofDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(OneofDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
-            .field(stringify!(options), &self.options_opt())
-            .finish()
+            .field(stringify!(options), &self.options_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for OneofDescriptorProto {
@@ -2081,6 +2114,7 @@ impl ::std::cmp::PartialEq for OneofDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         true && self.name_opt() == rhs.name_opt()
             && self.options_opt() == rhs.options_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -2106,6 +2140,7 @@ pub struct EnumDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl EnumDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2337,6 +2372,7 @@ impl ::std::clone::Clone for EnumDescriptorProto {
                 reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -2351,13 +2387,16 @@ impl ::std::fmt::Debug for EnumDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(EnumDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(EnumDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(value), &self.value())
             .field(stringify!(options), &self.options_opt())
             .field(stringify!(reserved_range), &self.reserved_range())
-            .field(stringify!(reserved_name), &self.reserved_name())
-            .finish()
+            .field(stringify!(reserved_name), &self.reserved_name());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for EnumDescriptorProto {
@@ -2368,6 +2407,7 @@ impl ::std::cmp::PartialEq for EnumDescriptorProto {
             && self.options_opt() == rhs.options_opt()
             && self.reserved_range() == rhs.reserved_range()
             && self.reserved_name() == rhs.reserved_name()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -2388,6 +2428,7 @@ pub struct EnumValueDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl EnumValueDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2564,6 +2605,7 @@ impl ::std::clone::Clone for EnumValueDescriptorProto {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -2578,11 +2620,14 @@ impl ::std::fmt::Debug for EnumValueDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(EnumValueDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(EnumValueDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(number), &self.number_opt())
-            .field(stringify!(options), &self.options_opt())
-            .finish()
+            .field(stringify!(options), &self.options_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
@@ -2592,6 +2637,7 @@ impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
         true && self.name_opt() == rhs.name_opt()
             && self.number_opt() == rhs.number_opt()
             && self.options_opt() == rhs.options_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -2610,6 +2656,7 @@ pub struct ServiceDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ServiceDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2769,6 +2816,7 @@ impl ::std::clone::Clone for ServiceDescriptorProto {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -2783,11 +2831,14 @@ impl ::std::fmt::Debug for ServiceDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ServiceDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ServiceDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(method), &self.method())
-            .field(stringify!(options), &self.options_opt())
-            .finish()
+            .field(stringify!(options), &self.options_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ServiceDescriptorProto {
@@ -2796,6 +2847,7 @@ impl ::std::cmp::PartialEq for ServiceDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         true && self.name_opt() == rhs.name_opt() && self.method() == rhs.method()
             && self.options_opt() == rhs.options_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -2831,6 +2883,7 @@ pub struct MethodDescriptorProto {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl MethodDescriptorProto {
     pub fn name(&self) -> &str {
@@ -3156,6 +3209,7 @@ impl ::std::clone::Clone for MethodDescriptorProto {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -3170,14 +3224,17 @@ impl ::std::fmt::Debug for MethodDescriptorProto {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(MethodDescriptorProto))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(MethodDescriptorProto));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(input_type), &self.input_type_opt())
             .field(stringify!(output_type), &self.output_type_opt())
             .field(stringify!(options), &self.options_opt())
             .field(stringify!(client_streaming), &self.client_streaming_opt())
-            .field(stringify!(server_streaming), &self.server_streaming_opt())
-            .finish()
+            .field(stringify!(server_streaming), &self.server_streaming_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for MethodDescriptorProto {
@@ -3190,6 +3247,7 @@ impl ::std::cmp::PartialEq for MethodDescriptorProto {
             && self.options_opt() == rhs.options_opt()
             && self.client_streaming_opt() == rhs.client_streaming_opt()
             && self.server_streaming_opt() == rhs.server_streaming_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -3302,6 +3360,7 @@ pub struct FileOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl FileOptions {
     pub fn java_package(&self) -> &str {
@@ -4393,6 +4452,7 @@ impl ::std::clone::Clone for FileOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -4407,7 +4467,9 @@ impl ::std::fmt::Debug for FileOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(FileOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(FileOptions));
+        debug_struct
             .field(stringify!(java_package), &self.java_package_opt())
             .field(stringify!(java_outer_classname), &self.java_outer_classname_opt())
             .field(stringify!(java_multiple_files), &self.java_multiple_files_opt())
@@ -4437,8 +4499,9 @@ impl ::std::fmt::Debug for FileOptions {
                 &self.php_metadata_namespace_opt(),
             )
             .field(stringify!(ruby_package), &self.ruby_package_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for FileOptions {
@@ -4467,6 +4530,7 @@ impl ::std::cmp::PartialEq for FileOptions {
             && self.php_metadata_namespace_opt() == rhs.php_metadata_namespace_opt()
             && self.ruby_package_opt() == rhs.ruby_package_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -4497,6 +4561,7 @@ pub struct MessageOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl MessageOptions {
     pub fn message_set_wire_format(&self) -> bool {
@@ -4771,6 +4836,7 @@ impl ::std::clone::Clone for MessageOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -4785,7 +4851,9 @@ impl ::std::fmt::Debug for MessageOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(MessageOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(MessageOptions));
+        debug_struct
             .field(
                 stringify!(message_set_wire_format),
                 &self.message_set_wire_format_opt(),
@@ -4796,8 +4864,9 @@ impl ::std::fmt::Debug for MessageOptions {
             )
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(map_entry), &self.map_entry_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for MessageOptions {
@@ -4810,6 +4879,7 @@ impl ::std::cmp::PartialEq for MessageOptions {
             && self.deprecated_opt() == rhs.deprecated_opt()
             && self.map_entry_opt() == rhs.map_entry_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -4854,6 +4924,7 @@ pub struct FieldOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl FieldOptions {
     pub fn ctype(&self) -> self::_root::google::protobuf::field_options::CType {
@@ -5197,6 +5268,7 @@ impl ::std::clone::Clone for FieldOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -5211,15 +5283,18 @@ impl ::std::fmt::Debug for FieldOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(FieldOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(FieldOptions));
+        debug_struct
             .field(stringify!(ctype), &self.ctype_opt())
             .field(stringify!(packed), &self.packed_opt())
             .field(stringify!(jstype), &self.jstype_opt())
             .field(stringify!(lazy), &self.lazy_opt())
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(weak), &self.weak_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for FieldOptions {
@@ -5232,6 +5307,7 @@ impl ::std::cmp::PartialEq for FieldOptions {
             && self.deprecated_opt() == rhs.deprecated_opt()
             && self.weak_opt() == rhs.weak_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -5242,6 +5318,7 @@ pub struct OneofOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl OneofOptions {
     pub fn uninterpreted_option(
@@ -5322,6 +5399,7 @@ impl ::std::clone::Clone for OneofOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -5336,9 +5414,12 @@ impl ::std::fmt::Debug for OneofOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(OneofOptions))
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(OneofOptions));
+        debug_struct
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for OneofOptions {
@@ -5346,6 +5427,7 @@ impl ::std::cmp::PartialEq for OneofOptions {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -5366,6 +5448,7 @@ pub struct EnumOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl EnumOptions {
     pub fn allow_alias(&self) -> bool {
@@ -5532,6 +5615,7 @@ impl ::std::clone::Clone for EnumOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -5546,11 +5630,14 @@ impl ::std::fmt::Debug for EnumOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(EnumOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(EnumOptions));
+        debug_struct
             .field(stringify!(allow_alias), &self.allow_alias_opt())
             .field(stringify!(deprecated), &self.deprecated_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for EnumOptions {
@@ -5560,6 +5647,7 @@ impl ::std::cmp::PartialEq for EnumOptions {
         true && self.allow_alias_opt() == rhs.allow_alias_opt()
             && self.deprecated_opt() == rhs.deprecated_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -5575,6 +5663,7 @@ pub struct EnumValueOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl EnumValueOptions {
     pub fn deprecated(&self) -> bool {
@@ -5698,6 +5787,7 @@ impl ::std::clone::Clone for EnumValueOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -5712,10 +5802,13 @@ impl ::std::fmt::Debug for EnumValueOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(EnumValueOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(EnumValueOptions));
+        debug_struct
             .field(stringify!(deprecated), &self.deprecated_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for EnumValueOptions {
@@ -5724,6 +5817,7 @@ impl ::std::cmp::PartialEq for EnumValueOptions {
         use self::_pinternal::OneofUnion as _;
         true && self.deprecated_opt() == rhs.deprecated_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -5739,6 +5833,7 @@ pub struct ServiceOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ServiceOptions {
     pub fn deprecated(&self) -> bool {
@@ -5862,6 +5957,7 @@ impl ::std::clone::Clone for ServiceOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -5876,10 +5972,13 @@ impl ::std::fmt::Debug for ServiceOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ServiceOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ServiceOptions));
+        debug_struct
             .field(stringify!(deprecated), &self.deprecated_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ServiceOptions {
@@ -5888,6 +5987,7 @@ impl ::std::cmp::PartialEq for ServiceOptions {
         use self::_pinternal::OneofUnion as _;
         true && self.deprecated_opt() == rhs.deprecated_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -5910,6 +6010,7 @@ pub struct MethodOptions {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl MethodOptions {
     pub fn deprecated(&self) -> bool {
@@ -6099,6 +6200,7 @@ impl ::std::clone::Clone for MethodOptions {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -6113,11 +6215,14 @@ impl ::std::fmt::Debug for MethodOptions {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(MethodOptions))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(MethodOptions));
+        debug_struct
             .field(stringify!(deprecated), &self.deprecated_opt())
             .field(stringify!(idempotency_level), &self.idempotency_level_opt())
-            .field(stringify!(uninterpreted_option), &self.uninterpreted_option())
-            .finish()
+            .field(stringify!(uninterpreted_option), &self.uninterpreted_option());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for MethodOptions {
@@ -6127,6 +6232,7 @@ impl ::std::cmp::PartialEq for MethodOptions {
         true && self.deprecated_opt() == rhs.deprecated_opt()
             && self.idempotency_level_opt() == rhs.idempotency_level_opt()
             && self.uninterpreted_option() == rhs.uninterpreted_option()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -6167,6 +6273,7 @@ pub struct UninterpretedOption {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl UninterpretedOption {
     pub fn name(
@@ -6532,6 +6639,7 @@ impl ::std::clone::Clone for UninterpretedOption {
                 aggregate_value: ::std::clone::Clone::clone(&self.fields.aggregate_value),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -6546,15 +6654,18 @@ impl ::std::fmt::Debug for UninterpretedOption {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(UninterpretedOption))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(UninterpretedOption));
+        debug_struct
             .field(stringify!(name), &self.name())
             .field(stringify!(identifier_value), &self.identifier_value_opt())
             .field(stringify!(positive_int_value), &self.positive_int_value_opt())
             .field(stringify!(negative_int_value), &self.negative_int_value_opt())
             .field(stringify!(double_value), &self.double_value_opt())
             .field(stringify!(string_value), &self.string_value_opt())
-            .field(stringify!(aggregate_value), &self.aggregate_value_opt())
-            .finish()
+            .field(stringify!(aggregate_value), &self.aggregate_value_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for UninterpretedOption {
@@ -6568,6 +6679,7 @@ impl ::std::cmp::PartialEq for UninterpretedOption {
             && self.double_value_opt() == rhs.double_value_opt()
             && self.string_value_opt() == rhs.string_value_opt()
             && self.aggregate_value_opt() == rhs.aggregate_value_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -6578,6 +6690,7 @@ pub struct SourceCodeInfo {
         >,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl SourceCodeInfo {
     pub fn location(
@@ -6652,6 +6765,7 @@ impl ::std::clone::Clone for SourceCodeInfo {
                 location: ::std::clone::Clone::clone(&self.fields.location),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -6666,9 +6780,11 @@ impl ::std::fmt::Debug for SourceCodeInfo {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(SourceCodeInfo))
-            .field(stringify!(location), &self.location())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(SourceCodeInfo));
+        debug_struct.field(stringify!(location), &self.location());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for SourceCodeInfo {
@@ -6676,6 +6792,7 @@ impl ::std::cmp::PartialEq for SourceCodeInfo {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.location() == rhs.location()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -6686,6 +6803,7 @@ pub struct GeneratedCodeInfo {
         >,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl GeneratedCodeInfo {
     pub fn annotation(
@@ -6760,6 +6878,7 @@ impl ::std::clone::Clone for GeneratedCodeInfo {
                 annotation: ::std::clone::Clone::clone(&self.fields.annotation),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -6774,9 +6893,11 @@ impl ::std::fmt::Debug for GeneratedCodeInfo {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(GeneratedCodeInfo))
-            .field(stringify!(annotation), &self.annotation())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(GeneratedCodeInfo));
+        debug_struct.field(stringify!(annotation), &self.annotation());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for GeneratedCodeInfo {
@@ -6784,6 +6905,7 @@ impl ::std::cmp::PartialEq for GeneratedCodeInfo {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.annotation() == rhs.annotation()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

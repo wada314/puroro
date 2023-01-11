@@ -25,6 +25,7 @@ pub struct NamePart {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl NamePart {
     pub fn name_part(&self) -> &str {
@@ -153,6 +154,7 @@ impl ::std::clone::Clone for NamePart {
                 is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -167,10 +169,13 @@ impl ::std::fmt::Debug for NamePart {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(NamePart))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(NamePart));
+        debug_struct
             .field(stringify!(name_part), &self.name_part_opt())
-            .field(stringify!(is_extension), &self.is_extension_opt())
-            .finish()
+            .field(stringify!(is_extension), &self.is_extension_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for NamePart {
@@ -179,6 +184,7 @@ impl ::std::cmp::PartialEq for NamePart {
         use self::_pinternal::OneofUnion as _;
         true && self.name_part_opt() == rhs.name_part_opt()
             && self.is_extension_opt() == rhs.is_extension_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

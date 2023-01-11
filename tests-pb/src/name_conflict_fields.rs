@@ -20,6 +20,7 @@ pub struct Conflict {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Conflict {
     pub fn this_is_original_message_field(&self) -> i32 {
@@ -116,6 +117,7 @@ impl ::std::clone::Clone for Conflict {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -130,12 +132,15 @@ impl ::std::fmt::Debug for Conflict {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Conflict))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Conflict));
+        debug_struct
             .field(
                 stringify!(this_is_original_message_field),
                 &self.this_is_original_message_field_opt(),
-            )
-            .finish()
+            );
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Conflict {
@@ -145,6 +150,7 @@ impl ::std::cmp::PartialEq for Conflict {
         true
             && self.this_is_original_message_field_opt()
                 == rhs.this_is_original_message_field_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -157,6 +163,7 @@ pub struct ConflictFields {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ConflictFields {
     pub fn this_is_fields_message_field(&self) -> i32 {
@@ -253,6 +260,7 @@ impl ::std::clone::Clone for ConflictFields {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -267,12 +275,15 @@ impl ::std::fmt::Debug for ConflictFields {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ConflictFields))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ConflictFields));
+        debug_struct
             .field(
                 stringify!(this_is_fields_message_field),
                 &self.this_is_fields_message_field_opt(),
-            )
-            .finish()
+            );
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ConflictFields {
@@ -282,6 +293,7 @@ impl ::std::cmp::PartialEq for ConflictFields {
         true
             && self.this_is_fields_message_field_opt()
                 == rhs.this_is_fields_message_field_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

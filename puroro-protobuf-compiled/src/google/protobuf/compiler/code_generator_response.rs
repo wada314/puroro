@@ -33,6 +33,7 @@ pub struct File {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl File {
     pub fn name(&self) -> &str {
@@ -265,6 +266,7 @@ impl ::std::clone::Clone for File {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -279,12 +281,15 @@ impl ::std::fmt::Debug for File {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(File))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(File));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(insertion_point), &self.insertion_point_opt())
             .field(stringify!(content), &self.content_opt())
-            .field(stringify!(generated_code_info), &self.generated_code_info_opt())
-            .finish()
+            .field(stringify!(generated_code_info), &self.generated_code_info_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for File {
@@ -295,6 +300,7 @@ impl ::std::cmp::PartialEq for File {
             && self.insertion_point_opt() == rhs.insertion_point_opt()
             && self.content_opt() == rhs.content_opt()
             && self.generated_code_info_opt() == rhs.generated_code_info_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

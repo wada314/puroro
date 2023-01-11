@@ -18,6 +18,7 @@ pub struct Submsg {
         self::_pinternal::SingularNumericalField::<i64, self::_pinternal::tags::Int64>,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Submsg {
     pub fn i32_unlabeled(&self) -> i32 {
@@ -189,6 +190,7 @@ impl ::std::clone::Clone for Submsg {
                 i64_unlabeled: ::std::clone::Clone::clone(&self.fields.i64_unlabeled),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -203,11 +205,14 @@ impl ::std::fmt::Debug for Submsg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Submsg))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Submsg));
+        debug_struct
             .field(stringify!(i32_unlabeled), &self.i32_unlabeled_opt())
             .field(stringify!(i32_optional), &self.i32_optional_opt())
-            .field(stringify!(i64_unlabeled), &self.i64_unlabeled_opt())
-            .finish()
+            .field(stringify!(i64_unlabeled), &self.i64_unlabeled_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Submsg {
@@ -217,6 +222,7 @@ impl ::std::cmp::PartialEq for Submsg {
         true && self.i32_unlabeled_opt() == rhs.i32_unlabeled_opt()
             && self.i32_optional_opt() == rhs.i32_optional_opt()
             && self.i64_unlabeled_opt() == rhs.i64_unlabeled_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

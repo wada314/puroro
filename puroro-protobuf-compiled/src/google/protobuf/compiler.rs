@@ -36,6 +36,7 @@ pub struct Version {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Version {
     pub fn major(&self) -> i32 {
@@ -247,6 +248,7 @@ impl ::std::clone::Clone for Version {
                 suffix: ::std::clone::Clone::clone(&self.fields.suffix),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -261,12 +263,15 @@ impl ::std::fmt::Debug for Version {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Version))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Version));
+        debug_struct
             .field(stringify!(major), &self.major_opt())
             .field(stringify!(minor), &self.minor_opt())
             .field(stringify!(patch), &self.patch_opt())
-            .field(stringify!(suffix), &self.suffix_opt())
-            .finish()
+            .field(stringify!(suffix), &self.suffix_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Version {
@@ -276,6 +281,7 @@ impl ::std::cmp::PartialEq for Version {
         true && self.major_opt() == rhs.major_opt()
             && self.minor_opt() == rhs.minor_opt() && self.patch_opt() == rhs.patch_opt()
             && self.suffix_opt() == rhs.suffix_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -298,6 +304,7 @@ pub struct CodeGeneratorRequest {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl CodeGeneratorRequest {
     pub fn file_to_generate(
@@ -508,6 +515,7 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -522,12 +530,15 @@ impl ::std::fmt::Debug for CodeGeneratorRequest {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(CodeGeneratorRequest))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(CodeGeneratorRequest));
+        debug_struct
             .field(stringify!(file_to_generate), &self.file_to_generate())
             .field(stringify!(parameter), &self.parameter_opt())
             .field(stringify!(proto_file), &self.proto_file())
-            .field(stringify!(compiler_version), &self.compiler_version_opt())
-            .finish()
+            .field(stringify!(compiler_version), &self.compiler_version_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for CodeGeneratorRequest {
@@ -538,6 +549,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
             && self.parameter_opt() == rhs.parameter_opt()
             && self.proto_file() == rhs.proto_file()
             && self.compiler_version_opt() == rhs.compiler_version_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -558,6 +570,7 @@ pub struct CodeGeneratorResponse {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl CodeGeneratorResponse {
     pub fn error(&self) -> &str {
@@ -728,6 +741,7 @@ impl ::std::clone::Clone for CodeGeneratorResponse {
                 file: ::std::clone::Clone::clone(&self.fields.file),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -742,11 +756,14 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(CodeGeneratorResponse))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(CodeGeneratorResponse));
+        debug_struct
             .field(stringify!(error), &self.error_opt())
             .field(stringify!(supported_features), &self.supported_features_opt())
-            .field(stringify!(file), &self.file())
-            .finish()
+            .field(stringify!(file), &self.file());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for CodeGeneratorResponse {
@@ -755,7 +772,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorResponse {
         use self::_pinternal::OneofUnion as _;
         true && self.error_opt() == rhs.error_opt()
             && self.supported_features_opt() == rhs.supported_features_opt()
-            && self.file() == rhs.file()
+            && self.file() == rhs.file() && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

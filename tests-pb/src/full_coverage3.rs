@@ -160,6 +160,7 @@ pub struct Msg {
         self::_pinternal::RepeatedNumericalField::<f64, self::_pinternal::tags::Double>,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Msg {
     pub fn i32_unlabeled(&self) -> i32 {
@@ -2202,6 +2203,7 @@ impl ::std::clone::Clone for Msg {
                 f64_repeated: ::std::clone::Clone::clone(&self.fields.f64_repeated),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -2216,7 +2218,9 @@ impl ::std::fmt::Debug for Msg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Msg))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Msg));
+        debug_struct
             .field(stringify!(i32_unlabeled), &self.i32_unlabeled_opt())
             .field(stringify!(i32_optional), &self.i32_optional_opt())
             .field(stringify!(i32_repeated), &self.i32_repeated())
@@ -2264,8 +2268,9 @@ impl ::std::fmt::Debug for Msg {
             .field(stringify!(sfixed64_repeated), &self.sfixed64_repeated())
             .field(stringify!(f64_unlabeled), &self.f64_unlabeled_opt())
             .field(stringify!(f64_optional), &self.f64_optional_opt())
-            .field(stringify!(f64_repeated), &self.f64_repeated())
-            .finish()
+            .field(stringify!(f64_repeated), &self.f64_repeated());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Msg {
@@ -2320,6 +2325,7 @@ impl ::std::cmp::PartialEq for Msg {
             && self.f64_unlabeled_opt() == rhs.f64_unlabeled_opt()
             && self.f64_optional_opt() == rhs.f64_optional_opt()
             && self.f64_repeated() == rhs.f64_repeated()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

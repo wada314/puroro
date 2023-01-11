@@ -19,7 +19,7 @@ use ::std::convert::TryFrom;
 use ::std::io::{Result as IoResult, Write};
 use ::std::iter;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum FieldData<T> {
     Variant(Variant),
     LengthDelimited(T),
@@ -27,7 +27,7 @@ pub enum FieldData<T> {
     Bits64([u8; 8]),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum WireType {
     Variant = 0,
     Bits64 = 1,

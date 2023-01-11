@@ -18,7 +18,7 @@ use std::io::Result as IoResult;
 use std::io::Write;
 
 /// A representative type of variant-encoded types.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct Variant([u8; 8]);
 
 impl Variant {

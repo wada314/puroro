@@ -16,6 +16,7 @@ pub struct Submsg {
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Submsg {
     pub fn item_inner(&self) -> i32 {
@@ -101,6 +102,7 @@ impl ::std::clone::Clone for Submsg {
                 item_inner: ::std::clone::Clone::clone(&self.fields.item_inner),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -115,9 +117,11 @@ impl ::std::fmt::Debug for Submsg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Submsg))
-            .field(stringify!(item_inner), &self.item_inner_opt())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Submsg));
+        debug_struct.field(stringify!(item_inner), &self.item_inner_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Submsg {
@@ -125,6 +129,7 @@ impl ::std::cmp::PartialEq for Submsg {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.item_inner_opt() == rhs.item_inner_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

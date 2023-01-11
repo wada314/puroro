@@ -31,6 +31,7 @@ pub struct Annotation {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Annotation {
     pub fn path(&self) -> &[i32] {
@@ -226,6 +227,7 @@ impl ::std::clone::Clone for Annotation {
                 end: ::std::clone::Clone::clone(&self.fields.end),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -240,12 +242,15 @@ impl ::std::fmt::Debug for Annotation {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Annotation))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Annotation));
+        debug_struct
             .field(stringify!(path), &self.path())
             .field(stringify!(source_file), &self.source_file_opt())
             .field(stringify!(begin), &self.begin_opt())
-            .field(stringify!(end), &self.end_opt())
-            .finish()
+            .field(stringify!(end), &self.end_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Annotation {
@@ -255,6 +260,7 @@ impl ::std::cmp::PartialEq for Annotation {
         true && self.path() == rhs.path()
             && self.source_file_opt() == rhs.source_file_opt()
             && self.begin_opt() == rhs.begin_opt() && self.end_opt() == rhs.end_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {
