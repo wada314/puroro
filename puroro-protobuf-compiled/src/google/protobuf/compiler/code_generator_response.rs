@@ -360,7 +360,7 @@ impl ::std::convert::TryFrom::<i32> for Feature {
             1i32 => ::std::result::Result::Ok(self::Feature::FeatureProto3Optional),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }

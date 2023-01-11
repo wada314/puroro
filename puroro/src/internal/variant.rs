@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::tags;
-use crate::{ErrorKind, Result};
+use crate::{PuroroError, Result};
 use std::io::Result as IoResult;
 use std::io::Write;
 
@@ -41,7 +41,7 @@ impl Variant {
                     }
                 }
                 (0, None) => return Ok(None),
-                (_, None) => Err(ErrorKind::UnexpectedInputTermination)?,
+                (_, None) => Err(PuroroError::UnexpectedInputTermination)?,
             }
         }
         // i == 9, so now checking a last MSBit.
@@ -50,12 +50,12 @@ impl Variant {
                 let byte = maybe_byte?;
                 x |= ((byte & 0x01) as u64) << 63;
                 if byte & 0xFE != 0 {
-                    Err(ErrorKind::TooLargeVariant)?
+                    Err(PuroroError::TooLargeVariant)?
                 } else {
                     return Ok(Some(Variant(x.to_ne_bytes())));
                 }
             }
-            None => Err(ErrorKind::UnexpectedInputTermination)?,
+            None => Err(PuroroError::UnexpectedInputTermination)?,
         }
     }
     pub fn encode_bytes<W>(&self, write: &mut W) -> Result<()>

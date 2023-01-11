@@ -176,7 +176,7 @@ fn gen_enum_try_from_i32(this: &(impl ?Sized + Enum)) -> Result<ItemImpl> {
             fn try_from(val: i32) -> ::std::result::Result<Self, Self::Error> {
                 match val {
                     #(#value_numbers => ::std::result::Result::Ok(self::#ident::#value_idents),)*
-                    _ => ::std::result::Result::Err(#PURORO_LIB::ErrorKind::UnknownEnumVariant(val))?,
+                    _ => ::std::result::Result::Err(#PURORO_LIB::PuroroError::UnknownEnumVariant(val))?,
                 }
             }
         }

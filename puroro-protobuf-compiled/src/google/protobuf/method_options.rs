@@ -48,7 +48,7 @@ impl ::std::convert::TryFrom::<i32> for IdempotencyLevel {
             2i32 => ::std::result::Result::Ok(self::IdempotencyLevel::Idempotent),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }

@@ -2504,7 +2504,7 @@ impl ::std::convert::TryFrom::<i32> for Enum {
             10i32 => ::std::result::Result::Ok(self::Enum::Tenth),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }

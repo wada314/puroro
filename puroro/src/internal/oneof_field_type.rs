@@ -14,7 +14,7 @@
 
 use crate::internal::ser::{ser_bytes_shared, ser_numerical_shared, FieldData, WireType};
 use crate::internal::tags;
-use crate::{ErrorKind, Message, Result};
+use crate::{Message, PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 
@@ -127,9 +127,9 @@ where
             FieldData::Variant(variant) => {
                 self.0 = variant.get::<ProtoType>()?;
             }
-            FieldData::LengthDelimited(_) => {
-                Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as u32))?
-            }
+            FieldData::LengthDelimited(_) => Err(PuroroError::InvalidWireType(
+                WireType::LengthDelimited as u32,
+            ))?,
             FieldData::Bits32(bits) => {
                 self.0 = <ProtoType as tags::NumericalType>::from_bits32(bits)?;
             }
@@ -189,7 +189,7 @@ where
             self.0 = ProtoType::from_bytes_iter(iter)?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
+            Err(PuroroError::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 
@@ -240,7 +240,7 @@ where
             msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
+            Err(PuroroError::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 

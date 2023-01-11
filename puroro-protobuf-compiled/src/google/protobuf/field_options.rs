@@ -48,7 +48,7 @@ impl ::std::convert::TryFrom::<i32> for CType {
             2i32 => ::std::result::Result::Ok(self::CType::StringPiece),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }
@@ -92,7 +92,7 @@ impl ::std::convert::TryFrom::<i32> for JSType {
             2i32 => ::std::result::Result::Ok(self::JSType::JsNumber),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }

@@ -93,7 +93,7 @@ impl ::std::convert::TryFrom::<i32> for Type {
             18i32 => ::std::result::Result::Ok(self::Type::TypeSint64),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }
@@ -137,7 +137,7 @@ impl ::std::convert::TryFrom::<i32> for Label {
             3i32 => ::std::result::Result::Ok(self::Label::LabelRepeated),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }
