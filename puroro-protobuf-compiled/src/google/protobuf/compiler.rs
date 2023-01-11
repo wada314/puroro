@@ -168,41 +168,52 @@ impl self::_puroro::Message for Version {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.major,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.major,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.minor,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    3i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.patch,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    4i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.suffix,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.minor,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                3i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.patch,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                4i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.suffix,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -431,41 +442,52 @@ impl self::_puroro::Message for CodeGeneratorRequest {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.file_to_generate,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.file_to_generate,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.parameter,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    15i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.proto_file,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    3i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.compiler_version,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.parameter,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                15i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.proto_file,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                3i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.compiler_version,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -673,34 +695,45 @@ impl self::_puroro::Message for CodeGeneratorResponse {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
         while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.error,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.error,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.supported_features,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    15i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.file,
+                            &mut self.bitfield,
+                            field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.supported_features,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                15i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.file,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
