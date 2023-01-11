@@ -16,7 +16,7 @@ use super::{
     DataTypeBase, Enum, Message, MessageOrEnumCase, Oneof, Package, PackageOrMessageCase,
     RootPackage,
 };
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
@@ -92,7 +92,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
                 return Ok(MessageOrEnumCase::Enum(m));
             }
         }
-        Err(ErrorKind::UnknownTypeName {
+        Err(FatalErrorKind::UnknownTypeName {
             name: type_name.to_string(),
         })?
     }

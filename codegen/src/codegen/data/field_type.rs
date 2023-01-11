@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::{Enum, Message, MessageOrEnumCase, Syntax};
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 use ::std::rc::{Rc, Weak};
 
@@ -89,7 +89,7 @@ impl FieldType {
                             Syntax::Proto3 => Variant(Enum3(Rc::downgrade(&e))),
                         }
                     } else {
-                        Err(ErrorKind::UnknownTypeName {
+                        Err(FatalErrorKind::UnknownTypeName {
                             name: type_name.to_string(),
                         })?
                     }
@@ -102,12 +102,12 @@ impl FieldType {
                 TypeDouble => Bits64(Double),
                 TypeString => LengthDelimited(String),
                 TypeBytes => LengthDelimited(Bytes),
-                TypeGroup => Err(ErrorKind::GroupNotSupported)?,
+                TypeGroup => Err(FatalErrorKind::GroupNotSupported)?,
                 TypeMessage => {
                     if let Some(MessageOrEnumCase::Message(m)) = maybe_m_or_e {
                         LengthDelimited(Message(Rc::downgrade(&m)))
                     } else {
-                        Err(ErrorKind::UnknownTypeName {
+                        Err(FatalErrorKind::UnknownTypeName {
                             name: type_name.to_string(),
                         })?
                     }
@@ -122,7 +122,7 @@ impl FieldType {
                 },
             })
         } else {
-            Err(ErrorKind::MissingTypeName)?
+            Err(FatalErrorKind::MissingTypeName)?
         }
     }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::lazy_static::lazy_static;
 use ::once_cell::unsync::OnceCell;
 use ::std::any::Any;
@@ -25,7 +25,7 @@ pub trait WeakExt<T: ?Sized> {
 }
 impl<T: ?Sized> WeakExt<T> for Weak<T> {
     fn try_upgrade(&self) -> Result<Rc<T>> {
-        Ok(Weak::upgrade(self).ok_or(ErrorKind::InternalError {
+        Ok(Weak::upgrade(self).ok_or(FatalErrorKind::InternalError {
             detail: "Weak ptr upgrade failed".to_string(),
         })?)
     }
@@ -238,17 +238,17 @@ pub fn convert_octal_escapes_to_bytes(input: &str) -> Result<Vec<u8>> {
                                         &format!("{}{}{}", d - b'0', e - b'0', f - b'0'),
                                         8,
                                     )
-                                    .map_err(|e| ErrorKind::ParseIntError { source: e })?;
+                                    .map_err(|e| FatalErrorKind::ParseIntError { source: e })?;
                                     decoded.push(u8_value);
                                 }
-                                _ => Err(ErrorKind::InvalidString {
+                                _ => Err(FatalErrorKind::InvalidString {
                                     string: input.to_string(),
                                 })?,
                             }
                         }
                     }
                 } else {
-                    Err(ErrorKind::InvalidString {
+                    Err(FatalErrorKind::InvalidString {
                         string: input.to_string(),
                     })?
                 }

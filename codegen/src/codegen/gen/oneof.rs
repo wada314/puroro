@@ -20,7 +20,7 @@ use super::{
 use crate::syn::{
     parse2, Arm, Expr, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, Stmt, Type,
 };
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
@@ -73,7 +73,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             // Force allocate the bitfields
             let _ = self.message()?.bitfield_size()?;
             let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() else {
-            Err(ErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
+            Err(FatalErrorKind::InternalError { detail: "Oneof bitfield is not allocated".to_string() })?
         };
             alloc
         };

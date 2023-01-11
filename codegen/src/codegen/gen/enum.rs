@@ -21,7 +21,7 @@ use super::super::util::*;
 use super::{Enum, PackageOrMessageExt, Syntax, PURORO_LIB};
 use crate::syn;
 use crate::syn::{parse2, Item, ItemEnum, Path, Type};
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
@@ -52,7 +52,7 @@ impl<T: ?Sized + Enum> EnumExt for T {
             Syntax::Proto2 => quote! {},
             Syntax::Proto3 => quote! { _None(i32), },
         };
-        let first_value_ident = value_idents.first().ok_or(ErrorKind::NoEnumValues)?;
+        let first_value_ident = value_idents.first().ok_or(FatalErrorKind::NoEnumValues)?;
         let item_into_i32 = gen_enum_into_i32(self)?;
         let item_from_i32 = match syntax {
             Syntax::Proto2 => gen_enum_try_from_i32(self)?,

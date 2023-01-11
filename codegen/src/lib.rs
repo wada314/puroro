@@ -68,7 +68,7 @@ mod syn {
     pub(crate) type NamedField = TokenStream;
 }
 
-pub use crate::error::{ErrorKind, GeneratorError};
+pub use crate::error::{FatalErrorKind, GeneratorError};
 pub type Result<T> = ::std::result::Result<T, GeneratorError>;
 
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;

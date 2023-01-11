@@ -25,6 +25,7 @@ use ::std::fs::File;
 use ::std::io::{Read, Write};
 use ::std::process::Command;
 use ::tempdir::TempDir;
+use puroro_codegen::GeneratorError;
 
 // I really want protoc to support stdin / stdout handling:
 // https://github.com/protocolbuffers/protobuf/issues/4163
@@ -74,8 +75,12 @@ pub fn puroro_inline(input: TokenStream) -> TokenStream {
 
     let main_code = match generate_tokens_for_inline(fd_set.file().into_iter()) {
         Ok(main_code) => main_code,
-        Err(e) => {
-            let message = format!("{}\n{}", e.to_string(), &e.backtrace);
+        Err(GeneratorError::FatalError { kind, backtrace }) => {
+            let message = format!("{}\n{}", kind.to_string(), &backtrace);
+            return quote! { compile_error!(#message); }.into();
+        }
+        Err(GeneratorError::RecoverableError { kind }) => {
+            let message = format!("{}", kind.to_string());
             return quote! { compile_error!(#message); }.into();
         }
     };

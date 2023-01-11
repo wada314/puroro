@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::Syntax;
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 
 #[derive(Debug, Clone, Copy)]
@@ -33,7 +33,7 @@ impl FieldRule {
         use FieldRule::*;
 
         let Some(label) = label_opt else {
-            Err(ErrorKind::InvalidLabel { label: "No label!".to_string(), syntax: format!("{:?}", syntax), proto3_optional })?
+            Err(FatalErrorKind::InvalidLabel { label: "No label!".to_string(), syntax: format!("{:?}", syntax), proto3_optional })?
         };
         Ok(match (label, proto3_optional, syntax) {
             (LabelOptional | LabelRequired, false, Syntax::Proto2) => Optional,
@@ -41,7 +41,7 @@ impl FieldRule {
             (LabelOptional, false, Syntax::Proto3) => Singular,
             (LabelOptional, true, Syntax::Proto3) => Optional,
             (LabelRepeated, false, Syntax::Proto3) => Repeated,
-            (label, proto3_optional, syntax) => Err(ErrorKind::InvalidLabel {
+            (label, proto3_optional, syntax) => Err(FatalErrorKind::InvalidLabel {
                 label: format!("{:?}", label),
                 syntax: format!("{:?}", syntax),
                 proto3_optional,
