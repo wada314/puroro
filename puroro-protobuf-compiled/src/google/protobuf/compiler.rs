@@ -227,6 +227,7 @@ impl self::_puroro::Message for Version {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.major,
             &self.bitfield,
@@ -251,6 +252,7 @@ impl self::_puroro::Message for Version {
             4i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -506,6 +508,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.file_to_generate,
             &self.bitfield,
@@ -530,6 +533,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
             3i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -757,6 +761,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.error,
             &self.bitfield,
@@ -775,6 +780,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
             15i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }

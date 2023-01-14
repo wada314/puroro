@@ -99,12 +99,14 @@ impl self::_puroro::Message for FileDescriptorSet {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.file,
             &self.bitfield,
             1i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -590,6 +592,7 @@ impl self::_puroro::Message for FileDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -662,6 +665,7 @@ impl self::_puroro::Message for FileDescriptorProto {
             12i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -1096,6 +1100,7 @@ impl self::_puroro::Message for DescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -1156,6 +1161,7 @@ impl self::_puroro::Message for DescriptorProto {
             10i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -1312,12 +1318,14 @@ impl self::_puroro::Message for ExtensionRangeOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -1883,6 +1891,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -1949,6 +1958,7 @@ impl self::_puroro::Message for FieldDescriptorProto {
             17i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -2157,6 +2167,7 @@ impl self::_puroro::Message for OneofDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -2169,6 +2180,7 @@ impl self::_puroro::Message for OneofDescriptorProto {
             2i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -2440,6 +2452,7 @@ impl self::_puroro::Message for EnumDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -2470,6 +2483,7 @@ impl self::_puroro::Message for EnumDescriptorProto {
             5i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -2703,6 +2717,7 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -2721,6 +2736,7 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
             3i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -2930,6 +2946,7 @@ impl self::_puroro::Message for ServiceDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -2948,6 +2965,7 @@ impl self::_puroro::Message for ServiceDescriptorProto {
             3i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -3314,6 +3332,7 @@ impl self::_puroro::Message for MethodDescriptorProto {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -3350,6 +3369,7 @@ impl self::_puroro::Message for MethodDescriptorProto {
             6i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -4444,6 +4464,7 @@ impl self::_puroro::Message for FileOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.java_package,
             &self.bitfield,
@@ -4570,6 +4591,7 @@ impl self::_puroro::Message for FileOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -4978,6 +5000,7 @@ impl self::_puroro::Message for MessageOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.message_set_wire_format,
             &self.bitfield,
@@ -5008,6 +5031,7 @@ impl self::_puroro::Message for MessageOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -5416,6 +5440,7 @@ impl self::_puroro::Message for FieldOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.ctype,
             &self.bitfield,
@@ -5458,6 +5483,7 @@ impl self::_puroro::Message for FieldOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -5605,12 +5631,14 @@ impl self::_puroro::Message for OneofOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.uninterpreted_option,
             &self.bitfield,
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -5823,6 +5851,7 @@ impl self::_puroro::Message for EnumOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.allow_alias,
             &self.bitfield,
@@ -5841,6 +5870,7 @@ impl self::_puroro::Message for EnumOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -6018,6 +6048,7 @@ impl self::_puroro::Message for EnumValueOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
@@ -6030,6 +6061,7 @@ impl self::_puroro::Message for EnumValueOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -6204,6 +6236,7 @@ impl self::_puroro::Message for ServiceOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
@@ -6216,6 +6249,7 @@ impl self::_puroro::Message for ServiceOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -6454,6 +6488,7 @@ impl self::_puroro::Message for MethodOptions {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.deprecated,
             &self.bitfield,
@@ -6472,6 +6507,7 @@ impl self::_puroro::Message for MethodOptions {
             999i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -6879,6 +6915,7 @@ impl self::_puroro::Message for UninterpretedOption {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -6921,6 +6958,7 @@ impl self::_puroro::Message for UninterpretedOption {
             8i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -7069,12 +7107,14 @@ impl self::_puroro::Message for SourceCodeInfo {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.location,
             &self.bitfield,
             1i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -7198,12 +7238,14 @@ impl self::_puroro::Message for GeneratedCodeInfo {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.annotation,
             &self.bitfield,
             1i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }

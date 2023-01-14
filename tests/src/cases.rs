@@ -21,3 +21,4 @@ mod self_recursive;
 mod serialization;
 mod simple_get_set;
 mod simple_misc_traits;
+mod unknown_fields;
