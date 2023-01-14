@@ -243,7 +243,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
                 Ok(parse2(quote! {
                     #field_number => self.fields.#field_ident.deser_from_iter(
                         &mut self.bitfield,
-                        #field_data_expr,
+                        &mut #field_data_expr,
                         #case_type::#case_name(()),
                     )?,
                 })?)
@@ -388,7 +388,7 @@ fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
             fn deser_from_iter<I, B>(
                 &mut self,
                 bitvec: &mut B,
-                field_data: #PURORO_INTERNAL::ser::FieldData<I>,
+                field_data: &mut #PURORO_INTERNAL::ser::FieldData<I>,
                 case: Self::Case,
             ) -> #PURORO_LIB::Result<()>
             where

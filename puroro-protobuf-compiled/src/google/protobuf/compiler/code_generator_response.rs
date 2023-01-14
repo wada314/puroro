@@ -182,10 +182,11 @@ impl self::_puroro::Message for File {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -193,28 +194,28 @@ impl self::_puroro::Message for File {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.insertion_point,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     15i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.content,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     16i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.generated_code_info,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -223,7 +224,11 @@ impl self::_puroro::Message for File {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }

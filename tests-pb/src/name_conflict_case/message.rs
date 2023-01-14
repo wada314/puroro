@@ -77,10 +77,11 @@ impl self::_puroro::Message for ConflictCase {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -88,7 +89,7 @@ impl self::_puroro::Message for ConflictCase {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.this_is_message_field,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -97,7 +98,11 @@ impl self::_puroro::Message for ConflictCase {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -321,7 +326,7 @@ where
     fn deser_from_iter<I, B>(
         &mut self,
         bitvec: &mut B,
-        field_data: self::_pinternal::ser::FieldData<I>,
+        field_data: &mut self::_pinternal::ser::FieldData<I>,
         case: Self::Case,
     ) -> self::_puroro::Result<()>
     where

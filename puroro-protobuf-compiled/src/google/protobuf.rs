@@ -61,10 +61,11 @@ impl self::_puroro::Message for FileDescriptorSet {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -72,7 +73,7 @@ impl self::_puroro::Message for FileDescriptorSet {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.file,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -81,7 +82,11 @@ impl self::_puroro::Message for FileDescriptorSet {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -470,10 +475,11 @@ impl self::_puroro::Message for FileDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -481,84 +487,84 @@ impl self::_puroro::Message for FileDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.package,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.dependency,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.public_dependency,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     11i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.weak_dependency,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.message_type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.service,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extension,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.source_code_info,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     12i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.syntax,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -567,7 +573,11 @@ impl self::_puroro::Message for FileDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -985,10 +995,11 @@ impl self::_puroro::Message for DescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -996,70 +1007,70 @@ impl self::_puroro::Message for DescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.field,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extension,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.nested_type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extension_range,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.oneof_decl,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_range,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -1068,7 +1079,11 @@ impl self::_puroro::Message for DescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -1259,10 +1274,11 @@ impl self::_puroro::Message for ExtensionRangeOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -1270,7 +1286,7 @@ impl self::_puroro::Message for ExtensionRangeOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -1279,7 +1295,11 @@ impl self::_puroro::Message for ExtensionRangeOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -1755,10 +1775,11 @@ impl self::_puroro::Message for FieldDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -1766,77 +1787,77 @@ impl self::_puroro::Message for FieldDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.number,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.label,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.r#type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.type_name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extendee,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.default_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.oneof_index,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.json_name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     17i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.proto3_optional,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -1845,7 +1866,11 @@ impl self::_puroro::Message for FieldDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -2087,10 +2112,11 @@ impl self::_puroro::Message for OneofDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -2098,14 +2124,14 @@ impl self::_puroro::Message for OneofDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2114,7 +2140,11 @@ impl self::_puroro::Message for OneofDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -2344,10 +2374,11 @@ impl self::_puroro::Message for EnumDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -2355,35 +2386,35 @@ impl self::_puroro::Message for EnumDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_range,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2392,7 +2423,11 @@ impl self::_puroro::Message for EnumDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -2616,10 +2651,11 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -2627,21 +2663,21 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.number,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2650,7 +2686,11 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -2838,10 +2878,11 @@ impl self::_puroro::Message for ServiceDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -2849,21 +2890,21 @@ impl self::_puroro::Message for ServiceDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.method,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2872,7 +2913,11 @@ impl self::_puroro::Message for ServiceDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -3196,10 +3241,11 @@ impl self::_puroro::Message for MethodDescriptorProto {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -3207,42 +3253,42 @@ impl self::_puroro::Message for MethodDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.input_type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.output_type,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.client_streaming,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.server_streaming,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -3251,7 +3297,11 @@ impl self::_puroro::Message for MethodDescriptorProto {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -4216,10 +4266,11 @@ impl self::_puroro::Message for FileOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -4227,147 +4278,147 @@ impl self::_puroro::Message for FileOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_package,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_outer_classname,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_multiple_files,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     20i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_generate_equals_and_hash,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     27i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_string_check_utf8,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.optimize_for,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     11i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.go_package,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     16i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.cc_generic_services,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     17i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_generic_services,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     18i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.py_generic_services,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     42i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_generic_services,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     23i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     31i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.cc_enable_arenas,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     36i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.objc_class_prefix,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     37i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.csharp_namespace,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     39i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.swift_prefix,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     40i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_class_prefix,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     41i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_namespace,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     44i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_metadata_namespace,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     45i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.ruby_package,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -4376,7 +4427,11 @@ impl self::_puroro::Message for FileOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -4857,10 +4912,11 @@ impl self::_puroro::Message for MessageOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -4868,35 +4924,35 @@ impl self::_puroro::Message for MessageOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.message_set_wire_format,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.no_standard_descriptor_accessor,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.map_entry,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -4905,7 +4961,11 @@ impl self::_puroro::Message for MessageOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -5276,10 +5336,11 @@ impl self::_puroro::Message for FieldOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -5287,49 +5348,49 @@ impl self::_puroro::Message for FieldOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.ctype,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.packed,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.jstype,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.lazy,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.weak,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -5338,7 +5399,11 @@ impl self::_puroro::Message for FieldOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -5502,10 +5567,11 @@ impl self::_puroro::Message for OneofOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -5513,7 +5579,7 @@ impl self::_puroro::Message for OneofOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -5522,7 +5588,11 @@ impl self::_puroro::Message for OneofOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -5701,10 +5771,11 @@ impl self::_puroro::Message for EnumOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -5712,21 +5783,21 @@ impl self::_puroro::Message for EnumOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.allow_alias,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -5735,7 +5806,11 @@ impl self::_puroro::Message for EnumOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -5898,10 +5973,11 @@ impl self::_puroro::Message for EnumValueOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -5909,14 +5985,14 @@ impl self::_puroro::Message for EnumValueOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -5925,7 +6001,11 @@ impl self::_puroro::Message for EnumValueOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -6079,10 +6159,11 @@ impl self::_puroro::Message for ServiceOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -6090,14 +6171,14 @@ impl self::_puroro::Message for ServiceOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6106,7 +6187,11 @@ impl self::_puroro::Message for ServiceOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -6317,10 +6402,11 @@ impl self::_puroro::Message for MethodOptions {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -6328,21 +6414,21 @@ impl self::_puroro::Message for MethodOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     34i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.idempotency_level,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6351,7 +6437,11 @@ impl self::_puroro::Message for MethodOptions {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -6709,10 +6799,11 @@ impl self::_puroro::Message for UninterpretedOption {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -6720,49 +6811,49 @@ impl self::_puroro::Message for UninterpretedOption {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.identifier_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.positive_int_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.negative_int_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.double_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.string_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.aggregate_value,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6771,7 +6862,11 @@ impl self::_puroro::Message for UninterpretedOption {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -6936,10 +7031,11 @@ impl self::_puroro::Message for SourceCodeInfo {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -6947,7 +7043,7 @@ impl self::_puroro::Message for SourceCodeInfo {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.location,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6956,7 +7052,11 @@ impl self::_puroro::Message for SourceCodeInfo {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }
@@ -7060,10 +7160,11 @@ impl self::_puroro::Message for GeneratedCodeInfo {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -7071,7 +7172,7 @@ impl self::_puroro::Message for GeneratedCodeInfo {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.annotation,
                             &mut self.bitfield,
-                            field_data,
+                            &mut field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -7080,7 +7181,11 @@ impl self::_puroro::Message for GeneratedCodeInfo {
             })();
             match result {
                 Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
                 Err(e) => Err(e)?,
             }
         }

@@ -213,9 +213,10 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
             fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> #PURORO_LIB::Result<()> {
                 use #PURORO_INTERNAL::ser::FieldData;
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                use #PURORO_INTERNAL::UnknownFields as _;
                 #[allow(unused)] use ::std::result::Result::{Ok, Err};
                 use #PURORO_LIB::PuroroError;
-                while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                while let Some((number, mut #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
                     let result: #PURORO_LIB::Result<()> = (|| {
                         match number {
                             #(#deser_arms)*
@@ -226,7 +227,8 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
                     match result {
                         Ok(_) => (),
                         Err(PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_)) => {
-                            // Do something for unknown field
+                            // Recoverable error. Store the field into unknown_fields.
+                            self.unknown_fields.push(number, #field_data_ident)?;
                         }
                         Err(e) => Err(e)?,
                     }

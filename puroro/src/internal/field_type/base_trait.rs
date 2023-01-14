@@ -27,13 +27,13 @@ pub trait FieldType {
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
     ) -> Result<()> {
         match field_data {
-            FieldData::Variant(v) => self.deser_from_variant(bitvec, v),
+            FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
             FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
-            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits),
-            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits),
+            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
+            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
         }
     }
     fn deser_from_variant<B: BitSlice>(
@@ -60,7 +60,7 @@ pub trait FieldType {
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] iter: I,
+        #[allow(unused)] iter: &mut I,
     ) -> Result<()> {
         Err(PuroroError::InvalidWireType(
             WireType::LengthDelimited as u32,
@@ -90,7 +90,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        mut iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             let v = var.get::<ProtoType>()?;
@@ -131,13 +131,13 @@ where
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
     ) -> Result<()> {
         match field_data {
-            FieldData::Variant(v) => self.deser_from_variant(bitvec, v),
+            FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
             FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
-            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits),
-            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits),
+            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
+            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
         }
     }
 }
@@ -156,7 +156,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        mut iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             self.0 = var.get::<ProtoType>()?;
@@ -200,7 +200,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        mut iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             self.0.push(var.get::<ProtoType>()?)
@@ -263,7 +263,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         let val = ProtoType::from_bytes_iter(iter)?;
         if val != RustType::default() {
@@ -293,7 +293,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         self.0 = ProtoType::from_bytes_iter(iter)?;
         bitvec.set(BITFIELD_INDEX, true);
@@ -320,7 +320,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         self.0.push(ProtoType::from_bytes_iter(iter)?);
         Ok(())
@@ -346,10 +346,10 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut I,
     ) -> Result<()> {
         let msg = self.0.get_or_insert_with(Default::default).as_mut();
-        Ok(msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?)
+        Ok(msg.merge_from_bytes_iter(iter)?)
     }
 
     fn ser_to_write<W: Write, B: BitSlice>(
@@ -374,9 +374,9 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut I,
     ) -> Result<()> {
-        let msg = M::from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
+        let msg = M::from_bytes_iter(iter)?;
         self.0.push(msg);
         Ok(())
     }

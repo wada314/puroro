@@ -155,7 +155,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             #number => #PURORO_INTERNAL::FieldType::deser_from_iter(
                 &mut self.fields.#ident,
                 &mut self.bitfield,
-                #field_data_expr,
+                &mut #field_data_expr,
             )?,
         })?)
     }

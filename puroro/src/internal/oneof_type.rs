@@ -29,7 +29,7 @@ pub trait OneofUnion {
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
         case: Self::Case,
     ) -> Result<()>;
 
