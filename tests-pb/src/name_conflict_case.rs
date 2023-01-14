@@ -116,7 +116,9 @@ impl self::_puroro::Message for Message {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self.fields.conflict.ser_to_write(&self.bitfield, out)?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }

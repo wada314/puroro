@@ -238,7 +238,9 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
 
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                use #PURORO_INTERNAL::UnknownFields as _;
                 #(#ser_stmts)*
+                self.unknown_fields.ser_to_write(#out_ident)?;
                 ::std::result::Result::Ok(())
             }
         }
