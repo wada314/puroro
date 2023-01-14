@@ -225,7 +225,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
                     })();
                     match result {
                         Ok(_) => (),
-                        Err(PuroroError::UnknownFieldNumber) => {
+                        Err(PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_)) => {
                             // Do something for unknown field
                         }
                         Err(e) => Err(e)?,

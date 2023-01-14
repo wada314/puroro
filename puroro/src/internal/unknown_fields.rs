@@ -13,11 +13,18 @@
 // limitations under the License.
 
 use super::ser::FieldData;
+use crate::Result;
 use ::std::collections::HashMap;
 use ::std::fmt::{DebugStruct, Result as FmtResult};
+use ::std::io::Result as IoResult;
 
 pub trait UnknownFields {
     fn debug_struct_fields<'a, 'b>(&self, debug_struct: &mut DebugStruct<'a, 'b>) -> FmtResult;
+    fn push<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        number: i32,
+        field_data: FieldData<I>,
+    ) -> Result<()>;
 }
 
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -28,6 +35,21 @@ pub struct UnknownFieldsImpl {
 impl UnknownFields for UnknownFieldsImpl {
     fn debug_struct_fields<'a, 'b>(&self, debug_struct: &mut DebugStruct<'a, 'b>) -> FmtResult {
         debug_struct.field("TODO_Maybe_unknown_fields", &());
+        Ok(())
+    }
+
+    fn push<I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        number: i32,
+        field_data: FieldData<I>,
+    ) -> Result<()> {
+        let owned_field_data = field_data
+            .map(|iter| iter.collect::<IoResult<Vec<_>>>())
+            .transpose()?;
+        self.fields
+            .entry(number)
+            .or_default()
+            .push(owned_field_data);
         Ok(())
     }
 }

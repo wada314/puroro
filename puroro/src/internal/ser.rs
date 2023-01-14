@@ -69,6 +69,17 @@ impl<T> FieldData<T> {
     }
 }
 
+impl<T, E> FieldData<::std::result::Result<T, E>> {
+    pub fn transpose(self) -> ::std::result::Result<FieldData<T>, E> {
+        Ok(match self {
+            FieldData::Variant(x) => FieldData::Variant(x),
+            FieldData::LengthDelimited(x) => FieldData::LengthDelimited(x?),
+            FieldData::Bits32(x) => FieldData::Bits32(x),
+            FieldData::Bits64(x) => FieldData::Bits64(x),
+        })
+    }
+}
+
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
     pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
