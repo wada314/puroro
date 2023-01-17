@@ -16,6 +16,7 @@ use ::puroro::Message;
 use ::puroro_inline::puroro_inline;
 use ::std::io::Read;
 
+const SUBMSG_FIELD_NUMBER: u8 = 7;
 const UNKNOWN_FIELD_NUMBER: u8 = 15;
 
 puroro_inline! {r#"
@@ -34,6 +35,8 @@ message Msg {
     repeated string string_repeated = 6;
 
     message Submsg {
+        // Reserve for unknown field number test
+        reserved 15;
         int32 i32_unlabeled = 1;
     }
     Submsg submsg_unlabeled = 7;
@@ -76,4 +79,18 @@ fn test_unknown_field_number_is_preserved() {
     let mut output = Vec::new();
     msg.to_bytes(&mut output).unwrap();
     assert_eq!(&output, &input);
+}
+
+#[test]
+fn test_submsg_unknown_field_is_capsuled() {
+    // submsg with unknown field
+    let input = [
+        (SUBMSG_FIELD_NUMBER << 3) | 2,
+        0x02,
+        (UNKNOWN_FIELD_NUMBER << 3) | 0,
+        0x01,
+    ];
+    let msg = Msg::from_bytes_iter(input.bytes()).unwrap();
+    assert!(msg.has_submsg_unlabeled());
+    assert!(!msg.submsg_unlabeled().unwrap().has_i32_unlabeled());
 }
