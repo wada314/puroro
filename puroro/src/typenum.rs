@@ -28,7 +28,7 @@ impl Bool for B0 {
     type If<T, F> = F;
 }
 impl Bool for B1 {
-    type If<T, F> = F;
+    type If<T, F> = T;
 }
 struct Not<B>(PhantomData<B>);
 impl<B: Bool> Bool for Not<B> {
@@ -37,6 +37,10 @@ impl<B: Bool> Bool for Not<B> {
 struct And<A, B>(PhantomData<(A, B)>);
 impl<A: Bool, B: Bool> Bool for And<A, B> {
     type If<T, F> = A::If<B::If<T, F>, F>;
+}
+struct And3<A, B, C>(PhantomData<(A, B, C)>);
+impl<A: Bool, B: Bool, C: Bool> Bool for And3<A, B, C> {
+    type If<T, F> = <And<A, And<B, C>> as Bool>::If<T, F>;
 }
 struct Or<A, B>(PhantomData<(A, B)>);
 impl<A: Bool, B: Bool> Bool for Or<A, B> {
@@ -47,35 +51,34 @@ impl<A: Bool, B: Bool> Bool for Xor<A, B> {
     type If<T, F> = A::If<B::If<F, T>, B::If<T, F>>;
 }
 
-trait ComparableNumber {
-    type IsUterm: Bool;
-    type Lower: Bool;
-    type Higher: ComparableNumber;
+trait Comparable {
+    type Eq<RHS: Comparable>: Bool;
+    type IsTerm: Bool;
+    type Lo: Bool;
+    type Hi: Comparable;
 }
-impl<U: ComparableNumber, B: Bool> ComparableNumber for UInt<U, B> {
-    type IsUterm = B0;
-    type Lower = B;
-    type Higher = U;
+impl Comparable for UTerm {
+    type Eq<RHS: Comparable> = RHS::IsTerm;
+    type IsTerm = B1;
+    type Lo = B0;
+    type Hi = UTerm;
 }
-impl ComparableNumber for UTerm {
-    type IsUterm = B1;
-    type Lower = B0;
-    type Higher = UTerm;
+impl<L: Bool, H: Comparable> Comparable for UInt<H, L> {
+    type Eq<RHS: Comparable> = And3<Not<RHS::IsTerm>, Not<Xor<L, RHS::Lo>>, H::Eq<RHS::Hi>>;
+    type IsTerm = B0;
+    type Lo = L;
+    type Hi = H;
 }
-
-struct CmpEq<L, R>(PhantomData<(L, R)>);
-impl<L: ComparableNumber, R: ComparableNumber> Bool for CmpEq<L, R> {
-    type If<T, F> = <Or<
-        And<L::IsUterm, R::IsUterm>,
-        And<
-            Not<Or<L::IsUterm, R::IsUterm>>,
-            And<Not<Xor<L::Lower, R::Lower>>, CmpEq<L::Higher, R::Higher>>,
-        >,
-    > as Bool>::If<T, F>;
+struct Cmp<A, B>(PhantomData<(A, B)>);
+impl<A: Comparable, B: Comparable> Bool for Cmp<A, B> {
+    type If<T, F> = <A::Eq<B> as Bool>::If<T, F>;
 }
 
 fn hoge() {
-    fn except_u32(_v: u32) {}
-    fn except_f32(_v: f32) {}
-    let u: <CmpEq<U0, U0> as Bool>::If<u32, f32> = 0u32;
+    let _: u32 = <Cmp<U0, U0> as Bool>::If::<u32, f32>::default();
+    let _: u32 = <Cmp<U1, U1> as Bool>::If::<u32, f32>::default();
+    let _: u32 = <Cmp<U2, U2> as Bool>::If::<u32, f32>::default();
+    let _: f32 = <Cmp<U0, U1> as Bool>::If::<u32, f32>::default();
+    let _: f32 = <Cmp<U1, U2> as Bool>::If::<u32, f32>::default();
+    let _: f32 = <Cmp<U2, U0> as Bool>::If::<u32, f32>::default();
 }
