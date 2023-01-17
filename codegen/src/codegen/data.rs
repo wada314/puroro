@@ -37,7 +37,7 @@ pub use self::package::*;
 pub use self::package_or_message::*;
 
 use super::util::AnonymousCache;
-use crate::{ErrorKind, GeneratorError, Result};
+use crate::{FatalErrorKind, GeneratorError, Result};
 
 pub trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;
@@ -55,7 +55,7 @@ impl TryFrom<&str> for Syntax {
         Ok(match value {
             "" | "proto2" => Syntax::Proto2,
             "proto3" => Syntax::Proto3,
-            _ => Err(ErrorKind::UnknownProtoSyntax {
+            _ => Err(FatalErrorKind::UnknownProtoSyntax {
                 name: value.to_string(),
             })?,
         })

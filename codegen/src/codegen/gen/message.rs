@@ -125,6 +125,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             pub struct #ident {
                 fields: #fields_struct_type,
                 bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
+                unknown_fields: #PURORO_INTERNAL::UnknownFieldsImpl,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -212,18 +213,34 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
             fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> #PURORO_LIB::Result<()> {
                 use #PURORO_INTERNAL::ser::FieldData;
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
-                    match number {
-                        #(#deser_arms)*
-                        _ => todo!(), // Unknown field number
+                use #PURORO_INTERNAL::UnknownFields as _;
+                #[allow(unused)] use ::std::result::Result::{Ok, Err};
+                use #PURORO_LIB::PuroroError;
+                while let Some((number, mut #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                    let result: #PURORO_LIB::Result<()> = (|| {
+                        match number {
+                            #(#deser_arms)*
+                            _ => Err(PuroroError::UnknownFieldNumber)?,
+                        }
+                        Ok(())
+                    })();
+                    match result {
+                        Ok(_) => (),
+                        Err(PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_)) => {
+                            // Recoverable error. Store the field into unknown_fields.
+                            self.unknown_fields.push(number, #field_data_ident)?;
+                        }
+                        Err(e) => Err(e)?,
                     }
                 }
-                ::std::result::Result::Ok(())
+                Ok(())
             }
 
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                use #PURORO_INTERNAL::UnknownFields as _;
                 #(#ser_stmts)*
+                self.unknown_fields.ser_to_write(#out_ident)?;
                 ::std::result::Result::Ok(())
             }
         }
@@ -245,6 +262,7 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
                         #(#field_values,)*
                     },
                     bitfield: ::std::clone::Clone::clone(&self.bitfield),
+                    unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
                 }
             }
         }
@@ -271,15 +289,19 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
 
 fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemImpl> {
     let ident = gen_message_struct_ident(this)?;
-    let mut fmt_body: Expr = parse2(quote! { fmt.debug_struct(stringify!(#ident)) })?;
+    let mut debug_fields: Expr = parse2(quote! { debug_struct })?;
     for field_or_oneof in this.fields_or_oneofs()? {
-        field_or_oneof.gen_message_struct_impl_debug_method_call(&mut fmt_body)?;
+        field_or_oneof.gen_message_struct_impl_debug_method_call(&mut debug_fields)?;
     }
 
     Ok(parse2(quote! {
         impl ::std::fmt::Debug for #ident {
             fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                #fmt_body.finish()
+                use #PURORO_INTERNAL::UnknownFields as _;
+                let mut debug_struct = fmt.debug_struct(stringify!(#ident));
+                #debug_fields;
+                self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+                debug_struct.finish()
             }
         }
     })?)
@@ -299,6 +321,7 @@ fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<
 
                 true
                     #( && #cmp_exprs)*
+                    && self.unknown_fields == rhs.unknown_fields
             }
         }
     })?)

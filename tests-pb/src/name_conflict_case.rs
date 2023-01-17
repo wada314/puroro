@@ -19,6 +19,7 @@ pub struct Message {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Message {
     pub fn conflict(
@@ -74,23 +75,39 @@ impl self::_puroro::Message for Message {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self
-                        .fields
-                        .conflict
-                        .deser_from_iter(
-                            &mut self.bitfield,
-                            field_data,
-                            self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
-                        )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self
+                            .fields
+                            .conflict
+                            .deser_from_iter(
+                                &mut self.bitfield,
+                                &mut field_data,
+                                self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
+                            )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                _ => todo!(),
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -99,7 +116,9 @@ impl self::_puroro::Message for Message {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self.fields.conflict.ser_to_write(&self.bitfield, out)?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -113,6 +132,7 @@ impl ::std::clone::Clone for Message {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -128,9 +148,12 @@ impl ::std::fmt::Debug for Message {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Message))
-            .field(stringify!(this_is_oneof_field), &self.this_is_oneof_field_opt())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Message));
+        debug_struct
+            .field(stringify!(this_is_oneof_field), &self.this_is_oneof_field_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Message {
@@ -138,6 +161,7 @@ impl ::std::cmp::PartialEq for Message {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.conflict() == rhs.conflict()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

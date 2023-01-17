@@ -20,7 +20,7 @@ use super::{
 use crate::syn::{
     parse2, Arm, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt, Type,
 };
-use crate::{ErrorKind, Result};
+use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::proc_macro2::Span;
 use ::quote::{format_ident, quote};
@@ -92,7 +92,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             .try_insert(alloc)
         {
             Ok(alloc) => Ok(alloc.tail),
-            Err(_) => Err(ErrorKind::InternalError {
+            Err(_) => Err(FatalErrorKind::InternalError {
                 detail: "Tried to assign the field's bitfield twice.".to_string(),
             })?,
         }
@@ -155,7 +155,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             #number => #PURORO_INTERNAL::FieldType::deser_from_iter(
                 &mut self.fields.#ident,
                 &mut self.bitfield,
-                #field_data_expr,
+                &mut #field_data_expr,
             )?,
         })?)
     }
@@ -218,7 +218,7 @@ fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<us
         let Some(alloc) = this
             .cache()
             .get::<Cache>()?.allocated_bitfield.get() else {
-                Err(ErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
+                Err(FatalErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
             };
         alloc
     };
@@ -398,7 +398,7 @@ pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<Expr> {
                     quote! { || #byte_lit }
                 }
                 LengthDelimited(LengthDelimitedType::Message(_)) => {
-                    Err(ErrorKind::InternalError {
+                    Err(FatalErrorKind::InternalError {
                         detail: "The field default value should not be set for the message field."
                             .to_string(),
                     })?

@@ -20,6 +20,7 @@ pub struct ConflictCase {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ConflictCase {
     pub fn this_is_message_field(&self) -> i32 {
@@ -76,20 +77,36 @@ impl self::_puroro::Message for ConflictCase {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.this_is_message_field,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.this_is_message_field,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                _ => todo!(),
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -98,12 +115,14 @@ impl self::_puroro::Message for ConflictCase {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.this_is_message_field,
             &self.bitfield,
             1i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -116,6 +135,7 @@ impl ::std::clone::Clone for ConflictCase {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -130,9 +150,12 @@ impl ::std::fmt::Debug for ConflictCase {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ConflictCase))
-            .field(stringify!(this_is_message_field), &self.this_is_message_field_opt())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ConflictCase));
+        debug_struct
+            .field(stringify!(this_is_message_field), &self.this_is_message_field_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ConflictCase {
@@ -140,6 +163,7 @@ impl ::std::cmp::PartialEq for ConflictCase {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.this_is_message_field_opt() == rhs.this_is_message_field_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {
@@ -304,7 +328,7 @@ where
     fn deser_from_iter<I, B>(
         &mut self,
         bitvec: &mut B,
-        field_data: self::_pinternal::ser::FieldData<I>,
+        field_data: &mut self::_pinternal::ser::FieldData<I>,
         case: Self::Case,
     ) -> self::_puroro::Result<()>
     where

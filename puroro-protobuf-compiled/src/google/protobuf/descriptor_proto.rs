@@ -28,6 +28,7 @@ pub struct ExtensionRange {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ExtensionRange {
     pub fn start(&self) -> i32 {
@@ -137,34 +138,50 @@ impl self::_puroro::Message for ExtensionRange {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.start,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.start,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.end,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    3i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.options,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.end,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
                 }
-                3i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.options,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -173,6 +190,7 @@ impl self::_puroro::Message for ExtensionRange {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.start,
             &self.bitfield,
@@ -191,6 +209,7 @@ impl self::_puroro::Message for ExtensionRange {
             3i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -203,6 +222,7 @@ impl ::std::clone::Clone for ExtensionRange {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -217,11 +237,14 @@ impl ::std::fmt::Debug for ExtensionRange {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ExtensionRange))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ExtensionRange));
+        debug_struct
             .field(stringify!(start), &self.start_opt())
             .field(stringify!(end), &self.end_opt())
-            .field(stringify!(options), &self.options_opt())
-            .finish()
+            .field(stringify!(options), &self.options_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ExtensionRange {
@@ -230,6 +253,7 @@ impl ::std::cmp::PartialEq for ExtensionRange {
         use self::_pinternal::OneofUnion as _;
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
             && self.options_opt() == rhs.options_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -247,6 +271,7 @@ pub struct ReservedRange {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl ReservedRange {
     pub fn start(&self) -> i32 {
@@ -321,27 +346,43 @@ impl self::_puroro::Message for ReservedRange {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.start,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.start,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.end,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.end,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
                 }
-                _ => todo!(),
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -350,6 +391,7 @@ impl self::_puroro::Message for ReservedRange {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.start,
             &self.bitfield,
@@ -362,6 +404,7 @@ impl self::_puroro::Message for ReservedRange {
             2i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -373,6 +416,7 @@ impl ::std::clone::Clone for ReservedRange {
                 end: ::std::clone::Clone::clone(&self.fields.end),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -387,10 +431,13 @@ impl ::std::fmt::Debug for ReservedRange {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(ReservedRange))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(ReservedRange));
+        debug_struct
             .field(stringify!(start), &self.start_opt())
-            .field(stringify!(end), &self.end_opt())
-            .finish()
+            .field(stringify!(end), &self.end_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for ReservedRange {
@@ -398,6 +445,7 @@ impl ::std::cmp::PartialEq for ReservedRange {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

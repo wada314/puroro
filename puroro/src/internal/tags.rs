@@ -14,7 +14,7 @@
 
 //! Typetags for Proto field types.
 
-use crate::{ErrorKind, PuroroError, Result};
+use crate::{PuroroError, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 
@@ -64,16 +64,16 @@ pub struct SFixed64;
 pub trait NumericalType {
     type RustType;
     fn from_variant(_bytes: [u8; 8]) -> Result<Self::RustType> {
-        Err(ErrorKind::UnexpectedWireType)?
+        Err(PuroroError::UnexpectedWireType)?
     }
     fn from_bits32(_bytes: [u8; 4]) -> Result<Self::RustType> {
-        Err(ErrorKind::UnexpectedWireType)?
+        Err(PuroroError::UnexpectedWireType)?
     }
     fn from_bits64(_bytes: [u8; 8]) -> Result<Self::RustType> {
-        Err(ErrorKind::UnexpectedWireType)?
+        Err(PuroroError::UnexpectedWireType)?
     }
     fn to_variant(_val: Self::RustType) -> Result<[u8; 8]> {
-        Err(ErrorKind::UnexpectedWireType)?
+        Err(PuroroError::UnexpectedWireType)?
     }
     fn to_wire_type(_val: Self::RustType) -> Result<NumericalWireType> {
         unimplemented!()

@@ -33,6 +33,7 @@ pub struct File {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl File {
     pub fn name(&self) -> &str {
@@ -181,41 +182,57 @@ impl self::_puroro::Message for File {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.name,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.name,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.insertion_point,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    15i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.content,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    16i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.generated_code_info,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.insertion_point,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
                 }
-                15i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.content,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                16i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.generated_code_info,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -224,6 +241,7 @@ impl self::_puroro::Message for File {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
@@ -248,6 +266,7 @@ impl self::_puroro::Message for File {
             16i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -265,6 +284,7 @@ impl ::std::clone::Clone for File {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -279,12 +299,15 @@ impl ::std::fmt::Debug for File {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(File))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(File));
+        debug_struct
             .field(stringify!(name), &self.name_opt())
             .field(stringify!(insertion_point), &self.insertion_point_opt())
             .field(stringify!(content), &self.content_opt())
-            .field(stringify!(generated_code_info), &self.generated_code_info_opt())
-            .finish()
+            .field(stringify!(generated_code_info), &self.generated_code_info_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for File {
@@ -295,6 +318,7 @@ impl ::std::cmp::PartialEq for File {
             && self.insertion_point_opt() == rhs.insertion_point_opt()
             && self.content_opt() == rhs.content_opt()
             && self.generated_code_info_opt() == rhs.generated_code_info_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {
@@ -354,7 +378,7 @@ impl ::std::convert::TryFrom::<i32> for Feature {
             1i32 => ::std::result::Result::Ok(self::Feature::FeatureProto3Optional),
             _ => {
                 ::std::result::Result::Err(
-                    self::_puroro::ErrorKind::UnknownEnumVariant(val),
+                    self::_puroro::PuroroError::UnknownEnumVariant(val),
                 )?
             }
         }

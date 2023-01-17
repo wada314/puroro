@@ -14,12 +14,12 @@
 
 use crate::internal::tags;
 use crate::internal::variant::Variant;
-use crate::{ErrorKind, PuroroError, Result};
+use crate::{PuroroError, Result};
 use ::std::convert::TryFrom;
 use ::std::io::{Result as IoResult, Write};
 use ::std::iter;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum FieldData<T> {
     Variant(Variant),
     LengthDelimited(T),
@@ -27,7 +27,7 @@ pub enum FieldData<T> {
     Bits64([u8; 8]),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum WireType {
     Variant = 0,
     Bits64 = 1,
@@ -69,6 +69,17 @@ impl<T> FieldData<T> {
     }
 }
 
+impl<T, E> FieldData<::std::result::Result<T, E>> {
+    pub fn transpose(self) -> ::std::result::Result<FieldData<T>, E> {
+        Ok(match self {
+            FieldData::Variant(x) => FieldData::Variant(x),
+            FieldData::LengthDelimited(x) => FieldData::LengthDelimited(x?),
+            FieldData::Bits32(x) => FieldData::Bits32(x),
+            FieldData::Bits64(x) => FieldData::Bits64(x),
+        })
+    }
+}
+
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
     pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
@@ -78,11 +89,11 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
 
             let field_data = match wire_type {
                 WireType::Variant => FieldData::Variant(
-                    Variant::decode_bytes(bytes)?.ok_or(ErrorKind::UnexpectedInputTermination)?,
+                    Variant::decode_bytes(bytes)?.ok_or(PuroroError::UnexpectedInputTermination)?,
                 ),
                 WireType::LengthDelimited => {
                     let length: usize = Variant::decode_bytes(bytes.by_ref())?
-                        .ok_or(ErrorKind::UnexpectedInputTermination)?
+                        .ok_or(PuroroError::UnexpectedInputTermination)?
                         .get_i32()?
                         .try_into()?;
                     FieldData::LengthDelimited(bytes.take(length))
@@ -131,7 +142,7 @@ impl TryFrom<u32> for WireType {
             3 => WireType::StartGroup,
             4 => WireType::EndGroup,
             5 => WireType::Bits32,
-            _ => Err(ErrorKind::InvalidWireType(value))?,
+            _ => Err(PuroroError::InvalidWireType(value))?,
         })
     }
 }
@@ -191,5 +202,5 @@ pub(crate) fn ser_bytes_shared<W: Write>(bytes: &[u8], number: i32, out: &mut W)
 fn read_byte<I: Iterator<Item = IoResult<u8>>>(bytes: &mut I) -> Result<u8> {
     Ok(bytes
         .next()
-        .ok_or(ErrorKind::UnexpectedInputTermination)??)
+        .ok_or(PuroroError::UnexpectedInputTermination)??)
 }

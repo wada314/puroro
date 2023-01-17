@@ -108,7 +108,7 @@ Currently only used by testing purpose, not published.
     - [ ] Nightly / stable features
         - [ ] Support stable (not using nightly features)
     - [ ] Message traits
-    - [ ] Keep unknown fields
+    - [x] Keep unknown fields
     - [ ] Deserializer from a slice
     - [ ] Serializer performance improvement
     - [ ] Custom deserializer (?)

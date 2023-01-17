@@ -18,6 +18,7 @@ pub mod oneof_field_type;
 pub mod oneof_type;
 pub mod ser;
 pub mod tags;
+pub mod unknown_fields;
 pub mod utils;
 pub mod variant;
 
@@ -29,3 +30,4 @@ pub use self::field_type::{
 };
 pub use self::oneof_field_type::{HeapMessageField, NumericalField, OneofFieldType, UnsizedField};
 pub use self::oneof_type::{OneofCase, OneofUnion};
+pub use self::unknown_fields::{UnknownFields, UnknownFieldsImpl};

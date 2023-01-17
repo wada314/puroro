@@ -21,6 +21,7 @@ pub struct Book {
         self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Book {
     pub fn title(&self) -> &str {
@@ -125,34 +126,50 @@ impl self::_puroro::Message for Book {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.title,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.title,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.num_pages,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    3i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.author,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.num_pages,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
                 }
-                3i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.author,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -161,6 +178,7 @@ impl self::_puroro::Message for Book {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.title,
             &self.bitfield,
@@ -179,6 +197,7 @@ impl self::_puroro::Message for Book {
             3i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -191,6 +210,7 @@ impl ::std::clone::Clone for Book {
                 author: ::std::clone::Clone::clone(&self.fields.author),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -205,11 +225,14 @@ impl ::std::fmt::Debug for Book {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Book))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Book));
+        debug_struct
             .field(stringify!(title), &self.title_opt())
             .field(stringify!(num_pages), &self.num_pages_opt())
-            .field(stringify!(author), &self.author_opt())
-            .finish()
+            .field(stringify!(author), &self.author_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Book {
@@ -219,6 +242,7 @@ impl ::std::cmp::PartialEq for Book {
         true && self.title_opt() == rhs.title_opt()
             && self.num_pages_opt() == rhs.num_pages_opt()
             && self.author_opt() == rhs.author_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -230,6 +254,7 @@ pub struct Author {
         >,
     >,
     bitfield: self::_pinternal::BitArray<0usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Author {
     pub fn name(&self) -> &str {
@@ -276,20 +301,36 @@ impl self::_puroro::Message for Author {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.name,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.name,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                _ => todo!(),
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
+                }
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -298,12 +339,14 @@ impl self::_puroro::Message for Author {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name,
             &self.bitfield,
             1i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -314,6 +357,7 @@ impl ::std::clone::Clone for Author {
                 name: ::std::clone::Clone::clone(&self.fields.name),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -328,9 +372,11 @@ impl ::std::fmt::Debug for Author {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Author))
-            .field(stringify!(name), &self.name_opt())
-            .finish()
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Author));
+        debug_struct.field(stringify!(name), &self.name_opt());
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Author {
@@ -338,6 +384,7 @@ impl ::std::cmp::PartialEq for Author {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
         true && self.name_opt() == rhs.name_opt()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

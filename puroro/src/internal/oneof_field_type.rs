@@ -14,7 +14,7 @@
 
 use crate::internal::ser::{ser_bytes_shared, ser_numerical_shared, FieldData, WireType};
 use crate::internal::tags;
-use crate::{ErrorKind, Message, Result};
+use crate::{Message, PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 
@@ -80,7 +80,7 @@ pub trait OneofFieldType: Default + Clone {
 
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
     ) -> Result<()>;
     fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()>;
 }
@@ -121,20 +121,20 @@ where
     }
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(variant) => {
                 self.0 = variant.get::<ProtoType>()?;
             }
-            FieldData::LengthDelimited(_) => {
-                Err(ErrorKind::InvalidWireType(WireType::LengthDelimited as u32))?
-            }
+            FieldData::LengthDelimited(_) => Err(PuroroError::InvalidWireType(
+                WireType::LengthDelimited as u32,
+            ))?,
             FieldData::Bits32(bits) => {
-                self.0 = <ProtoType as tags::NumericalType>::from_bits32(bits)?;
+                self.0 = <ProtoType as tags::NumericalType>::from_bits32(bits.clone())?;
             }
             FieldData::Bits64(bits) => {
-                self.0 = <ProtoType as tags::NumericalType>::from_bits64(bits)?;
+                self.0 = <ProtoType as tags::NumericalType>::from_bits64(bits.clone())?;
             }
         }
         Ok(())
@@ -183,13 +183,13 @@ where
 
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = field_data {
             self.0 = ProtoType::from_bytes_iter(iter)?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
+            Err(PuroroError::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 
@@ -233,14 +233,14 @@ where
     }
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: &mut FieldData<I>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = field_data {
             let msg = self.0.as_mut();
             msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
             Ok(())
         } else {
-            Err(ErrorKind::InvalidWireType(field_data.wire_type() as u32))?
+            Err(PuroroError::InvalidWireType(field_data.wire_type() as u32))?
         }
     }
 

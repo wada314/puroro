@@ -13,15 +13,7 @@
 // limitations under the License.
 
 #[derive(::thiserror::Error, Debug)]
-#[error(r#"PuroroError. kind = "{kind}""#)]
-pub struct PuroroError {
-    #[from]
-    pub kind: ErrorKind,
-    pub backtrace: std::backtrace::Backtrace,
-}
-
-#[derive(::thiserror::Error, Debug)]
-pub enum ErrorKind {
+pub enum PuroroError {
     #[error("The input binary has terminated in irregular position.")]
     UnexpectedInputTermination,
     #[error("A variant integer type has too large or too small value.")]
@@ -70,25 +62,4 @@ pub enum ErrorKind {
     InvalidOneofIndex,
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
-}
-
-impl From<std::io::Error> for PuroroError {
-    fn from(input: std::io::Error) -> Self {
-        PuroroError::from(ErrorKind::from(input))
-    }
-}
-impl From<std::fmt::Error> for PuroroError {
-    fn from(input: std::fmt::Error) -> Self {
-        PuroroError::from(ErrorKind::from(input))
-    }
-}
-impl From<std::num::TryFromIntError> for PuroroError {
-    fn from(input: std::num::TryFromIntError) -> Self {
-        PuroroError::from(ErrorKind::from(input))
-    }
-}
-impl From<std::string::FromUtf8Error> for PuroroError {
-    fn from(input: std::string::FromUtf8Error) -> Self {
-        PuroroError::from(ErrorKind::from(input))
-    }
 }

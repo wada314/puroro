@@ -12,48 +12,74 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::backtrace::Backtrace;
+
 #[derive(Debug, ::thiserror::Error)]
 #[error(r#"GeneratorError. kind="{kind}""#)]
-pub struct GeneratorError {
-    #[from]
-    pub kind: ErrorKind,
-    pub backtrace: std::backtrace::Backtrace,
+pub enum GeneratorError {
+    FatalError {
+        #[from]
+        kind: FatalErrorKind,
+        backtrace: Backtrace,
+    },
+    RecoverableError {
+        #[from]
+        kind: RecoverableErrorKind,
+    },
 }
 
 #[derive(Debug, ::thiserror::Error)]
-pub enum ErrorKind {
+pub enum FatalErrorKind {
     #[error(r#"The type name "{name}" is not found in any other input .proto files."#)]
     UnknownTypeName { name: String },
     #[error(r#"The group feature is not yet supported. GIVE ME A DOCUMENT!!!"#)]
     GroupNotSupported,
     #[error(r#"Unknown value for proto file's syntax: "{name}"."#)]
     UnknownProtoSyntax { name: String },
-    // #[error(r#"The enum type "{name}" has no values. The empty enum is not allowed."#)]
-    // EmptyEnum { name: String },
-    // #[error(r#"A length of some sort of array in the proto is too large."#)]
-    // TooLargeLength,
     #[error(r#"An error from formatter: "{source}""#)]
-    WriteError { source: std::fmt::Error },
+    WriteError {
+        #[from]
+        source: std::fmt::Error,
+    },
     #[error(r#"An error from ParseIntError: "{source}""#)]
-    ParseIntError { source: std::num::ParseIntError },
+    ParseIntError {
+        #[from]
+        source: std::num::ParseIntError,
+    },
     #[error(r#"An error from ParseFloatError: "{source}""#)]
-    ParseBoolError { source: std::str::ParseBoolError },
+    ParseBoolError {
+        #[from]
+        source: std::str::ParseBoolError,
+    },
     #[error(r#"An error from ParseFloatError: "{source}""#)]
-    ParseFloatError { source: std::num::ParseFloatError },
+    ParseFloatError {
+        #[from]
+        source: std::num::ParseFloatError,
+    },
     #[error(r#"An error from syn::parse::Error: "{source}""#)]
-    SynParseError { source: ::syn::parse::Error },
+    SynParseError {
+        #[from]
+        source: ::syn::parse::Error,
+    },
     #[error(r#"Ar error from std::io::Error: "{source}""#)]
-    IoError { source: ::std::io::Error },
+    IoError {
+        #[from]
+        source: ::std::io::Error,
+    },
     #[error(r#"Bad format string: "{string}""#)]
     InvalidString { string: String },
     #[error(r#"An error from puroro: "{source}""#)]
-    PuroroError { source: crate::puroro::PuroroError },
+    PuroroError {
+        #[from]
+        source: crate::puroro::PuroroError,
+    },
     #[error(r#"Expected the field descriptor's type_name field is filled, but is not"#)]
     MissingTypeName,
     #[error(r#"Enum must have at least one value"#)]
     NoEnumValues,
     #[error(r#"Utf8 error."#)]
     FromUtf8Error {
+        #[from]
         source: ::std::string::FromUtf8Error,
     },
     #[error(
@@ -68,67 +94,27 @@ pub enum ErrorKind {
     #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
 }
-impl From<::std::fmt::Error> for GeneratorError {
-    fn from(e: ::std::fmt::Error) -> Self {
-        Self {
-            kind: ErrorKind::WriteError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
+
+#[derive(Debug, ::thiserror::Error)]
+pub enum RecoverableErrorKind {
+    #[error(r#"Unknown enum value: {0}"#)]
+    UnknownEnumValue(i32),
 }
-impl From<::std::io::Error> for GeneratorError {
-    fn from(e: ::std::io::Error) -> Self {
-        Self {
-            kind: ErrorKind::IoError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
+
+macro_rules! impl_from_from {
+    ($ty:ty) => {
+        impl From<$ty> for GeneratorError {
+            fn from(e: $ty) -> Self {
+                Into::<FatalErrorKind>::into(e).into()
+            }
         }
-    }
+    };
 }
-impl From<crate::puroro::PuroroError> for GeneratorError {
-    fn from(e: crate::puroro::PuroroError) -> Self {
-        Self {
-            kind: ErrorKind::PuroroError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
-}
-impl From<::std::string::FromUtf8Error> for GeneratorError {
-    fn from(e: ::std::string::FromUtf8Error) -> Self {
-        Self {
-            kind: ErrorKind::FromUtf8Error { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
-}
-impl From<::std::num::ParseIntError> for GeneratorError {
-    fn from(e: ::std::num::ParseIntError) -> Self {
-        Self {
-            kind: ErrorKind::ParseIntError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
-}
-impl From<::std::num::ParseFloatError> for GeneratorError {
-    fn from(e: ::std::num::ParseFloatError) -> Self {
-        Self {
-            kind: ErrorKind::ParseFloatError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
-}
-impl From<::std::str::ParseBoolError> for GeneratorError {
-    fn from(e: ::std::str::ParseBoolError) -> Self {
-        Self {
-            kind: ErrorKind::ParseBoolError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
-}
-impl From<::syn::parse::Error> for GeneratorError {
-    fn from(e: ::syn::parse::Error) -> Self {
-        Self {
-            kind: ErrorKind::SynParseError { source: e },
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
-}
+impl_from_from!(::std::fmt::Error);
+impl_from_from!(::std::io::Error);
+impl_from_from!(crate::puroro::PuroroError);
+impl_from_from!(::std::string::FromUtf8Error);
+impl_from_from!(::std::num::ParseIntError);
+impl_from_from!(::std::num::ParseFloatError);
+impl_from_from!(::std::str::ParseBoolError);
+impl_from_from!(::syn::parse::Error);

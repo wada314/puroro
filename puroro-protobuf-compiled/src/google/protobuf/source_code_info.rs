@@ -31,6 +31,7 @@ pub struct Location {
         >,
     >,
     bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Location {
     pub fn path(&self) -> &[i32] {
@@ -176,48 +177,64 @@ impl self::_puroro::Message for Location {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        while let Some((number, field_data))
+        use self::_pinternal::UnknownFields as _;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        use self::_puroro::PuroroError;
+        while let Some((number, mut field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
-            match number {
-                1i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.path,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.path,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.span,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    3i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.leading_comments,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    4i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.trailing_comments,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    6i32 => {
+                        self::_pinternal::FieldType::deser_from_iter(
+                            &mut self.fields.leading_detached_comments,
+                            &mut self.bitfield,
+                            &mut field_data,
+                        )?
+                    }
+                    _ => Err(PuroroError::UnknownFieldNumber)?,
                 }
-                2i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.span,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(
+                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
+                ) => {
+                    self.unknown_fields.push(number, field_data)?;
                 }
-                3i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.leading_comments,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                4i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.trailing_comments,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                6i32 => {
-                    self::_pinternal::FieldType::deser_from_iter(
-                        &mut self.fields.leading_detached_comments,
-                        &mut self.bitfield,
-                        field_data,
-                    )?
-                }
-                _ => todo!(),
+                Err(e) => Err(e)?,
             }
         }
-        ::std::result::Result::Ok(())
+        Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
         &self,
@@ -226,6 +243,7 @@ impl self::_puroro::Message for Location {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.path,
             &self.bitfield,
@@ -256,6 +274,7 @@ impl self::_puroro::Message for Location {
             6i32,
             out,
         )?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -276,6 +295,7 @@ impl ::std::clone::Clone for Location {
                 ),
             },
             bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
@@ -290,7 +310,9 @@ impl ::std::fmt::Debug for Location {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        fmt.debug_struct(stringify!(Location))
+        use self::_pinternal::UnknownFields as _;
+        let mut debug_struct = fmt.debug_struct(stringify!(Location));
+        debug_struct
             .field(stringify!(path), &self.path())
             .field(stringify!(span), &self.span())
             .field(stringify!(leading_comments), &self.leading_comments_opt())
@@ -298,8 +320,9 @@ impl ::std::fmt::Debug for Location {
             .field(
                 stringify!(leading_detached_comments),
                 &self.leading_detached_comments(),
-            )
-            .finish()
+            );
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        debug_struct.finish()
     }
 }
 impl ::std::cmp::PartialEq for Location {
@@ -310,6 +333,7 @@ impl ::std::cmp::PartialEq for Location {
             && self.leading_comments_opt() == rhs.leading_comments_opt()
             && self.trailing_comments_opt() == rhs.trailing_comments_opt()
             && self.leading_detached_comments() == rhs.leading_detached_comments()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {
