@@ -13,8 +13,6 @@
 // limitations under the License.
 
 #![doc = include_str!("lib.md")]
-#![feature(error_generic_member_access)]
-#![feature(provide_any)]
 
 mod error;
 pub mod internal;

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #![allow(incomplete_features)]
-#![feature(arc_unwrap_or_clone)]
 #![feature(error_generic_member_access)]
 #![feature(provide_any)]
 #![feature(is_some_and)]
