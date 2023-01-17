@@ -55,8 +55,8 @@ use unknown_fields::{msg::Submsg, Enum, Msg};
 #[test]
 fn test_unknown_field_number_is_ignored() {
     // field #15 has variant value 1.
-    let buffer = [(UNKNOWN_FIELD_NUMBER << 3) | 0, 0x01];
-    let msg = Msg::from_bytes_iter(buffer.bytes()).unwrap();
+    let input = [(UNKNOWN_FIELD_NUMBER << 3) | 0, 0x01];
+    let msg = Msg::from_bytes_iter(input.bytes()).unwrap();
     assert!(!msg.has_i32_unlabeled());
     assert!(!msg.has_float_unlabeled());
     assert!(!msg.has_string_unlabeled());
@@ -67,4 +67,13 @@ fn test_unknown_field_number_is_ignored() {
     assert!(msg.string_repeated().is_empty());
     assert!(msg.submsg_repeated().is_empty());
     assert!(msg.enum_repeated().is_empty());
+}
+
+#[test]
+fn test_unknown_field_number_is_preserved() {
+    let input = [(UNKNOWN_FIELD_NUMBER << 3) | 0, 0x01];
+    let msg = Msg::from_bytes_iter(input.bytes()).unwrap();
+    let mut output = Vec::new();
+    msg.to_bytes(&mut output).unwrap();
+    assert_eq!(&output, &input);
 }
