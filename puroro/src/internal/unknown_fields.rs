@@ -36,7 +36,11 @@ pub struct UnknownFieldsImpl {
 
 impl UnknownFields for UnknownFieldsImpl {
     fn debug_struct_fields<'a, 'b>(&self, debug_struct: &mut DebugStruct<'a, 'b>) -> FmtResult {
-        debug_struct.field("TODO_Maybe_unknown_fields", &());
+        for (&number, fields) in &self.fields {
+            for field in fields {
+                debug_struct.field(&number.to_string(), field);
+            }
+        }
         Ok(())
     }
 
