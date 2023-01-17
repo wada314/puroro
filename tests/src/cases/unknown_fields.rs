@@ -58,4 +58,13 @@ fn test_unknown_field_number_is_ignored() {
     let buffer = [(UNKNOWN_FIELD_NUMBER << 3) | 0, 0x01];
     let msg = Msg::from_bytes_iter(buffer.bytes()).unwrap();
     assert!(!msg.has_i32_unlabeled());
+    assert!(!msg.has_float_unlabeled());
+    assert!(!msg.has_string_unlabeled());
+    assert!(!msg.has_submsg_unlabeled());
+    assert!(!msg.has_enum_unlabeled());
+    assert!(msg.i32_repeated().is_empty());
+    assert!(msg.float_repeated().is_empty());
+    assert!(msg.string_repeated().is_empty());
+    assert!(msg.submsg_repeated().is_empty());
+    assert!(msg.enum_repeated().is_empty());
 }
