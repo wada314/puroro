@@ -15,35 +15,67 @@
 //! An extention to typenum crate.
 
 use ::std::marker::PhantomData;
-pub use ::typenum::{UTerm, B0, B1};
+use ::typenum::{UInt, UTerm, B0, B1, U0, U1, U2, U3};
 
-// A sample external trait that the result type need to be bound
-pub trait Message {}
-
-pub trait MessageGen {
-    type Type: Message;
+trait Func {
+    type R;
 }
 
-pub trait BoolGen {
-    type Type;
+trait Bool {
+    type If<T, F>;
 }
-impl BoolGen for B0 {
-    type Type = B0;
+impl Bool for B0 {
+    type If<T, F> = F;
 }
-impl BoolGen for B1 {
-    type Type = B1;
+impl Bool for B1 {
+    type If<T, F> = F;
+}
+struct Not<B>(PhantomData<B>);
+impl<B: Bool> Bool for Not<B> {
+    type If<T, F> = B::If<F, T>;
+}
+struct And<A, B>(PhantomData<(A, B)>);
+impl<A: Bool, B: Bool> Bool for And<A, B> {
+    type If<T, F> = A::If<B::If<T, F>, F>;
+}
+struct Or<A, B>(PhantomData<(A, B)>);
+impl<A: Bool, B: Bool> Bool for Or<A, B> {
+    type If<T, F> = A::If<T, B::If<T, F>>;
+}
+struct Xor<A, B>(PhantomData<(A, B)>);
+impl<A: Bool, B: Bool> Bool for Xor<A, B> {
+    type If<T, F> = A::If<B::If<F, T>, B::If<T, F>>;
 }
 
-pub struct If<B, T, F>(PhantomData<(B, T, F)>);
-pub struct IfGen<B, T, F>(PhantomData<(B, T, F)>);
-
-impl<B: BoolGen, T: MessageGen, F: MessageGen> MessageGen for If<B, T, F> {
-    type Type = <IfGen<B::Type, T, F> as MessageGen>::Type;
+trait ComparableNumber {
+    type IsUterm: Bool;
+    type Lower: Bool;
+    type Higher: ComparableNumber;
+}
+impl<U: ComparableNumber, B: Bool> ComparableNumber for UInt<U, B> {
+    type IsUterm = B0;
+    type Lower = B;
+    type Higher = U;
+}
+impl ComparableNumber for UTerm {
+    type IsUterm = B1;
+    type Lower = B0;
+    type Higher = UTerm;
 }
 
-impl<T: MessageGen, F: MessageGen> MessageGen for IfGen<B0, T, F> {
-    type Type = F::Type;
+struct CmpEq<L, R>(PhantomData<(L, R)>);
+impl<L: ComparableNumber, R: ComparableNumber> Bool for CmpEq<L, R> {
+    type If<T, F> = <Or<
+        And<L::IsUterm, R::IsUterm>,
+        And<
+            Not<Or<L::IsUterm, R::IsUterm>>,
+            And<Not<Xor<L::Lower, R::Lower>>, CmpEq<L::Higher, R::Higher>>,
+        >,
+    > as Bool>::If<T, F>;
 }
-impl<T: MessageGen, F: MessageGen> MessageGen for IfGen<B1, T, F> {
-    type Type = T::Type;
+
+fn hoge() {
+    fn except_u32(_v: u32) {}
+    fn except_f32(_v: f32) {}
+    let u: <CmpEq<U0, U0> as Bool>::If<u32, f32> = 0u32;
 }
