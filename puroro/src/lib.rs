@@ -17,6 +17,7 @@
 mod error;
 pub mod internal;
 pub mod message;
+pub mod typenum;
 
 pub use self::error::PuroroError;
 pub type Result<T> = ::std::result::Result<T, PuroroError>;

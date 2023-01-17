@@ -14,6 +14,7 @@ readme = "../readme.md"
 thiserror = "1.0"
 either = "1.8"
 bitvec = "1.0"
+typenum = "1.16"
 
 [dev-dependencies]
 puroro-doc-samples = { path = "../puroro-doc-samples" }
