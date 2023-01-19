@@ -75,6 +75,17 @@ pub trait FieldType {
     ) -> Result<()>;
 }
 
+impl FieldType for () {
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        #[allow(unused)] bitvec: &B,
+        #[allow(unused)] number: i32,
+        #[allow(unused)] out: &mut W,
+    ) -> Result<()> {
+        Ok(())
+    }
+}
+
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
     RustType: PartialEq + Default + Clone,
