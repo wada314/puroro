@@ -15,6 +15,7 @@
 #![doc = include_str!("lib.md")]
 
 mod error;
+pub mod generic_message;
 pub mod internal;
 pub mod message;
 pub mod typenum;
