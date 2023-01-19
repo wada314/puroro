@@ -92,25 +92,28 @@ fn hoge() {
 }
 
 trait GenericMessage {
-    type FieldType<'a, N: Comparable>: FieldType
+    type FieldType<'a, N: 'a + Comparable>: GenericField
     where
         Self: 'a;
 }
 trait GenericField {}
+trait FieldsTrait {
+    type Type<N: Comparable>: FieldType;
+}
 
 impl GenericMessage for () {
-    type FieldType<'a, N: Comparable> = () where Self: 'a;
+    type FieldType<'a, N: 'a + Comparable> = () where Self: 'a;
 }
 impl GenericField for () {}
 
 #[derive(Default)]
 struct PersonMessage {
-    fields: PersonMessageField,
+    fields: PersonMessageFields,
     bitfield: int::BitArray<1>,
     unknown_fields: int::UnknownFieldsImpl,
 }
 #[derive(Default)]
-struct PersonMessageField {
+struct PersonMessageFields {
     partner: int::SingularHeapMessageField<PersonMessage>,
 }
 impl crate::Message for PersonMessage {
@@ -127,6 +130,10 @@ impl crate::Message for PersonMessage {
         todo!()
     }
 }
+impl FieldsTrait for PersonMessageFields {
+    type Type<N: Comparable> =
+        <Cmp<U1, N> as Bool>::IfF<int::SingularHeapMessageField<PersonMessage>, ()>;
+}
 struct FieldRef<'a, F, B, U>(&'a F, &'a B, &'a U);
 impl<'a, F, B, U> GenericField for FieldRef<'a, F, B, U>
 where
@@ -137,7 +144,6 @@ where
 }
 
 impl GenericMessage for PersonMessage {
-    type FieldType<'a, N: Comparable> =
-        FieldRef<'a, <Cmp<U1, N> as Bool>::IfF<int::SingularHeapMessageField<PersonMessage>, ()>,
-        int::BitArray<1>, int::UnknownFieldsImpl> where Self: 'a;
+    type FieldType<'a, N: 'a + Comparable> =
+        FieldRef<'a, <PersonMessageFields as FieldsTrait>::Type<N>, int::BitArray<1>, int::UnknownFieldsImpl> where Self: 'a;
 }
