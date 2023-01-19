@@ -15,11 +15,7 @@
 //! An extention to typenum crate.
 
 use ::std::marker::PhantomData;
-use ::typenum::{UInt, UTerm, B0, B1, U0, U1, U2, U3};
-
-trait Func {
-    type R;
-}
+use ::typenum::{UInt, UTerm, B0, B1, U0, U1, U2};
 
 trait Bool {
     type If<T, F>;
@@ -74,6 +70,7 @@ impl<A: Comparable, B: Comparable> Bool for Cmp<A, B> {
     type If<T, F> = <A::Eq<B> as Bool>::If<T, F>;
 }
 
+#[test]
 fn hoge() {
     let _: u32 = <Cmp<U0, U0> as Bool>::If::<u32, f32>::default();
     let _: u32 = <Cmp<U1, U1> as Bool>::If::<u32, f32>::default();
@@ -81,4 +78,8 @@ fn hoge() {
     let _: f32 = <Cmp<U0, U1> as Bool>::If::<u32, f32>::default();
     let _: f32 = <Cmp<U1, U2> as Bool>::If::<u32, f32>::default();
     let _: f32 = <Cmp<U2, U0> as Bool>::If::<u32, f32>::default();
+}
+
+trait GenericMessage {
+    type MessageType<N: Comparable>: GenericMessage;
 }
