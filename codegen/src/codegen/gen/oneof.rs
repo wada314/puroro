@@ -208,14 +208,14 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
-                    use #PURORO_INTERNAL::OneofUnion as _;
-                    self.fields.#field_ident.case_ref(&self.bitfield)
+                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
+                    self.fields.#field_ident.case_ref(self.shared.bitfield())
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
-                    use #PURORO_INTERNAL::OneofUnion as _;
-                    self.fields.#field_ident.clear(&mut self.bitfield)
+                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
+                    self.fields.#field_ident.clear(self.shared.bitfield_mut())
                 }
             })?,
         ])
@@ -224,7 +224,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
-            #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, &self.bitfield)
+            #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, self.shared.bitfield())
         })?)
     }
 
@@ -242,7 +242,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
                     #field_number => self.fields.#field_ident.deser_from_iter(
-                        &mut self.bitfield,
+                        self.shared.bitfield_mut(),
                         &mut #field_data_expr,
                         #case_type::#case_name(()),
                     )?,
@@ -255,7 +255,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let field_ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             self.fields.#field_ident.ser_to_write(
-                &self.bitfield,
+                self.shared.bitfield(),
                 #out_expr
             )?;
         })?)

@@ -15,38 +15,46 @@ pub struct Submsg {
     fields: self::_root::nested::msg::_fields::SubmsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
-    bitfield: self::_pinternal::BitArray<0usize>,
-    unknown_fields: self::_pinternal::UnknownFieldsImpl,
+    shared: self::_pinternal::SharedItemsImpl<0usize>,
 }
 impl Submsg {
     pub fn item_inner(&self) -> i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.item_inner,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn item_inner_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.item_inner, &self.bitfield)
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        NonRepeatedFieldType::get_field_opt(
+            &self.fields.item_inner,
+            self.shared.bitfield(),
+        )
     }
     pub fn item_inner_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.item_inner,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_item_inner(&self) -> bool {
-        use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.item_inner, &self.bitfield)
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        NonRepeatedFieldType::get_field_opt(
+                &self.fields.item_inner,
+                self.shared.bitfield(),
+            )
             .is_some()
     }
     pub fn clear_item_inner(&mut self) {
-        use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.item_inner, &mut self.bitfield)
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        NonRepeatedFieldType::clear(
+            &mut self.fields.item_inner,
+            self.shared.bitfield_mut(),
+        )
     }
 }
 impl self::_puroro::Message for Submsg {
@@ -64,7 +72,7 @@ impl self::_puroro::Message for Submsg {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -75,7 +83,7 @@ impl self::_puroro::Message for Submsg {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.item_inner,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
@@ -88,7 +96,7 @@ impl self::_puroro::Message for Submsg {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.unknown_fields.push(number, field_data)?;
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -102,32 +110,33 @@ impl self::_puroro::Message for Submsg {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.item_inner,
-            &self.bitfield,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
-        self.unknown_fields.ser_to_write(out)?;
+        self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
+        #[allow(unused)]
+        use self::_pinternal::SharedItems as _;
         Self {
             fields: self::_fields::SubmsgFields {
                 item_inner: ::std::clone::Clone::clone(&self.fields.item_inner),
             },
-            bitfield: ::std::clone::Clone::clone(&self.bitfield),
-            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+            shared: ::std::clone::Clone::clone(&self.shared),
         }
     }
 }
 impl ::std::ops::Drop for Submsg {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for Submsg {
@@ -135,10 +144,10 @@ impl ::std::fmt::Debug for Submsg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         let mut debug_struct = fmt.debug_struct(stringify!(Submsg));
         debug_struct.field(stringify!(item_inner), &self.item_inner_opt());
-        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -146,8 +155,9 @@ impl ::std::cmp::PartialEq for Submsg {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::SharedItems as _;
         true && self.item_inner_opt() == rhs.item_inner_opt()
-            && self.unknown_fields == rhs.unknown_fields
+            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
 pub mod _fields {

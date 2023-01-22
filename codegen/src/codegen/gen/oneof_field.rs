@@ -314,17 +314,20 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_ident(&self) -> #getter_type {
-                    self.fields.#oneof_struct_field_ident.#getter_ident(&self.bitfield)
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    self.fields.#oneof_struct_field_ident.#getter_ident(self.shared.bitfield())
                 }
             })?,
             parse2(quote! {
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                    self.fields.#oneof_struct_field_ident.#getter_opt_ident(&self.bitfield)
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    self.fields.#oneof_struct_field_ident.#getter_opt_ident(self.shared.bitfield())
                 }
             })?,
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                    self.fields.#oneof_struct_field_ident.#getter_mut_ident(&mut self.bitfield)
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    self.fields.#oneof_struct_field_ident.#getter_mut_ident(self.shared.bitfield_mut())
                 }
             })?,
             parse2(quote! {
@@ -335,10 +338,9 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     #[allow(unused)] use ::std::option::Option::Some;
-                    use #PURORO_INTERNAL::OneofCase;
-                    use #PURORO_INTERNAL::OneofUnion;
-                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(&self.bitfield) {
-                        self.fields.#oneof_struct_field_ident.clear(&mut self.bitfield)
+                    use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItems as _};
+                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.shared.bitfield()) {
+                        self.fields.#oneof_struct_field_ident.clear(self.shared.bitfield_mut())
                     }
                 }
             })?,

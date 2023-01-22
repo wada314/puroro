@@ -154,7 +154,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         Ok(parse2(quote! {
             #number => #PURORO_INTERNAL::FieldType::deser_from_iter(
                 &mut self.fields.#ident,
-                &mut self.bitfield,
+                self.shared.bitfield_mut(),
                 &mut #field_data_expr,
             )?,
         })?)
@@ -165,7 +165,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         Ok(parse2(quote! {
             #PURORO_INTERNAL::FieldType::ser_to_write(
                 &self.fields.#ident,
-                &self.bitfield,
+                self.shared.bitfield(),
                 #number,
                 #out_expr,
             )?;
@@ -256,25 +256,25 @@ fn gen_message_struct_field_methods_for_repeated(
     Ok(vec![
         parse2(quote! {
             pub fn #getter_ident(&self) -> &[#getter_item_type] {
-                use #PURORO_INTERNAL::RepeatedFieldType;
+                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::get_field(
-                    &self.fields.#field_ident, &self.bitfield,
+                    &self.fields.#field_ident, self.shared.bitfield(),
                 )
             }
         })?,
         parse2(quote! {
             pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
-                use #PURORO_INTERNAL::RepeatedFieldType;
+                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::get_field_mut(
-                    &mut self.fields.#field_ident, &mut self.bitfield,
+                    &mut self.fields.#field_ident, self.shared.bitfield_mut(),
                 )
             }
         })?,
         parse2(quote! {
             pub fn #clear_ident(&mut self) {
-                use #PURORO_INTERNAL::RepeatedFieldType;
+                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::clear(
-                    &mut self.fields.#field_ident, &mut self.bitfield,
+                    &mut self.fields.#field_ident, self.shared.bitfield_mut(),
                 )
             }
         })?,
@@ -312,41 +312,41 @@ fn gen_message_struct_field_methods_for_non_repeated(
     Ok(vec![
         parse2(quote! {
             pub fn #getter_ident(&self) -> #getter_type {
-               use #PURORO_INTERNAL::NonRepeatedFieldType;
+               use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                 NonRepeatedFieldType::get_field_or_else(
-                    &self.fields.#field_ident, &self.bitfield, #default_fn,
+                    &self.fields.#field_ident, self.shared.bitfield(), #default_fn,
                 )
             }
         })?,
         parse2(quote! {
             pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                use #PURORO_INTERNAL::NonRepeatedFieldType;
+                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                 NonRepeatedFieldType::get_field_opt(
-                    &self.fields.#field_ident, &self.bitfield,
+                    &self.fields.#field_ident, self.shared.bitfield(),
                 )
             }
         })?,
         parse2(quote! {
             pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                use #PURORO_INTERNAL::NonRepeatedFieldType;
+                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                 NonRepeatedFieldType::get_field_mut(
-                    &mut self.fields.#field_ident, &mut self.bitfield, #default_fn,
+                    &mut self.fields.#field_ident, self.shared.bitfield_mut(), #default_fn,
                 )
             }
         })?,
         parse2(quote! {
             pub fn #getter_has_ident(&self) -> bool {
-                use #PURORO_INTERNAL::NonRepeatedFieldType;
+                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                 NonRepeatedFieldType::get_field_opt(
-                    &self.fields.#field_ident, &self.bitfield,
+                    &self.fields.#field_ident, self.shared.bitfield(),
                 ).is_some()
             }
         })?,
         parse2(quote! {
             pub fn #clear_ident(&mut self) {
-                use #PURORO_INTERNAL::NonRepeatedFieldType;
+                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                 NonRepeatedFieldType::clear(
-                    &mut self.fields.#field_ident, &mut self.bitfield,
+                    &mut self.fields.#field_ident, self.shared.bitfield_mut(),
                 )
             }
         })?,
