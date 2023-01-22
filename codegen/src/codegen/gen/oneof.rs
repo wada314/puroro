@@ -208,13 +208,13 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
-                    use #PURORO_INTERNAL::{SharedItemsTrait as _, OneofUnion as _};
+                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
                     self.fields.#field_ident.case_ref(self.shared.bitfield())
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
-                    use #PURORO_INTERNAL::{SharedItemsTrait as _, OneofUnion as _};
+                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
                     self.fields.#field_ident.clear(self.shared.bitfield_mut())
                 }
             })?,
