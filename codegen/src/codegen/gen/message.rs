@@ -212,7 +212,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
             fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> #PURORO_LIB::Result<()> {
                 use #PURORO_INTERNAL::ser::FieldData;
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                use #PURORO_INTERNAL::UnknownFields as _;
+                use #PURORO_INTERNAL::{SharedItemsTrait as _, UnknownFields as _};
                 #[allow(unused)] use ::std::result::Result::{Ok, Err};
                 use #PURORO_LIB::PuroroError;
                 while let Some((number, mut #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
@@ -227,7 +227,7 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
                         Ok(_) => (),
                         Err(PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_)) => {
                             // Recoverable error. Store the field into unknown_fields.
-                            self.unknown_fields.push(number, #field_data_ident)?;
+                            self.shared.unknown_fields_mut().push(number, #field_data_ident)?;
                         }
                         Err(e) => Err(e)?,
                     }
@@ -237,9 +237,9 @@ fn gen_message_struct_message_impl(this: &(impl ?Sized + Message)) -> Result<Ite
 
             fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                use #PURORO_INTERNAL::UnknownFields as _;
+                use #PURORO_INTERNAL::{SharedItemsTrait as _, UnknownFields as _};
                 #(#ser_stmts)*
-                self.unknown_fields.ser_to_write(#out_ident)?;
+                self.shared.unknown_fields().ser_to_write(#out_ident)?;
                 ::std::result::Result::Ok(())
             }
         }
@@ -256,6 +256,7 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
     Ok(parse2(quote! {
         impl ::std::clone::Clone for #ident {
             fn clone(&self) -> Self {
+                #[allow(unused)] use #PURORO_INTERNAL::SharedItemsTrait as _;
                 Self {
                     fields: self::_fields::#fields_ident {
                         #(#field_values,)*
@@ -278,8 +279,9 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
         impl ::std::ops::Drop for #ident {
             fn drop(&mut self) {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                use #PURORO_INTERNAL::SharedItemsTrait as _;
 
-                #(self.fields.#oneof_idents.clear(&mut self.bitfield);)*
+                #(self.fields.#oneof_idents.clear(self.shared.bitfield_mut());)*
             }
         }
     })?)
@@ -295,10 +297,10 @@ fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemI
     Ok(parse2(quote! {
         impl ::std::fmt::Debug for #ident {
             fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                use #PURORO_INTERNAL::UnknownFields as _;
+                use #PURORO_INTERNAL::{SharedItemsTrait as _, UnknownFields as _};
                 let mut debug_struct = fmt.debug_struct(stringify!(#ident));
                 #debug_fields;
-                self.shared.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+                self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
                 debug_struct.finish()
             }
         }
@@ -316,10 +318,11 @@ fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<
         impl ::std::cmp::PartialEq for #ident {
             fn eq(&self, rhs: &Self) -> bool {
                 #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                use #PURORO_INTERNAL::SharedItemsTrait as _;
 
                 true
                     #( && #cmp_exprs)*
-                    && self.shared.unknown_fields == rhs.shared.unknown_fields
+                    && self.shared.unknown_fields() == rhs.shared.unknown_fields()
             }
         }
     })?)
