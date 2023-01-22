@@ -62,8 +62,8 @@ impl FieldsTrait for PersonMessageFields {
         <Cmp<U1, N> as Bool>::IfF<int::SingularHeapMessageField<PersonMessage>, ()>;
 }
 
-struct FieldRef<'a, F, S>(&'a F, &'a S);
-impl<'a, F, S> GenericField for FieldRef<'a, F, S>
+struct GenericFieldImpl<'a, F, S>(&'a F, &'a S);
+impl<'a, F, S> GenericField for GenericFieldImpl<'a, F, S>
 where
     F: FieldType,
     S: SharedItems,
@@ -72,5 +72,5 @@ where
 
 impl GenericMessage for PersonMessage {
     type FieldType<'a, N: 'a + Comparable> =
-        FieldRef<'a, <PersonMessageFields as FieldsTrait>::Type<N>, SharedItemsImpl<1>> where Self: 'a;
+        GenericFieldImpl<'a, <PersonMessageFields as FieldsTrait>::Type<N>, SharedItemsImpl<1>> where Self: 'a;
 }
