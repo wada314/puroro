@@ -15,7 +15,7 @@
 use crate::internal as int;
 use crate::internal::{FieldType, SharedItems, SharedItemsImpl};
 use crate::typenum::{Bool, Cmp, Comparable};
-use crate::Message;
+use crate::{PuroroError, Result};
 use ::typenum::U1;
 
 trait GenericMessage {
@@ -23,7 +23,11 @@ trait GenericMessage {
     where
         Self: 'a;
 }
-trait GenericField {}
+trait GenericField {
+    fn try_get_i32(&self) -> Result<i32>;
+    type MessageType: GenericMessage;
+    fn try_get_message(&self) -> Result<Option<Self::MessageType>>;
+}
 trait FieldsTrait {
     type Type<N: Comparable>: FieldType;
 }
@@ -31,7 +35,15 @@ trait FieldsTrait {
 impl GenericMessage for () {
     type FieldType<'a, N: 'a + Comparable> = () where Self: 'a;
 }
-impl GenericField for () {}
+impl GenericField for () {
+    fn try_get_i32(&self) -> Result<i32> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    type MessageType = ();
+    fn try_get_message(&self) -> Result<Option<Self::MessageType>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+}
 
 #[derive(Default)]
 struct PersonMessage {
@@ -68,6 +80,13 @@ where
     F: FieldType,
     S: SharedItems,
 {
+    fn try_get_i32(&self) -> Result<i32> {
+        todo!()
+    }
+    type MessageType = (); // TODO
+    fn try_get_message(&self) -> Result<Option<Self::MessageType>> {
+        todo!()
+    }
 }
 
 impl GenericMessage for PersonMessage {

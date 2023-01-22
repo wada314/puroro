@@ -44,6 +44,8 @@ pub enum PuroroError {
     ZeroLengthPackedField,
     #[error("Unknown enum variant.")]
     UnknownEnumVariant(i32),
+    #[error("This GenericField does not support that type.")]
+    UnavailableGenericFieldType,
     #[error("The bytestream iterator returned an error: {0}")]
     IteratorError(#[from] std::io::Error),
     #[error("The formatter returned an error: {0}")]
