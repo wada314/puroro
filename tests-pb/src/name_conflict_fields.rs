@@ -142,8 +142,7 @@ impl ::std::clone::Clone for Conflict {
 impl ::std::ops::Drop for Conflict {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItemsTrait as _;
+        use self::_pinternal::{OneofUnion as _, SharedItemsTrait as _};
     }
 }
 impl ::std::fmt::Debug for Conflict {
@@ -305,8 +304,7 @@ impl ::std::clone::Clone for ConflictFields {
 impl ::std::ops::Drop for ConflictFields {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItemsTrait as _;
+        use self::_pinternal::{OneofUnion as _, SharedItemsTrait as _};
     }
 }
 impl ::std::fmt::Debug for ConflictFields {

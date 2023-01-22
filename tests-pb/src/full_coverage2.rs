@@ -2533,8 +2533,7 @@ impl ::std::clone::Clone for Msg {
 impl ::std::ops::Drop for Msg {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItemsTrait as _;
+        use self::_pinternal::{OneofUnion as _, SharedItemsTrait as _};
     }
 }
 impl ::std::fmt::Debug for Msg {

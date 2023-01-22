@@ -278,8 +278,7 @@ fn gen_message_struct_impl_drop(this: &(impl ?Sized + Message)) -> Result<ItemIm
     Ok(parse2(quote! {
         impl ::std::ops::Drop for #ident {
             fn drop(&mut self) {
-                #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                use #PURORO_INTERNAL::SharedItemsTrait as _;
+                #[allow(unused)] use #PURORO_INTERNAL::{OneofUnion as _, SharedItemsTrait as _};
 
                 #(self.fields.#oneof_idents.clear(self.shared.bitfield_mut());)*
             }

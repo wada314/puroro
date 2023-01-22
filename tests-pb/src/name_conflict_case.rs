@@ -141,8 +141,7 @@ impl ::std::clone::Clone for Message {
 impl ::std::ops::Drop for Message {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItemsTrait as _;
+        use self::_pinternal::{OneofUnion as _, SharedItemsTrait as _};
         self.fields.conflict.clear(self.shared.bitfield_mut());
     }
 }
