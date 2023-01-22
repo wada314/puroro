@@ -35,122 +35,124 @@ pub struct Version {
             3usize,
         >,
     >,
-    bitfield: self::_pinternal::BitArray<1usize>,
-    unknown_fields: self::_pinternal::UnknownFieldsImpl,
+    shared: self::_pinternal::SharedItems<1usize>,
 }
 impl Version {
     pub fn major(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.major,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn major_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.major, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.major, self.shared.bitfield())
     }
     pub fn major_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.major,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_major(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.major, &self.bitfield).is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.major, self.shared.bitfield())
+            .is_some()
     }
     pub fn clear_major(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.major, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.major, self.shared.bitfield_mut())
     }
     pub fn minor(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.minor,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn minor_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.minor, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.minor, self.shared.bitfield())
     }
     pub fn minor_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.minor,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_minor(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.minor, &self.bitfield).is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.minor, self.shared.bitfield())
+            .is_some()
     }
     pub fn clear_minor(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.minor, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.minor, self.shared.bitfield_mut())
     }
     pub fn patch(&self) -> i32 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.patch,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn patch_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.patch, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.patch, self.shared.bitfield())
     }
     pub fn patch_mut(&mut self) -> &mut i32 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.patch,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_patch(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.patch, &self.bitfield).is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.patch, self.shared.bitfield())
+            .is_some()
     }
     pub fn clear_patch(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.patch, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.patch, self.shared.bitfield_mut())
     }
     pub fn suffix(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.suffix,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn suffix_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.suffix, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.suffix, self.shared.bitfield())
     }
     pub fn suffix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.suffix,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_suffix(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.suffix, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.suffix, self.shared.bitfield())
             .is_some()
     }
     pub fn clear_suffix(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.suffix, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.suffix, self.shared.bitfield_mut())
     }
 }
 impl self::_puroro::Message for Version {
@@ -168,7 +170,7 @@ impl self::_puroro::Message for Version {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -179,28 +181,28 @@ impl self::_puroro::Message for Version {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.major,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.minor,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.patch,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.suffix,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
@@ -213,7 +215,7 @@ impl self::_puroro::Message for Version {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.unknown_fields.push(number, field_data)?;
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -227,32 +229,32 @@ impl self::_puroro::Message for Version {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.major,
-            &self.bitfield,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.minor,
-            &self.bitfield,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.patch,
-            &self.bitfield,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.suffix,
-            &self.bitfield,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
-        self.unknown_fields.ser_to_write(out)?;
+        self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -265,8 +267,7 @@ impl ::std::clone::Clone for Version {
                 patch: ::std::clone::Clone::clone(&self.fields.patch),
                 suffix: ::std::clone::Clone::clone(&self.fields.suffix),
             },
-            bitfield: ::std::clone::Clone::clone(&self.bitfield),
-            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+            shared: ::std::clone::Clone::clone(&self.shared),
         }
     }
 }
@@ -288,7 +289,7 @@ impl ::std::fmt::Debug for Version {
             .field(stringify!(minor), &self.minor_opt())
             .field(stringify!(patch), &self.patch_opt())
             .field(stringify!(suffix), &self.suffix_opt());
-        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields.debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -299,7 +300,7 @@ impl ::std::cmp::PartialEq for Version {
         true && self.major_opt() == rhs.major_opt()
             && self.minor_opt() == rhs.minor_opt() && self.patch_opt() == rhs.patch_opt()
             && self.suffix_opt() == rhs.suffix_opt()
-            && self.unknown_fields == rhs.unknown_fields
+            && self.shared.unknown_fields == rhs.shared.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -321,8 +322,7 @@ pub struct CodeGeneratorRequest {
             self::_root::google::protobuf::compiler::Version,
         >,
     >,
-    bitfield: self::_pinternal::BitArray<1usize>,
-    unknown_fields: self::_pinternal::UnknownFieldsImpl,
+    shared: self::_pinternal::SharedItems<1usize>,
 }
 impl CodeGeneratorRequest {
     pub fn file_to_generate(
@@ -331,7 +331,10 @@ impl CodeGeneratorRequest {
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field(&self.fields.file_to_generate, &self.bitfield)
+        RepeatedFieldType::get_field(
+            &self.fields.file_to_generate,
+            self.shared.bitfield(),
+        )
     }
     pub fn file_to_generate_mut(
         &mut self,
@@ -339,55 +342,70 @@ impl CodeGeneratorRequest {
         use self::_pinternal::RepeatedFieldType;
         RepeatedFieldType::get_field_mut(
             &mut self.fields.file_to_generate,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
     pub fn clear_file_to_generate(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::clear(&mut self.fields.file_to_generate, &mut self.bitfield)
+        RepeatedFieldType::clear(
+            &mut self.fields.file_to_generate,
+            self.shared.bitfield_mut(),
+        )
     }
     pub fn parameter(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.parameter,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn parameter_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.parameter, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(
+            &self.fields.parameter,
+            self.shared.bitfield(),
+        )
     }
     pub fn parameter_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.parameter,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_parameter(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.parameter, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(
+                &self.fields.parameter,
+                self.shared.bitfield(),
+            )
             .is_some()
     }
     pub fn clear_parameter(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.parameter, &mut self.bitfield)
+        NonRepeatedFieldType::clear(
+            &mut self.fields.parameter,
+            self.shared.bitfield_mut(),
+        )
     }
     pub fn proto_file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field(&self.fields.proto_file, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.proto_file, self.shared.bitfield())
     }
     pub fn proto_file_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto> {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field_mut(&mut self.fields.proto_file, &mut self.bitfield)
+        RepeatedFieldType::get_field_mut(
+            &mut self.fields.proto_file,
+            self.shared.bitfield_mut(),
+        )
     }
     pub fn clear_proto_file(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::clear(&mut self.fields.proto_file, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.proto_file, self.shared.bitfield_mut())
     }
     pub fn compiler_version(
         &self,
@@ -395,7 +413,7 @@ impl CodeGeneratorRequest {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.compiler_version,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
@@ -405,7 +423,7 @@ impl CodeGeneratorRequest {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_opt(
             &self.fields.compiler_version,
-            &self.bitfield,
+            self.shared.bitfield(),
         )
     }
     pub fn compiler_version_mut(
@@ -414,7 +432,7 @@ impl CodeGeneratorRequest {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.compiler_version,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
@@ -422,7 +440,7 @@ impl CodeGeneratorRequest {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_opt(
                 &self.fields.compiler_version,
-                &self.bitfield,
+                self.shared.bitfield(),
             )
             .is_some()
     }
@@ -430,7 +448,7 @@ impl CodeGeneratorRequest {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::clear(
             &mut self.fields.compiler_version,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
 }
@@ -449,7 +467,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -460,28 +478,28 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.file_to_generate,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.parameter,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     15i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.proto_file,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.compiler_version,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
@@ -494,7 +512,7 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.unknown_fields.push(number, field_data)?;
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -508,32 +526,32 @@ impl self::_puroro::Message for CodeGeneratorRequest {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.file_to_generate,
-            &self.bitfield,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.parameter,
-            &self.bitfield,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.proto_file,
-            &self.bitfield,
+            self.shared.bitfield(),
             15i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.compiler_version,
-            &self.bitfield,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
-        self.unknown_fields.ser_to_write(out)?;
+        self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -550,8 +568,7 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
                     &self.fields.compiler_version,
                 ),
             },
-            bitfield: ::std::clone::Clone::clone(&self.bitfield),
-            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+            shared: ::std::clone::Clone::clone(&self.shared),
         }
     }
 }
@@ -573,7 +590,7 @@ impl ::std::fmt::Debug for CodeGeneratorRequest {
             .field(stringify!(parameter), &self.parameter_opt())
             .field(stringify!(proto_file), &self.proto_file())
             .field(stringify!(compiler_version), &self.compiler_version_opt());
-        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields.debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -585,7 +602,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
             && self.parameter_opt() == rhs.parameter_opt()
             && self.proto_file() == rhs.proto_file()
             && self.compiler_version_opt() == rhs.compiler_version_opt()
-            && self.unknown_fields == rhs.unknown_fields
+            && self.shared.unknown_fields == rhs.shared.unknown_fields
     }
 }
 #[derive(::std::default::Default)]
@@ -605,43 +622,43 @@ pub struct CodeGeneratorResponse {
             self::_root::google::protobuf::compiler::code_generator_response::File,
         >,
     >,
-    bitfield: self::_pinternal::BitArray<1usize>,
-    unknown_fields: self::_pinternal::UnknownFieldsImpl,
+    shared: self::_pinternal::SharedItems<1usize>,
 }
 impl CodeGeneratorResponse {
     pub fn error(&self) -> &str {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.error,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn error_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.error, &self.bitfield)
+        NonRepeatedFieldType::get_field_opt(&self.fields.error, self.shared.bitfield())
     }
     pub fn error_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.error,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_error(&self) -> bool {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::get_field_opt(&self.fields.error, &self.bitfield).is_some()
+        NonRepeatedFieldType::get_field_opt(&self.fields.error, self.shared.bitfield())
+            .is_some()
     }
     pub fn clear_error(&mut self) {
         use self::_pinternal::NonRepeatedFieldType;
-        NonRepeatedFieldType::clear(&mut self.fields.error, &mut self.bitfield)
+        NonRepeatedFieldType::clear(&mut self.fields.error, self.shared.bitfield_mut())
     }
     pub fn supported_features(&self) -> u64 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.supported_features,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
@@ -649,14 +666,14 @@ impl CodeGeneratorResponse {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_opt(
             &self.fields.supported_features,
-            &self.bitfield,
+            self.shared.bitfield(),
         )
     }
     pub fn supported_features_mut(&mut self) -> &mut u64 {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.supported_features,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
@@ -664,7 +681,7 @@ impl CodeGeneratorResponse {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_opt(
                 &self.fields.supported_features,
-                &self.bitfield,
+                self.shared.bitfield(),
             )
             .is_some()
     }
@@ -672,14 +689,14 @@ impl CodeGeneratorResponse {
         use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::clear(
             &mut self.fields.supported_features,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
     pub fn file(
         &self,
     ) -> &[self::_root::google::protobuf::compiler::code_generator_response::File] {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field(&self.fields.file, &self.bitfield)
+        RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
     }
     pub fn file_mut(
         &mut self,
@@ -687,11 +704,14 @@ impl CodeGeneratorResponse {
         self::_root::google::protobuf::compiler::code_generator_response::File,
     > {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field_mut(&mut self.fields.file, &mut self.bitfield)
+        RepeatedFieldType::get_field_mut(
+            &mut self.fields.file,
+            self.shared.bitfield_mut(),
+        )
     }
     pub fn clear_file(&mut self) {
         use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::clear(&mut self.fields.file, &mut self.bitfield)
+        RepeatedFieldType::clear(&mut self.fields.file, self.shared.bitfield_mut())
     }
 }
 impl self::_puroro::Message for CodeGeneratorResponse {
@@ -709,7 +729,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -720,21 +740,21 @@ impl self::_puroro::Message for CodeGeneratorResponse {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.error,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.supported_features,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     15i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.file,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
@@ -747,7 +767,7 @@ impl self::_puroro::Message for CodeGeneratorResponse {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.unknown_fields.push(number, field_data)?;
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -761,26 +781,26 @@ impl self::_puroro::Message for CodeGeneratorResponse {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.error,
-            &self.bitfield,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.supported_features,
-            &self.bitfield,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.file,
-            &self.bitfield,
+            self.shared.bitfield(),
             15i32,
             out,
         )?;
-        self.unknown_fields.ser_to_write(out)?;
+        self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
@@ -794,8 +814,7 @@ impl ::std::clone::Clone for CodeGeneratorResponse {
                 ),
                 file: ::std::clone::Clone::clone(&self.fields.file),
             },
-            bitfield: ::std::clone::Clone::clone(&self.bitfield),
-            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+            shared: ::std::clone::Clone::clone(&self.shared),
         }
     }
 }
@@ -816,7 +835,7 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
             .field(stringify!(error), &self.error_opt())
             .field(stringify!(supported_features), &self.supported_features_opt())
             .field(stringify!(file), &self.file());
-        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields.debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -826,7 +845,8 @@ impl ::std::cmp::PartialEq for CodeGeneratorResponse {
         use self::_pinternal::OneofUnion as _;
         true && self.error_opt() == rhs.error_opt()
             && self.supported_features_opt() == rhs.supported_features_opt()
-            && self.file() == rhs.file() && self.unknown_fields == rhs.unknown_fields
+            && self.file() == rhs.file()
+            && self.shared.unknown_fields == rhs.shared.unknown_fields
     }
 }
 pub mod _fields {

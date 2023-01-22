@@ -19,46 +19,45 @@ pub struct ConflictCase {
             0usize,
         >,
     >,
-    bitfield: self::_pinternal::BitArray<1usize>,
-    unknown_fields: self::_pinternal::UnknownFieldsImpl,
+    shared: self::_pinternal::SharedItems<1usize>,
 }
 impl ConflictCase {
     pub fn this_is_message_field(&self) -> i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItemsTrait as _};
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.this_is_message_field,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn this_is_message_field_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItemsTrait as _};
         NonRepeatedFieldType::get_field_opt(
             &self.fields.this_is_message_field,
-            &self.bitfield,
+            self.shared.bitfield(),
         )
     }
     pub fn this_is_message_field_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItemsTrait as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.this_is_message_field,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_this_is_message_field(&self) -> bool {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItemsTrait as _};
         NonRepeatedFieldType::get_field_opt(
                 &self.fields.this_is_message_field,
-                &self.bitfield,
+                self.shared.bitfield(),
             )
             .is_some()
     }
     pub fn clear_this_is_message_field(&mut self) {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItemsTrait as _};
         NonRepeatedFieldType::clear(
             &mut self.fields.this_is_message_field,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
 }
@@ -77,7 +76,7 @@ impl self::_puroro::Message for ConflictCase {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -88,7 +87,7 @@ impl self::_puroro::Message for ConflictCase {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.this_is_message_field,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
@@ -101,7 +100,7 @@ impl self::_puroro::Message for ConflictCase {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.unknown_fields.push(number, field_data)?;
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -115,34 +114,35 @@ impl self::_puroro::Message for ConflictCase {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.this_is_message_field,
-            &self.bitfield,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
-        self.unknown_fields.ser_to_write(out)?;
+        self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for ConflictCase {
     fn clone(&self) -> Self {
+        #[allow(unused)]
+        use self::_pinternal::SharedItemsTrait as _;
         Self {
             fields: self::_fields::ConflictCaseFields {
                 this_is_message_field: ::std::clone::Clone::clone(
                     &self.fields.this_is_message_field,
                 ),
             },
-            bitfield: ::std::clone::Clone::clone(&self.bitfield),
-            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+            shared: ::std::clone::Clone::clone(&self.shared),
         }
     }
 }
 impl ::std::ops::Drop for ConflictCase {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{OneofUnion as _, SharedItemsTrait as _};
     }
 }
 impl ::std::fmt::Debug for ConflictCase {
@@ -150,11 +150,11 @@ impl ::std::fmt::Debug for ConflictCase {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
         let mut debug_struct = fmt.debug_struct(stringify!(ConflictCase));
         debug_struct
             .field(stringify!(this_is_message_field), &self.this_is_message_field_opt());
-        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -162,8 +162,9 @@ impl ::std::cmp::PartialEq for ConflictCase {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::SharedItemsTrait as _;
         true && self.this_is_message_field_opt() == rhs.this_is_message_field_opt()
-            && self.unknown_fields == rhs.unknown_fields
+            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
 pub mod _fields {

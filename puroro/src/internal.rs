@@ -31,5 +31,5 @@ pub use self::field_type::{
 };
 pub use self::oneof_field_type::{HeapMessageField, NumericalField, OneofFieldType, UnsizedField};
 pub use self::oneof_type::{OneofCase, OneofUnion};
-pub use self::shared::SharedItems;
+pub use self::shared::{SharedItems, SharedItemsTrait};
 pub use self::unknown_fields::{UnknownFields, UnknownFieldsImpl};
