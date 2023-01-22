@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal as int;
-use crate::internal::FieldType;
+use crate::internal::{FieldType, SharedItems, SharedItemsImpl};
 use crate::typenum::{Bool, Cmp, Comparable};
 use crate::Message;
 use ::typenum::U1;
@@ -36,19 +36,12 @@ impl GenericField for () {}
 #[derive(Default)]
 struct PersonMessage {
     fields: PersonMessageFields,
-    shared: SharedItems<1>,
+    shared: SharedItemsImpl<1>,
 }
 #[derive(Default)]
 struct PersonMessageFields {
     partner: int::SingularHeapMessageField<PersonMessage>,
 }
-#[derive(Default)]
-struct SharedItems<const BITFIELD32_LEN: usize> {
-    bitfield: int::BitArray<BITFIELD32_LEN>,
-    unknown_fields: int::UnknownFieldsImpl,
-}
-trait SharedItemsTrait {}
-impl<const BITFIELD32_LEN: usize> SharedItemsTrait for SharedItems<BITFIELD32_LEN> {}
 
 impl crate::Message for PersonMessage {
     fn from_bytes_iter<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> crate::Result<Self> {
@@ -68,15 +61,16 @@ impl FieldsTrait for PersonMessageFields {
     type Type<N: Comparable> =
         <Cmp<U1, N> as Bool>::IfF<int::SingularHeapMessageField<PersonMessage>, ()>;
 }
+
 struct FieldRef<'a, F, S>(&'a F, &'a S);
 impl<'a, F, S> GenericField for FieldRef<'a, F, S>
 where
     F: FieldType,
-    S: SharedItemsTrait,
+    S: SharedItems,
 {
 }
 
 impl GenericMessage for PersonMessage {
     type FieldType<'a, N: 'a + Comparable> =
-        FieldRef<'a, <PersonMessageFields as FieldsTrait>::Type<N>, SharedItems<1>> where Self: 'a;
+        FieldRef<'a, <PersonMessageFields as FieldsTrait>::Type<N>, SharedItemsImpl<1>> where Self: 'a;
 }
