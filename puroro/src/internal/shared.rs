@@ -19,12 +19,12 @@ use crate::internal::bitvec::{BitArray, BitSlice};
 use crate::internal::unknown_fields::{UnknownFields, UnknownFieldsImpl};
 
 #[derive(Debug, Clone, Default)]
-pub struct SharedItems<const BITFIELD_LEN32: usize> {
+pub struct SharedItemsImpl<const BITFIELD_LEN32: usize> {
     bitfield: BitArray<BITFIELD_LEN32>,
     unknown_fields: UnknownFieldsImpl,
 }
 
-pub trait SharedItemsTrait {
+pub trait SharedItems {
     type BitSliceType: BitSlice;
     fn bitfield(&self) -> &Self::BitSliceType;
     fn bitfield_mut(&mut self) -> &mut Self::BitSliceType;
@@ -33,7 +33,7 @@ pub trait SharedItemsTrait {
     fn unknown_fields_mut(&mut self) -> &mut Self::UnknownFieldsType;
 }
 
-impl<const BITFIELD_LEN32: usize> SharedItemsTrait for SharedItems<BITFIELD_LEN32> {
+impl<const BITFIELD_LEN32: usize> SharedItems for SharedItemsImpl<BITFIELD_LEN32> {
     type BitSliceType = BitArray<BITFIELD_LEN32>;
     fn bitfield(&self) -> &Self::BitSliceType {
         &self.bitfield

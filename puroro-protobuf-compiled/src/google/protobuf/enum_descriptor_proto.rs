@@ -24,11 +24,11 @@ pub struct EnumReservedRange {
             1usize,
         >,
     >,
-    shared: self::_pinternal::SharedItems<1usize>,
+    shared: self::_pinternal::SharedItemsImpl<1usize>,
 }
 impl EnumReservedRange {
     pub fn start(&self) -> i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.start,
             self.shared.bitfield(),
@@ -36,11 +36,11 @@ impl EnumReservedRange {
         )
     }
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
     }
     pub fn start_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.start,
             self.shared.bitfield_mut(),
@@ -48,16 +48,16 @@ impl EnumReservedRange {
         )
     }
     pub fn has_start(&self) -> bool {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
             .is_some()
     }
     pub fn clear_start(&mut self) {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(&mut self.fields.start, self.shared.bitfield_mut())
     }
     pub fn end(&self) -> i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.end,
             self.shared.bitfield(),
@@ -65,11 +65,11 @@ impl EnumReservedRange {
         )
     }
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
     }
     pub fn end_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.end,
             self.shared.bitfield_mut(),
@@ -77,12 +77,12 @@ impl EnumReservedRange {
         )
     }
     pub fn has_end(&self) -> bool {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
             .is_some()
     }
     pub fn clear_end(&mut self) {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
     }
 }
@@ -101,7 +101,7 @@ impl self::_puroro::Message for EnumReservedRange {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -146,7 +146,7 @@ impl self::_puroro::Message for EnumReservedRange {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItemsTrait as _, UnknownFields as _};
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.start,
             self.shared.bitfield(),
@@ -165,6 +165,8 @@ impl self::_puroro::Message for EnumReservedRange {
 }
 impl ::std::clone::Clone for EnumReservedRange {
     fn clone(&self) -> Self {
+        #[allow(unused)]
+        use self::_pinternal::SharedItems as _;
         Self {
             fields: self::_fields::EnumReservedRangeFields {
                 start: ::std::clone::Clone::clone(&self.fields.start),
@@ -177,7 +179,7 @@ impl ::std::clone::Clone for EnumReservedRange {
 impl ::std::ops::Drop for EnumReservedRange {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for EnumReservedRange {
@@ -185,12 +187,12 @@ impl ::std::fmt::Debug for EnumReservedRange {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         let mut debug_struct = fmt.debug_struct(stringify!(EnumReservedRange));
         debug_struct
             .field(stringify!(start), &self.start_opt())
             .field(stringify!(end), &self.end_opt());
-        self.shared.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -198,8 +200,9 @@ impl ::std::cmp::PartialEq for EnumReservedRange {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::SharedItems as _;
         true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
-            && self.shared.unknown_fields == rhs.shared.unknown_fields
+            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
 pub mod _fields {

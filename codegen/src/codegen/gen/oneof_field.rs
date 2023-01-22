@@ -314,19 +314,19 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_ident(&self) -> #getter_type {
-                    use #PURORO_INTERNAL::SharedItemsTrait as _;
+                    use #PURORO_INTERNAL::SharedItems as _;
                     self.fields.#oneof_struct_field_ident.#getter_ident(self.shared.bitfield())
                 }
             })?,
             parse2(quote! {
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                    use #PURORO_INTERNAL::SharedItemsTrait as _;
+                    use #PURORO_INTERNAL::SharedItems as _;
                     self.fields.#oneof_struct_field_ident.#getter_opt_ident(self.shared.bitfield())
                 }
             })?,
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                    use #PURORO_INTERNAL::SharedItemsTrait as _;
+                    use #PURORO_INTERNAL::SharedItems as _;
                     self.fields.#oneof_struct_field_ident.#getter_mut_ident(self.shared.bitfield_mut())
                 }
             })?,
@@ -338,7 +338,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     #[allow(unused)] use ::std::option::Option::Some;
-                    use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItemsTrait as _};
+                    use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItems as _};
                     if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.shared.bitfield()) {
                         self.fields.#oneof_struct_field_ident.clear(self.shared.bitfield_mut())
                     }
