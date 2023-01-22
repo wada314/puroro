@@ -124,8 +124,7 @@ impl<T: ?Sized + Message> MessageExt for T {
             #[derive(::std::default::Default)]
             pub struct #ident {
                 fields: #fields_struct_type,
-                bitfield: #PURORO_INTERNAL::BitArray<#bitfield_size_in_u32_array>,
-                unknown_fields: #PURORO_INTERNAL::UnknownFieldsImpl,
+                shared: #PURORO_INTERNAL::SharedItems<#bitfield_size_in_u32_array>,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -261,8 +260,7 @@ fn gen_message_struct_impl_clone(this: &(impl ?Sized + Message)) -> Result<ItemI
                     fields: self::_fields::#fields_ident {
                         #(#field_values,)*
                     },
-                    bitfield: ::std::clone::Clone::clone(&self.bitfield),
-                    unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+                    shared: ::std::clone::Clone::clone(&self.shared),
                 }
             }
         }
@@ -300,7 +298,7 @@ fn gen_message_struct_impl_debug(this: &(impl ?Sized + Message)) -> Result<ItemI
                 use #PURORO_INTERNAL::UnknownFields as _;
                 let mut debug_struct = fmt.debug_struct(stringify!(#ident));
                 #debug_fields;
-                self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+                self.shared.unknown_fields.debug_struct_fields(&mut debug_struct)?;
                 debug_struct.finish()
             }
         }
@@ -321,7 +319,7 @@ fn gen_message_struct_impl_partial_eq(this: &(impl ?Sized + Message)) -> Result<
 
                 true
                     #( && #cmp_exprs)*
-                    && self.unknown_fields == rhs.unknown_fields
+                    && self.shared.unknown_fields == rhs.shared.unknown_fields
             }
         }
     })?)

@@ -18,6 +18,7 @@
 use crate::internal::bitvec::{BitArray, BitSlice};
 use crate::internal::unknown_fields::{UnknownFields, UnknownFieldsImpl};
 
+#[derive(Debug, Clone)]
 pub struct SharedItems<const BITFIELD_LEN32: usize> {
     bitfield: BitArray<BITFIELD_LEN32>,
     unknown_fields: UnknownFieldsImpl,
