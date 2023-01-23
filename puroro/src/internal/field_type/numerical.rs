@@ -17,7 +17,7 @@ use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, FieldData, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
-use crate::Result;
+use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 
@@ -30,11 +30,15 @@ pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usi
 );
 #[derive(Default, Clone)]
 pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
+
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
-    RustType: PartialEq + Default + Clone,
+    RustType: PartialEq + Default + Clone + CheckNumType<i32>,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn try_get_i32(&self) -> Result<i32> {
+        CheckNumType::maybe(self.0.clone()).ok_or(PuroroError::UnavailableGenericFieldType)
+    }
     type MessageType<'a> = ()
     where
         Self: 'a;
@@ -325,3 +329,20 @@ where
         self.0.clear()
     }
 }
+
+trait CheckNumType<T>: Sized {
+    fn maybe(self) -> Option<T> {
+        None
+    }
+}
+impl CheckNumType<i32> for i32 {
+    fn maybe(self) -> Option<i32> {
+        Some(self)
+    }
+}
+impl CheckNumType<i32> for i64 {}
+impl CheckNumType<i32> for u32 {}
+impl CheckNumType<i32> for u64 {}
+impl CheckNumType<i32> for f32 {}
+impl CheckNumType<i32> for f64 {}
+impl CheckNumType<i32> for bool {}
