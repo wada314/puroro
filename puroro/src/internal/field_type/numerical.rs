@@ -33,11 +33,11 @@ pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomDat
 
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
-    RustType: PartialEq + Default + Clone + CheckNumType<i32>,
+    RustType: PartialEq + Default + Clone + CheckNumType,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn try_get_i32(&self) -> Result<i32> {
-        CheckNumType::maybe(self.0.clone()).ok_or(PuroroError::UnavailableGenericFieldType)
+        CheckNumType::maybe_i32(self.0.clone()).ok_or(PuroroError::UnavailableGenericFieldType)
     }
     type MessageType<'a> = ()
     where
@@ -108,7 +108,7 @@ where
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
-    RustType: Clone,
+    RustType: Clone + CheckNumType,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type MessageType<'a> = ()
@@ -228,7 +228,7 @@ where
 
 impl<ProtoType> NonRepeatedFieldType for SingularNumericalField<ProtoType::RustType, ProtoType>
 where
-    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType::RustType: PartialEq + Default + Clone + CheckNumType,
     ProtoType: tags::NumericalType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustType>
@@ -270,7 +270,7 @@ where
 impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
     for OptionalNumericalField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
-    ProtoType::RustType: Clone,
+    ProtoType::RustType: Clone + CheckNumType,
     ProtoType: tags::NumericalType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustType>
@@ -330,19 +330,19 @@ where
     }
 }
 
-trait CheckNumType<T>: Sized {
-    fn maybe(self) -> Option<T> {
+trait CheckNumType: Sized {
+    fn maybe_i32(self) -> Option<i32> {
         None
     }
 }
-impl CheckNumType<i32> for i32 {
-    fn maybe(self) -> Option<i32> {
+impl CheckNumType for i32 {
+    fn maybe_i32(self) -> Option<i32> {
         Some(self)
     }
 }
-impl CheckNumType<i32> for i64 {}
-impl CheckNumType<i32> for u32 {}
-impl CheckNumType<i32> for u64 {}
-impl CheckNumType<i32> for f32 {}
-impl CheckNumType<i32> for f64 {}
-impl CheckNumType<i32> for bool {}
+impl CheckNumType for i64 {}
+impl CheckNumType for u32 {}
+impl CheckNumType for u64 {}
+impl CheckNumType for f32 {}
+impl CheckNumType for f64 {}
+impl CheckNumType for bool {}
