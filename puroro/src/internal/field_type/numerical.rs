@@ -12,80 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::*;
+use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
-use crate::internal::ser::{
-    ser_bytes_shared, ser_numerical_shared, ser_wire_and_number, FieldData, WireType,
-};
+use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, FieldData, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
-use crate::Message;
-use crate::{PuroroError, Result};
+use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::marker::PhantomData;
 
-pub trait FieldType {
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        field_data: &mut FieldData<I>,
-    ) -> Result<()> {
-        match field_data {
-            FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
-            FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
-            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
-            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
-        }
-    }
-    fn deser_from_variant<B: BitSlice>(
-        &mut self,
-        #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] variant: Variant,
-    ) -> Result<()> {
-        Err(PuroroError::InvalidWireType(WireType::Variant as u32))?
-    }
-    fn deser_from_bits32<B: BitSlice>(
-        &mut self,
-        #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] bits: [u8; 4],
-    ) -> Result<()> {
-        Err(PuroroError::InvalidWireType(WireType::Bits32 as u32))?
-    }
-    fn deser_from_bits64<B: BitSlice>(
-        &mut self,
-        #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] bits: [u8; 8],
-    ) -> Result<()> {
-        Err(PuroroError::InvalidWireType(WireType::Bits64 as u32))?
-    }
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] iter: &mut I,
-    ) -> Result<()> {
-        Err(PuroroError::InvalidWireType(
-            WireType::LengthDelimited as u32,
-        ))?
-    }
-
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        #[allow(unused)] bitvec: &B,
-        #[allow(unused)] number: i32,
-        #[allow(unused)] out: &mut W,
-    ) -> Result<()>;
-}
-
-impl FieldType for () {
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        #[allow(unused)] bitvec: &B,
-        #[allow(unused)] number: i32,
-        #[allow(unused)] out: &mut W,
-    ) -> Result<()> {
-        Ok(())
-    }
-}
-
+#[derive(Default, Clone)]
+pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
+#[derive(Default, Clone)]
+pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+    RustType,
+    PhantomData<ProtoType>,
+);
+#[derive(Default, Clone)]
+pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
     RustType: PartialEq + Default + Clone,
@@ -266,143 +210,106 @@ where
     }
 }
 
-impl<RustType, ProtoType> FieldType for SingularUnsizedField<RustType, ProtoType>
+impl<ProtoType> NonRepeatedFieldType for SingularNumericalField<ProtoType::RustType, ProtoType>
 where
-    RustType: Default + PartialEq,
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::NumericalType,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: &mut I,
-    ) -> Result<()> {
-        let val = ProtoType::from_bytes_iter(iter)?;
-        if val != RustType::default() {
-            self.0 = val
-        }
-        Ok(())
-    }
+    type GetterOptType<'a> = Option<ProtoType::RustType>
+    where
+        Self: 'a;
+    type DefaultValueType = ProtoType::RustType;
+    type GetterOrElseType<'a> = ProtoType::RustType
+    where
+        Self: 'a;
+    type GetterMutType<'a> = &'a mut ProtoType::RustType where Self: 'a;
 
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        _bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        if self.0 != RustType::default() {
-            ser_bytes_shared(ProtoType::to_bytes_slice(&self.0)?, number, out)?;
-        }
-        Ok(())
-    }
-}
-
-impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
-    for OptionalUnsizedField<RustType, ProtoType, BITFIELD_INDEX>
-where
-    ProtoType: tags::UnsizedType<RustType = RustType>,
-{
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        iter: &mut I,
-    ) -> Result<()> {
-        self.0 = ProtoType::from_bytes_iter(iter)?;
-        bitvec.set(BITFIELD_INDEX, true);
-        Ok(())
-    }
-
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
+        &'a self,
         bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        if bitvec.get(BITFIELD_INDEX) {
-            ser_bytes_shared(ProtoType::to_bytes_slice(&self.0)?, number, out)?;
+        default: F,
+    ) -> Self::GetterOrElseType<'a> {
+        self.get_field_opt(bitvec).unwrap_or_else(default)
+    }
+    fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
+        if self.0 == ProtoType::RustType::default() {
+            None
+        } else {
+            Some(self.0.clone())
         }
-        Ok(())
+    }
+    fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
+        &'a mut self,
+        _bitvec: &mut B,
+        _default: D,
+    ) -> Self::GetterMutType<'a> {
+        &mut self.0
+    }
+
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0 = ProtoType::RustType::default();
     }
 }
 
-impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType>
+impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
+    for OptionalNumericalField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType::RustType: Clone,
+    ProtoType: tags::NumericalType,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: &mut I,
-    ) -> Result<()> {
-        self.0.push(ProtoType::from_bytes_iter(iter)?);
-        Ok(())
-    }
+    type GetterOptType<'a> = Option<ProtoType::RustType>
+    where
+        Self: 'a;
+    type DefaultValueType = ProtoType::RustType;
+    type GetterOrElseType<'a> = ProtoType::RustType
+    where
+        Self: 'a;
+    type GetterMutType<'a> = &'a mut ProtoType::RustType where Self: 'a;
 
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        _bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        for val in &self.0 {
-            ser_bytes_shared(ProtoType::to_bytes_slice(val)?, number, out)?;
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
+        &'a self,
+        bitvec: &B,
+        default: F,
+    ) -> Self::GetterOrElseType<'a> {
+        self.get_field_opt(bitvec).unwrap_or_else(default)
+    }
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::GetterOptType<'_> {
+        bitvec.get(BITFIELD_INDEX).then_some(self.0.clone())
+    }
+    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
+        &'a mut self,
+        bitvec: &mut B,
+        default: F,
+    ) -> Self::GetterMutType<'a> {
+        if !bitvec.get(BITFIELD_INDEX) {
+            self.0 = default();
+            bitvec.set(BITFIELD_INDEX, true);
         }
-        Ok(())
+        &mut self.0
+    }
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
+        bitvec.set(BITFIELD_INDEX, false);
     }
 }
 
-impl<M> FieldType for SingularHeapMessageField<M>
+impl<ProtoType> RepeatedFieldType for RepeatedNumericalField<ProtoType::RustType, ProtoType>
 where
-    M: Message + Default,
+    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType: tags::NumericalType,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: &mut I,
-    ) -> Result<()> {
-        let msg = self.0.get_or_insert_with(Default::default).as_mut();
-        Ok(msg.merge_from_bytes_iter(iter)?)
+    type ScalarType = ProtoType::RustType;
+
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
+        self.0.as_slice()
     }
 
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        _bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        if let Some(ref message) = &self.0 {
-            let mut vec = Vec::new();
-            message.to_bytes(&mut vec)?;
-            ser_bytes_shared(vec.as_slice(), number, out)?;
-        }
-        Ok(())
-    }
-}
+    type ContainerType = Vec<Self::ScalarType>;
 
-impl<M> FieldType for RepeatedMessageField<M>
-where
-    M: Message + Default,
-{
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        _bitvec: &mut B,
-        iter: &mut I,
-    ) -> Result<()> {
-        let msg = M::from_bytes_iter(iter)?;
-        self.0.push(msg);
-        Ok(())
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+        &mut self.0
     }
 
-    fn ser_to_write<W: Write, B: BitSlice>(
-        &self,
-        _bitvec: &B,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()> {
-        for message in &self.0 {
-            let mut vec = Vec::new();
-            message.to_bytes(&mut vec)?;
-            ser_bytes_shared(vec.as_slice(), number, out)?;
-        }
-        Ok(())
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear()
     }
 }

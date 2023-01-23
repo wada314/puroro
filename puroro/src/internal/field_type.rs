@@ -12,37 +12,135 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod base_trait;
-mod non_repeated;
-mod repeated;
+mod message;
+mod numerical;
+mod r#unsized;
 
-pub use base_trait::FieldType;
-pub use non_repeated::NonRepeatedFieldType;
-pub use repeated::RepeatedFieldType;
+pub use self::message::{RepeatedMessageField, SingularHeapMessageField};
+pub use self::numerical::{OptionalNumericalField, RepeatedNumericalField, SingularNumericalField};
+pub use self::r#unsized::{OptionalUnsizedField, RepeatedUnsizedField, SingularUnsizedField};
 
-use ::std::marker::PhantomData;
+use crate::internal::bitvec::BitSlice;
+use crate::internal::ser::{FieldData, WireType};
+use crate::internal::variant::Variant;
+use crate::{PuroroError, Result};
+use ::std::io::{Result as IoResult, Write};
 
-#[derive(Default, Clone)]
-pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
-#[derive(Default, Clone)]
-pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
-    RustType,
-    PhantomData<ProtoType>,
-);
-#[derive(Default, Clone)]
-pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
+pub trait FieldType {
+    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        bitvec: &mut B,
+        field_data: &mut FieldData<I>,
+    ) -> Result<()> {
+        match field_data {
+            FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
+            FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
+            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
+            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
+        }
+    }
+    fn deser_from_variant<B: BitSlice>(
+        &mut self,
+        #[allow(unused)] bitvec: &mut B,
+        #[allow(unused)] variant: Variant,
+    ) -> Result<()> {
+        Err(PuroroError::InvalidWireType(WireType::Variant as u32))?
+    }
+    fn deser_from_bits32<B: BitSlice>(
+        &mut self,
+        #[allow(unused)] bitvec: &mut B,
+        #[allow(unused)] bits: [u8; 4],
+    ) -> Result<()> {
+        Err(PuroroError::InvalidWireType(WireType::Bits32 as u32))?
+    }
+    fn deser_from_bits64<B: BitSlice>(
+        &mut self,
+        #[allow(unused)] bitvec: &mut B,
+        #[allow(unused)] bits: [u8; 8],
+    ) -> Result<()> {
+        Err(PuroroError::InvalidWireType(WireType::Bits64 as u32))?
+    }
+    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+        &mut self,
+        #[allow(unused)] bitvec: &mut B,
+        #[allow(unused)] iter: &mut I,
+    ) -> Result<()> {
+        Err(PuroroError::InvalidWireType(
+            WireType::LengthDelimited as u32,
+        ))?
+    }
 
-#[derive(Default, Clone)]
-pub struct SingularUnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
-#[derive(Default, Clone)]
-pub struct OptionalUnsizedField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
-    RustType,
-    PhantomData<ProtoType>,
-);
-#[derive(Default, Clone)]
-pub struct RepeatedUnsizedField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        #[allow(unused)] bitvec: &B,
+        #[allow(unused)] number: i32,
+        #[allow(unused)] out: &mut W,
+    ) -> Result<()>;
+}
 
-#[derive(Default, Clone)]
-pub struct SingularHeapMessageField<M>(Option<Box<M>>);
-#[derive(Default, Clone)]
-pub struct RepeatedMessageField<M>(Vec<M>);
+impl FieldType for () {
+    fn ser_to_write<W: Write, B: BitSlice>(
+        &self,
+        #[allow(unused)] bitvec: &B,
+        #[allow(unused)] number: i32,
+        #[allow(unused)] out: &mut W,
+    ) -> Result<()> {
+        Ok(())
+    }
+}
+
+pub trait NonRepeatedFieldType: FieldType {
+    /// An optional getter type, which is used by the message struct's
+    /// getter methods.
+    /// int32 => Option<i32>
+    /// String => Option<&'a str>
+    /// Message => Option<&'a Message>
+    type GetterOptType<'a>
+    where
+        Self: 'a;
+
+    /// A default field type which can be defined in proto2.
+    /// int32 => i32
+    /// String => &'static str
+    /// Message => unreachable!()
+    type DefaultValueType;
+
+    /// A getter type, which overrides `Self::GetterOptType`'s `None` case
+    /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
+    /// this benefit so it's still an optional type.
+    /// int32 => i32
+    /// String => &'a str
+    /// Message => Option<&'a Message>
+    type GetterOrElseType<'a>
+    where
+        Self: 'a;
+
+    /// A mutable getter type.
+    /// int32 => &'a mut i32
+    /// String => &'a mut String
+    /// Message => &'a mut Message
+    type GetterMutType<'a>
+    where
+        Self: 'a;
+
+    fn get_field_or_else<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
+        &'a self,
+        bitvec: &B,
+        default: F,
+    ) -> Self::GetterOrElseType<'a>;
+    fn get_field_opt<B: BitSlice>(&self, bitvec: &B) -> Self::GetterOptType<'_>;
+    fn get_field_mut<'a, B: BitSlice, F: FnOnce() -> Self::DefaultValueType>(
+        &'a mut self,
+        bitvec: &mut B,
+        default: F,
+    ) -> Self::GetterMutType<'a>;
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
+}
+
+pub trait RepeatedFieldType: FieldType {
+    type ScalarType;
+    fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
+    type ContainerType;
+    fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
+    fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
+}
