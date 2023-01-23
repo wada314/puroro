@@ -35,6 +35,10 @@ where
     RustType: PartialEq + Default + Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    type MessageType<'a> = ()
+    where
+        Self: 'a;
+
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         let v = variant.get::<ProtoType>()?;
         if v != RustType::default() {
@@ -103,6 +107,10 @@ where
     RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    type MessageType<'a> = ()
+    where
+        Self: 'a;
+
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
         bitvec.set(BITFIELD_INDEX, true);
@@ -147,6 +155,10 @@ where
     RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    type MessageType<'a> = ()
+    where
+        Self: 'a;
+
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0.push(variant.get::<ProtoType>()?);
         Ok(())

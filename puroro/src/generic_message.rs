@@ -18,23 +18,34 @@ use crate::typenum::{Bool, Cmp, Comparable};
 use crate::{PuroroError, Result};
 use ::typenum::U1;
 
-trait GenericMessage {
+pub trait GenericMessage {
     type FieldType<'a, N: 'a + Comparable>: GenericField
     where
         Self: 'a;
 }
-trait GenericField {
+pub trait GenericField {
     fn try_get_i32(&self) -> Result<i32>;
     type MessageType: GenericMessage;
     fn try_get_message(&self) -> Result<Option<Self::MessageType>>;
 }
-trait FieldsTrait {
+pub trait FieldsTrait {
     type Type<N: Comparable>: FieldType;
 }
 
 impl GenericMessage for () {
     type FieldType<'a, N: 'a + Comparable> = () where Self: 'a;
 }
+impl<'a, T: GenericMessage> GenericMessage for &'a T {
+    type FieldType<'b, N: 'b + Comparable> = T::FieldType<'b, N>
+    where
+        Self: 'b;
+}
+impl<'a, T: GenericMessage> GenericMessage for &'a mut T {
+    type FieldType<'b, N: 'b + Comparable> = T::FieldType<'b, N>
+    where
+        Self: 'b;
+}
+
 impl GenericField for () {
     fn try_get_i32(&self) -> Result<i32> {
         Err(PuroroError::UnavailableGenericFieldType)?

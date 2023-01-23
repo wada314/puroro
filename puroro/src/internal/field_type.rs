@@ -20,6 +20,7 @@ pub use self::message::{RepeatedMessageField, SingularHeapMessageField};
 pub use self::numerical::{OptionalNumericalField, RepeatedNumericalField, SingularNumericalField};
 pub use self::r#unsized::{OptionalUnsizedField, RepeatedUnsizedField, SingularUnsizedField};
 
+use crate::generic_message::GenericMessage;
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{FieldData, WireType};
 use crate::internal::variant::Variant;
@@ -27,6 +28,19 @@ use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 
 pub trait FieldType {
+    // Reflection methods
+    fn try_get_i32(&self) -> Result<i32> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    type MessageType<'a>: GenericMessage
+    where
+        Self: 'a;
+    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+
+    // Deserialization methods
+
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
@@ -70,6 +84,8 @@ pub trait FieldType {
         ))?
     }
 
+    // Serialization methods
+
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         #[allow(unused)] bitvec: &B,
@@ -79,6 +95,9 @@ pub trait FieldType {
 }
 
 impl FieldType for () {
+    type MessageType<'a> = ()
+    where
+        Self: 'a;
     fn ser_to_write<W: Write, B: BitSlice>(
         &self,
         #[allow(unused)] bitvec: &B,

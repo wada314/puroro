@@ -28,6 +28,10 @@ impl<M> FieldType for SingularHeapMessageField<M>
 where
     M: Message + Default,
 {
+    type MessageType<'a> = ()
+    where
+        Self: 'a;
+
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
@@ -56,6 +60,10 @@ impl<M> FieldType for RepeatedMessageField<M>
 where
     M: Message + Default,
 {
+    type MessageType<'a> = ()
+    where
+        Self: 'a;
+
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
