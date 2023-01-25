@@ -14,7 +14,7 @@
 
 use crate::internal as int;
 use crate::internal::{FieldType, SharedItems, SharedItemsImpl};
-use crate::typenum::{Bool, Cmp, Comparable};
+use crate::typenum::{Bool, Comparable};
 use crate::{PuroroError, Result};
 use ::std::iter;
 use ::std::slice;
@@ -51,7 +51,7 @@ pub trait GenericField {
 }
 pub trait FieldsTrait {
     type Type<N: Comparable>: FieldType;
-    fn field<N: Comparable>(&self) -> &Self::Type<N>;
+    fn field<'a, N: 'a + Comparable>(&'a self) -> &'a Self::Type<N>;
 }
 
 impl GenericMessage for () {
@@ -98,7 +98,11 @@ struct PersonMessageFields {
 
 impl<T: GenericMessage> Person<T> {
     pub fn age(&self) -> i32 {
-        todo!()
+        self.0
+            .field::<U2>()
+            .try_get_i32()
+            .unwrap()
+            .unwrap_or_default()
     }
 }
 
@@ -124,12 +128,12 @@ impl GenericMessage for PersonMessage {
     }
 }
 impl FieldsTrait for PersonMessageFields {
-    type Type<N: Comparable> = <Cmp<U1, N> as Bool>::IfF<
+    type Type<N: Comparable> = <N::Eq<U1> as Bool>::IfF<
         int::SingularHeapMessageField<PersonMessage>,
-        <Cmp<U2, N> as Bool>::IfF<int::SingularNumericalField<i32, int::tags::Int32>, ()>,
+        <N::Eq<U2> as Bool>::IfF<int::SingularNumericalField<i32, int::tags::Int32>, ()>,
     >;
-    fn field<N: Comparable>(&self) -> &Self::Type<N> {
-        todo!()
+    fn field<'a, N: 'a + Comparable>(&'a self) -> &'a Self::Type<N> {
+        <N::Eq<U1> as Bool>::if_f(&self.partner, <N::Eq<U2> as Bool>::if_f(&self.age, &()))
     }
 }
 
