@@ -30,7 +30,6 @@ impl ::std::default::Default for OptimizeMode {
         Self::Speed
     }
 }
-impl self::_pinternal::CheckNumType for OptimizeMode {}
 impl ::std::convert::From::<OptimizeMode> for i32 {
     fn from(val: OptimizeMode) -> i32 {
         match val {

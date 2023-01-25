@@ -41,6 +41,9 @@ pub trait GenericField {
     fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<'_, i32>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
+    type MessageIteratorType<'a>: Iterator<Item = Self::MessageType<'a>>
+    where
+        Self: 'a;
 }
 pub trait FieldsTrait {
     type Type<N: Comparable>: FieldType;
@@ -63,6 +66,7 @@ impl<'a, T: GenericMessage> GenericMessage for &'a mut T {
 impl GenericField for () {
     type MessageType<'a> = ();
     type NumIteratorType<'a, T: 'a + Clone> = iter::Empty<T>;
+    type MessageIteratorType<'a> = iter::Empty<()>;
 }
 
 #[derive(Default)]
@@ -108,6 +112,9 @@ where
         FieldType::try_get_message(self.0)
     }
     type NumIteratorType<'b, T: 'b + Clone> = iter::Cloned<slice::Iter<'b, T>>
+    where
+        Self: 'b;
+    type MessageIteratorType<'b> = F::RepeatedMessageType<'b>
     where
         Self: 'b;
 }

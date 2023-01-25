@@ -24,84 +24,67 @@ pub struct Submsg {
             1usize,
         >,
     >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Submsg {
     pub fn i32_required(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.i32_required,
-            self.shared.bitfield(),
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn i32_required_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.i32_required,
-            self.shared.bitfield(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.i32_required, &self.bitfield)
     }
     pub fn i32_required_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.i32_required,
-            self.shared.bitfield_mut(),
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_i32_required(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.i32_required,
-                self.shared.bitfield(),
-            )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.i32_required, &self.bitfield)
             .is_some()
     }
     pub fn clear_i32_required(&mut self) {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(
-            &mut self.fields.i32_required,
-            self.shared.bitfield_mut(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::clear(&mut self.fields.i32_required, &mut self.bitfield)
     }
     pub fn i64_required(&self) -> i64 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.i64_required,
-            self.shared.bitfield(),
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn i64_required_opt(&self) -> ::std::option::Option::<i64> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.i64_required,
-            self.shared.bitfield(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.i64_required, &self.bitfield)
     }
     pub fn i64_required_mut(&mut self) -> &mut i64 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.i64_required,
-            self.shared.bitfield_mut(),
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_i64_required(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.i64_required,
-                self.shared.bitfield(),
-            )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.i64_required, &self.bitfield)
             .is_some()
     }
     pub fn clear_i64_required(&mut self) {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(
-            &mut self.fields.i64_required,
-            self.shared.bitfield_mut(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::clear(&mut self.fields.i64_required, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for Submsg {
@@ -119,7 +102,7 @@ impl self::_puroro::Message for Submsg {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -130,14 +113,14 @@ impl self::_puroro::Message for Submsg {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i32_required,
-                            self.shared.bitfield_mut(),
+                            &mut self.bitfield,
                             &mut field_data,
                         )?
                     }
                     101i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i64_required,
-                            self.shared.bitfield_mut(),
+                            &mut self.bitfield,
                             &mut field_data,
                         )?
                     }
@@ -150,7 +133,7 @@ impl self::_puroro::Message for Submsg {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.unknown_fields.push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -164,40 +147,39 @@ impl self::_puroro::Message for Submsg {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.i32_required,
-            self.shared.bitfield(),
+            &self.bitfield,
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.i64_required,
-            self.shared.bitfield(),
+            &self.bitfield,
             101i32,
             out,
         )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
             fields: self::_fields::SubmsgFields {
                 i32_required: ::std::clone::Clone::clone(&self.fields.i32_required),
                 i64_required: ::std::clone::Clone::clone(&self.fields.i64_required),
             },
-            shared: ::std::clone::Clone::clone(&self.shared),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
 impl ::std::ops::Drop for Submsg {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        use self::_pinternal::OneofUnion as _;
     }
 }
 impl ::std::fmt::Debug for Submsg {
@@ -205,12 +187,12 @@ impl ::std::fmt::Debug for Submsg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         let mut debug_struct = fmt.debug_struct(stringify!(Submsg));
         debug_struct
             .field(stringify!(i32_required), &self.i32_required_opt())
             .field(stringify!(i64_required), &self.i64_required_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -218,10 +200,9 @@ impl ::std::cmp::PartialEq for Submsg {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
         true && self.i32_required_opt() == rhs.i32_required_opt()
             && self.i64_required_opt() == rhs.i64_required_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

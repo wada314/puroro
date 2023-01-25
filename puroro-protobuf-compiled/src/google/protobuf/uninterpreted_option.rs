@@ -24,84 +24,67 @@ pub struct NamePart {
             1usize,
         >,
     >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl NamePart {
     pub fn name_part(&self) -> &str {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.name_part,
-            self.shared.bitfield(),
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn name_part_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.name_part,
-            self.shared.bitfield(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.name_part, &self.bitfield)
     }
     pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.name_part,
-            self.shared.bitfield_mut(),
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_name_part(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.name_part,
-                self.shared.bitfield(),
-            )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.name_part, &self.bitfield)
             .is_some()
     }
     pub fn clear_name_part(&mut self) {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(
-            &mut self.fields.name_part,
-            self.shared.bitfield_mut(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::clear(&mut self.fields.name_part, &mut self.bitfield)
     }
     pub fn is_extension(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.is_extension,
-            self.shared.bitfield(),
+            &self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn is_extension_opt(&self) -> ::std::option::Option::<bool> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.is_extension,
-            self.shared.bitfield(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.is_extension, &self.bitfield)
     }
     pub fn is_extension_mut(&mut self) -> &mut bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        use self::_pinternal::NonRepeatedFieldType;
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.is_extension,
-            self.shared.bitfield_mut(),
+            &mut self.bitfield,
             ::std::default::Default::default,
         )
     }
     pub fn has_is_extension(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.is_extension,
-                self.shared.bitfield(),
-            )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::get_field_opt(&self.fields.is_extension, &self.bitfield)
             .is_some()
     }
     pub fn clear_is_extension(&mut self) {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(
-            &mut self.fields.is_extension,
-            self.shared.bitfield_mut(),
-        )
+        use self::_pinternal::NonRepeatedFieldType;
+        NonRepeatedFieldType::clear(&mut self.fields.is_extension, &mut self.bitfield)
     }
 }
 impl self::_puroro::Message for NamePart {
@@ -119,7 +102,7 @@ impl self::_puroro::Message for NamePart {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -130,14 +113,14 @@ impl self::_puroro::Message for NamePart {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name_part,
-                            self.shared.bitfield_mut(),
+                            &mut self.bitfield,
                             &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.is_extension,
-                            self.shared.bitfield_mut(),
+                            &mut self.bitfield,
                             &mut field_data,
                         )?
                     }
@@ -150,7 +133,7 @@ impl self::_puroro::Message for NamePart {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.unknown_fields.push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -164,40 +147,39 @@ impl self::_puroro::Message for NamePart {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.name_part,
-            self.shared.bitfield(),
+            &self.bitfield,
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.is_extension,
-            self.shared.bitfield(),
+            &self.bitfield,
             2i32,
             out,
         )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for NamePart {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
             fields: self::_fields::NamePartFields {
                 name_part: ::std::clone::Clone::clone(&self.fields.name_part),
                 is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
             },
-            shared: ::std::clone::Clone::clone(&self.shared),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
 impl ::std::ops::Drop for NamePart {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        use self::_pinternal::OneofUnion as _;
     }
 }
 impl ::std::fmt::Debug for NamePart {
@@ -205,12 +187,12 @@ impl ::std::fmt::Debug for NamePart {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         let mut debug_struct = fmt.debug_struct(stringify!(NamePart));
         debug_struct
             .field(stringify!(name_part), &self.name_part_opt())
             .field(stringify!(is_extension), &self.is_extension_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -218,10 +200,9 @@ impl ::std::cmp::PartialEq for NamePart {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
         true && self.name_part_opt() == rhs.name_part_opt()
             && self.is_extension_opt() == rhs.is_extension_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

@@ -18,7 +18,8 @@ pub struct Message {
             self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,
         >,
     >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
+    bitfield: self::_pinternal::BitArray<1usize>,
+    unknown_fields: self::_pinternal::UnknownFieldsImpl,
 }
 impl Message {
     pub fn conflict(
@@ -26,24 +27,21 @@ impl Message {
     ) -> ::std::option::Option<
         self::_root::name_conflict_case::message::_case::ConflictCase::<i32>,
     > {
-        use self::_pinternal::{SharedItems as _, OneofUnion as _};
-        self.fields.conflict.case_ref(self.shared.bitfield())
+        use self::_pinternal::OneofUnion as _;
+        self.fields.conflict.case_ref(&self.bitfield)
     }
     pub fn clear_conflict(&mut self) {
-        use self::_pinternal::{SharedItems as _, OneofUnion as _};
-        self.fields.conflict.clear(self.shared.bitfield_mut())
+        use self::_pinternal::OneofUnion as _;
+        self.fields.conflict.clear(&mut self.bitfield)
     }
     pub fn this_is_oneof_field(&self) -> i32 {
-        use self::_pinternal::SharedItems as _;
-        self.fields.conflict.this_is_oneof_field(self.shared.bitfield())
+        self.fields.conflict.this_is_oneof_field(&self.bitfield)
     }
     pub fn this_is_oneof_field_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::SharedItems as _;
-        self.fields.conflict.this_is_oneof_field_opt(self.shared.bitfield())
+        self.fields.conflict.this_is_oneof_field_opt(&self.bitfield)
     }
     pub fn this_is_oneof_field_mut(&mut self) -> &mut i32 {
-        use self::_pinternal::SharedItems as _;
-        self.fields.conflict.this_is_oneof_field_mut(self.shared.bitfield_mut())
+        self.fields.conflict.this_is_oneof_field_mut(&mut self.bitfield)
     }
     pub fn has_this_is_oneof_field(&self) -> bool {
         self.this_is_oneof_field_opt().is_some()
@@ -51,13 +49,14 @@ impl Message {
     pub fn clear_this_is_oneof_field(&mut self) {
         #[allow(unused)]
         use ::std::option::Option::Some;
-        use self::_pinternal::{OneofCase, OneofUnion as _, SharedItems as _};
+        use self::_pinternal::OneofCase;
+        use self::_pinternal::OneofUnion;
         if let Some(
             self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(
                 _,
             ),
-        ) = OneofCase::from_bitslice(self.shared.bitfield()) {
-            self.fields.conflict.clear(self.shared.bitfield_mut())
+        ) = OneofCase::from_bitslice(&self.bitfield) {
+            self.fields.conflict.clear(&mut self.bitfield)
         }
     }
 }
@@ -76,7 +75,7 @@ impl self::_puroro::Message for Message {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -89,7 +88,7 @@ impl self::_puroro::Message for Message {
                             .fields
                             .conflict
                             .deser_from_iter(
-                                self.shared.bitfield_mut(),
+                                &mut self.bitfield,
                                 &mut field_data,
                                 self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
                             )?
@@ -103,7 +102,7 @@ impl self::_puroro::Message for Message {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.unknown_fields.push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -117,32 +116,31 @@ impl self::_puroro::Message for Message {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self.fields.conflict.ser_to_write(self.shared.bitfield(), out)?;
-        self.shared.unknown_fields().ser_to_write(out)?;
+        use self::_pinternal::UnknownFields as _;
+        self.fields.conflict.ser_to_write(&self.bitfield, out)?;
+        self.unknown_fields.ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Message {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
             fields: self::_fields::MessageFields {
                 conflict: self::_pinternal::OneofUnion::clone(
                     &self.fields.conflict,
-                    self.shared.bitfield(),
+                    &self.bitfield,
                 ),
             },
-            shared: ::std::clone::Clone::clone(&self.shared),
+            bitfield: ::std::clone::Clone::clone(&self.bitfield),
+            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
         }
     }
 }
 impl ::std::ops::Drop for Message {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
-        self.fields.conflict.clear(self.shared.bitfield_mut());
+        use self::_pinternal::OneofUnion as _;
+        self.fields.conflict.clear(&mut self.bitfield);
     }
 }
 impl ::std::fmt::Debug for Message {
@@ -150,11 +148,11 @@ impl ::std::fmt::Debug for Message {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        use self::_pinternal::UnknownFields as _;
         let mut debug_struct = fmt.debug_struct(stringify!(Message));
         debug_struct
             .field(stringify!(this_is_oneof_field), &self.this_is_oneof_field_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -162,9 +160,8 @@ impl ::std::cmp::PartialEq for Message {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
         true && self.conflict() == rhs.conflict()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+            && self.unknown_fields == rhs.unknown_fields
     }
 }
 pub mod _fields {

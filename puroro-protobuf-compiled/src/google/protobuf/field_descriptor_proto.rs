@@ -45,7 +45,6 @@ impl ::std::default::Default for Type {
         Self::TypeDouble
     }
 }
-impl self::_pinternal::CheckNumType for Type {}
 impl ::std::convert::From::<Type> for i32 {
     fn from(val: Type) -> i32 {
         match val {
@@ -120,7 +119,6 @@ impl ::std::default::Default for Label {
         Self::LabelOptional
     }
 }
-impl self::_pinternal::CheckNumType for Label {}
 impl ::std::convert::From::<Label> for i32 {
     fn from(val: Label) -> i32 {
         match val {
