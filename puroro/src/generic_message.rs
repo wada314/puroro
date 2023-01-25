@@ -91,8 +91,12 @@ struct PersonMessageFields {
 }
 
 impl<T: GenericMessage> Person<T> {
-    pub fn partner(&self) -> Option<impl '_ + GenericMessage> {
-        self.0.field::<U1>().try_get_message().unwrap()
+    pub fn partner(&self) -> Option<Person<impl '_ + GenericMessage>> {
+        self.0
+            .field::<U1>()
+            .try_get_message()
+            .unwrap()
+            .map(|m| Person(m))
     }
     pub fn age(&self) -> i32 {
         self.0
