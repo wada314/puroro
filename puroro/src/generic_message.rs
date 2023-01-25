@@ -18,7 +18,7 @@ use crate::typenum::{Bool, Comparable};
 use crate::{PuroroError, Result};
 use ::std::iter;
 use ::std::slice;
-use ::typenum::{U1, U2};
+use ::typenum::{U1, U2, U3, U4};
 
 pub trait GenericMessage {
     type FieldType<'a, N: 'a + Comparable>: GenericField<'a>
@@ -104,6 +104,16 @@ impl<T: GenericMessage> Person<T> {
             .try_get_i32()
             .unwrap()
             .unwrap_or_default()
+    }
+    pub fn children(&self) -> impl '_ + Iterator<Item = Person<impl '_ + GenericMessage>> {
+        self.0
+            .field::<U3>()
+            .try_get_repeated_message()
+            .unwrap()
+            .map(|m| Person(m))
+    }
+    pub fn ipv4_address(&self) -> impl '_ + Iterator<Item = i32> {
+        self.0.field::<U4>().try_get_repeated_i32().unwrap()
     }
 }
 
