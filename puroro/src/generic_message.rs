@@ -18,7 +18,7 @@ use crate::typenum::{Bool, Cmp, Comparable};
 use crate::{PuroroError, Result};
 use ::std::iter;
 use ::std::slice;
-use ::typenum::U1;
+use ::typenum::{U1, U2};
 
 pub trait GenericMessage {
     type FieldType<'a, N: 'a + Comparable>: GenericField
@@ -80,6 +80,7 @@ struct PersonMessage {
 #[derive(Default)]
 struct PersonMessageFields {
     partner: int::SingularHeapMessageField<PersonMessage>,
+    age: int::SingularNumericalField<i32, int::tags::Int32>,
 }
 
 impl crate::Message for PersonMessage {
@@ -97,8 +98,10 @@ impl crate::Message for PersonMessage {
     }
 }
 impl FieldsTrait for PersonMessageFields {
-    type Type<N: Comparable> =
-        <Cmp<U1, N> as Bool>::IfF<int::SingularHeapMessageField<PersonMessage>, ()>;
+    type Type<N: Comparable> = <Cmp<U1, N> as Bool>::IfF<
+        int::SingularHeapMessageField<PersonMessage>,
+        <Cmp<U2, N> as Bool>::IfF<int::SingularNumericalField<i32, int::tags::Int32>, ()>,
+    >;
 }
 
 struct GenericFieldImpl<'a, F, S>(&'a F, &'a S);
