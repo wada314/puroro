@@ -149,7 +149,7 @@ where
     fn try_get_i32(&self) -> Result<Option<i32>> {
         FieldType::try_get_i32(self.0)
     }
-    type MessageType<'b> = F::MessageType<'b> where Self: 'b;
+    type MessageType<'b> = F::MessageType<'a> where Self: 'b;
     fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
         FieldType::try_get_message(self.0)
     }
@@ -159,7 +159,7 @@ where
     fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<'_, i32>> {
         FieldType::try_get_repeated_i32(self.0).map(|slice| slice.iter().cloned())
     }
-    type MessageIteratorType<'b> = F::RepeatedMessageType<'b>
+    type MessageIteratorType<'b> = F::RepeatedMessageType<'a>
     where
         Self: 'b;
     fn try_get_repeated_message(&self) -> Result<Self::MessageIteratorType<'_>> {
