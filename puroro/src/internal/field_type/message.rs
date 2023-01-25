@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
+use crate::generic_message::GenericMessage;
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::ser_bytes_shared;
 use crate::Message;
@@ -26,9 +27,9 @@ pub struct RepeatedMessageField<M>(Vec<M>);
 
 impl<M> FieldType for SingularHeapMessageField<M>
 where
-    M: Message + Default,
+    M: Message + GenericMessage + Default,
 {
-    type MessageType<'a> = ()
+    type MessageType<'a> = &'a M
     where
         Self: 'a;
 
@@ -91,7 +92,7 @@ where
 
 impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
 where
-    M: Message + Default,
+    M: Message + GenericMessage + Default,
 {
     type GetterOptType<'a> = Option<&'a M>
     where

@@ -332,7 +332,7 @@ where
     }
 }
 
-trait CheckNumType: Sized {
+pub trait CheckNumType: Sized {
     fn maybe_i32(self) -> Option<i32> {
         None
     }

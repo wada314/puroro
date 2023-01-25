@@ -30,6 +30,7 @@ impl ::std::default::Default for CType {
         Self::String
     }
 }
+impl self::_pinternal::CheckNumType for CType {}
 impl ::std::convert::From::<CType> for i32 {
     fn from(val: CType) -> i32 {
         match val {
@@ -74,6 +75,7 @@ impl ::std::default::Default for JSType {
         Self::JsNormal
     }
 }
+impl self::_pinternal::CheckNumType for JSType {}
 impl ::std::convert::From::<JSType> for i32 {
     fn from(val: JSType) -> i32 {
         match val {

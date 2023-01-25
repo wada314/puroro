@@ -18,7 +18,7 @@
 //!  - [c++ generated code](https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#enum)
 
 use super::super::util::*;
-use super::{Enum, PackageOrMessageExt, Syntax, PURORO_LIB};
+use super::{Enum, PackageOrMessageExt, Syntax, PURORO_INTERNAL, PURORO_LIB};
 use crate::syn;
 use crate::syn::{parse2, Item, ItemEnum, Path, Type};
 use crate::{FatalErrorKind, Result};
@@ -82,9 +82,13 @@ impl<T: ?Sized + Enum> EnumExt for T {
                 }
             }
         })?;
+        let item_impl_check_num: ItemImpl = parse2(quote! {
+            impl #PURORO_INTERNAL::CheckNumType for #ident {}
+        })?;
         Ok(vec![
             item_enum.into(),
             item_impl_default.into(),
+            item_impl_check_num.into(),
             item_into_i32.into(),
             item_from_i32.into(),
         ])

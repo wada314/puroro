@@ -30,6 +30,7 @@ impl ::std::default::Default for IdempotencyLevel {
         Self::IdempotencyUnknown
     }
 }
+impl self::_pinternal::CheckNumType for IdempotencyLevel {}
 impl ::std::convert::From::<IdempotencyLevel> for i32 {
     fn from(val: IdempotencyLevel) -> i32 {
         match val {

@@ -373,6 +373,7 @@ impl ::std::default::Default for Feature {
         Self::FeatureNone
     }
 }
+impl self::_pinternal::CheckNumType for Feature {}
 impl ::std::convert::From::<Feature> for i32 {
     fn from(val: Feature) -> i32 {
         match val {

@@ -25,7 +25,7 @@ pub mod variant;
 
 pub use self::bitvec::{BitArray, BitSlice};
 pub use self::field_type::{
-    FieldType, NonRepeatedFieldType, OptionalNumericalField, OptionalUnsizedField,
+    CheckNumType, FieldType, NonRepeatedFieldType, OptionalNumericalField, OptionalUnsizedField,
     RepeatedFieldType, RepeatedMessageField, RepeatedNumericalField, RepeatedUnsizedField,
     SingularHeapMessageField, SingularNumericalField, SingularUnsizedField,
 };

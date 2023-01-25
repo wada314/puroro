@@ -17,7 +17,9 @@ mod numerical;
 mod r#unsized;
 
 pub use self::message::{RepeatedMessageField, SingularHeapMessageField};
-pub use self::numerical::{OptionalNumericalField, RepeatedNumericalField, SingularNumericalField};
+pub use self::numerical::{
+    CheckNumType, OptionalNumericalField, RepeatedNumericalField, SingularNumericalField,
+};
 pub use self::r#unsized::{OptionalUnsizedField, RepeatedUnsizedField, SingularUnsizedField};
 
 use crate::generic_message::GenericMessage;
