@@ -36,8 +36,10 @@ where
     RustType: PartialEq + Default + Clone + CheckNumType,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
-    fn try_get_i32(&self) -> Result<i32> {
-        CheckNumType::maybe_i32(self.0.clone()).ok_or(PuroroError::UnavailableGenericFieldType)
+    fn try_get_i32(&self) -> Result<Option<i32>> {
+        CheckNumType::maybe_i32(self.0.clone())
+            .ok_or(PuroroError::UnavailableGenericFieldType)
+            .map(|i| (i == 0).then(|| i))
     }
     type MessageType<'a> = ()
     where

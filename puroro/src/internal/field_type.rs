@@ -29,7 +29,7 @@ use ::std::io::{Result as IoResult, Write};
 
 pub trait FieldType {
     // Reflection methods
-    fn try_get_i32(&self) -> Result<i32> {
+    fn try_get_i32(&self) -> Result<Option<i32>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
     type MessageType<'a>: GenericMessage
