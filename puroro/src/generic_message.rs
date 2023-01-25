@@ -21,31 +21,25 @@ use ::std::slice;
 use ::typenum::{U1, U2};
 
 pub trait GenericMessage {
-    type FieldType<'a, N: 'a + Comparable>: GenericField
+    type FieldType<'a, N: 'a + Comparable>: GenericField<'a>
     where
         Self: 'a;
     fn field<'a, N: 'a + Comparable>(&'a self) -> Self::FieldType<'a, N>;
 }
-pub trait GenericField {
+pub trait GenericField<'a> {
     fn try_get_i32(&self) -> Result<Option<i32>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
-    type MessageType<'a>: GenericMessage
-    where
-        Self: 'a;
-    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
+    type MessageType: GenericMessage;
+    fn try_get_message(&self) -> Result<Option<Self::MessageType>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
-    type NumIteratorType<'a, T: 'a + Clone>: Iterator<Item = T>
-    where
-        Self: 'a;
-    fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<'_, i32>> {
+    type NumIteratorType<T: 'a + Clone>: Iterator<Item = T>;
+    fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<i32>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
-    type MessageIteratorType<'a>: Iterator<Item = Self::MessageType<'a>>
-    where
-        Self: 'a;
-    fn try_get_repeated_message(&self) -> Result<Self::MessageIteratorType<'_>> {
+    type MessageIteratorType: Iterator<Item = Self::MessageType>;
+    fn try_get_repeated_message(&self) -> Result<Self::MessageIteratorType> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
 }
@@ -77,10 +71,10 @@ impl<'a, T: GenericMessage> GenericMessage for &'a mut T {
     }
 }
 
-impl GenericField for () {
-    type MessageType<'a> = ();
-    type NumIteratorType<'a, T: 'a + Clone> = iter::Empty<T>;
-    type MessageIteratorType<'a> = iter::Empty<()>;
+impl<'a> GenericField<'a> for () {
+    type MessageType = ();
+    type NumIteratorType<T: 'a + Clone> = iter::Empty<T>;
+    type MessageIteratorType = iter::Empty<()>;
 }
 
 #[repr(transparent)]
@@ -141,7 +135,7 @@ impl FieldsTrait for PersonMessageFields {
 }
 
 struct GenericFieldImpl<'a, F, S>(&'a F, &'a S);
-impl<'a, F, S> GenericField for GenericFieldImpl<'a, F, S>
+impl<'a, F, S> GenericField<'a> for GenericFieldImpl<'a, F, S>
 where
     F: FieldType,
     S: SharedItems,
@@ -149,20 +143,16 @@ where
     fn try_get_i32(&self) -> Result<Option<i32>> {
         FieldType::try_get_i32(self.0)
     }
-    type MessageType<'b> = F::MessageType<'a> where Self: 'b;
-    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
+    type MessageType = F::MessageType<'a>;
+    fn try_get_message(&self) -> Result<Option<Self::MessageType>> {
         FieldType::try_get_message(self.0)
     }
-    type NumIteratorType<'b, T: 'b + Clone> = iter::Cloned<slice::Iter<'b, T>>
-    where
-        Self: 'b;
-    fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<'_, i32>> {
+    type NumIteratorType<T: 'a + Clone> = iter::Cloned<slice::Iter<'a, T>>;
+    fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<i32>> {
         FieldType::try_get_repeated_i32(self.0).map(|slice| slice.iter().cloned())
     }
-    type MessageIteratorType<'b> = F::RepeatedMessageType<'a>
-    where
-        Self: 'b;
-    fn try_get_repeated_message(&self) -> Result<Self::MessageIteratorType<'_>> {
+    type MessageIteratorType = F::RepeatedMessageType<'a>;
+    fn try_get_repeated_message(&self) -> Result<Self::MessageIteratorType> {
         FieldType::try_get_repeated_message(self.0)
     }
 }
