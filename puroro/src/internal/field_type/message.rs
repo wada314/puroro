@@ -32,6 +32,9 @@ where
     type MessageType<'a> = &'a M
     where
         Self: 'a;
+    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
+        Ok(self.0.as_deref())
+    }
 
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
