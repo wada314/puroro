@@ -21,39 +21,61 @@ use ::typenum::{UInt, UTerm, B0, B1};
 pub trait Bool {
     type If<T, F>;
     type IfF<T: FieldType, F: FieldType>: FieldType;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F>;
 }
 impl Bool for B0 {
     type If<T, F> = F;
     type IfF<T: FieldType, F: FieldType> = F;
+    fn r#if<T, F>(_t: T, f: F) -> Self::If<T, F> {
+        f
+    }
 }
 impl Bool for B1 {
     type If<T, F> = T;
     type IfF<T: FieldType, F: FieldType> = T;
+    fn r#if<T, F>(t: T, _f: F) -> Self::If<T, F> {
+        t
+    }
 }
 pub struct Not<B>(PhantomData<B>);
 impl<B: Bool> Bool for Not<B> {
     type If<T, F> = B::If<F, T>;
     type IfF<T: FieldType, F: FieldType> = B::IfF<F, T>;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F> {
+        B::r#if(f, t)
+    }
 }
 pub struct And<A, B>(PhantomData<(A, B)>);
 impl<A: Bool, B: Bool> Bool for And<A, B> {
     type If<T, F> = A::If<B::If<T, F>, F>;
     type IfF<T: FieldType, F: FieldType> = A::IfF<B::IfF<T, F>, F>;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F> {
+        A::r#if(B::r#if(t, f), f)
+    }
 }
 pub struct And3<A, B, C>(PhantomData<(A, B, C)>);
 impl<A: Bool, B: Bool, C: Bool> Bool for And3<A, B, C> {
     type If<T, F> = <And<A, And<B, C>> as Bool>::If<T, F>;
     type IfF<T: FieldType, F: FieldType> = <And<A, And<B, C>> as Bool>::IfF<T, F>;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F> {
+        And::<A, And<B, C>>::r#if(t, f)
+    }
 }
 pub struct Or<A, B>(PhantomData<(A, B)>);
 impl<A: Bool, B: Bool> Bool for Or<A, B> {
     type If<T, F> = A::If<T, B::If<T, F>>;
     type IfF<T: FieldType, F: FieldType> = A::IfF<T, B::IfF<T, F>>;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F> {
+        A::r#if(t, B::r#if(t, f))
+    }
 }
 pub struct Xor<A, B>(PhantomData<(A, B)>);
 impl<A: Bool, B: Bool> Bool for Xor<A, B> {
     type If<T, F> = A::If<B::If<F, T>, B::If<T, F>>;
     type IfF<T: FieldType, F: FieldType> = A::IfF<B::IfF<F, T>, B::IfF<T, F>>;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F> {
+        A::r#if(B::r#if(f, t), B::r#if(t, f))
+    }
 }
 
 pub trait Comparable {
@@ -78,6 +100,9 @@ pub struct Cmp<A, B>(PhantomData<(A, B)>);
 impl<A: Comparable, B: Comparable> Bool for Cmp<A, B> {
     type If<T, F> = <A::Eq<B> as Bool>::If<T, F>;
     type IfF<T: FieldType, F: FieldType> = <A::Eq<B> as Bool>::IfF<T, F>;
+    fn r#if<T, F>(t: T, f: F) -> Self::If<T, F> {
+        A::Eq::<B>::r#if(t, f)
+    }
 }
 
 #[test]
