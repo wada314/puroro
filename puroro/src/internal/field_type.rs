@@ -28,6 +28,7 @@ use crate::internal::ser::{FieldData, WireType};
 use crate::internal::variant::Variant;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
+use ::std::iter;
 
 pub trait FieldType {
     // Reflection methods
@@ -37,7 +38,16 @@ pub trait FieldType {
     type MessageType<'a>: GenericMessage
     where
         Self: 'a;
+    type RepeatedMessageType<'a>: Iterator<Item = Self::MessageType<'a>>
+    where
+        Self: 'a;
     fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    fn try_get_repeated_i32(&self) -> Result<&[i32]> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    fn try_get_repeated_message(&self) -> Result<Self::RepeatedMessageType<'_>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
 
@@ -98,6 +108,9 @@ pub trait FieldType {
 
 impl FieldType for () {
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
     fn ser_to_write<W: Write, B: BitSlice>(

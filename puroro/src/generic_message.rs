@@ -16,6 +16,8 @@ use crate::internal as int;
 use crate::internal::{FieldType, SharedItems, SharedItemsImpl};
 use crate::typenum::{Bool, Cmp, Comparable};
 use crate::{PuroroError, Result};
+use ::std::iter;
+use ::std::slice;
 use ::typenum::U1;
 
 pub trait GenericMessage {
@@ -24,11 +26,21 @@ pub trait GenericMessage {
         Self: 'a;
 }
 pub trait GenericField {
-    fn try_get_i32(&self) -> Result<Option<i32>>;
+    fn try_get_i32(&self) -> Result<Option<i32>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
     type MessageType<'a>: GenericMessage
     where
         Self: 'a;
-    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>>;
+    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    type NumIteratorType<'a, T: 'a + Clone>: Iterator<Item = T>
+    where
+        Self: 'a;
+    fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<'_, i32>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
 }
 pub trait FieldsTrait {
     type Type<N: Comparable>: FieldType;
@@ -49,13 +61,8 @@ impl<'a, T: GenericMessage> GenericMessage for &'a mut T {
 }
 
 impl GenericField for () {
-    fn try_get_i32(&self) -> Result<Option<i32>> {
-        Err(PuroroError::UnavailableGenericFieldType)?
-    }
     type MessageType<'a> = ();
-    fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
-        Err(PuroroError::UnavailableGenericFieldType)?
-    }
+    type NumIteratorType<'a, T: 'a + Clone> = iter::Empty<T>;
 }
 
 #[derive(Default)]
@@ -100,6 +107,9 @@ where
     fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
         FieldType::try_get_message(self.0)
     }
+    type NumIteratorType<'b, T: 'b + Clone> = iter::Cloned<slice::Iter<'b, T>>
+    where
+        Self: 'b;
 }
 
 impl GenericMessage for PersonMessage {

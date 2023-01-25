@@ -19,6 +19,7 @@ use crate::internal::tags;
 use crate::internal::variant::Variant;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
+use ::std::iter;
 use ::std::marker::PhantomData;
 
 #[derive(Default, Clone)]
@@ -42,6 +43,9 @@ where
             .map(|i| (i == 0).then(|| i))
     }
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
 
@@ -116,6 +120,9 @@ where
     type MessageType<'a> = ()
     where
         Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
+    where
+        Self: 'a;
 
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
@@ -162,6 +169,9 @@ where
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
 

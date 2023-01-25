@@ -18,6 +18,7 @@ use crate::internal::ser::ser_bytes_shared;
 use crate::internal::tags;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::iter;
 use ::std::marker::PhantomData;
 
 #[derive(Default, Clone)]
@@ -36,6 +37,9 @@ where
     ProtoType: tags::UnsizedType<RustType = RustType>,
 {
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
 
@@ -72,6 +76,9 @@ where
     type MessageType<'a> = ()
     where
         Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
+    where
+        Self: 'a;
 
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -101,6 +108,9 @@ where
     ProtoType: tags::UnsizedType<RustType = RustType>,
 {
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
 

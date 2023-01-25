@@ -19,6 +19,8 @@ use crate::internal::ser::ser_bytes_shared;
 use crate::Message;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::iter;
+use ::std::slice;
 
 #[derive(Default, Clone)]
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);
@@ -30,6 +32,9 @@ where
     M: Message + GenericMessage + Default,
 {
     type MessageType<'a> = &'a M
+    where
+        Self: 'a;
+    type RepeatedMessageType<'a> = iter::Empty<&'a M>
     where
         Self: 'a;
     fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
@@ -62,11 +67,17 @@ where
 
 impl<M> FieldType for RepeatedMessageField<M>
 where
-    M: Message + Default,
+    M: Message + GenericMessage + Default,
 {
-    type MessageType<'a> = ()
+    type MessageType<'a> = &'a M
     where
         Self: 'a;
+    type RepeatedMessageType<'a> = slice::Iter<'a, M>
+    where
+        Self: 'a;
+    fn try_get_repeated_message(&self) -> Result<Self::RepeatedMessageType<'_>> {
+        Ok(self.0.iter())
+    }
 
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -129,7 +140,7 @@ where
     }
 }
 
-impl<M: Message + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
+impl<M: Message + GenericMessage + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
     type ScalarType = M;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
