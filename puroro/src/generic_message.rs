@@ -24,7 +24,7 @@ pub trait GenericMessage {
         Self: 'a;
 }
 pub trait GenericField {
-    fn try_get_i32(&self) -> Result<i32>;
+    fn try_get_i32(&self) -> Result<Option<i32>>;
     type MessageType: GenericMessage;
     fn try_get_message(&self) -> Result<Option<Self::MessageType>>;
 }
@@ -47,7 +47,7 @@ impl<'a, T: GenericMessage> GenericMessage for &'a mut T {
 }
 
 impl GenericField for () {
-    fn try_get_i32(&self) -> Result<i32> {
+    fn try_get_i32(&self) -> Result<Option<i32>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
     type MessageType = ();
@@ -91,7 +91,7 @@ where
     F: FieldType,
     S: SharedItems,
 {
-    fn try_get_i32(&self) -> Result<i32> {
+    fn try_get_i32(&self) -> Result<Option<i32>> {
         todo!()
     }
     type MessageType = (); // TODO
