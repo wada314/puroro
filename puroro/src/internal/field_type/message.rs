@@ -34,6 +34,9 @@ where
     type MessageType<'a> = &'a M
     where
         Self: 'a;
+    type RepeatedStringType<'a> = iter::Empty<&'a str>
+    where
+        Self: 'a;
     type RepeatedMessageType<'a> = iter::Empty<&'a M>
     where
         Self: 'a;
@@ -70,6 +73,9 @@ where
     M: Message + GenericMessage + Default,
 {
     type MessageType<'a> = &'a M
+    where
+        Self: 'a;
+    type RepeatedStringType<'a> = iter::Empty<&'a str>
     where
         Self: 'a;
     type RepeatedMessageType<'a> = slice::Iter<'a, M>

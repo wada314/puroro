@@ -39,8 +39,8 @@ pub trait GenericField<'a> {
     fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<i32>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
-    type UnsizedIteratorType<T: 'a + ?Sized>: Iterator<Item = &'a T>;
-    fn try_get_repeated_string(&self) -> Result<Self::UnsizedIteratorType<str>> {
+    type StringIteratorType: Iterator<Item = &'a str>;
+    fn try_get_repeated_string(&self) -> Result<Self::StringIteratorType> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
     type MessageIteratorType: Iterator<Item = Self::MessageType>;
@@ -79,7 +79,7 @@ impl<'a, T: GenericMessage> GenericMessage for &'a mut T {
 impl<'a> GenericField<'a> for () {
     type MessageType = ();
     type NumIteratorType<T: 'a + Clone> = iter::Empty<T>;
-    type UnsizedIteratorType<T: 'a + ?Sized> = iter::Empty<&'a T>;
+    type StringIteratorType = iter::Empty<&'a str>;
     type MessageIteratorType = iter::Empty<()>;
 }
 
@@ -100,8 +100,8 @@ where
     fn try_get_repeated_i32(&self) -> Result<Self::NumIteratorType<i32>> {
         FieldType::try_get_repeated_i32(self.0).map(|slice| slice.iter().cloned())
     }
-    type UnsizedIteratorType<T: 'a + ?Sized> = F::RepeatedUnsizedType<'a, T>;
-    fn try_get_repeated_string(&self) -> Result<Self::UnsizedIteratorType<str>> {
+    type StringIteratorType = F::RepeatedStringType<'a>;
+    fn try_get_repeated_string(&self) -> Result<Self::StringIteratorType> {
         FieldType::try_get_repeated_string(self.0)
     }
     type MessageIteratorType = F::RepeatedMessageType<'a>;

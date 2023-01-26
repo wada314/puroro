@@ -45,6 +45,9 @@ where
     type MessageType<'a> = ()
     where
         Self: 'a;
+    type RepeatedStringType<'a> = iter::Empty<&'a str>
+    where
+        Self: 'a;
     type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
@@ -120,6 +123,9 @@ where
     type MessageType<'a> = ()
     where
         Self: 'a;
+    type RepeatedStringType<'a> = iter::Empty<&'a str>
+    where
+        Self: 'a;
     type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
@@ -169,6 +175,9 @@ where
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedStringType<'a> = iter::Empty<&'a str>
     where
         Self: 'a;
     type RepeatedMessageType<'a> = iter::Empty<()>

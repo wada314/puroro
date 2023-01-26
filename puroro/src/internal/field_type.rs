@@ -31,20 +31,29 @@ use ::std::io::{Result as IoResult, Write};
 use ::std::iter;
 
 pub trait FieldType {
-    // Reflection methods
-    fn try_get_i32(&self) -> Result<Option<i32>> {
-        Err(PuroroError::UnavailableGenericFieldType)?
-    }
+    // Reflection methods & types
     type MessageType<'a>: GenericMessage
+    where
+        Self: 'a;
+    type RepeatedStringType<'a>: Iterator<Item = &'a str>
     where
         Self: 'a;
     type RepeatedMessageType<'a>: Iterator<Item = Self::MessageType<'a>>
     where
         Self: 'a;
+    fn try_get_i32(&self) -> Result<Option<i32>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    fn try_get_string(&self) -> Result<Option<&str>> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
     fn try_get_message(&self) -> Result<Option<Self::MessageType<'_>>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
     fn try_get_repeated_i32(&self) -> Result<&[i32]> {
+        Err(PuroroError::UnavailableGenericFieldType)?
+    }
+    fn try_get_repeated_string(&self) -> Result<Self::RepeatedStringType<'_>> {
         Err(PuroroError::UnavailableGenericFieldType)?
     }
     fn try_get_repeated_message(&self) -> Result<Self::RepeatedMessageType<'_>> {
@@ -108,6 +117,9 @@ pub trait FieldType {
 
 impl FieldType for () {
     type MessageType<'a> = ()
+    where
+        Self: 'a;
+    type RepeatedStringType<'a> = iter::Empty<&'a str>
     where
         Self: 'a;
     type RepeatedMessageType<'a> = iter::Empty<()>
