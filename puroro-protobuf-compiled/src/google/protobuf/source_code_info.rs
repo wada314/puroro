@@ -30,108 +30,113 @@ pub struct Location {
             self::_pinternal::tags::String,
         >,
     >,
-    bitfield: self::_pinternal::BitArray<1usize>,
-    unknown_fields: self::_pinternal::UnknownFieldsImpl,
+    shared: self::_pinternal::SharedItemsImpl<1usize>,
 }
 impl Location {
     pub fn path(&self) -> &[i32] {
-        use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field(&self.fields.path, &self.bitfield)
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+        RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
     }
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
-        use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field_mut(&mut self.fields.path, &mut self.bitfield)
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+        RepeatedFieldType::get_field_mut(
+            &mut self.fields.path,
+            self.shared.bitfield_mut(),
+        )
     }
     pub fn clear_path(&mut self) {
-        use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::clear(&mut self.fields.path, &mut self.bitfield)
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+        RepeatedFieldType::clear(&mut self.fields.path, self.shared.bitfield_mut())
     }
     pub fn span(&self) -> &[i32] {
-        use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field(&self.fields.span, &self.bitfield)
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+        RepeatedFieldType::get_field(&self.fields.span, self.shared.bitfield())
     }
     pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
-        use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::get_field_mut(&mut self.fields.span, &mut self.bitfield)
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+        RepeatedFieldType::get_field_mut(
+            &mut self.fields.span,
+            self.shared.bitfield_mut(),
+        )
     }
     pub fn clear_span(&mut self) {
-        use self::_pinternal::RepeatedFieldType;
-        RepeatedFieldType::clear(&mut self.fields.span, &mut self.bitfield)
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+        RepeatedFieldType::clear(&mut self.fields.span, self.shared.bitfield_mut())
     }
     pub fn leading_comments(&self) -> &str {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.leading_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn leading_comments_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
             &self.fields.leading_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
         )
     }
     pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.leading_comments,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_leading_comments(&self) -> bool {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
                 &self.fields.leading_comments,
-                &self.bitfield,
+                self.shared.bitfield(),
             )
             .is_some()
     }
     pub fn clear_leading_comments(&mut self) {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
             &mut self.fields.leading_comments,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
     pub fn trailing_comments(&self) -> &str {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_or_else(
             &self.fields.trailing_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
             ::std::default::Default::default,
         )
     }
     pub fn trailing_comments_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
             &self.fields.trailing_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
         )
     }
     pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.fields.trailing_comments,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn has_trailing_comments(&self) -> bool {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
                 &self.fields.trailing_comments,
-                &self.bitfield,
+                self.shared.bitfield(),
             )
             .is_some()
     }
     pub fn clear_trailing_comments(&mut self) {
-        use self::_pinternal::NonRepeatedFieldType;
+        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
             &mut self.fields.trailing_comments,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
     pub fn leading_detached_comments(
@@ -139,26 +144,26 @@ impl Location {
     ) -> &[impl ::std::ops::Deref::<
         Target = str,
     > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
-        use self::_pinternal::RepeatedFieldType;
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field(
             &self.fields.leading_detached_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
         )
     }
     pub fn leading_detached_comments_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
-        use self::_pinternal::RepeatedFieldType;
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.fields.leading_detached_comments,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
     pub fn clear_leading_detached_comments(&mut self) {
-        use self::_pinternal::RepeatedFieldType;
+        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
             &mut self.fields.leading_detached_comments,
-            &mut self.bitfield,
+            self.shared.bitfield_mut(),
         )
     }
 }
@@ -177,7 +182,7 @@ impl self::_puroro::Message for Location {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
         use self::_puroro::PuroroError;
@@ -188,35 +193,35 @@ impl self::_puroro::Message for Location {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.path,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.span,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.leading_comments,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.trailing_comments,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.leading_detached_comments,
-                            &mut self.bitfield,
+                            self.shared.bitfield_mut(),
                             &mut field_data,
                         )?
                     }
@@ -229,7 +234,7 @@ impl self::_puroro::Message for Location {
                 Err(
                     PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
                 ) => {
-                    self.unknown_fields.push(number, field_data)?;
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -243,43 +248,45 @@ impl self::_puroro::Message for Location {
     ) -> self::_puroro::Result<()> {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.path,
-            &self.bitfield,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.span,
-            &self.bitfield,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.leading_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.trailing_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
             &self.fields.leading_detached_comments,
-            &self.bitfield,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
-        self.unknown_fields.ser_to_write(out)?;
+        self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Location {
     fn clone(&self) -> Self {
+        #[allow(unused)]
+        use self::_pinternal::SharedItems as _;
         Self {
             fields: self::_fields::LocationFields {
                 path: ::std::clone::Clone::clone(&self.fields.path),
@@ -294,15 +301,14 @@ impl ::std::clone::Clone for Location {
                     &self.fields.leading_detached_comments,
                 ),
             },
-            bitfield: ::std::clone::Clone::clone(&self.bitfield),
-            unknown_fields: ::std::clone::Clone::clone(&self.unknown_fields),
+            shared: ::std::clone::Clone::clone(&self.shared),
         }
     }
 }
 impl ::std::ops::Drop for Location {
     fn drop(&mut self) {
         #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for Location {
@@ -310,7 +316,7 @@ impl ::std::fmt::Debug for Location {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::UnknownFields as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
         let mut debug_struct = fmt.debug_struct(stringify!(Location));
         debug_struct
             .field(stringify!(path), &self.path())
@@ -321,7 +327,7 @@ impl ::std::fmt::Debug for Location {
                 stringify!(leading_detached_comments),
                 &self.leading_detached_comments(),
             );
-        self.unknown_fields.debug_struct_fields(&mut debug_struct)?;
+        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
     }
 }
@@ -329,11 +335,12 @@ impl ::std::cmp::PartialEq for Location {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
         use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::SharedItems as _;
         true && self.path() == rhs.path() && self.span() == rhs.span()
             && self.leading_comments_opt() == rhs.leading_comments_opt()
             && self.trailing_comments_opt() == rhs.trailing_comments_opt()
             && self.leading_detached_comments() == rhs.leading_detached_comments()
-            && self.unknown_fields == rhs.unknown_fields
+            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
 pub mod _fields {
