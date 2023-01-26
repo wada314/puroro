@@ -99,6 +99,8 @@ pub trait UnsizedType {
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a>;
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType>;
     fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]>;
+    fn as_str_or_none(_val: &Self::RustType) -> Option<&str> { None }
+    fn as_bytes_or_none(_val: &Self::RustType) -> Option<&[u8]> { None }
 }
 
 // Trait impls
@@ -313,7 +315,10 @@ impl UnsizedType for String {
     fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]> {
         Ok(val.as_bytes())
     }
+
+    fn as_str_or_none(val: &Self::RustType) -> Option<&str> { Some(val.as_str()) }
 }
+
 impl UnsizedType for Bytes {
     type RustType = Vec<u8>;
     type RustRefType<'a> = &'a [u8]
@@ -343,6 +348,8 @@ impl UnsizedType for Bytes {
     fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]> {
         Ok(val.as_slice())
     }
+
+    fn as_bytes_or_none(val: &Self::RustType) -> Option<&[u8]> { Some(val.as_slice()) }
 }
 
 fn encode_sint32(s: i32) -> u32 {

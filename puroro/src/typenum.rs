@@ -35,7 +35,7 @@ impl Bool for B0 {
     fn r#if<T, F>(_t: T, f: F) -> Self::If<T, F> {
         f
     }
-    fn if_f<'a, T: FieldType, F: FieldType>(t: &'a T, f: &'a F) -> &'a Self::IfF<T, F> {
+    fn if_f<'a, T: FieldType, F: FieldType>(_t: &'a T, f: &'a F) -> &'a Self::IfF<T, F> {
         f
     }
 
@@ -51,7 +51,7 @@ impl Bool for B1 {
     fn r#if<T, F>(t: T, _f: F) -> Self::If<T, F> {
         t
     }
-    fn if_f<'a, T: FieldType, F: FieldType>(t: &'a T, f: &'a F) -> &'a Self::IfF<T, F> {
+    fn if_f<'a, T: FieldType, F: FieldType>(t: &'a T, _f: &'a F) -> &'a Self::IfF<T, F> {
         t
     }
 

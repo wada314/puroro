@@ -20,6 +20,7 @@ use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 use ::std::iter;
 use ::std::marker::PhantomData;
+use ::std::slice;
 
 #[derive(Default, Clone)]
 pub struct SingularUnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -45,6 +46,9 @@ where
     type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
+    fn try_get_string(&self) -> Result<Option<&str>> {
+        Ok(<ProtoType as tags::UnsizedType>::as_str_or_none(&self.0))
+    }
 
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -116,12 +120,18 @@ where
     type MessageType<'a> = ()
     where
         Self: 'a;
-    type RepeatedStringType<'a> = iter::Empty<&'a str>
+    type RepeatedStringType<'a> = iter::FilterMap<slice::Iter<'a, RustType>, fn(&RustType) -> Option<&str>>
     where
         Self: 'a;
     type RepeatedMessageType<'a> = iter::Empty<()>
     where
         Self: 'a;
+    fn try_get_repeated_string(&self) -> Result<Self::RepeatedStringType<'_>> {
+        Ok(self
+            .0
+            .iter()
+            .filter_map(<ProtoType as tags::UnsizedType>::as_str_or_none))
+    }
 
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
