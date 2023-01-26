@@ -18,6 +18,7 @@ mod error;
 pub mod generic_message;
 pub mod internal;
 pub mod message;
+pub mod sample;
 pub mod typenum;
 
 pub use self::error::PuroroError;

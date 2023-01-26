@@ -15,7 +15,6 @@
 //! An extention to typenum crate.
 
 use crate::internal::FieldType;
-use ::std::marker::PhantomData;
 use ::typenum::{UInt, UTerm, B0, B1};
 
 pub trait Bool {

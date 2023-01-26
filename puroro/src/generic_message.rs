@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal as int;
-use crate::internal::{FieldType, SharedItems, SharedItemsImpl};
-use crate::typenum::{Bool, Comparable};
+use crate::internal::{FieldType, SharedItems};
+use crate::typenum::Comparable;
 use crate::{PuroroError, Result};
 use ::std::iter;
 use ::std::slice;
-use ::typenum::{U1, U2, U3, U4};
 
 pub trait GenericMessage {
     type FieldType<'a, N: 'a + Comparable>: GenericField<'a>
@@ -77,78 +75,7 @@ impl<'a> GenericField<'a> for () {
     type MessageIteratorType = iter::Empty<()>;
 }
 
-#[repr(transparent)]
-struct Person<T>(T);
-#[derive(Default)]
-struct PersonMessage {
-    fields: PersonMessageFields,
-    shared: SharedItemsImpl<1>,
-}
-#[derive(Default)]
-struct PersonMessageFields {
-    partner: int::SingularHeapMessageField<PersonMessage>,
-    age: int::SingularNumericalField<i32, int::tags::Int32>,
-}
-
-impl<T: GenericMessage> Person<T> {
-    pub fn partner(&self) -> Option<Person<impl '_ + GenericMessage>> {
-        self.0
-            .field::<U1>()
-            .try_get_message()
-            .unwrap()
-            .map(|m| Person(m))
-    }
-    pub fn age(&self) -> i32 {
-        self.0
-            .field::<U2>()
-            .try_get_i32()
-            .unwrap()
-            .unwrap_or_default()
-    }
-    pub fn children(&self) -> impl '_ + Iterator<Item = Person<impl '_ + GenericMessage>> {
-        self.0
-            .field::<U3>()
-            .try_get_repeated_message()
-            .unwrap()
-            .map(|m| Person(m))
-    }
-    pub fn ipv4_address(&self) -> impl '_ + Iterator<Item = i32> {
-        self.0.field::<U4>().try_get_repeated_i32().unwrap()
-    }
-}
-
-impl crate::Message for PersonMessage {
-    fn from_bytes_iter<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> crate::Result<Self> {
-        todo!()
-    }
-    fn merge_from_bytes_iter<I: Iterator<Item = std::io::Result<u8>>>(
-        &mut self,
-        iter: I,
-    ) -> crate::Result<()> {
-        todo!()
-    }
-    fn to_bytes<W: std::io::Write>(&self, out: &mut W) -> crate::Result<()> {
-        todo!()
-    }
-}
-impl GenericMessage for PersonMessage {
-    type FieldType<'a, N: 'a + Comparable> =
-        GenericFieldImpl<'a, <PersonMessageFields as FieldsTrait>::Type<N>, SharedItemsImpl<1>> where Self: 'a;
-    fn field<'a, N: 'a + Comparable>(&'a self) -> Self::FieldType<'a, N> {
-        GenericFieldImpl(self.fields.field::<N>(), &self.shared)
-    }
-}
-impl FieldsTrait for PersonMessageFields {
-    type Type<N: Comparable> = <N::Eq<U1> as Bool>::IfF<
-        int::SingularHeapMessageField<PersonMessage>,
-        <N::Eq<U2> as Bool>::IfF<int::SingularNumericalField<i32, int::tags::Int32>, ()>,
-    >;
-    fn field<'a, N: 'a + Comparable>(&'a self) -> &'a Self::Type<N> {
-        <N::Eq<U1> as Bool>::if_f(&self.partner, <N::Eq<U2> as Bool>::if_f(&self.age, &()))
-    }
-}
-
-struct GenericFieldImpl<'a, F, S>(&'a F, &'a S);
+pub struct GenericFieldImpl<'a, F, S>(pub &'a F, pub &'a S);
 impl<'a, F, S> GenericField<'a> for GenericFieldImpl<'a, F, S>
 where
     F: FieldType,
