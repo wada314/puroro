@@ -241,9 +241,9 @@ impl PackageOrMessage for Package {
     }
 }
 
-#[cfg(never)]
+#[cfg(test)]
 mod tests {
-    use super::super::{InputFileFake, Package, PackageOrMessage, RootPackage};
+    use super::super::{DataTypeBase, Package};
     use crate::Result;
     use ::once_cell::sync::Lazy;
     use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
@@ -286,7 +286,7 @@ mod tests {
     #[test]
     fn test_make_package_empty() -> Result<()> {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_package = Package::new_root(files.into_iter());
         let root_files = root_package.files()?.collect::<Vec<_>>();
 
         assert_eq!(1, root_files.len());
@@ -298,7 +298,7 @@ mod tests {
     #[test]
     fn test_make_package_single() -> Result<()> {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_package = Package::new_root(files.into_iter());
         let root_files = root_package.files()?.collect::<Vec<_>>();
 
         assert_eq!(0, root_files.len());
@@ -329,7 +329,7 @@ mod tests {
             Lazy::force(&FD_G_P_EMPTY),
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_package = Package::new_root(files.into_iter());
 
         let root_files = root_package.files()?.collect::<Vec<_>>();
         assert_eq!(1, root_files.len());

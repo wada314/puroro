@@ -24,6 +24,8 @@ use ::std::rc::{Rc, Weak};
 pub struct InputFile {
     cache: AnonymousCache,
     name: String,
+    #[cfg(test)]
+    package: Weak<Package>,
     syntax: String,
     syntax_cell: OnceCell<Syntax>,
     messages: Vec<Rc<Message>>,
@@ -35,6 +37,8 @@ impl InputFile {
         Rc::new_cyclic(|weak| Self {
             cache: Default::default(),
             name: proto.name().to_string(),
+            #[cfg(test)]
+            package: Weak::clone(&package),
             syntax: proto.syntax().to_string(),
             syntax_cell: OnceCell::new(),
             messages: proto
@@ -83,5 +87,9 @@ impl InputFile {
     }
     pub(crate) fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
+    }
+    #[cfg(test)]
+    pub(crate) fn package(&self) -> Result<Rc<Package>> {
+        self.package.try_upgrade()
     }
 }
