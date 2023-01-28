@@ -26,7 +26,7 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait PackageOrMessageExt {
+pub(crate) trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
     fn module_file_path(&self) -> Result<&str>;
     fn module_file_dir(&self) -> Result<&str>;

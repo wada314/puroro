@@ -28,7 +28,7 @@ pub(crate) struct Oneof {
 }
 
 impl Oneof {
-    pub fn new(
+    pub(crate) fn new(
         message_proto: &DescriptorProto,
         oneof_proto: &OneofDescriptorProto,
         oneof_index: usize,

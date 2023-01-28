@@ -24,7 +24,7 @@ mod package_or_message;
 
 use self::field_base::FieldBaseExt;
 use self::field_or_oneof::FieldOrOneofExt;
-pub use self::package_or_message::PackageOrMessageExt;
+pub(crate) use self::package_or_message::PackageOrMessageExt;
 
 use super::data::*;
 

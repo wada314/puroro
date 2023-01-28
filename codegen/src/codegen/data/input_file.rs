@@ -21,7 +21,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
-pub struct InputFile {
+pub(crate) struct InputFile {
     cache: AnonymousCache,
     name: String,
     #[cfg(test)]

@@ -32,7 +32,7 @@ pub(crate) trait FieldBase: DataTypeBase + Debug {
 /// A field of message, but not including the field belonging to an `oneof`.
 /// Proto3 optional field IS this type.
 #[derive(Debug)]
-pub struct Field {
+pub(crate) struct Field {
     cache: AnonymousCache,
     name: String,
     message: Weak<Message>,

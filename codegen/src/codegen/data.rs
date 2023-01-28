@@ -39,13 +39,13 @@ pub(crate) use self::package_or_message::*;
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
 
-pub trait DataTypeBase {
+pub(crate) trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Syntax {
+pub(crate) enum Syntax {
     Proto2,
     Proto3,
 }
@@ -63,19 +63,19 @@ impl TryFrom<&str> for Syntax {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum PackageOrMessageCase<P, M> {
+pub(crate) enum PackageOrMessageCase<P, M> {
     Package(P),
     Message(M),
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum MessageOrEnumCase<M, E> {
+pub(crate) enum MessageOrEnumCase<M, E> {
     Message(M),
     Enum(E),
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum FieldOrOneofCase<F, O> {
+pub(crate) enum FieldOrOneofCase<F, O> {
     Field(F),
     Oneof(O),
 }

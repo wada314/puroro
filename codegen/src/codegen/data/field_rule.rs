@@ -24,7 +24,7 @@ pub(crate) enum FieldRule {
 }
 
 impl FieldRule {
-    pub fn try_new(
+    pub(crate) fn try_new(
         label_opt: Option<field_descriptor_proto::Label>,
         syntax: Syntax,
         proto3_optional: bool,

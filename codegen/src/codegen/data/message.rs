@@ -36,7 +36,7 @@ pub(crate) struct Message {
 }
 
 impl Message {
-    pub fn new(
+    pub(crate) fn new(
         proto: &DescriptorProto,
         input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,

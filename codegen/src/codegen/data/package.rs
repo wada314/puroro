@@ -46,7 +46,7 @@ enum IsRoot {
 }
 
 impl Package {
-    pub fn new_root<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<Package> {
+    pub(crate) fn new_root<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<Package> {
         Rc::new_cyclic(|weak_root| {
             let names_and_fds = fds.map(|fd| {
                 let package_name_iter = fd.package().split('.').filter(|s| !s.is_empty());

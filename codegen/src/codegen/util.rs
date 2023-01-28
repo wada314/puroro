@@ -20,7 +20,7 @@ use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 use ::std::rc::{Rc, Weak};
 
-pub trait WeakExt<T: ?Sized> {
+pub(crate) trait WeakExt<T: ?Sized> {
     fn try_upgrade(&self) -> Result<Rc<T>>;
 }
 impl<T: ?Sized> WeakExt<T> for Weak<T> {
@@ -32,11 +32,11 @@ impl<T: ?Sized> WeakExt<T> for Weak<T> {
 }
 
 #[derive(Debug, Default)]
-pub struct AnonymousCache {
+pub(crate) struct AnonymousCache {
     list: OnceCell<Cell>,
 }
 impl AnonymousCache {
-    pub fn get<T: 'static + Default>(&self) -> Result<&T> {
+    pub(crate) fn get<T: 'static + Default>(&self) -> Result<&T> {
         self.list
             .get_or_try_init(|| -> Result<_> {
                 Ok(Cell {
@@ -70,14 +70,14 @@ impl Cell {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum WordCase {
+pub(crate) enum WordCase {
     CamelCase,
     LowerSnakeCase,
     #[allow(unused)]
     UpperSnakeCase,
 }
 
-pub trait StrExt {
+pub(crate) trait StrExt {
     fn to_word_case(&self, case: WordCase) -> Cow<str>;
     fn word_case_matches(&self, case: WordCase) -> bool;
     fn escape_rust_keywords(&self) -> Cow<str>;
@@ -209,7 +209,7 @@ lazy_static! {
 }
 
 #[allow(unused)]
-pub fn convert_octal_escapes_to_bytes(input: &str) -> Result<Vec<u8>> {
+pub(crate) fn convert_octal_escapes_to_bytes(input: &str) -> Result<Vec<u8>> {
     // protoc escapes 0x7F~0xFF character as octal escape "\234".
     // Rust does not support that style so we need to re-encode it.
     let mut decoded = Vec::new();

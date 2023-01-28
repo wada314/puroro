@@ -23,7 +23,7 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait FieldOrOneofExt {
+pub(crate) trait FieldOrOneofExt {
     fn gen_fields_struct_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;

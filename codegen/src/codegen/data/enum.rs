@@ -34,7 +34,7 @@ pub(crate) struct Enum {
 }
 
 impl Enum {
-    pub fn new(
+    pub(crate) fn new(
         proto: &EnumDescriptorProto,
         input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
@@ -53,13 +53,13 @@ impl Enum {
         })
     }
 
-    pub fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>> {
+    pub(crate) fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>> {
         Ok(Box::new(self.values.iter().map(|(s, n)| (s.as_str(), *n))))
     }
-    pub fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
+    pub(crate) fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
-    pub fn syntax(&self) -> Result<Syntax> {
+    pub(crate) fn syntax(&self) -> Result<Syntax> {
         Ok(self.input_file.try_upgrade()?.syntax()?)
     }
 }

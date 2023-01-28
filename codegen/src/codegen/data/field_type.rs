@@ -56,7 +56,7 @@ pub(crate) enum Bits64Type {
 }
 
 impl FieldType {
-    pub fn try_new(
+    pub(crate) fn try_new(
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
