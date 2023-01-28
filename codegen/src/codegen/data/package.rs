@@ -14,7 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, InputFile, InputFileImpl, Message, PackageOrMessage, PackageOrMessageCase,
+    DataTypeBase, Enum, InputFile, InputFileImpl, Message, Oneof, PackageOrMessage,
+    PackageOrMessageCase,
 };
 use crate::Result;
 use ::itertools::Itertools;
@@ -233,7 +234,7 @@ impl PackageOrMessage for RootPackage {
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.base.enums()?))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
         Ok(Box::new(iter::empty()))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
@@ -278,7 +279,7 @@ impl PackageOrMessage for NonRootPackage {
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.base.enums()?))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
         Ok(Box::new(iter::empty()))
     }
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {

@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    FieldBase, FieldOrOneofExt, MessageExt, Oneof, OneofField, PackageOrMessageExt,
+    DataTypeBase, FieldBase, FieldOrOneofExt, MessageExt, Oneof, OneofField, PackageOrMessageExt,
     PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
@@ -26,31 +26,6 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::Rc;
-
-pub trait OneofExt {
-    // Message's bitfield allocation
-    fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)>;
-    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
-    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
-
-    fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
-    fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>>;
-
-    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
-
-    fn gen_oneof_union_items(&self) -> Result<Vec<Item>>;
-    fn gen_oneof_case_items(&self) -> Result<Vec<Item>>;
-
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
-    fn gen_message_struct_impl_message_deser_arms(
-        &self,
-        field_data_expr: &Expr,
-    ) -> Result<Vec<Arm>>;
-    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
-    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
-}
 
 #[derive(Debug, Default)]
 struct Cache {
@@ -65,8 +40,8 @@ struct OneofBitfieldAllocation {
     tail: usize,
 }
 
-impl<T: ?Sized + Oneof> OneofExt for T {
-    fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)> {
+impl Oneof {
+    pub(crate) fn bitfield_index_for_oneof(&self) -> Result<(usize, usize)> {
         let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
             alloc
         } else {
@@ -80,7 +55,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         Ok(alloc.oneof_bits_range)
     }
 
-    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
+    pub(crate) fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
         Ok(self
             .cache()
             .get::<Cache>()?
@@ -89,7 +64,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .map(|a| a.tail))
     }
 
-    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
+    pub(crate) fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
         let case_num = self.fields()?.count() + 1 /* 1 for none case */;
         let required_bits = (usize::leading_zeros(0) - usize::leading_zeros(case_num)) as usize;
         Ok(self
@@ -103,34 +78,41 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .tail)
     }
 
-    fn gen_oneof_union_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+    pub(crate) fn gen_oneof_union_type(
+        &self,
+        generics: impl Iterator<Item = Rc<Type>>,
+    ) -> Result<Rc<Type>> {
         let message_module = self.message()?.gen_rust_module_path()?;
-        let union_ident = gen_union_ident(self)?;
+        let union_ident = self.gen_union_ident()?;
         Ok(Rc::new(parse2(quote! {
             #message_module :: #union_ident :: < #(#generics),* >
         })?))
     }
 
-    fn gen_oneof_case_type(&self, generics: impl Iterator<Item = Rc<Type>>) -> Result<Rc<Type>> {
+    pub(crate) fn gen_oneof_case_type(
+        &self,
+        generics: impl Iterator<Item = Rc<Type>>,
+    ) -> Result<Rc<Type>> {
         let message_module = self.message()?.gen_rust_module_path()?;
-        let case_ident = gen_case_ident(self)?;
+        let case_ident = self.gen_case_ident()?;
         Ok(Rc::new(parse2(quote! {
             #message_module :: _case :: #case_ident :: < #(#generics),* >
         })?))
     }
 
-    fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {
-        let union_ident = gen_union_ident(self)?;
-        let union_fields = try_map_fields(self, |f| f.gen_oneof_union_field())?;
-        let union_methods = try_map_fields(self, |f| Ok(f.gen_oneof_union_methods()?.into_iter()))?
+    pub(crate) fn gen_oneof_union_items(&self) -> Result<Vec<Item>> {
+        let union_ident = self.gen_union_ident()?;
+        let union_fields = self.try_map_fields(|f| f.gen_oneof_union_field())?;
+        let union_methods = self
+            .try_map_fields(|f| Ok(f.gen_oneof_union_methods()?.into_iter()))?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        let generic_params = try_map_fields(self, |f| f.gen_oneof_union_generic_param_ident())?;
+        let generic_params = self.try_map_fields(|f| f.gen_oneof_union_generic_param_ident())?;
         let generic_param_bounds =
-            try_map_fields(self, |f| f.gen_oneof_union_generic_param_where_bounds())?;
+            self.try_map_fields(|f| f.gen_oneof_union_generic_param_where_bounds())?;
 
-        let oneof_union_impl = gen_oneof_union_impl(self)?;
+        let oneof_union_impl = self.gen_oneof_union_impl()?;
 
         // Union includes none case, where the case enum does not.
         Ok(vec![
@@ -163,12 +145,12 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_oneof_case_items(&self) -> Result<Vec<Item>> {
-        let case_ident = gen_case_ident(self)?;
-        let case_names = try_map_fields(self, |f| f.gen_oneof_case_value_ident())?;
-        let generic_params = try_map_fields(self, |f| f.gen_oneof_union_generic_param_ident())?;
+    pub(crate) fn gen_oneof_case_items(&self) -> Result<Vec<Item>> {
+        let case_ident = self.gen_case_ident()?;
+        let case_names = self.try_map_fields(|f| f.gen_oneof_case_value_ident())?;
+        let generic_params = self.try_map_fields(|f| f.gen_oneof_union_generic_param_ident())?;
 
-        let oneof_case_impl = gen_oneof_case_impl(self)?;
+        let oneof_case_impl = self.gen_oneof_case_impl()?;
 
         // Union includes none case, where the case enum does not.
         Ok(vec![
@@ -186,7 +168,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
         let generic_params = self
             .fields()?
             .map(|f| f.gen_oneof_union_field_type())
@@ -194,7 +176,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         self.gen_oneof_union_type(generic_params.iter().cloned())
     }
 
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
@@ -202,7 +184,8 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
 
-        let getter_case_generic_params = try_map_fields(self, |f| f.gen_maybe_borrowed_type(None))?;
+        let getter_case_generic_params =
+            self.try_map_fields(|f| f.gen_maybe_borrowed_type(None))?;
         let getter_type = self.gen_oneof_case_type(getter_case_generic_params.iter().cloned())?;
 
         Ok(vec![
@@ -221,22 +204,22 @@ impl<T: ?Sized + Oneof> OneofExt for T {
         ])
     }
 
-    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
+    pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, self.shared.bitfield())
         })?)
     }
 
-    fn gen_message_struct_impl_message_deser_arms(
+    pub(crate) fn gen_message_struct_impl_message_deser_arms(
         &self,
         field_data_expr: &Expr,
     ) -> Result<Vec<Arm>> {
         let field_ident = self.gen_fields_struct_field_ident()?;
-        let field_numbers = try_map_fields(self, |f| f.number())?;
+        let field_numbers = self.try_map_fields(|f| f.number())?;
 
         let case_type = self.gen_oneof_case_type(iter::empty())?;
-        let case_names = try_map_fields(self, |f| f.gen_oneof_case_value_ident())?;
+        let case_names = self.try_map_fields(|f| f.gen_oneof_case_value_ident())?;
 
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
@@ -251,7 +234,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             .collect::<Result<Vec<_>>>()
     }
 
-    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+    pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let field_ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             self.fields.#field_ident.ser_to_write(
@@ -260,14 +243,18 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             )?;
         })?)
     }
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
+
+    pub(crate) fn gen_message_struct_impl_debug_method_call(
+        &self,
+        receiver: &mut Expr,
+    ) -> Result<()> {
         for field in self.fields()? {
             field.gen_message_struct_impl_debug_method_call(receiver)?;
         }
         Ok(())
     }
 
-    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+    pub(crate) fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
@@ -276,180 +263,180 @@ impl<T: ?Sized + Oneof> OneofExt for T {
             self.#getter_ident() == #rhs_expr.#getter_ident()
         })?)
     }
-}
 
-fn try_map_fields<F, R>(this: &(impl ?Sized + Oneof), f: F) -> Result<Vec<R>>
-where
-    F: FnMut(Rc<OneofField>) -> Result<R>,
-{
-    this.fields()?.map(f).collect::<Result<Vec<_>>>()
-}
+    fn try_map_fields<F, R>(&self, f: F) -> Result<Vec<R>>
+    where
+        F: FnMut(Rc<OneofField>) -> Result<R>,
+    {
+        self.fields()?.map(f).collect::<Result<Vec<_>>>()
+    }
 
-fn gen_union_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
-    this.cache()
-        .get::<Cache>()?
-        .union_ident
-        .get_or_try_init(|| {
-            Ok(Rc::new(format_ident!(
-                "{}",
-                this.name()?.to_camel_case().escape_rust_keywords()
-            )))
-        })
-        .cloned()
-}
+    fn gen_union_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .union_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}",
+                    self.name()?.to_camel_case().escape_rust_keywords()
+                )))
+            })
+            .cloned()
+    }
 
-fn gen_case_ident(this: &(impl ?Sized + Oneof)) -> Result<Rc<Ident>> {
-    this.cache()
-        .get::<Cache>()?
-        .case_ident
-        .get_or_try_init(|| {
-            Ok(Rc::new(format_ident!(
-                "{}Case",
-                this.name()?.to_camel_case()
-            )))
-        })
-        .cloned()
-}
+    fn gen_case_ident(&self) -> Result<Rc<Ident>> {
+        self.cache()
+            .get::<Cache>()?
+            .case_ident
+            .get_or_try_init(|| {
+                Ok(Rc::new(format_ident!(
+                    "{}Case",
+                    self.name()?.to_camel_case()
+                )))
+            })
+            .cloned()
+    }
 
-fn gen_oneof_union_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
-    let union_ident = gen_union_ident(this)?;
-    let union_field_idents = try_map_fields(this, |f| f.gen_oneof_union_field_ident())?;
-    let getter_mut_idents = try_map_fields(this, |f| f.gen_oneof_union_getter_mut_ident())?;
-    let field_numbers = try_map_fields(this, |f| f.number())?;
-    let case_names = try_map_fields(this, |f| f.gen_oneof_case_value_ident())?;
-    let generic_params = try_map_fields(this, |f| f.gen_oneof_union_generic_param_ident())?;
-    let generic_param_bounds =
-        try_map_fields(this, |f| f.gen_oneof_union_generic_param_where_bounds())?;
+    fn gen_oneof_union_impl(&self) -> Result<ItemImpl> {
+        let union_ident = self.gen_union_ident()?;
+        let union_field_idents = self.try_map_fields(|f| f.gen_oneof_union_field_ident())?;
+        let getter_mut_idents = self.try_map_fields(|f| f.gen_oneof_union_getter_mut_ident())?;
+        let field_numbers = self.try_map_fields(|f| f.number())?;
+        let case_names = self.try_map_fields(|f| f.gen_oneof_case_value_ident())?;
+        let generic_params = self.try_map_fields(|f| f.gen_oneof_union_generic_param_ident())?;
+        let generic_param_bounds =
+            self.try_map_fields(|f| f.gen_oneof_union_generic_param_where_bounds())?;
 
-    let case_ref_generic_params = generic_params
-        .iter()
-        .map(|param| {
-            Ok(Rc::new(parse2(quote! {
-                <#param as #PURORO_INTERNAL::OneofFieldType>::GetterType::<'a>
-            })?))
-        })
-        .collect::<Result<Vec<_>>>()?;
-    let case_type = this.gen_oneof_case_type(iter::empty())?;
-    let case_ref_type = this.gen_oneof_case_type(case_ref_generic_params.into_iter())?;
+        let case_ref_generic_params = generic_params
+            .iter()
+            .map(|param| {
+                Ok(Rc::new(parse2(quote! {
+                    <#param as #PURORO_INTERNAL::OneofFieldType>::GetterType::<'a>
+                })?))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let case_type = self.gen_oneof_case_type(iter::empty())?;
+        let case_ref_type = self.gen_oneof_case_type(case_ref_generic_params.into_iter())?;
 
-    let bitfield_begin = this.bitfield_index_for_oneof()?.0;
-    let bitfield_end = this.bitfield_index_for_oneof()?.1;
+        let bitfield_begin = self.bitfield_index_for_oneof()?.0;
+        let bitfield_end = self.bitfield_index_for_oneof()?.1;
 
-    Ok(parse2(quote! {
-        impl< #(#generic_params),* > #PURORO_INTERNAL::OneofUnion
-        for #union_ident< #(#generic_params),* >
-        where #( #generic_param_bounds, )*
-        {
-            type Case = #case_type;
-            type CaseRef<'a> = #case_ref_type
-            where Self: 'a;
-
-            fn case_ref<B: #PURORO_INTERNAL::BitSlice>(&self, bits: &B)
-                -> ::std::option::Option<Self::CaseRef<'_>>
+        Ok(parse2(quote! {
+            impl< #(#generic_params),* > #PURORO_INTERNAL::OneofUnion
+            for #union_ident< #(#generic_params),* >
+            where #( #generic_param_bounds, )*
             {
-                use #PURORO_INTERNAL::OneofCase;
-                use ::std::mem::ManuallyDrop;
-                use ::std::ops::Deref as _;
-                let case_opt = OneofCase::from_bitslice(bits);
-                case_opt.map(|case| {
-                    match case {
-                        #(Self::Case::#case_names(_) => Self::CaseRef::#case_names(
-                            ManuallyDrop::deref(unsafe { &self.#union_field_idents }).get_field()
-                        ),)*
+                type Case = #case_type;
+                type CaseRef<'a> = #case_ref_type
+                where Self: 'a;
+
+                fn case_ref<B: #PURORO_INTERNAL::BitSlice>(&self, bits: &B)
+                    -> ::std::option::Option<Self::CaseRef<'_>>
+                {
+                    use #PURORO_INTERNAL::OneofCase;
+                    use ::std::mem::ManuallyDrop;
+                    use ::std::ops::Deref as _;
+                    let case_opt = OneofCase::from_bitslice(bits);
+                    case_opt.map(|case| {
+                        match case {
+                            #(Self::Case::#case_names(_) => Self::CaseRef::#case_names(
+                                ManuallyDrop::deref(unsafe { &self.#union_field_idents }).get_field()
+                            ),)*
+                        }
+                    })
+                }
+
+                fn clear<B: #PURORO_INTERNAL::BitSlice>(&mut self, bits: &mut B) {
+                    use #PURORO_INTERNAL::OneofCase;
+                    use ::std::mem::ManuallyDrop;
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    match OneofCase::from_bitslice(bits) {
+                        #(Some(Self::Case::#case_names(())) => {
+                            unsafe { ManuallyDrop::take(&mut self.#union_field_idents) };
+                        })*
+                        _ => ()
                     }
-                })
-            }
-
-            fn clear<B: #PURORO_INTERNAL::BitSlice>(&mut self, bits: &mut B) {
-                use #PURORO_INTERNAL::OneofCase;
-                use ::std::mem::ManuallyDrop;
-                #[allow(unused)] use ::std::option::Option::Some;
-                match OneofCase::from_bitslice(bits) {
-                    #(Some(Self::Case::#case_names(())) => {
-                        unsafe { ManuallyDrop::take(&mut self.#union_field_idents) };
-                    })*
-                    _ => ()
+                    bits.set_range(#bitfield_begin..#bitfield_end, 0);
                 }
-                bits.set_range(#bitfield_begin..#bitfield_end, 0);
-            }
 
-            fn clone<B: #PURORO_INTERNAL::BitSlice>(&self, bits: &B) -> Self {
-                use #PURORO_INTERNAL::OneofCase;
-                #[allow(unused)] use ::std::option::Option::Some;
-                #[allow(unused)] use ::std::clone::Clone;
-                match OneofCase::from_bitslice(bits) {
-                    #(Some(Self::Case::#case_names(())) => Self {
-                        #union_field_idents: Clone::clone(unsafe { &self.#union_field_idents }),
-                    },)*
-                    _ => Self { _none: (), },
+                fn clone<B: #PURORO_INTERNAL::BitSlice>(&self, bits: &B) -> Self {
+                    use #PURORO_INTERNAL::OneofCase;
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    #[allow(unused)] use ::std::clone::Clone;
+                    match OneofCase::from_bitslice(bits) {
+                        #(Some(Self::Case::#case_names(())) => Self {
+                            #union_field_idents: Clone::clone(unsafe { &self.#union_field_idents }),
+                        },)*
+                        _ => Self { _none: (), },
+                    }
                 }
-            }
 
-            fn deser_from_iter<I, B>(
-                &mut self,
-                bitvec: &mut B,
-                field_data: &mut #PURORO_INTERNAL::ser::FieldData<I>,
-                case: Self::Case,
-            ) -> #PURORO_LIB::Result<()>
-            where
-                I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-                B: #PURORO_INTERNAL::BitSlice,
-            {
-                #[allow(unused)] use ::std::result::Result::Ok;
-                match case {
-                    #(Self::Case::#case_names(_) => {
-                        let _ = <Self>::#getter_mut_idents(self, bitvec);
-                        unsafe { &mut self.#union_field_idents }.deser_from_iter(field_data)?;
-                    })*
+                fn deser_from_iter<I, B>(
+                    &mut self,
+                    bitvec: &mut B,
+                    field_data: &mut #PURORO_INTERNAL::ser::FieldData<I>,
+                    case: Self::Case,
+                ) -> #PURORO_LIB::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                    B: #PURORO_INTERNAL::BitSlice,
+                {
+                    #[allow(unused)] use ::std::result::Result::Ok;
+                    match case {
+                        #(Self::Case::#case_names(_) => {
+                            let _ = <Self>::#getter_mut_idents(self, bitvec);
+                            unsafe { &mut self.#union_field_idents }.deser_from_iter(field_data)?;
+                        })*
+                    }
+                    Ok(())
                 }
-                Ok(())
-            }
 
-            fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> #PURORO_LIB::Result<()>
-            where
-                W: ::std::io::Write,
-                B: #PURORO_INTERNAL::BitSlice
-            {
-                #[allow(unused)] use ::std::option::Option::Some;
-                #[allow(unused)] use ::std::result::Result::Ok;
-                use #PURORO_INTERNAL::OneofCase;
-                match OneofCase::from_bitslice(bitvec) {
-                    #(Some(Self::Case::#case_names(_)) => {
-                        unsafe { &self.#union_field_idents }.ser_to_write(
-                            #field_numbers, out,
-                        )?;
-                    })*
-                    _ => (),
-                }
-                Ok(())
-            }
-        }
-    })?)
-}
-
-fn gen_oneof_case_impl(this: &(impl ?Sized + Oneof)) -> Result<ItemImpl> {
-    let case_ident = gen_case_ident(this)?;
-    let union_fields = try_map_fields(this, |f| f.gen_oneof_union_field())?;
-    let item_indices = (1..=(union_fields.len() as u32)).collect::<Vec<_>>();
-    let case_names = try_map_fields(this, |f| f.gen_oneof_case_value_ident())?;
-    let bitfield_begin = this.bitfield_index_for_oneof()?.0;
-    let bitfield_end = this.bitfield_index_for_oneof()?.1;
-
-    Ok(parse2(quote! {
-        impl #PURORO_INTERNAL::OneofCase for #case_ident {
-            const BITFIELD_BEGIN: usize = #bitfield_begin;
-            const BITFIELD_END: usize = #bitfield_end;
-            fn from_u32(x: u32) -> ::std::option::Option<Self> {
-                match x {
-                    #(#item_indices => ::std::option::Option::Some(Self::#case_names(())),)*
-                    _ => ::std::option::Option::None,
+                fn ser_to_write<W, B>(&self, bitvec: &B, out: &mut W) -> #PURORO_LIB::Result<()>
+                where
+                    W: ::std::io::Write,
+                    B: #PURORO_INTERNAL::BitSlice
+                {
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    #[allow(unused)] use ::std::result::Result::Ok;
+                    use #PURORO_INTERNAL::OneofCase;
+                    match OneofCase::from_bitslice(bitvec) {
+                        #(Some(Self::Case::#case_names(_)) => {
+                            unsafe { &self.#union_field_idents }.ser_to_write(
+                                #field_numbers, out,
+                            )?;
+                        })*
+                        _ => (),
+                    }
+                    Ok(())
                 }
             }
-            fn into_u32(self) -> u32 {
-                match self {
-                    #(Self::#case_names(_) => #item_indices,)*
+        })?)
+    }
+
+    fn gen_oneof_case_impl(&self) -> Result<ItemImpl> {
+        let case_ident = self.gen_case_ident()?;
+        let union_fields = self.try_map_fields(|f| f.gen_oneof_union_field())?;
+        let item_indices = (1..=(union_fields.len() as u32)).collect::<Vec<_>>();
+        let case_names = self.try_map_fields(|f| f.gen_oneof_case_value_ident())?;
+        let bitfield_begin = self.bitfield_index_for_oneof()?.0;
+        let bitfield_end = self.bitfield_index_for_oneof()?.1;
+
+        Ok(parse2(quote! {
+            impl #PURORO_INTERNAL::OneofCase for #case_ident {
+                const BITFIELD_BEGIN: usize = #bitfield_begin;
+                const BITFIELD_END: usize = #bitfield_end;
+                fn from_u32(x: u32) -> ::std::option::Option<Self> {
+                    match x {
+                        #(#item_indices => ::std::option::Option::Some(Self::#case_names(())),)*
+                        _ => ::std::option::Option::None,
+                    }
+                }
+                fn into_u32(self) -> u32 {
+                    match self {
+                        #(Self::#case_names(_) => #item_indices,)*
+                    }
                 }
             }
-        }
-    })?)
+        })?)
+    }
 }

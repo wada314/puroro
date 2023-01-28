@@ -25,7 +25,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
 
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>>;
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;

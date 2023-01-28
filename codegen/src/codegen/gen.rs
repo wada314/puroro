@@ -24,7 +24,6 @@ mod package_or_message;
 use self::field::*;
 use self::field_or_oneof::*;
 use self::message::*;
-use self::oneof::*;
 pub use self::package_or_message::*;
 
 use super::data::*;

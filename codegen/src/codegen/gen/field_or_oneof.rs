@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{FieldExt, FieldOrOneof, FieldOrOneofCase, OneofExt};
+use super::{FieldExt, FieldOrOneof, FieldOrOneofCase};
 use crate::syn::{
     parse2, Arm, Expr, Field as SynField, FieldValue, Ident, ImplItemMethod, NamedField, Stmt, Type,
 };
@@ -76,7 +76,7 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             .fields_struct_field_type
             .get_or_try_init(|| match self.either() {
                 FieldOrOneofCase::Field(f) => FieldExt::gen_fields_struct_field_type(f),
-                FieldOrOneofCase::Oneof(o) => OneofExt::gen_fields_struct_field_type(o),
+                FieldOrOneofCase::Oneof(o) => o.gen_fields_struct_field_type(),
             })
             .cloned()
     }
@@ -93,7 +93,7 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.either() {
             FieldOrOneofCase::Field(f) => FieldExt::gen_message_struct_methods(f),
-            FieldOrOneofCase::Oneof(o) => OneofExt::gen_message_struct_methods(o),
+            FieldOrOneofCase::Oneof(o) => o.gen_message_struct_methods(),
         }
     }
 
@@ -107,7 +107,7 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
                 Ok(vec![arm])
             }
             FieldOrOneofCase::Oneof(o) => {
-                OneofExt::gen_message_struct_impl_message_deser_arms(o, field_data_expr)
+                o.gen_message_struct_impl_message_deser_arms(field_data_expr)
             }
         }
     }
@@ -117,16 +117,14 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             FieldOrOneofCase::Field(f) => {
                 FieldExt::gen_message_struct_impl_message_ser_stmt(f, out_expr)
             }
-            FieldOrOneofCase::Oneof(o) => {
-                OneofExt::gen_message_struct_impl_message_ser_stmt(o, out_expr)
-            }
+            FieldOrOneofCase::Oneof(o) => o.gen_message_struct_impl_message_ser_stmt(out_expr),
         }
     }
 
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         match self.either() {
             FieldOrOneofCase::Field(f) => FieldExt::gen_message_struct_impl_clone_field_value(f),
-            FieldOrOneofCase::Oneof(o) => OneofExt::gen_message_struct_impl_clone_field_value(o),
+            FieldOrOneofCase::Oneof(o) => o.gen_message_struct_impl_clone_field_value(),
         }
     }
 
@@ -135,9 +133,7 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             FieldOrOneofCase::Field(f) => {
                 FieldExt::gen_message_struct_impl_debug_method_call(f, receiver)
             }
-            FieldOrOneofCase::Oneof(o) => {
-                OneofExt::gen_message_struct_impl_debug_method_call(o, receiver)
-            }
+            FieldOrOneofCase::Oneof(o) => o.gen_message_struct_impl_debug_method_call(receiver),
         }
     }
 
@@ -146,9 +142,7 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             FieldOrOneofCase::Field(f) => {
                 FieldExt::gen_message_struct_impl_partial_eq_cmp(f, rhs_expr)
             }
-            FieldOrOneofCase::Oneof(o) => {
-                OneofExt::gen_message_struct_impl_partial_eq_cmp(o, rhs_expr)
-            }
+            FieldOrOneofCase::Oneof(o) => o.gen_message_struct_impl_partial_eq_cmp(rhs_expr),
         }
     }
 }

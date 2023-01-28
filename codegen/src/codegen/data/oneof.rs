@@ -19,34 +19,29 @@ use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescrip
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait Oneof: FieldOrOneof + DataTypeBase + Debug {
-    fn message(&self) -> Result<Rc<dyn Message>>;
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>>;
-}
-
 #[derive(Debug)]
-pub struct OneofImpl {
+pub struct Oneof {
     cache: AnonymousCache,
     message: Weak<dyn Message>,
     name: String,
     fields: Vec<Rc<OneofField>>,
 }
 
-impl OneofImpl {
+impl Oneof {
     pub fn new(
         message_proto: &DescriptorProto,
         oneof_proto: &OneofDescriptorProto,
         oneof_index: usize,
         message: Weak<dyn Message>,
-    ) -> Rc<OneofImpl> {
+    ) -> Rc<Oneof> {
         Rc::new_cyclic(|weak| {
             let fields = message_proto
                 .field()
                 .iter()
                 .filter(|f| f.oneof_index() as usize == oneof_index)
-                .map(|f| OneofField::new(f, Weak::clone(weak) as Weak<dyn Oneof>))
+                .map(|f| OneofField::new(f, Weak::clone(weak)))
                 .collect::<Vec<_>>();
-            OneofImpl {
+            Oneof {
                 cache: Default::default(),
                 message,
                 name: oneof_proto.name().to_string(),
@@ -56,7 +51,7 @@ impl OneofImpl {
     }
 }
 
-impl DataTypeBase for OneofImpl {
+impl DataTypeBase for Oneof {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
@@ -65,17 +60,17 @@ impl DataTypeBase for OneofImpl {
     }
 }
 
-impl FieldOrOneof for OneofImpl {
-    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof> {
+impl FieldOrOneof for Oneof {
+    fn either(&self) -> FieldOrOneofCase<&dyn Field, &Oneof> {
         FieldOrOneofCase::Oneof(self)
     }
 }
 
-impl Oneof for OneofImpl {
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>> {
+impl Oneof {
+    pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
-    fn message(&self) -> Result<Rc<dyn Message>> {
+    pub(crate) fn message(&self) -> Result<Rc<dyn Message>> {
         Ok(self.message.try_upgrade()?)
     }
 }

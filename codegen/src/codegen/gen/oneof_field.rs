@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::field::gen_default_fn;
 use super::{
-    DataTypeBase, FieldBase, FieldOrOneofExt, FieldType, LengthDelimitedType, MessageExt, OneofExt,
+    DataTypeBase, FieldBase, FieldOrOneofExt, FieldType, LengthDelimitedType, MessageExt,
     OneofField, PURORO_INTERNAL,
 };
 use crate::syn::{

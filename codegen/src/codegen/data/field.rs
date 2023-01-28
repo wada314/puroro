@@ -60,7 +60,7 @@ impl DataTypeBase for FieldImpl {
 }
 
 impl FieldOrOneof for FieldImpl {
-    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof> {
+    fn either(&self) -> FieldOrOneofCase<&dyn Field, &Oneof> {
         FieldOrOneofCase::Field(self)
     }
 }

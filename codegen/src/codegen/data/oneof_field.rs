@@ -23,7 +23,7 @@ use ::std::rc::{Rc, Weak};
 #[derive(Debug)]
 pub struct OneofField {
     cache: AnonymousCache,
-    oneof: Weak<dyn Oneof>,
+    oneof: Weak<Oneof>,
     name: String,
     number: i32,
     type_opt: Option<field_descriptor_proto::Type>,
@@ -65,7 +65,7 @@ impl FieldBase for OneofField {
 }
 
 impl OneofField {
-    pub(crate) fn new(proto: &FieldDescriptorProto, oneof: Weak<dyn Oneof>) -> Rc<Self> {
+    pub(crate) fn new(proto: &FieldDescriptorProto, oneof: Weak<Oneof>) -> Rc<Self> {
         Rc::new(Self {
             cache: Default::default(),
             oneof,
@@ -78,7 +78,7 @@ impl OneofField {
         })
     }
 
-    pub(crate) fn oneof(&self) -> Result<Rc<dyn Oneof>> {
+    pub(crate) fn oneof(&self) -> Result<Rc<Oneof>> {
         Ok(self.oneof.try_upgrade()?)
     }
 }
