@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    FieldOrOneofExt, MessageExt, Oneof, OneofField, OneofFieldExt, PackageOrMessageExt,
+    FieldBase, FieldOrOneofExt, MessageExt, Oneof, OneofField, PackageOrMessageExt,
     PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
@@ -280,7 +280,7 @@ impl<T: ?Sized + Oneof> OneofExt for T {
 
 fn try_map_fields<F, R>(this: &(impl ?Sized + Oneof), f: F) -> Result<Vec<R>>
 where
-    F: FnMut(Rc<dyn OneofField>) -> Result<R>,
+    F: FnMut(Rc<OneofField>) -> Result<R>,
 {
     this.fields()?.map(f).collect::<Result<Vec<_>>>()
 }

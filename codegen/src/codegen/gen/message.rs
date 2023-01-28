@@ -14,8 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    FieldExt, FieldOrOneofExt, Message, OneofExt, OneofFieldExt, PackageOrMessageExt,
-    PURORO_INTERNAL, PURORO_LIB,
+    FieldExt, FieldOrOneofExt, Message, OneofExt, PackageOrMessageExt, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;

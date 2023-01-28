@@ -25,7 +25,6 @@ use self::field::*;
 use self::field_or_oneof::*;
 use self::message::*;
 use self::oneof::*;
-use self::oneof_field::*;
 pub use self::package_or_message::*;
 
 use super::data::*;

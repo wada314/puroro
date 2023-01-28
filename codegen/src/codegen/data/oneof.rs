@@ -13,9 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{
-    DataTypeBase, Field, FieldOrOneof, FieldOrOneofCase, Message, OneofField, OneofFieldImpl,
-};
+use super::{DataTypeBase, Field, FieldOrOneof, FieldOrOneofCase, Message, OneofField};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescriptorProto};
 use ::std::fmt::Debug;
@@ -23,7 +21,7 @@ use ::std::rc::{Rc, Weak};
 
 pub trait Oneof: FieldOrOneof + DataTypeBase + Debug {
     fn message(&self) -> Result<Rc<dyn Message>>;
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>>;
+    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>>;
 }
 
 #[derive(Debug)]
@@ -31,7 +29,7 @@ pub struct OneofImpl {
     cache: AnonymousCache,
     message: Weak<dyn Message>,
     name: String,
-    fields: Vec<Rc<dyn OneofField>>,
+    fields: Vec<Rc<OneofField>>,
 }
 
 impl OneofImpl {
@@ -46,10 +44,7 @@ impl OneofImpl {
                 .field()
                 .iter()
                 .filter(|f| f.oneof_index() as usize == oneof_index)
-                .map(|f| {
-                    OneofFieldImpl::new(f, Weak::clone(weak) as Weak<dyn Oneof>)
-                        as Rc<dyn OneofField>
-                })
+                .map(|f| OneofField::new(f, Weak::clone(weak) as Weak<dyn Oneof>))
                 .collect::<Vec<_>>();
             OneofImpl {
                 cache: Default::default(),
@@ -77,7 +72,7 @@ impl FieldOrOneof for OneofImpl {
 }
 
 impl Oneof for OneofImpl {
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn OneofField>>>> {
+    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
     fn message(&self) -> Result<Rc<dyn Message>> {
