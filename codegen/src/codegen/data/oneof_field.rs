@@ -21,7 +21,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
-pub struct OneofField {
+pub(crate) struct OneofField {
     cache: AnonymousCache,
     oneof: Weak<Oneof>,
     name: String,

@@ -16,7 +16,7 @@ mod data;
 mod gen;
 mod util;
 
-use self::data::{PackageOrMessage, RootPackage};
+use self::data::{Package, PackageOrMessage};
 use self::gen::PackageOrMessageExt as _;
 
 use crate::Result;
@@ -32,7 +32,7 @@ use ::std::rc::Rc;
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
-    let root_package = RootPackage::new(files);
+    let root_package = Package::new_root(files);
 
     let file_generating_items =
         iter::once(Ok(Rc::clone(&root_package) as Rc<dyn PackageOrMessage>))
@@ -93,6 +93,6 @@ pub fn generate_output_file_protos<'a>(
 pub fn generate_tokens_for_inline<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<TokenStream> {
-    let root_package = RootPackage::new(files);
+    let root_package = Package::new_root(files);
     root_package.gen_inline_code()
 }

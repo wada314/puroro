@@ -18,14 +18,14 @@ use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone)]
-pub enum FieldType {
+pub(crate) enum FieldType {
     Variant(VariantType),
     LengthDelimited(LengthDelimitedType),
     Bits32(Bits32Type),
     Bits64(Bits64Type),
 }
 #[derive(Debug, Clone)]
-pub enum VariantType {
+pub(crate) enum VariantType {
     Int32,
     UInt32,
     SInt32,
@@ -37,19 +37,19 @@ pub enum VariantType {
     Enum3(Weak<Enum>),
 }
 #[derive(Debug, Clone)]
-pub enum LengthDelimitedType {
+pub(crate) enum LengthDelimitedType {
     String,
     Bytes,
     Message(Weak<Message>),
 }
 #[derive(Debug, Clone)]
-pub enum Bits32Type {
+pub(crate) enum Bits32Type {
     Fixed32,
     SFixed32,
     Float,
 }
 #[derive(Debug, Clone)]
-pub enum Bits64Type {
+pub(crate) enum Bits64Type {
     Fixed64,
     SFixed64,
     Double,

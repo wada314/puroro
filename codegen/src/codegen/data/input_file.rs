@@ -31,7 +31,7 @@ pub struct InputFile {
 }
 
 impl InputFile {
-    pub fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
+    pub(crate) fn new(proto: &FileDescriptorProto, package: Weak<Package>) -> Rc<Self> {
         Rc::new_cyclic(|weak| Self {
             cache: Default::default(),
             name: proto.name().to_string(),

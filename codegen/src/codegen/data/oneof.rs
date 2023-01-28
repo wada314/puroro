@@ -20,7 +20,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
-pub struct Oneof {
+pub(crate) struct Oneof {
     cache: AnonymousCache,
     message: Weak<Message>,
     name: String,

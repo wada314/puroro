@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
-    PackageOrMessageCase, RootPackage,
+    PackageOrMessageCase,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
@@ -24,7 +24,7 @@ use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
-pub struct Message {
+pub(crate) struct Message {
     cache: AnonymousCache,
     name: String,
     fields: Vec<Rc<Field>>,
@@ -115,7 +115,7 @@ impl DataTypeBase for Message {
 }
 
 impl PackageOrMessage for Message {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &Message> {
+    fn either(&self) -> PackageOrMessageCase<&Package, &Message> {
         PackageOrMessageCase::Message(self)
     }
 
@@ -128,10 +128,10 @@ impl PackageOrMessage for Message {
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
         Ok(Box::new(self.oneofs.iter().cloned()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn root_package(&self) -> Result<Rc<RootPackage>> {
+    fn root_package(&self) -> Result<Rc<Package>> {
         self.parent.try_upgrade()?.root_package()
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {

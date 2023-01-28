@@ -22,7 +22,7 @@ use ::std::rc::{Rc, Weak};
 
 /// A field of message, regardless if it's directly under the message or
 /// the field under the `oneof`.
-pub trait FieldBase: DataTypeBase + Debug {
+pub(crate) trait FieldBase: DataTypeBase + Debug {
     fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
     fn default_value(&self) -> Result<Option<&str>>;

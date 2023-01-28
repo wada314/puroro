@@ -25,7 +25,7 @@ use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
-pub struct Enum {
+pub(crate) struct Enum {
     cache: AnonymousCache,
     name: String,
     input_file: Weak<InputFile>,
