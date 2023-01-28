@@ -45,13 +45,22 @@ pub fn puroro_inline(input: TokenStream) -> TokenStream {
         Err(e) => return e.to_compile_error(),
     };
 
+    gen_code(string_lit.value())
+}
+
+#[proc_macro]
+pub fn puroro_inline2(input: TokenStream) -> TokenStream {
+    gen_code(&input.to_string())
+}
+
+fn gen_code(input_str: &str) -> TokenStream {
     let temp_dir = TempDir::new("puroro-inline").unwrap();
     let input_file_path = temp_dir.path().join("input.proto");
     let output_file_path = temp_dir.path().join("output.pb");
 
     {
         let mut f = File::create(&input_file_path).unwrap();
-        f.write_all(string_lit.value().as_bytes()).unwrap();
+        f.write_all(input_str.as_bytes()).unwrap();
     }
 
     let status = Command::new(protoc_bin_path().unwrap())
