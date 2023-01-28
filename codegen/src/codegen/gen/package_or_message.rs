@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    MessageExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT, PURORO_ROOT,
-    PURORO_ROOT_IDENT, SUBMODULE_HEADER,
+    PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT, PURORO_ROOT, PURORO_ROOT_IDENT,
+    SUBMODULE_HEADER,
 };
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;

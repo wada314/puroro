@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{
-    Bits32Type, Bits64Type, FieldType, LengthDelimitedType, MessageExt, VariantType,
-    PURORO_INTERNAL,
-};
+use super::{Bits32Type, Bits64Type, FieldType, LengthDelimitedType, VariantType, PURORO_INTERNAL};
 use crate::syn::{parse2, Lifetime, Type};
 use crate::Result;
 use ::quote::quote;

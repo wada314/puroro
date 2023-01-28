@@ -14,17 +14,16 @@
 
 mod r#enum;
 mod field;
-mod field_or_oneof;
 mod field_base;
+mod field_or_oneof;
 mod field_type;
 mod message;
 mod oneof;
 mod oneof_field;
 mod package_or_message;
 
-use self::field_or_oneof::*;
 use self::field_base::FieldBaseExt;
-use self::message::*;
+use self::field_or_oneof::*;
 pub use self::package_or_message::*;
 
 use super::data::*;

@@ -26,7 +26,7 @@ pub trait FieldBase: DataTypeBase + Debug {
     fn number(&self) -> Result<i32>;
     fn r#type(&self) -> Result<&FieldType>;
     fn default_value(&self) -> Result<Option<&str>>;
-    fn message(&self) -> Result<Rc<dyn Message>>;
+    fn message(&self) -> Result<Rc<Message>>;
 }
 
 /// A field of message, but not including the field belonging to an `oneof`.
@@ -35,7 +35,7 @@ pub trait FieldBase: DataTypeBase + Debug {
 pub struct Field {
     cache: AnonymousCache,
     name: String,
-    message: Weak<dyn Message>,
+    message: Weak<Message>,
     rule: OnceCell<FieldRule>,
     r#type: OnceCell<FieldType>,
     proto3_optional: bool,
@@ -79,13 +79,13 @@ impl FieldBase for Field {
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
     }
-    fn message(&self) -> Result<Rc<dyn Message>> {
+    fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.try_upgrade()?)
     }
 }
 
 impl Field {
-    pub(crate) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
+    pub(crate) fn new(proto: &FieldDescriptorProto, message: Weak<Message>) -> Rc<Self> {
         Rc::new(Field {
             cache: Default::default(),
             name: proto.name().to_string(),

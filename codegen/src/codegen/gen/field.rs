@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, Field, FieldBase, FieldBaseExt, FieldOrOneofExt, FieldRule, FieldType,
-    LengthDelimitedType, MessageExt, PURORO_INTERNAL,
+    LengthDelimitedType, PURORO_INTERNAL,
 };
 use crate::syn::{
     parse2, Arm, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt, Type,

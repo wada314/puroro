@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldBase, FieldOrOneofExt, MessageExt, Oneof, OneofField, PackageOrMessageExt,
+    DataTypeBase, FieldBase, FieldOrOneofExt, Oneof, OneofField, PackageOrMessageExt,
     PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{

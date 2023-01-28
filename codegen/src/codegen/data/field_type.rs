@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{Enum, Message, MessageOrEnumCase, Syntax};
+use super::{Enum, Message, MessageOrEnumCase, PackageOrMessage, Syntax};
 use crate::{FatalErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 use ::std::rc::{Rc, Weak};
@@ -40,7 +40,7 @@ pub enum VariantType {
 pub enum LengthDelimitedType {
     String,
     Bytes,
-    Message(Weak<dyn Message>),
+    Message(Weak<Message>),
 }
 #[derive(Debug, Clone)]
 pub enum Bits32Type {
@@ -60,7 +60,7 @@ impl FieldType {
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
-        message: Rc<dyn Message>,
+        message: Rc<Message>,
     ) -> Result<Self> {
         use field_descriptor_proto::Type::*;
         use Bits32Type::*;

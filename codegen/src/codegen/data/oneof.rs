@@ -22,7 +22,7 @@ use ::std::rc::{Rc, Weak};
 #[derive(Debug)]
 pub struct Oneof {
     cache: AnonymousCache,
-    message: Weak<dyn Message>,
+    message: Weak<Message>,
     name: String,
     fields: Vec<Rc<OneofField>>,
 }
@@ -32,7 +32,7 @@ impl Oneof {
         message_proto: &DescriptorProto,
         oneof_proto: &OneofDescriptorProto,
         oneof_index: usize,
-        message: Weak<dyn Message>,
+        message: Weak<Message>,
     ) -> Rc<Oneof> {
         Rc::new_cyclic(|weak| {
             let fields = message_proto
@@ -70,7 +70,7 @@ impl Oneof {
     pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
-    pub(crate) fn message(&self) -> Result<Rc<dyn Message>> {
+    pub(crate) fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.try_upgrade()?)
     }
 }

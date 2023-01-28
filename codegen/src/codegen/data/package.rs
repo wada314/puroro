@@ -35,7 +35,7 @@ pub struct PackageBase {
     subpackages: Vec<Rc<NonRootPackage>>,
     files: Vec<Rc<dyn InputFile>>,
     root: Weak<RootPackage>,
-    messages: OnceCell<Vec<Rc<dyn Message>>>,
+    messages: OnceCell<Vec<Rc<Message>>>,
     enums: OnceCell<Vec<Rc<Enum>>>,
 }
 
@@ -102,7 +102,7 @@ impl PackageBase {
         Ok(self.files.iter().cloned())
     }
 
-    fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Message>>> {
+    fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<Message>>> {
         self.messages
             .get_or_try_init(|| {
                 self.files
@@ -224,11 +224,11 @@ impl DataTypeBase for RootPackage {
 }
 
 impl PackageOrMessage for RootPackage {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &Message> {
         PackageOrMessageCase::Package(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
@@ -269,11 +269,11 @@ impl DataTypeBase for NonRootPackage {
 }
 
 impl PackageOrMessage for NonRootPackage {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &Message> {
         PackageOrMessageCase::Package(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {

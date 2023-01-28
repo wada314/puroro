@@ -59,7 +59,7 @@ impl FieldBase for OneofField {
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
     }
-    fn message(&self) -> Result<Rc<dyn Message>> {
+    fn message(&self) -> Result<Rc<Message>> {
         Ok(self.oneof.try_upgrade()?.message()?)
     }
 }

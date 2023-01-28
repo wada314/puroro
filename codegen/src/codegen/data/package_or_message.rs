@@ -21,9 +21,9 @@ use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub trait PackageOrMessage: DataTypeBase + Debug {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message>;
+    fn either(&self) -> PackageOrMessageCase<&dyn Package, &Message>;
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>>;
     fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>>;
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
@@ -44,7 +44,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
         Ok(ret)
     }
 
-    fn all_child_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
+    fn all_child_messages(&self) -> Result<Vec<Rc<Message>>> {
         let mut ret = self.messages()?.collect::<Vec<_>>();
         let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessage>);
         let packages_iter = self.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>);
@@ -60,7 +60,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnumCase<Rc<dyn Message>, Rc<Enum>>> {
+    ) -> Result<MessageOrEnumCase<Rc<Message>, Rc<Enum>>> {
         if let Some(absolute_path) = type_name.strip_prefix('.') {
             return self.root_package()?.resolve_type_name(absolute_path);
         }
