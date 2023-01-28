@@ -33,8 +33,8 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(Weak<dyn Enum>),
-    Enum3(Weak<dyn Enum>),
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
 }
 #[derive(Debug, Clone)]
 pub enum LengthDelimitedType {

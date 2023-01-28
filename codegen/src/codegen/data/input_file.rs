@@ -13,14 +13,10 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{
-    DataTypeBase, Enum, EnumImpl, Message, MessageImpl, Package, PackageOrMessage, Syntax,
-};
+use super::{DataTypeBase, Enum, Message, MessageImpl, Package, PackageOrMessage, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
-};
+use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FileDescriptorProto};
 use ::std::fmt::Debug;
 #[cfg(test)]
 use ::std::iter;
@@ -30,7 +26,7 @@ pub trait InputFile: DataTypeBase + DataTypeBase + Debug {
     fn syntax(&self) -> Result<Syntax>;
     fn package(&self) -> Result<Rc<dyn Package>>;
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
 }
 
 #[derive(Debug)]
@@ -41,24 +37,17 @@ pub struct InputFileImpl {
     syntax_cell: OnceCell<Syntax>,
     package: Weak<dyn Package>,
     messages: Vec<Rc<dyn Message>>,
-    enums: Vec<Rc<dyn Enum>>,
+    enums: Vec<Rc<Enum>>,
 }
 
 impl InputFileImpl {
     pub fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
-        Self::new_with(proto, package, MessageImpl::new, EnumImpl::new)
+        Self::new_with(proto, package, MessageImpl::new)
     }
-    fn new_with<FM, M, FE, E>(
-        proto: &FileDescriptorProto,
-        package: Weak<dyn Package>,
-        fm: FM,
-        fe: FE,
-    ) -> Rc<Self>
+    fn new_with<FM, M>(proto: &FileDescriptorProto, package: Weak<dyn Package>, fm: FM) -> Rc<Self>
     where
         FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
-        FE: Fn(&EnumDescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<E>,
         M: 'static + Message,
-        E: 'static + Enum,
     {
         Rc::new_cyclic(|weak| Self {
             cache: Default::default(),
@@ -81,11 +70,11 @@ impl InputFileImpl {
                 .enum_type()
                 .into_iter()
                 .map(|e| {
-                    fe(
+                    Enum::new(
                         e,
                         Weak::clone(weak) as Weak<dyn InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
-                    ) as Rc<dyn Enum>
+                    )
                 })
                 .collect(),
         })
@@ -113,7 +102,7 @@ impl InputFile for InputFileImpl {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
     }
 }
@@ -156,7 +145,7 @@ impl InputFile for InputFileFake {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(iter::empty()))
     }
 }

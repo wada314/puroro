@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    Bits32Type, Bits64Type, EnumExt, FieldType, LengthDelimitedType, MessageExt, VariantType,
+    Bits32Type, Bits64Type, FieldType, LengthDelimitedType, MessageExt, VariantType,
     PURORO_INTERNAL,
 };
 use crate::syn::{parse2, Lifetime, Type};

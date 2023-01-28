@@ -14,7 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldOrOneofExt, FieldRule, FieldType,
+    Bits32Type, Bits64Type, Field, FieldBase, FieldOrOneofExt, FieldRule, FieldType,
     LengthDelimitedType, MessageExt, VariantType, PURORO_INTERNAL,
 };
 use crate::syn::{

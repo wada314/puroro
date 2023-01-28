@@ -35,7 +35,7 @@ pub struct PackageBase {
     files: Vec<Rc<dyn InputFile>>,
     root: Weak<RootPackage>,
     messages: OnceCell<Vec<Rc<dyn Message>>>,
-    enums: OnceCell<Vec<Rc<dyn Enum>>>,
+    enums: OnceCell<Vec<Rc<Enum>>>,
 }
 
 #[derive(Debug)]
@@ -113,7 +113,7 @@ impl PackageBase {
             .map(|v| v.iter().cloned())
     }
 
-    fn enums(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Enum>>> {
+    fn enums(&self) -> Result<impl '_ + Iterator<Item = Rc<Enum>>> {
         self.enums
             .get_or_try_init(|| {
                 self.files
@@ -230,7 +230,7 @@ impl PackageOrMessage for RootPackage {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.base.enums()?))
     }
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
@@ -275,7 +275,7 @@ impl PackageOrMessage for NonRootPackage {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.base.messages()?))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.base.enums()?))
     }
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {

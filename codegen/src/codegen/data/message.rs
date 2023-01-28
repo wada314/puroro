@@ -14,12 +14,12 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, EnumImpl, Field, FieldImpl, FieldOrOneof, InputFile, Oneof, OneofImpl,
-    Package, PackageOrMessage, PackageOrMessageCase, RootPackage,
+    DataTypeBase, Enum, Field, FieldImpl, FieldOrOneof, InputFile, Oneof, OneofImpl, Package,
+    PackageOrMessage, PackageOrMessageCase, RootPackage,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
+    DescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
 };
 use ::std::fmt::Debug;
 use ::std::iter;
@@ -45,7 +45,7 @@ pub struct MessageImpl {
     name: String,
     fields: Vec<Rc<dyn Field>>,
     messages: Vec<Rc<dyn Message>>,
-    enums: Vec<Rc<dyn Enum>>,
+    enums: Vec<Rc<Enum>>,
     oneofs: Vec<Rc<dyn Oneof>>,
     input_file: Weak<dyn InputFile>,
     parent: Weak<dyn PackageOrMessage>,
@@ -63,28 +63,24 @@ impl MessageImpl {
             parent,
             FieldImpl::new,
             MessageImpl::new,
-            EnumImpl::new,
             OneofImpl::new,
         )
     }
 
-    pub fn new_with<FF, F, FM, M, FE, E, FO, O>(
+    pub fn new_with<FF, F, FM, M, FO, O>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,
         ff: FF,
         fm: FM,
-        fe: FE,
         fo: FO,
     ) -> Rc<Self>
     where
         FF: Fn(&FieldDescriptorProto, Weak<dyn Message>) -> Rc<F>,
         FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
-        FE: Fn(&EnumDescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<E>,
         FO: Fn(&DescriptorProto, &OneofDescriptorProto, usize, Weak<dyn Message>) -> Rc<O>,
         F: 'static + Field,
         M: 'static + Message,
-        E: 'static + Enum,
         O: 'static + Oneof,
     {
         let name = proto.name().to_string();
@@ -110,11 +106,11 @@ impl MessageImpl {
                 .enum_type()
                 .into_iter()
                 .map(|e| {
-                    fe(
+                    Enum::new(
                         e,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
-                    ) as Rc<dyn Enum>
+                    )
                 })
                 .collect();
             let oneof_num = proto
@@ -168,7 +164,7 @@ impl PackageOrMessage for MessageImpl {
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
     }
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>> {

@@ -21,7 +21,6 @@ mod oneof;
 mod oneof_field;
 mod package_or_message;
 
-use self::r#enum::*;
 use self::field::*;
 use self::field_or_oneof::*;
 use self::message::*;

@@ -24,7 +24,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
     fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message>;
 
     fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
     fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
     fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
     fn root_package(&self) -> Result<Rc<RootPackage>>;
@@ -60,7 +60,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnumCase<Rc<dyn Message>, Rc<dyn Enum>>> {
+    ) -> Result<MessageOrEnumCase<Rc<dyn Message>, Rc<Enum>>> {
         if let Some(absolute_path) = type_name.strip_prefix('.') {
             return self.root_package()?.resolve_type_name(absolute_path);
         }
