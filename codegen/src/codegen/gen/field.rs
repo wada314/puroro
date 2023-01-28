@@ -1,7 +1,7 @@
 // Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// you may not use self file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -14,34 +14,17 @@
 
 use super::super::util::*;
 use super::{
-    Bits32Type, Bits64Type, EnumExt, Field, FieldBase, FieldOrOneofExt, FieldRule, FieldType,
-    LengthDelimitedType, MessageExt, VariantType, PURORO_INTERNAL,
+    DataTypeBase, Field, FieldBase, FieldBaseExt, FieldOrOneofExt, FieldRule, FieldType,
+    LengthDelimitedType, PURORO_INTERNAL,
 };
 use crate::syn::{
     parse2, Arm, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt, Type,
 };
 use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-use ::proc_macro2::Span;
 use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
-use ::syn::{LitBool, LitByteStr};
-
-pub trait FieldExt {
-    // Message's bitfield allocation
-    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>>;
-    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize>;
-
-    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
-
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
-    fn gen_message_struct_impl_message_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm>;
-    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
-    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
-}
 
 #[derive(Debug, Clone, Copy)]
 struct FieldBitfieldAllocation {
@@ -56,8 +39,8 @@ struct Cache {
     allocated_bitfield: OnceCell<FieldBitfieldAllocation>,
 }
 
-impl<T: ?Sized + Field> FieldExt for T {
-    fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
+impl Field {
+    pub(crate) fn maybe_allocated_bitfield_tail(&self) -> Result<Option<usize>> {
         Ok(self
             .cache()
             .get::<Cache>()?
@@ -65,7 +48,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             .get()
             .map(|a| a.tail))
     }
-    fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
+    pub(crate) fn assign_and_get_bitfield_tail(&self, head: usize) -> Result<usize> {
         // We need to allocate the bit for optional bit.
         let mut alloc = FieldBitfieldAllocation {
             maybe_optional: None,
@@ -98,13 +81,13 @@ impl<T: ?Sized + Field> FieldExt for T {
         }
     }
 
-    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
         use FieldRule::*;
         use FieldType::*;
         use LengthDelimitedType::*;
         let primitive_type = self.r#type()?.rust_type()?;
         let tag_type = self.r#type()?.tag_type()?;
-        let bitfield_index = bitfield_index_for_optional(self)?.unwrap_or(usize::MAX);
+        let bitfield_index = self.bitfield_index_for_optional()?.unwrap_or(usize::MAX);
         let type_name_segment: PathSegment = parse2(match (self.rule()?, self.r#type()?) {
             (Optional | Singular, LengthDelimited(Message(_))) => quote! {
                 SingularHeapMessageField::<#primitive_type>
@@ -136,19 +119,22 @@ impl<T: ?Sized + Field> FieldExt for T {
         })?))
     }
 
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         match self.rule()? {
-            FieldRule::Repeated => gen_message_struct_field_methods_for_repeated(self),
-            _ => gen_message_struct_field_methods_for_non_repeated(self),
+            FieldRule::Repeated => self.gen_message_struct_field_methods_for_repeated(),
+            _ => self.gen_message_struct_field_methods_for_non_repeated(),
         }
     }
-    fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
+    pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             #ident: ::std::clone::Clone::clone(&self.fields.#ident)
         })?)
     }
-    fn gen_message_struct_impl_message_deser_arm(&self, field_data_expr: &Expr) -> Result<Arm> {
+    pub(crate) fn gen_message_struct_impl_message_deser_arm(
+        &self,
+        field_data_expr: &Expr,
+    ) -> Result<Arm> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
         Ok(parse2(quote! {
@@ -159,7 +145,7 @@ impl<T: ?Sized + Field> FieldExt for T {
             )?,
         })?)
     }
-    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+    pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
         Ok(parse2(quote! {
@@ -171,7 +157,10 @@ impl<T: ?Sized + Field> FieldExt for T {
             )?;
         })?)
     }
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
+    pub(crate) fn gen_message_struct_impl_debug_method_call(
+        &self,
+        receiver: &mut Expr,
+    ) -> Result<()> {
         let ident = self.gen_fields_struct_field_ident()?;
         let new_expr: ExprMethodCall = parse2(match self.rule()? {
             FieldRule::Repeated => {
@@ -193,7 +182,7 @@ impl<T: ?Sized + Field> FieldExt for T {
         *receiver = new_expr.into();
         Ok(())
     }
-    fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+    pub(crate) fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
                 let getter_ident = format_ident!(
@@ -208,239 +197,145 @@ impl<T: ?Sized + Field> FieldExt for T {
             }
         })?)
     }
-}
 
-fn bitfield_index_for_optional(this: &(impl ?Sized + Field)) -> Result<Option<usize>> {
-    let alloc = if let Some(alloc) = this.cache().get::<Cache>()?.allocated_bitfield.get() {
-        alloc
-    } else {
-        let _ = this.message()?.bitfield_size()?;
-        let Some(alloc) = this
+    fn bitfield_index_for_optional(&self) -> Result<Option<usize>> {
+        let alloc = if let Some(alloc) = self.cache().get::<Cache>()?.allocated_bitfield.get() {
+            alloc
+        } else {
+            let _ = self.message()?.bitfield_size()?;
+            let Some(alloc) = self
             .cache()
             .get::<Cache>()?.allocated_bitfield.get() else {
                 Err(FatalErrorKind::InternalError { detail: "field bitfield is not set after the message's bitfield size is calculated.".to_string() })?
             };
-        alloc
-    };
-    Ok(alloc.maybe_optional)
-}
+            alloc
+        };
+        Ok(alloc.maybe_optional)
+    }
 
-fn gen_message_struct_field_methods_for_repeated(
-    this: &(impl ?Sized + Field),
-) -> Result<Vec<ImplItemMethod>> {
-    debug_assert!(matches!(this.rule(), Ok(FieldRule::Repeated)));
-    let getter_ident = format_ident!(
-        "{}",
-        this.name()?.to_lower_snake_case().escape_rust_keywords()
-    );
-    let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
-    let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
-    let field_ident = this.gen_fields_struct_field_ident()?;
-    let getter_item_type = match this.r#type()? {
-        FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
-            impl ::std::ops::Deref::<Target = str> +
-                ::std::fmt::Debug +
-                ::std::cmp::PartialEq
-        })?),
-        FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(parse2(quote! {
-            impl ::std::ops::Deref::<Target = [u8]> +
-                ::std::fmt::Debug +
-                ::std::cmp::PartialEq
-        })?),
-        FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-            m.try_upgrade()?.gen_message_struct_type()?
-        }
-        _ => this.r#type()?.rust_type()?,
-    };
-    let mut_item_type = this.r#type()?.rust_type()?;
-    Ok(vec![
-        parse2(quote! {
-            pub fn #getter_ident(&self) -> &[#getter_item_type] {
-                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                RepeatedFieldType::get_field(
-                    &self.fields.#field_ident, self.shared.bitfield(),
-                )
+    fn gen_message_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+        debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
+        let field_ident = self.gen_fields_struct_field_ident()?;
+        let getter_item_type = match self.r#type()? {
+            FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
+                impl ::std::ops::Deref::<Target = str> +
+                    ::std::fmt::Debug +
+                    ::std::cmp::PartialEq
+            })?),
+            FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(parse2(quote! {
+                impl ::std::ops::Deref::<Target = [u8]> +
+                    ::std::fmt::Debug +
+                    ::std::cmp::PartialEq
+            })?),
+            FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
+                m.try_upgrade()?.gen_message_struct_type()?
             }
-        })?,
-        parse2(quote! {
-            pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
-                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                RepeatedFieldType::get_field_mut(
-                    &mut self.fields.#field_ident, self.shared.bitfield_mut(),
-                )
-            }
-        })?,
-        parse2(quote! {
-            pub fn #clear_ident(&mut self) {
-                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                RepeatedFieldType::clear(
-                    &mut self.fields.#field_ident, self.shared.bitfield_mut(),
-                )
-            }
-        })?,
-    ])
-}
+            _ => self.r#type()?.rust_type()?,
+        };
+        let mut_item_type = self.r#type()?.rust_type()?;
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_ident(&self) -> &[#getter_item_type] {
+                    use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
+                    RepeatedFieldType::get_field(
+                        &self.fields.#field_ident, self.shared.bitfield(),
+                    )
+                }
+            })?,
+            parse2(quote! {
+                pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
+                    use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
+                    RepeatedFieldType::get_field_mut(
+                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                    )
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
+                    RepeatedFieldType::clear(
+                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                    )
+                }
+            })?,
+        ])
+    }
 
-fn gen_message_struct_field_methods_for_non_repeated(
-    this: &(impl ?Sized + Field),
-) -> Result<Vec<ImplItemMethod>> {
-    debug_assert!(matches!(
-        this.rule(),
-        Ok(FieldRule::Optional | FieldRule::Singular)
-    ));
-    let getter_ident = format_ident!(
-        "{}",
-        this.name()?.to_lower_snake_case().escape_rust_keywords()
-    );
-    let getter_opt_ident = format_ident!("{}_opt", this.name()?.to_lower_snake_case());
-    let getter_mut_ident = format_ident!("{}_mut", this.name()?.to_lower_snake_case());
-    let getter_has_ident = format_ident!("has_{}", this.name()?.to_lower_snake_case());
-    let clear_ident = format_ident!("clear_{}", this.name()?.to_lower_snake_case());
-    let field_ident = this.gen_fields_struct_field_ident()?;
-    let borrowed_type = this.r#type()?.rust_maybe_borrowed_type(None)?;
-    let getter_type = match this.r#type()? {
-        FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => Rc::new(parse2(quote! {
+    fn gen_message_struct_field_methods_for_non_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+        debug_assert!(matches!(
+            self.rule(),
+            Ok(FieldRule::Optional | FieldRule::Singular)
+        ));
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
+        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
+        let getter_has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
+        let field_ident = self.gen_fields_struct_field_ident()?;
+        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
+        let getter_type = match self.r#type()? {
+            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
+                Rc::new(parse2(quote! {
+                    ::std::option::Option::< #borrowed_type >
+                })?)
+            }
+            _ => Rc::clone(&borrowed_type),
+        };
+        let getter_opt_type = Rc::new(quote! {
             ::std::option::Option::< #borrowed_type >
-        })?),
-        _ => Rc::clone(&borrowed_type),
-    };
-    let getter_opt_type = Rc::new(quote! {
-        ::std::option::Option::< #borrowed_type >
-    });
-    let getter_mut_type = this.r#type()?.rust_mut_ref_type()?;
-    let default_fn = gen_default_fn(this)?;
-    Ok(vec![
-        parse2(quote! {
-            pub fn #getter_ident(&self) -> #getter_type {
-               use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                NonRepeatedFieldType::get_field_or_else(
-                    &self.fields.#field_ident, self.shared.bitfield(), #default_fn,
-                )
-            }
-        })?,
-        parse2(quote! {
-            pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                NonRepeatedFieldType::get_field_opt(
-                    &self.fields.#field_ident, self.shared.bitfield(),
-                )
-            }
-        })?,
-        parse2(quote! {
-            pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                NonRepeatedFieldType::get_field_mut(
-                    &mut self.fields.#field_ident, self.shared.bitfield_mut(), #default_fn,
-                )
-            }
-        })?,
-        parse2(quote! {
-            pub fn #getter_has_ident(&self) -> bool {
-                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                NonRepeatedFieldType::get_field_opt(
-                    &self.fields.#field_ident, self.shared.bitfield(),
-                ).is_some()
-            }
-        })?,
-        parse2(quote! {
-            pub fn #clear_ident(&mut self) {
-                use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                NonRepeatedFieldType::clear(
-                    &mut self.fields.#field_ident, self.shared.bitfield_mut(),
-                )
-            }
-        })?,
-    ])
-}
-
-pub(crate) fn gen_default_fn(this: &(impl ?Sized + FieldBase)) -> Result<Expr> {
-    use ::std::str::FromStr;
-
-    Ok(parse2(
-        if let Some(default_value_string) = this.default_value()? {
-            use FieldType::*;
-            match this.r#type()? {
-                // Floats. I believe the rust's `f32::from_str()` method supports
-                // all the possible patterns of protoc command output:
-                // https://doc.rust-lang.org/std/primitive.f32.html#impl-FromStr-for-f32
-                Bits32(Bits32Type::Float) => {
-                    let value = f32::from_str(&default_value_string)?;
-                    if value.is_infinite() && value.is_sign_positive() {
-                        quote! { || f32::INFINITY }
-                    } else if value.is_infinite() && value.is_sign_negative() {
-                        quote! { || f32::NEG_INFINITY }
-                    } else if value.is_nan() {
-                        quote! { || f32::NAN }
-                    } else {
-                        quote! { || #value }
-                    }
+        });
+        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
+        let default_fn = self.gen_default_fn()?;
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_ident(&self) -> #getter_type {
+                   use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::get_field_or_else(
+                        &self.fields.#field_ident, self.shared.bitfield(), #default_fn,
+                    )
                 }
-                Bits64(Bits64Type::Double) => {
-                    let value = f64::from_str(&default_value_string)?;
-                    if value.is_infinite() && value.is_sign_positive() {
-                        quote! { || f64::INFINITY }
-                    } else if value.is_infinite() && value.is_sign_negative() {
-                        quote! { || f64::NEG_INFINITY }
-                    } else if value.is_nan() {
-                        quote! { || f64::NAN }
-                    } else {
-                        quote! { || #value }
-                    }
+            })?,
+            parse2(quote! {
+                pub fn #getter_opt_ident(&self) -> #getter_opt_type {
+                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::get_field_opt(
+                        &self.fields.#field_ident, self.shared.bitfield(),
+                    )
                 }
-                // Strings and bytes. Strings are okay for as-is, but bytes need to parse
-                // the octal escape sequences.
-                LengthDelimited(LengthDelimitedType::String) => {
-                    quote! { || #default_value_string }
+            })?,
+            parse2(quote! {
+                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::get_field_mut(
+                        &mut self.fields.#field_ident, self.shared.bitfield_mut(), #default_fn,
+                    )
                 }
-                LengthDelimited(LengthDelimitedType::Bytes) => {
-                    let bytes = convert_octal_escapes_to_bytes(&default_value_string)?;
-                    let byte_lit = LitByteStr::new(&bytes, Span::call_site());
-                    quote! { || #byte_lit }
+            })?,
+            parse2(quote! {
+                pub fn #getter_has_ident(&self) -> bool {
+                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::get_field_opt(
+                        &self.fields.#field_ident, self.shared.bitfield(),
+                    ).is_some()
                 }
-                LengthDelimited(LengthDelimitedType::Message(_)) => {
-                    Err(FatalErrorKind::InternalError {
-                        detail: "The field default value should not be set for the message field."
-                            .to_string(),
-                    })?
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::clear(
+                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                    )
                 }
-                // Enum. Need to generate the value name.
-                FieldType::Variant(VariantType::Enum2(e) | VariantType::Enum3(e)) => {
-                    let e = e.try_upgrade()?;
-                    let enum_path = e.gen_enum_path()?;
-                    let enum_value_ident = format_ident!(
-                        "{}",
-                        default_value_string.to_camel_case().escape_rust_keywords()
-                    );
-                    quote! { || #enum_path :: #enum_value_ident }
-                }
-                // Integers and boolean. For the both cases just convert the given string
-                // as-is is okay.
-                Variant(VariantType::Bool) => {
-                    let value = bool::from_str(&default_value_string)?;
-                    let lit_bool = LitBool::new(value, Span::call_site());
-                    quote! { || #lit_bool }
-                }
-                Variant(VariantType::Int32 | VariantType::SInt32)
-                | Bits32(Bits32Type::SFixed32) => {
-                    let value = i32::from_str(&default_value_string)?;
-                    quote! { || #value }
-                }
-                Variant(VariantType::Int64 | VariantType::SInt64)
-                | Bits64(Bits64Type::SFixed64) => {
-                    let value = i64::from_str(&default_value_string)?;
-                    quote! { || #value }
-                }
-                Variant(VariantType::UInt32) | Bits32(Bits32Type::Fixed32) => {
-                    let value = u32::from_str(&default_value_string)?;
-                    quote! { || #value }
-                }
-                Variant(VariantType::UInt64) | Bits64(Bits64Type::Fixed64) => {
-                    let value = u64::from_str(&default_value_string)?;
-                    quote! { || #value }
-                }
-            }
-        } else {
-            quote! { ::std::default::Default::default }
-        },
-    )?)
+            })?,
+        ])
+    }
 }

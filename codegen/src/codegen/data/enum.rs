@@ -24,25 +24,19 @@ use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait Enum: DataTypeBase + Debug {
-    fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>>;
-    fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
-    fn syntax(&self) -> Result<Syntax>;
-}
-
 #[derive(Debug)]
-pub struct EnumImpl {
+pub(crate) struct Enum {
     cache: AnonymousCache,
     name: String,
-    input_file: Weak<dyn InputFile>,
+    input_file: Weak<InputFile>,
     parent: Weak<dyn PackageOrMessage>,
     values: Vec<(String, i32)>,
 }
 
-impl EnumImpl {
-    pub fn new(
+impl Enum {
+    pub(crate) fn new(
         proto: &EnumDescriptorProto,
-        input_file: Weak<dyn InputFile>,
+        input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
         let values = proto
@@ -50,7 +44,7 @@ impl EnumImpl {
             .into_iter()
             .map(|v| (v.name().to_string(), v.number()))
             .collect::<Vec<_>>();
-        Rc::new(EnumImpl {
+        Rc::new(Enum {
             cache: Default::default(),
             name: proto.name().to_string(),
             input_file,
@@ -58,25 +52,23 @@ impl EnumImpl {
             values,
         })
     }
+
+    pub(crate) fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>> {
+        Ok(Box::new(self.values.iter().map(|(s, n)| (s.as_str(), *n))))
+    }
+    pub(crate) fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
+        Ok(self.parent.try_upgrade()?)
+    }
+    pub(crate) fn syntax(&self) -> Result<Syntax> {
+        Ok(self.input_file.try_upgrade()?.syntax()?)
+    }
 }
 
-impl DataTypeBase for EnumImpl {
+impl DataTypeBase for Enum {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
         Ok(&self.name)
-    }
-}
-
-impl Enum for EnumImpl {
-    fn values(&self) -> Result<Box<dyn '_ + Iterator<Item = (&str, i32)>>> {
-        Ok(Box::new(self.values.iter().map(|(s, n)| (s.as_str(), *n))))
-    }
-    fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
-        Ok(self.parent.try_upgrade()?)
-    }
-    fn syntax(&self) -> Result<Syntax> {
-        Ok(self.input_file.try_upgrade()?.syntax()?)
     }
 }

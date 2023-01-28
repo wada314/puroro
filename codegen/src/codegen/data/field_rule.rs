@@ -17,14 +17,14 @@ use crate::{FatalErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 
 #[derive(Debug, Clone, Copy)]
-pub enum FieldRule {
+pub(crate) enum FieldRule {
     Optional,
     Singular,
     Repeated,
 }
 
 impl FieldRule {
-    pub fn try_new(
+    pub(crate) fn try_new(
         label_opt: Option<field_descriptor_proto::Label>,
         syntax: Syntax,
         proto3_optional: bool,

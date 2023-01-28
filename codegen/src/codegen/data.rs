@@ -24,28 +24,28 @@ mod oneof_field;
 mod package;
 mod package_or_message;
 
-pub use self::r#enum::*;
-pub use self::field::*;
-pub use self::field_or_oneof::*;
-pub use self::field_rule::*;
-pub use self::field_type::*;
-pub use self::input_file::*;
-pub use self::message::*;
-pub use self::oneof::*;
-pub use self::oneof_field::*;
-pub use self::package::*;
-pub use self::package_or_message::*;
+pub(crate) use self::r#enum::*;
+pub(crate) use self::field::*;
+pub(crate) use self::field_or_oneof::*;
+pub(crate) use self::field_rule::*;
+pub(crate) use self::field_type::*;
+pub(crate) use self::input_file::*;
+pub(crate) use self::message::*;
+pub(crate) use self::oneof::*;
+pub(crate) use self::oneof_field::*;
+pub(crate) use self::package::*;
+pub(crate) use self::package_or_message::*;
 
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
 
-pub trait DataTypeBase {
+pub(crate) trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Syntax {
+pub(crate) enum Syntax {
     Proto2,
     Proto3,
 }
@@ -63,19 +63,19 @@ impl TryFrom<&str> for Syntax {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum PackageOrMessageCase<P, M> {
+pub(crate) enum PackageOrMessageCase<P, M> {
     Package(P),
     Message(M),
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum MessageOrEnumCase<M, E> {
+pub(crate) enum MessageOrEnumCase<M, E> {
     Message(M),
     Enum(E),
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum FieldOrOneofCase<F, O> {
+pub(crate) enum FieldOrOneofCase<F, O> {
     Field(F),
     Oneof(O),
 }

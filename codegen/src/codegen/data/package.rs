@@ -14,9 +14,9 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, InputFile, InputFileImpl, Message, PackageOrMessage, PackageOrMessageCase,
+    DataTypeBase, Enum, InputFile, Message, Oneof, PackageOrMessage, PackageOrMessageCase,
 };
-use crate::Result;
+use crate::{FatalErrorKind, Result};
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
@@ -24,47 +24,75 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub trait Package: PackageOrMessage + DataTypeBase + Debug {
-    fn full_name(&self) -> Result<&str>;
-    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>>;
-}
-
 #[derive(Debug)]
-pub struct PackageBase {
-    subpackages: Vec<Rc<NonRootPackage>>,
-    files: Vec<Rc<dyn InputFile>>,
-    root: Weak<RootPackage>,
-    messages: OnceCell<Vec<Rc<dyn Message>>>,
-    enums: OnceCell<Vec<Rc<dyn Enum>>>,
-}
-
-#[derive(Debug)]
-pub struct NonRootPackage {
+pub(crate) struct Package {
     cache: AnonymousCache,
-    name: String,
-    full_name: OnceCell<String>,
-    parent: Weak<dyn Package>,
-    base: PackageBase,
+    subpackages: Vec<Rc<Package>>,
+    files: Vec<Rc<InputFile>>,
+    root: Weak<Package>,
+    messages: OnceCell<Vec<Rc<Message>>>,
+    enums: OnceCell<Vec<Rc<Enum>>>,
+    is_root: IsRoot,
 }
 
 #[derive(Debug)]
-pub struct RootPackage {
-    cache: AnonymousCache,
-    base: PackageBase,
+enum IsRoot {
+    Root,
+    NonRoot {
+        name: String,
+        full_name: OnceCell<String>,
+        parent: Weak<Package>,
+    },
 }
 
-impl PackageBase {
-    fn new<'a, FP, FF, F, PNI>(
-        root: Weak<RootPackage>,
+impl Package {
+    pub(crate) fn new_root<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<Package> {
+        Rc::new_cyclic(|weak_root| {
+            let names_and_fds = fds.map(|fd| {
+                let package_name_iter = fd.package().split('.').filter(|s| !s.is_empty());
+                (package_name_iter, fd)
+            });
+
+            Self::new_shared(
+                Weak::clone(weak_root),
+                Weak::clone(weak_root),
+                names_and_fds,
+                IsRoot::Root,
+            )
+        })
+    }
+
+    fn new_non_root<'a, PNI>(
+        name: &str,
+        weak_root: Weak<Package>,
+        parent: Weak<Package>,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
-        fp: FP,
-        ff: FF,
-    ) -> Self
+    ) -> Rc<Self>
     where
         PNI: Iterator<Item = &'a str>,
-        FP: Fn(&str, Vec<(PNI, &'a FileDescriptorProto)>) -> Rc<NonRootPackage>,
-        FF: Fn(&FileDescriptorProto) -> Rc<F>,
-        F: 'static + InputFile,
+    {
+        Rc::new_cyclic(|weak_self| {
+            Self::new_shared(
+                Weak::clone(weak_self),
+                weak_root,
+                names_and_fds,
+                IsRoot::NonRoot {
+                    name: name.to_string(),
+                    full_name: OnceCell::new(),
+                    parent,
+                },
+            )
+        })
+    }
+
+    fn new_shared<'a, PNI>(
+        weak_self: Weak<Package>,
+        weak_root: Weak<Package>,
+        names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
+        is_root: IsRoot,
+    ) -> Package
+    where
+        PNI: Iterator<Item = &'a str>,
     {
         let name_fd_map = names_and_fds
             .map(|(mut name_iter, fd)| {
@@ -78,30 +106,41 @@ impl PackageBase {
             .get(&None)
             .into_iter()
             .flatten()
-            .map(|(_, fd)| ff(fd) as Rc<dyn InputFile>)
+            .map(|(_, fd)| InputFile::new(fd, Weak::clone(&weak_self)))
             .collect();
 
         // The remaining FDs belong to the child packages.
         let subpackages = name_fd_map
             .into_iter()
             .filter_map(|(name_opt, child_files)| name_opt.map(|name| (name, child_files)))
-            .map(|(name, child_files)| fp(&name, child_files))
+            .map(|(name, child_files)| {
+                Package::new_non_root(
+                    name,
+                    Weak::clone(&weak_root),
+                    Weak::clone(&weak_self),
+                    child_files.into_iter(),
+                )
+            })
             .collect();
 
-        PackageBase {
-            root,
+        Package {
+            cache: Default::default(),
+            root: Weak::clone(&weak_root),
             subpackages,
             files: self_files,
             messages: OnceCell::new(),
             enums: OnceCell::new(),
+            is_root,
         }
     }
 
-    fn files(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn InputFile>>> {
+    // Will no one use this???
+    #[allow(unused)]
+    fn files(&self) -> Result<impl '_ + Iterator<Item = Rc<InputFile>>> {
         Ok(self.files.iter().cloned())
     }
 
-    fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Message>>> {
+    fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<Message>>> {
         self.messages
             .get_or_try_init(|| {
                 self.files
@@ -113,7 +152,7 @@ impl PackageBase {
             .map(|v| v.iter().cloned())
     }
 
-    fn enums(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn Enum>>> {
+    fn enums(&self) -> Result<impl '_ + Iterator<Item = Rc<Enum>>> {
         self.enums
             .get_or_try_init(|| {
                 self.files
@@ -125,197 +164,86 @@ impl PackageBase {
             .map(|v| v.iter().cloned())
     }
 
-    fn subpackages(&self) -> Result<impl '_ + Iterator<Item = Rc<NonRootPackage>>> {
+    fn subpackages(&self) -> Result<impl '_ + Iterator<Item = Rc<Package>>> {
         Ok(self.subpackages.iter().cloned())
     }
 
-    fn root(&self) -> Result<Rc<RootPackage>> {
+    fn root(&self) -> Result<Rc<Package>> {
         self.root.try_upgrade()
     }
-}
 
-impl RootPackage {
-    pub fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
-        Self::new_with(fds, InputFileImpl::new)
-    }
-
-    pub fn new_with<'a, FF, F>(
-        fds: impl Iterator<Item = &'a FileDescriptorProto>,
-        ff: FF,
-    ) -> Rc<RootPackage>
-    where
-        FF: Fn(&FileDescriptorProto, Weak<dyn Package>) -> Rc<F>,
-        F: 'static + InputFile,
-    {
-        Rc::new_cyclic(|weak_root| {
-            let names_and_fds = fds.map(|fd| {
-                let package_name_iter = fd.package().split('.').filter(|s| !s.is_empty());
-                (package_name_iter, fd)
-            });
-            let base = PackageBase::new(
-                Weak::clone(weak_root),
-                names_and_fds,
-                |name, names_and_fds_vec| {
-                    NonRootPackage::new_with(
-                        name,
-                        names_and_fds_vec.into_iter(),
-                        Weak::clone(weak_root) as Weak<dyn Package>,
-                        Weak::clone(weak_root),
-                        &ff,
-                    )
-                },
-                |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn Package>),
-            );
-            Self {
-                cache: Default::default(),
-                base,
-            }
-        })
+    // I think I will use this in somewhere document generating
+    #[allow(unused)]
+    pub(crate) fn full_name(&self) -> Result<&str> {
+        if let IsRoot::NonRoot {
+            name,
+            full_name,
+            parent,
+        } = &self.is_root
+        {
+            full_name
+                .get_or_try_init(|| {
+                    let parent = parent.try_upgrade()?;
+                    let parent_full_name = parent.full_name()?;
+                    if parent_full_name.is_empty() {
+                        Ok(name.clone())
+                    } else {
+                        Ok(format!("{}.{}", parent_full_name, &name))
+                    }
+                })
+                .map(|s| s.as_str())
+        } else {
+            Ok("")
+        }
     }
 }
 
-impl NonRootPackage {
-    fn new_with<'a, PNI, FF, F>(
-        name: &str,
-        names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
-        parent: Weak<dyn Package>,
-        root: Weak<RootPackage>,
-        ff: &FF,
-    ) -> Rc<NonRootPackage>
-    where
-        PNI: Iterator<Item = &'a str>,
-        FF: Fn(&FileDescriptorProto, Weak<dyn Package>) -> Rc<F>,
-        F: 'static + InputFile,
-    {
-        Rc::new_cyclic(|weak_self| {
-            let base = PackageBase::new(
-                Weak::clone(&root),
-                names_and_fds,
-                |name, names_and_fds_vec| {
-                    NonRootPackage::new_with(
-                        name,
-                        names_and_fds_vec.into_iter(),
-                        Weak::clone(weak_self) as Weak<dyn Package>,
-                        Weak::clone(&root),
-                        ff,
-                    )
-                },
-                |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn Package>),
-            );
-            Self {
-                cache: Default::default(),
-                name: name.to_string(),
-                full_name: OnceCell::new(),
-                parent,
-                base,
-            }
-        })
-    }
-}
-
-impl DataTypeBase for RootPackage {
+impl DataTypeBase for Package {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
     fn name(&self) -> Result<&str> {
-        Ok("".into())
+        Ok(match &self.is_root {
+            IsRoot::Root => Err(FatalErrorKind::InternalError {
+                detail: "name requested for root package".to_string(),
+            })?,
+            IsRoot::NonRoot { name, .. } => name,
+        })
     }
 }
 
-impl PackageOrMessage for RootPackage {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+impl PackageOrMessage for Package {
+    fn either(&self) -> PackageOrMessageCase<&Package, &Message> {
         PackageOrMessageCase::Package(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
-        Ok(Box::new(self.base.messages()?))
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
+        Ok(Box::new(self.messages()?))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
-        Ok(Box::new(self.base.enums()?))
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
+        Ok(Box::new(self.enums()?))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
-        Ok(Box::new(
-            self.base.subpackages()?.map(|p| p as Rc<dyn Package>),
-        ))
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>> {
+        Ok(Box::new(self.subpackages()?.map(|p| p as Rc<Package>)))
     }
-    fn root_package(&self) -> Result<Rc<RootPackage>> {
-        self.base.root()
+    fn root_package(&self) -> Result<Rc<Package>> {
+        self.root()
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
-        Ok(None)
-    }
-}
-
-impl Package for RootPackage {
-    fn full_name(&self) -> Result<&str> {
-        Ok("".into())
-    }
-    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>> {
-        Ok(Box::new(self.base.files()?))
-    }
-}
-
-impl DataTypeBase for NonRootPackage {
-    fn cache(&self) -> &AnonymousCache {
-        &self.cache
-    }
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
-    }
-}
-
-impl PackageOrMessage for NonRootPackage {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
-        PackageOrMessageCase::Package(self)
-    }
-
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
-        Ok(Box::new(self.base.messages()?))
-    }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
-        Ok(Box::new(self.base.enums()?))
-    }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn super::Oneof>>>> {
-        Ok(Box::new(iter::empty()))
-    }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
-        Ok(Box::new(
-            self.base.subpackages()?.map(|p| p as Rc<dyn Package>),
-        ))
-    }
-    fn root_package(&self) -> Result<Rc<RootPackage>> {
-        self.base.root()
-    }
-    fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
-        Ok(Some(self.parent.try_upgrade()?))
-    }
-}
-
-impl Package for NonRootPackage {
-    fn full_name(&self) -> Result<&str> {
-        self.full_name
-            .get_or_try_init(|| {
-                let parent = self.parent.try_upgrade()?;
-                let parent_full_name = parent.full_name()?;
-                if parent_full_name.is_empty() {
-                    Ok(self.name.clone())
-                } else {
-                    Ok(format!("{}.{}", parent_full_name, &self.name))
-                }
-            })
-            .map(|s| s.as_str())
-    }
-    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>> {
-        Ok(Box::new(self.base.files()?))
+        if let IsRoot::NonRoot { parent, .. } = &self.is_root {
+            Ok(Some(parent.try_upgrade()?))
+        } else {
+            Ok(None)
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::{InputFileFake, Package, PackageOrMessage, RootPackage};
+    use super::super::{DataTypeBase, Package};
     use crate::Result;
     use ::once_cell::sync::Lazy;
     use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
@@ -348,17 +276,17 @@ mod tests {
         fd
     });
 
-    trait IteratorExt: Sized + Iterator<Item = Rc<dyn Package>> {
-        fn find_subp(&mut self, name: &str) -> Option<Rc<dyn Package>> {
+    trait IteratorExt: Sized + Iterator<Item = Rc<Package>> {
+        fn find_subp(&mut self, name: &str) -> Option<Rc<Package>> {
             self.find(|p| p.name().is_ok_and(|n| n == name))
         }
     }
-    impl<T: Iterator<Item = Rc<dyn Package>>> IteratorExt for T {}
+    impl<T: Iterator<Item = Rc<Package>>> IteratorExt for T {}
 
     #[test]
     fn test_make_package_empty() -> Result<()> {
         let files = [Lazy::force(&FD_ROOT)];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_package = Package::new_root(files.into_iter());
         let root_files = root_package.files()?.collect::<Vec<_>>();
 
         assert_eq!(1, root_files.len());
@@ -370,7 +298,7 @@ mod tests {
     #[test]
     fn test_make_package_single() -> Result<()> {
         let files = [Lazy::force(&FD_G_P_DESC)];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_package = Package::new_root(files.into_iter());
         let root_files = root_package.files()?.collect::<Vec<_>>();
 
         assert_eq!(0, root_files.len());
@@ -401,7 +329,7 @@ mod tests {
             Lazy::force(&FD_G_P_EMPTY),
             Lazy::force(&FD_G_P_C_PLUGIN),
         ];
-        let root_package = RootPackage::new_with(files.into_iter(), InputFileFake::new);
+        let root_package = Package::new_root(files.into_iter());
 
         let root_files = root_package.files()?.collect::<Vec<_>>();
         assert_eq!(1, root_files.len());

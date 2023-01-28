@@ -20,14 +20,10 @@ use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, Field
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
-pub trait OneofField: FieldBase + DataTypeBase + Debug {
-    fn oneof(&self) -> Result<Rc<dyn Oneof>>;
-}
-
 #[derive(Debug)]
-pub struct OneofFieldImpl {
+pub(crate) struct OneofField {
     cache: AnonymousCache,
-    oneof: Weak<dyn Oneof>,
+    oneof: Weak<Oneof>,
     name: String,
     number: i32,
     type_opt: Option<field_descriptor_proto::Type>,
@@ -36,7 +32,7 @@ pub struct OneofFieldImpl {
     default_value: Option<String>,
 }
 
-impl DataTypeBase for OneofFieldImpl {
+impl DataTypeBase for OneofField {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
@@ -45,7 +41,7 @@ impl DataTypeBase for OneofFieldImpl {
     }
 }
 
-impl FieldBase for OneofFieldImpl {
+impl FieldBase for OneofField {
     fn number(&self) -> Result<i32> {
         Ok(self.number)
     }
@@ -63,19 +59,13 @@ impl FieldBase for OneofFieldImpl {
     fn default_value(&self) -> Result<Option<&str>> {
         Ok(self.default_value.as_deref())
     }
-    fn message(&self) -> Result<Rc<dyn Message>> {
+    fn message(&self) -> Result<Rc<Message>> {
         Ok(self.oneof.try_upgrade()?.message()?)
     }
 }
 
-impl OneofField for OneofFieldImpl {
-    fn oneof(&self) -> Result<Rc<dyn Oneof>> {
-        Ok(self.oneof.try_upgrade()?)
-    }
-}
-
-impl OneofFieldImpl {
-    pub fn new(proto: &FieldDescriptorProto, oneof: Weak<dyn Oneof>) -> Rc<Self> {
+impl OneofField {
+    pub(crate) fn new(proto: &FieldDescriptorProto, oneof: Weak<Oneof>) -> Rc<Self> {
         Rc::new(Self {
             cache: Default::default(),
             oneof,
@@ -86,5 +76,9 @@ impl OneofFieldImpl {
             r#type: OnceCell::new(),
             default_value: proto.default_value_opt().map(|s| s.to_string()),
         })
+    }
+
+    pub(crate) fn oneof(&self) -> Result<Rc<Oneof>> {
+        Ok(self.oneof.try_upgrade()?)
     }
 }
