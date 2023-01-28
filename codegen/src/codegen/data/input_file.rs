@@ -18,8 +18,6 @@ use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::fmt::Debug;
-#[cfg(test)]
-use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
@@ -28,7 +26,6 @@ pub struct InputFile {
     name: String,
     syntax: String,
     syntax_cell: OnceCell<Syntax>,
-    package: Weak<dyn Package>,
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
 }
@@ -40,7 +37,6 @@ impl InputFile {
             name: proto.name().to_string(),
             syntax: proto.syntax().to_string(),
             syntax_cell: OnceCell::new(),
-            package: Weak::clone(&package),
             messages: proto
                 .message_type()
                 .into_iter()
@@ -81,9 +77,6 @@ impl InputFile {
         self.syntax_cell
             .get_or_try_init(|| self.syntax.as_str().try_into())
             .cloned()
-    }
-    pub(crate) fn package(&self) -> Result<Rc<dyn Package>> {
-        self.package.try_upgrade()
     }
     pub(crate) fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
