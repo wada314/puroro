@@ -22,15 +22,8 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub trait InputFile: DataTypeBase + DataTypeBase + Debug {
-    fn syntax(&self) -> Result<Syntax>;
-    fn package(&self) -> Result<Rc<dyn Package>>;
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>>;
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
-}
-
 #[derive(Debug)]
-pub struct InputFileImpl {
+pub struct InputFile {
     cache: AnonymousCache,
     name: String,
     syntax: String,
@@ -40,7 +33,7 @@ pub struct InputFileImpl {
     enums: Vec<Rc<Enum>>,
 }
 
-impl InputFileImpl {
+impl InputFile {
     pub fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
         Rc::new_cyclic(|weak| Self {
             cache: Default::default(),
@@ -54,7 +47,7 @@ impl InputFileImpl {
                 .map(|m| {
                     Message::new(
                         m,
-                        Weak::clone(weak) as Weak<dyn InputFile>,
+                        Weak::clone(weak) as Weak<InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
                     )
                 })
@@ -65,7 +58,7 @@ impl InputFileImpl {
                 .map(|e| {
                     Enum::new(
                         e,
-                        Weak::clone(weak) as Weak<dyn InputFile>,
+                        Weak::clone(weak) as Weak<InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
                     )
                 })
@@ -74,7 +67,7 @@ impl InputFileImpl {
     }
 }
 
-impl DataTypeBase for InputFileImpl {
+impl DataTypeBase for InputFile {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
@@ -83,62 +76,19 @@ impl DataTypeBase for InputFileImpl {
     }
 }
 
-impl InputFile for InputFileImpl {
-    fn syntax(&self) -> Result<Syntax> {
+impl InputFile {
+    pub(crate) fn syntax(&self) -> Result<Syntax> {
         self.syntax_cell
             .get_or_try_init(|| self.syntax.as_str().try_into())
             .cloned()
     }
-    fn package(&self) -> Result<Rc<dyn Package>> {
+    pub(crate) fn package(&self) -> Result<Rc<dyn Package>> {
         self.package.try_upgrade()
     }
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
+    pub(crate) fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
+    pub(crate) fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
-    }
-}
-
-#[cfg(test)]
-#[derive(Debug)]
-pub struct InputFileFake {
-    name: String,
-    package: Weak<dyn Package>,
-}
-
-#[cfg(test)]
-impl InputFileFake {
-    pub fn new(proto: &FileDescriptorProto, package: Weak<dyn Package>) -> Rc<Self> {
-        Rc::new(Self {
-            name: proto.name().to_string(),
-            package,
-        })
-    }
-}
-
-#[cfg(test)]
-impl DataTypeBase for InputFileFake {
-    fn cache(&self) -> &AnonymousCache {
-        unimplemented!()
-    }
-    fn name(&self) -> Result<&str> {
-        Ok(&self.name)
-    }
-}
-
-#[cfg(test)]
-impl InputFile for InputFileFake {
-    fn syntax(&self) -> Result<Syntax> {
-        unimplemented!()
-    }
-    fn package(&self) -> Result<Rc<dyn Package>> {
-        self.package.try_upgrade()
-    }
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
-        Ok(Box::new(iter::empty()))
-    }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
-        Ok(Box::new(iter::empty()))
     }
 }

@@ -31,14 +31,14 @@ pub struct Message {
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
     oneofs: Vec<Rc<Oneof>>,
-    input_file: Weak<dyn InputFile>,
+    input_file: Weak<InputFile>,
     parent: Weak<dyn PackageOrMessage>,
 }
 
 impl Message {
     pub fn new(
         proto: &DescriptorProto,
-        input_file: Weak<dyn InputFile>,
+        input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
         let name = proto.name().to_string();
@@ -140,7 +140,7 @@ impl PackageOrMessage for Message {
 }
 
 impl Message {
-    pub(crate) fn input_file(&self) -> Result<Rc<dyn InputFile>> {
+    pub(crate) fn input_file(&self) -> Result<Rc<InputFile>> {
         Ok(self.input_file.try_upgrade()?)
     }
     pub(crate) fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {

@@ -28,7 +28,7 @@ use ::std::rc::{Rc, Weak};
 pub struct Enum {
     cache: AnonymousCache,
     name: String,
-    input_file: Weak<dyn InputFile>,
+    input_file: Weak<InputFile>,
     parent: Weak<dyn PackageOrMessage>,
     values: Vec<(String, i32)>,
 }
@@ -36,7 +36,7 @@ pub struct Enum {
 impl Enum {
     pub fn new(
         proto: &EnumDescriptorProto,
-        input_file: Weak<dyn InputFile>,
+        input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
         let values = proto

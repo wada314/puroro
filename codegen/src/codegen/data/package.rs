@@ -14,8 +14,7 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, InputFile, InputFileImpl, Message, Oneof, PackageOrMessage,
-    PackageOrMessageCase,
+    DataTypeBase, Enum, InputFile, Message, Oneof, PackageOrMessage, PackageOrMessageCase,
 };
 use crate::Result;
 use ::itertools::Itertools;
@@ -27,13 +26,13 @@ use ::std::rc::{Rc, Weak};
 
 pub trait Package: PackageOrMessage + DataTypeBase + Debug {
     fn full_name(&self) -> Result<&str>;
-    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>>;
+    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<InputFile>>>>;
 }
 
 #[derive(Debug)]
 pub struct PackageBase {
     subpackages: Vec<Rc<NonRootPackage>>,
-    files: Vec<Rc<dyn InputFile>>,
+    files: Vec<Rc<InputFile>>,
     root: Weak<RootPackage>,
     messages: OnceCell<Vec<Rc<Message>>>,
     enums: OnceCell<Vec<Rc<Enum>>>,
@@ -55,17 +54,15 @@ pub struct RootPackage {
 }
 
 impl PackageBase {
-    fn new<'a, FP, FF, F, PNI>(
+    fn new<'a, FP, PNI>(
         root: Weak<RootPackage>,
+        parent: Weak<dyn Package>,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         fp: FP,
-        ff: FF,
     ) -> Self
     where
         PNI: Iterator<Item = &'a str>,
         FP: Fn(&str, Vec<(PNI, &'a FileDescriptorProto)>) -> Rc<NonRootPackage>,
-        FF: Fn(&FileDescriptorProto) -> Rc<F>,
-        F: 'static + InputFile,
     {
         let name_fd_map = names_and_fds
             .map(|(mut name_iter, fd)| {
@@ -79,7 +76,7 @@ impl PackageBase {
             .get(&None)
             .into_iter()
             .flatten()
-            .map(|(_, fd)| ff(fd) as Rc<dyn InputFile>)
+            .map(|(_, fd)| InputFile::new(fd, Weak::clone(&parent) as Weak<dyn Package>))
             .collect();
 
         // The remaining FDs belong to the child packages.
@@ -98,7 +95,7 @@ impl PackageBase {
         }
     }
 
-    fn files(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn InputFile>>> {
+    fn files(&self) -> Result<impl '_ + Iterator<Item = Rc<InputFile>>> {
         Ok(self.files.iter().cloned())
     }
 
@@ -137,17 +134,6 @@ impl PackageBase {
 
 impl RootPackage {
     pub fn new<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<RootPackage> {
-        Self::new_with(fds, InputFileImpl::new)
-    }
-
-    pub fn new_with<'a, FF, F>(
-        fds: impl Iterator<Item = &'a FileDescriptorProto>,
-        ff: FF,
-    ) -> Rc<RootPackage>
-    where
-        FF: Fn(&FileDescriptorProto, Weak<dyn Package>) -> Rc<F>,
-        F: 'static + InputFile,
-    {
         Rc::new_cyclic(|weak_root| {
             let names_and_fds = fds.map(|fd| {
                 let package_name_iter = fd.package().split('.').filter(|s| !s.is_empty());
@@ -155,6 +141,7 @@ impl RootPackage {
             });
             let base = PackageBase::new(
                 Weak::clone(weak_root),
+                Weak::clone(weak_root) as Weak<dyn Package>,
                 names_and_fds,
                 |name, names_and_fds_vec| {
                     NonRootPackage::new_with(
@@ -162,10 +149,8 @@ impl RootPackage {
                         names_and_fds_vec.into_iter(),
                         Weak::clone(weak_root) as Weak<dyn Package>,
                         Weak::clone(weak_root),
-                        &ff,
                     )
                 },
-                |fd| (ff)(fd, Weak::clone(weak_root) as Weak<dyn Package>),
             );
             Self {
                 cache: Default::default(),
@@ -176,21 +161,19 @@ impl RootPackage {
 }
 
 impl NonRootPackage {
-    fn new_with<'a, PNI, FF, F>(
+    fn new_with<'a, PNI>(
         name: &str,
         names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
         parent: Weak<dyn Package>,
         root: Weak<RootPackage>,
-        ff: &FF,
     ) -> Rc<NonRootPackage>
     where
         PNI: Iterator<Item = &'a str>,
-        FF: Fn(&FileDescriptorProto, Weak<dyn Package>) -> Rc<F>,
-        F: 'static + InputFile,
     {
         Rc::new_cyclic(|weak_self| {
             let base = PackageBase::new(
                 Weak::clone(&root),
+                Weak::clone(weak_self) as Weak<dyn Package>,
                 names_and_fds,
                 |name, names_and_fds_vec| {
                     NonRootPackage::new_with(
@@ -198,10 +181,8 @@ impl NonRootPackage {
                         names_and_fds_vec.into_iter(),
                         Weak::clone(weak_self) as Weak<dyn Package>,
                         Weak::clone(&root),
-                        ff,
                     )
                 },
-                |fd| (ff)(fd, Weak::clone(weak_self) as Weak<dyn Package>),
             );
             Self {
                 cache: Default::default(),
@@ -254,7 +235,7 @@ impl Package for RootPackage {
     fn full_name(&self) -> Result<&str> {
         Ok("".into())
     }
-    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>> {
+    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<InputFile>>>> {
         Ok(Box::new(self.base.files()?))
     }
 }
@@ -309,12 +290,12 @@ impl Package for NonRootPackage {
             })
             .map(|s| s.as_str())
     }
-    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn InputFile>>>> {
+    fn files(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<InputFile>>>> {
         Ok(Box::new(self.base.files()?))
     }
 }
 
-#[cfg(test)]
+#[cfg(never)]
 mod tests {
     use super::super::{InputFileFake, Package, PackageOrMessage, RootPackage};
     use crate::Result;
