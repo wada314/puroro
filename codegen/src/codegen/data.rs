@@ -24,17 +24,17 @@ mod oneof_field;
 mod package;
 mod package_or_message;
 
-pub use self::r#enum::*;
-pub use self::field::*;
-pub use self::field_or_oneof::*;
-pub use self::field_rule::*;
-pub use self::field_type::*;
-pub use self::input_file::*;
-pub use self::message::*;
-pub use self::oneof::*;
-pub use self::oneof_field::*;
-pub use self::package::*;
-pub use self::package_or_message::*;
+pub(crate) use self::r#enum::*;
+pub(crate) use self::field::*;
+pub(crate) use self::field_or_oneof::*;
+pub(crate) use self::field_rule::*;
+pub(crate) use self::field_type::*;
+pub(crate) use self::input_file::*;
+pub(crate) use self::message::*;
+pub(crate) use self::oneof::*;
+pub(crate) use self::oneof_field::*;
+pub(crate) use self::package::*;
+pub(crate) use self::package_or_message::*;
 
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
