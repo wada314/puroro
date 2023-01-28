@@ -31,12 +31,8 @@ pub trait FieldBase: DataTypeBase + Debug {
 
 /// A field of message, but not including the field belonging to an `oneof`.
 /// Proto3 optional field IS this type.
-pub trait Field: FieldBase + FieldOrOneof + DataTypeBase + Debug {
-    fn rule(&self) -> Result<FieldRule>;
-}
-
 #[derive(Debug)]
-pub struct FieldImpl {
+pub struct Field {
     cache: AnonymousCache,
     name: String,
     message: Weak<dyn Message>,
@@ -50,7 +46,7 @@ pub struct FieldImpl {
     default_value: Option<String>,
 }
 
-impl DataTypeBase for FieldImpl {
+impl DataTypeBase for Field {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
@@ -59,13 +55,13 @@ impl DataTypeBase for FieldImpl {
     }
 }
 
-impl FieldOrOneof for FieldImpl {
-    fn either(&self) -> FieldOrOneofCase<&dyn Field, &Oneof> {
+impl FieldOrOneof for Field {
+    fn either(&self) -> FieldOrOneofCase<&Field, &Oneof> {
         FieldOrOneofCase::Field(self)
     }
 }
 
-impl FieldBase for FieldImpl {
+impl FieldBase for Field {
     fn number(&self) -> Result<i32> {
         Ok(self.number)
     }
@@ -88,24 +84,9 @@ impl FieldBase for FieldImpl {
     }
 }
 
-impl Field for FieldImpl {
-    fn rule(&self) -> Result<FieldRule> {
-        self.rule
-            .get_or_try_init(|| {
-                let syntax = self.message()?.input_file()?.syntax()?;
-                Ok(FieldRule::try_new(
-                    self.label_opt.clone(),
-                    syntax,
-                    self.proto3_optional,
-                )?)
-            })
-            .cloned()
-    }
-}
-
-impl FieldImpl {
-    pub fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
-        Rc::new(FieldImpl {
+impl Field {
+    pub(crate) fn new(proto: &FieldDescriptorProto, message: Weak<dyn Message>) -> Rc<Self> {
+        Rc::new(Field {
             cache: Default::default(),
             name: proto.name().to_string(),
             message,
@@ -118,5 +99,17 @@ impl FieldImpl {
             type_name: proto.type_name().to_string(),
             default_value: proto.default_value_opt().map(|s| s.to_string()),
         })
+    }
+    pub(crate) fn rule(&self) -> Result<FieldRule> {
+        self.rule
+            .get_or_try_init(|| {
+                let syntax = self.message()?.input_file()?.syntax()?;
+                Ok(FieldRule::try_new(
+                    self.label_opt.clone(),
+                    syntax,
+                    self.proto3_optional,
+                )?)
+            })
+            .cloned()
     }
 }

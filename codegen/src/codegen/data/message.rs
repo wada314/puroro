@@ -14,11 +14,11 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, Field, FieldImpl, FieldOrOneof, InputFile, Oneof, Package,
-    PackageOrMessage, PackageOrMessageCase, RootPackage,
+    DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
+    PackageOrMessageCase, RootPackage,
 };
 use crate::Result;
-use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, FieldDescriptorProto};
+use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
@@ -26,7 +26,7 @@ use ::std::rc::{Rc, Weak};
 pub trait Message: Debug + PackageOrMessage {
     fn input_file(&self) -> Result<Rc<dyn InputFile>>;
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>>;
+    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Field>>>>;
     fn fields_or_oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>>;
 
     fn should_generate_module_file(&self) -> Result<bool> {
@@ -41,7 +41,7 @@ pub trait Message: Debug + PackageOrMessage {
 pub struct MessageImpl {
     cache: AnonymousCache,
     name: String,
-    fields: Vec<Rc<dyn Field>>,
+    fields: Vec<Rc<Field>>,
     messages: Vec<Rc<dyn Message>>,
     enums: Vec<Rc<Enum>>,
     oneofs: Vec<Rc<Oneof>>,
@@ -55,20 +55,17 @@ impl MessageImpl {
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
-        Self::new_with(proto, input_file, parent, FieldImpl::new, MessageImpl::new)
+        Self::new_with(proto, input_file, parent, MessageImpl::new)
     }
 
-    pub fn new_with<FF, F, FM, M>(
+    pub fn new_with<FM, M>(
         proto: &DescriptorProto,
         input_file: Weak<dyn InputFile>,
         parent: Weak<dyn PackageOrMessage>,
-        ff: FF,
         fm: FM,
     ) -> Rc<Self>
     where
-        FF: Fn(&FieldDescriptorProto, Weak<dyn Message>) -> Rc<F>,
         FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
-        F: 'static + Field,
         M: 'static + Message,
     {
         let name = proto.name().to_string();
@@ -77,7 +74,7 @@ impl MessageImpl {
                 .field()
                 .into_iter()
                 .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| ff(f, Weak::clone(weak_message) as Weak<dyn Message>) as Rc<dyn Field>)
+                .map(|f| Field::new(f, Weak::clone(weak_message) as Weak<dyn Message>) as Rc<Field>)
                 .collect();
             let messages = proto
                 .nested_type()
@@ -176,7 +173,7 @@ impl Message for MessageImpl {
     fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>> {
+    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Field>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
     fn fields_or_oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {

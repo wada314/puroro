@@ -61,7 +61,7 @@ impl DataTypeBase for Oneof {
 }
 
 impl FieldOrOneof for Oneof {
-    fn either(&self) -> FieldOrOneofCase<&dyn Field, &Oneof> {
+    fn either(&self) -> FieldOrOneofCase<&Field, &Oneof> {
         FieldOrOneofCase::Oneof(self)
     }
 }

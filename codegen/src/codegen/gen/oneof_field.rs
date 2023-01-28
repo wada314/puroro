@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::field::gen_default_fn;
 use super::{
     DataTypeBase, FieldBase, FieldOrOneofExt, FieldType, LengthDelimitedType, MessageExt,
     OneofField, PURORO_INTERNAL,
@@ -203,7 +202,7 @@ impl OneofField {
         let enum_item_ident = self.gen_oneof_case_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
-        let default_fn = gen_default_fn(self)?;
+        let default_fn = self.gen_default_fn()?;
 
         Ok(vec![
             parse2(quote! {
