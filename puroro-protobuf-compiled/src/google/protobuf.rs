@@ -21,6 +21,9 @@ pub mod method_options;
 pub mod source_code_info;
 pub mod uninterpreted_option;
 #[derive(::std::default::Default)]
+/** The protocol compiler can output a FileDescriptorSet containing the .proto
+ files it parses.
+*/
 pub struct FileDescriptorSet {
     fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields<
         self::_pinternal::RepeatedMessageField::<
@@ -152,6 +155,8 @@ impl ::std::cmp::PartialEq for FileDescriptorSet {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a complete .proto file.
+*/
 pub struct FileDescriptorProto {
     fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -780,6 +785,8 @@ impl ::std::cmp::PartialEq for FileDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a message type.
+*/
 pub struct DescriptorProto {
     fields: self::_root::google::protobuf::_fields::DescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -1437,6 +1444,8 @@ impl ::std::cmp::PartialEq for ExtensionRangeOptions {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a field within a message.
+*/
 pub struct FieldDescriptorProto {
     fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -2154,6 +2163,8 @@ impl ::std::cmp::PartialEq for FieldDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a oneof.
+*/
 pub struct OneofDescriptorProto {
     fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -2352,6 +2363,8 @@ impl ::std::cmp::PartialEq for OneofDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes an enum type.
+*/
 pub struct EnumDescriptorProto {
     fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -2674,6 +2687,8 @@ impl ::std::cmp::PartialEq for EnumDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a value within an enum.
+*/
 pub struct EnumValueDescriptorProto {
     fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -2924,6 +2939,8 @@ impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a service.
+*/
 pub struct ServiceDescriptorProto {
     fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -3157,6 +3174,8 @@ impl ::std::cmp::PartialEq for ServiceDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes a method of a service.
+*/
 pub struct MethodDescriptorProto {
     fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -6894,6 +6913,13 @@ impl ::std::cmp::PartialEq for MethodOptions {
     }
 }
 #[derive(::std::default::Default)]
+/** A message representing a option the parser does not recognize. This only
+ appears in options protos created by the compiler::Parser class.
+ DescriptorPool resolves these when building Descriptor objects. Therefore,
+ options protos in descriptor objects (e.g. returned by Descriptor::options(),
+ or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
+ in them.
+*/
 pub struct UninterpretedOption {
     fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields<
         self::_pinternal::RepeatedMessageField::<
@@ -7390,6 +7416,9 @@ impl ::std::cmp::PartialEq for UninterpretedOption {
     }
 }
 #[derive(::std::default::Default)]
+/** Encapsulates information about the original source file from which a
+ FileDescriptorProto was generated.
+*/
 pub struct SourceCodeInfo {
     fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields<
         self::_pinternal::RepeatedMessageField::<
@@ -7525,6 +7554,10 @@ impl ::std::cmp::PartialEq for SourceCodeInfo {
     }
 }
 #[derive(::std::default::Default)]
+/** Describes the relationship between generated code and its original source
+ file. A GeneratedCodeInfo message is associated with only one generated
+ source file, but may contain references to different source .proto files.
+*/
 pub struct GeneratedCodeInfo {
     fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields<
         self::_pinternal::RepeatedMessageField::<

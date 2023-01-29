@@ -11,6 +11,8 @@ mod _pinternal {
     pub(crate) use ::puroro::internal::*;
 }
 #[derive(::std::default::Default)]
+/** Represents a single generated file.
+*/
 pub struct File {
     fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
         self::_pinternal::OptionalUnsizedField::<

@@ -113,8 +113,17 @@ impl Message {
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
 
+        let maybe_struct_doc = if let Some(doc) = self.gen_message_struct_doc()? {
+            quote! {
+                #[doc=#doc]
+            }
+        } else {
+            quote! {}
+        };
+
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
+            #maybe_struct_doc
             pub struct #ident {
                 fields: #fields_struct_type,
                 shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
@@ -317,5 +326,21 @@ impl Message {
                 }
             }
         })?)
+    }
+
+    fn gen_message_struct_doc(&self) -> Result<Option<String>> {
+        let input_file = self.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(None);
+        };
+        match (sci.leading_comments.len(), sci.trailing_comments.len()) {
+            (0, 0) => Ok(None),
+            (_, 0) => Ok(Some(sci.leading_comments.clone())),
+            (0, _) => Ok(Some(sci.trailing_comments.clone())),
+            _ => Ok(Some(format!(
+                "{}\n\n{}",
+                &sci.leading_comments, &sci.trailing_comments,
+            ))),
+        }
     }
 }

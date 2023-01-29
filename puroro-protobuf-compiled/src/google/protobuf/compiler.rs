@@ -12,6 +12,8 @@ mod _pinternal {
 }
 pub mod code_generator_response;
 #[derive(::std::default::Default)]
+/** The version number of protocol compiler.
+*/
 pub struct Version {
     fields: self::_root::google::protobuf::compiler::_fields::VersionFields<
         self::_pinternal::OptionalNumericalField::<
@@ -307,6 +309,8 @@ impl ::std::cmp::PartialEq for Version {
     }
 }
 #[derive(::std::default::Default)]
+/** An encoded CodeGeneratorRequest is written to the plugin's stdin.
+*/
 pub struct CodeGeneratorRequest {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
         self::_pinternal::RepeatedUnsizedField::<
@@ -612,6 +616,8 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
     }
 }
 #[derive(::std::default::Default)]
+/** The plugin writes an encoded CodeGeneratorResponse to stdout.
+*/
 pub struct CodeGeneratorResponse {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
         self::_pinternal::OptionalUnsizedField::<

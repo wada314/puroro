@@ -260,6 +260,10 @@ impl ::std::cmp::PartialEq for ExtensionRange {
     }
 }
 #[derive(::std::default::Default)]
+/** Range of reserved tag numbers. Reserved tag numbers may not be used by
+ fields or extension ranges in the same message. Reserved ranges may
+ not overlap.
+*/
 pub struct ReservedRange {
     fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<

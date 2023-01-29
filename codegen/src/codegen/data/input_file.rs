@@ -20,7 +20,6 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
-use itertools::Itertools;
 
 #[derive(Debug)]
 pub(crate) struct InputFile {

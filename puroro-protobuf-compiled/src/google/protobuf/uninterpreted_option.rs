@@ -11,6 +11,12 @@ mod _pinternal {
     pub(crate) use ::puroro::internal::*;
 }
 #[derive(::std::default::Default)]
+/** The name of the uninterpreted option.  Each string represents a segment in
+ a dot-separated name.  is_extension is true iff a segment represents an
+ extension (denoted with parentheses in options specs in .proto files).
+ E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
+ "foo.(bar.baz).qux".
+*/
 pub struct NamePart {
     fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
         self::_pinternal::OptionalUnsizedField::<

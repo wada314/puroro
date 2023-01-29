@@ -11,6 +11,13 @@ mod _pinternal {
     pub(crate) use ::puroro::internal::*;
 }
 #[derive(::std::default::Default)]
+/** Range of reserved numeric values. Reserved values may not be used by
+ entries in the same enum. Reserved ranges may not overlap.
+
+ Note that this is distinct from DescriptorProto.ReservedRange in that it
+ is inclusive such that it can appropriately represent the entire int32
+ domain.
+*/
 pub struct EnumReservedRange {
     fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<
