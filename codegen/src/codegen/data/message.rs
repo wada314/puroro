@@ -15,7 +15,8 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
-    PackageOrMessageCase,
+    PackageOrMessageCase, MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
+    MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
@@ -166,6 +167,26 @@ impl Message {
             .iter()
             .map(|o| o.clone() as Rc<dyn FieldOrOneof>);
         Ok(Box::new(fields.chain(oneofs)))
+    }
+    pub(crate) fn location_path(&self) -> Result<Box<dyn Iterator<Item = i32>>> {
+        Ok(match self.parent()?.either() {
+            PackageOrMessageCase::Package(_) => {
+                // This message is a direct item under the input file.
+                let this_path = [
+                    MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
+                    self.index_in_parent.try_into()?,
+                ];
+                Box::new(this_path.into_iter())
+            }
+            PackageOrMessageCase::Message(m) => {
+                let parent_path = m.location_path()?;
+                let this_path = [
+                    MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+                    self.index_in_parent.try_into()?,
+                ];
+                Box::new(parent_path.chain(this_path.into_iter()))
+            }
+        })
     }
     pub(crate) fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();

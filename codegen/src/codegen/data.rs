@@ -39,6 +39,9 @@ pub(crate) use self::package_or_message::*;
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
 
+const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 4;
+const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 3;
+
 pub(crate) trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;
     fn name(&self) -> Result<&str>;
