@@ -38,6 +38,7 @@ pub(crate) use self::package_or_message::*;
 
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
+use ::puroro_protobuf_compiled::google::protobuf::source_code_info;
 
 const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 4;
 const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 3;
@@ -87,4 +88,12 @@ pub(crate) enum FieldOrOneofCase<F, O> {
 pub(crate) struct SourceCodeInfo {
     pub(crate) leading_comments: String,
     pub(crate) trailing_comments: String,
+}
+impl From<&source_code_info::Location> for SourceCodeInfo {
+    fn from(info: &source_code_info::Location) -> Self {
+        Self {
+            leading_comments: info.leading_comments().to_string(),
+            trailing_comments: info.trailing_comments().to_string(),
+        }
+    }
 }

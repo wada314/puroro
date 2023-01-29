@@ -20,6 +20,7 @@ use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
+use itertools::Itertools;
 
 #[derive(Debug)]
 pub(crate) struct InputFile {
@@ -67,6 +68,15 @@ impl InputFile {
                     )
                 })
                 .collect(),
+            source_code_info: proto
+                .source_code_info()
+                .into_iter()
+                .flat_map(|sci| {
+                    sci.location()
+                        .into_iter()
+                        .map(|loc| (loc.path().to_vec(), loc.into()))
+                })
+                .collect(),
         })
     }
 }
@@ -95,5 +105,12 @@ impl InputFile {
     #[cfg(test)]
     pub(crate) fn package(&self) -> Result<Rc<Package>> {
         self.package.try_upgrade()
+    }
+    pub(crate) fn source_code_info(
+        &self,
+        path: impl Iterator<Item = i32>,
+    ) -> Result<Option<&SourceCodeInfo>> {
+        let path_vec: Vec<i32> = path.collect();
+        Ok(self.source_code_info.get(&path_vec))
     }
 }
