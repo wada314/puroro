@@ -41,6 +41,7 @@ fn main() {
     let protoc_status = Command::new(&protoc_exe)
         .arg("protos/*.proto")
         .arg(format!("--proto_path={}", "./protos/"))
+        .arg("--include_source_info")
         .arg("--experimental_allow_proto3_optional")
         .arg(format!(
             "--descriptor_set_out={}",
