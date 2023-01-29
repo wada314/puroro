@@ -33,6 +33,7 @@ pub(crate) struct Message {
     oneofs: Vec<Rc<Oneof>>,
     input_file: Weak<InputFile>,
     parent: Weak<dyn PackageOrMessage>,
+    index_in_parent: usize,
 }
 
 impl Message {
@@ -40,6 +41,7 @@ impl Message {
         proto: &DescriptorProto,
         input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
+        index_in_parent: usize,
     ) -> Rc<Self> {
         let name = proto.name().to_string();
         Rc::new_cyclic(|weak_message| {
@@ -52,11 +54,13 @@ impl Message {
             let messages = proto
                 .nested_type()
                 .into_iter()
-                .map(|m| {
+                .enumerate()
+                .map(|(i, m)| {
                     Message::new(
                         m,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect();
@@ -96,6 +100,7 @@ impl Message {
                 name,
                 input_file: Weak::clone(&input_file),
                 parent,
+                index_in_parent,
                 fields,
                 messages,
                 enums,

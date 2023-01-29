@@ -44,11 +44,13 @@ impl InputFile {
             messages: proto
                 .message_type()
                 .into_iter()
-                .map(|m| {
+                .enumerate()
+                .map(|(i, m)| {
                     Message::new(
                         m,
                         Weak::clone(weak) as Weak<InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect(),
