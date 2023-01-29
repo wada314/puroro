@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    EnumExt, MessageExt, OneofExt, PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT,
-    PURORO_ROOT, PURORO_ROOT_IDENT, SUBMODULE_HEADER,
+    PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT, PURORO_ROOT, PURORO_ROOT_IDENT,
+    SUBMODULE_HEADER,
 };
 use crate::syn::{parse2, File, Item, Path};
 use crate::Result;
@@ -26,7 +26,7 @@ use ::quote::{format_ident, quote};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait PackageOrMessageExt {
+pub(crate) trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
     fn module_file_path(&self) -> Result<&str>;
     fn module_file_dir(&self) -> Result<&str>;

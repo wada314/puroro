@@ -13,10 +13,9 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::field::gen_default_fn;
 use super::{
-    FieldOrOneofExt, FieldType, LengthDelimitedType, MessageExt, OneofExt, OneofField,
-    PURORO_INTERNAL,
+    DataTypeBase, FieldBase, FieldBaseExt, FieldOrOneofExt, FieldType, LengthDelimitedType,
+    OneofField, PURORO_INTERNAL,
 };
 use crate::syn::{
     parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
@@ -30,25 +29,6 @@ use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::Rc;
 
-pub trait OneofFieldExt {
-    fn gen_oneof_union_field_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_oneof_union_getter_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_oneof_union_getter_opt_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_oneof_union_getter_mut_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_oneof_union_generic_param_ident(&self) -> Result<Rc<Ident>>;
-    // `syn::PredicateType` does not impl `syn::parse::Parse`...
-    fn gen_oneof_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>>;
-    fn gen_oneof_case_value_ident(&self) -> Result<Ident>;
-
-    fn gen_oneof_union_field_type(&self) -> Result<Rc<Type>>;
-    fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>>;
-
-    fn gen_oneof_union_field(&self) -> Result<Rc<Field>>;
-    fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
-}
-
 #[derive(Debug, Default)]
 struct Cache {
     union_field_ident: OnceCell<Rc<Ident>>,
@@ -60,8 +40,8 @@ struct Cache {
     union_generic_param_where_bounds: OnceCell<Rc<TokenStream>>,
 }
 
-impl<T: ?Sized + OneofField> OneofFieldExt for T {
-    fn gen_oneof_union_field_ident(&self) -> Result<Rc<Ident>> {
+impl OneofField {
+    pub(crate) fn gen_oneof_union_field_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_field_ident
@@ -73,7 +53,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_oneof_union_getter_ident(&self) -> Result<Rc<Ident>> {
+    pub(crate) fn gen_oneof_union_getter_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_getter_ident
@@ -85,7 +65,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_oneof_union_getter_opt_ident(&self) -> Result<Rc<Ident>> {
+    pub(crate) fn gen_oneof_union_getter_opt_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_getter_opt_ident
@@ -97,7 +77,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_oneof_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
+    pub(crate) fn gen_oneof_union_getter_mut_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_getter_mut_ident
@@ -109,7 +89,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_oneof_union_generic_param_ident(&self) -> Result<Rc<Ident>> {
+    pub(crate) fn gen_oneof_union_generic_param_ident(&self) -> Result<Rc<Ident>> {
         self.cache()
             .get::<Cache>()?
             .union_generic_param_ident
@@ -121,7 +101,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_oneof_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>> {
+    pub(crate) fn gen_oneof_union_generic_param_where_bounds(&self) -> Result<Rc<TokenStream>> {
         self.cache()
             .get::<Cache>()?
             .union_generic_param_where_bounds
@@ -133,14 +113,14 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_oneof_case_value_ident(&self) -> Result<Ident> {
+    pub(crate) fn gen_oneof_case_value_ident(&self) -> Result<Ident> {
         Ok(format_ident!(
             "{}",
             self.name()?.to_camel_case().escape_rust_keywords()
         ))
     }
 
-    fn gen_oneof_union_field_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn gen_oneof_union_field_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .union_field_type
@@ -178,11 +158,12 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
             })
             .cloned()
     }
-    fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
+
+    pub(crate) fn gen_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         Ok(self.r#type()?.rust_maybe_borrowed_type(lt)?)
     }
 
-    fn gen_oneof_union_field(&self) -> Result<Rc<Field>> {
+    pub(crate) fn gen_oneof_union_field(&self) -> Result<Rc<Field>> {
         let ident = self.gen_oneof_union_field_ident()?;
         let field_inner_type_ident = self.gen_oneof_union_generic_param_ident()?;
         let field_type: Type = parse2(quote! {
@@ -197,7 +178,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ))
     }
 
-    fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let getter_ident = self.gen_oneof_union_getter_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
@@ -221,7 +202,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         let enum_item_ident = self.gen_oneof_case_value_ident()?;
         let bitfield_begin = self.oneof()?.bitfield_index_for_oneof()?.0;
         let bitfield_end = self.oneof()?.bitfield_index_for_oneof()?.1;
-        let default_fn = gen_default_fn(self)?;
+        let default_fn = self.gen_default_fn()?;
 
         Ok(vec![
             parse2(quote! {
@@ -287,7 +268,7 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let oneof_struct_field_ident = self.oneof()?.gen_fields_struct_field_ident()?;
         let getter_ident = self.gen_oneof_union_getter_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
@@ -347,7 +328,10 @@ impl<T: ?Sized + OneofField> OneofFieldExt for T {
         ])
     }
 
-    fn gen_message_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
+    pub(crate) fn gen_message_struct_impl_debug_method_call(
+        &self,
+        receiver: &mut Expr,
+    ) -> Result<()> {
         let ident = self.gen_oneof_union_field_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         let new_expr: ExprMethodCall = parse2(quote! {

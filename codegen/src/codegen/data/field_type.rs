@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{Enum, Message, MessageOrEnumCase, Syntax};
+use super::{Enum, Message, MessageOrEnumCase, PackageOrMessage, Syntax};
 use crate::{FatalErrorKind, Result};
 use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone)]
-pub enum FieldType {
+pub(crate) enum FieldType {
     Variant(VariantType),
     LengthDelimited(LengthDelimitedType),
     Bits32(Bits32Type),
     Bits64(Bits64Type),
 }
 #[derive(Debug, Clone)]
-pub enum VariantType {
+pub(crate) enum VariantType {
     Int32,
     UInt32,
     SInt32,
@@ -33,34 +33,34 @@ pub enum VariantType {
     UInt64,
     SInt64,
     Bool,
-    Enum2(Weak<dyn Enum>),
-    Enum3(Weak<dyn Enum>),
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
 }
 #[derive(Debug, Clone)]
-pub enum LengthDelimitedType {
+pub(crate) enum LengthDelimitedType {
     String,
     Bytes,
-    Message(Weak<dyn Message>),
+    Message(Weak<Message>),
 }
 #[derive(Debug, Clone)]
-pub enum Bits32Type {
+pub(crate) enum Bits32Type {
     Fixed32,
     SFixed32,
     Float,
 }
 #[derive(Debug, Clone)]
-pub enum Bits64Type {
+pub(crate) enum Bits64Type {
     Fixed64,
     SFixed64,
     Double,
 }
 
 impl FieldType {
-    pub fn try_new(
+    pub(crate) fn try_new(
         type_opt: Option<field_descriptor_proto::Type>,
         type_name: &str,
         syntax: Syntax,
-        message: Rc<dyn Message>,
+        message: Rc<Message>,
     ) -> Result<Self> {
         use field_descriptor_proto::Type::*;
         use Bits32Type::*;

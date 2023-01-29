@@ -13,17 +13,14 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{
-    Bits32Type, Bits64Type, EnumExt, FieldType, LengthDelimitedType, MessageExt, VariantType,
-    PURORO_INTERNAL,
-};
+use super::{Bits32Type, Bits64Type, FieldType, LengthDelimitedType, VariantType, PURORO_INTERNAL};
 use crate::syn::{parse2, Lifetime, Type};
 use crate::Result;
 use ::quote::quote;
 use ::std::rc::Rc;
 
 impl FieldType {
-    pub fn rust_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn rust_type(&self) -> Result<Rc<Type>> {
         use FieldType::*;
         match self {
             Variant(v) => v.rust_type(),
@@ -32,14 +29,14 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
-    pub fn rust_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
+    pub(crate) fn rust_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_maybe_borrowed_type(lt)
         } else {
             self.rust_type()
         }
     }
-    pub fn rust_mut_ref_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn rust_mut_ref_type(&self) -> Result<Rc<Type>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_mut_ref_type()
         } else {
@@ -47,7 +44,7 @@ impl FieldType {
             Ok(Rc::new(parse2(quote! { &mut #raw_type })?))
         }
     }
-    pub fn tag_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn tag_type(&self) -> Result<Rc<Type>> {
         use FieldType::*;
         match self {
             Variant(v) => v.tag_type(),

@@ -14,107 +14,61 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, EnumImpl, Field, FieldImpl, FieldOrOneof, InputFile, Oneof, OneofImpl,
-    Package, PackageOrMessage, PackageOrMessageCase, RootPackage,
+    DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
+    PackageOrMessageCase,
 };
 use crate::Result;
-use ::puroro_protobuf_compiled::google::protobuf::{
-    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, OneofDescriptorProto,
-};
+use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
 
-pub trait Message: Debug + PackageOrMessage {
-    fn input_file(&self) -> Result<Rc<dyn InputFile>>;
-    fn parent(&self) -> Result<Rc<dyn PackageOrMessage>>;
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>>;
-    fn fields_or_oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>>;
-
-    fn should_generate_module_file(&self) -> Result<bool> {
-        let has_submessages = self.messages()?.next().is_some();
-        let has_subenums = self.enums()?.next().is_some();
-        let has_oneofs = self.oneofs()?.next().is_some();
-        Ok(has_submessages || has_subenums || has_oneofs)
-    }
-}
-
 #[derive(Debug)]
-pub struct MessageImpl {
+pub(crate) struct Message {
     cache: AnonymousCache,
     name: String,
-    fields: Vec<Rc<dyn Field>>,
-    messages: Vec<Rc<dyn Message>>,
-    enums: Vec<Rc<dyn Enum>>,
-    oneofs: Vec<Rc<dyn Oneof>>,
-    input_file: Weak<dyn InputFile>,
+    fields: Vec<Rc<Field>>,
+    messages: Vec<Rc<Message>>,
+    enums: Vec<Rc<Enum>>,
+    oneofs: Vec<Rc<Oneof>>,
+    input_file: Weak<InputFile>,
     parent: Weak<dyn PackageOrMessage>,
 }
 
-impl MessageImpl {
-    pub fn new(
+impl Message {
+    pub(crate) fn new(
         proto: &DescriptorProto,
-        input_file: Weak<dyn InputFile>,
+        input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
     ) -> Rc<Self> {
-        Self::new_with(
-            proto,
-            input_file,
-            parent,
-            FieldImpl::new,
-            MessageImpl::new,
-            EnumImpl::new,
-            OneofImpl::new,
-        )
-    }
-
-    pub fn new_with<FF, F, FM, M, FE, E, FO, O>(
-        proto: &DescriptorProto,
-        input_file: Weak<dyn InputFile>,
-        parent: Weak<dyn PackageOrMessage>,
-        ff: FF,
-        fm: FM,
-        fe: FE,
-        fo: FO,
-    ) -> Rc<Self>
-    where
-        FF: Fn(&FieldDescriptorProto, Weak<dyn Message>) -> Rc<F>,
-        FM: Fn(&DescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<M>,
-        FE: Fn(&EnumDescriptorProto, Weak<dyn InputFile>, Weak<dyn PackageOrMessage>) -> Rc<E>,
-        FO: Fn(&DescriptorProto, &OneofDescriptorProto, usize, Weak<dyn Message>) -> Rc<O>,
-        F: 'static + Field,
-        M: 'static + Message,
-        E: 'static + Enum,
-        O: 'static + Oneof,
-    {
         let name = proto.name().to_string();
         Rc::new_cyclic(|weak_message| {
             let fields = proto
                 .field()
                 .into_iter()
                 .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| ff(f, Weak::clone(weak_message) as Weak<dyn Message>) as Rc<dyn Field>)
+                .map(|f| Field::new(f, Weak::clone(weak_message) as Weak<Message>) as Rc<Field>)
                 .collect();
             let messages = proto
                 .nested_type()
                 .into_iter()
                 .map(|m| {
-                    fm(
+                    Message::new(
                         m,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
-                    ) as Rc<dyn Message>
+                    )
                 })
                 .collect();
             let enums = proto
                 .enum_type()
                 .into_iter()
                 .map(|e| {
-                    fe(
+                    Enum::new(
                         e,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
-                    ) as Rc<dyn Enum>
+                    )
                 })
                 .collect();
             let oneof_num = proto
@@ -129,15 +83,15 @@ impl MessageImpl {
             let oneofs = (0..oneof_num)
                 .into_iter()
                 .map(|i| {
-                    fo(
+                    Oneof::new(
                         proto,
                         &proto.oneof_decl()[i],
                         i,
-                        Weak::clone(weak_message) as Weak<dyn Message>,
-                    ) as Rc<dyn Oneof>
+                        Weak::clone(weak_message) as Weak<Message>,
+                    )
                 })
                 .collect();
-            MessageImpl {
+            Message {
                 cache: Default::default(),
                 name,
                 input_file: Weak::clone(&input_file),
@@ -151,7 +105,7 @@ impl MessageImpl {
     }
 }
 
-impl DataTypeBase for MessageImpl {
+impl DataTypeBase for Message {
     fn cache(&self) -> &AnonymousCache {
         &self.cache
     }
@@ -160,24 +114,24 @@ impl DataTypeBase for MessageImpl {
     }
 }
 
-impl PackageOrMessage for MessageImpl {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message> {
+impl PackageOrMessage for Message {
+    fn either(&self) -> PackageOrMessageCase<&Package, &Message> {
         PackageOrMessageCase::Message(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>> {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
         Ok(Box::new(self.messages.iter().cloned()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
         Ok(Box::new(self.enums.iter().cloned()))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>> {
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
         Ok(Box::new(self.oneofs.iter().cloned()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn root_package(&self) -> Result<Rc<RootPackage>> {
+    fn root_package(&self) -> Result<Rc<Package>> {
         self.parent.try_upgrade()?.root_package()
     }
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>> {
@@ -185,17 +139,19 @@ impl PackageOrMessage for MessageImpl {
     }
 }
 
-impl Message for MessageImpl {
-    fn input_file(&self) -> Result<Rc<dyn InputFile>> {
+impl Message {
+    pub(crate) fn input_file(&self) -> Result<Rc<InputFile>> {
         Ok(self.input_file.try_upgrade()?)
     }
-    fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
+    pub(crate) fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
-    fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Field>>>> {
+    pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Field>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
-    fn fields_or_oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {
+    pub(crate) fn fields_or_oneofs(
+        &self,
+    ) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {
         let fields = self
             .fields
             .iter()
@@ -205,5 +161,11 @@ impl Message for MessageImpl {
             .iter()
             .map(|o| o.clone() as Rc<dyn FieldOrOneof>);
         Ok(Box::new(fields.chain(oneofs)))
+    }
+    pub(crate) fn should_generate_module_file(&self) -> Result<bool> {
+        let has_submessages = self.messages()?.next().is_some();
+        let has_subenums = self.enums()?.next().is_some();
+        let has_oneofs = self.oneofs()?.next().is_some();
+        Ok(has_submessages || has_subenums || has_oneofs)
     }
 }

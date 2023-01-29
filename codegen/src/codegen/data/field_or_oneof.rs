@@ -15,6 +15,6 @@
 use super::{DataTypeBase, Field, FieldOrOneofCase, Oneof};
 use ::std::fmt::Debug;
 
-pub trait FieldOrOneof: DataTypeBase + Debug {
-    fn either(&self) -> FieldOrOneofCase<&dyn Field, &dyn Oneof>;
+pub(crate) trait FieldOrOneof: DataTypeBase + Debug {
+    fn either(&self) -> FieldOrOneofCase<&Field, &Oneof>;
 }

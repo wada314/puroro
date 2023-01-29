@@ -14,6 +14,7 @@
 
 mod r#enum;
 mod field;
+mod field_base;
 mod field_or_oneof;
 mod field_type;
 mod message;
@@ -21,13 +22,9 @@ mod oneof;
 mod oneof_field;
 mod package_or_message;
 
-use self::r#enum::*;
-use self::field::*;
-use self::field_or_oneof::*;
-use self::message::*;
-use self::oneof::*;
-use self::oneof_field::*;
-pub use self::package_or_message::*;
+use self::field_base::FieldBaseExt;
+use self::field_or_oneof::FieldOrOneofExt;
+pub(crate) use self::package_or_message::PackageOrMessageExt;
 
 use super::data::*;
 

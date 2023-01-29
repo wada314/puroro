@@ -12,39 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{
-    DataTypeBase, Enum, Message, MessageOrEnumCase, Oneof, Package, PackageOrMessageCase,
-    RootPackage,
-};
+use super::{DataTypeBase, Enum, Message, MessageOrEnumCase, Oneof, Package, PackageOrMessageCase};
 use crate::{FatalErrorKind, Result};
 use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub trait PackageOrMessage: DataTypeBase + Debug {
-    fn either(&self) -> PackageOrMessageCase<&dyn Package, &dyn Message>;
+pub(crate) trait PackageOrMessage: DataTypeBase + Debug {
+    fn either(&self) -> PackageOrMessageCase<&Package, &Message>;
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Message>>>>;
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Enum>>>>;
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Oneof>>>>;
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn Package>>>>;
-    fn root_package(&self) -> Result<Rc<RootPackage>>;
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>>;
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>>;
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>>;
+    fn root_package(&self) -> Result<Rc<Package>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;
 
     fn is_root(&self) -> Result<bool> {
         Ok(self.parent()?.is_none())
     }
 
-    fn all_child_packages(&self) -> Result<Vec<Rc<dyn Package>>> {
+    fn all_child_packages(&self) -> Result<Vec<Rc<Package>>> {
         let mut ret = Vec::new();
         let mut stack = self.subpackages()?.collect::<Vec<_>>();
         while let Some(p) = stack.pop() {
             stack.extend(p.subpackages()?);
-            ret.push(p as Rc<dyn Package>);
+            ret.push(p as Rc<Package>);
         }
         Ok(ret)
     }
 
-    fn all_child_messages(&self) -> Result<Vec<Rc<dyn Message>>> {
+    fn all_child_messages(&self) -> Result<Vec<Rc<Message>>> {
         let mut ret = self.messages()?.collect::<Vec<_>>();
         let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessage>);
         let packages_iter = self.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>);
@@ -60,7 +57,7 @@ pub trait PackageOrMessage: DataTypeBase + Debug {
     fn resolve_type_name(
         &self,
         type_name: &str,
-    ) -> Result<MessageOrEnumCase<Rc<dyn Message>, Rc<dyn Enum>>> {
+    ) -> Result<MessageOrEnumCase<Rc<Message>, Rc<Enum>>> {
         if let Some(absolute_path) = type_name.strip_prefix('.') {
             return self.root_package()?.resolve_type_name(absolute_path);
         }
