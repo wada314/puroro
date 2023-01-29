@@ -82,3 +82,9 @@ pub(crate) enum FieldOrOneofCase<F, O> {
     Field(F),
     Oneof(O),
 }
+
+#[derive(Debug, Clone)]
+pub(crate) struct SourceCodeInfo {
+    pub(crate) leading_comments: String,
+    pub(crate) trailing_comments: String,
+}
