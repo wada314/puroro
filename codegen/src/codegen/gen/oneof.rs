@@ -151,11 +151,17 @@ impl Oneof {
         let generic_params = self.try_map_fields(|f| f.gen_oneof_union_generic_param_ident())?;
 
         let oneof_case_impl = self.gen_oneof_case_impl()?;
+        let maybe_oneof_case_doc = self.gen_oneof_case_doc()?.map(|doc| {
+            quote! {
+                #[doc=#doc]
+            }
+        });
 
         // Union includes none case, where the case enum does not.
         Ok(vec![
             parse2(quote! {
                 #[derive(::std::fmt::Debug, ::std::cmp::PartialEq)]
+                #maybe_oneof_case_doc
                 pub enum #case_ident<
                     #(#generic_params = (),)*
                 > {
@@ -438,5 +444,13 @@ impl Oneof {
                 }
             }
         })?)
+    }
+
+    fn gen_oneof_case_doc(&self) -> Result<Option<String>> {
+        let input_file = self.message()?.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(None);
+        };
+        Ok(sci.into())
     }
 }

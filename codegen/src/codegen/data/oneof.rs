@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{DataTypeBase, Field, FieldOrOneof, FieldOrOneofCase, Message, OneofField};
+use super::{
+    DataTypeBase, Field, FieldOrOneof, FieldOrOneofCase, Message, OneofField,
+    ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+};
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::{DescriptorProto, OneofDescriptorProto};
 use ::std::fmt::Debug;
@@ -23,6 +26,7 @@ use ::std::rc::{Rc, Weak};
 pub(crate) struct Oneof {
     cache: AnonymousCache,
     message: Weak<Message>,
+    oneof_index: usize,
     name: String,
     fields: Vec<Rc<OneofField>>,
 }
@@ -44,6 +48,7 @@ impl Oneof {
             Oneof {
                 cache: Default::default(),
                 message,
+                oneof_index,
                 name: oneof_proto.name().to_string(),
                 fields,
             }
@@ -72,5 +77,15 @@ impl Oneof {
     }
     pub(crate) fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.try_upgrade()?)
+    }
+    pub(crate) fn location_path(&self) -> Result<impl Iterator<Item = i32>> {
+        let this_path = [
+            ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+            self.oneof_index.try_into()?,
+        ];
+        Ok(self
+            .message()?
+            .location_path()?
+            .chain(this_path.into_iter()))
     }
 }
