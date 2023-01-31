@@ -366,6 +366,8 @@ pub use self::_fields::*;
     ::std::hash::Hash,
     ::std::fmt::Debug,
 )]
+/** Sync with code_generator.h.
+*/
 pub enum Feature {
     FeatureNone,
     FeatureProto3Optional,

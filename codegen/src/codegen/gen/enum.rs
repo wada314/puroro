@@ -52,6 +52,13 @@ impl Enum {
             Syntax::Proto2 => self.gen_enum_try_from_i32()?,
             Syntax::Proto3 => self.gen_enum_from_i32()?,
         };
+        let maybe_enum_doc = if let Some(doc) = self.gen_enum_doc()? {
+            quote! {
+                #[doc=#doc]
+            }
+        } else {
+            quote! {}
+        };
 
         let item_enum: ItemEnum = parse2(quote! {
             #[derive(
@@ -64,6 +71,7 @@ impl Enum {
                 ::std::hash::Hash,
                 ::std::fmt::Debug,
             )]
+            #maybe_enum_doc
             pub enum #ident {
                 #(#value_idents,)*
                 #maybe_extra_value
@@ -174,5 +182,13 @@ impl Enum {
                 }
             }
         })?)
+    }
+
+    fn gen_enum_doc(&self) -> Result<Option<String>> {
+        let input_file = self.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(None);
+        };
+        Ok(sci.into())
     }
 }

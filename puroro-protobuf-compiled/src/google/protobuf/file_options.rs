@@ -20,6 +20,8 @@ mod _pinternal {
     ::std::hash::Hash,
     ::std::fmt::Debug,
 )]
+/** Generated classes can be optimized for speed or code size.
+*/
 pub enum OptimizeMode {
     Speed,
     CodeSize,

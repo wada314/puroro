@@ -42,6 +42,8 @@ use ::puroro_protobuf_compiled::google::protobuf::source_code_info;
 
 const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 4;
 const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 3;
+const ENUM_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 5;
+const ENUM_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 4;
 
 pub(crate) trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;

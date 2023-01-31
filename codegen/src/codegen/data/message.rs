@@ -68,11 +68,13 @@ impl Message {
             let enums = proto
                 .enum_type()
                 .into_iter()
-                .map(|e| {
+                .enumerate()
+                .map(|(i, e)| {
                     Enum::new(
                         e,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect();

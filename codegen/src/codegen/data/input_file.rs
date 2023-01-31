@@ -59,11 +59,13 @@ impl InputFile {
             enums: proto
                 .enum_type()
                 .into_iter()
-                .map(|e| {
+                .enumerate()
+                .map(|(i, e)| {
                     Enum::new(
                         e,
                         Weak::clone(weak) as Weak<InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect(),
