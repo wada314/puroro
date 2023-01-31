@@ -23,6 +23,7 @@ mod oneof;
 mod oneof_field;
 mod package;
 mod package_or_message;
+mod source_code_info;
 
 pub(crate) use self::r#enum::*;
 pub(crate) use self::field::*;
@@ -35,10 +36,10 @@ pub(crate) use self::oneof::*;
 pub(crate) use self::oneof_field::*;
 pub(crate) use self::package::*;
 pub(crate) use self::package_or_message::*;
+pub(crate) use self::source_code_info::*;
 
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
-use ::puroro_protobuf_compiled::google::protobuf::source_code_info;
 
 const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 4;
 const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 3;
@@ -86,31 +87,4 @@ pub(crate) enum MessageOrEnumCase<M, E> {
 pub(crate) enum FieldOrOneofCase<F, O> {
     Field(F),
     Oneof(O),
-}
-
-#[derive(Debug, Clone)]
-pub(crate) struct SourceCodeInfo {
-    pub(crate) leading_comments: String,
-    pub(crate) trailing_comments: String,
-}
-impl From<&source_code_info::Location> for SourceCodeInfo {
-    fn from(info: &source_code_info::Location) -> Self {
-        Self {
-            leading_comments: info.leading_comments().to_string(),
-            trailing_comments: info.trailing_comments().to_string(),
-        }
-    }
-}
-impl From<&SourceCodeInfo> for Option<String> {
-    fn from(sci: &SourceCodeInfo) -> Option<String> {
-        match (sci.leading_comments.len(), sci.trailing_comments.len()) {
-            (0, 0) => None,
-            (_, 0) => Some(sci.leading_comments.clone()),
-            (0, _) => Some(sci.trailing_comments.clone()),
-            _ => Some(format!(
-                "{}\n\n{}",
-                &sci.leading_comments, &sci.trailing_comments,
-            )),
-        }
-    }
 }
