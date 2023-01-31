@@ -42,6 +42,8 @@ impl EnumReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
@@ -71,6 +73,8 @@ impl EnumReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())

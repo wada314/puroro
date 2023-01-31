@@ -38,6 +38,8 @@ impl ExtensionRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
@@ -67,6 +69,8 @@ impl ExtensionRange {
             ::std::default::Default::default,
         )
     }
+    /** Exclusive.
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
@@ -288,6 +292,8 @@ impl ReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
@@ -317,6 +323,8 @@ impl ReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Exclusive.
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
