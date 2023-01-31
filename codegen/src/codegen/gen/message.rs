@@ -333,14 +333,6 @@ impl Message {
         let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
             return Ok(None);
         };
-        match (sci.leading_comments.len(), sci.trailing_comments.len()) {
-            (0, 0) => Ok(None),
-            (_, 0) => Ok(Some(sci.leading_comments.clone())),
-            (0, _) => Ok(Some(sci.trailing_comments.clone())),
-            _ => Ok(Some(format!(
-                "{}\n\n{}",
-                &sci.leading_comments, &sci.trailing_comments,
-            ))),
-        }
+        Ok(sci.into())
     }
 }

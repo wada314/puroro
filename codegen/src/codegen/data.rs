@@ -97,3 +97,16 @@ impl From<&source_code_info::Location> for SourceCodeInfo {
         }
     }
 }
+impl From<&SourceCodeInfo> for Option<String> {
+    fn from(sci: &SourceCodeInfo) -> Option<String> {
+        match (sci.leading_comments.len(), sci.trailing_comments.len()) {
+            (0, 0) => None,
+            (_, 0) => Some(sci.leading_comments.clone()),
+            (0, _) => Some(sci.trailing_comments.clone()),
+            _ => Some(format!(
+                "{}\n\n{}",
+                &sci.leading_comments, &sci.trailing_comments,
+            )),
+        }
+    }
+}
