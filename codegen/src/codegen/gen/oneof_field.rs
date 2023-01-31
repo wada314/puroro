@@ -291,6 +291,11 @@ impl OneofField {
         };
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let enum_item_ident = self.gen_oneof_case_value_ident()?;
+        let maybe_method_doc = self.gen_message_struct_field_method_doc()?.map(|doc| {
+            quote! {
+                #[doc=#doc]
+            }
+        });
 
         Ok(vec![
             parse2(quote! {
@@ -300,6 +305,7 @@ impl OneofField {
                 }
             })?,
             parse2(quote! {
+                #maybe_method_doc
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
                     use #PURORO_INTERNAL::SharedItems as _;
                     self.fields.#oneof_struct_field_ident.#getter_opt_ident(self.shared.bitfield())
@@ -339,5 +345,13 @@ impl OneofField {
         })?;
         *receiver = new_expr.into();
         Ok(())
+    }
+
+    fn gen_message_struct_field_method_doc(&self) -> Result<Option<String>> {
+        let input_file = self.message()?.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(None);
+        };
+        Ok(sci.into())
     }
 }

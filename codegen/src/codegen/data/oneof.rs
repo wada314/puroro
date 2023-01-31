@@ -42,8 +42,9 @@ impl Oneof {
             let fields = message_proto
                 .field()
                 .iter()
-                .filter(|f| f.oneof_index() as usize == oneof_index)
-                .map(|f| OneofField::new(f, Weak::clone(weak)))
+                .enumerate()
+                .filter(|(_, f)| f.oneof_index() as usize == oneof_index)
+                .map(|(i, f)| OneofField::new(f, Weak::clone(weak), i))
                 .collect::<Vec<_>>();
             Oneof {
                 cache: Default::default(),

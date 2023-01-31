@@ -49,8 +49,11 @@ impl Message {
             let fields = proto
                 .field()
                 .into_iter()
-                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| Field::new(f, Weak::clone(weak_message) as Weak<Message>) as Rc<Field>)
+                .enumerate()
+                .filter(|(_, f)| !f.has_oneof_index() || f.has_proto3_optional())
+                .map(|(i, f)| {
+                    Field::new(f, Weak::clone(weak_message) as Weak<Message>, i) as Rc<Field>
+                })
                 .collect();
             let messages = proto
                 .nested_type()

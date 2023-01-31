@@ -239,8 +239,14 @@ impl Field {
             _ => self.r#type()?.rust_type()?,
         };
         let mut_item_type = self.r#type()?.rust_type()?;
+        let maybe_method_doc = self.gen_message_struct_field_method_doc()?.map(|doc| {
+            quote! {
+                #[doc=#doc]
+            }
+        });
         Ok(vec![
             parse2(quote! {
+                #maybe_method_doc
                 pub fn #getter_ident(&self) -> &[#getter_item_type] {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field(
@@ -295,8 +301,21 @@ impl Field {
         });
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
+        let maybe_method_doc = self.gen_message_struct_field_method_doc()?.map(|doc| {
+            quote! {
+                #[doc=#doc]
+            }
+        });
+        let (maybe_getter_doc, maybe_getter_opt_doc) =
+            if matches!(self.rule()?, FieldRule::Optional) {
+                (None, maybe_method_doc)
+            } else {
+                (maybe_method_doc, None)
+            };
+
         Ok(vec![
             parse2(quote! {
+                #maybe_getter_doc
                 pub fn #getter_ident(&self) -> #getter_type {
                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::get_field_or_else(
@@ -305,6 +324,7 @@ impl Field {
                 }
             })?,
             parse2(quote! {
+                #maybe_getter_opt_doc
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::get_field_opt(
@@ -337,5 +357,13 @@ impl Field {
                 }
             })?,
         ])
+    }
+
+    fn gen_message_struct_field_method_doc(&self) -> Result<Option<String>> {
+        let input_file = self.message()?.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(None);
+        };
+        Ok(sci.into())
     }
 }
