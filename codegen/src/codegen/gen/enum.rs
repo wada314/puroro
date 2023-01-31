@@ -52,13 +52,11 @@ impl Enum {
             Syntax::Proto2 => self.gen_enum_try_from_i32()?,
             Syntax::Proto3 => self.gen_enum_from_i32()?,
         };
-        let maybe_enum_doc = if let Some(doc) = self.gen_enum_doc()? {
+        let maybe_enum_doc = self.gen_enum_doc()?.map(|doc| {
             quote! {
                 #[doc=#doc]
             }
-        } else {
-            quote! {}
-        };
+        });
 
         let item_enum: ItemEnum = parse2(quote! {
             #[derive(

@@ -113,13 +113,11 @@ impl Message {
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
 
-        let maybe_struct_doc = if let Some(doc) = self.gen_message_struct_doc()? {
+        let maybe_struct_doc = self.gen_message_struct_doc()?.map(|doc| {
             quote! {
                 #[doc=#doc]
             }
-        } else {
-            quote! {}
-        };
+        });
 
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
