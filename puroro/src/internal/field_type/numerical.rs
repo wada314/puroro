@@ -46,7 +46,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        iter: &mut I,
+        mut iter: I,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             let v = var.get::<ProtoType>()?;
@@ -112,7 +112,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        iter: &mut I,
+        mut iter: I,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             self.0 = var.get::<ProtoType>()?;
@@ -156,7 +156,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: &mut I,
+        mut iter: I,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             self.0.push(var.get::<ProtoType>()?)

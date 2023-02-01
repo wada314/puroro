@@ -137,14 +137,14 @@ impl self::_puroro::Message for NamePart {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name_part,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.is_extension,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

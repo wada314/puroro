@@ -261,28 +261,28 @@ impl self::_puroro::Message for File {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.insertion_point,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     15i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.content,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     16i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.generated_code_info,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
