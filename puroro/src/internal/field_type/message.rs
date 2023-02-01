@@ -34,7 +34,7 @@ where
         iter: I,
     ) -> Result<()> {
         let msg = self.0.get_or_insert_with(Default::default).as_mut();
-        Ok(msg.merge_from_bytes_iter(iter)?)
+        Ok(msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?)
     }
 
     fn ser_to_write<W: Write, B: BitSlice>(
@@ -61,7 +61,7 @@ where
         _bitvec: &mut B,
         iter: I,
     ) -> Result<()> {
-        let msg = M::from_bytes_iter(iter)?;
+        let msg = M::from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
         self.0.push(msg);
         Ok(())
     }

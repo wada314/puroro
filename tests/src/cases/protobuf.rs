@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod enums;
-mod official_samples;
-mod oneof;
-mod proto2_defaults;
-mod proto3_defaults;
-mod protobuf;
-mod self_recursive;
-mod serialization;
-mod simple_get_set;
-mod simple_misc_traits;
-mod unknown_fields;
+use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
+use ::puroro_protobuf_compiled::Message;
+use ::std::io::Read;
+
+#[test]
+fn test_deser_empty() {
+    let input: &[u8] = &[];
+    let _msg = DescriptorProto::from_bytes_iter(input.bytes()).unwrap();
+}

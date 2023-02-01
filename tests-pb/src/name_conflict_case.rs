@@ -78,9 +78,13 @@ impl self::_puroro::Message for Message {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         #[allow(unused)]
+        use ::std::result::Result;
+        #[allow(unused)]
         use ::std::result::Result::{Ok, Err};
+        #[allow(unused)]
+        use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, mut field_data))
+        while let Some((number, field_data))
             = FieldData::from_bytes_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
@@ -90,19 +94,22 @@ impl self::_puroro::Message for Message {
                             .conflict
                             .deser_from_iter(
                                 self.shared.bitfield_mut(),
-                                &mut field_data,
+                                field_data,
                                 self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
                             )?
                     }
-                    _ => Err(PuroroError::UnknownFieldNumber)?,
+                    _ => {
+                        let field_data = field_data
+                            .map(|iter| { iter.collect::<Result<Vec<_>, _>>() })
+                            .transpose()?;
+                        Err(PuroroError::UnknownFieldNumber(field_data))?
+                    }
                 }
                 Ok(())
             })();
             match result {
                 Ok(_) => {}
-                Err(
-                    PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_),
-                ) => {
+                Err(PuroroError::UnknownFieldNumber(field_data)) => {
                     self.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,

@@ -35,7 +35,7 @@ pub enum PuroroError {
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]
     UnexpectedFieldType,
     #[error("Unknown field number. This should be recoverable.")]
-    UnknownFieldNumber,
+    UnknownFieldNumber(crate::internal::ser::FieldData<Vec<u8>>),
     #[error("An internal error while converting enum from / into integer type.")]
     EnumConvertError,
     #[error("Failed to parse a boolean value.")]
