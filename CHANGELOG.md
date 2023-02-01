@@ -1,4 +1,8 @@
 
+# v 0.9.0
+- Fixed the bug release-build is not working.
+- Propagates (some part of) the .proto file's doc into the generated .rs files.
+
 # v 0.8.0
 - Mostly internal code refactoring.
 

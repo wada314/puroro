@@ -102,7 +102,7 @@ Currently only used by testing purpose, not published.
     - [ ] Enum allow-alias option
     - [ ] More more more unit tests
     - [ ] More more more more documents
-    - [ ] Print comments in the generated files
+    - [x] Print original .proto files comments into the generated files
     - [ ] Reflections
         - [ ] Get message metadata (descriptors)
     - [ ] Nightly / stable features
