@@ -272,35 +272,35 @@ impl self::_puroro::Message for Location {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.path,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.span,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.leading_comments,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.trailing_comments,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.leading_detached_comments,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

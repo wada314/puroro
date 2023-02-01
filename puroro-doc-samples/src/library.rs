@@ -147,21 +147,21 @@ impl self::_puroro::Message for Book {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.title,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.num_pages,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.author,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -324,7 +324,7 @@ impl self::_puroro::Message for Author {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

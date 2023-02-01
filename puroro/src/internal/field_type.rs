@@ -65,7 +65,7 @@ pub trait FieldType {
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] iter: &mut I,
+        #[allow(unused)] iter: I,
     ) -> Result<()> {
         Err(PuroroError::InvalidWireType(
             WireType::LengthDelimited as u32,

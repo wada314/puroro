@@ -79,7 +79,7 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.r#type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -224,7 +224,7 @@ impl self::_puroro::Message for _Self {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.r#type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

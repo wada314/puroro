@@ -155,21 +155,21 @@ impl self::_puroro::Message for ExtensionRange {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.start,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.end,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -374,14 +374,14 @@ impl self::_puroro::Message for ReservedRange {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.start,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.end,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

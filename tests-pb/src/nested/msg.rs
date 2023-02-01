@@ -84,7 +84,7 @@ impl self::_puroro::Message for Submsg {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.item_inner,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

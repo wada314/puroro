@@ -142,7 +142,7 @@ impl Field {
             #number => #PURORO_INTERNAL::FieldType::deser_from_iter(
                 &mut self.fields.#ident,
                 self.shared.bitfield_mut(),
-                &mut #field_data_expr,
+                #field_data_expr,
             )?,
         })?)
     }

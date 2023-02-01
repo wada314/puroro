@@ -184,28 +184,28 @@ impl self::_puroro::Message for Annotation {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.path,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.source_file,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.begin,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.end,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
