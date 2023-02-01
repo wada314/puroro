@@ -207,21 +207,28 @@ impl Message {
                     use #PURORO_INTERNAL::ser::FieldData;
                     #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
                     use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
+                    #[allow(unused)] use ::std::result::Result;
                     #[allow(unused)] use ::std::result::Result::{Ok, Err};
+                    #[allow(unused)] use ::std::vec::Vec;
                     use #PURORO_LIB::PuroroError;
-                    while let Some((number, mut #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                    while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
                         let result: #PURORO_LIB::Result<()> = (|| {
                             match number {
                                 #(#deser_arms)*
-                                _ => Err(PuroroError::UnknownFieldNumber)?,
+                                _ => {
+                                    let field_data = #field_data_ident.map(|iter| {
+                                        iter.collect::<Result<Vec<_>, _>>()
+                                    }).transpose()?;
+                                    Err(PuroroError::UnknownFieldNumber(field_data))?
+                                }
                             }
                             Ok(())
                         })();
                         match result {
                             Ok(_) => (),
-                            Err(PuroroError::UnknownFieldNumber | PuroroError::UnknownEnumVariant(_)) => {
+                            Err(PuroroError::UnknownFieldNumber(field_data)) => {
                                 // Recoverable error. Store the field into unknown_fields.
-                                self.shared.unknown_fields_mut().push(number, #field_data_ident)?;
+                                self.shared.unknown_fields_mut().push(number, field_data)?;
                             }
                             Err(e) => Err(e)?,
                         }

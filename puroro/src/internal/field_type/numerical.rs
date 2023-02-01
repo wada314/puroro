@@ -87,7 +87,7 @@ where
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        field_data: &mut FieldData<I>,
+        field_data: FieldData<I>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),

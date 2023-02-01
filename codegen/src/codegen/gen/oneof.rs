@@ -228,7 +228,7 @@ impl Oneof {
                 Ok(parse2(quote! {
                     #field_number => self.fields.#field_ident.deser_from_iter(
                         self.shared.bitfield_mut(),
-                        &mut #field_data_expr,
+                        #field_data_expr,
                         #case_type::#case_name(()),
                     )?,
                 })?)
@@ -376,7 +376,7 @@ impl Oneof {
                 fn deser_from_iter<I, B>(
                     &mut self,
                     bitvec: &mut B,
-                    field_data: &mut #PURORO_INTERNAL::ser::FieldData<I>,
+                    field_data: #PURORO_INTERNAL::ser::FieldData<I>,
                     case: Self::Case,
                 ) -> #PURORO_LIB::Result<()>
                 where
