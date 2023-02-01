@@ -80,7 +80,7 @@ pub trait OneofFieldType: Default + Clone {
 
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: &mut FieldData<I>,
+        field_data: FieldData<I>,
     ) -> Result<()>;
     fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()>;
 }
@@ -121,7 +121,7 @@ where
     }
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: &mut FieldData<I>,
+        field_data: FieldData<I>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(variant) => {
@@ -183,7 +183,7 @@ where
 
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: &mut FieldData<I>,
+        field_data: FieldData<I>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = field_data {
             self.0 = ProtoType::from_bytes_iter(iter)?;
@@ -233,7 +233,7 @@ where
     }
     fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: &mut FieldData<I>,
+        field_data: FieldData<I>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = field_data {
             let msg = self.0.as_mut();

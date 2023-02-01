@@ -17,15 +17,11 @@ use crate::internal::tags;
 use crate::Result;
 use ::std::collections::HashMap;
 use ::std::fmt::{DebugStruct, Result as FmtResult};
-use ::std::io::{Result as IoResult, Write};
+use ::std::io::Write;
 
 pub trait UnknownFields {
     fn debug_struct_fields<'a, 'b>(&self, debug_struct: &mut DebugStruct<'a, 'b>) -> FmtResult;
-    fn push<I: Iterator<Item = IoResult<u8>>>(
-        &mut self,
-        number: i32,
-        field_data: FieldData<I>,
-    ) -> Result<()>;
+    fn push(&mut self, number: i32, field_data: FieldData<Vec<u8>>) -> Result<()>;
     fn ser_to_write<W: Write>(&self, out: &mut W) -> Result<()>;
 }
 
@@ -44,18 +40,8 @@ impl UnknownFields for UnknownFieldsImpl {
         Ok(())
     }
 
-    fn push<I: Iterator<Item = IoResult<u8>>>(
-        &mut self,
-        number: i32,
-        field_data: FieldData<I>,
-    ) -> Result<()> {
-        let owned_field_data = field_data
-            .map(|iter| iter.collect::<IoResult<Vec<_>>>())
-            .transpose()?;
-        self.fields
-            .entry(number)
-            .or_default()
-            .push(owned_field_data);
+    fn push(&mut self, number: i32, field_data: FieldData<Vec<u8>>) -> Result<()> {
+        self.fields.entry(number).or_default().push(field_data);
         Ok(())
     }
 

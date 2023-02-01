@@ -11,6 +11,7 @@ publish = false
 tests-pb = { path = "../tests-pb" }
 puroro-inline = { path = "../inline" }
 puroro = { path = "../puroro" }
+puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled" }
 itertools = "0.10"
 
 [features]
