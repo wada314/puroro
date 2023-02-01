@@ -31,7 +31,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: &mut I,
+        iter: I,
     ) -> Result<()> {
         let msg = self.0.get_or_insert_with(Default::default).as_mut();
         Ok(msg.merge_from_bytes_iter(iter)?)
@@ -59,7 +59,7 @@ where
     fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: &mut I,
+        iter: I,
     ) -> Result<()> {
         let msg = M::from_bytes_iter(iter)?;
         self.0.push(msg);

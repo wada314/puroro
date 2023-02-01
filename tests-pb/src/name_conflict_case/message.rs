@@ -88,7 +88,7 @@ impl self::_puroro::Message for ConflictCase {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.this_is_message_field,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

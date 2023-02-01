@@ -187,28 +187,28 @@ impl self::_puroro::Message for Version {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.major,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.minor,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.patch,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.suffix,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -512,28 +512,28 @@ impl self::_puroro::Message for CodeGeneratorRequest {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.file_to_generate,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.parameter,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     15i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.proto_file,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.compiler_version,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -791,21 +791,21 @@ impl self::_puroro::Message for CodeGeneratorResponse {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.error,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.supported_features,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     15i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.file,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

@@ -1742,336 +1742,336 @@ impl self::_puroro::Message for Msg {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i32_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i32_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i32_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     11i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.float_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     12i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.float_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     13i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.float_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     21i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.bytes_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     22i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.bytes_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     23i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.bytes_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     31i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.string_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     32i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.string_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     33i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.string_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     41i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     42i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     43i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     51i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.submsg_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     52i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.submsg_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     53i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.submsg_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     101i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i64_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     102i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i64_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     103i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.i64_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     111i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.u32_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     112i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.u32_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     113i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.u32_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     121i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.u64_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     122i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.u64_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     123i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.u64_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     131i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.s32_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     132i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.s32_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     133i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.s32_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     141i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.s64_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     142i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.s64_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     143i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.s64_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     151i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.fixed32_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     152i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.fixed32_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     153i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.fixed32_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     161i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.fixed64_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     162i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.fixed64_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     163i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.fixed64_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     171i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.sfixed32_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     172i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.sfixed32_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     173i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.sfixed32_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     181i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.sfixed64_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     182i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.sfixed64_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     183i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.sfixed64_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     191i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.f64_unlabeled,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     192i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.f64_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     193i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.f64_repeated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,

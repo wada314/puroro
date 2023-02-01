@@ -78,7 +78,7 @@ impl self::_puroro::Message for FileDescriptorSet {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.file,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -547,84 +547,84 @@ impl self::_puroro::Message for FileDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.package,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.dependency,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.public_dependency,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     11i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.weak_dependency,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.message_type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.service,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extension,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.source_code_info,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     12i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.syntax,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -1103,70 +1103,70 @@ impl self::_puroro::Message for DescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.field,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extension,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.nested_type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.enum_type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extension_range,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.oneof_decl,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_range,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -1390,7 +1390,7 @@ impl self::_puroro::Message for ExtensionRangeOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2000,77 +2000,77 @@ impl self::_puroro::Message for FieldDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.number,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.label,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.r#type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.type_name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.extendee,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.default_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.oneof_index,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.json_name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     17i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.proto3_optional,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2343,14 +2343,14 @@ impl self::_puroro::Message for OneofDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2627,35 +2627,35 @@ impl self::_puroro::Message for EnumDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_range,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.reserved_name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -2910,21 +2910,21 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.number,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -3146,21 +3146,21 @@ impl self::_puroro::Message for ServiceDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.method,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -3540,42 +3540,42 @@ impl self::_puroro::Message for MethodDescriptorProto {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.input_type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.output_type,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.options,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.client_streaming,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.server_streaming,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -4714,147 +4714,147 @@ impl self::_puroro::Message for FileOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_package,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_outer_classname,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_multiple_files,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     20i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_generate_equals_and_hash,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     27i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_string_check_utf8,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     9i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.optimize_for,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     11i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.go_package,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     16i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.cc_generic_services,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     17i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.java_generic_services,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     18i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.py_generic_services,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     42i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_generic_services,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     23i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     31i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.cc_enable_arenas,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     36i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.objc_class_prefix,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     37i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.csharp_namespace,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     39i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.swift_prefix,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     40i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_class_prefix,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     41i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_namespace,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     44i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.php_metadata_namespace,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     45i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.ruby_package,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -5436,35 +5436,35 @@ impl self::_puroro::Message for MessageOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.message_set_wire_format,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.no_standard_descriptor_accessor,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.map_entry,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -5939,49 +5939,49 @@ impl self::_puroro::Message for FieldOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.ctype,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.packed,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.jstype,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.lazy,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     10i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.weak,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6178,7 +6178,7 @@ impl self::_puroro::Message for OneofOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6416,21 +6416,21 @@ impl self::_puroro::Message for EnumOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.allow_alias,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6640,14 +6640,14 @@ impl self::_puroro::Message for EnumValueOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -6848,14 +6848,14 @@ impl self::_puroro::Message for ServiceOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -7113,21 +7113,21 @@ impl self::_puroro::Message for MethodOptions {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.deprecated,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     34i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.idempotency_level,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     999i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.uninterpreted_option,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -7553,49 +7553,49 @@ impl self::_puroro::Message for UninterpretedOption {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.identifier_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.positive_int_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     5i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.negative_int_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.double_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     7i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.string_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     8i32 => {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.aggregate_value,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -7838,7 +7838,7 @@ impl self::_puroro::Message for SourceCodeInfo {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.location,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
@@ -7980,7 +7980,7 @@ impl self::_puroro::Message for GeneratedCodeInfo {
                         self::_pinternal::FieldType::deser_from_iter(
                             &mut self.fields.annotation,
                             self.shared.bitfield_mut(),
-                            &mut field_data,
+                            field_data,
                         )?
                     }
                     _ => Err(PuroroError::UnknownFieldNumber)?,
