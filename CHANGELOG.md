@@ -1,7 +1,8 @@
 
-# v 0.9.0
+# v 0.10.0
 - Fixed the bug release-build is not working.
 - Propagates (some part of) the .proto file's doc into the generated .rs files.
+- Added ability to keep the unknown number field when deserializing
 
 # v 0.8.0
 - Mostly internal code refactoring.
