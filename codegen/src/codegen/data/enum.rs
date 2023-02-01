@@ -21,6 +21,7 @@ use super::super::util::*;
 use super::{
     DataTypeBase, InputFile, PackageOrMessage, PackageOrMessageCase, Syntax,
     ENUM_FIELD_NUMBER_IN_FILE_DESCRIPTOR, ENUM_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+    VALUE_FIELD_NUMBER_IN_ENUM_DESCRIPTOR,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::EnumDescriptorProto;
@@ -90,6 +91,10 @@ impl Enum {
                 Box::new(parent_path.chain(this_path.into_iter()))
             }
         })
+    }
+    pub(crate) fn value_location_path(&self, index: usize) -> Result<impl Iterator<Item = i32>> {
+        let this_path = [VALUE_FIELD_NUMBER_IN_ENUM_DESCRIPTOR, index.try_into()?];
+        Ok(self.location_path()?.chain(this_path.into_iter()))
     }
 }
 

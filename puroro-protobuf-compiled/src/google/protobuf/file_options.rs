@@ -23,8 +23,17 @@ mod _pinternal {
 /** Generated classes can be optimized for speed or code size.
 */
 pub enum OptimizeMode {
+    /** Generate complete code for parsing, serialization,
+*/
     Speed,
+    /** etc.
+
+
+ Use ReflectionOps to implement these methods.
+*/
     CodeSize,
+    /** Generate code using MessageLite and the lite runtime.
+*/
     LiteRuntime,
 }
 impl ::std::default::Default for OptimizeMode {

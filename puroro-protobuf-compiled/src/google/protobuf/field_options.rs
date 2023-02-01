@@ -21,6 +21,8 @@ mod _pinternal {
     ::std::fmt::Debug,
 )]
 pub enum CType {
+    /** Default mode.
+*/
     String,
     Cord,
     StringPiece,
@@ -65,8 +67,14 @@ impl ::std::convert::TryFrom::<i32> for CType {
     ::std::fmt::Debug,
 )]
 pub enum JSType {
+    /** Use the default type.
+*/
     JsNormal,
+    /** Use JavaScript strings.
+*/
     JsString,
+    /** Use JavaScript numbers.
+*/
     JsNumber,
 }
 impl ::std::default::Default for JSType {

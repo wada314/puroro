@@ -26,7 +26,11 @@ mod _pinternal {
 */
 pub enum IdempotencyLevel {
     IdempotencyUnknown,
+    /** implies idempotent
+*/
     NoSideEffects,
+    /** idempotent, but may have side effects
+*/
     Idempotent,
 }
 impl ::std::default::Default for IdempotencyLevel {
