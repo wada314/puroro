@@ -15,7 +15,8 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
-    PackageOrMessageCase,
+    PackageOrMessageCase, MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
+    MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
 use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
@@ -33,6 +34,7 @@ pub(crate) struct Message {
     oneofs: Vec<Rc<Oneof>>,
     input_file: Weak<InputFile>,
     parent: Weak<dyn PackageOrMessage>,
+    index_in_parent: usize,
 }
 
 impl Message {
@@ -40,34 +42,42 @@ impl Message {
         proto: &DescriptorProto,
         input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
+        index_in_parent: usize,
     ) -> Rc<Self> {
         let name = proto.name().to_string();
         Rc::new_cyclic(|weak_message| {
             let fields = proto
                 .field()
                 .into_iter()
-                .filter(|f| !f.has_oneof_index() || f.has_proto3_optional())
-                .map(|f| Field::new(f, Weak::clone(weak_message) as Weak<Message>) as Rc<Field>)
+                .enumerate()
+                .filter(|(_, f)| !f.has_oneof_index() || f.has_proto3_optional())
+                .map(|(i, f)| {
+                    Field::new(f, Weak::clone(weak_message) as Weak<Message>, i) as Rc<Field>
+                })
                 .collect();
             let messages = proto
                 .nested_type()
                 .into_iter()
-                .map(|m| {
+                .enumerate()
+                .map(|(i, m)| {
                     Message::new(
                         m,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect();
             let enums = proto
                 .enum_type()
                 .into_iter()
-                .map(|e| {
+                .enumerate()
+                .map(|(i, e)| {
                     Enum::new(
                         e,
                         Weak::clone(&input_file),
                         Weak::clone(weak_message) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect();
@@ -96,6 +106,7 @@ impl Message {
                 name,
                 input_file: Weak::clone(&input_file),
                 parent,
+                index_in_parent,
                 fields,
                 messages,
                 enums,
@@ -161,6 +172,26 @@ impl Message {
             .iter()
             .map(|o| o.clone() as Rc<dyn FieldOrOneof>);
         Ok(Box::new(fields.chain(oneofs)))
+    }
+    pub(crate) fn location_path(&self) -> Result<Box<dyn Iterator<Item = i32>>> {
+        Ok(match self.parent()?.either() {
+            PackageOrMessageCase::Package(_) => {
+                // This message is a direct item under the input file.
+                let this_path = [
+                    MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
+                    self.index_in_parent.try_into()?,
+                ];
+                Box::new(this_path.into_iter())
+            }
+            PackageOrMessageCase::Message(m) => {
+                let parent_path = m.location_path()?;
+                let this_path = [
+                    MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+                    self.index_in_parent.try_into()?,
+                ];
+                Box::new(parent_path.chain(this_path.into_iter()))
+            }
+        })
     }
     pub(crate) fn should_generate_module_file(&self) -> Result<bool> {
         let has_submessages = self.messages()?.next().is_some();

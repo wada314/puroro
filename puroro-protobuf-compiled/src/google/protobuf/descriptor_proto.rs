@@ -38,6 +38,8 @@ impl ExtensionRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
@@ -67,6 +69,8 @@ impl ExtensionRange {
             ::std::default::Default::default,
         )
     }
+    /** Exclusive.
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
@@ -260,6 +264,10 @@ impl ::std::cmp::PartialEq for ExtensionRange {
     }
 }
 #[derive(::std::default::Default)]
+/** Range of reserved tag numbers. Reserved tag numbers may not be used by
+ fields or extension ranges in the same message. Reserved ranges may
+ not overlap.
+*/
 pub struct ReservedRange {
     fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<
@@ -284,6 +292,8 @@ impl ReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
@@ -313,6 +323,8 @@ impl ReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Exclusive.
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
@@ -454,6 +466,7 @@ impl ::std::cmp::PartialEq for ReservedRange {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
 pub mod _fields {
     mod _root {
         #[allow(unused)]
@@ -479,4 +492,5 @@ pub mod _fields {
         pub end: TEnd,
     }
 }
+#[doc(hidden)]
 pub use self::_fields::*;

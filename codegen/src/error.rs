@@ -56,6 +56,11 @@ pub enum FatalErrorKind {
         #[from]
         source: std::num::ParseFloatError,
     },
+    #[error(r#"An error from TryFromIntError: "{source}""#)]
+    TryFromIntError {
+        #[from]
+        source: std::num::TryFromIntError,
+    },
     #[error(r#"An error from syn::parse::Error: "{source}""#)]
     SynParseError {
         #[from]
@@ -117,4 +122,5 @@ impl_from_from!(::std::string::FromUtf8Error);
 impl_from_from!(::std::num::ParseIntError);
 impl_from_from!(::std::num::ParseFloatError);
 impl_from_from!(::std::str::ParseBoolError);
+impl_from_from!(::std::num::TryFromIntError);
 impl_from_from!(::syn::parse::Error);

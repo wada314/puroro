@@ -13,10 +13,11 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{DataTypeBase, Enum, Message, Package, PackageOrMessage, Syntax};
+use super::{DataTypeBase, Enum, Message, Package, PackageOrMessage, SourceCodeInfo, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
@@ -30,6 +31,7 @@ pub(crate) struct InputFile {
     syntax_cell: OnceCell<Syntax>,
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
+    source_code_info: HashMap<Vec<i32>, SourceCodeInfo>,
 }
 
 impl InputFile {
@@ -44,23 +46,36 @@ impl InputFile {
             messages: proto
                 .message_type()
                 .into_iter()
-                .map(|m| {
+                .enumerate()
+                .map(|(i, m)| {
                     Message::new(
                         m,
                         Weak::clone(weak) as Weak<InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
                 })
                 .collect(),
             enums: proto
                 .enum_type()
                 .into_iter()
-                .map(|e| {
+                .enumerate()
+                .map(|(i, e)| {
                     Enum::new(
                         e,
                         Weak::clone(weak) as Weak<InputFile>,
                         Weak::clone(&package) as Weak<dyn PackageOrMessage>,
+                        i,
                     )
+                })
+                .collect(),
+            source_code_info: proto
+                .source_code_info()
+                .into_iter()
+                .flat_map(|sci| {
+                    sci.location()
+                        .into_iter()
+                        .map(|loc| (loc.path().to_vec(), loc.into()))
                 })
                 .collect(),
         })
@@ -91,5 +106,12 @@ impl InputFile {
     #[cfg(test)]
     pub(crate) fn package(&self) -> Result<Rc<Package>> {
         self.package.try_upgrade()
+    }
+    pub(crate) fn source_code_info(
+        &self,
+        path: impl Iterator<Item = i32>,
+    ) -> Result<Option<&SourceCodeInfo>> {
+        let path_vec: Vec<i32> = path.collect();
+        Ok(self.source_code_info.get(&path_vec))
     }
 }

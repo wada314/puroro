@@ -11,6 +11,13 @@ mod _pinternal {
     pub(crate) use ::puroro::internal::*;
 }
 #[derive(::std::default::Default)]
+/** Range of reserved numeric values. Reserved values may not be used by
+ entries in the same enum. Reserved ranges may not overlap.
+
+ Note that this is distinct from DescriptorProto.ReservedRange in that it
+ is inclusive such that it can appropriately represent the entire int32
+ domain.
+*/
 pub struct EnumReservedRange {
     fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<
@@ -35,6 +42,8 @@ impl EnumReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn start_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
@@ -64,6 +73,8 @@ impl EnumReservedRange {
             ::std::default::Default::default,
         )
     }
+    /** Inclusive.
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
@@ -205,6 +216,7 @@ impl ::std::cmp::PartialEq for EnumReservedRange {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
 pub mod _fields {
     mod _root {
         #[allow(unused)]
@@ -224,4 +236,5 @@ pub mod _fields {
         pub end: TEnd,
     }
 }
+#[doc(hidden)]
 pub use self::_fields::*;

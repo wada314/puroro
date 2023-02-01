@@ -23,15 +23,14 @@
 mod codegen;
 mod error;
 
-#[cfg(debug_assertions)]
 mod syn {
     pub(crate) use ::syn::{
-        parse2, Arm, Expr, ExprMethodCall, Field, FieldValue, File, Ident, ImplItemMethod, Item,
-        ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
+        parse2, Arm, Attribute, Expr, ExprMethodCall, Field, FieldValue, File, Ident,
+        ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
     };
     pub(crate) struct NamedField(::syn::Field);
     impl ::syn::parse::Parse for NamedField {
-        fn parse(input: syn::parse::ParseStream) -> ::syn::Result<Self> {
+        fn parse(input: ::syn::parse::ParseStream) -> ::syn::Result<Self> {
             Ok(NamedField(::syn::Field::parse_named(input)?))
         }
     }
@@ -40,31 +39,17 @@ mod syn {
             value.0
         }
     }
-}
-#[cfg(not(debug_assertions))]
-mod syn {
-    use ::proc_macro2::TokenStream;
-    use ::syn::parse::Result;
-    pub(crate) type Arm = TokenStream;
-    pub(crate) type Expr = TokenStream;
-    pub(crate) type ExprMethodCall = TokenStream;
-    pub(crate) type Field = TokenStream;
-    pub(crate) type FieldValue = TokenStream;
-    pub(crate) type File = TokenStream;
-    pub(crate) type ImplItemMethod = TokenStream;
-    pub(crate) type Item = TokenStream;
-    pub(crate) type ItemEnum = TokenStream;
-    pub(crate) type ItemImpl = TokenStream;
-    pub(crate) type Ident = TokenStream;
-    pub(crate) type Lifetime = TokenStream;
-    pub(crate) type Path = TokenStream;
-    pub(crate) type PathSegment = TokenStream;
-    pub(crate) type Stmt = TokenStream;
-    pub(crate) type Type = TokenStream;
-    pub(crate) fn parse2(ts: TokenStream) -> Result<TokenStream> {
-        Ok(ts)
+    pub(crate) struct OuterAttributes(Vec<Attribute>);
+    impl ::syn::parse::Parse for OuterAttributes {
+        fn parse(input: ::syn::parse::ParseStream) -> ::syn::Result<Self> {
+            Ok(OuterAttributes(::syn::Attribute::parse_outer(&input)?))
+        }
     }
-    pub(crate) type NamedField = TokenStream;
+    impl ::std::convert::From<OuterAttributes> for Vec<Attribute> {
+        fn from(value: OuterAttributes) -> Self {
+            value.0
+        }
+    }
 }
 
 pub use crate::error::{FatalErrorKind, GeneratorError};

@@ -21,6 +21,7 @@ mod message;
 mod oneof;
 mod oneof_field;
 mod package_or_message;
+mod source_code_info;
 
 use self::field_base::FieldBaseExt;
 use self::field_or_oneof::FieldOrOneofExt;

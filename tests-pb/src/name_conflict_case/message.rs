@@ -167,6 +167,7 @@ impl ::std::cmp::PartialEq for ConflictCase {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
 pub mod _fields {
     mod _root {
         #[allow(unused)]
@@ -185,6 +186,7 @@ pub mod _fields {
         pub this_is_message_field: TThisIsMessageField,
     }
 }
+#[doc(hidden)]
 pub use self::_fields::*;
 pub union Conflict<TThisIsOneofField> {
     _none: (),

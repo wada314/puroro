@@ -12,6 +12,8 @@ mod _pinternal {
 }
 pub mod code_generator_response;
 #[derive(::std::default::Default)]
+/** The version number of protocol compiler.
+*/
 pub struct Version {
     fields: self::_root::google::protobuf::compiler::_fields::VersionFields<
         self::_pinternal::OptionalNumericalField::<
@@ -133,6 +135,9 @@ impl Version {
             ::std::default::Default::default,
         )
     }
+    /** A suffix for alpha, beta or rc release, e.g., "alpha-1", "rc2". It should
+ be empty for mainline stable releases.
+*/
     pub fn suffix_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.suffix, self.shared.bitfield())
@@ -307,6 +312,8 @@ impl ::std::cmp::PartialEq for Version {
     }
 }
 #[derive(::std::default::Default)]
+/** An encoded CodeGeneratorRequest is written to the plugin's stdin.
+*/
 pub struct CodeGeneratorRequest {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
         self::_pinternal::RepeatedUnsizedField::<
@@ -328,6 +335,10 @@ pub struct CodeGeneratorRequest {
     shared: self::_pinternal::SharedItemsImpl<1usize>,
 }
 impl CodeGeneratorRequest {
+    /** The .proto files that were explicitly listed on the command-line.  The
+ code generator should generate code only for these files.  Each file's
+ descriptor will be included in proto_file, below.
+*/
     pub fn file_to_generate(
         &self,
     ) -> &[impl ::std::ops::Deref::<
@@ -363,6 +374,8 @@ impl CodeGeneratorRequest {
             ::std::default::Default::default,
         )
     }
+    /** The generator parameter passed on the command-line.
+*/
     pub fn parameter_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
@@ -393,6 +406,21 @@ impl CodeGeneratorRequest {
             self.shared.bitfield_mut(),
         )
     }
+    /** FileDescriptorProtos for all files in files_to_generate and everything
+ they import.  The files will appear in topological order, so each file
+ appears before any file that imports it.
+
+ protoc guarantees that all proto_files will be written after
+ the fields above, even though this is not technically guaranteed by the
+ protobuf wire format.  This theoretically could allow a plugin to stream
+ in the FileDescriptorProtos and handle them one by one rather than read
+ the entire set into memory at once.  However, as of this writing, this
+ is not similarly optimized on protoc's end -- it will store all fields in
+ memory at once before sending them to the plugin.
+
+ Type names of fields and extensions in the FileDescriptorProto are always
+ fully qualified.
+*/
     pub fn proto_file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field(&self.fields.proto_file, self.shared.bitfield())
@@ -420,6 +448,8 @@ impl CodeGeneratorRequest {
             ::std::default::Default::default,
         )
     }
+    /** The version number of protocol compiler.
+*/
     pub fn compiler_version_opt(
         &self,
     ) -> ::std::option::Option::<&self::_root::google::protobuf::compiler::Version> {
@@ -612,6 +642,8 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
     }
 }
 #[derive(::std::default::Default)]
+/** The plugin writes an encoded CodeGeneratorResponse to stdout.
+*/
 pub struct CodeGeneratorResponse {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
         self::_pinternal::OptionalUnsizedField::<
@@ -639,6 +671,15 @@ impl CodeGeneratorResponse {
             ::std::default::Default::default,
         )
     }
+    /** Error message.  If non-empty, code generation failed.  The plugin process
+ should exit with status code zero even if it reports an error in this way.
+
+ This should be used to indicate errors in .proto files which prevent the
+ code generator from generating correct code.  Errors which indicate a
+ problem in protoc itself -- such as the input CodeGeneratorRequest being
+ unparseable -- should be reported by writing a message to stderr and
+ exiting with a non-zero status code.
+*/
     pub fn error_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.error, self.shared.bitfield())
@@ -668,6 +709,9 @@ impl CodeGeneratorResponse {
             ::std::default::Default::default,
         )
     }
+    /** A bitmask of supported features that the code generator supports.
+ This is a bitwise "or" of values from the Feature enum.
+*/
     pub fn supported_features_opt(&self) -> ::std::option::Option::<u64> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
@@ -858,6 +902,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorResponse {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
 pub mod _fields {
     mod _root {
         #[allow(unused)]
@@ -897,4 +942,5 @@ pub mod _fields {
         pub file: TFile,
     }
 }
+#[doc(hidden)]
 pub use self::_fields::*;

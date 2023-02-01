@@ -43,6 +43,7 @@ fn main() {
         .arg(format!("--proto_path={}", "./protos/"))
         .arg("--experimental_allow_proto3_optional")
         .arg("--include_imports")
+        .arg("--include_source_info")
         .arg(format!(
             "--descriptor_set_out={}",
             file_descriptor_set_file_path.to_string_lossy()

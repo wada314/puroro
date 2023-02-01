@@ -23,6 +23,7 @@ mod oneof;
 mod oneof_field;
 mod package;
 mod package_or_message;
+mod source_code_info;
 
 pub(crate) use self::r#enum::*;
 pub(crate) use self::field::*;
@@ -35,9 +36,18 @@ pub(crate) use self::oneof::*;
 pub(crate) use self::oneof_field::*;
 pub(crate) use self::package::*;
 pub(crate) use self::package_or_message::*;
+pub(crate) use self::source_code_info::*;
 
 use super::util::AnonymousCache;
 use crate::{FatalErrorKind, GeneratorError, Result};
+
+const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 4;
+const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 3;
+const ENUM_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 5;
+const ENUM_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 4;
+const ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 8;
+const FIELD_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 2;
+const VALUE_FIELD_NUMBER_IN_ENUM_DESCRIPTOR: i32 = 2;
 
 pub(crate) trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;

@@ -21,23 +21,45 @@ mod _pinternal {
     ::std::fmt::Debug,
 )]
 pub enum Type {
+    /** 0 is reserved for errors.
+ Order is weird for historical reasons.
+*/
     TypeDouble,
     TypeFloat,
+    /** Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
+ negative values are likely.
+*/
     TypeInt64,
     TypeUint64,
+    /** Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
+ negative values are likely.
+*/
     TypeInt32,
     TypeFixed64,
     TypeFixed32,
     TypeBool,
     TypeString,
+    /** Tag-delimited aggregate.
+ Group type is deprecated and not supported in proto3. However, Proto3
+ implementations should still be able to parse the group wire format and
+ treat group fields as unknown fields.
+*/
     TypeGroup,
+    /** Length-delimited aggregate.
+*/
     TypeMessage,
+    /** New in version 2.
+*/
     TypeBytes,
     TypeUint32,
     TypeEnum,
     TypeSfixed32,
     TypeSfixed64,
+    /** Uses ZigZag encoding.
+*/
     TypeSint32,
+    /** Uses ZigZag encoding.
+*/
     TypeSint64,
 }
 impl ::std::default::Default for Type {
@@ -110,6 +132,8 @@ impl ::std::convert::TryFrom::<i32> for Type {
     ::std::fmt::Debug,
 )]
 pub enum Label {
+    /** 0 is reserved for errors
+*/
     LabelOptional,
     LabelRequired,
     LabelRepeated,

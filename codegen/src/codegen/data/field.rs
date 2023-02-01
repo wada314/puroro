@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use super::super::util::{AnonymousCache, WeakExt};
-use super::{DataTypeBase, FieldOrOneof, FieldOrOneofCase, FieldRule, FieldType, Message, Oneof};
+use super::{
+    DataTypeBase, FieldOrOneof, FieldOrOneofCase, FieldRule, FieldType, Message, Oneof,
+    FIELD_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
 use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
@@ -27,6 +30,18 @@ pub(crate) trait FieldBase: DataTypeBase + Debug {
     fn r#type(&self) -> Result<&FieldType>;
     fn default_value(&self) -> Result<Option<&str>>;
     fn message(&self) -> Result<Rc<Message>>;
+    fn index_in_parent(&self) -> Result<usize>;
+    fn location_path(&self) -> Result<Box<dyn Iterator<Item = i32>>> {
+        let this_path = [
+            FIELD_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
+            self.index_in_parent()?.try_into()?,
+        ];
+        Ok(Box::new(
+            self.message()?
+                .location_path()?
+                .chain(this_path.into_iter()),
+        ))
+    }
 }
 
 /// A field of message, but not including the field belonging to an `oneof`.
@@ -36,6 +51,7 @@ pub(crate) struct Field {
     cache: AnonymousCache,
     name: String,
     message: Weak<Message>,
+    index_in_parent: usize,
     rule: OnceCell<FieldRule>,
     r#type: OnceCell<FieldType>,
     proto3_optional: bool,
@@ -82,14 +98,22 @@ impl FieldBase for Field {
     fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.try_upgrade()?)
     }
+    fn index_in_parent(&self) -> Result<usize> {
+        Ok(self.index_in_parent)
+    }
 }
 
 impl Field {
-    pub(crate) fn new(proto: &FieldDescriptorProto, message: Weak<Message>) -> Rc<Self> {
+    pub(crate) fn new(
+        proto: &FieldDescriptorProto,
+        message: Weak<Message>,
+        index_in_parent: usize,
+    ) -> Rc<Self> {
         Rc::new(Field {
             cache: Default::default(),
             name: proto.name().to_string(),
             message,
+            index_in_parent,
             rule: OnceCell::new(),
             r#type: OnceCell::new(),
             proto3_optional: proto.proto3_optional(),

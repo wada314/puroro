@@ -24,6 +24,7 @@ use ::std::rc::{Rc, Weak};
 pub(crate) struct OneofField {
     cache: AnonymousCache,
     oneof: Weak<Oneof>,
+    index_in_parent: usize, // Note the `parent` in here means DescriptorProto.
     name: String,
     number: i32,
     type_opt: Option<field_descriptor_proto::Type>,
@@ -62,13 +63,21 @@ impl FieldBase for OneofField {
     fn message(&self) -> Result<Rc<Message>> {
         Ok(self.oneof.try_upgrade()?.message()?)
     }
+    fn index_in_parent(&self) -> Result<usize> {
+        Ok(self.index_in_parent)
+    }
 }
 
 impl OneofField {
-    pub(crate) fn new(proto: &FieldDescriptorProto, oneof: Weak<Oneof>) -> Rc<Self> {
+    pub(crate) fn new(
+        proto: &FieldDescriptorProto,
+        oneof: Weak<Oneof>,
+        index_in_parent: usize,
+    ) -> Rc<Self> {
         Rc::new(Self {
             cache: Default::default(),
             oneof,
+            index_in_parent,
             name: proto.name().to_string(),
             number: proto.number(),
             type_opt: proto.type_opt(),

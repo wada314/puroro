@@ -33,6 +33,9 @@ pub struct Annotation {
     shared: self::_pinternal::SharedItemsImpl<1usize>,
 }
 impl Annotation {
+    /** Identifies the element in the original source .proto file. This field
+ is formatted the same as SourceCodeInfo.Location.path.
+*/
     pub fn path(&self) -> &[i32] {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
@@ -56,6 +59,8 @@ impl Annotation {
             ::std::default::Default::default,
         )
     }
+    /** Identifies the filesystem path to the original source .proto.
+*/
     pub fn source_file_opt(&self) -> ::std::option::Option::<&str> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(
@@ -94,6 +99,9 @@ impl Annotation {
             ::std::default::Default::default,
         )
     }
+    /** Identifies the starting offset in bytes in the generated code
+ that relates to the identified object.
+*/
     pub fn begin_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.begin, self.shared.bitfield())
@@ -123,6 +131,10 @@ impl Annotation {
             ::std::default::Default::default,
         )
     }
+    /** Identifies the ending offset in bytes in the generated code that
+ relates to the identified offset. The end offset should be one past
+ the last relevant byte (so the length of the text = end - begin).
+*/
     pub fn end_opt(&self) -> ::std::option::Option::<i32> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
@@ -296,6 +308,7 @@ impl ::std::cmp::PartialEq for Annotation {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
 pub mod _fields {
     mod _root {
         #[allow(unused)]
@@ -317,4 +330,5 @@ pub mod _fields {
         pub end: TEnd,
     }
 }
+#[doc(hidden)]
 pub use self::_fields::*;

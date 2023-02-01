@@ -45,6 +45,7 @@ fn main() {
         .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
         .arg(format!("--proto_path={}", "../protobuf/src/"))
         .arg("--include_imports")
+        .arg("--include_source_info")
         .arg("--experimental_allow_proto3_optional")
         .arg(format!(
             "--descriptor_set_out={}",
