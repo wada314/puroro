@@ -421,6 +421,7 @@ impl ::std::cmp::PartialEq for Location {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
 pub mod _fields {
     mod _root {
         #[allow(unused)]
@@ -449,4 +450,5 @@ pub mod _fields {
         pub leading_detached_comments: TLeadingDetachedComments,
     }
 }
+#[doc(hidden)]
 pub use self::_fields::*;

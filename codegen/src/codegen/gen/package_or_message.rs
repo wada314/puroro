@@ -270,12 +270,14 @@ fn gen_messages_enums_oneofs_in_module(
         .then(|| -> Result<_> {
             Ok([
                 Ok(parse2::<Item>(quote! {
+                    #[doc(hidden)]
                     pub mod _fields {
                         #SUBMODULE_HEADER
                         #(#fields_struct_in_module_items)*
                     }
                 })?),
                 Ok(parse2::<Item>(quote! {
+                    #[doc(hidden)]
                     pub use self::_fields::*;
                 })?),
             ]
