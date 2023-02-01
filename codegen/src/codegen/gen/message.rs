@@ -17,7 +17,7 @@ use super::{
     DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, PURORO_INTERNAL,
     PURORO_LIB,
 };
-use crate::syn::{parse2, Expr, Ident, Item, ItemImpl, Type};
+use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -112,16 +112,11 @@ impl Message {
         let drop_impl = self.gen_message_struct_impl_drop()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
-
-        let maybe_struct_doc = self.gen_message_struct_doc()?.map(|doc| {
-            quote! {
-                #[doc=#doc]
-            }
-        });
+        let docs = self.gen_message_struct_doc_attrs()?;
 
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
-            #maybe_struct_doc
+            #(#docs)*
             pub struct #ident {
                 fields: #fields_struct_type,
                 shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
@@ -326,11 +321,11 @@ impl Message {
         })?)
     }
 
-    fn gen_message_struct_doc(&self) -> Result<Option<String>> {
+    fn gen_message_struct_doc_attrs(&self) -> Result<Vec<Attribute>> {
         let input_file = self.input_file()?;
         let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
-            return Ok(None);
+            return Ok(Vec::new());
         };
-        Ok(sci.into())
+        Ok(sci.gen_doc_attributes()?)
     }
 }

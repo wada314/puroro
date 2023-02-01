@@ -20,7 +20,7 @@
 use super::super::util::*;
 use super::{DataTypeBase, Enum, PackageOrMessageExt, Syntax, PURORO_LIB};
 use crate::syn;
-use crate::syn::{parse2, Item, ItemEnum, Path, Type};
+use crate::syn::{parse2, Attribute, Item, ItemEnum, Path, Type};
 use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 use ::quote::{format_ident, quote};
@@ -52,11 +52,7 @@ impl Enum {
             Syntax::Proto2 => self.gen_enum_try_from_i32()?,
             Syntax::Proto3 => self.gen_enum_from_i32()?,
         };
-        let maybe_enum_doc = self.gen_enum_doc()?.map(|doc| {
-            quote! {
-                #[doc=#doc]
-            }
-        });
+        let docs = self.gen_enum_doc_attrs()?;
 
         let item_enum: ItemEnum = parse2(quote! {
             #[derive(
@@ -69,7 +65,7 @@ impl Enum {
                 ::std::hash::Hash,
                 ::std::fmt::Debug,
             )]
-            #maybe_enum_doc
+            #(#docs)*
             pub enum #ident {
                 #(#value_idents,)*
                 #maybe_extra_value
@@ -182,11 +178,11 @@ impl Enum {
         })?)
     }
 
-    fn gen_enum_doc(&self) -> Result<Option<String>> {
+    fn gen_enum_doc_attrs(&self) -> Result<Vec<Attribute>> {
         let input_file = self.input_file()?;
         let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
-            return Ok(None);
+            return Ok(Vec::new());
         };
-        Ok(sci.into())
+        Ok(sci.gen_doc_attributes()?)
     }
 }

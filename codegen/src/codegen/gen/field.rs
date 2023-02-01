@@ -18,7 +18,8 @@ use super::{
     LengthDelimitedType, PURORO_INTERNAL,
 };
 use crate::syn::{
-    parse2, Arm, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt, Type,
+    parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt,
+    Type,
 };
 use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -239,14 +240,10 @@ impl Field {
             _ => self.r#type()?.rust_type()?,
         };
         let mut_item_type = self.r#type()?.rust_type()?;
-        let maybe_method_doc = self.gen_message_struct_field_method_doc()?.map(|doc| {
-            quote! {
-                #[doc=#doc]
-            }
-        });
+        let docs = self.gen_message_struct_field_method_doc_attrs()?;
         Ok(vec![
             parse2(quote! {
-                #maybe_method_doc
+                #(#docs)*
                 pub fn #getter_ident(&self) -> &[#getter_item_type] {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field(
@@ -301,21 +298,16 @@ impl Field {
         });
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
-        let maybe_method_doc = self.gen_message_struct_field_method_doc()?.map(|doc| {
-            quote! {
-                #[doc=#doc]
-            }
-        });
-        let (maybe_getter_doc, maybe_getter_opt_doc) =
-            if matches!(self.rule()?, FieldRule::Optional) {
-                (None, maybe_method_doc)
-            } else {
-                (maybe_method_doc, None)
-            };
+        let docs = self.gen_message_struct_field_method_doc_attrs()?;
+        let (getter_docs, getter_opt_docs) = if matches!(self.rule()?, FieldRule::Optional) {
+            (Vec::new(), docs)
+        } else {
+            (docs, Vec::new())
+        };
 
         Ok(vec![
             parse2(quote! {
-                #maybe_getter_doc
+                #(#getter_docs)*
                 pub fn #getter_ident(&self) -> #getter_type {
                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::get_field_or_else(
@@ -324,7 +316,7 @@ impl Field {
                 }
             })?,
             parse2(quote! {
-                #maybe_getter_opt_doc
+                #(#getter_opt_docs)*
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::get_field_opt(
@@ -359,11 +351,11 @@ impl Field {
         ])
     }
 
-    fn gen_message_struct_field_method_doc(&self) -> Result<Option<String>> {
+    fn gen_message_struct_field_method_doc_attrs(&self) -> Result<Vec<Attribute>> {
         let input_file = self.message()?.input_file()?;
         let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
-            return Ok(None);
+            return Ok(Vec::new());
         };
-        Ok(sci.into())
+        Ok(sci.gen_doc_attributes()?)
     }
 }

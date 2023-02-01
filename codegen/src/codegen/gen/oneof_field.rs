@@ -18,8 +18,8 @@ use super::{
     OneofField, PURORO_INTERNAL,
 };
 use crate::syn::{
-    parse2, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField, PathSegment,
-    Type,
+    parse2, Attribute, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField,
+    PathSegment, Type,
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -291,11 +291,7 @@ impl OneofField {
         };
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let enum_item_ident = self.gen_oneof_case_value_ident()?;
-        let maybe_method_doc = self.gen_message_struct_field_method_doc()?.map(|doc| {
-            quote! {
-                #[doc=#doc]
-            }
-        });
+        let docs = self.gen_message_struct_field_method_doc_attrs()?;
 
         Ok(vec![
             parse2(quote! {
@@ -305,7 +301,7 @@ impl OneofField {
                 }
             })?,
             parse2(quote! {
-                #maybe_method_doc
+                #(#docs)*
                 pub fn #getter_opt_ident(&self) -> #getter_opt_type {
                     use #PURORO_INTERNAL::SharedItems as _;
                     self.fields.#oneof_struct_field_ident.#getter_opt_ident(self.shared.bitfield())
@@ -347,11 +343,11 @@ impl OneofField {
         Ok(())
     }
 
-    fn gen_message_struct_field_method_doc(&self) -> Result<Option<String>> {
+    fn gen_message_struct_field_method_doc_attrs(&self) -> Result<Vec<Attribute>> {
         let input_file = self.message()?.input_file()?;
         let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
-            return Ok(None);
+            return Ok(Vec::new());
         };
-        Ok(sci.into())
+        Ok(sci.gen_doc_attributes()?)
     }
 }
