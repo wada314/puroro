@@ -52,6 +52,10 @@ pub struct CodegenOptions {
     /// field as `"my_module.rs"`, then `my_module.rs` and
     /// `my_module/my_package.rs` files will be generated.
     pub subdirectory_except_for_root_file: Option<String>,
+
+    /// If specified, overwrites the puroro library path referenced by the
+    /// generated code. Defaults by `"::puroro"`.
+    pub puroro_library_path: Option<String>,
 }
 
 pub fn generate_file_names_and_tokens<'a>(
