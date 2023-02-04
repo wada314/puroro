@@ -19,7 +19,7 @@ use super::{
     MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
-use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
+use ::puroro::protobuf::google::protobuf::DescriptorProto;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};

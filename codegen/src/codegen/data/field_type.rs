@@ -14,7 +14,7 @@
 
 use super::{Enum, Message, MessageOrEnumCase, PackageOrMessage, Syntax};
 use crate::{FatalErrorKind, Result};
-use ::puroro_protobuf_compiled::google::protobuf::field_descriptor_proto;
+use ::puroro::protobuf::google::protobuf::field_descriptor_proto;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug, Clone)]

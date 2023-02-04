@@ -10,5 +10,8 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use ::puroro::internal::*;
 }
-pub use _puroro::*;
+/// Re-exporting puroro
+pub mod puroro {
+    pub use ::puroro::*;
+}
 pub mod library;

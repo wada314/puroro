@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::{DataTypeBase, FieldBase, FieldType, Message, Oneof};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
+use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 

@@ -152,7 +152,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                     #[allow(unused)]
                     pub(crate) use #puroro_library_path::internal::*;
                 }
-                pub use #PURORO_LIB_IDENT::*;
+                /// Re-exporting puroro
+                pub mod puroro {
+                    pub use #puroro_library_path::*;
+                }
             }
         } else {
             quote! { #SUBMODULE_HEADER }
@@ -239,7 +242,10 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                     #[allow(unused)]
                     pub(crate) use #puroro_library_path::internal::*;
                 }
-                pub use #PURORO_LIB_IDENT::*;
+                /// Re-exporting puroro
+                pub mod puroro {
+                    pub use #puroro_library_path::*;
+                }
             }
         } else {
             quote! { #SUBMODULE_HEADER }
