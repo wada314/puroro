@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ::puroro_codegen::{
-    generate_output_file_protos, puroro::Message, CodeGeneratorRequest, CodegenOptions, Result,
+    generate_output_file_protos, puroro::Message, CodeGeneratorRequest, Result,
 };
 
 use ::std::io::Read;
@@ -21,8 +21,7 @@ use ::std::io::{stdin, stdout};
 
 fn main() -> Result<()> {
     let request = CodeGeneratorRequest::from_bytes_iter(&mut stdin().bytes()).unwrap();
-    let options = CodegenOptions::default();
-    let response = generate_output_file_protos(request.proto_file().into_iter(), &options)?;
+    let response = generate_output_file_protos(request.proto_file().into_iter())?;
     response.to_bytes(&mut stdout())?;
     Ok(())
 }
