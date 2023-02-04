@@ -11,6 +11,8 @@ puroro = { path = "../puroro" }
 
 [build-dependencies]
 puroro-codegen = { path = "../codegen" }
+protoc-bin-vendored = "3.0.0"
 
 [features]
 default = []
+dev-for-protobuf-use-stable-puroro = ["puroro/dev-for-protobuf-use-stable-puroro", "puroro-codegen/dev-for-protobuf-use-stable-puroro"]

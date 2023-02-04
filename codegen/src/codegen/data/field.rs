@@ -19,7 +19,7 @@ use super::{
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro_protobuf_compiled::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
+use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 

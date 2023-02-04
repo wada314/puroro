@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::protobuf::google::protobuf::source_code_info;
+use ::puroro_codegen::puroro::Message;
+use ::puroro_codegen::{generate_output_file_protos, CodeGeneratorRequest, CodegenOptions, Result};
+use ::std::io::Read;
+use ::std::io::{stdin, stdout};
 
-#[derive(Debug, Clone)]
-pub(crate) struct SourceCodeInfo {
-    pub(crate) leading_comments: String,
-    pub(crate) trailing_comments: String,
-}
-
-impl From<&source_code_info::Location> for SourceCodeInfo {
-    fn from(info: &source_code_info::Location) -> Self {
-        Self {
-            leading_comments: info.leading_comments().to_string(),
-            trailing_comments: info.trailing_comments().to_string(),
-        }
-    }
+fn main() -> Result<()> {
+    let request = CodeGeneratorRequest::from_bytes_iter(&mut stdin().bytes()).unwrap();
+    let options = CodegenOptions::default();
+    let response = generate_output_file_protos(request.proto_file().into_iter(), &options)?;
+    response.to_bytes(&mut stdout())?;
+    Ok(())
 }

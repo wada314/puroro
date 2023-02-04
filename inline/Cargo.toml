@@ -11,9 +11,12 @@ proc-macro = true
 
 [dependencies]
 puroro-codegen = { path = "../codegen" }
-puroro-protobuf-compiled = "0.10.0"
 litrs = "0.3.0"
 quote = "1.0"
 proc-macro2 = "1.0"
 tempdir = "0.3"
 protoc-bin-vendored = "3.0.0"
+
+[features]
+default = []
+dev-for-protobuf-use-stable-puroro = ["puroro-codegen/dev-for-protobuf-use-stable-puroro"]

@@ -12,7 +12,6 @@ documentation = "https://docs.rs/puroro/"
 
 [dependencies]
 puroro = { path = "../puroro", version = "0.10.0" }
-puroro-protobuf-compiled = "0.10.0"
 itertools = "0.10"
 lazy_static = "1.4"
 thiserror = "1.0"
@@ -22,6 +21,13 @@ quote = "1.0"
 proc-macro2 = "1.0"
 prettyplease = "0.1.23"
 protoc-bin-vendored = "3.0.0"
- 
+
 [features]
 default = []
+dev-for-protobuf-use-stable-puroro = ["puroro/dev-for-protobuf-use-stable-puroro"]
+
+[lib]
+
+[[bin]]
+name = "puroro-plugin"
+path = "src/main.rs"

@@ -11,8 +11,12 @@ publish = false
 tests-pb = { path = "../tests-pb" }
 puroro-inline = { path = "../inline" }
 puroro = { path = "../puroro" }
-puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled" }
 itertools = "0.10"
 
 [features]
 default = []
+dev-for-protobuf-use-stable-puroro = [
+    "puroro/dev-for-protobuf-use-stable-puroro",
+    "puroro-inline/dev-for-protobuf-use-stable-puroro",
+    "tests-pb/dev-for-protobuf-use-stable-puroro"
+]

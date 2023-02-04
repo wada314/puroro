@@ -17,9 +17,19 @@
 mod error;
 pub mod internal;
 pub mod message;
+pub mod protobuf;
 
 pub use self::error::PuroroError;
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
 pub use crate::message::Message;
+
+#[cfg(dev_for_protobuf_use_stable_puroro)]
+mod puroro_for_protobuf {
+    pub use ::stable_puroro::*;
+}
+#[cfg(not(dev_for_protobuf_use_stable_puroro))]
+mod puroro_for_protobuf {
+    pub use super::*;
+}

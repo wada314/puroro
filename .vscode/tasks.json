@@ -22,8 +22,8 @@
             "type": "cargo",
             "command": "build",
             "args": [
-                "-p",
-                "puroro-codegen"
+                "--features",
+                "dev-for-protobuf-use-stable-puroro"
             ],
             "problemMatcher": [
                 "$rustc"
@@ -37,73 +37,7 @@
                 "clear": true
             },
             "group": "build",
-            "label": "rust: cargo build -p puroro-codegen"
-        },
-        {
-            "type": "cargo",
-            "command": "build",
-            "args": [
-                "-p",
-                "puroro-protobuf-compiler"
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo build -p puroro-protobuf-compiler"
-        },
-        {
-            "type": "cargo",
-            "command": "build",
-            "args": [
-                "-p",
-                "puroro-protobuf-compiled"
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo build -p puroro-protobuf-compiled",
-            "dependsOn": [
-                "rust: cargo build -p puroro-protobuf-compiler"
-            ]
-        },
-        {
-            "type": "cargo",
-            "command": "build",
-            "args": [
-                "-p",
-                "tests-pb"
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo build -p tests-pb"
+            "label": "rust: cargo build (use stable puroro)"
         },
         {
             "type": "cargo",
@@ -124,6 +58,30 @@
             },
             "group": "test",
             "label": "rust: cargo test"
+        },
+        {
+            "type": "cargo",
+            "command": "test",
+            "args": [
+                "--features",
+                "dev-for-protobuf-use-stable-puroro"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "env": {
+                "RUST_BACKTRACE": "1"
+            },
+            "group": "test",
+            "label": "rust: cargo test (use stable puroro)"
         },
         {
             "type": "cargo",
@@ -154,7 +112,9 @@
             "command": "test",
             "args": [
                 "-p",
-                "puroro"
+                "tests",
+                "--features",
+                "dev-for-protobuf-use-stable-puroro"
             ],
             "problemMatcher": [
                 "$rustc"
@@ -171,31 +131,7 @@
                 "RUST_BACKTRACE": "1"
             },
             "group": "test",
-            "label": "rust: cargo test -p puroro"
-        },
-        {
-            "type": "cargo",
-            "command": "test",
-            "args": [
-                "-p",
-                "puroro-plugin"
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "env": {
-                "RUST_BACKTRACE": "1"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "test",
-            "label": "rust: cargo test -p puroro-plugin"
+            "label": "rust: cargo test -p tests (use stable puroro)"
         },
         {
             "type": "cargo",
@@ -221,11 +157,10 @@
         },
         {
             "type": "cargo",
-            "command": "doc",
+            "command": "run",
             "args": [
                 "-p",
-                "puroro-protobuf-compiled",
-                "--no-deps"
+                "update-puroro-protobuf",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -239,10 +174,7 @@
                 "clear": true
             },
             "group": "build",
-            "label": "rust: cargo doc -p puroro-protobuf-compiled",
-            "dependsOn": [
-                "rust: cargo build -p puroro-protobuf-compiler"
-            ]
+            "label": "rust: cargo run -p update-puroro-protobuf"
         }
     ]
 }

@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::{DataTypeBase, Enum, Message, Package, PackageOrMessage, SourceCodeInfo, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorProto;
+use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};

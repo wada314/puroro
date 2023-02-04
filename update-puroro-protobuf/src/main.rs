@@ -21,29 +21,38 @@ use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
-    println!("cargo:rerun-if-changed=../puroro");
-    println!("cargo:rerun-if-changed=../puroro-plugin");
-    println!("cargo:rerun-if-changed=../protobuf");
-    println!("cargo:rerun-if-changed=build.rs");
+    // Check if the current directory is puroro's workspace directory
+    // (not the crate puroro's directory)."
+    let output_rust_path = ["puroro", "src", "protobuf"]
+        .into_iter()
+        .collect::<PathBuf>();
+    if !output_rust_path.exists() || !output_rust_path.is_dir() {
+        eprintln!(
+            "Please run this command at the puroro's workspace dir, which contains the
+        directories like 'puroro' and 'tests'."
+        );
+        panic!();
+    }
 
-    let output_rust_path = ["../puroro-protobuf-compiled/src"]
-        .iter()
-        .collect::<PathBuf>();
-    let temp_output_rust_path = [env::var("OUT_DIR").unwrap(), "tmp-src".to_string()]
-        .iter()
-        .collect::<PathBuf>();
-    let file_descriptor_set_file_path = [
-        env::var("OUT_DIR").unwrap(),
-        "file_descriptor_set.pb".to_string(),
-    ]
-    .iter()
-    .collect::<PathBuf>();
+    let temp_dir = env::temp_dir().join("update-puroro-protobuf");
+    if !temp_dir.exists() {
+        create_dir_all(&temp_dir).unwrap();
+    }
+    let temp_output_rust_path = temp_dir.join("generated-rust");
+    let file_descriptor_set_file_path = temp_dir.join("file_descriptor_set.pb");
 
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
-    let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
+    let protoc_exe = protoc_bin_vendored::protoc_bin_path().unwrap();
+    let proto_path = protoc_bin_vendored::include_path().unwrap();
+    let plugin_proto_file = proto_path.join(
+        ["google", "protobuf", "compiler", "plugin.proto"]
+            .into_iter()
+            .collect::<PathBuf>(),
+    );
+
     let protoc_status = Command::new(&protoc_exe)
-        .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
-        .arg(format!("--proto_path={}", "../protobuf/src/"))
+        .arg(plugin_proto_file.as_os_str())
+        .arg(format!("--proto_path={}", proto_path.to_string_lossy()))
         .arg("--include_imports")
         .arg("--include_source_info")
         .arg("--experimental_allow_proto3_optional")
@@ -54,7 +63,7 @@ fn main() {
         .status()
         .unwrap();
     if !protoc_status.success() {
-        println!("cargo:warning=Failed to run `protoc` command.");
+        eprintln!("Failed to run `protoc` command.");
         panic!("Failed to run `protoc` command.")
     }
 
@@ -63,7 +72,9 @@ fn main() {
     let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
-    let options = CodegenOptions::default();
+    let mut options = CodegenOptions::default();
+    options.root_file_name = Some("mod.rs".to_string());
+    options.puroro_library_path = Some("crate::puroro_for_protobuf".to_string());
     let cgr =
         generate_output_file_protos(file_descriptor_set.file().into_iter(), &options).unwrap();
     let output_files = cgr.file();
