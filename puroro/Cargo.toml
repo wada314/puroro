@@ -14,7 +14,7 @@ readme = "../readme.md"
 thiserror = "1.0"
 either = "1.8"
 bitvec = "1.0"
-stable_puroro = { package = "puroro", version = "0.11.0", optional = true }
+stable_puroro = { package = "puroro", version = "*", optional = true }
 
 [dev-dependencies]
 puroro-doc-samples = { path = "../puroro-doc-samples" }
