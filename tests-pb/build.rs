@@ -22,9 +22,7 @@ use std::process::Command;
 
 fn main() {
     println!("cargo:rerun-if-changed=../puroro");
-    println!("cargo:rerun-if-changed=../puroro-internal");
-    println!("cargo:rerun-if-changed=../puroro-plugin");
-    println!("cargo:rerun-if-changed=../purotobuf");
+    println!("cargo:rerun-if-changed=../puroro-codegen");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=protos/*.proto");
 
@@ -37,7 +35,7 @@ fn main() {
     .collect::<PathBuf>();
 
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
-    let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
+    let protoc_exe = protoc_bin_vendored::protoc_bin_path().unwrap();
     let protoc_status = Command::new(&protoc_exe)
         .arg("protos/*.proto")
         .arg(format!("--proto_path={}", "./protos/"))
