@@ -29,6 +29,34 @@ use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
 
+/// Configurates the generated code.
+pub struct CodegenOptions {
+    /// Replaces the generated root .rs file name. If not specified, "lib.rs" is used.
+    /// Example: "my_library.rs"
+    pub root_file_name: Option<String>,
+
+    /// If specified, all generated rust files except the root files are prefixed
+    /// by the value + "/".
+    /// This field will be combined with the [`root_file_name`] field to generate a
+    /// module-level output code (instead of crate-level output code).
+    ///
+    /// Example:
+    /// Imagine if you have a single input file with `package = my_package;`
+    /// If you don't specify this field (and `root_file_name`), then the
+    /// generated file will be:
+    ///
+    /// ```rust lib.rs
+    /// // lib.rs
+    /// pub mod my_package;
+    /// ```
+    ///
+    /// ```rust my_package.rs
+    /// // my_package.rs
+    /// // some generated code...
+    /// ```
+    pub subdirectory_except_for_root_file: Option<String>,
+}
+
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
