@@ -3,7 +3,7 @@ name = "puroro-plugin"
 version = "0.10.0"
 edition = "2021"
 license = "Apache-2.0"
-description = "Google Protocol Buffer's compiler plugin implementation for puroro"
+description = "Deprecated, integrated into puroro-codegen. Google Protocol Buffer's compiler plugin implementation for puroro"
 repository = "https://github.com/wada314/puroro"
 documentation = "https://docs.rs/puroro/"
 
