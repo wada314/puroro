@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro_protobuf_compiled::google::protobuf::DescriptorProto;
-use ::puroro_protobuf_compiled::Message;
+use ::puroro::protobuf::google::protobuf::DescriptorProto;
+use ::puroro::protobuf::puroro::Message;
 use ::std::io::Read;
 
 #[test]
