@@ -38,6 +38,10 @@ pub struct CodegenOptions {
     /// `<root_module_name>/` directory.
     pub root_module_name: Option<String>,
 
+    /// Note: `root_module_name` will overwrite this flag.
+    /// Renames the default `"lib.rs"` root file name.
+    pub root_file_name: Option<String>,
+
     /// If specified, overwrites the puroro library path referenced by the
     /// generated code. Defaults by `"::puroro"`.
     pub puroro_library_path: Option<String>,
@@ -74,7 +78,10 @@ pub fn generate_file_names_and_tokens<'a>(
     file_generating_items
         .map_ok(|item| {
             let file_name = item
-                .module_file_path(options.root_module_name.as_deref())?
+                .module_file_path(
+                    options.root_module_name.as_deref(),
+                    options.root_file_name.as_deref(),
+                )?
                 .to_string();
             let file_content = item.gen_module_file(options.puroro_library_path.as_deref())?;
             Ok((file_name, quote! { #file_content }))

@@ -26,9 +26,7 @@ fn main() {
     println!("cargo:rerun-if-changed=../protobuf");
     println!("cargo:rerun-if-changed=build.rs");
 
-    let output_rust_path = ["../puroro-protobuf-compiled/src"]
-        .iter()
-        .collect::<PathBuf>();
+    let output_rust_path = ["../puroro/src/protobuf"].iter().collect::<PathBuf>();
     let temp_output_rust_path = [env::var("OUT_DIR").unwrap(), "tmp-src".to_string()]
         .iter()
         .collect::<PathBuf>();
@@ -63,7 +61,9 @@ fn main() {
     let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
-    let options = CodegenOptions::default();
+    let mut options = CodegenOptions::default();
+    options.root_file_name = Some("mod.rs".to_string());
+    options.puroro_library_path = Some("crate::puroro_for_protobuf".to_string());
     let cgr =
         generate_output_file_protos(file_descriptor_set.file().into_iter(), &options).unwrap();
     let output_files = cgr.file();
