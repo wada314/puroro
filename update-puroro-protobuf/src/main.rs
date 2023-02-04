@@ -34,18 +34,25 @@ fn main() {
         panic!();
     }
 
-    let mut temp_dir = env::temp_dir();
-    temp_dir.push("update-puroro-protobuf");
-    let mut temp_output_rust_path = temp_dir.clone();
-    temp_output_rust_path.push("generated-rust");
-    let mut file_descriptor_set_file_path = temp_dir.clone();
-    file_descriptor_set_file_path.push("file_descriptor_set.pb");
+    let temp_dir = env::temp_dir().join("update-puroro-protobuf");
+    if !temp_dir.exists() {
+        create_dir_all(&temp_dir).unwrap();
+    }
+    let temp_output_rust_path = temp_dir.join("generated-rust");
+    let file_descriptor_set_file_path = temp_dir.join("file_descriptor_set.pb");
 
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
-    let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
+    let protoc_exe = protoc_bin_vendored::protoc_bin_path().unwrap();
+    let proto_path = protoc_bin_vendored::include_path().unwrap();
+    let plugin_proto_file = proto_path.join(
+        ["google", "protobuf", "compiler", "plugin.proto"]
+            .into_iter()
+            .collect::<PathBuf>(),
+    );
+
     let protoc_status = Command::new(&protoc_exe)
-        .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
-        .arg(format!("--proto_path={}", "../protobuf/src/"))
+        .arg(plugin_proto_file.as_os_str())
+        .arg(format!("--proto_path={}", proto_path.to_string_lossy()))
         .arg("--include_imports")
         .arg("--include_source_info")
         .arg("--experimental_allow_proto3_optional")
@@ -56,7 +63,7 @@ fn main() {
         .status()
         .unwrap();
     if !protoc_status.success() {
-        println!("cargo:warning=Failed to run `protoc` command.");
+        eprintln!("Failed to run `protoc` command.");
         panic!("Failed to run `protoc` command.")
     }
 
