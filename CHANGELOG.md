@@ -1,4 +1,8 @@
 
+# v 0.11.0
+- Re-organized packages
+- Added some configurable options for code generation
+
 # v 0.10.0
 - Fixed the bug release-build is not working.
 - Propagates (some part of) the .proto file's doc into the generated .rs files.
