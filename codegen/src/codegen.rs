@@ -29,8 +29,23 @@ use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
 
+#[derive(Default)]
+/// Configurates the generated code.
+pub struct CodegenOptions {
+    /// If this value is not specified, the code generator generates `lib.rs`
+    /// as a root file. If it is specified, the root file name will become
+    /// this `<root_module_name>.rs`, and the other files are generated under
+    /// `<root_module_name>/` directory.
+    pub root_module_name: Option<String>,
+
+    /// If specified, overwrites the puroro library path referenced by the
+    /// generated code. Defaults by `"::puroro"`.
+    pub puroro_library_path: Option<String>,
+}
+
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
+    options: &CodegenOptions,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = Package::new_root(files);
 
@@ -58,8 +73,10 @@ pub fn generate_file_names_and_tokens<'a>(
             );
     file_generating_items
         .map_ok(|item| {
-            let file_name = item.module_file_path()?.to_string();
-            let file_content = item.gen_module_file()?;
+            let file_name = item
+                .module_file_path(options.root_module_name.as_deref())?
+                .to_string();
+            let file_content = item.gen_module_file(options.puroro_library_path.as_deref())?;
             Ok((file_name, quote! { #file_content }))
         })
         .map(|rr| rr.flatten())
@@ -68,9 +85,10 @@ pub fn generate_file_names_and_tokens<'a>(
 
 pub fn generate_output_file_protos<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
+    options: &CodegenOptions,
 ) -> Result<CodeGeneratorResponse> {
     let mut cgr = CodeGeneratorResponse::default();
-    *cgr.file_mut() = generate_file_names_and_tokens(files)?
+    *cgr.file_mut() = generate_file_names_and_tokens(files, options)?
         .into_iter()
         .map(|(file_name, ts)| {
             let formatted = if let Ok(syn_file) = syn::parse2::<syn::File>(ts.clone()) {
@@ -92,7 +110,8 @@ pub fn generate_output_file_protos<'a>(
 
 pub fn generate_tokens_for_inline<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
+    options: &CodegenOptions,
 ) -> Result<TokenStream> {
     let root_package = Package::new_root(files);
-    root_package.gen_inline_code()
+    root_package.gen_inline_code(options.puroro_library_path.as_deref())
 }

@@ -4,11 +4,11 @@ mod _root {
 }
 mod _puroro {
     #[allow(unused)]
-    pub(crate) use ::puroro::*;
+    pub(crate) use super::_root::_puroro::*;
 }
 mod _pinternal {
     #[allow(unused)]
-    pub(crate) use ::puroro::internal::*;
+    pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(
     ::std::clone::Clone,

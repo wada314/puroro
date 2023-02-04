@@ -4,11 +4,11 @@ mod _root {
 }
 mod _puroro {
     #[allow(unused)]
-    pub(crate) use ::puroro::*;
+    pub(crate) use super::_root::_puroro::*;
 }
 mod _pinternal {
     #[allow(unused)]
-    pub(crate) use ::puroro::internal::*;
+    pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
 /** Represents a single generated file.
@@ -401,15 +401,15 @@ impl ::std::cmp::PartialEq for File {
 pub mod _fields {
     mod _root {
         #[allow(unused)]
-        pub use super::super::_root::*;
+        pub(crate) use super::super::_root::*;
     }
     mod _puroro {
         #[allow(unused)]
-        pub use ::puroro::*;
+        pub(crate) use super::_root::_puroro::*;
     }
     mod _pinternal {
         #[allow(unused)]
-        pub use ::puroro::internal::*;
+        pub(crate) use super::_root::_pinternal::*;
     }
     #[derive(::std::default::Default)]
     pub struct FileFields<TName, TInsertionPoint, TContent, TGeneratedCodeInfo> {

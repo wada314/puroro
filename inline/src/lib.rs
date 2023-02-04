@@ -17,7 +17,7 @@
 use ::litrs::StringLit;
 use ::proc_macro::{LineColumn, Span, TokenStream};
 use ::protoc_bin_vendored::protoc_bin_path;
-use ::puroro_codegen::generate_tokens_for_inline;
+use ::puroro_codegen::{generate_tokens_for_inline, CodegenOptions};
 use ::puroro_protobuf_compiled::google::protobuf::FileDescriptorSet;
 use ::puroro_protobuf_compiled::Message;
 use ::quote::{format_ident, quote};
@@ -82,7 +82,9 @@ fn gen_code(input_str: &str) -> TokenStream {
         FileDescriptorSet::from_bytes_iter(f.bytes()).unwrap()
     };
 
-    let main_code = match generate_tokens_for_inline(fd_set.file().into_iter()) {
+    let options = CodegenOptions::default();
+
+    let main_code = match generate_tokens_for_inline(fd_set.file().into_iter(), &options) {
         Ok(main_code) => main_code,
         Err(GeneratorError::FatalError { kind, backtrace }) => {
             let message = format!("{}\n{}", kind.to_string(), &backtrace);

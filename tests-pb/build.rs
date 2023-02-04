@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use puroro_codegen::puroro::Message;
-use puroro_codegen::{generate_output_file_protos, FileDescriptorSet};
+use puroro_codegen::{generate_output_file_protos, CodegenOptions, FileDescriptorSet};
 use std::env;
 use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
@@ -60,7 +60,9 @@ fn main() {
     let file_descriptor_set = FileDescriptorSet::from_bytes_iter(fds_file.bytes()).unwrap();
 
     // Generate the code, returned by File proto structs.
-    let cgr = generate_output_file_protos(file_descriptor_set.file().iter()).unwrap();
+    let options = CodegenOptions::default();
+    let cgr = generate_output_file_protos(file_descriptor_set.file().iter(), &options).unwrap();
+
     // Output the File proto structs into the actual filesystem.
     for output_file in cgr.file() {
         let file_path = output_rust_path.join(output_file.name());

@@ -17,7 +17,7 @@ use super::{
     PackageOrMessage, PURORO_INTERNAL_IDENT, PURORO_LIB_IDENT, PURORO_ROOT, PURORO_ROOT_IDENT,
     SUBMODULE_HEADER,
 };
-use crate::syn::{parse2, File, Item, Path};
+use crate::syn::{parse2, parse_str, File, Item, Path};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -28,11 +28,11 @@ use ::std::rc::Rc;
 
 pub(crate) trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
-    fn module_file_path(&self) -> Result<&str>;
-    fn module_file_dir(&self) -> Result<&str>;
+    fn module_file_path(&self, root_name: Option<&str>) -> Result<&str>;
+    fn module_file_dir(&self, root_name: Option<&str>) -> Result<&str>;
     fn gen_rust_module_path(&self) -> Result<Rc<Path>>;
-    fn gen_module_file(&self) -> Result<File>;
-    fn gen_inline_code(&self) -> Result<TokenStream>;
+    fn gen_module_file(&self, puroro_library_path: Option<&str>) -> Result<File>;
+    fn gen_inline_code(&self, puroro_library_path: Option<&str>) -> Result<TokenStream>;
 }
 
 #[derive(Debug, Default)]
@@ -60,7 +60,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             })
             .map(|s| s.as_str())
     }
-    fn module_file_path(&self) -> Result<&str> {
+    fn module_file_path(&self, root_name: Option<&str>) -> Result<&str> {
         self.cache()
             .get::<Cache>()?
             .module_file_path
@@ -68,17 +68,21 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 Ok(if let Some(parent) = self.parent()? {
                     format!(
                         "{}{}.rs",
-                        parent.module_file_dir()?,
+                        parent.module_file_dir(root_name)?,
                         self.name()?.to_lower_snake_case()
                     )
                 } else {
-                    "lib.rs".to_string()
+                    if let Some(root_name) = root_name {
+                        format!("{}.rs", root_name)
+                    } else {
+                        "lib.rs".to_string()
+                    }
                 })
             })
             .map(|s| s.as_str())
     }
 
-    fn module_file_dir(&self) -> Result<&str> {
+    fn module_file_dir(&self, root_name: Option<&str>) -> Result<&str> {
         self.cache()
             .get::<Cache>()?
             .module_file_dir
@@ -86,11 +90,15 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 if let Some(parent) = self.parent()? {
                     Ok(format!(
                         "{}{}/",
-                        parent.module_file_dir()?,
+                        parent.module_file_dir(root_name)?,
                         self.name()?.to_lower_snake_case()
                     ))
                 } else {
-                    Ok("".to_string())
+                    if let Some(root_name) = root_name {
+                        Ok(root_name.to_string())
+                    } else {
+                        Ok("".to_string())
+                    }
                 }
             })
             .map(|s| s.as_str())
@@ -116,28 +124,30 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .cloned()
     }
 
-    fn gen_module_file(&self) -> Result<File> {
+    fn gen_module_file(&self, puroro_library_path: Option<&str>) -> Result<File> {
+        let puroro_library_path: Path = if let Some(puroro_library_path) = puroro_library_path {
+            parse_str(puroro_library_path)?
+        } else {
+            parse2(quote! { ::puroro })?
+        };
         let header = if self.is_root()? {
             quote! {
-                /// re-export puroro.
-                pub use ::puroro;
-
-                /// re-export the primitive types in puroro namespace.
-                /// by using the "*", it can be hidden by the same typename explicitly defined in this file.
-                pub use ::puroro::*;
-
                 mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
                     pub(crate) use super::*;
                 }
+                mod #PURORO_LIB_IDENT {
+                    #[allow(unused)]
+                    pub use #puroro_library_path::*;
+                }
+                mod #PURORO_INTERNAL_IDENT {
+                    #[allow(unused)]
+                    pub(crate) use #puroro_library_path::internal::*;
+                }
+                pub use #PURORO_LIB_IDENT::*;
             }
         } else {
-            quote! {
-                mod #PURORO_ROOT_IDENT {
-                    #[allow(unused)]
-                    pub(crate) use super::super::#PURORO_ROOT_IDENT::*;
-                }
-            }
+            quote! { #SUBMODULE_HEADER }
         };
 
         let submodule_sources = self
@@ -162,36 +172,12 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
         let content_items = gen_messages_enums_oneofs_in_module(self)?;
         Ok(parse2(quote! {
             #header
-            mod #PURORO_LIB_IDENT {
-                #[allow(unused)]
-                pub(crate) use ::puroro::*;
-            }
-            mod #PURORO_INTERNAL_IDENT {
-                #[allow(unused)]
-                pub(crate) use ::puroro::internal::*;
-            }
             #(pub mod #submodule_idents;)*
             #(#content_items)*
         })?)
     }
 
-    fn gen_inline_code(&self) -> Result<TokenStream> {
-        let header = if self.is_root()? {
-            quote! {
-                mod #PURORO_ROOT_IDENT {
-                    #[allow(unused)]
-                    pub(crate) use super::*;
-                }
-            }
-        } else {
-            quote! {
-                mod #PURORO_ROOT_IDENT {
-                    #[allow(unused)]
-                    pub(crate) use super::super::#PURORO_ROOT_IDENT::*;
-                }
-            }
-        };
-
+    fn gen_inline_code(&self, puroro_library_path: Option<&str>) -> Result<TokenStream> {
         let submodule_sources = self
             .subpackages()?
             .map(|p| Ok(p as Rc<dyn PackageOrMessage>))
@@ -208,7 +194,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 .map(|rp| {
                     let p = rp?;
                     let name = format_ident!("{}", p.module_name()?);
-                    let contents = p.gen_inline_code()?;
+                    let contents = p.gen_inline_code(puroro_library_path)?;
                     Ok((name, contents))
                 })
                 .collect::<Result<Vec<_>>>()?;
@@ -226,16 +212,33 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
 
         let content_items = gen_messages_enums_oneofs_in_module(self)?;
 
+        let puroro_library_path: Path = if let Some(puroro_library_path) = puroro_library_path {
+            parse_str(puroro_library_path)?
+        } else {
+            parse2(quote! { ::puroro })?
+        };
+        let header = if self.is_root()? {
+            quote! {
+                mod #PURORO_ROOT_IDENT {
+                    #[allow(unused)]
+                    pub(crate) use super::*;
+                }
+                mod #PURORO_LIB_IDENT {
+                    #[allow(unused)]
+                    pub use #puroro_library_path::*;
+                }
+                mod #PURORO_INTERNAL_IDENT {
+                    #[allow(unused)]
+                    pub(crate) use #puroro_library_path::internal::*;
+                }
+                pub use #PURORO_LIB_IDENT::*;
+            }
+        } else {
+            quote! { #SUBMODULE_HEADER }
+        };
+
         Ok(quote! {
             #header
-            mod #PURORO_LIB_IDENT {
-                #[allow(unused)]
-                pub(crate) use ::puroro::*;
-            }
-            mod #PURORO_INTERNAL_IDENT {
-                #[allow(unused)]
-                pub(crate) use ::puroro::internal::*;
-            }
             #(pub mod #submodule_idents {
                 #submodule_contents
             })*

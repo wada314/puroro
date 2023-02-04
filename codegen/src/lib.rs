@@ -25,7 +25,7 @@ mod error;
 
 mod syn {
     pub(crate) use ::syn::{
-        parse2, Arm, Attribute, Expr, ExprMethodCall, Field, FieldValue, File, Ident,
+        parse2, parse_str, Arm, Attribute, Expr, ExprMethodCall, Field, FieldValue, File, Ident,
         ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
     };
     pub(crate) struct NamedField(::syn::Field);
@@ -56,11 +56,15 @@ pub use crate::error::{FatalErrorKind, GeneratorError};
 pub type Result<T> = ::std::result::Result<T, GeneratorError>;
 
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::code_generator_response::File;
+// SOMEHOW these `pub use`s are causing cargo doc to stack overflow!
+#[doc(hidden)]
 pub use ::puroro_protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
+#[doc(hidden)]
 pub use ::puroro_protobuf_compiled::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
 pub use ::puroro_protobuf_compiled::puroro;
 
 pub use crate::codegen::generate_output_file_protos;
 pub use crate::codegen::generate_tokens_for_inline;
+pub use crate::codegen::CodegenOptions;
