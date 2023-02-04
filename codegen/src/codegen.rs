@@ -44,6 +44,7 @@ pub struct CodegenOptions {
 
 pub fn generate_file_names_and_tokens<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
+    options: &CodegenOptions,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = Package::new_root(files);
 
@@ -71,7 +72,9 @@ pub fn generate_file_names_and_tokens<'a>(
             );
     file_generating_items
         .map_ok(|item| {
-            let file_name = item.module_file_path()?.to_string();
+            let file_name = item
+                .module_file_path(options.root_module_name.as_deref())?
+                .to_string();
             let file_content = item.gen_module_file()?;
             Ok((file_name, quote! { #file_content }))
         })
@@ -81,9 +84,10 @@ pub fn generate_file_names_and_tokens<'a>(
 
 pub fn generate_output_file_protos<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
+    options: &CodegenOptions,
 ) -> Result<CodeGeneratorResponse> {
     let mut cgr = CodeGeneratorResponse::default();
-    *cgr.file_mut() = generate_file_names_and_tokens(files)?
+    *cgr.file_mut() = generate_file_names_and_tokens(files, options)?
         .into_iter()
         .map(|(file_name, ts)| {
             let formatted = if let Ok(syn_file) = syn::parse2::<syn::File>(ts.clone()) {

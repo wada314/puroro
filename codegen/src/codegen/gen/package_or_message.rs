@@ -28,8 +28,8 @@ use ::std::rc::Rc;
 
 pub(crate) trait PackageOrMessageExt {
     fn module_name(&self) -> Result<&str>;
-    fn module_file_path(&self) -> Result<&str>;
-    fn module_file_dir(&self) -> Result<&str>;
+    fn module_file_path(&self, root_name: Option<&str>) -> Result<&str>;
+    fn module_file_dir(&self, root_name: Option<&str>) -> Result<&str>;
     fn gen_rust_module_path(&self) -> Result<Rc<Path>>;
     fn gen_module_file(&self) -> Result<File>;
     fn gen_inline_code(&self) -> Result<TokenStream>;
@@ -60,7 +60,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             })
             .map(|s| s.as_str())
     }
-    fn module_file_path(&self) -> Result<&str> {
+    fn module_file_path(&self, root_name: Option<&str>) -> Result<&str> {
         self.cache()
             .get::<Cache>()?
             .module_file_path
@@ -68,17 +68,21 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 Ok(if let Some(parent) = self.parent()? {
                     format!(
                         "{}{}.rs",
-                        parent.module_file_dir()?,
+                        parent.module_file_dir(root_name)?,
                         self.name()?.to_lower_snake_case()
                     )
                 } else {
-                    "lib.rs".to_string()
+                    if let Some(root_name) = root_name {
+                        format!("{}.rs", root_name)
+                    } else {
+                        "lib.rs".to_string()
+                    }
                 })
             })
             .map(|s| s.as_str())
     }
 
-    fn module_file_dir(&self) -> Result<&str> {
+    fn module_file_dir(&self, root_name: Option<&str>) -> Result<&str> {
         self.cache()
             .get::<Cache>()?
             .module_file_dir
@@ -86,11 +90,15 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
                 if let Some(parent) = self.parent()? {
                     Ok(format!(
                         "{}{}/",
-                        parent.module_file_dir()?,
+                        parent.module_file_dir(root_name)?,
                         self.name()?.to_lower_snake_case()
                     ))
                 } else {
-                    Ok("".to_string())
+                    if let Some(root_name) = root_name {
+                        Ok(root_name.to_string())
+                    } else {
+                        Ok("".to_string())
+                    }
                 }
             })
             .map(|s| s.as_str())
