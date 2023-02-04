@@ -37,23 +37,20 @@ pub struct CodegenOptions {
 
     /// If specified, all generated rust files except the root files are prefixed
     /// by the value + "/".
-    /// This field will be combined with the [`root_file_name`] field to generate a
+    /// This field will be combined with the `root_file_name` field to generate a
     /// module-level output code (instead of crate-level output code).
     ///
-    /// Example:
-    /// Imagine if you have a single input file with `package = my_package;`
-    /// If you don't specify this field (and `root_file_name`), then the
-    /// generated file will be:
+    /// # Example
     ///
-    /// ```rust lib.rs
-    /// // lib.rs
-    /// pub mod my_package;
-    /// ```
+    /// Imagine if you have a single input proto file with
+    /// `package = my_package;`.
     ///
-    /// ```rust my_package.rs
-    /// // my_package.rs
-    /// // some generated code...
-    /// ```
+    /// If you don't specify this field (neither `root_file_name`), then
+    /// `lib.rs` and `my_package.rs` will be generated.
+    ///
+    /// If you set `"my_module"` to this field, and set the `root_file_name`
+    /// field as `"my_module.rs"`, then `my_module.rs` and
+    /// `my_module/my_package.rs` files will be generated.
     pub subdirectory_except_for_root_file: Option<String>,
 }
 

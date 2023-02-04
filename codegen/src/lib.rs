@@ -67,3 +67,4 @@ pub use ::puroro_protobuf_compiled::puroro;
 
 pub use crate::codegen::generate_output_file_protos;
 pub use crate::codegen::generate_tokens_for_inline;
+pub use crate::codegen::CodegenOptions;
