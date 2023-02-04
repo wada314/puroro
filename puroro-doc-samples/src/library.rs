@@ -426,7 +426,7 @@ pub mod _fields {
     }
     mod _pinternal {
         #[allow(unused)]
-        pub use super::_puroro::_pinternal::*;
+        pub use super::_puroro::internal::*;
     }
     #[derive(::std::default::Default)]
     pub struct BookFields<TTitle, TNumPages, TAuthor> {

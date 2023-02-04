@@ -31,27 +31,11 @@ use ::std::rc::Rc;
 
 /// Configurates the generated code.
 pub struct CodegenOptions {
-    /// Replaces the generated root .rs file name. If not specified, "lib.rs" is used.
-    /// Example: "my_library.rs"
-    pub root_file_name: Option<String>,
-
-    /// If specified, all generated rust files except the root files are prefixed
-    /// by the value + "/".
-    /// This field will be combined with the `root_file_name` field to generate a
-    /// module-level output code (instead of crate-level output code).
-    ///
-    /// # Example
-    ///
-    /// Imagine if you have a single input proto file with
-    /// `package = my_package;`.
-    ///
-    /// If you don't specify this field (neither `root_file_name`), then
-    /// `lib.rs` and `my_package.rs` will be generated.
-    ///
-    /// If you set `"my_module"` to this field, and set the `root_file_name`
-    /// field as `"my_module.rs"`, then `my_module.rs` and
-    /// `my_module/my_package.rs` files will be generated.
-    pub subdirectory_except_for_root_file: Option<String>,
+    /// If this value is not specified, the code generator generates `lib.rs`
+    /// as a root file. If it is specified, the root file name will become
+    /// this `<root_module_name>.rs`, and the other files are generated under
+    /// `<root_module_name>/` directory.
+    pub root_module_name: Option<String>,
 
     /// If specified, overwrites the puroro library path referenced by the
     /// generated code. Defaults by `"::puroro"`.
