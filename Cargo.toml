@@ -5,7 +5,6 @@ members = [
     "inline",
     "plugin",
     "puroro-protobuf-compiled",
-    "puroro-protobuf-compiler",
     "puroro-doc-samples",
     "update-puroro-protobuf",
     "tests",
