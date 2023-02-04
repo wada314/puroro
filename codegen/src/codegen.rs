@@ -29,6 +29,7 @@ use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
 
+#[derive(Default)]
 /// Configurates the generated code.
 pub struct CodegenOptions {
     /// If this value is not specified, the code generator generates `lib.rs`
@@ -75,7 +76,7 @@ pub fn generate_file_names_and_tokens<'a>(
             let file_name = item
                 .module_file_path(options.root_module_name.as_deref())?
                 .to_string();
-            let file_content = item.gen_module_file()?;
+            let file_content = item.gen_module_file(options.puroro_library_path.as_deref())?;
             Ok((file_name, quote! { #file_content }))
         })
         .map(|rr| rr.flatten())
@@ -109,7 +110,8 @@ pub fn generate_output_file_protos<'a>(
 
 pub fn generate_tokens_for_inline<'a>(
     files: impl Iterator<Item = &'a FileDescriptorProto>,
+    options: &CodegenOptions,
 ) -> Result<TokenStream> {
     let root_package = Package::new_root(files);
-    root_package.gen_inline_code()
+    root_package.gen_inline_code(options.puroro_library_path.as_deref())
 }

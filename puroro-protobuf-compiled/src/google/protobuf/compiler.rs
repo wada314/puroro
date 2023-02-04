@@ -4,11 +4,11 @@ mod _root {
 }
 mod _puroro {
     #[allow(unused)]
-    pub(crate) use ::puroro::*;
+    pub(crate) use super::_root::_puroro::*;
 }
 mod _pinternal {
     #[allow(unused)]
-    pub(crate) use ::puroro::internal::*;
+    pub(crate) use super::_root::_pinternal::*;
 }
 pub mod code_generator_response;
 #[derive(::std::default::Default)]
@@ -927,15 +927,15 @@ impl ::std::cmp::PartialEq for CodeGeneratorResponse {
 pub mod _fields {
     mod _root {
         #[allow(unused)]
-        pub use super::super::_root::*;
+        pub(crate) use super::super::_root::*;
     }
     mod _puroro {
         #[allow(unused)]
-        pub use super::_root::_puroro::*;
+        pub(crate) use super::_root::_puroro::*;
     }
     mod _pinternal {
         #[allow(unused)]
-        pub use super::_puroro::internal::*;
+        pub(crate) use super::_root::_pinternal::*;
     }
     #[derive(::std::default::Default)]
     pub struct VersionFields<TMajor, TMinor, TPatch, TSuffix> {
