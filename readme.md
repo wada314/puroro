@@ -52,7 +52,8 @@ Then edit the `Cargo.toml` to add the dependency to `puroro` library crates:
 puroro = "*"
 
 [build-dependencies]
-puroro-plugin = "*"
+puroro-codegen = "*"
+protoc-bin-vendored = "3.0.0"
 ```
 
 As a last step, create a file `build.rs` under the crate root directory.
@@ -78,14 +79,8 @@ your own crate. Congraturations!
 - codegen -- Generate rust code from the given .proto files info
 - inline -- Provides a proc macro to directly write proto code in rust code.
 Currently only used by testing purpose, not published.
-- plugin -- A protoc compiler plugin
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
-- protobuf -- A git submodule of Google's official protobuf repository
-  - When you cloned & checkout the puroro repository, remember to run `git submodule init` and
-   `git submodule update` to download this directory.
-- puroro-protobuf-compiled -- Compiled .rs files from protobuf crate so that puroro-plugin crate can use it.
-- puroro-protobuf-compiler -- A crate which only contains build.rs that generates the ...-compiled crate.
 
 # TODOs
 - proto2
