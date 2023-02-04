@@ -931,11 +931,11 @@ pub mod _fields {
     }
     mod _puroro {
         #[allow(unused)]
-        pub use ::puroro::*;
+        pub use super::_root::_puroro::*;
     }
     mod _pinternal {
         #[allow(unused)]
-        pub use ::puroro::internal::*;
+        pub use super::_puroro::internal::*;
     }
     #[derive(::std::default::Default)]
     pub struct VersionFields<TMajor, TMinor, TPatch, TSuffix> {

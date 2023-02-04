@@ -70,11 +70,11 @@ gen_global_constants! {
         }
         mod #PURORO_LIB_IDENT {
             #[allow(unused)]
-            pub use ::puroro::*;
+            pub use super::#PURORO_ROOT_IDENT::#PURORO_LIB_IDENT::*;
         }
         mod #PURORO_INTERNAL_IDENT {
             #[allow(unused)]
-            pub use ::puroro::internal::*;
+            pub use super::#PURORO_LIB_IDENT::internal::*;
         }
     };
 }
