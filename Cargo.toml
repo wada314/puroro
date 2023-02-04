@@ -3,8 +3,6 @@ members = [
     "puroro",
     "codegen",
     "inline",
-    "plugin",
-    "puroro-protobuf-compiled",
     "puroro-doc-samples",
     "update-puroro-protobuf",
     "tests",
