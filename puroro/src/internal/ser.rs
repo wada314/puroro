@@ -81,7 +81,9 @@ impl<T, E> FieldData<::std::result::Result<T, E>> {
 }
 
 impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<ScopedIter<'a, I>> {
-    pub fn from_bytes_scoped_iter(bytes: &'a mut ScopedIter<'a, I>) -> Result<Option<(i32, Self)>> {
+    pub fn from_bytes_scoped_iter<'b: 'a>(
+        bytes: &'a mut ScopedIter<'b, I>,
+    ) -> Result<Option<(i32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
             let var_u32 = var.get_u32()?;
             let wire_type: WireType = (var_u32 & 0x7).try_into()?;
@@ -238,9 +240,12 @@ impl<'a, I> ScopedIter<'a, I> {
     }
 }
 impl<'a, I: Iterator> ScopedIter<'a, I> {
-    pub fn scope(&'a mut self, len: usize) -> ScopedIter<'a, I> {
+    pub fn scope<'b>(&'b mut self, len: usize) -> ScopedIter<'b, I>
+    where
+        'a: 'b,
+    {
         let end = Some(self.iter.pos() + len);
-        Self {
+        ScopedIter {
             iter: self.iter,
             end,
         }
