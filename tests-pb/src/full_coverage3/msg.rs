@@ -145,7 +145,51 @@ impl self::_puroro::Message for Submsg {
     }
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        mut iter: I,
+        iter: I,
+    ) -> self::_puroro::Result<()> {
+        let mut scoped_iter = self::_pinternal::ScopedIter::new(iter);
+        <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
+            self,
+            &mut scoped_iter,
+        )?;
+        Ok(())
+    }
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)]
+        out: &mut W,
+    ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.i32_unlabeled,
+            self.shared.bitfield(),
+            1i32,
+            out,
+        )?;
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.i32_optional,
+            self.shared.bitfield(),
+            2i32,
+            out,
+        )?;
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.i64_unlabeled,
+            self.shared.bitfield(),
+            101i32,
+            out,
+        )?;
+        self.shared.unknown_fields().ser_to_write(out)?;
+        ::std::result::Result::Ok(())
+    }
+}
+impl self::_pinternal::MessageInternal for Submsg {
+    fn merge_from_scoped_bytes_iter<
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+    >(
+        &mut self,
+        iter: &mut self::_pinternal::ScopedIter<I>,
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
@@ -201,35 +245,6 @@ impl self::_puroro::Message for Submsg {
             }
         }
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_unlabeled,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_optional,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i64_unlabeled,
-            self.shared.bitfield(),
-            101i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Submsg {

@@ -16,7 +16,7 @@ use crate::internal::ScopedIter;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 
-pub trait MessageInternal: Sized {
+pub trait MessageInternal: crate::Message {
     fn merge_from_scoped_bytes_iter<I: Iterator<Item = IoResult<u8>>>(
         &mut self,
         scoped_iter: &mut ScopedIter<I>,

@@ -14,6 +14,7 @@
 
 pub mod bitvec;
 pub mod field_type;
+pub mod message_internal;
 pub mod oneof_field_type;
 pub mod oneof_type;
 pub mod ser;
@@ -29,6 +30,7 @@ pub use self::field_type::{
     RepeatedFieldType, RepeatedMessageField, RepeatedNumericalField, RepeatedUnsizedField,
     SingularHeapMessageField, SingularNumericalField, SingularUnsizedField,
 };
+pub use self::message_internal::MessageInternal;
 pub use self::oneof_field_type::{HeapMessageField, NumericalField, OneofFieldType, UnsizedField};
 pub use self::oneof_type::{OneofCase, OneofUnion};
 pub use self::ser::ScopedIter;
