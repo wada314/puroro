@@ -17,7 +17,6 @@ use crate::internal::variant::Variant;
 use crate::{PuroroError, Result};
 use ::std::convert::TryFrom;
 use ::std::io::{Result as IoResult, Write};
-use ::std::iter;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldData<T> {
@@ -80,8 +79,10 @@ impl<T, E> FieldData<::std::result::Result<T, E>> {
     }
 }
 
-impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
-    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
+impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<ScopedIter<'a, I>> {
+    pub fn from_bytes_scoped_iter<'b: 'a>(
+        bytes: &'a mut ScopedIter<'b, I>,
+    ) -> Result<Option<(i32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
             let var_u32 = var.get_u32()?;
             let wire_type: WireType = (var_u32 & 0x7).try_into()?;
@@ -96,7 +97,7 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
                         .ok_or(PuroroError::UnexpectedInputTermination)?
                         .get_i32()?
                         .try_into()?;
-                    FieldData::LengthDelimited(bytes.take(length))
+                    FieldData::LengthDelimited(bytes.scope(length))
                 }
                 WireType::StartGroup => todo!(),
                 WireType::EndGroup => todo!(),
@@ -203,4 +204,72 @@ fn read_byte<I: Iterator<Item = IoResult<u8>>>(bytes: &mut I) -> Result<u8> {
     Ok(bytes
         .next()
         .ok_or(PuroroError::UnexpectedInputTermination)??)
+}
+
+pub struct PosIter<I> {
+    iter: I,
+    pos: usize,
+}
+impl<I> PosIter<I> {
+    pub fn new(iter: I) -> Self {
+        Self { iter, pos: 0 }
+    }
+    pub fn pos(&self) -> usize {
+        self.pos
+    }
+}
+impl<I: Iterator> Iterator for PosIter<I> {
+    type Item = I::Item;
+    fn next(&mut self) -> Option<Self::Item> {
+        let next_val = self.iter.next();
+        if next_val.is_some() {
+            self.pos += 1;
+        }
+        next_val
+    }
+}
+
+pub struct ScopedIter<'a, I> {
+    iter: &'a mut PosIter<I>,
+    end: Option<usize>,
+}
+impl<'a, I> ScopedIter<'a, I> {
+    pub fn from_mut_pos_iter(iter: &'a mut PosIter<I>) -> Self {
+        Self { iter, end: None }
+    }
+    pub fn drop_and_check_scope_completed(self) -> Result<()> {
+        if let Some(end) = self.end {
+            if end != self.iter.pos() {
+                Err(PuroroError::UnexpectedInputTermination)?;
+            }
+        }
+        ::std::mem::forget(self);
+        Ok(())
+    }
+}
+impl<'a, I: Iterator> ScopedIter<'a, I> {
+    pub fn scope<'b>(&'b mut self, len: usize) -> ScopedIter<'b, I>
+    where
+        'a: 'b,
+    {
+        let end = Some(self.iter.pos() + len);
+        ScopedIter {
+            iter: self.iter,
+            end,
+        }
+    }
+}
+impl<'a, I: Iterator> Iterator for ScopedIter<'a, I> {
+    type Item = I::Item;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(end) = self.end {
+            if self.iter.pos() < end {
+                self.iter.next()
+            } else {
+                None
+            }
+        } else {
+            self.iter.next()
+        }
+    }
 }

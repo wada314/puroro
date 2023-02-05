@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::ser::{ser_bytes_shared, ser_numerical_shared, FieldData, WireType};
+use crate::internal::message_internal::MessageInternal;
+use crate::internal::ser::{
+    ser_bytes_shared, ser_numerical_shared, FieldData, ScopedIter, WireType,
+};
 use crate::internal::tags;
-use crate::{Message, PuroroError, Result};
+use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 
@@ -78,9 +81,9 @@ pub trait OneofFieldType: Default + Clone {
     ) -> Self::GetterOrElseType<'a>;
     fn get_field_mut(&mut self) -> Self::GetterMutType<'_>;
 
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()>;
     fn ser_to_write<W: Write>(&self, number: i32, out: &mut W) -> Result<()>;
 }
@@ -119,9 +122,9 @@ where
     fn get_field_mut(&mut self) -> Self::GetterMutType<'_> {
         &mut self.0
     }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(variant) => {
@@ -181,9 +184,9 @@ where
         ProtoType::as_mut(&mut self.0)
     }
 
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(iter) = field_data {
             self.0 = ProtoType::from_bytes_iter(iter)?;
@@ -198,7 +201,7 @@ where
     }
 }
 
-impl<M: Message + Default> OneofFieldType for HeapMessageField<M>
+impl<M: MessageInternal + Default> OneofFieldType for HeapMessageField<M>
 where
     M: Default + Clone,
 {
@@ -231,13 +234,14 @@ where
     fn get_field_mut(&mut self) -> Self::GetterMutType<'_> {
         &mut self.0
     }
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>>(
+    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        field_data: FieldData<I>,
+        field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()> {
-        if let FieldData::LengthDelimited(iter) = field_data {
+        if let FieldData::LengthDelimited(mut iter) = field_data {
             let msg = self.0.as_mut();
-            msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
+            msg.merge_from_scoped_bytes_iter(&mut iter)?;
+            iter.drop_and_check_scope_completed()?;
             Ok(())
         } else {
             Err(PuroroError::InvalidWireType(field_data.wire_type() as u32))?

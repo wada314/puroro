@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::bitvec::BitSlice;
-use crate::internal::ser::FieldData;
+use crate::internal::ser::{FieldData, ScopedIter};
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 
@@ -26,10 +26,10 @@ pub trait OneofUnion {
     fn clear<B: BitSlice>(&mut self, bits: &mut B);
     fn clone<B: BitSlice>(&self, bits: &B) -> Self;
 
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        field_data: FieldData<I>,
+        field_data: FieldData<ScopedIter<'a, I>>,
         case: Self::Case,
     ) -> Result<()>;
 

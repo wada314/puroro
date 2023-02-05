@@ -71,7 +71,44 @@ impl self::_puroro::Message for ConflictCase {
     }
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        mut iter: I,
+        iter: I,
+    ) -> self::_puroro::Result<()> {
+        let mut pos_iter = self::_pinternal::PosIter::new(iter);
+        let mut scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(
+            &mut pos_iter,
+        );
+        <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
+            self,
+            &mut scoped_iter,
+        )?;
+        scoped_iter.drop_and_check_scope_completed()?;
+        Ok(())
+    }
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)]
+        out: &mut W,
+    ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.this_is_message_field,
+            self.shared.bitfield(),
+            1i32,
+            out,
+        )?;
+        self.shared.unknown_fields().ser_to_write(out)?;
+        ::std::result::Result::Ok(())
+    }
+}
+impl self::_pinternal::MessageInternal for ConflictCase {
+    fn merge_from_scoped_bytes_iter<
+        'a,
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+    >(
+        &mut self,
+        iter: &mut self::_pinternal::ScopedIter<'a, I>,
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
@@ -85,11 +122,11 @@ impl self::_puroro::Message for ConflictCase {
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
         while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.this_is_message_field,
                             self.shared.bitfield_mut(),
                             field_data,
@@ -113,23 +150,6 @@ impl self::_puroro::Message for ConflictCase {
             }
         }
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.this_is_message_field,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for ConflictCase {
@@ -335,10 +355,12 @@ where
             _ => Self { _none: () },
         }
     }
-    fn deser_from_iter<I, B>(
+    fn deser_from_field_data<'a, I, B>(
         &mut self,
         bitvec: &mut B,
-        field_data: self::_pinternal::ser::FieldData<I>,
+        field_data: self::_pinternal::ser::FieldData<
+            self::_pinternal::ScopedIter<'a, I>,
+        >,
         case: Self::Case,
     ) -> self::_puroro::Result<()>
     where
@@ -350,7 +372,8 @@ where
         match case {
             Self::Case::ThisIsOneofField(_) => {
                 let _ = <Self>::this_is_oneof_field_mut(self, bitvec);
-                unsafe { &mut self.this_is_oneof_field }.deser_from_iter(field_data)?;
+                unsafe { &mut self.this_is_oneof_field }
+                    .deser_from_field_data(field_data)?;
             }
         }
         Ok(())

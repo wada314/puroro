@@ -130,61 +130,17 @@ impl self::_puroro::Message for Book {
     }
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        mut iter: I,
+        iter: I,
     ) -> self::_puroro::Result<()> {
-        use self::_pinternal::ser::FieldData;
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        #[allow(unused)]
-        use ::std::result::Result;
-        #[allow(unused)]
-        use ::std::result::Result::{Ok, Err};
-        #[allow(unused)]
-        use ::std::vec::Vec;
-        use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
-            let result: self::_puroro::Result<()> = (|| {
-                match number {
-                    1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
-                            &mut self.fields.title,
-                            self.shared.bitfield_mut(),
-                            field_data,
-                        )?
-                    }
-                    2i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
-                            &mut self.fields.num_pages,
-                            self.shared.bitfield_mut(),
-                            field_data,
-                        )?
-                    }
-                    3i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
-                            &mut self.fields.author,
-                            self.shared.bitfield_mut(),
-                            field_data,
-                        )?
-                    }
-                    _ => {
-                        let field_data = field_data
-                            .map(|iter| { iter.collect::<Result<Vec<_>, _>>() })
-                            .transpose()?;
-                        Err(PuroroError::UnknownFieldNumber(field_data))?
-                    }
-                }
-                Ok(())
-            })();
-            match result {
-                Ok(_) => {}
-                Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
-                }
-                Err(e) => Err(e)?,
-            }
-        }
+        let mut pos_iter = self::_pinternal::PosIter::new(iter);
+        let mut scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(
+            &mut pos_iter,
+        );
+        <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
+            self,
+            &mut scoped_iter,
+        )?;
+        scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
@@ -215,6 +171,70 @@ impl self::_puroro::Message for Book {
         )?;
         self.shared.unknown_fields().ser_to_write(out)?;
         ::std::result::Result::Ok(())
+    }
+}
+impl self::_pinternal::MessageInternal for Book {
+    fn merge_from_scoped_bytes_iter<
+        'a,
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+    >(
+        &mut self,
+        iter: &mut self::_pinternal::ScopedIter<'a, I>,
+    ) -> self::_puroro::Result<()> {
+        use self::_pinternal::ser::FieldData;
+        #[allow(unused)]
+        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        #[allow(unused)]
+        use ::std::result::Result;
+        #[allow(unused)]
+        use ::std::result::Result::{Ok, Err};
+        #[allow(unused)]
+        use ::std::vec::Vec;
+        use self::_puroro::PuroroError;
+        while let Some((number, field_data))
+            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+            let result: self::_puroro::Result<()> = (|| {
+                match number {
+                    1i32 => {
+                        self::_pinternal::FieldType::deser_from_field_data(
+                            &mut self.fields.title,
+                            self.shared.bitfield_mut(),
+                            field_data,
+                        )?
+                    }
+                    2i32 => {
+                        self::_pinternal::FieldType::deser_from_field_data(
+                            &mut self.fields.num_pages,
+                            self.shared.bitfield_mut(),
+                            field_data,
+                        )?
+                    }
+                    3i32 => {
+                        self::_pinternal::FieldType::deser_from_field_data(
+                            &mut self.fields.author,
+                            self.shared.bitfield_mut(),
+                            field_data,
+                        )?
+                    }
+                    _ => {
+                        let field_data = field_data
+                            .map(|iter| { iter.collect::<Result<Vec<_>, _>>() })
+                            .transpose()?;
+                        Err(PuroroError::UnknownFieldNumber(field_data))?
+                    }
+                }
+                Ok(())
+            })();
+            match result {
+                Ok(_) => {}
+                Err(PuroroError::UnknownFieldNumber(field_data)) => {
+                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                }
+                Err(e) => Err(e)?,
+            }
+        }
+        Ok(())
     }
 }
 impl ::std::clone::Clone for Book {
@@ -314,7 +334,44 @@ impl self::_puroro::Message for Author {
     }
     fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         &mut self,
-        mut iter: I,
+        iter: I,
+    ) -> self::_puroro::Result<()> {
+        let mut pos_iter = self::_pinternal::PosIter::new(iter);
+        let mut scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(
+            &mut pos_iter,
+        );
+        <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
+            self,
+            &mut scoped_iter,
+        )?;
+        scoped_iter.drop_and_check_scope_completed()?;
+        Ok(())
+    }
+    fn to_bytes<W: ::std::io::Write>(
+        &self,
+        #[allow(unused)]
+        out: &mut W,
+    ) -> self::_puroro::Result<()> {
+        #[allow(unused)]
+        use self::_pinternal::OneofUnion as _;
+        use self::_pinternal::{SharedItems as _, UnknownFields as _};
+        self::_pinternal::FieldType::ser_to_write(
+            &self.fields.name,
+            self.shared.bitfield(),
+            1i32,
+            out,
+        )?;
+        self.shared.unknown_fields().ser_to_write(out)?;
+        ::std::result::Result::Ok(())
+    }
+}
+impl self::_pinternal::MessageInternal for Author {
+    fn merge_from_scoped_bytes_iter<
+        'a,
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+    >(
+        &mut self,
+        iter: &mut self::_pinternal::ScopedIter<'a, I>,
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
@@ -328,11 +385,11 @@ impl self::_puroro::Message for Author {
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
         while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
                             field_data,
@@ -356,23 +413,6 @@ impl self::_puroro::Message for Author {
             }
         }
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl ::std::clone::Clone for Author {

@@ -14,7 +14,7 @@
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
-use crate::internal::ser::ser_bytes_shared;
+use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
@@ -35,10 +35,10 @@ where
     RustType: Default + PartialEq,
     ProtoType: tags::UnsizedType<RustType = RustType>,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         let val = ProtoType::from_bytes_iter(iter)?;
         if val != RustType::default() {
@@ -65,10 +65,10 @@ impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
 where
     ProtoType: tags::UnsizedType<RustType = RustType>,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        iter: I,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         self.0 = ProtoType::from_bytes_iter(iter)?;
         bitvec.set(BITFIELD_INDEX, true);
@@ -92,10 +92,10 @@ impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType
 where
     ProtoType: tags::UnsizedType<RustType = RustType>,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         self.0.push(ProtoType::from_bytes_iter(iter)?);
         Ok(())

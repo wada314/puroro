@@ -14,8 +14,8 @@
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
-use crate::internal::ser::ser_bytes_shared;
-use crate::Message;
+use crate::internal::message_internal::MessageInternal;
+use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 
@@ -26,15 +26,15 @@ pub struct RepeatedMessageField<M>(Vec<M>);
 
 impl<M> FieldType for SingularHeapMessageField<M>
 where
-    M: Message + Default,
+    M: MessageInternal + Default,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         let msg = self.0.get_or_insert_with(Default::default).as_mut();
-        Ok(msg.merge_from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?)
+        Ok(msg.merge_from_scoped_bytes_iter(iter)?)
     }
 
     fn ser_to_write<W: Write, B: BitSlice>(
@@ -54,14 +54,14 @@ where
 
 impl<M> FieldType for RepeatedMessageField<M>
 where
-    M: Message + Default,
+    M: MessageInternal + Default,
 {
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: I,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        let msg = M::from_bytes_iter(Box::new(iter) as Box<dyn Iterator<Item = IoResult<u8>>>)?;
+        let msg = M::from_scoped_bytes_iter(iter)?;
         self.0.push(msg);
         Ok(())
     }
@@ -83,7 +83,7 @@ where
 
 impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
 where
-    M: Message + Default,
+    M: MessageInternal + Default,
 {
     type GetterOptType<'a> = Option<&'a M>
     where
@@ -117,7 +117,7 @@ where
     }
 }
 
-impl<M: Message + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
+impl<M: MessageInternal + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
     type ScalarType = M;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()

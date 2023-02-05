@@ -226,7 +226,7 @@ impl Oneof {
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
-                    #field_number => self.fields.#field_ident.deser_from_iter(
+                    #field_number => self.fields.#field_ident.deser_from_field_data(
                         self.shared.bitfield_mut(),
                         #field_data_expr,
                         #case_type::#case_name(()),
@@ -373,10 +373,10 @@ impl Oneof {
                     }
                 }
 
-                fn deser_from_iter<I, B>(
+                fn deser_from_field_data<'a, I, B>(
                     &mut self,
                     bitvec: &mut B,
-                    field_data: #PURORO_INTERNAL::ser::FieldData<I>,
+                    field_data: #PURORO_INTERNAL::ser::FieldData<#PURORO_INTERNAL::ScopedIter<'a, I>>,
                     case: Self::Case,
                 ) -> #PURORO_LIB::Result<()>
                 where
@@ -387,7 +387,7 @@ impl Oneof {
                     match case {
                         #(Self::Case::#case_names(_) => {
                             let _ = <Self>::#getter_mut_idents(self, bitvec);
-                            unsafe { &mut self.#union_field_idents }.deser_from_iter(field_data)?;
+                            unsafe { &mut self.#union_field_idents }.deser_from_field_data(field_data)?;
                         })*
                     }
                     Ok(())

@@ -139,7 +139,7 @@ impl Field {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
         Ok(parse2(quote! {
-            #number => #PURORO_INTERNAL::FieldType::deser_from_iter(
+            #number => #PURORO_INTERNAL::FieldType::deser_from_field_data(
                 &mut self.fields.#ident,
                 self.shared.bitfield_mut(),
                 #field_data_expr,

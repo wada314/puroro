@@ -108,6 +108,7 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = self.gen_message_struct_message_impl()?;
+        let message_internal_impl = self.gen_message_struct_message_internal_impl()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let drop_impl = self.gen_message_struct_impl_drop()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
@@ -132,6 +133,7 @@ impl Message {
             item_struct,
             impl_struct,
             message_impl.into(),
+            message_internal_impl.into(),
             clone_impl.into(),
             drop_impl.into(),
             debug_impl.into(),
@@ -177,19 +179,8 @@ impl Message {
 
     fn gen_message_struct_message_impl(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
-        let field_data_ident: Ident = parse2(quote! { field_data })?;
-        let field_data_expr = parse2(quote! { field_data })?;
         let out_ident = quote! { out };
         let out_expr = parse2(quote! { out })?;
-        let deser_arms = self
-            .fields_or_oneofs()?
-            .map(|fo| {
-                Ok(fo
-                    .gen_message_struct_impl_message_deser_arms(&field_data_expr)?
-                    .into_iter())
-            })
-            .flatten_ok()
-            .collect::<Result<Vec<_>>>()?;
         let ser_stmts = self
             .fields_or_oneofs()?
             .map(|fo| fo.gen_message_struct_impl_message_ser_stmt(&out_expr))
@@ -203,7 +194,48 @@ impl Message {
                     ::std::result::Result::Ok(msg)
                 }
 
-                fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(&mut self, mut iter: I) -> #PURORO_LIB::Result<()> {
+                fn merge_from_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(
+                    &mut self,
+                    iter: I
+                ) -> #PURORO_LIB::Result<()> {
+                    let mut pos_iter = #PURORO_INTERNAL::PosIter::new(iter);
+                    let mut scoped_iter = #PURORO_INTERNAL::ScopedIter::from_mut_pos_iter(&mut pos_iter);
+                    <Self as #PURORO_INTERNAL::MessageInternal>::merge_from_scoped_bytes_iter(self, &mut scoped_iter)?;
+                    scoped_iter.drop_and_check_scope_completed()?;
+                    Ok(())
+                }
+
+                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
+                    #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
+                    #(#ser_stmts)*
+                    self.shared.unknown_fields().ser_to_write(#out_ident)?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+        })?)
+    }
+
+    fn gen_message_struct_message_internal_impl(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let field_data_ident: Ident = parse2(quote! { field_data })?;
+        let field_data_expr = parse2(quote! { field_data })?;
+        let deser_arms = self
+            .fields_or_oneofs()?
+            .map(|fo| {
+                Ok(fo
+                    .gen_message_struct_impl_message_deser_arms(&field_data_expr)?
+                    .into_iter())
+            })
+            .flatten_ok()
+            .collect::<Result<Vec<_>>>()?;
+
+        Ok(parse2(quote! {
+            impl #PURORO_INTERNAL::MessageInternal for #ident {
+                fn merge_from_scoped_bytes_iter<'a, I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(
+                    &mut self,
+                    iter: &mut #PURORO_INTERNAL::ScopedIter<'a, I>,
+                ) -> #PURORO_LIB::Result<()> {
                     use #PURORO_INTERNAL::ser::FieldData;
                     #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
                     use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
@@ -211,7 +243,7 @@ impl Message {
                     #[allow(unused)] use ::std::result::Result::{Ok, Err};
                     #[allow(unused)] use ::std::vec::Vec;
                     use #PURORO_LIB::PuroroError;
-                    while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                    while let Some((number, #field_data_ident)) = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
                         let result: #PURORO_LIB::Result<()> = (|| {
                             match number {
                                 #(#deser_arms)*
@@ -234,14 +266,6 @@ impl Message {
                         }
                     }
                     Ok(())
-                }
-
-                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
-                    #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
-                    #(#ser_stmts)*
-                    self.shared.unknown_fields().ser_to_write(#out_ident)?;
-                    ::std::result::Result::Ok(())
                 }
             }
         })?)

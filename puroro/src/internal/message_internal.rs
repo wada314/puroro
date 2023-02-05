@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod deserialization;
-mod enums;
-mod official_samples;
-mod oneof;
-mod proto2_defaults;
-mod proto3_defaults;
-mod protobuf;
-mod self_recursive;
-mod serialization;
-mod simple_get_set;
-mod simple_misc_traits;
-mod unknown_fields;
+use crate::internal::ScopedIter;
+use crate::Result;
+use ::std::io::Result as IoResult;
+
+pub trait MessageInternal: crate::Message {
+    fn from_scoped_bytes_iter<'a, I: Iterator<Item = IoResult<u8>>>(
+        scoped_iter: &mut ScopedIter<'a, I>,
+    ) -> Result<Self>
+    where
+        Self: Default,
+    {
+        let mut msg = Self::default();
+        msg.merge_from_scoped_bytes_iter(scoped_iter)?;
+        Ok(msg)
+    }
+    fn merge_from_scoped_bytes_iter<'a, I: Iterator<Item = IoResult<u8>>>(
+        &mut self,
+        scoped_iter: &mut ScopedIter<'a, I>,
+    ) -> Result<()>;
+}
