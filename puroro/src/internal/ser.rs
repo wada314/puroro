@@ -237,6 +237,15 @@ impl<'a, I> ScopedIter<'a, I> {
     pub fn from_mut_pos_iter(iter: &'a mut PosIter<I>) -> Self {
         Self { iter, end: None }
     }
+    pub fn drop_and_check_scope_completed(self) -> Result<()> {
+        if let Some(end) = self.end {
+            if end != self.iter.pos() {
+                Err(PuroroError::UnexpectedInputTermination)?;
+            }
+        }
+        ::std::mem::forget(self);
+        Ok(())
+    }
 }
 impl<'a, I: Iterator> ScopedIter<'a, I> {
     pub fn scope<'b>(&'b mut self, len: usize) -> ScopedIter<'b, I>
@@ -262,5 +271,13 @@ impl<'a, I: Iterator> Iterator for ScopedIter<'a, I> {
         } else {
             self.iter.next()
         }
+    }
+}
+impl<I> Drop for ScopedIter<'_, I> {
+    fn drop(&mut self) {
+        panic!(
+            "Do not drop this iterator, use drop_and_check_scope_completed()
+        and check the return value instead",
+        );
     }
 }

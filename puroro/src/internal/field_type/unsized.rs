@@ -38,7 +38,7 @@ where
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: ScopedIter<'a, I>,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         let val = ProtoType::from_bytes_iter(iter)?;
         if val != RustType::default() {
@@ -68,7 +68,7 @@ where
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        iter: ScopedIter<'a, I>,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         self.0 = ProtoType::from_bytes_iter(iter)?;
         bitvec.set(BITFIELD_INDEX, true);
@@ -95,7 +95,7 @@ where
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        iter: ScopedIter<'a, I>,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         self.0.push(ProtoType::from_bytes_iter(iter)?);
         Ok(())

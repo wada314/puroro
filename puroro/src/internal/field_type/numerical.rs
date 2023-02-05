@@ -14,9 +14,7 @@
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
-use crate::internal::ser::{
-    ser_numerical_shared, ser_wire_and_number, FieldData, ScopedIter, WireType,
-};
+use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, ScopedIter, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
 use crate::Result;
@@ -48,7 +46,7 @@ where
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        mut iter: ScopedIter<'a, I>,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             let v = var.get::<ProtoType>()?;
@@ -85,19 +83,6 @@ where
         ser_numerical_shared::<_, ProtoType, _>(self.0.clone(), number, out)?;
         Ok(())
     }
-
-    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
-        &mut self,
-        bitvec: &mut B,
-        field_data: FieldData<ScopedIter<'a, I>>,
-    ) -> Result<()> {
-        match field_data {
-            FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
-            FieldData::LengthDelimited(iter) => self.deser_from_ld_scoped_iter(bitvec, iter),
-            FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
-            FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
-        }
-    }
 }
 
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
@@ -114,7 +99,7 @@ where
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        mut iter: ScopedIter<'a, I>,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             self.0 = var.get::<ProtoType>()?;
@@ -158,7 +143,7 @@ where
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
-        mut iter: ScopedIter<'a, I>,
+        iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
             self.0.push(var.get::<ProtoType>()?)

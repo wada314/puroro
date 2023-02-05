@@ -36,7 +36,11 @@ pub trait FieldType {
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
-            FieldData::LengthDelimited(iter) => self.deser_from_ld_scoped_iter(bitvec, iter),
+            FieldData::LengthDelimited(mut iter) => {
+                self.deser_from_ld_scoped_iter(bitvec, &mut iter)?;
+                iter.drop_and_check_scope_completed()?;
+                Ok(())
+            }
             FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
             FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
         }
@@ -65,7 +69,7 @@ pub trait FieldType {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] iter: ScopedIter<'a, I>,
+        #[allow(unused)] iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         Err(PuroroError::InvalidWireType(
             WireType::LengthDelimited as u32,

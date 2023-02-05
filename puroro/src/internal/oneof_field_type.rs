@@ -238,9 +238,10 @@ where
         &mut self,
         field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()> {
-        if let FieldData::LengthDelimited(iter) = field_data {
+        if let FieldData::LengthDelimited(mut iter) = field_data {
             let msg = self.0.as_mut();
-            msg.merge_from_scoped_bytes_iter(iter)?;
+            msg.merge_from_scoped_bytes_iter(&mut iter)?;
+            iter.drop_and_check_scope_completed()?;
             Ok(())
         } else {
             Err(PuroroError::InvalidWireType(field_data.wire_type() as u32))?

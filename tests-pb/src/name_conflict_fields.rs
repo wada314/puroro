@@ -74,11 +74,14 @@ impl self::_puroro::Message for Conflict {
         iter: I,
     ) -> self::_puroro::Result<()> {
         let mut pos_iter = self::_pinternal::PosIter::new(iter);
-        let scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(&mut pos_iter);
+        let mut scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(
+            &mut pos_iter,
+        );
         <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
             self,
-            scoped_iter,
+            &mut scoped_iter,
         )?;
+        scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
@@ -105,7 +108,7 @@ impl self::_pinternal::MessageInternal for Conflict {
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
     >(
         &mut self,
-        mut iter: self::_pinternal::ScopedIter<'a, I>,
+        iter: &mut self::_pinternal::ScopedIter<'a, I>,
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
@@ -260,11 +263,14 @@ impl self::_puroro::Message for ConflictFields {
         iter: I,
     ) -> self::_puroro::Result<()> {
         let mut pos_iter = self::_pinternal::PosIter::new(iter);
-        let scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(&mut pos_iter);
+        let mut scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(
+            &mut pos_iter,
+        );
         <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
             self,
-            scoped_iter,
+            &mut scoped_iter,
         )?;
+        scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
     }
     fn to_bytes<W: ::std::io::Write>(
@@ -291,7 +297,7 @@ impl self::_pinternal::MessageInternal for ConflictFields {
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
     >(
         &mut self,
-        mut iter: self::_pinternal::ScopedIter<'a, I>,
+        iter: &mut self::_pinternal::ScopedIter<'a, I>,
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]

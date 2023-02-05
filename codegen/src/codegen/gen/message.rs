@@ -199,8 +199,9 @@ impl Message {
                     iter: I
                 ) -> #PURORO_LIB::Result<()> {
                     let mut pos_iter = #PURORO_INTERNAL::PosIter::new(iter);
-                    let scoped_iter = #PURORO_INTERNAL::ScopedIter::from_mut_pos_iter(&mut pos_iter);
-                    <Self as #PURORO_INTERNAL::MessageInternal>::merge_from_scoped_bytes_iter(self, scoped_iter)?;
+                    let mut scoped_iter = #PURORO_INTERNAL::ScopedIter::from_mut_pos_iter(&mut pos_iter);
+                    <Self as #PURORO_INTERNAL::MessageInternal>::merge_from_scoped_bytes_iter(self, &mut scoped_iter)?;
+                    scoped_iter.drop_and_check_scope_completed()?;
                     Ok(())
                 }
 
@@ -233,7 +234,7 @@ impl Message {
             impl #PURORO_INTERNAL::MessageInternal for #ident {
                 fn merge_from_scoped_bytes_iter<'a, I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(
                     &mut self,
-                    mut iter: #PURORO_INTERNAL::ScopedIter<'a, I>,
+                    iter: &mut #PURORO_INTERNAL::ScopedIter<'a, I>,
                 ) -> #PURORO_LIB::Result<()> {
                     use #PURORO_INTERNAL::ser::FieldData;
                     #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
