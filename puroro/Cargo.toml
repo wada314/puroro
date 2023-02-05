@@ -20,4 +20,5 @@ stable_puroro = { package = "puroro", version = "0.11.1", optional = true }
 puroro-doc-samples = { path = "../puroro-doc-samples" }
 
 [features]
+default = []
 dev-for-protobuf-use-stable-puroro = ["stable_puroro"]

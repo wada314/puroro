@@ -8,3 +8,12 @@ members = [
     "tests",
     "tests-pb",
 ]
+default-members = [
+    "puroro",
+    "codegen",
+    "inline",
+    "puroro-doc-samples",
+#    "update-puroro-protobuf",
+    "tests",
+    "tests-pb",
+]

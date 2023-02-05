@@ -28,9 +28,9 @@ pub use crate::message::Message;
 #[cfg(feature = "dev-for-protobuf-use-stable-puroro")]
 mod puroro_for_protobuf {
     pub use ::stable_puroro::*;
+    compile_error!("not here!");
 }
 #[cfg(not(feature = "dev-for-protobuf-use-stable-puroro"))]
 mod puroro_for_protobuf {
-    compile_error!("not here!");
     pub use super::*;
 }
