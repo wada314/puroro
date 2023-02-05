@@ -147,10 +147,11 @@ impl self::_puroro::Message for Submsg {
         &mut self,
         iter: I,
     ) -> self::_puroro::Result<()> {
-        let mut scoped_iter = self::_pinternal::ScopedIter::new(iter);
+        let mut pos_iter = self::_pinternal::PosIter::new(iter);
+        let scoped_iter = self::_pinternal::ScopedIter::from_mut_pos_iter(&mut pos_iter);
         <Self as self::_pinternal::MessageInternal>::merge_from_scoped_bytes_iter(
             self,
-            &mut scoped_iter,
+            scoped_iter,
         )?;
         Ok(())
     }
@@ -186,10 +187,11 @@ impl self::_puroro::Message for Submsg {
 }
 impl self::_pinternal::MessageInternal for Submsg {
     fn merge_from_scoped_bytes_iter<
+        'a,
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
     >(
         &mut self,
-        iter: &mut self::_pinternal::ScopedIter<I>,
+        mut iter: self::_pinternal::ScopedIter<'a, I>,
     ) -> self::_puroro::Result<()> {
         use self::_pinternal::ser::FieldData;
         #[allow(unused)]
@@ -203,7 +205,7 @@ impl self::_pinternal::MessageInternal for Submsg {
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
         while let Some((number, field_data))
-            = FieldData::from_bytes_iter(iter.by_ref())? {
+            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {

@@ -17,15 +17,15 @@
 use ::litrs::StringLit;
 use ::proc_macro::{LineColumn, Span, TokenStream};
 use ::protoc_bin_vendored::protoc_bin_path;
-use ::puroro_codegen::puroro::protobuf::google::protobuf::FileDescriptorSet;
 use ::puroro_codegen::puroro::Message;
-use ::puroro_codegen::{generate_tokens_for_inline, CodegenOptions};
+use ::puroro_codegen::{
+    generate_tokens_for_inline, CodegenOptions, FileDescriptorSet, GeneratorError,
+};
 use ::quote::{format_ident, quote};
 use ::std::fs::File;
 use ::std::io::{Read, Write};
 use ::std::process::Command;
 use ::tempdir::TempDir;
-use puroro_codegen::GeneratorError;
 
 // I really want protoc to support stdin / stdout handling:
 // https://github.com/protocolbuffers/protobuf/issues/4163
