@@ -204,3 +204,46 @@ fn read_byte<I: Iterator<Item = IoResult<u8>>>(bytes: &mut I) -> Result<u8> {
         .next()
         .ok_or(PuroroError::UnexpectedInputTermination)??)
 }
+
+pub struct ScopedIter<I> {
+    iter: I,
+    pos: usize,
+    end_stack: Vec<usize>,
+}
+impl<I> ScopedIter<I> {
+    pub fn new(iter: I) -> Self {
+        Self {
+            iter,
+            pos: 0,
+            end_stack: Vec::new(),
+        }
+    }
+    pub fn push_scope(&mut self, len: usize) {
+        self.end_stack.push(self.pos + len);
+    }
+    pub fn pop_scope(&mut self) -> Result<()> {
+        let Some(popped_end) = self.end_stack.pop() else {
+            return Err(PuroroError::InternalError);
+        };
+        if popped_end != 0 {
+            return Err(PuroroError::UnexpectedInputTermination);
+        }
+        Ok(())
+    }
+}
+impl<I: Iterator> Iterator for ScopedIter<I> {
+    type Item = I::Item;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(end) = self.end_stack.last() {
+            if self.pos < *end {
+                self.pos += 1;
+                self.iter.next()
+            } else {
+                None
+            }
+        } else {
+            self.pos += 1;
+            self.iter.next()
+        }
+    }
+}

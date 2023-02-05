@@ -60,6 +60,8 @@ pub enum PuroroError {
     GroupNotSupported,
     #[error("Internal error in oneof item treatment.")]
     InvalidOneofIndex,
+    #[error("Puroro library's error. A bug.")]
+    InternalError,
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }
