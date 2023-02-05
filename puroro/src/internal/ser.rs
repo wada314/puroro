@@ -80,8 +80,10 @@ impl<T, E> FieldData<::std::result::Result<T, E>> {
     }
 }
 
-impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
-    pub fn from_bytes_iter<'b: 'a>(bytes: &'b mut I) -> Result<Option<(i32, Self)>> {
+impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<ScopedIter<'a, I>> {
+    pub fn from_bytes_scoped_iter<'b: 'a>(
+        bytes: &'b mut ScopedIter<I>,
+    ) -> Result<Option<(i32, Self)>> {
         if let Some(var) = Variant::decode_bytes(bytes.by_ref())? {
             let var_u32 = var.get_u32()?;
             let wire_type: WireType = (var_u32 & 0x7).try_into()?;
@@ -96,7 +98,7 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> FieldData<iter::Take<&'a mut I>> {
                         .ok_or(PuroroError::UnexpectedInputTermination)?
                         .get_i32()?
                         .try_into()?;
-                    FieldData::LengthDelimited(bytes.take(length))
+                    FieldData::LengthDelimited(bytes.scope(length))
                 }
                 WireType::StartGroup => todo!(),
                 WireType::EndGroup => todo!(),
@@ -205,44 +207,54 @@ fn read_byte<I: Iterator<Item = IoResult<u8>>>(bytes: &mut I) -> Result<u8> {
         .ok_or(PuroroError::UnexpectedInputTermination)??)
 }
 
-pub struct ScopedIter<I> {
+pub struct PosIter<I> {
     iter: I,
     pos: usize,
-    end_stack: Vec<usize>,
 }
-impl<I> ScopedIter<I> {
+impl<I> PosIter<I> {
     pub fn new(iter: I) -> Self {
-        Self {
-            iter,
-            pos: 0,
-            end_stack: Vec::new(),
-        }
+        Self { iter, pos: 0 }
     }
-    pub fn push_scope(&mut self, len: usize) {
-        self.end_stack.push(self.pos + len);
-    }
-    pub fn pop_scope(&mut self) -> Result<()> {
-        let Some(popped_end) = self.end_stack.pop() else {
-            return Err(PuroroError::InternalError);
-        };
-        if popped_end != 0 {
-            return Err(PuroroError::UnexpectedInputTermination);
-        }
-        Ok(())
+    pub fn pos(&self) -> usize {
+        self.pos
     }
 }
-impl<I: Iterator> Iterator for ScopedIter<I> {
+impl<I: Iterator> Iterator for PosIter<I> {
     type Item = I::Item;
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(end) = self.end_stack.last() {
-            if self.pos < *end {
-                self.pos += 1;
+        let next_val = self.iter.next();
+        if next_val.is_some() {
+            self.pos += 1;
+        }
+        next_val
+    }
+}
+
+pub struct ScopedIter<'a, I> {
+    iter: &'a mut PosIter<I>,
+    end: Option<usize>,
+}
+impl<'a, I> ScopedIter<'a, I> {
+    pub fn from_mut_pos_iter(iter: &'a mut PosIter<I>) -> Self {
+        Self { iter, end: None }
+    }
+    pub fn scope(&self, len: usize) -> ScopedIter<'a, I> {
+        Self {
+            iter: self.iter,
+            end: Some(self.iter.pos() + len),
+        }
+    }
+}
+impl<'a, I: Iterator> Iterator for ScopedIter<'a, I> {
+    type Item = I::Item;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(end) = self.end {
+            if self.iter.pos() < end {
                 self.iter.next()
             } else {
                 None
             }
         } else {
-            self.pos += 1;
             self.iter.next()
         }
     }

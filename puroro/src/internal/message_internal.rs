@@ -14,11 +14,11 @@
 
 use crate::internal::ScopedIter;
 use crate::Result;
-use ::std::io::{Result as IoResult, Write};
+use ::std::io::Result as IoResult;
 
 pub trait MessageInternal: crate::Message {
-    fn merge_from_scoped_bytes_iter<I: Iterator<Item = IoResult<u8>>>(
+    fn merge_from_scoped_bytes_iter<'a, I: Iterator<Item = IoResult<u8>>>(
         &mut self,
-        scoped_iter: &mut ScopedIter<I>,
+        scoped_iter: ScopedIter<'a, I>,
     ) -> Result<()>;
 }

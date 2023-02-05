@@ -198,8 +198,9 @@ impl Message {
                     &mut self,
                     iter: I
                 ) -> #PURORO_LIB::Result<()> {
-                    let mut scoped_iter = #PURORO_INTERNAL::ScopedIter::new(iter);
-                    <Self as #PURORO_INTERNAL::MessageInternal>::merge_from_scoped_bytes_iter(self, &mut scoped_iter)?;
+                    let mut pos_iter = #PURORO_INTERNAL::PosIter::new(iter);
+                    let scoped_iter = #PURORO_INTERNAL::ScopedIter::from_mut_pos_iter(&mut pos_iter);
+                    <Self as #PURORO_INTERNAL::MessageInternal>::merge_from_scoped_bytes_iter(self, scoped_iter)?;
                     Ok(())
                 }
 
@@ -230,9 +231,9 @@ impl Message {
 
         Ok(parse2(quote! {
             impl #PURORO_INTERNAL::MessageInternal for #ident {
-                fn merge_from_scoped_bytes_iter<I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(
+                fn merge_from_scoped_bytes_iter<'a, I: ::std::iter::Iterator<Item =::std::io::Result<u8>>>(
                     &mut self,
-                    iter: &mut #PURORO_INTERNAL::ScopedIter<I>,
+                    mut iter: #PURORO_INTERNAL::ScopedIter<'a, I>,
                 ) -> #PURORO_LIB::Result<()> {
                     use #PURORO_INTERNAL::ser::FieldData;
                     #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
@@ -241,7 +242,7 @@ impl Message {
                     #[allow(unused)] use ::std::result::Result::{Ok, Err};
                     #[allow(unused)] use ::std::vec::Vec;
                     use #PURORO_LIB::PuroroError;
-                    while let Some((number, #field_data_ident)) = FieldData::from_bytes_iter(iter.by_ref())? {
+                    while let Some((number, #field_data_ident)) = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
                         let result: #PURORO_LIB::Result<()> = (|| {
                             match number {
                                 #(#deser_arms)*
