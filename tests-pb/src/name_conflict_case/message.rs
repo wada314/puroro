@@ -123,7 +123,7 @@ impl self::_pinternal::MessageInternal for ConflictCase {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.this_is_message_field,
                             self.shared.bitfield_mut(),
                             field_data,
@@ -352,10 +352,12 @@ where
             _ => Self { _none: () },
         }
     }
-    fn deser_from_iter<I, B>(
+    fn deser_from_field_data<'a, I, B>(
         &mut self,
         bitvec: &mut B,
-        field_data: self::_pinternal::ser::FieldData<I>,
+        field_data: self::_pinternal::ser::FieldData<
+            self::_pinternal::ScopedIter<'a, I>,
+        >,
         case: Self::Case,
     ) -> self::_puroro::Result<()>
     where
@@ -367,7 +369,8 @@ where
         match case {
             Self::Case::ThisIsOneofField(_) => {
                 let _ = <Self>::this_is_oneof_field_mut(self, bitvec);
-                unsafe { &mut self.this_is_oneof_field }.deser_from_iter(field_data)?;
+                unsafe { &mut self.this_is_oneof_field }
+                    .deser_from_field_data(field_data)?;
             }
         }
         Ok(())

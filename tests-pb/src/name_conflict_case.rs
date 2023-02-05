@@ -121,7 +121,7 @@ impl self::_pinternal::MessageInternal for Message {
                         self
                             .fields
                             .conflict
-                            .deser_from_iter(
+                            .deser_from_field_data(
                                 self.shared.bitfield_mut(),
                                 field_data,
                                 self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),

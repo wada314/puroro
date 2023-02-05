@@ -114,7 +114,7 @@ impl self::_pinternal::MessageInternal for Msg {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.r#type,
                             self.shared.bitfield_mut(),
                             field_data,
@@ -283,7 +283,7 @@ impl self::_pinternal::MessageInternal for _Self {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.r#type,
                             self.shared.bitfield_mut(),
                             field_data,

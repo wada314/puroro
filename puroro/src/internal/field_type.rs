@@ -21,7 +21,7 @@ pub use self::numerical::{OptionalNumericalField, RepeatedNumericalField, Singul
 pub use self::r#unsized::{OptionalUnsizedField, RepeatedUnsizedField, SingularUnsizedField};
 
 use crate::internal::bitvec::BitSlice;
-use crate::internal::ser::{FieldData, WireType};
+use crate::internal::ser::{FieldData, ScopedIter, WireType};
 use crate::internal::variant::Variant;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
@@ -29,14 +29,14 @@ use ::std::io::{Result as IoResult, Write};
 pub trait FieldType {
     // Deserialization methods
 
-    fn deser_from_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
-        field_data: FieldData<I>,
+        field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()> {
         match field_data {
             FieldData::Variant(v) => self.deser_from_variant(bitvec, v.clone()),
-            FieldData::LengthDelimited(iter) => self.deser_from_ld_iter(bitvec, iter),
+            FieldData::LengthDelimited(iter) => self.deser_from_ld_scoped_iter(bitvec, iter),
             FieldData::Bits32(bits) => self.deser_from_bits32(bitvec, bits.clone()),
             FieldData::Bits64(bits) => self.deser_from_bits64(bitvec, bits.clone()),
         }
@@ -62,10 +62,10 @@ pub trait FieldType {
     ) -> Result<()> {
         Err(PuroroError::InvalidWireType(WireType::Bits64 as u32))?
     }
-    fn deser_from_ld_iter<I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
+    fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         #[allow(unused)] bitvec: &mut B,
-        #[allow(unused)] iter: I,
+        #[allow(unused)] iter: ScopedIter<'a, I>,
     ) -> Result<()> {
         Err(PuroroError::InvalidWireType(
             WireType::LengthDelimited as u32,

@@ -17,7 +17,6 @@ use crate::internal::variant::Variant;
 use crate::{PuroroError, Result};
 use ::std::convert::TryFrom;
 use ::std::io::{Result as IoResult, Write};
-use ::std::iter;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldData<T> {

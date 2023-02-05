@@ -123,7 +123,7 @@ impl self::_pinternal::MessageInternal for Conflict {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.this_is_original_message_field,
                             self.shared.bitfield_mut(),
                             field_data,
@@ -309,7 +309,7 @@ impl self::_pinternal::MessageInternal for ConflictFields {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.this_is_fields_message_field,
                             self.shared.bitfield_mut(),
                             field_data,

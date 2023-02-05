@@ -194,21 +194,21 @@ impl self::_pinternal::MessageInternal for Book {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.title,
                             self.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.num_pages,
                             self.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.author,
                             self.shared.bitfield_mut(),
                             field_data,
@@ -383,7 +383,7 @@ impl self::_pinternal::MessageInternal for Author {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self::_pinternal::FieldType::deser_from_iter(
+                        self::_pinternal::FieldType::deser_from_field_data(
                             &mut self.fields.name,
                             self.shared.bitfield_mut(),
                             field_data,
