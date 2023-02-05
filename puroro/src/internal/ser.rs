@@ -273,11 +273,3 @@ impl<'a, I: Iterator> Iterator for ScopedIter<'a, I> {
         }
     }
 }
-impl<I> Drop for ScopedIter<'_, I> {
-    fn drop(&mut self) {
-        panic!(
-            "Do not drop this iterator, use drop_and_check_scope_completed()
-        and check the return value instead",
-        );
-    }
-}
