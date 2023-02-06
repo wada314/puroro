@@ -34,10 +34,20 @@ fn main() {
     .iter()
     .collect::<PathBuf>();
 
+    let proto_files_dir = ["protos"].iter().collect::<PathBuf>();
+    debug_assert!(proto_files_dir.is_dir());
+    let proto_files = proto_files_dir.read_dir().unwrap().filter_map(|entry| {
+        let path = entry.unwrap().path();
+        let Some(extension) = path.extension() else {
+            return None;
+        };
+        (extension.to_str() == Some("proto")).then_some(path)
+    });
+
     // Run protoc command, output a temporal file which contains the encoded FileDescriptorSet.
     let protoc_exe = protoc_bin_vendored::protoc_bin_path().unwrap();
     let protoc_status = Command::new(&protoc_exe)
-        .arg("protos/*.proto")
+        .args(proto_files)
         .arg(format!("--proto_path={}", "./protos/"))
         .arg("--experimental_allow_proto3_optional")
         .arg("--include_imports")
