@@ -46,9 +46,28 @@ pub trait HeadTrait {
     fn mouth_opt(&self) -> Option<&dyn MouthTrait>;
 }
 pub trait MouthTrait {
-    fn tooth(&self) -> &dyn RepeatedField<Item = dyn TeethTrait>;
+    fn tooth(&self) -> &dyn RepeatedField<Item = dyn '_ + TeethTrait>;
 }
 pub trait TeethTrait {}
+
+pub struct PersonOption<T>(Option<T>);
+impl<T: PersonTrait> PersonTrait for PersonOption<T> {
+    fn partner_opt(&self) -> Option<&dyn PersonTrait> {
+        todo!()
+    }
+    fn children(&self) -> &dyn RepeatedField<Item = dyn PersonTrait> {
+        todo!()
+    }
+    fn head_opt(&self) -> Option<&dyn HeadTrait> {
+        self.0.and_then(|p| p.head_opt())
+    }
+}
+pub struct HeadOption<T>(Option<T>);
+impl<T: HeadTrait> HeadTrait for HeadOption<T> {
+    fn mouth_opt(&self) -> Option<&dyn MouthTrait> {
+        self.0.and_then(|h| h.mouth_opt())
+    }
+}
 
 pub struct PersonTuple<T, U>(T, U);
 impl<T: PersonTrait, U: PersonTrait> PersonTrait for PersonTuple<T, U> {
@@ -72,27 +91,32 @@ impl<T: PersonTrait, U: PersonTrait> PersonTrait for PersonTuple<T, U> {
 
 #[repr(transparent)]
 #[derive(RefCast)]
-pub struct PersonField<T, const NUMBER: usize>(T);
+pub struct PersonField<T: ?Sized, const NUMBER: usize>(T);
 
 #[repr(transparent)]
 #[derive(RefCast)]
-pub struct HeadField<T, const NUMBER: usize>(T);
+pub struct HeadField<T: ?Sized, const NUMBER: usize>(T);
 
 #[repr(transparent)]
 #[derive(RefCast)]
-pub struct MouthField<T, const NUMBER: usize>(T);
+pub struct MouthField<T: ?Sized, const NUMBER: usize>(T);
 
-impl<T: PersonTrait> HeadTrait for PersonField<T, 3> {
+impl<T: ?Sized + PersonTrait> HeadTrait for PersonField<T, 3> {
     fn mouth_opt(&self) -> Option<&dyn MouthTrait> {
-        Some(HeadField::<_, 1>::ref_cast(self))
+        self.0
+            .head_opt()
+            .map(|head| HeadField::<dyn HeadTrait, 1>::ref_cast(head) as &dyn MouthTrait)
     }
 }
-impl<T: HeadTrait> MouthTrait for HeadField<T, 1> {
-    fn tooth(&self) -> &dyn RepeatedField<Item = dyn TeethTrait> {
-        MouthField::<_, 1>::ref_cast(self)
+fn hoge(v: &HeadField<dyn HeadTrait, 1>) {
+    let w = v as &dyn MouthTrait;
+}
+impl<T: ?Sized + HeadTrait> MouthTrait for HeadField<T, 1> {
+    fn tooth(&self) -> &dyn RepeatedField<Item = dyn '_ + TeethTrait> {
+        todo!()
     }
 }
-impl<T: MouthTrait> RepeatedField for MouthField<T, 1> {
+impl<T: ?Sized + MouthTrait> RepeatedField for MouthField<T, 1> {
     type Item = dyn TeethTrait;
     fn get(&self, index: usize) -> &Self::Item {
         todo!()
@@ -108,7 +132,7 @@ pub trait RepeatedField {
     fn get(&self, index: usize) -> &Self::Item;
     fn len(&self) -> usize;
 }
-impl<'a, T> IntoIterator for &'a dyn RepeatedField<Item = T> {
+impl<'a, T: ?Sized> IntoIterator for &'a dyn RepeatedField<Item = T> {
     type Item = &'a T;
     type IntoIter = RepeatedFieldIter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
@@ -120,12 +144,12 @@ impl<'a, T> IntoIterator for &'a dyn RepeatedField<Item = T> {
     }
 }
 
-pub struct RepeatedFieldIter<'a, T> {
+pub struct RepeatedFieldIter<'a, T: ?Sized> {
     repeated: &'a dyn RepeatedField<Item = T>,
     len: usize,
     cur: usize,
 }
-impl<'a, T> Iterator for RepeatedFieldIter<'a, T> {
+impl<'a, T: ?Sized> Iterator for RepeatedFieldIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.len >= self.cur {
