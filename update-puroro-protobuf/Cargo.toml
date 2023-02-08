@@ -7,4 +7,7 @@ edition = "2021"
 
 [dependencies]
 protoc-bin-vendored = "3.0.0"
-puroro-codegen = { path = "../codegen", features = ["dev-for-protobuf-use-stable-puroro"] }
+puroro-codegen = { path = "../codegen" }
+
+[features]
+dev-for-protobuf-use-stable-puroro = ["puroro-codegen/dev-for-protobuf-use-stable-puroro"]

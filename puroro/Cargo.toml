@@ -14,6 +14,8 @@ readme = "../readme.md"
 thiserror = "1.0"
 either = "1.8"
 bitvec = "1.0"
+bytemuck = "1.12"
+ref-cast = "1.0"
 stable_puroro = { package = "puroro", version = "0.11.1", optional = true }
 #stable_puroro = { git = "https://github.com/wada314/puroro", branch = "master", package = "puroro", optional = true }
 
