@@ -59,13 +59,13 @@ impl<T: PersonTrait> PersonTrait for PersonOption<T> {
         todo!()
     }
     fn head_opt(&self) -> Option<&dyn HeadTrait> {
-        self.0.and_then(|p| p.head_opt())
+        self.0.as_ref().and_then(|p| p.head_opt())
     }
 }
 pub struct HeadOption<T>(Option<T>);
 impl<T: HeadTrait> HeadTrait for HeadOption<T> {
     fn mouth_opt(&self) -> Option<&dyn MouthTrait> {
-        self.0.and_then(|h| h.mouth_opt())
+        self.0.as_ref().and_then(|h| h.mouth_opt())
     }
 }
 
@@ -84,7 +84,7 @@ impl<T: PersonTrait, U: PersonTrait> PersonTrait for PersonTuple<T, U> {
             (None, None) => None,
             (None, Some(r)) => Some(r),
             (Some(l), None) => Some(l),
-            (Some(_), Some(_)) => Some(PersonField::<_, 3>::ref_cast(self)),
+            (Some(_), Some(_)) => Some(PersonTupleField::<_, _, 3>::ref_cast(self)),
         }
     }
 }
@@ -95,22 +95,27 @@ pub struct PersonField<T: ?Sized, const NUMBER: usize>(T);
 
 #[repr(transparent)]
 #[derive(RefCast)]
+pub struct PersonTupleField<T: PersonTrait, U: PersonTrait, const NUMBER: usize>(PersonTuple<T, U>);
+
+#[repr(transparent)]
+#[derive(RefCast)]
 pub struct HeadField<T: ?Sized, const NUMBER: usize>(T);
 
 #[repr(transparent)]
 #[derive(RefCast)]
 pub struct MouthField<T: ?Sized, const NUMBER: usize>(T);
 
-impl<T: ?Sized + PersonTrait> HeadTrait for PersonField<T, 3> {
+pub enum Cow<'a, B: ?Sized> {
+    Borrowed(&'a B),
+    Owned()
+}
+
+impl<T: PersonTrait, U: PersonTrait> HeadTrait for PersonTupleField<T, U, 3> {
     fn mouth_opt(&self) -> Option<&dyn MouthTrait> {
-        self.0
-            .head_opt()
-            .map(|head| HeadField::<dyn HeadTrait, 1>::ref_cast(head) as &dyn MouthTrait)
+        
     }
 }
-fn hoge(v: &HeadField<dyn HeadTrait, 1>) {
-    let w = v as &dyn MouthTrait;
-}
+
 impl<T: ?Sized + HeadTrait> MouthTrait for HeadField<T, 1> {
     fn tooth(&self) -> &dyn RepeatedField<Item = dyn '_ + TeethTrait> {
         todo!()
