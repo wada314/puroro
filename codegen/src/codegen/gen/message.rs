@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, PURORO_INTERNAL,
-    PURORO_LIB,
+    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, CFG_ALLOC,
+    PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Type};
 use crate::Result;
@@ -118,7 +118,7 @@ impl Message {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             #(#docs)*
-            pub struct #ident {
+            pub struct #ident < #CFG_ALLOC A > {
                 fields: #fields_struct_type,
                 shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
             }

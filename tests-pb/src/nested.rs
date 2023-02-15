@@ -12,7 +12,7 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg {
+pub struct Msg<#[cfg(feature = "allocator_api")] A> {
     fields: self::_root::nested::_fields::MsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,

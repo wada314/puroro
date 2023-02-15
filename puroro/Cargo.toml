@@ -22,4 +22,5 @@ puroro-doc-samples = { path = "../puroro-doc-samples" }
 
 [features]
 default = []
+allocator_api = []
 dev-for-protobuf-use-stable-puroro = ["stable_puroro"]
