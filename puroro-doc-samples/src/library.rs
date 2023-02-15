@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Book<#[cfg(feature = "allocator_api")] A> {
+pub struct Book<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::library::_fields::BookFields<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
@@ -284,7 +284,7 @@ impl ::std::cmp::PartialEq for Book {
     }
 }
 #[derive(::std::default::Default)]
-pub struct Author<#[cfg(feature = "allocator_api")] A> {
+pub struct Author<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::library::_fields::AuthorFields<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,

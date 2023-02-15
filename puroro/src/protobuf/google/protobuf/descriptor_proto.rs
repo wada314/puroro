@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct ExtensionRange {
+pub struct ExtensionRange<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -295,7 +295,7 @@ impl ::std::cmp::PartialEq for ExtensionRange {
  fields or extension ranges in the same message. Reserved ranges may
  not overlap.
 */
-pub struct ReservedRange {
+pub struct ReservedRange<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<
             i32,

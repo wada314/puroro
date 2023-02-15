@@ -12,7 +12,7 @@ mod _pinternal {
 }
 pub mod message;
 #[derive(::std::default::Default)]
-pub struct Message<#[cfg(feature = "allocator_api")] A> {
+pub struct Message<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::name_conflict_case::_fields::MessageFields<
         self::_root::name_conflict_case::message::Conflict::<
             self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,

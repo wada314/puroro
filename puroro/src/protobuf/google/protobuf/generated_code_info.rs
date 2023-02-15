@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Annotation {
+pub struct Annotation<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields<
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::OptionalUnsizedField::<

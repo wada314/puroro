@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Location {
+pub struct Location<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields<
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,

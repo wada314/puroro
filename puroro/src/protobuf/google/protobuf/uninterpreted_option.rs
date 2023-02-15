@@ -17,7 +17,7 @@ mod _pinternal {
  E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
  "foo.(bar.baz).qux".
 */
-pub struct NamePart {
+pub struct NamePart<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,

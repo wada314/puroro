@@ -18,7 +18,7 @@ mod _pinternal {
  is inclusive such that it can appropriately represent the entire int32
  domain.
 */
-pub struct EnumReservedRange {
+pub struct EnumReservedRange<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<
             i32,

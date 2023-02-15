@@ -13,7 +13,7 @@ mod _pinternal {
 #[derive(::std::default::Default)]
 /** Represents a single generated file.
 */
-pub struct File {
+pub struct File<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,

@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(feature = "allocator_api")] A> {
+pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::keywords::_fields::MsgFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -183,7 +183,7 @@ impl ::std::cmp::PartialEq for Msg {
     }
 }
 #[derive(::std::default::Default)]
-pub struct _Self<#[cfg(feature = "allocator_api")] A> {
+pub struct _Self<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::keywords::_fields::SelfFields<
         self::_pinternal::OptionalNumericalField::<
             i32,

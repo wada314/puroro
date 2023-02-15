@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Conflict<#[cfg(feature = "allocator_api")] A> {
+pub struct Conflict<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::name_conflict_fields::_fields::ConflictFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -200,7 +200,7 @@ impl ::std::cmp::PartialEq for Conflict {
     }
 }
 #[derive(::std::default::Default)]
-pub struct ConflictFields<#[cfg(feature = "allocator_api")] A> {
+pub struct ConflictFields<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
         self::_pinternal::OptionalNumericalField::<
             i32,

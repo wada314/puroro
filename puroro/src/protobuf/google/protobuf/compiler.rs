@@ -14,7 +14,7 @@ pub mod code_generator_response;
 #[derive(::std::default::Default)]
 /** The version number of protocol compiler.
 */
-pub struct Version {
+pub struct Version<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::compiler::_fields::VersionFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -341,7 +341,7 @@ impl ::std::cmp::PartialEq for Version {
 #[derive(::std::default::Default)]
 /** An encoded CodeGeneratorRequest is written to the plugin's stdin.
 */
-pub struct CodeGeneratorRequest {
+pub struct CodeGeneratorRequest<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
         self::_pinternal::RepeatedUnsizedField::<
             ::std::string::String,
@@ -698,7 +698,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
 #[derive(::std::default::Default)]
 /** The plugin writes an encoded CodeGeneratorResponse to stdout.
 */
-pub struct CodeGeneratorResponse {
+pub struct CodeGeneratorResponse<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,

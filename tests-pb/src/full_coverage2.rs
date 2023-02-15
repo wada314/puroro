@@ -12,7 +12,7 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(feature = "allocator_api")] A> {
+pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::full_coverage2::_fields::MsgFields<
         self::_pinternal::OptionalNumericalField::<
             i32,

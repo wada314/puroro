@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct ConflictCase<#[cfg(feature = "allocator_api")] A> {
+pub struct ConflictCase<#[cfg(any(feature = "allocator_api", doc))] A> {
     fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
