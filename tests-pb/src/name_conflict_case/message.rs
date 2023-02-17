@@ -11,7 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct ConflictCase<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct ConflictCase<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -20,6 +23,8 @@ pub struct ConflictCase<#[cfg(any(feature = "allocator_api", doc))] A> {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl ConflictCase {
     pub fn this_is_message_field(&self) -> i32 {

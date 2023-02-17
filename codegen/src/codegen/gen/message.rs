@@ -118,9 +118,10 @@ impl Message {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             #(#docs)*
-            pub struct #ident < #CFG_ALLOC A > {
+            pub struct #ident < #CFG_ALLOC A: ?Sized = ::std::alloc::Global > {
                 fields: #fields_struct_type,
                 shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
+                #CFG_ALLOC alloc: A,
             }
         })?;
         let impl_struct = parse2(quote! {

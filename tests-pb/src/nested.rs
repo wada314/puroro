@@ -12,11 +12,16 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Msg<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::nested::_fields::MsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Msg {
     pub fn item_outer(&self) -> i32 {

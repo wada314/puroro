@@ -11,7 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Book<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Book<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::library::_fields::BookFields<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
@@ -21,6 +24,8 @@ pub struct Book<#[cfg(any(feature = "allocator_api", doc))] A> {
         self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Book {
     pub fn title(&self) -> &str {
@@ -284,7 +289,10 @@ impl ::std::cmp::PartialEq for Book {
     }
 }
 #[derive(::std::default::Default)]
-pub struct Author<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Author<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::library::_fields::AuthorFields<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
@@ -292,6 +300,8 @@ pub struct Author<#[cfg(any(feature = "allocator_api", doc))] A> {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Author {
     pub fn name(&self) -> &str {

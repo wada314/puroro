@@ -11,11 +11,16 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Msg<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::self_recursive::_fields::MsgFields<
         self::_pinternal::SingularHeapMessageField::<self::_root::self_recursive::Msg>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Msg {
     pub fn recursive_unlabeled(

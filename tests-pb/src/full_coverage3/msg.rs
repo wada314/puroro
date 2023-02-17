@@ -11,13 +11,18 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Submsg<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i64, self::_pinternal::tags::Int64>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Submsg {
     pub fn i32_unlabeled(&self) -> i32 {

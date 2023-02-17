@@ -11,7 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Msg<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::keywords::_fields::MsgFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -20,6 +23,8 @@ pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Msg {
     pub fn r#type(&self) -> i32 {
@@ -183,7 +188,10 @@ impl ::std::cmp::PartialEq for Msg {
     }
 }
 #[derive(::std::default::Default)]
-pub struct _Self<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct _Self<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::keywords::_fields::SelfFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -192,6 +200,8 @@ pub struct _Self<#[cfg(any(feature = "allocator_api", doc))] A> {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl _Self {
     pub fn r#type(&self) -> i32 {

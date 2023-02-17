@@ -12,7 +12,10 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Msg<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::full_coverage3::_fields::MsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::OptionalNumericalField::<
@@ -160,6 +163,8 @@ pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A> {
         self::_pinternal::RepeatedNumericalField::<f64, self::_pinternal::tags::Double>,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Msg {
     pub fn i32_unlabeled(&self) -> i32 {

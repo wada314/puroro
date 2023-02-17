@@ -11,7 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Submsg<
+    #[cfg(any(feature = "allocator_api", doc))]
+    A: ?Sized = ::std::alloc::Global,
+> {
     fields: self::_root::full_coverage2::msg::_fields::SubmsgFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -25,6 +28,8 @@ pub struct Submsg<#[cfg(any(feature = "allocator_api", doc))] A> {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    #[cfg(any(feature = "allocator_api", doc))]
+    alloc: A,
 }
 impl Submsg {
     pub fn i32_required(&self) -> i32 {
