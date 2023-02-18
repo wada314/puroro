@@ -227,14 +227,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn item_inner_mut(&mut self) -> &mut i32 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.item_inner,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_item_inner(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -242,13 +234,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_item_inner(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.item_inner,
-                self.shared.bitfield_mut(),
-            )
         }
     }
 }

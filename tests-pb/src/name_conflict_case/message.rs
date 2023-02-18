@@ -235,14 +235,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn this_is_message_field_mut(&mut self) -> &mut i32 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.this_is_message_field,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_this_is_message_field(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -250,13 +242,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_this_is_message_field(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.this_is_message_field,
-                self.shared.bitfield_mut(),
-            )
         }
     }
 }

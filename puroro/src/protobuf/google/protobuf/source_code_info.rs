@@ -519,17 +519,6 @@ pub mod _view {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
         }
-        pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field_mut(
-                &mut self.fields.path,
-                self.shared.bitfield_mut(),
-            )
-        }
-        pub fn clear_path(&mut self) {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::clear(&mut self.fields.path, self.shared.bitfield_mut())
-        }
         /** Always has exactly three or four elements: start line, start column,
  end line (optional, otherwise assumed same as start line), end column.
  These are packed into a single field for efficiency.  Note that line
@@ -539,17 +528,6 @@ pub mod _view {
         pub fn span(&self) -> &[i32] {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field(&self.fields.span, self.shared.bitfield())
-        }
-        pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field_mut(
-                &mut self.fields.span,
-                self.shared.bitfield_mut(),
-            )
-        }
-        pub fn clear_span(&mut self) {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::clear(&mut self.fields.span, self.shared.bitfield_mut())
         }
         pub fn leading_comments(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -614,14 +592,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.leading_comments,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_leading_comments(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -629,13 +599,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_leading_comments(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.leading_comments,
-                self.shared.bitfield_mut(),
-            )
         }
         pub fn trailing_comments(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -652,14 +615,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.trailing_comments,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_trailing_comments(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -667,13 +622,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_trailing_comments(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.trailing_comments,
-                self.shared.bitfield_mut(),
-            )
         }
         pub fn leading_detached_comments(
             &self,
@@ -684,22 +632,6 @@ pub mod _view {
             RepeatedFieldType::get_field(
                 &self.fields.leading_detached_comments,
                 self.shared.bitfield(),
-            )
-        }
-        pub fn leading_detached_comments_mut(
-            &mut self,
-        ) -> &mut ::std::vec::Vec::<::std::string::String> {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field_mut(
-                &mut self.fields.leading_detached_comments,
-                self.shared.bitfield_mut(),
-            )
-        }
-        pub fn clear_leading_detached_comments(&mut self) {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::clear(
-                &mut self.fields.leading_detached_comments,
-                self.shared.bitfield_mut(),
             )
         }
     }

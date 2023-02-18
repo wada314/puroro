@@ -237,16 +237,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn recursive_unlabeled_mut(
-            &mut self,
-        ) -> &mut self::_root::self_recursive::Msg {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.recursive_unlabeled,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_recursive_unlabeled(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -254,13 +244,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_recursive_unlabeled(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.recursive_unlabeled,
-                self.shared.bitfield_mut(),
-            )
         }
     }
 }

@@ -499,14 +499,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn title_mut(&mut self) -> &mut ::std::string::String {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.title,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_title(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -514,13 +506,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_title(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.title,
-                self.shared.bitfield_mut(),
-            )
         }
         pub fn num_pages(&self) -> u32 {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -537,14 +522,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn num_pages_mut(&mut self) -> &mut u32 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.num_pages,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_num_pages(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -552,13 +529,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_num_pages(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.num_pages,
-                self.shared.bitfield_mut(),
-            )
         }
         pub fn author(&self) -> ::std::option::Option::<&self::_root::library::Author> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -577,14 +547,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn author_mut(&mut self) -> &mut self::_root::library::Author {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.author,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_author(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -592,13 +554,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_author(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.author,
-                self.shared.bitfield_mut(),
-            )
         }
     }
     #[derive(::std::default::Default)]
@@ -627,14 +582,6 @@ pub mod _view {
                 self.shared.bitfield(),
             )
         }
-        pub fn name_mut(&mut self) -> &mut ::std::string::String {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_mut(
-                &mut self.fields.name,
-                self.shared.bitfield_mut(),
-                ::std::default::Default::default,
-            )
-        }
         pub fn has_name(&self) -> bool {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
@@ -642,13 +589,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-        pub fn clear_name(&mut self) {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::clear(
-                &mut self.fields.name,
-                self.shared.bitfield_mut(),
-            )
         }
     }
 }
