@@ -174,7 +174,7 @@ impl Message {
 
         let fields_or_oneofs_methods = self
             .fields_or_oneofs()?
-            .map(|fo| (Ok(fo.gen_message_struct_methods()?.into_iter())))
+            .map(|fo| (Ok(fo.gen_view_struct_methods()?.into_iter())))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         let oneofs = self.oneofs()?.collect::<Vec<_>>();
@@ -182,7 +182,7 @@ impl Message {
             .iter()
             .map(|o| o.fields())
             .flatten_ok()
-            .map(|f| Ok(f?.gen_message_struct_methods()?.into_iter()))
+            .map(|f| Ok(f?.gen_view_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
 

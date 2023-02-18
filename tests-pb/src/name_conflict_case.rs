@@ -226,10 +226,6 @@ pub mod _view {
             use self::_pinternal::{SharedItems as _, OneofUnion as _};
             self.fields.conflict.case_ref(self.shared.bitfield())
         }
-        pub fn clear_conflict(&mut self) {
-            use self::_pinternal::{SharedItems as _, OneofUnion as _};
-            self.fields.conflict.clear(self.shared.bitfield_mut())
-        }
         pub fn this_is_oneof_field(&self) -> i32 {
             use self::_pinternal::SharedItems as _;
             self.fields.conflict.this_is_oneof_field(self.shared.bitfield())
@@ -238,24 +234,8 @@ pub mod _view {
             use self::_pinternal::SharedItems as _;
             self.fields.conflict.this_is_oneof_field_opt(self.shared.bitfield())
         }
-        pub fn this_is_oneof_field_mut(&mut self) -> &mut i32 {
-            use self::_pinternal::SharedItems as _;
-            self.fields.conflict.this_is_oneof_field_mut(self.shared.bitfield_mut())
-        }
         pub fn has_this_is_oneof_field(&self) -> bool {
             self.this_is_oneof_field_opt().is_some()
-        }
-        pub fn clear_this_is_oneof_field(&mut self) {
-            #[allow(unused)]
-            use ::std::option::Option::Some;
-            use self::_pinternal::{OneofCase, OneofUnion as _, SharedItems as _};
-            if let Some(
-                self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(
-                    _,
-                ),
-            ) = OneofCase::from_bitslice(self.shared.bitfield()) {
-                self.fields.conflict.clear(self.shared.bitfield_mut())
-            }
         }
     }
 }
