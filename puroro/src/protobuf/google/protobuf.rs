@@ -25,12 +25,13 @@ pub mod uninterpreted_option;
  files it parses.
 */
 pub struct FileDescriptorSet {
-    fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields<
+    fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields::<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::FileDescriptorProto,
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::google::protobuf::_view::FileDescriptorSetView,
 }
 impl FileDescriptorSet {
     pub fn file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
@@ -151,6 +152,7 @@ impl ::std::clone::Clone for FileDescriptorSet {
                 file: ::std::clone::Clone::clone(&self.fields.file),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -172,6 +174,12 @@ impl ::std::fmt::Debug for FileDescriptorSet {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for FileDescriptorSet {
+    type Target = self::_root::google::protobuf::_view::FileDescriptorSetView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for FileDescriptorSet {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -185,7 +193,7 @@ impl ::std::cmp::PartialEq for FileDescriptorSet {
 /** Describes a complete .proto file.
 */
 pub struct FileDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -227,6 +235,7 @@ pub struct FileDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::FileDescriptorProtoView,
 }
 impl FileDescriptorProto {
     pub fn name(&self) -> &str {
@@ -807,6 +816,7 @@ impl ::std::clone::Clone for FileDescriptorProto {
                 syntax: ::std::clone::Clone::clone(&self.fields.syntax),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -840,6 +850,12 @@ impl ::std::fmt::Debug for FileDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for FileDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::FileDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for FileDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -863,7 +879,7 @@ impl ::std::cmp::PartialEq for FileDescriptorProto {
 /** Describes a message type.
 */
 pub struct DescriptorProto {
-    fields: self::_root::google::protobuf::_fields::DescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::DescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -899,6 +915,7 @@ pub struct DescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::DescriptorProtoView,
 }
 impl DescriptorProto {
     pub fn name(&self) -> &str {
@@ -1358,6 +1375,7 @@ impl ::std::clone::Clone for DescriptorProto {
                 reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -1389,6 +1407,12 @@ impl ::std::fmt::Debug for DescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for DescriptorProto {
+    type Target = self::_root::google::protobuf::_view::DescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for DescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -1408,12 +1432,13 @@ impl ::std::cmp::PartialEq for DescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct ExtensionRangeOptions {
-    fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields<
+    fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields::<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::UninterpretedOption,
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::google::protobuf::_view::ExtensionRangeOptionsView,
 }
 impl ExtensionRangeOptions {
     /** The parser stores options it doesn't recognize here. See above.
@@ -1546,6 +1571,7 @@ impl ::std::clone::Clone for ExtensionRangeOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -1568,6 +1594,12 @@ impl ::std::fmt::Debug for ExtensionRangeOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for ExtensionRangeOptions {
+    type Target = self::_root::google::protobuf::_view::ExtensionRangeOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for ExtensionRangeOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -1581,7 +1613,7 @@ impl ::std::cmp::PartialEq for ExtensionRangeOptions {
 /** Describes a field within a message.
 */
 pub struct FieldDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -1641,6 +1673,7 @@ pub struct FieldDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::FieldDescriptorProtoView,
 }
 impl FieldDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2321,6 +2354,7 @@ impl ::std::clone::Clone for FieldDescriptorProto {
                 proto3_optional: ::std::clone::Clone::clone(&self.fields.proto3_optional),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -2353,6 +2387,12 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for FieldDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::FieldDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for FieldDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -2375,7 +2415,7 @@ impl ::std::cmp::PartialEq for FieldDescriptorProto {
 /** Describes a oneof.
 */
 pub struct OneofDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -2386,6 +2426,7 @@ pub struct OneofDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::OneofDescriptorProtoView,
 }
 impl OneofDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2565,6 +2606,7 @@ impl ::std::clone::Clone for OneofDescriptorProto {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -2588,6 +2630,12 @@ impl ::std::fmt::Debug for OneofDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for OneofDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::OneofDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for OneofDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -2602,7 +2650,7 @@ impl ::std::cmp::PartialEq for OneofDescriptorProto {
 /** Describes an enum type.
 */
 pub struct EnumDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -2623,6 +2671,7 @@ pub struct EnumDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::EnumDescriptorProtoView,
 }
 impl EnumDescriptorProto {
     pub fn name(&self) -> &str {
@@ -2918,6 +2967,7 @@ impl ::std::clone::Clone for EnumDescriptorProto {
                 reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -2944,6 +2994,12 @@ impl ::std::fmt::Debug for EnumDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for EnumDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::EnumDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for EnumDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -2960,7 +3016,7 @@ impl ::std::cmp::PartialEq for EnumDescriptorProto {
 /** Describes a value within an enum.
 */
 pub struct EnumValueDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -2976,6 +3032,7 @@ pub struct EnumValueDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
 }
 impl EnumValueDescriptorProto {
     pub fn name(&self) -> &str {
@@ -3200,6 +3257,7 @@ impl ::std::clone::Clone for EnumValueDescriptorProto {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -3224,6 +3282,12 @@ impl ::std::fmt::Debug for EnumValueDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for EnumValueDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::EnumValueDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -3239,7 +3303,7 @@ impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
 /** Describes a service.
 */
 pub struct ServiceDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -3253,6 +3317,7 @@ pub struct ServiceDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::ServiceDescriptorProtoView,
 }
 impl ServiceDescriptorProto {
     pub fn name(&self) -> &str {
@@ -3463,6 +3528,7 @@ impl ::std::clone::Clone for ServiceDescriptorProto {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -3487,6 +3553,12 @@ impl ::std::fmt::Debug for ServiceDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for ServiceDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::ServiceDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for ServiceDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -3501,7 +3573,7 @@ impl ::std::cmp::PartialEq for ServiceDescriptorProto {
 /** Describes a method of a service.
 */
 pub struct MethodDescriptorProto {
-    fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields<
+    fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -3532,6 +3604,7 @@ pub struct MethodDescriptorProto {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::MethodDescriptorProtoView,
 }
 impl MethodDescriptorProto {
     pub fn name(&self) -> &str {
@@ -3930,6 +4003,7 @@ impl ::std::clone::Clone for MethodDescriptorProto {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -3957,6 +4031,12 @@ impl ::std::fmt::Debug for MethodDescriptorProto {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for MethodDescriptorProto {
+    type Target = self::_root::google::protobuf::_view::MethodDescriptorProtoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for MethodDescriptorProto {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -3973,7 +4053,7 @@ impl ::std::cmp::PartialEq for MethodDescriptorProto {
 }
 #[derive(::std::default::Default)]
 pub struct FileOptions {
-    fields: self::_root::google::protobuf::_fields::FileOptionsFields<
+    fields: self::_root::google::protobuf::_fields::FileOptionsFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -4081,6 +4161,7 @@ pub struct FileOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::FileOptionsView,
 }
 impl FileOptions {
     pub fn java_package(&self) -> &str {
@@ -5365,6 +5446,7 @@ impl ::std::clone::Clone for FileOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -5416,6 +5498,12 @@ impl ::std::fmt::Debug for FileOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for FileOptions {
+    type Target = self::_root::google::protobuf::_view::FileOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for FileOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -5448,7 +5536,7 @@ impl ::std::cmp::PartialEq for FileOptions {
 }
 #[derive(::std::default::Default)]
 pub struct MessageOptions {
-    fields: self::_root::google::protobuf::_fields::MessageOptionsFields<
+    fields: self::_root::google::protobuf::_fields::MessageOptionsFields::<
         self::_pinternal::OptionalNumericalField::<
             bool,
             self::_pinternal::tags::Bool,
@@ -5474,6 +5562,7 @@ pub struct MessageOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::MessageOptionsView,
 }
 impl MessageOptions {
     pub fn message_set_wire_format(&self) -> bool {
@@ -5868,6 +5957,7 @@ impl ::std::clone::Clone for MessageOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -5900,6 +5990,12 @@ impl ::std::fmt::Debug for MessageOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for MessageOptions {
+    type Target = self::_root::google::protobuf::_view::MessageOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for MessageOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -5916,7 +6012,7 @@ impl ::std::cmp::PartialEq for MessageOptions {
 }
 #[derive(::std::default::Default)]
 pub struct FieldOptions {
-    fields: self::_root::google::protobuf::_fields::FieldOptionsFields<
+    fields: self::_root::google::protobuf::_fields::FieldOptionsFields::<
         self::_pinternal::OptionalNumericalField::<
             self::_root::google::protobuf::field_options::CType,
             self::_pinternal::tags::Enum2::<
@@ -5956,6 +6052,7 @@ pub struct FieldOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::FieldOptionsView,
 }
 impl FieldOptions {
     pub fn ctype(&self) -> self::_root::google::protobuf::field_options::CType {
@@ -6422,6 +6519,7 @@ impl ::std::clone::Clone for FieldOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -6450,6 +6548,12 @@ impl ::std::fmt::Debug for FieldOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for FieldOptions {
+    type Target = self::_root::google::protobuf::_view::FieldOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for FieldOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -6466,12 +6570,13 @@ impl ::std::cmp::PartialEq for FieldOptions {
 }
 #[derive(::std::default::Default)]
 pub struct OneofOptions {
-    fields: self::_root::google::protobuf::_fields::OneofOptionsFields<
+    fields: self::_root::google::protobuf::_fields::OneofOptionsFields::<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::UninterpretedOption,
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::google::protobuf::_view::OneofOptionsView,
 }
 impl OneofOptions {
     /** The parser stores options it doesn't recognize here. See above.
@@ -6604,6 +6709,7 @@ impl ::std::clone::Clone for OneofOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -6626,6 +6732,12 @@ impl ::std::fmt::Debug for OneofOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for OneofOptions {
+    type Target = self::_root::google::protobuf::_view::OneofOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for OneofOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -6637,7 +6749,7 @@ impl ::std::cmp::PartialEq for OneofOptions {
 }
 #[derive(::std::default::Default)]
 pub struct EnumOptions {
-    fields: self::_root::google::protobuf::_fields::EnumOptionsFields<
+    fields: self::_root::google::protobuf::_fields::EnumOptionsFields::<
         self::_pinternal::OptionalNumericalField::<
             bool,
             self::_pinternal::tags::Bool,
@@ -6653,6 +6765,7 @@ pub struct EnumOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::EnumOptionsView,
 }
 impl EnumOptions {
     pub fn allow_alias(&self) -> bool {
@@ -6897,6 +7010,7 @@ impl ::std::clone::Clone for EnumOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -6921,6 +7035,12 @@ impl ::std::fmt::Debug for EnumOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for EnumOptions {
+    type Target = self::_root::google::protobuf::_view::EnumOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for EnumOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -6934,7 +7054,7 @@ impl ::std::cmp::PartialEq for EnumOptions {
 }
 #[derive(::std::default::Default)]
 pub struct EnumValueOptions {
-    fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields<
+    fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields::<
         self::_pinternal::OptionalNumericalField::<
             bool,
             self::_pinternal::tags::Bool,
@@ -6945,6 +7065,7 @@ pub struct EnumValueOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::EnumValueOptionsView,
 }
 impl EnumValueOptions {
     pub fn deprecated(&self) -> bool {
@@ -7134,6 +7255,7 @@ impl ::std::clone::Clone for EnumValueOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -7157,6 +7279,12 @@ impl ::std::fmt::Debug for EnumValueOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for EnumValueOptions {
+    type Target = self::_root::google::protobuf::_view::EnumValueOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for EnumValueOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -7169,7 +7297,7 @@ impl ::std::cmp::PartialEq for EnumValueOptions {
 }
 #[derive(::std::default::Default)]
 pub struct ServiceOptions {
-    fields: self::_root::google::protobuf::_fields::ServiceOptionsFields<
+    fields: self::_root::google::protobuf::_fields::ServiceOptionsFields::<
         self::_pinternal::OptionalNumericalField::<
             bool,
             self::_pinternal::tags::Bool,
@@ -7180,6 +7308,7 @@ pub struct ServiceOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::ServiceOptionsView,
 }
 impl ServiceOptions {
     pub fn deprecated(&self) -> bool {
@@ -7369,6 +7498,7 @@ impl ::std::clone::Clone for ServiceOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -7392,6 +7522,12 @@ impl ::std::fmt::Debug for ServiceOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for ServiceOptions {
+    type Target = self::_root::google::protobuf::_view::ServiceOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for ServiceOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -7404,7 +7540,7 @@ impl ::std::cmp::PartialEq for ServiceOptions {
 }
 #[derive(::std::default::Default)]
 pub struct MethodOptions {
-    fields: self::_root::google::protobuf::_fields::MethodOptionsFields<
+    fields: self::_root::google::protobuf::_fields::MethodOptionsFields::<
         self::_pinternal::OptionalNumericalField::<
             bool,
             self::_pinternal::tags::Bool,
@@ -7422,6 +7558,7 @@ pub struct MethodOptions {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::MethodOptionsView,
 }
 impl MethodOptions {
     pub fn deprecated(&self) -> bool {
@@ -7677,6 +7814,7 @@ impl ::std::clone::Clone for MethodOptions {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -7701,6 +7839,12 @@ impl ::std::fmt::Debug for MethodOptions {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for MethodOptions {
+    type Target = self::_root::google::protobuf::_view::MethodOptionsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for MethodOptions {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -7721,7 +7865,7 @@ impl ::std::cmp::PartialEq for MethodOptions {
  in them.
 */
 pub struct UninterpretedOption {
-    fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields<
+    fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields::<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::uninterpreted_option::NamePart,
         >,
@@ -7757,6 +7901,7 @@ pub struct UninterpretedOption {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::_view::UninterpretedOptionView,
 }
 impl UninterpretedOption {
     pub fn name(
@@ -8202,6 +8347,7 @@ impl ::std::clone::Clone for UninterpretedOption {
                 aggregate_value: ::std::clone::Clone::clone(&self.fields.aggregate_value),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -8230,6 +8376,12 @@ impl ::std::fmt::Debug for UninterpretedOption {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for UninterpretedOption {
+    type Target = self::_root::google::protobuf::_view::UninterpretedOptionView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for UninterpretedOption {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -8250,12 +8402,13 @@ impl ::std::cmp::PartialEq for UninterpretedOption {
  FileDescriptorProto was generated.
 */
 pub struct SourceCodeInfo {
-    fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields<
+    fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields::<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::source_code_info::Location,
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::google::protobuf::_view::SourceCodeInfoView,
 }
 impl SourceCodeInfo {
     /** A Location identifies a piece of source code in a .proto file which
@@ -8424,6 +8577,7 @@ impl ::std::clone::Clone for SourceCodeInfo {
                 location: ::std::clone::Clone::clone(&self.fields.location),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -8445,6 +8599,12 @@ impl ::std::fmt::Debug for SourceCodeInfo {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for SourceCodeInfo {
+    type Target = self::_root::google::protobuf::_view::SourceCodeInfoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for SourceCodeInfo {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -8460,12 +8620,13 @@ impl ::std::cmp::PartialEq for SourceCodeInfo {
  source file, but may contain references to different source .proto files.
 */
 pub struct GeneratedCodeInfo {
-    fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields<
+    fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields::<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::generated_code_info::Annotation,
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::google::protobuf::_view::GeneratedCodeInfoView,
 }
 impl GeneratedCodeInfo {
     /** An Annotation connects some span of text in generated code to an element
@@ -8593,6 +8754,7 @@ impl ::std::clone::Clone for GeneratedCodeInfo {
                 annotation: ::std::clone::Clone::clone(&self.fields.annotation),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -8612,6 +8774,12 @@ impl ::std::fmt::Debug for GeneratedCodeInfo {
         debug_struct.field(stringify!(annotation), &self.annotation());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for GeneratedCodeInfo {
+    type Target = self::_root::google::protobuf::_view::GeneratedCodeInfoView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for GeneratedCodeInfo {
@@ -8639,7 +8807,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct FileDescriptorSetView {
-        fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields<
+        fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields::<
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::FileDescriptorProto,
             >,
@@ -8647,14 +8815,33 @@ pub mod _view {
         shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
     impl FileDescriptorSetView {
-        pub fn file(&self) -> &[self::_root::google::protobuf::FileDescriptorProto] {
+        pub fn file(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::FileDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::FileDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.file, self.shared.bitfield())
+        }
+    }
+    impl ::std::clone::Clone for FileDescriptorSetView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields {
+                    file: ::std::clone::Clone::clone(&self.fields.file),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
     #[derive(::std::default::Default)]
     pub struct FileDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -8758,17 +8945,24 @@ pub mod _view {
 */
         pub fn dependency(
             &self,
-        ) -> &[impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &str,
+        > + ::std::ops::Index<usize, Output = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.dependency, self.shared.bitfield())
+            RepeatedFieldType::get_field2(
+                &self.fields.dependency,
+                self.shared.bitfield(),
+            )
         }
         /** Indexes of the public imported files in the dependency list above.
 */
-        pub fn public_dependency(&self) -> &[i32] {
+        pub fn public_dependency(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = i32,
+        > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.public_dependency,
                 self.shared.bitfield(),
             )
@@ -8776,39 +8970,65 @@ pub mod _view {
         /** Indexes of the weak imported files in the dependency list.
  For Google-internal migration only. Do not use.
 */
-        pub fn weak_dependency(&self) -> &[i32] {
+        pub fn weak_dependency(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = i32,
+        > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.weak_dependency,
                 self.shared.bitfield(),
             )
         }
         /** All top-level definitions in this file.
 */
-        pub fn message_type(&self) -> &[self::_root::google::protobuf::DescriptorProto] {
+        pub fn message_type(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::DescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::DescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.message_type,
                 self.shared.bitfield(),
             )
         }
         pub fn enum_type(
             &self,
-        ) -> &[self::_root::google::protobuf::EnumDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::EnumDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::EnumDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.enum_type, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.enum_type, self.shared.bitfield())
         }
         pub fn service(
             &self,
-        ) -> &[self::_root::google::protobuf::ServiceDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::ServiceDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::ServiceDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.service, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.service, self.shared.bitfield())
         }
         pub fn extension(
             &self,
-        ) -> &[self::_root::google::protobuf::FieldDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::FieldDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::FieldDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.extension, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.extension, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -8896,9 +9116,38 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for FileDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    package: ::std::clone::Clone::clone(&self.fields.package),
+                    dependency: ::std::clone::Clone::clone(&self.fields.dependency),
+                    public_dependency: ::std::clone::Clone::clone(
+                        &self.fields.public_dependency,
+                    ),
+                    weak_dependency: ::std::clone::Clone::clone(
+                        &self.fields.weak_dependency,
+                    ),
+                    message_type: ::std::clone::Clone::clone(&self.fields.message_type),
+                    enum_type: ::std::clone::Clone::clone(&self.fields.enum_type),
+                    service: ::std::clone::Clone::clone(&self.fields.service),
+                    extension: ::std::clone::Clone::clone(&self.fields.extension),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                    source_code_info: ::std::clone::Clone::clone(
+                        &self.fields.source_code_info,
+                    ),
+                    syntax: ::std::clone::Clone::clone(&self.fields.syntax),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct DescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::DescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::DescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -8959,43 +9208,80 @@ pub mod _view {
                 )
                 .is_some()
         }
-        pub fn field(&self) -> &[self::_root::google::protobuf::FieldDescriptorProto] {
+        pub fn field(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::FieldDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::FieldDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.field, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.field, self.shared.bitfield())
         }
         pub fn extension(
             &self,
-        ) -> &[self::_root::google::protobuf::FieldDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::FieldDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::FieldDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.extension, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.extension, self.shared.bitfield())
         }
-        pub fn nested_type(&self) -> &[self::_root::google::protobuf::DescriptorProto] {
+        pub fn nested_type(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::DescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::DescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.nested_type,
                 self.shared.bitfield(),
             )
         }
         pub fn enum_type(
             &self,
-        ) -> &[self::_root::google::protobuf::EnumDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::EnumDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::EnumDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.enum_type, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.enum_type, self.shared.bitfield())
         }
         pub fn extension_range(
             &self,
-        ) -> &[self::_root::google::protobuf::descriptor_proto::ExtensionRange] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.extension_range,
                 self.shared.bitfield(),
             )
         }
         pub fn oneof_decl(
             &self,
-        ) -> &[self::_root::google::protobuf::OneofDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::OneofDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::OneofDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.oneof_decl, self.shared.bitfield())
+            RepeatedFieldType::get_field2(
+                &self.fields.oneof_decl,
+                self.shared.bitfield(),
+            )
         }
         pub fn options(
             &self,
@@ -9026,9 +9312,14 @@ pub mod _view {
         }
         pub fn reserved_range(
             &self,
-        ) -> &[self::_root::google::protobuf::descriptor_proto::ReservedRange] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.reserved_range,
                 self.shared.bitfield(),
             )
@@ -9038,19 +9329,44 @@ pub mod _view {
 */
         pub fn reserved_name(
             &self,
-        ) -> &[impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &str,
+        > + ::std::ops::Index<usize, Output = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.reserved_name,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for DescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::DescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    field: ::std::clone::Clone::clone(&self.fields.field),
+                    extension: ::std::clone::Clone::clone(&self.fields.extension),
+                    nested_type: ::std::clone::Clone::clone(&self.fields.nested_type),
+                    enum_type: ::std::clone::Clone::clone(&self.fields.enum_type),
+                    extension_range: ::std::clone::Clone::clone(
+                        &self.fields.extension_range,
+                    ),
+                    oneof_decl: ::std::clone::Clone::clone(&self.fields.oneof_decl),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                    reserved_range: ::std::clone::Clone::clone(
+                        &self.fields.reserved_range,
+                    ),
+                    reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ExtensionRangeOptionsView {
-        fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields<
+        fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields::<
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::UninterpretedOption,
             >,
@@ -9062,17 +9378,36 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for ExtensionRangeOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields {
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct FieldDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -9452,9 +9787,35 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for FieldDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    number: ::std::clone::Clone::clone(&self.fields.number),
+                    label: ::std::clone::Clone::clone(&self.fields.label),
+                    r#type: ::std::clone::Clone::clone(&self.fields.r#type),
+                    type_name: ::std::clone::Clone::clone(&self.fields.type_name),
+                    extendee: ::std::clone::Clone::clone(&self.fields.extendee),
+                    default_value: ::std::clone::Clone::clone(
+                        &self.fields.default_value,
+                    ),
+                    oneof_index: ::std::clone::Clone::clone(&self.fields.oneof_index),
+                    json_name: ::std::clone::Clone::clone(&self.fields.json_name),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                    proto3_optional: ::std::clone::Clone::clone(
+                        &self.fields.proto3_optional,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct OneofDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -9518,9 +9879,22 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for OneofDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct EnumDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -9568,9 +9942,14 @@ pub mod _view {
         }
         pub fn value(
             &self,
-        ) -> &[self::_root::google::protobuf::EnumValueDescriptorProto] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.value, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.value, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -9605,9 +9984,14 @@ pub mod _view {
 */
         pub fn reserved_range(
             &self,
-        ) -> &[self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.reserved_range,
                 self.shared.bitfield(),
             )
@@ -9617,19 +10001,37 @@ pub mod _view {
 */
         pub fn reserved_name(
             &self,
-        ) -> &[impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &str,
+        > + ::std::ops::Index<usize, Output = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.reserved_name,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for EnumDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    value: ::std::clone::Clone::clone(&self.fields.value),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                    reserved_range: ::std::clone::Clone::clone(
+                        &self.fields.reserved_range,
+                    ),
+                    reserved_name: ::std::clone::Clone::clone(&self.fields.reserved_name),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct EnumValueDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -9721,9 +10123,23 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for EnumValueDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    number: ::std::clone::Clone::clone(&self.fields.number),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ServiceDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -9762,9 +10178,16 @@ pub mod _view {
                 )
                 .is_some()
         }
-        pub fn method(&self) -> &[self::_root::google::protobuf::MethodDescriptorProto] {
+        pub fn method(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::MethodDescriptorProtoView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::MethodDescriptorProtoView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.method, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.method, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -9794,9 +10217,23 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for ServiceDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    method: ::std::clone::Clone::clone(&self.fields.method),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct MethodDescriptorProtoView {
-        fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields<
+        fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -9979,9 +10416,30 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for MethodDescriptorProtoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    input_type: ::std::clone::Clone::clone(&self.fields.input_type),
+                    output_type: ::std::clone::Clone::clone(&self.fields.output_type),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                    client_streaming: ::std::clone::Clone::clone(
+                        &self.fields.client_streaming,
+                    ),
+                    server_streaming: ::std::clone::Clone::clone(
+                        &self.fields.server_streaming,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct FileOptionsView {
-        fields: self::_root::google::protobuf::_fields::FileOptionsFields<
+        fields: self::_root::google::protobuf::_fields::FileOptionsFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -10641,17 +11099,84 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for FileOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::FileOptionsFields {
+                    java_package: ::std::clone::Clone::clone(&self.fields.java_package),
+                    java_outer_classname: ::std::clone::Clone::clone(
+                        &self.fields.java_outer_classname,
+                    ),
+                    java_multiple_files: ::std::clone::Clone::clone(
+                        &self.fields.java_multiple_files,
+                    ),
+                    java_generate_equals_and_hash: ::std::clone::Clone::clone(
+                        &self.fields.java_generate_equals_and_hash,
+                    ),
+                    java_string_check_utf8: ::std::clone::Clone::clone(
+                        &self.fields.java_string_check_utf8,
+                    ),
+                    optimize_for: ::std::clone::Clone::clone(&self.fields.optimize_for),
+                    go_package: ::std::clone::Clone::clone(&self.fields.go_package),
+                    cc_generic_services: ::std::clone::Clone::clone(
+                        &self.fields.cc_generic_services,
+                    ),
+                    java_generic_services: ::std::clone::Clone::clone(
+                        &self.fields.java_generic_services,
+                    ),
+                    py_generic_services: ::std::clone::Clone::clone(
+                        &self.fields.py_generic_services,
+                    ),
+                    php_generic_services: ::std::clone::Clone::clone(
+                        &self.fields.php_generic_services,
+                    ),
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    cc_enable_arenas: ::std::clone::Clone::clone(
+                        &self.fields.cc_enable_arenas,
+                    ),
+                    objc_class_prefix: ::std::clone::Clone::clone(
+                        &self.fields.objc_class_prefix,
+                    ),
+                    csharp_namespace: ::std::clone::Clone::clone(
+                        &self.fields.csharp_namespace,
+                    ),
+                    swift_prefix: ::std::clone::Clone::clone(&self.fields.swift_prefix),
+                    php_class_prefix: ::std::clone::Clone::clone(
+                        &self.fields.php_class_prefix,
+                    ),
+                    php_namespace: ::std::clone::Clone::clone(
+                        &self.fields.php_namespace,
+                    ),
+                    php_metadata_namespace: ::std::clone::Clone::clone(
+                        &self.fields.php_metadata_namespace,
+                    ),
+                    ruby_package: ::std::clone::Clone::clone(&self.fields.ruby_package),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct MessageOptionsView {
-        fields: self::_root::google::protobuf::_fields::MessageOptionsFields<
+        fields: self::_root::google::protobuf::_fields::MessageOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
                 bool,
                 self::_pinternal::tags::Bool,
@@ -10827,17 +11352,44 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for MessageOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::MessageOptionsFields {
+                    message_set_wire_format: ::std::clone::Clone::clone(
+                        &self.fields.message_set_wire_format,
+                    ),
+                    no_standard_descriptor_accessor: ::std::clone::Clone::clone(
+                        &self.fields.no_standard_descriptor_accessor,
+                    ),
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    map_entry: ::std::clone::Clone::clone(&self.fields.map_entry),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct FieldOptionsView {
-        fields: self::_root::google::protobuf::_fields::FieldOptionsFields<
+        fields: self::_root::google::protobuf::_fields::FieldOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
                 self::_root::google::protobuf::field_options::CType,
                 self::_pinternal::tags::Enum2::<
@@ -11088,17 +11640,42 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for FieldOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::FieldOptionsFields {
+                    ctype: ::std::clone::Clone::clone(&self.fields.ctype),
+                    packed: ::std::clone::Clone::clone(&self.fields.packed),
+                    jstype: ::std::clone::Clone::clone(&self.fields.jstype),
+                    lazy: ::std::clone::Clone::clone(&self.fields.lazy),
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    weak: ::std::clone::Clone::clone(&self.fields.weak),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct OneofOptionsView {
-        fields: self::_root::google::protobuf::_fields::OneofOptionsFields<
+        fields: self::_root::google::protobuf::_fields::OneofOptionsFields::<
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::UninterpretedOption,
             >,
@@ -11110,17 +11687,36 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for OneofOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::OneofOptionsFields {
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct EnumOptionsView {
-        fields: self::_root::google::protobuf::_fields::EnumOptionsFields<
+        fields: self::_root::google::protobuf::_fields::EnumOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
                 bool,
                 self::_pinternal::tags::Bool,
@@ -11196,17 +11792,38 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for EnumOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::EnumOptionsFields {
+                    allow_alias: ::std::clone::Clone::clone(&self.fields.allow_alias),
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct EnumValueOptionsView {
-        fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields<
+        fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
                 bool,
                 self::_pinternal::tags::Bool,
@@ -11251,17 +11868,37 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for EnumValueOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields {
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ServiceOptionsView {
-        fields: self::_root::google::protobuf::_fields::ServiceOptionsFields<
+        fields: self::_root::google::protobuf::_fields::ServiceOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
                 bool,
                 self::_pinternal::tags::Bool,
@@ -11306,17 +11943,37 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for ServiceOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::ServiceOptionsFields {
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct MethodOptionsView {
-        fields: self::_root::google::protobuf::_fields::MethodOptionsFields<
+        fields: self::_root::google::protobuf::_fields::MethodOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
                 bool,
                 self::_pinternal::tags::Bool,
@@ -11399,17 +12056,40 @@ pub mod _view {
 */
         pub fn uninterpreted_option(
             &self,
-        ) -> &[self::_root::google::protobuf::UninterpretedOption] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::_view::UninterpretedOptionView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
         }
     }
+    impl ::std::clone::Clone for MethodOptionsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::MethodOptionsFields {
+                    deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
+                    idempotency_level: ::std::clone::Clone::clone(
+                        &self.fields.idempotency_level,
+                    ),
+                    uninterpreted_option: ::std::clone::Clone::clone(
+                        &self.fields.uninterpreted_option,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct UninterpretedOptionView {
-        fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields<
+        fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields::<
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::uninterpreted_option::NamePart,
             >,
@@ -11449,9 +12129,14 @@ pub mod _view {
     impl UninterpretedOptionView {
         pub fn name(
             &self,
-        ) -> &[self::_root::google::protobuf::uninterpreted_option::NamePart] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.name, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.name, self.shared.bitfield())
         }
         pub fn identifier_value(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -11595,9 +12280,35 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for UninterpretedOptionView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    identifier_value: ::std::clone::Clone::clone(
+                        &self.fields.identifier_value,
+                    ),
+                    positive_int_value: ::std::clone::Clone::clone(
+                        &self.fields.positive_int_value,
+                    ),
+                    negative_int_value: ::std::clone::Clone::clone(
+                        &self.fields.negative_int_value,
+                    ),
+                    double_value: ::std::clone::Clone::clone(&self.fields.double_value),
+                    string_value: ::std::clone::Clone::clone(&self.fields.string_value),
+                    aggregate_value: ::std::clone::Clone::clone(
+                        &self.fields.aggregate_value,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct SourceCodeInfoView {
-        fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields<
+        fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields::<
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::source_code_info::Location,
             >,
@@ -11651,14 +12362,31 @@ pub mod _view {
 */
         pub fn location(
             &self,
-        ) -> &[self::_root::google::protobuf::source_code_info::Location] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::source_code_info::_view::LocationView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::source_code_info::_view::LocationView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.location, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.location, self.shared.bitfield())
+        }
+    }
+    impl ::std::clone::Clone for SourceCodeInfoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields {
+                    location: ::std::clone::Clone::clone(&self.fields.location),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
     #[derive(::std::default::Default)]
     pub struct GeneratedCodeInfoView {
-        fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields<
+        fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields::<
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::generated_code_info::Annotation,
             >,
@@ -11671,9 +12399,29 @@ pub mod _view {
 */
         pub fn annotation(
             &self,
-        ) -> &[self::_root::google::protobuf::generated_code_info::Annotation] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
+        > + ::std::ops::Index<
+            usize,
+            Output = self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.annotation, self.shared.bitfield())
+            RepeatedFieldType::get_field2(
+                &self.fields.annotation,
+                self.shared.bitfield(),
+            )
+        }
+    }
+    impl ::std::clone::Clone for GeneratedCodeInfoView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields {
+                    annotation: ::std::clone::Clone::clone(&self.fields.annotation),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

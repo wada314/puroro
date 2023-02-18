@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct ExtensionRange {
-    fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields<
+    fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -28,6 +28,7 @@ pub struct ExtensionRange {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
 }
 impl ExtensionRange {
     pub fn start(&self) -> i32 {
@@ -256,6 +257,7 @@ impl ::std::clone::Clone for ExtensionRange {
                 options: ::std::clone::Clone::clone(&self.fields.options),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -280,6 +282,12 @@ impl ::std::fmt::Debug for ExtensionRange {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for ExtensionRange {
+    type Target = self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for ExtensionRange {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -296,7 +304,7 @@ impl ::std::cmp::PartialEq for ExtensionRange {
  not overlap.
 */
 pub struct ReservedRange {
-    fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
+    fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -309,6 +317,7 @@ pub struct ReservedRange {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView,
 }
 impl ReservedRange {
     pub fn start(&self) -> i32 {
@@ -488,6 +497,7 @@ impl ::std::clone::Clone for ReservedRange {
                 end: ::std::clone::Clone::clone(&self.fields.end),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -509,6 +519,12 @@ impl ::std::fmt::Debug for ReservedRange {
             .field(stringify!(end), &self.end_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for ReservedRange {
+    type Target = self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for ReservedRange {
@@ -536,7 +552,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct ExtensionRangeView {
-        fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields<
+        fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -630,9 +646,23 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for ExtensionRangeView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields {
+                    start: ::std::clone::Clone::clone(&self.fields.start),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ReservedRangeView {
-        fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
+        fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -690,6 +720,19 @@ pub mod _view {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for ReservedRangeView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields {
+                    start: ::std::clone::Clone::clone(&self.fields.start),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

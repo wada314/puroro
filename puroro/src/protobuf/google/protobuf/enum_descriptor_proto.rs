@@ -19,7 +19,7 @@ mod _pinternal {
  domain.
 */
 pub struct EnumReservedRange {
-    fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
+    fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -32,6 +32,7 @@ pub struct EnumReservedRange {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
 }
 impl EnumReservedRange {
     pub fn start(&self) -> i32 {
@@ -211,6 +212,7 @@ impl ::std::clone::Clone for EnumReservedRange {
                 end: ::std::clone::Clone::clone(&self.fields.end),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -232,6 +234,12 @@ impl ::std::fmt::Debug for EnumReservedRange {
             .field(stringify!(end), &self.end_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for EnumReservedRange {
+    type Target = self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for EnumReservedRange {
@@ -259,7 +267,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct EnumReservedRangeView {
-        fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
+        fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -317,6 +325,19 @@ pub mod _view {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for EnumReservedRangeView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields {
+                    start: ::std::clone::Clone::clone(&self.fields.start),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

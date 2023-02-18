@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Location {
-    fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields<
+    fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields::<
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::OptionalUnsizedField::<
@@ -31,6 +31,7 @@ pub struct Location {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::source_code_info::_view::LocationView,
 }
 impl Location {
     /** Identifies which part of the FileDescriptorProto was defined at this
@@ -407,6 +408,7 @@ impl ::std::clone::Clone for Location {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -434,6 +436,12 @@ impl ::std::fmt::Debug for Location {
             );
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Location {
+    type Target = self::_root::google::protobuf::source_code_info::_view::LocationView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Location {
@@ -464,7 +472,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct LocationView {
-        fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields<
+        fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields::<
             self::_pinternal::RepeatedNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -515,9 +523,13 @@ pub mod _view {
  this path refers to the whole field declaration (from the beginning
  of the label to the terminating semicolon).
 */
-        pub fn path(&self) -> &[i32] {
+        pub fn path(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = i32,
+        > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.path, self.shared.bitfield())
         }
         /** Always has exactly three or four elements: start line, start column,
  end line (optional, otherwise assumed same as start line), end column.
@@ -525,9 +537,13 @@ pub mod _view {
  and column numbers are zero-based -- typically you will want to add
  1 to each before displaying to a user.
 */
-        pub fn span(&self) -> &[i32] {
+        pub fn span(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = i32,
+        > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.span, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.span, self.shared.bitfield())
         }
         pub fn leading_comments(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -625,14 +641,36 @@ pub mod _view {
         }
         pub fn leading_detached_comments(
             &self,
-        ) -> &[impl ::std::ops::Deref::<
-            Target = str,
-        > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = &str,
+        > + ::std::ops::Index<usize, Output = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.leading_detached_comments,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl ::std::clone::Clone for LocationView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields {
+                    path: ::std::clone::Clone::clone(&self.fields.path),
+                    span: ::std::clone::Clone::clone(&self.fields.span),
+                    leading_comments: ::std::clone::Clone::clone(
+                        &self.fields.leading_comments,
+                    ),
+                    trailing_comments: ::std::clone::Clone::clone(
+                        &self.fields.trailing_comments,
+                    ),
+                    leading_detached_comments: ::std::clone::Clone::clone(
+                        &self.fields.leading_detached_comments,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

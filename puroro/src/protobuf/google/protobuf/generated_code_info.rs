@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Annotation {
-    fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields<
+    fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields::<
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -31,6 +31,7 @@ pub struct Annotation {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
 }
 impl Annotation {
     /** Identifies the element in the original source .proto file. This field
@@ -299,6 +300,7 @@ impl ::std::clone::Clone for Annotation {
                 end: ::std::clone::Clone::clone(&self.fields.end),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -322,6 +324,12 @@ impl ::std::fmt::Debug for Annotation {
             .field(stringify!(end), &self.end_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Annotation {
+    type Target = self::_root::google::protobuf::generated_code_info::_view::AnnotationView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Annotation {
@@ -351,7 +359,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct AnnotationView {
-        fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields<
+        fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields::<
             self::_pinternal::RepeatedNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -378,9 +386,13 @@ pub mod _view {
         /** Identifies the element in the original source .proto file. This field
  is formatted the same as SourceCodeInfo.Location.path.
 */
-        pub fn path(&self) -> &[i32] {
+        pub fn path(
+            &self,
+        ) -> impl '_ + ::std::iter::IntoIterator<
+            Item = i32,
+        > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
+            RepeatedFieldType::get_field2(&self.fields.path, self.shared.bitfield())
         }
         pub fn source_file(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -453,6 +465,21 @@ pub mod _view {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for AnnotationView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields {
+                    path: ::std::clone::Clone::clone(&self.fields.path),
+                    source_file: ::std::clone::Clone::clone(&self.fields.source_file),
+                    begin: ::std::clone::Clone::clone(&self.fields.begin),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

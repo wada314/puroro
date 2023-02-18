@@ -18,7 +18,7 @@ mod _pinternal {
  "foo.(bar.baz).qux".
 */
 pub struct NamePart {
-    fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
+    fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -31,6 +31,7 @@ pub struct NamePart {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
 }
 impl NamePart {
     pub fn name_part(&self) -> &str {
@@ -224,6 +225,7 @@ impl ::std::clone::Clone for NamePart {
                 is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -245,6 +247,12 @@ impl ::std::fmt::Debug for NamePart {
             .field(stringify!(is_extension), &self.is_extension_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for NamePart {
+    type Target = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for NamePart {
@@ -273,7 +281,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct NamePartView {
-        fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
+        fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -333,6 +341,19 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for NamePartView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields {
+                    name_part: ::std::clone::Clone::clone(&self.fields.name_part),
+                    is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

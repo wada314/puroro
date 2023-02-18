@@ -14,7 +14,7 @@ mod _pinternal {
 /** Represents a single generated file.
 */
 pub struct File {
-    fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
+    fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields::<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -35,6 +35,7 @@ pub struct File {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::compiler::code_generator_response::_view::FileView,
 }
 impl File {
     pub fn name(&self) -> &str {
@@ -380,6 +381,7 @@ impl ::std::clone::Clone for File {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -403,6 +405,12 @@ impl ::std::fmt::Debug for File {
             .field(stringify!(generated_code_info), &self.generated_code_info_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for File {
+    type Target = self::_root::google::protobuf::compiler::code_generator_response::_view::FileView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for File {
@@ -433,7 +441,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct FileView {
-        fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
+        fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields::<
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -607,6 +615,25 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for FileView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                    insertion_point: ::std::clone::Clone::clone(
+                        &self.fields.insertion_point,
+                    ),
+                    content: ::std::clone::Clone::clone(&self.fields.content),
+                    generated_code_info: ::std::clone::Clone::clone(
+                        &self.fields.generated_code_info,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }
