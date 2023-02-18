@@ -19,7 +19,10 @@ use crate::internal::tags;
 use crate::internal::variant::Variant;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::iter;
 use ::std::marker::PhantomData;
+use ::std::ops::Index;
+use ::std::slice;
 
 #[derive(Default, Clone)]
 pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -300,6 +303,16 @@ where
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
         self.0.clear()
     }
+
+    type ItemType<'a> = ProtoType::RustType
+    where
+        Self: 'a;
+    type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustType>
+    where
+        Self: 'a;
+    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_> {
+        RepeatedField(self.0.as_slice())
+    }
 }
 
 trait CheckNumType: Sized {
@@ -318,3 +331,18 @@ impl CheckNumType for u64 {}
 impl CheckNumType for f32 {}
 impl CheckNumType for f64 {}
 impl CheckNumType for bool {}
+
+pub struct RepeatedField<'a, T>(&'a [T]);
+impl<'a, T: Clone> IntoIterator for RepeatedField<'a, T> {
+    type Item = T;
+    type IntoIter = iter::Cloned<slice::Iter<'a, T>>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter().cloned()
+    }
+}
+impl<'a, T> Index<usize> for RepeatedField<'a, T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}

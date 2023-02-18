@@ -17,6 +17,7 @@
 use crate::{PuroroError, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
+use ::std::ops::Deref;
 
 // Variants
 #[derive(Default, Clone)]
@@ -85,7 +86,7 @@ pub enum NumericalWireType {
     Bits64([u8; 8]),
 }
 pub trait UnsizedType {
-    type RustOwnedType: for<'a> From<Self::RustRefType<'a>>;
+    type RustOwnedType: for<'a> From<Self::RustRefType<'a>> + Deref;
     type RustRefType<'a>
     where
         Self: 'a;

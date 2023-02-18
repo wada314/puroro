@@ -18,7 +18,10 @@ use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::iter;
 use ::std::marker::PhantomData;
+use ::std::ops::{Deref, Index};
+use ::std::slice;
 
 #[derive(Default, Clone)]
 pub struct SingularUnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -215,5 +218,43 @@ where
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
         self.0.clear()
+    }
+
+    type ItemType<'a> = &'a <ProtoType::RustOwnedType as Deref>::Target
+    where
+        Self: 'a;
+    type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustOwnedType>
+    where
+        Self: 'a;
+
+    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_> {
+        RepeatedField(self.0.as_slice())
+    }
+}
+
+pub struct RepeatedField<'a, T>(&'a [T]);
+impl<'a, T: Deref> IntoIterator for RepeatedField<'a, T> {
+    type Item = &'a T::Target;
+    type IntoIter = Derefed<'a, slice::Iter<'a, T>, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        Derefed(self.0.into_iter(), PhantomData)
+    }
+}
+impl<'a, T: Deref> Index<usize> for RepeatedField<'a, T> {
+    type Output = &'a T::Target;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index].deref()
+    }
+}
+
+pub struct Derefed<'a, I, B: ?Sized>(I, PhantomData<&'a B>);
+impl<'a, I, B> Iterator for Derefed<'a, I, B>
+where
+    I: Iterator<Item = &'a B>,
+    B: Deref,
+{
+    type Item = &'a B::Target;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next().map(|borrowed| B::deref(borrowed))
     }
 }
