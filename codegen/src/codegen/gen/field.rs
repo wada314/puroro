@@ -372,14 +372,17 @@ impl Field {
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
         let field_ident = self.gen_fields_struct_field_ident()?;
-        let getter_item_type = match self.r#type()? {
+        let index_output_type = match self.r#type()? {
+            FieldType::LengthDelimited(ld_type) => match ld_type {
+                LengthDelimitedType::String => Rc::new(parse2(quote! { str })?),
+                LengthDelimitedType::Bytes => Rc::new(parse2(quote! { [u8] })?),
+                LengthDelimitedType::Message(m) => m.try_upgrade()?.gen_view_struct_type()?,
+            },
+            _ => self.r#type()?.rust_type()?,
+        };
+        let into_iter_item_type = match self.r#type()? {
             FieldType::LengthDelimited(ld_type) => {
-                let deref_type: Rc<Type> = match ld_type {
-                    LengthDelimitedType::String => Rc::new(parse2(quote! { str })?),
-                    LengthDelimitedType::Bytes => Rc::new(parse2(quote! { [u8] })?),
-                    LengthDelimitedType::Message(m) => m.try_upgrade()?.gen_view_struct_type()?,
-                };
-                Rc::new(parse2(quote! { & #deref_type })?)
+                Rc::new(parse2(quote! { & #index_output_type })?)
             }
             _ => self.r#type()?.rust_type()?,
         };
@@ -388,8 +391,8 @@ impl Field {
             #(#docs)*
             pub fn #getter_ident(&self) -> impl
                 '_ +
-                ::std::iter::IntoIterator<Item = #getter_item_type> +
-                ::std::ops::Index<usize, Output = #getter_item_type>
+                ::std::iter::IntoIterator<Item = #into_iter_item_type> +
+                ::std::ops::Index<usize, Output = #index_output_type>
             {
                 use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::get_field(

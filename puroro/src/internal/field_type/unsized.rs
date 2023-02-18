@@ -18,7 +18,6 @@ use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
-use ::std::iter;
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, Index};
 use ::std::slice;
@@ -212,6 +211,18 @@ where
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
+
+    type IntoIterItemType<'a> = &'a <ProtoType::RustOwnedType as Deref>::Target
+    where
+        Self: 'a;
+    type IndexOutputType = <ProtoType::RustOwnedType as Deref>::Target;
+    type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustOwnedType>
+    where
+        Self: 'a;
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedRustType<'_> {
+        RepeatedField(self.0.as_slice())
+    }
+
     type ContainerType = Vec<Self::ScalarType>;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
@@ -219,20 +230,9 @@ where
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
         self.0.clear()
     }
-
-    type ItemType<'a> = &'a <ProtoType::RustOwnedType as Deref>::Target
-    where
-        Self: 'a;
-    type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustOwnedType>
-    where
-        Self: 'a;
-
-    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_> {
-        RepeatedField(self.0.as_slice())
-    }
 }
 
-pub struct RepeatedField<'a, T>(&'a [T]);
+pub struct RepeatedField<'a, T>(pub(crate) &'a [T]);
 impl<'a, T: Deref> IntoIterator for RepeatedField<'a, T> {
     type Item = &'a T::Target;
     type IntoIter = Derefed<'a, slice::Iter<'a, T>, T>;
@@ -241,9 +241,9 @@ impl<'a, T: Deref> IntoIterator for RepeatedField<'a, T> {
     }
 }
 impl<'a, T: Deref> Index<usize> for RepeatedField<'a, T> {
-    type Output = &'a T::Target;
+    type Output = T::Target;
     fn index(&self, index: usize) -> &Self::Output {
-        &self.0[index].deref()
+        self.0.index(index).deref()
     }
 }
 

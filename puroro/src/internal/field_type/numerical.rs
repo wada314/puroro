@@ -289,29 +289,27 @@ where
     ProtoType: tags::NumericalType,
 {
     type ScalarType = ProtoType::RustType;
-
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
 
-    type ContainerType = Vec<Self::ScalarType>;
-
-    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
-        &mut self.0
-    }
-
-    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0.clear()
-    }
-
-    type ItemType<'a> = ProtoType::RustType
+    type IntoIterItemType<'a>= ProtoType::RustType
     where
         Self: 'a;
+    type IndexOutputType = ProtoType::RustType;
     type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustType>
     where
         Self: 'a;
-    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_> {
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedRustType<'_> {
         RepeatedField(self.0.as_slice())
+    }
+
+    type ContainerType = Vec<Self::ScalarType>;
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+        &mut self.0
+    }
+    fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
+        self.0.clear()
     }
 }
 

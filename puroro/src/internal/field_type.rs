@@ -138,11 +138,12 @@ pub trait NonRepeatedFieldType: FieldType {
 pub trait RepeatedFieldType: FieldType {
     type ScalarType;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
-    type ItemType<'a>
+    type IntoIterItemType<'a>
     where
         Self: 'a;
-    type RepeatedRustType<'a>: IntoIterator<Item = Self::ItemType<'a>>
-        + Index<usize, Output = Self::ItemType<'a>>
+    type IndexOutputType: ?Sized;
+    type RepeatedRustType<'a>: IntoIterator<Item = Self::IntoIterItemType<'a>>
+        + Index<usize, Output = Self::IndexOutputType>
     where
         Self: 'a;
     fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_>;
