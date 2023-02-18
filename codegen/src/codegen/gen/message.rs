@@ -93,6 +93,8 @@ impl Message {
 
     pub(crate) fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+
         let fields_types = self
             .fields_or_oneofs()?
             .map(|fo| fo.gen_fields_struct_field_type())
@@ -118,6 +120,7 @@ impl Message {
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let drop_impl = self.gen_message_struct_impl_drop()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
+        let deref_impl = self.gen_message_struct_impl_deref()?;
         let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
         let docs = self.gen_message_struct_doc_attrs()?;
 
@@ -127,6 +130,7 @@ impl Message {
             pub struct #ident/* < #CFG_ALLOC A = ::std::alloc::Global >*/ {
                 fields: #fields_struct_type,
                 shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
+                view: #view_type,
                 //#CFG_ALLOC alloc: A,
             }
         })?;
@@ -144,6 +148,7 @@ impl Message {
             clone_impl.into(),
             drop_impl.into(),
             debug_impl.into(),
+            deref_impl.into(),
             partial_eq_impl.into(),
         ])
     }
@@ -343,6 +348,7 @@ impl Message {
                             #(#field_values,)*
                         },
                         shared: ::std::clone::Clone::clone(&self.shared),
+                        view: ::std::clone::Clone::clone(&self.view),
                     }
                 }
             }
@@ -382,6 +388,20 @@ impl Message {
                     #debug_fields;
                     self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
                     debug_struct.finish()
+                }
+            }
+        })?)
+    }
+
+    fn gen_message_struct_impl_deref(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+
+        Ok(parse2(quote! {
+            impl ::std::ops::Deref for #ident {
+                type Target = #view_type;
+                fn deref(&self) -> &Self::Target {
+                    &self.view
                 }
             }
         })?)

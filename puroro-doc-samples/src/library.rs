@@ -21,6 +21,7 @@ pub struct Book {
         self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::library::_view::BookView,
 }
 impl Book {
     pub fn title(&self) -> &str {
@@ -248,6 +249,7 @@ impl ::std::clone::Clone for Book {
                 author: ::std::clone::Clone::clone(&self.fields.author),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -272,6 +274,12 @@ impl ::std::fmt::Debug for Book {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for Book {
+    type Target = self::_root::library::_view::BookView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for Book {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -292,6 +300,7 @@ pub struct Author {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::library::_view::AuthorView,
 }
 impl Author {
     pub fn name(&self) -> &str {
@@ -424,6 +433,7 @@ impl ::std::clone::Clone for Author {
                 name: ::std::clone::Clone::clone(&self.fields.name),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -443,6 +453,12 @@ impl ::std::fmt::Debug for Author {
         debug_struct.field(stringify!(name), &self.name_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Author {
+    type Target = self::_root::library::_view::AuthorView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Author {
