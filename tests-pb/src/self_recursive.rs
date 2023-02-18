@@ -217,6 +217,52 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
+    impl MsgView {
+        pub fn recursive_unlabeled(
+            &self,
+        ) -> ::std::option::Option::<&self::_root::self_recursive::Msg> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.recursive_unlabeled,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn recursive_unlabeled_opt(
+            &self,
+        ) -> ::std::option::Option::<&self::_root::self_recursive::Msg> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.recursive_unlabeled,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn recursive_unlabeled_mut(
+            &mut self,
+        ) -> &mut self::_root::self_recursive::Msg {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.recursive_unlabeled,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_recursive_unlabeled(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.recursive_unlabeled,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_recursive_unlabeled(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.recursive_unlabeled,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

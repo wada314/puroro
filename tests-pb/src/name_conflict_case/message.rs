@@ -219,6 +219,46 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl ConflictCaseView {
+        pub fn this_is_message_field(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.this_is_message_field,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn this_is_message_field_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.this_is_message_field,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn this_is_message_field_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.this_is_message_field,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_this_is_message_field(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.this_is_message_field,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_this_is_message_field(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.this_is_message_field,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

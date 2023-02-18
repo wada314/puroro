@@ -126,6 +126,12 @@ impl Field {
             _ => self.gen_message_struct_field_methods_for_non_repeated(),
         }
     }
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        match self.rule()? {
+            FieldRule::Repeated => self.gen_message_struct_field_methods_for_repeated(),
+            _ => self.gen_message_struct_field_methods_for_non_repeated(),
+        }
+    }
     pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {

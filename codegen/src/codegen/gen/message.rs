@@ -172,13 +172,35 @@ impl Message {
 
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
 
-        Ok(vec![parse2(quote! {
-            #[derive(::std::default::Default)]
-            pub struct #ident {
-                fields: #fields_struct_type,
-                shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
-            }
-        })?])
+        let fields_or_oneofs_methods = self
+            .fields_or_oneofs()?
+            .map(|fo| (Ok(fo.gen_message_struct_methods()?.into_iter())))
+            .flatten_ok()
+            .collect::<Result<Vec<_>>>()?;
+        let oneofs = self.oneofs()?.collect::<Vec<_>>();
+        let oneof_field_methods = oneofs
+            .iter()
+            .map(|o| o.fields())
+            .flatten_ok()
+            .map(|f| Ok(f?.gen_message_struct_methods()?.into_iter()))
+            .flatten_ok()
+            .collect::<Result<Vec<_>>>()?;
+
+        Ok(vec![
+            parse2(quote! {
+                #[derive(::std::default::Default)]
+                pub struct #ident {
+                    fields: #fields_struct_type,
+                    shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
+                }
+            })?,
+            parse2(quote! {
+                impl #ident {
+                    #(#fields_or_oneofs_methods)*
+                    #(#oneof_field_methods)*
+                }
+            })?,
+        ])
     }
 
     fn gen_message_struct_ident(&self) -> Result<Ident> {

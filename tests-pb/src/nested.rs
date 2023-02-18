@@ -212,6 +212,46 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
+    impl MsgView {
+        pub fn item_outer(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.item_outer,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn item_outer_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.item_outer,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn item_outer_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.item_outer,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_item_outer(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.item_outer,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_item_outer(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.item_outer,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

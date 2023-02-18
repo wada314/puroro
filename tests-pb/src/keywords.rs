@@ -379,6 +379,46 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl MsgView {
+        pub fn r#type(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.r#type,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn type_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.r#type,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn type_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.r#type,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_type(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.r#type,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_type(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.r#type,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct SelfView {
         fields: self::_root::keywords::_fields::SelfFields<
@@ -389,6 +429,46 @@ pub mod _view {
             >,
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    impl SelfView {
+        pub fn r#type(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.r#type,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn type_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.r#type,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn type_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.r#type,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_type(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.r#type,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_type(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.r#type,
+                self.shared.bitfield_mut(),
+            )
+        }
     }
 }
 #[doc(inline)]

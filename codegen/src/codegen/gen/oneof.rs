@@ -206,6 +206,25 @@ impl Oneof {
         ])
     }
 
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let field_ident = self.gen_fields_struct_field_ident()?;
+
+        let getter_case_generic_params =
+            self.try_map_fields(|f| f.gen_maybe_borrowed_type(None))?;
+        let getter_type = self.gen_oneof_case_type(getter_case_generic_params.iter().cloned())?;
+
+        Ok(vec![parse2(quote! {
+            pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
+                use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
+                self.fields.#field_ident.case_ref(self.shared.bitfield())
+            }
+        })?])
+    }
+
     pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {

@@ -330,6 +330,122 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
+    impl SubmsgView {
+        pub fn i32_unlabeled(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.i32_unlabeled,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.i32_unlabeled,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.i32_unlabeled,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_i32_unlabeled(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.i32_unlabeled,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.i32_unlabeled,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn i32_optional(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.i32_optional,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn i32_optional_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.i32_optional,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn i32_optional_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.i32_optional,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_i32_optional(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.i32_optional,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_i32_optional(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.i32_optional,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn i64_unlabeled(&self) -> i64 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.i64_unlabeled,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn i64_unlabeled_opt(&self) -> ::std::option::Option::<i64> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.i64_unlabeled,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.i64_unlabeled,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_i64_unlabeled(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.i64_unlabeled,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_i64_unlabeled(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.i64_unlabeled,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

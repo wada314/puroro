@@ -281,6 +281,84 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl SubmsgView {
+        pub fn i32_required(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.i32_required,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn i32_required_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.i32_required,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn i32_required_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.i32_required,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_i32_required(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.i32_required,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_i32_required(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.i32_required,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn i64_required(&self) -> i64 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.i64_required,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn i64_required_opt(&self) -> ::std::option::Option::<i64> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.i64_required,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn i64_required_mut(&mut self) -> &mut i64 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.i64_required,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_i64_required(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.i64_required,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_i64_required(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.i64_required,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;
