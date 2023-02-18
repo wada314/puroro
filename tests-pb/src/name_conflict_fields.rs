@@ -12,53 +12,22 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Conflict {
-    fields: self::_root::name_conflict_fields::_fields::ConflictFields::<
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        >,
-    >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
     view: self::_root::name_conflict_fields::_view::ConflictView,
 }
 impl Conflict {
-    pub fn this_is_original_message_field(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.this_is_original_message_field,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    pub fn this_is_original_message_field_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.this_is_original_message_field,
-            self.shared.bitfield(),
-        )
-    }
     pub fn this_is_original_message_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.this_is_original_message_field,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.this_is_original_message_field,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_this_is_original_message_field(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.this_is_original_message_field,
-                self.shared.bitfield(),
-            )
-            .is_some()
     }
     pub fn clear_this_is_original_message_field(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.fields.this_is_original_message_field,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.this_is_original_message_field,
+            self.view.shared.bitfield_mut(),
         )
     }
 }
@@ -155,23 +124,9 @@ impl self::_pinternal::MessageInternal for Conflict {
 }
 impl ::std::clone::Clone for Conflict {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
-            fields: self::_fields::ConflictFields {
-                this_is_original_message_field: ::std::clone::Clone::clone(
-                    &self.fields.this_is_original_message_field,
-                ),
-            },
-            shared: ::std::clone::Clone::clone(&self.shared),
             view: ::std::clone::Clone::clone(&self.view),
         }
-    }
-}
-impl ::std::ops::Drop for Conflict {
-    fn drop(&mut self) {
-        #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for Conflict {
@@ -179,15 +134,10 @@ impl ::std::fmt::Debug for Conflict {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        let mut debug_struct = fmt.debug_struct(stringify!(Conflict));
-        debug_struct
-            .field(
-                stringify!(this_is_original_message_field),
-                &self.this_is_original_message_field_opt(),
-            );
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-        debug_struct.finish()
+        <self::_root::name_conflict_fields::_view::ConflictView as ::std::fmt::Debug>::fmt(
+            &self.view,
+            fmt,
+        )
     }
 }
 impl ::std::ops::Deref for Conflict {
@@ -198,64 +148,27 @@ impl ::std::ops::Deref for Conflict {
 }
 impl ::std::cmp::PartialEq for Conflict {
     fn eq(&self, rhs: &Self) -> bool {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
-        true
-            && self.this_is_original_message_field_opt()
-                == rhs.this_is_original_message_field_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        &self.view == &rhs.view
     }
 }
 #[derive(::std::default::Default)]
 pub struct ConflictFields {
-    fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        >,
-    >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
     view: self::_root::name_conflict_fields::_view::ConflictFieldsView,
 }
 impl ConflictFields {
-    pub fn this_is_fields_message_field(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.this_is_fields_message_field,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    pub fn this_is_fields_message_field_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.this_is_fields_message_field,
-            self.shared.bitfield(),
-        )
-    }
     pub fn this_is_fields_message_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.this_is_fields_message_field,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.this_is_fields_message_field,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_this_is_fields_message_field(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.this_is_fields_message_field,
-                self.shared.bitfield(),
-            )
-            .is_some()
     }
     pub fn clear_this_is_fields_message_field(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.fields.this_is_fields_message_field,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.this_is_fields_message_field,
+            self.view.shared.bitfield_mut(),
         )
     }
 }
@@ -352,23 +265,9 @@ impl self::_pinternal::MessageInternal for ConflictFields {
 }
 impl ::std::clone::Clone for ConflictFields {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
-            fields: self::_fields::ConflictFieldsFields {
-                this_is_fields_message_field: ::std::clone::Clone::clone(
-                    &self.fields.this_is_fields_message_field,
-                ),
-            },
-            shared: ::std::clone::Clone::clone(&self.shared),
             view: ::std::clone::Clone::clone(&self.view),
         }
-    }
-}
-impl ::std::ops::Drop for ConflictFields {
-    fn drop(&mut self) {
-        #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for ConflictFields {
@@ -376,15 +275,10 @@ impl ::std::fmt::Debug for ConflictFields {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        let mut debug_struct = fmt.debug_struct(stringify!(ConflictFields));
-        debug_struct
-            .field(
-                stringify!(this_is_fields_message_field),
-                &self.this_is_fields_message_field_opt(),
-            );
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-        debug_struct.finish()
+        <self::_root::name_conflict_fields::_view::ConflictFieldsView as ::std::fmt::Debug>::fmt(
+            &self.view,
+            fmt,
+        )
     }
 }
 impl ::std::ops::Deref for ConflictFields {
@@ -395,13 +289,7 @@ impl ::std::ops::Deref for ConflictFields {
 }
 impl ::std::cmp::PartialEq for ConflictFields {
     fn eq(&self, rhs: &Self) -> bool {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
-        true
-            && self.this_is_fields_message_field_opt()
-                == rhs.this_is_fields_message_field_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        &self.view == &rhs.view
     }
 }
 #[doc(hidden)]
@@ -470,6 +358,39 @@ pub mod _view {
             }
         }
     }
+    impl ::std::ops::Drop for ConflictView {
+        fn drop(&mut self) {
+            #[allow(unused)]
+            use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        }
+    }
+    impl ::std::fmt::Debug for ConflictView {
+        fn fmt(
+            &self,
+            fmt: &mut ::std::fmt::Formatter<'_>,
+        ) -> ::std::result::Result<(), ::std::fmt::Error> {
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            let mut debug_struct = fmt.debug_struct(stringify!(ConflictView));
+            debug_struct
+                .field(
+                    stringify!(this_is_original_message_field),
+                    &self.this_is_original_message_field_opt(),
+                );
+            self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+            debug_struct.finish()
+        }
+    }
+    impl ::std::cmp::PartialEq for ConflictView {
+        fn eq(&self, rhs: &Self) -> bool {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::SharedItems as _;
+            true
+                && self.this_is_original_message_field_opt()
+                    == rhs.this_is_original_message_field_opt()
+                && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ConflictFieldsView {
         fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
@@ -518,6 +439,39 @@ pub mod _view {
                 },
                 shared: ::std::clone::Clone::clone(&self.shared),
             }
+        }
+    }
+    impl ::std::ops::Drop for ConflictFieldsView {
+        fn drop(&mut self) {
+            #[allow(unused)]
+            use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        }
+    }
+    impl ::std::fmt::Debug for ConflictFieldsView {
+        fn fmt(
+            &self,
+            fmt: &mut ::std::fmt::Formatter<'_>,
+        ) -> ::std::result::Result<(), ::std::fmt::Error> {
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            let mut debug_struct = fmt.debug_struct(stringify!(ConflictFieldsView));
+            debug_struct
+                .field(
+                    stringify!(this_is_fields_message_field),
+                    &self.this_is_fields_message_field_opt(),
+                );
+            self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+            debug_struct.finish()
+        }
+    }
+    impl ::std::cmp::PartialEq for ConflictFieldsView {
+        fn eq(&self, rhs: &Self) -> bool {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::SharedItems as _;
+            true
+                && self.this_is_fields_message_field_opt()
+                    == rhs.this_is_fields_message_field_opt()
+                && self.shared.unknown_fields() == rhs.shared.unknown_fields()
         }
     }
 }

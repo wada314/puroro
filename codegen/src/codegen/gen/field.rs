@@ -249,15 +249,6 @@ impl Field {
         let docs = self.gen_message_struct_field_method_doc_attrs()?;
         Ok(vec![
             parse2(quote! {
-                #(#docs)*
-                pub fn #getter_ident(&self) -> &[#getter_item_type] {
-                    use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                    RepeatedFieldType::get_field(
-                        &self.fields.#field_ident, self.shared.bitfield(),
-                    )
-                }
-            })?,
-            parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field_mut(
@@ -281,76 +272,28 @@ impl Field {
             self.rule(),
             Ok(FieldRule::Optional | FieldRule::Singular)
         ));
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
-        let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
         let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
-        let getter_has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
-        let getter_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
-                Rc::new(parse2(quote! {
-                    ::std::option::Option::< #borrowed_type >
-                })?)
-            }
-            _ => Rc::clone(&borrowed_type),
-        };
-        let getter_opt_type = Rc::new(quote! {
-            ::std::option::Option::< #borrowed_type >
-        });
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
         let docs = self.gen_message_struct_field_method_doc_attrs()?;
-        let (getter_docs, getter_opt_docs) = if matches!(self.rule()?, FieldRule::Optional) {
-            (Vec::new(), docs)
-        } else {
-            (docs, Vec::new())
-        };
 
         Ok(vec![
-            parse2(quote! {
-                #(#getter_docs)*
-                pub fn #getter_ident(&self) -> #getter_type {
-                   use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                    NonRepeatedFieldType::get_field_or_else(
-                        &self.fields.#field_ident, self.shared.bitfield(), #default_fn,
-                    )
-                }
-            })?,
-            parse2(quote! {
-                #(#getter_opt_docs)*
-                pub fn #getter_opt_ident(&self) -> #getter_opt_type {
-                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                    NonRepeatedFieldType::get_field_opt(
-                        &self.fields.#field_ident, self.shared.bitfield(),
-                    )
-                }
-            })?,
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::get_field_mut(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(), #default_fn,
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(), #default_fn,
                     )
-                }
-            })?,
-            parse2(quote! {
-                pub fn #getter_has_ident(&self) -> bool {
-                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                    NonRepeatedFieldType::get_field_opt(
-                        &self.fields.#field_ident, self.shared.bitfield(),
-                    ).is_some()
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::clear(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(),
                     )
                 }
             })?,

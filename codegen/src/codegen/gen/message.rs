@@ -102,7 +102,6 @@ impl Message {
             .fields_or_oneofs()?
             .map(|fo| fo.gen_fields_struct_field_type())
             .collect::<Result<Vec<_>>>()?;
-        let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
 
         let fields_or_oneofs_methods = self
             .fields_or_oneofs()?
@@ -117,11 +116,9 @@ impl Message {
             .map(|f| Ok(f?.gen_message_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
-        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
         let message_impl = self.gen_message_struct_message_impl()?;
         let message_internal_impl = self.gen_message_struct_message_internal_impl()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
-        let drop_impl = self.gen_message_struct_impl_drop()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
         let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
@@ -131,8 +128,6 @@ impl Message {
             #[derive(::std::default::Default)]
             #(#docs)*
             pub struct #ident/* < #CFG_ALLOC A = ::std::alloc::Global >*/ {
-                fields: #fields_struct_type,
-                shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
                 view: #view_type,
                 //#CFG_ALLOC alloc: A,
             }
@@ -149,7 +144,6 @@ impl Message {
             message_impl.into(),
             message_internal_impl.into(),
             clone_impl.into(),
-            drop_impl.into(),
             debug_impl.into(),
             deref_impl.into(),
             partial_eq_impl.into(),
@@ -201,6 +195,9 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
 
         let clone_impl = self.gen_view_struct_impl_clone()?;
+        let drop_impl = self.gen_view_struct_impl_drop()?;
+        let debug_impl = self.gen_view_struct_impl_debug()?;
+        let partial_eq_impl = self.gen_view_struct_impl_partial_eq()?;
 
         Ok(vec![
             parse2(quote! {
@@ -217,6 +214,9 @@ impl Message {
                 }
             })?,
             clone_impl.into(),
+            drop_impl.into(),
+            debug_impl.into(),
+            partial_eq_impl.into(),
         ])
     }
 
@@ -340,20 +340,10 @@ impl Message {
 
     fn gen_message_struct_impl_clone(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
-        let fields_ident = self.gen_fields_struct_ident()?;
-        let field_values = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_message_struct_impl_clone_field_value())
-            .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl ::std::clone::Clone for #ident {
                 fn clone(&self) -> Self {
-                    #[allow(unused)] use #PURORO_INTERNAL::SharedItems as _;
                     Self {
-                        fields: self::_fields::#fields_ident {
-                            #(#field_values,)*
-                        },
-                        shared: ::std::clone::Clone::clone(&self.shared),
                         view: ::std::clone::Clone::clone(&self.view),
                     }
                 }
@@ -361,39 +351,14 @@ impl Message {
         })?)
     }
 
-    fn gen_message_struct_impl_drop(&self) -> Result<ItemImpl> {
-        let ident = self.gen_message_struct_ident()?;
-        let oneof_idents = self
-            .oneofs()?
-            .map(|o| o.gen_fields_struct_field_ident())
-            .collect::<Result<Vec<_>>>()?;
-        // We need to explicitly clear the oneof unions.
-        Ok(parse2(quote! {
-            impl ::std::ops::Drop for #ident {
-                fn drop(&mut self) {
-                    #[allow(unused)] use #PURORO_INTERNAL::{OneofUnion as _, SharedItems as _};
-
-                    #(self.fields.#oneof_idents.clear(self.shared.bitfield_mut());)*
-                }
-            }
-        })?)
-    }
-
     fn gen_message_struct_impl_debug(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
-        let mut debug_fields: Expr = parse2(quote! { debug_struct })?;
-        for field_or_oneof in self.fields_or_oneofs()? {
-            field_or_oneof.gen_message_struct_impl_debug_method_call(&mut debug_fields)?;
-        }
+        let view_type = self.gen_view_struct_type()?;
 
         Ok(parse2(quote! {
             impl ::std::fmt::Debug for #ident {
                 fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
-                    let mut debug_struct = fmt.debug_struct(stringify!(#ident));
-                    #debug_fields;
-                    self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-                    debug_struct.finish()
+                    <#view_type as ::std::fmt::Debug>::fmt(&self.view, fmt)
                 }
             }
         })?)
@@ -415,6 +380,55 @@ impl Message {
 
     fn gen_message_struct_impl_partial_eq(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
+        Ok(parse2(quote! {
+            impl ::std::cmp::PartialEq for #ident {
+                fn eq(&self, rhs: &Self) -> bool {
+                    &self.view == &rhs.view
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_drop(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+        let oneof_idents = self
+            .oneofs()?
+            .map(|o| o.gen_fields_struct_field_ident())
+            .collect::<Result<Vec<_>>>()?;
+        // We need to explicitly clear the oneof unions.
+        Ok(parse2(quote! {
+            impl ::std::ops::Drop for #ident {
+                fn drop(&mut self) {
+                    #[allow(unused)] use #PURORO_INTERNAL::{OneofUnion as _, SharedItems as _};
+
+                    #(self.fields.#oneof_idents.clear(self.shared.bitfield_mut());)*
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_debug(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+        let mut debug_fields: Expr = parse2(quote! { debug_struct })?;
+        for field_or_oneof in self.fields_or_oneofs()? {
+            field_or_oneof.gen_message_struct_impl_debug_method_call(&mut debug_fields)?;
+        }
+
+        Ok(parse2(quote! {
+            impl ::std::fmt::Debug for #ident {
+                fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
+                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
+                    let mut debug_struct = fmt.debug_struct(stringify!(#ident));
+                    #debug_fields;
+                    self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+                    debug_struct.finish()
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_partial_eq(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
         let rhs_expr = parse2(quote! { rhs })?;
         let cmp_exprs = self
             .fields_or_oneofs()?

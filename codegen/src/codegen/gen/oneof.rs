@@ -179,31 +179,18 @@ impl Oneof {
     }
 
     pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
 
         let getter_case_generic_params =
             self.try_map_fields(|f| f.gen_maybe_borrowed_type(None))?;
-        let getter_type = self.gen_oneof_case_type(getter_case_generic_params.iter().cloned())?;
 
-        Ok(vec![
-            parse2(quote! {
-                pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
-                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
-                    self.fields.#field_ident.case_ref(self.shared.bitfield())
-                }
-            })?,
-            parse2(quote! {
-                pub fn #clear_ident(&mut self) {
-                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
-                    self.fields.#field_ident.clear(self.shared.bitfield_mut())
-                }
-            })?,
-        ])
+        Ok(vec![parse2(quote! {
+            pub fn #clear_ident(&mut self) {
+                use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
+                self.view.fields.#field_ident.clear(self.view.shared.bitfield_mut())
+            }
+        })?])
     }
 
     pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {

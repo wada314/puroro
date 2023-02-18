@@ -13,49 +13,22 @@ mod _pinternal {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::nested::_fields::MsgFields::<
-        self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
-    >,
-    shared: self::_pinternal::SharedItemsImpl<0usize>,
     view: self::_root::nested::_view::MsgView,
 }
 impl Msg {
-    pub fn item_outer(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.item_outer,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    pub fn item_outer_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.item_outer,
-            self.shared.bitfield(),
-        )
-    }
     pub fn item_outer_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.item_outer,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.item_outer,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_item_outer(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.item_outer,
-                self.shared.bitfield(),
-            )
-            .is_some()
     }
     pub fn clear_item_outer(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.fields.item_outer,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.item_outer,
+            self.view.shared.bitfield_mut(),
         )
     }
 }
@@ -152,21 +125,9 @@ impl self::_pinternal::MessageInternal for Msg {
 }
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
-            fields: self::_fields::MsgFields {
-                item_outer: ::std::clone::Clone::clone(&self.fields.item_outer),
-            },
-            shared: ::std::clone::Clone::clone(&self.shared),
             view: ::std::clone::Clone::clone(&self.view),
         }
-    }
-}
-impl ::std::ops::Drop for Msg {
-    fn drop(&mut self) {
-        #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -174,11 +135,7 @@ impl ::std::fmt::Debug for Msg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        let mut debug_struct = fmt.debug_struct(stringify!(Msg));
-        debug_struct.field(stringify!(item_outer), &self.item_outer_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-        debug_struct.finish()
+        <self::_root::nested::_view::MsgView as ::std::fmt::Debug>::fmt(&self.view, fmt)
     }
 }
 impl ::std::ops::Deref for Msg {
@@ -189,11 +146,7 @@ impl ::std::ops::Deref for Msg {
 }
 impl ::std::cmp::PartialEq for Msg {
     fn eq(&self, rhs: &Self) -> bool {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
-        true && self.item_outer_opt() == rhs.item_outer_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        &self.view == &rhs.view
     }
 }
 #[doc(hidden)]
@@ -255,6 +208,33 @@ pub mod _view {
                 },
                 shared: ::std::clone::Clone::clone(&self.shared),
             }
+        }
+    }
+    impl ::std::ops::Drop for MsgView {
+        fn drop(&mut self) {
+            #[allow(unused)]
+            use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        }
+    }
+    impl ::std::fmt::Debug for MsgView {
+        fn fmt(
+            &self,
+            fmt: &mut ::std::fmt::Formatter<'_>,
+        ) -> ::std::result::Result<(), ::std::fmt::Error> {
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            let mut debug_struct = fmt.debug_struct(stringify!(MsgView));
+            debug_struct.field(stringify!(item_outer), &self.item_outer_opt());
+            self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+            debug_struct.finish()
+        }
+    }
+    impl ::std::cmp::PartialEq for MsgView {
+        fn eq(&self, rhs: &Self) -> bool {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::SharedItems as _;
+            true && self.item_outer_opt() == rhs.item_outer_opt()
+                && self.shared.unknown_fields() == rhs.shared.unknown_fields()
         }
     }
 }
