@@ -85,7 +85,7 @@ pub enum NumericalWireType {
     Bits64([u8; 8]),
 }
 pub trait UnsizedType {
-    type RustType: for<'a> From<Self::RustRefType<'a>>;
+    type RustOwnedType: for<'a> From<Self::RustRefType<'a>>;
     type RustRefType<'a>
     where
         Self: 'a;
@@ -93,12 +93,12 @@ pub trait UnsizedType {
     where
         Self: 'a;
     type DefaultValueType: Default;
-    fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_>;
-    fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_>;
-    fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustType;
+    fn as_ref(val: &Self::RustOwnedType) -> Self::RustRefType<'_>;
+    fn as_mut(val: &mut Self::RustOwnedType) -> Self::RustMutType<'_>;
+    fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType;
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a>;
-    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType>;
-    fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]>;
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType>;
+    fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]>;
 }
 
 // Trait impls
@@ -284,7 +284,7 @@ impl NumericalType for SFixed64 {
     }
 }
 impl UnsizedType for String {
-    type RustType = ::std::string::String;
+    type RustOwnedType = ::std::string::String;
     type RustRefType<'a> = &'a str
     where
         Self: 'a;
@@ -293,29 +293,29 @@ impl UnsizedType for String {
         Self: 'a;
     type DefaultValueType = &'static str;
 
-    fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_> {
+    fn as_ref(val: &Self::RustOwnedType) -> Self::RustRefType<'_> {
         val
     }
-    fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_> {
+    fn as_mut(val: &mut Self::RustOwnedType) -> Self::RustMutType<'_> {
         val
     }
-    fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustType {
+    fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType {
         default.to_string()
     }
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a> {
         default
     }
 
-    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType> {
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType> {
         let bytes = bytes.collect::<IoResult<Vec<_>>>()?;
         Ok(::std::string::String::from_utf8(bytes)?)
     }
-    fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]> {
+    fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]> {
         Ok(val.as_bytes())
     }
 }
 impl UnsizedType for Bytes {
-    type RustType = Vec<u8>;
+    type RustOwnedType = Vec<u8>;
     type RustRefType<'a> = &'a [u8]
     where
         Self: 'a;
@@ -324,23 +324,23 @@ impl UnsizedType for Bytes {
         Self: 'a;
     type DefaultValueType = &'static [u8];
 
-    fn as_ref(val: &Self::RustType) -> Self::RustRefType<'_> {
+    fn as_ref(val: &Self::RustOwnedType) -> Self::RustRefType<'_> {
         val
     }
-    fn as_mut(val: &mut Self::RustType) -> Self::RustMutType<'_> {
+    fn as_mut(val: &mut Self::RustOwnedType) -> Self::RustMutType<'_> {
         val
     }
-    fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustType {
+    fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType {
         default.to_vec()
     }
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a> {
         default
     }
 
-    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustType> {
+    fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType> {
         Ok(bytes.collect::<IoResult<Vec<_>>>()?)
     }
-    fn to_bytes_slice(val: &Self::RustType) -> Result<&[u8]> {
+    fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]> {
         Ok(val.as_slice())
     }
 }

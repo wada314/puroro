@@ -33,7 +33,7 @@ pub struct RepeatedUnsizedField<RustType, ProtoType>(Vec<RustType>, PhantomData<
 impl<RustType, ProtoType> FieldType for SingularUnsizedField<RustType, ProtoType>
 where
     RustType: Default + PartialEq,
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -63,7 +63,7 @@ where
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalUnsizedField<RustType, ProtoType, BITFIELD_INDEX>
 where
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -90,7 +90,7 @@ where
 
 impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType>
 where
-    ProtoType: tags::UnsizedType<RustType = RustType>,
+    ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -114,10 +114,10 @@ where
     }
 }
 
-impl<ProtoType> NonRepeatedFieldType for SingularUnsizedField<ProtoType::RustType, ProtoType>
+impl<ProtoType> NonRepeatedFieldType for SingularUnsizedField<ProtoType::RustOwnedType, ProtoType>
 where
     ProtoType: 'static + tags::UnsizedType,
-    ProtoType::RustType: Default + PartialEq,
+    ProtoType::RustOwnedType: Default + PartialEq,
 {
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
@@ -137,7 +137,7 @@ where
             .unwrap_or_else(|| ProtoType::default_to_ref(default()))
     }
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
-        if self.0 == ProtoType::RustType::default() {
+        if self.0 == ProtoType::RustOwnedType::default() {
             None
         } else {
             Some(ProtoType::as_ref(&self.0))
@@ -151,15 +151,15 @@ where
         ProtoType::as_mut(&mut self.0)
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0 = ProtoType::RustType::default();
+        self.0 = ProtoType::RustOwnedType::default();
     }
 }
 
 impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
-    for OptionalUnsizedField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
+    for OptionalUnsizedField<ProtoType::RustOwnedType, ProtoType, BITFIELD_INDEX>
 where
     ProtoType: 'static + tags::UnsizedType,
-    ProtoType::RustType: Default + PartialEq,
+    ProtoType::RustOwnedType: Default + PartialEq,
 {
     type GetterOptType<'a> = Option<ProtoType::RustRefType<'a>>
     where
@@ -196,16 +196,16 @@ where
     }
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B) {
         bitvec.set(BITFIELD_INDEX, false);
-        self.0 = ProtoType::RustType::default();
+        self.0 = ProtoType::RustOwnedType::default();
     }
 }
 
-impl<ProtoType> RepeatedFieldType for RepeatedUnsizedField<ProtoType::RustType, ProtoType>
+impl<ProtoType> RepeatedFieldType for RepeatedUnsizedField<ProtoType::RustOwnedType, ProtoType>
 where
-    ProtoType::RustType: PartialEq + Default + Clone,
+    ProtoType::RustOwnedType: PartialEq + Default + Clone,
     ProtoType: tags::UnsizedType,
 {
-    type ScalarType = ProtoType::RustType;
+    type ScalarType = ProtoType::RustOwnedType;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }

@@ -152,7 +152,7 @@ where
 impl<RustType, ProtoType> OneofFieldType for UnsizedField<RustType, ProtoType>
 where
     RustType: Clone + Default,
-    ProtoType: 'static + tags::UnsizedType<RustType = RustType> + Default + Clone,
+    ProtoType: 'static + tags::UnsizedType<RustOwnedType = RustType> + Default + Clone,
 {
     type GetterType<'a> = ProtoType::RustRefType<'a>
     where
