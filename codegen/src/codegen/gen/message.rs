@@ -85,6 +85,12 @@ impl Message {
         )?))
     }
 
+    pub(crate) fn gen_view_struct_type(&self) -> Result<Rc<Type>> {
+        let parent = self.parent()?.gen_rust_module_path()?;
+        let ident = self.gen_view_struct_ident()?;
+        Ok(Rc::new(parse2(quote! { #parent :: _view :: #ident })?))
+    }
+
     pub(crate) fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = self.gen_message_struct_ident()?;
         let fields_types = self

@@ -373,25 +373,23 @@ impl Field {
         );
         let field_ident = self.gen_fields_struct_field_ident()?;
         let getter_item_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
-                impl ::std::ops::Deref::<Target = str> +
-                    ::std::fmt::Debug +
-                    ::std::cmp::PartialEq
-            })?),
-            FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(parse2(quote! {
-                impl ::std::ops::Deref::<Target = [u8]> +
-                    ::std::fmt::Debug +
-                    ::std::cmp::PartialEq
-            })?),
-            FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-                m.try_upgrade()?.gen_message_struct_type()?
+            FieldType::LengthDelimited(ld_type) => {
+                let deref_type: Rc<Type> = match ld_type {
+                    LengthDelimitedType::String => Rc::new(parse2(quote! { str })?),
+                    LengthDelimitedType::Bytes => Rc::new(parse2(quote! { [u8] })?),
+                    LengthDelimitedType::Message(m) => m.try_upgrade()?.gen_view_struct_type()?,
+                };
+                Rc::new(parse2(quote! { & #deref_type })?)
             }
             _ => self.r#type()?.rust_type()?,
         };
         let docs = self.gen_message_struct_field_method_doc_attrs()?;
         Ok(vec![parse2(quote! {
             #(#docs)*
-            pub fn #getter_ident(&self) -> &[#getter_item_type] {
+            pub fn #getter_ident(&self) -> impl
+                ::std::iter::IntoIterator<Item = #getter_item_type> +
+                ::std::ops::Index<usize, Output = #getter_item_type>
+            {
                 use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::get_field(
                     &self.fields.#field_ident, self.shared.bitfield(),
