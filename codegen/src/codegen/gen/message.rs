@@ -327,7 +327,7 @@ impl Message {
                             Ok(_) => (),
                             Err(PuroroError::UnknownFieldNumber(field_data)) => {
                                 // Recoverable error. Store the field into unknown_fields.
-                                self.shared.unknown_fields_mut().push(number, field_data)?;
+                                self.view.shared.unknown_fields_mut().push(number, field_data)?;
                             }
                             Err(e) => Err(e)?,
                         }
@@ -411,7 +411,7 @@ impl Message {
         let ident = self.gen_view_struct_ident()?;
         let mut debug_fields: Expr = parse2(quote! { debug_struct })?;
         for field_or_oneof in self.fields_or_oneofs()? {
-            field_or_oneof.gen_message_struct_impl_debug_method_call(&mut debug_fields)?;
+            field_or_oneof.gen_view_struct_impl_debug_method_call(&mut debug_fields)?;
         }
 
         Ok(parse2(quote! {
@@ -432,7 +432,7 @@ impl Message {
         let rhs_expr = parse2(quote! { rhs })?;
         let cmp_exprs = self
             .fields_or_oneofs()?
-            .map(|fo| fo.gen_message_struct_impl_partial_eq_cmp(&rhs_expr))
+            .map(|fo| fo.gen_view_struct_impl_partial_eq_cmp(&rhs_expr))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl ::std::cmp::PartialEq for #ident {

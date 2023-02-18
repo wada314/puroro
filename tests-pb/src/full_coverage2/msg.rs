@@ -78,14 +78,14 @@ impl self::_puroro::Message for Submsg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_required,
-            self.shared.bitfield(),
+            &self.view.fields.i32_required,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i64_required,
-            self.shared.bitfield(),
+            &self.view.fields.i64_required,
+            self.view.shared.bitfield(),
             101i32,
             out,
         )?;
@@ -118,15 +118,15 @@ impl self::_pinternal::MessageInternal for Submsg {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.i32_required,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.i32_required,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     101i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.i64_required,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.i64_required,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -142,7 +142,7 @@ impl self::_pinternal::MessageInternal for Submsg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }

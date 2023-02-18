@@ -146,8 +146,8 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #number => #PURORO_INTERNAL::FieldType::deser_from_field_data(
-                &mut self.fields.#ident,
-                self.shared.bitfield_mut(),
+                &mut self.view.fields.#ident,
+                self.view.shared.bitfield_mut(),
                 #field_data_expr,
             )?,
         })?)
@@ -157,17 +157,14 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #PURORO_INTERNAL::FieldType::ser_to_write(
-                &self.fields.#ident,
-                self.shared.bitfield(),
+                &self.view.fields.#ident,
+                self.view.shared.bitfield(),
                 #number,
                 #out_expr,
             )?;
         })?)
     }
-    pub(crate) fn gen_message_struct_impl_debug_method_call(
-        &self,
-        receiver: &mut Expr,
-    ) -> Result<()> {
+    pub(crate) fn gen_view_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
         let ident = self.gen_fields_struct_field_ident()?;
         let new_expr: ExprMethodCall = parse2(match self.rule()? {
             FieldRule::Repeated => {
@@ -189,14 +186,14 @@ impl Field {
         *receiver = new_expr.into();
         Ok(())
     }
-    pub(crate) fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+    pub(crate) fn gen_view_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
                 let getter_ident = format_ident!(
                     "{}",
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
-                quote! { self.#getter_ident() == #rhs_expr.#getter_ident() }
+                quote! { self.#getter_ident().into_iter().eq(#rhs_expr.#getter_ident()) }
             }
             _ => {
                 let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());

@@ -93,20 +93,20 @@ impl self::_puroro::Message for Book {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.title,
-            self.shared.bitfield(),
+            &self.view.fields.title,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.num_pages,
-            self.shared.bitfield(),
+            &self.view.fields.num_pages,
+            self.view.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.author,
-            self.shared.bitfield(),
+            &self.view.fields.author,
+            self.view.shared.bitfield(),
             3i32,
             out,
         )?;
@@ -139,22 +139,22 @@ impl self::_pinternal::MessageInternal for Book {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.title,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.title,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.num_pages,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.num_pages,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.author,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.author,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -170,7 +170,7 @@ impl self::_pinternal::MessageInternal for Book {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -260,8 +260,8 @@ impl self::_puroro::Message for Author {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
+            &self.view.fields.name,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -294,8 +294,8 @@ impl self::_pinternal::MessageInternal for Author {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.name,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.name,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -311,7 +311,7 @@ impl self::_pinternal::MessageInternal for Author {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }

@@ -63,8 +63,8 @@ impl self::_puroro::Message for ConflictCase {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.this_is_message_field,
-            self.shared.bitfield(),
+            &self.view.fields.this_is_message_field,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -97,8 +97,8 @@ impl self::_pinternal::MessageInternal for ConflictCase {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.this_is_message_field,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.this_is_message_field,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -114,7 +114,7 @@ impl self::_pinternal::MessageInternal for ConflictCase {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }

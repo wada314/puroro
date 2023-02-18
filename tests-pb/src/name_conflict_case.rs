@@ -98,10 +98,11 @@ impl self::_pinternal::MessageInternal for Message {
                 match number {
                     1i32 => {
                         self
+                            .view
                             .fields
                             .conflict
                             .deser_from_field_data(
-                                self.shared.bitfield_mut(),
+                                self.view.shared.bitfield_mut(),
                                 field_data,
                                 self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
                             )?
@@ -118,7 +119,7 @@ impl self::_pinternal::MessageInternal for Message {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
