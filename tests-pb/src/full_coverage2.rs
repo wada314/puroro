@@ -2971,7 +2971,7 @@ pub mod _view {
             Item = i32,
         > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.i32_repeated,
                 self.shared.bitfield(),
             )
@@ -3028,7 +3028,7 @@ pub mod _view {
             Item = f32,
         > + ::std::ops::Index<usize, Output = f32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.float_repeated,
                 self.shared.bitfield(),
             )
@@ -3083,9 +3083,9 @@ pub mod _view {
             &self,
         ) -> impl '_ + ::std::iter::IntoIterator<
             Item = &[u8],
-        > + ::std::ops::Index<usize, Output = &[u8]> {
+        > + ::std::ops::Index<usize, Output = [u8]> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.bytes_repeated,
                 self.shared.bitfield(),
             )
@@ -3140,9 +3140,9 @@ pub mod _view {
             &self,
         ) -> impl '_ + ::std::iter::IntoIterator<
             Item = &str,
-        > + ::std::ops::Index<usize, Output = &str> {
+        > + ::std::ops::Index<usize, Output = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.string_repeated,
                 self.shared.bitfield(),
             )
@@ -3203,7 +3203,7 @@ pub mod _view {
             Item = self::_root::full_coverage2::Enum,
         > + ::std::ops::Index<usize, Output = self::_root::full_coverage2::Enum> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.enum_repeated,
                 self.shared.bitfield(),
             )
@@ -3268,10 +3268,10 @@ pub mod _view {
             Item = &self::_root::full_coverage2::msg::_view::SubmsgView,
         > + ::std::ops::Index<
             usize,
-            Output = &self::_root::full_coverage2::msg::_view::SubmsgView,
+            Output = self::_root::full_coverage2::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.submsg_repeated,
                 self.shared.bitfield(),
             )
@@ -3328,7 +3328,7 @@ pub mod _view {
             Item = i64,
         > + ::std::ops::Index<usize, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.i64_repeated,
                 self.shared.bitfield(),
             )
@@ -3385,7 +3385,7 @@ pub mod _view {
             Item = u32,
         > + ::std::ops::Index<usize, Output = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.u32_repeated,
                 self.shared.bitfield(),
             )
@@ -3442,7 +3442,7 @@ pub mod _view {
             Item = u64,
         > + ::std::ops::Index<usize, Output = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.u64_repeated,
                 self.shared.bitfield(),
             )
@@ -3499,7 +3499,7 @@ pub mod _view {
             Item = i32,
         > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.s32_repeated,
                 self.shared.bitfield(),
             )
@@ -3556,7 +3556,7 @@ pub mod _view {
             Item = i64,
         > + ::std::ops::Index<usize, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.s64_repeated,
                 self.shared.bitfield(),
             )
@@ -3613,7 +3613,7 @@ pub mod _view {
             Item = u32,
         > + ::std::ops::Index<usize, Output = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.fixed32_repeated,
                 self.shared.bitfield(),
             )
@@ -3670,7 +3670,7 @@ pub mod _view {
             Item = u64,
         > + ::std::ops::Index<usize, Output = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.fixed64_repeated,
                 self.shared.bitfield(),
             )
@@ -3727,7 +3727,7 @@ pub mod _view {
             Item = i32,
         > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.sfixed32_repeated,
                 self.shared.bitfield(),
             )
@@ -3784,7 +3784,7 @@ pub mod _view {
             Item = i64,
         > + ::std::ops::Index<usize, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.sfixed64_repeated,
                 self.shared.bitfield(),
             )
@@ -3841,7 +3841,7 @@ pub mod _view {
             Item = f64,
         > + ::std::ops::Index<usize, Output = f64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field(
+            RepeatedFieldType::get_field2(
                 &self.fields.f64_repeated,
                 self.shared.bitfield(),
             )

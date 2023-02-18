@@ -395,7 +395,7 @@ impl Field {
                 ::std::ops::Index<usize, Output = #index_output_type>
             {
                 use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                RepeatedFieldType::get_field(
+                RepeatedFieldType::get_field2(
                     &self.fields.#field_ident, self.shared.bitfield(),
                 )
             }
