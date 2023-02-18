@@ -14,7 +14,7 @@ pub mod message;
 #[derive(::std::default::Default)]
 pub struct Message<
     #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
+    A = ::std::alloc::Global,
 > {
     fields: self::_root::name_conflict_case::_fields::MessageFields<
         self::_root::name_conflict_case::message::Conflict::<

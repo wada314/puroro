@@ -13,7 +13,7 @@ mod _pinternal {
 #[derive(::std::default::Default)]
 pub struct Conflict<
     #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
+    A = ::std::alloc::Global,
 > {
     fields: self::_root::name_conflict_fields::_fields::ConflictFields<
         self::_pinternal::OptionalNumericalField::<
@@ -207,7 +207,7 @@ impl ::std::cmp::PartialEq for Conflict {
 #[derive(::std::default::Default)]
 pub struct ConflictFields<
     #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
+    A = ::std::alloc::Global,
 > {
     fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
         self::_pinternal::OptionalNumericalField::<

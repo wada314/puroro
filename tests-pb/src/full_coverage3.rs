@@ -12,10 +12,7 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg<
-    #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
-> {
+pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
     fields: self::_root::full_coverage3::_fields::MsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::OptionalNumericalField::<

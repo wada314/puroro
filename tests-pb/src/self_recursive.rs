@@ -11,10 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg<
-    #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
-> {
+pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
     fields: self::_root::self_recursive::_fields::MsgFields<
         self::_pinternal::SingularHeapMessageField::<self::_root::self_recursive::Msg>,
     >,

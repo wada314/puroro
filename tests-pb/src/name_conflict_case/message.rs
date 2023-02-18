@@ -13,7 +13,7 @@ mod _pinternal {
 #[derive(::std::default::Default)]
 pub struct ConflictCase<
     #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
+    A = ::std::alloc::Global,
 > {
     fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
         self::_pinternal::OptionalNumericalField::<

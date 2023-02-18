@@ -11,10 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg<
-    #[cfg(any(feature = "allocator_api", doc))]
-    A: ?Sized = ::std::alloc::Global,
-> {
+pub struct Submsg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
     fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
