@@ -19,6 +19,7 @@
 #![feature(result_flattening)]
 #![feature(try_find)]
 #![feature(trait_upcasting)]
+#![feature(allocator_api)]
 
 mod codegen;
 mod error;
@@ -68,3 +69,51 @@ pub use ::puroro::protobuf::puroro;
 pub use crate::codegen::generate_output_file_protos;
 pub use crate::codegen::generate_tokens_for_inline;
 pub use crate::codegen::CodegenOptions;
+
+//////////////////////////////////////////////////////
+
+use std::alloc::{Allocator, Global};
+use std::ops::Deref;
+
+pub struct PersonImpl<P: ?Sized> {
+    name: String,
+    partner: Option<Box<PersonImpl<>>>,
+    params: P,
+}
+
+pub trait UnknownFields {}
+impl UnknownFields for () {}
+pub trait Params {
+    fn allocator(&self) -> &dyn Allocator;
+    fn unknown_fields(&self) -> &dyn UnknownFields;
+}
+pub struct ParamsImpl<A, U> {
+    allocator: A,
+    unknown_fields: U,
+}
+impl<A: Allocator, U: UnknownFields> Params for ParamsImpl<A, U> {
+    fn allocator(&self) -> &dyn Allocator {
+        &self.allocator
+    }
+    fn unknown_fields(&self) -> &dyn UnknownFields {
+        &self.unknown_fields
+    }
+}
+
+#[repr(transparent)]
+pub struct Person<A, U>(PersonImpl<ParamsImpl<A, U>>);
+#[repr(transparent)]
+pub struct PersonView(PersonImpl<dyn Params>);
+
+impl<A: Allocator, U: UnknownFields> Deref for Person<A, U> {
+    type Target = PersonView;
+    fn deref(&self) -> &Self::Target {
+        let inner: &PersonImpl<dyn Params> = &self.0;
+        unsafe { &*(inner as *const PersonImpl<dyn Params> as *const PersonView) }
+    }
+}
+
+fn hoge(p: Person<Global, ()>) {
+    let rp = &p;
+    let dp = rp.deref();
+}
