@@ -18,7 +18,7 @@ mod _pinternal {
  "foo.(bar.baz).qux".
 */
 pub struct NamePart {
-    fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
+    fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -31,7 +31,6 @@ pub struct NamePart {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    view: self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
 }
 impl NamePart {
     pub fn name_part(&self) -> &str {
@@ -225,7 +224,6 @@ impl ::std::clone::Clone for NamePart {
                 is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
-            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -249,12 +247,6 @@ impl ::std::fmt::Debug for NamePart {
         debug_struct.finish()
     }
 }
-impl ::std::ops::Deref for NamePart {
-    type Target = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView;
-    fn deref(&self) -> &Self::Target {
-        &self.view
-    }
-}
 impl ::std::cmp::PartialEq for NamePart {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -265,100 +257,6 @@ impl ::std::cmp::PartialEq for NamePart {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
-#[doc(hidden)]
-pub mod _view {
-    mod _root {
-        #[allow(unused)]
-        pub(crate) use super::super::_root::*;
-    }
-    mod _puroro {
-        #[allow(unused)]
-        pub(crate) use super::_root::_puroro::*;
-    }
-    mod _pinternal {
-        #[allow(unused)]
-        pub(crate) use super::_root::_pinternal::*;
-    }
-    #[derive(::std::default::Default)]
-    pub struct NamePartView {
-        fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
-            self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                0usize,
-            >,
-            self::_pinternal::OptionalNumericalField::<
-                bool,
-                self::_pinternal::tags::Bool,
-                1usize,
-            >,
-        >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
-    }
-    impl NamePartView {
-        pub fn name_part(&self) -> &str {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.name_part,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        pub fn name_part_opt(&self) -> ::std::option::Option::<&str> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.name_part,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_name_part(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.name_part,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        pub fn is_extension(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.is_extension,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        pub fn is_extension_opt(&self) -> ::std::option::Option::<bool> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.is_extension,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_is_extension(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.is_extension,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-    }
-    impl ::std::clone::Clone for NamePartView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields {
-                    name_part: ::std::clone::Clone::clone(&self.fields.name_part),
-                    is_extension: ::std::clone::Clone::clone(&self.fields.is_extension),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
-}
-#[doc(inline)]
-pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

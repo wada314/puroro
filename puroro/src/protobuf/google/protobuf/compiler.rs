@@ -15,7 +15,7 @@ pub mod code_generator_response;
 /** The version number of protocol compiler.
 */
 pub struct Version {
-    fields: self::_root::google::protobuf::compiler::_fields::VersionFields::<
+    fields: self::_root::google::protobuf::compiler::_fields::VersionFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -38,7 +38,6 @@ pub struct Version {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    view: self::_root::google::protobuf::compiler::_view::VersionView,
 }
 impl Version {
     pub fn major(&self) -> i32 {
@@ -303,7 +302,6 @@ impl ::std::clone::Clone for Version {
                 suffix: ::std::clone::Clone::clone(&self.fields.suffix),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
-            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -329,12 +327,6 @@ impl ::std::fmt::Debug for Version {
         debug_struct.finish()
     }
 }
-impl ::std::ops::Deref for Version {
-    type Target = self::_root::google::protobuf::compiler::_view::VersionView;
-    fn deref(&self) -> &Self::Target {
-        &self.view
-    }
-}
 impl ::std::cmp::PartialEq for Version {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -350,7 +342,7 @@ impl ::std::cmp::PartialEq for Version {
 /** An encoded CodeGeneratorRequest is written to the plugin's stdin.
 */
 pub struct CodeGeneratorRequest {
-    fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields::<
+    fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
         self::_pinternal::RepeatedUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -368,7 +360,6 @@ pub struct CodeGeneratorRequest {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    view: self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView,
 }
 impl CodeGeneratorRequest {
     /** The .proto files that were explicitly listed on the command-line.  The
@@ -667,7 +658,6 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
-            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -693,12 +683,6 @@ impl ::std::fmt::Debug for CodeGeneratorRequest {
         debug_struct.finish()
     }
 }
-impl ::std::ops::Deref for CodeGeneratorRequest {
-    type Target = self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView;
-    fn deref(&self) -> &Self::Target {
-        &self.view
-    }
-}
 impl ::std::cmp::PartialEq for CodeGeneratorRequest {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -715,7 +699,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
 /** The plugin writes an encoded CodeGeneratorResponse to stdout.
 */
 pub struct CodeGeneratorResponse {
-    fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields::<
+    fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -731,7 +715,6 @@ pub struct CodeGeneratorResponse {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    view: self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView,
 }
 impl CodeGeneratorResponse {
     pub fn error(&self) -> &str {
@@ -965,7 +948,6 @@ impl ::std::clone::Clone for CodeGeneratorResponse {
                 file: ::std::clone::Clone::clone(&self.fields.file),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
-            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -990,12 +972,6 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
         debug_struct.finish()
     }
 }
-impl ::std::ops::Deref for CodeGeneratorResponse {
-    type Target = self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView;
-    fn deref(&self) -> &Self::Target {
-        &self.view
-    }
-}
 impl ::std::cmp::PartialEq for CodeGeneratorResponse {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -1007,407 +983,6 @@ impl ::std::cmp::PartialEq for CodeGeneratorResponse {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
-#[doc(hidden)]
-pub mod _view {
-    mod _root {
-        #[allow(unused)]
-        pub(crate) use super::super::_root::*;
-    }
-    mod _puroro {
-        #[allow(unused)]
-        pub(crate) use super::_root::_puroro::*;
-    }
-    mod _pinternal {
-        #[allow(unused)]
-        pub(crate) use super::_root::_pinternal::*;
-    }
-    #[derive(::std::default::Default)]
-    pub struct VersionView {
-        fields: self::_root::google::protobuf::compiler::_fields::VersionFields::<
-            self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                0usize,
-            >,
-            self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                1usize,
-            >,
-            self::_pinternal::OptionalNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-                2usize,
-            >,
-            self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                3usize,
-            >,
-        >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
-    }
-    impl VersionView {
-        pub fn major(&self) -> i32 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.major,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        pub fn major_opt(&self) -> ::std::option::Option::<i32> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.major,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_major(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.major,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        pub fn minor(&self) -> i32 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.minor,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        pub fn minor_opt(&self) -> ::std::option::Option::<i32> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.minor,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_minor(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.minor,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        pub fn patch(&self) -> i32 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.patch,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        pub fn patch_opt(&self) -> ::std::option::Option::<i32> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.patch,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_patch(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.patch,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        pub fn suffix(&self) -> &str {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.suffix,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        /** A suffix for alpha, beta or rc release, e.g., "alpha-1", "rc2". It should
- be empty for mainline stable releases.
-*/
-        pub fn suffix_opt(&self) -> ::std::option::Option::<&str> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.suffix,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_suffix(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.suffix,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-    }
-    impl ::std::clone::Clone for VersionView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::google::protobuf::compiler::_fields::VersionFields {
-                    major: ::std::clone::Clone::clone(&self.fields.major),
-                    minor: ::std::clone::Clone::clone(&self.fields.minor),
-                    patch: ::std::clone::Clone::clone(&self.fields.patch),
-                    suffix: ::std::clone::Clone::clone(&self.fields.suffix),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
-    #[derive(::std::default::Default)]
-    pub struct CodeGeneratorRequestView {
-        fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields::<
-            self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-            >,
-            self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                0usize,
-            >,
-            self::_pinternal::RepeatedMessageField::<
-                self::_root::google::protobuf::FileDescriptorProto,
-            >,
-            self::_pinternal::SingularHeapMessageField::<
-                self::_root::google::protobuf::compiler::Version,
-            >,
-        >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
-    }
-    impl CodeGeneratorRequestView {
-        /** The .proto files that were explicitly listed on the command-line.  The
- code generator should generate code only for these files.  Each file's
- descriptor will be included in proto_file, below.
-*/
-        pub fn file_to_generate(
-            &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = &str,
-        > + ::std::ops::Index<usize, Output = str> {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
-                &self.fields.file_to_generate,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn parameter(&self) -> &str {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.parameter,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        /** The generator parameter passed on the command-line.
-*/
-        pub fn parameter_opt(&self) -> ::std::option::Option::<&str> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.parameter,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_parameter(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.parameter,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        /** FileDescriptorProtos for all files in files_to_generate and everything
- they import.  The files will appear in topological order, so each file
- appears before any file that imports it.
-
- protoc guarantees that all proto_files will be written after
- the fields above, even though this is not technically guaranteed by the
- protobuf wire format.  This theoretically could allow a plugin to stream
- in the FileDescriptorProtos and handle them one by one rather than read
- the entire set into memory at once.  However, as of this writing, this
- is not similarly optimized on protoc's end -- it will store all fields in
- memory at once before sending them to the plugin.
-
- Type names of fields and extensions in the FileDescriptorProto are always
- fully qualified.
-*/
-        pub fn proto_file(
-            &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = &self::_root::google::protobuf::_view::FileDescriptorProtoView,
-        > + ::std::ops::Index<
-            usize,
-            Output = self::_root::google::protobuf::_view::FileDescriptorProtoView,
-        > {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
-                &self.fields.proto_file,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn compiler_version(
-            &self,
-        ) -> ::std::option::Option::<&self::_root::google::protobuf::compiler::Version> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.compiler_version,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        /** The version number of protocol compiler.
-*/
-        pub fn compiler_version_opt(
-            &self,
-        ) -> ::std::option::Option::<&self::_root::google::protobuf::compiler::Version> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.compiler_version,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_compiler_version(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.compiler_version,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-    }
-    impl ::std::clone::Clone for CodeGeneratorRequestView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields {
-                    file_to_generate: ::std::clone::Clone::clone(
-                        &self.fields.file_to_generate,
-                    ),
-                    parameter: ::std::clone::Clone::clone(&self.fields.parameter),
-                    proto_file: ::std::clone::Clone::clone(&self.fields.proto_file),
-                    compiler_version: ::std::clone::Clone::clone(
-                        &self.fields.compiler_version,
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
-    #[derive(::std::default::Default)]
-    pub struct CodeGeneratorResponseView {
-        fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields::<
-            self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
-                self::_pinternal::tags::String,
-                0usize,
-            >,
-            self::_pinternal::OptionalNumericalField::<
-                u64,
-                self::_pinternal::tags::UInt64,
-                1usize,
-            >,
-            self::_pinternal::RepeatedMessageField::<
-                self::_root::google::protobuf::compiler::code_generator_response::File,
-            >,
-        >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
-    }
-    impl CodeGeneratorResponseView {
-        pub fn error(&self) -> &str {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.error,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        /** Error message.  If non-empty, code generation failed.  The plugin process
- should exit with status code zero even if it reports an error in this way.
-
- This should be used to indicate errors in .proto files which prevent the
- code generator from generating correct code.  Errors which indicate a
- problem in protoc itself -- such as the input CodeGeneratorRequest being
- unparseable -- should be reported by writing a message to stderr and
- exiting with a non-zero status code.
-*/
-        pub fn error_opt(&self) -> ::std::option::Option::<&str> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.error,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_error(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.error,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        pub fn supported_features(&self) -> u64 {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_or_else(
-                &self.fields.supported_features,
-                self.shared.bitfield(),
-                ::std::default::Default::default,
-            )
-        }
-        /** A bitmask of supported features that the code generator supports.
- This is a bitwise "or" of values from the Feature enum.
-*/
-        pub fn supported_features_opt(&self) -> ::std::option::Option::<u64> {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                &self.fields.supported_features,
-                self.shared.bitfield(),
-            )
-        }
-        pub fn has_supported_features(&self) -> bool {
-            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-            NonRepeatedFieldType::get_field_opt(
-                    &self.fields.supported_features,
-                    self.shared.bitfield(),
-                )
-                .is_some()
-        }
-        pub fn file(
-            &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = &self::_root::google::protobuf::compiler::code_generator_response::_view::FileView,
-        > + ::std::ops::Index<
-            usize,
-            Output = self::_root::google::protobuf::compiler::code_generator_response::_view::FileView,
-        > {
-            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.file, self.shared.bitfield())
-        }
-    }
-    impl ::std::clone::Clone for CodeGeneratorResponseView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields {
-                    error: ::std::clone::Clone::clone(&self.fields.error),
-                    supported_features: ::std::clone::Clone::clone(
-                        &self.fields.supported_features,
-                    ),
-                    file: ::std::clone::Clone::clone(&self.fields.file),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
-}
-#[doc(inline)]
-pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {
