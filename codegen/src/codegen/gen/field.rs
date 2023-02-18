@@ -173,7 +173,10 @@ impl Field {
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
                 quote! {
-                    #receiver.field(stringify!(#ident), &self.#getter_ident())
+                    #receiver.field(
+                        stringify!(#ident),
+                        &self.#getter_ident().into_iter().collect::<::std::vec::Vec<_>>().as_slice()
+                    )
                 }
             }
             _ => {
@@ -249,7 +252,7 @@ impl Field {
                 pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field_mut(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -257,7 +260,7 @@ impl Field {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::clear(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(),
                     )
                 }
             })?,

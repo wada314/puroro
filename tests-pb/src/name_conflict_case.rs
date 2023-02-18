@@ -22,7 +22,10 @@ impl Message {
     }
     pub fn this_is_oneof_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::SharedItems as _;
-        self.view.fields.conflict.this_is_oneof_field_mut(self.shared.bitfield_mut())
+        self.view
+            .fields
+            .conflict
+            .this_is_oneof_field_mut(self.view.shared.bitfield_mut())
     }
     pub fn clear_this_is_oneof_field(&mut self) {
         #[allow(unused)]

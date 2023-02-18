@@ -282,7 +282,7 @@ impl OneofField {
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                     use #PURORO_INTERNAL::SharedItems as _;
-                    self.view.fields.#oneof_struct_field_ident.#getter_mut_ident(self.shared.bitfield_mut())
+                    self.view.fields.#oneof_struct_field_ident.#getter_mut_ident(self.view.shared.bitfield_mut())
                 }
             })?,
             parse2(quote! {

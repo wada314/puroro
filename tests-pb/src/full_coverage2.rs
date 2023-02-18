@@ -49,15 +49,15 @@ impl Msg {
     pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.i32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.i32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_i32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.i32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.i32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn float_required_mut(&mut self) -> &mut f32 {
@@ -93,15 +93,15 @@ impl Msg {
     pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.float_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.float_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_float_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.float_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.float_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn bytes_required_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
@@ -137,15 +137,15 @@ impl Msg {
     pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<::std::vec::Vec<u8>> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.bytes_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.bytes_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_bytes_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.bytes_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.bytes_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn string_required_mut(&mut self) -> &mut ::std::string::String {
@@ -183,15 +183,15 @@ impl Msg {
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.string_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.string_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_string_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.string_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.string_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn enum_required_mut(&mut self) -> &mut self::_root::full_coverage2::Enum {
@@ -229,15 +229,15 @@ impl Msg {
     ) -> &mut ::std::vec::Vec::<self::_root::full_coverage2::Enum> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.enum_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.enum_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_enum_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.enum_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.enum_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn submsg_required_mut(
@@ -279,15 +279,15 @@ impl Msg {
     ) -> &mut ::std::vec::Vec::<self::_root::full_coverage2::msg::Submsg> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.submsg_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.submsg_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_submsg_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.submsg_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.submsg_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn i64_required_mut(&mut self) -> &mut i64 {
@@ -323,15 +323,15 @@ impl Msg {
     pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.i64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.i64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_i64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.i64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.i64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn u32_required_mut(&mut self) -> &mut u32 {
@@ -367,15 +367,15 @@ impl Msg {
     pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.u32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.u32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_u32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.u32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.u32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn u64_required_mut(&mut self) -> &mut u64 {
@@ -411,15 +411,15 @@ impl Msg {
     pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.u64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.u64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_u64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.u64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.u64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn s32_required_mut(&mut self) -> &mut i32 {
@@ -455,15 +455,15 @@ impl Msg {
     pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.s32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.s32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_s32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.s32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.s32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn s64_required_mut(&mut self) -> &mut i64 {
@@ -499,15 +499,15 @@ impl Msg {
     pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.s64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.s64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_s64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.s64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.s64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn fixed32_required_mut(&mut self) -> &mut u32 {
@@ -543,15 +543,15 @@ impl Msg {
     pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.fixed32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.fixed32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_fixed32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.fixed32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.fixed32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn fixed64_required_mut(&mut self) -> &mut u64 {
@@ -587,15 +587,15 @@ impl Msg {
     pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.fixed64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.fixed64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_fixed64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.fixed64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.fixed64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn sfixed32_required_mut(&mut self) -> &mut i32 {
@@ -631,15 +631,15 @@ impl Msg {
     pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.sfixed32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.sfixed32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_sfixed32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.sfixed32_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.sfixed32_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn sfixed64_required_mut(&mut self) -> &mut i64 {
@@ -675,15 +675,15 @@ impl Msg {
     pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.sfixed64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.sfixed64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_sfixed64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.sfixed64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.sfixed64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn f64_required_mut(&mut self) -> &mut f64 {
@@ -719,15 +719,15 @@ impl Msg {
     pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.f64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.f64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_f64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.fields.f64_repeated,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.f64_repeated,
+            self.view.shared.bitfield_mut(),
         )
     }
 }
@@ -2759,52 +2759,164 @@ pub mod _view {
             debug_struct
                 .field(stringify!(i32_required), &self.i32_required_opt())
                 .field(stringify!(i32_optional), &self.i32_optional_opt())
-                .field(stringify!(i32_repeated), &self.i32_repeated_mut())
+                .field(
+                    stringify!(i32_repeated),
+                    &self
+                        .i32_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(float_required), &self.float_required_opt())
                 .field(stringify!(float_optional), &self.float_optional_opt())
-                .field(stringify!(float_repeated), &self.float_repeated_mut())
+                .field(
+                    stringify!(float_repeated),
+                    &self
+                        .float_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(bytes_required), &self.bytes_required_opt())
                 .field(stringify!(bytes_optional), &self.bytes_optional_opt())
-                .field(stringify!(bytes_repeated), &self.bytes_repeated_mut())
+                .field(
+                    stringify!(bytes_repeated),
+                    &self
+                        .bytes_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(string_required), &self.string_required_opt())
                 .field(stringify!(string_optional), &self.string_optional_opt())
-                .field(stringify!(string_repeated), &self.string_repeated_mut())
+                .field(
+                    stringify!(string_repeated),
+                    &self
+                        .string_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(enum_required), &self.enum_required_opt())
                 .field(stringify!(enum_optional), &self.enum_optional_opt())
-                .field(stringify!(enum_repeated), &self.enum_repeated_mut())
+                .field(
+                    stringify!(enum_repeated),
+                    &self
+                        .enum_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(submsg_required), &self.submsg_required_opt())
                 .field(stringify!(submsg_optional), &self.submsg_optional_opt())
-                .field(stringify!(submsg_repeated), &self.submsg_repeated_mut())
+                .field(
+                    stringify!(submsg_repeated),
+                    &self
+                        .submsg_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(i64_required), &self.i64_required_opt())
                 .field(stringify!(i64_optional), &self.i64_optional_opt())
-                .field(stringify!(i64_repeated), &self.i64_repeated_mut())
+                .field(
+                    stringify!(i64_repeated),
+                    &self
+                        .i64_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(u32_required), &self.u32_required_opt())
                 .field(stringify!(u32_optional), &self.u32_optional_opt())
-                .field(stringify!(u32_repeated), &self.u32_repeated_mut())
+                .field(
+                    stringify!(u32_repeated),
+                    &self
+                        .u32_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(u64_required), &self.u64_required_opt())
                 .field(stringify!(u64_optional), &self.u64_optional_opt())
-                .field(stringify!(u64_repeated), &self.u64_repeated_mut())
+                .field(
+                    stringify!(u64_repeated),
+                    &self
+                        .u64_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(s32_required), &self.s32_required_opt())
                 .field(stringify!(s32_optional), &self.s32_optional_opt())
-                .field(stringify!(s32_repeated), &self.s32_repeated_mut())
+                .field(
+                    stringify!(s32_repeated),
+                    &self
+                        .s32_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(s64_required), &self.s64_required_opt())
                 .field(stringify!(s64_optional), &self.s64_optional_opt())
-                .field(stringify!(s64_repeated), &self.s64_repeated_mut())
+                .field(
+                    stringify!(s64_repeated),
+                    &self
+                        .s64_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(fixed32_required), &self.fixed32_required_opt())
                 .field(stringify!(fixed32_optional), &self.fixed32_optional_opt())
-                .field(stringify!(fixed32_repeated), &self.fixed32_repeated_mut())
+                .field(
+                    stringify!(fixed32_repeated),
+                    &self
+                        .fixed32_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(fixed64_required), &self.fixed64_required_opt())
                 .field(stringify!(fixed64_optional), &self.fixed64_optional_opt())
-                .field(stringify!(fixed64_repeated), &self.fixed64_repeated_mut())
+                .field(
+                    stringify!(fixed64_repeated),
+                    &self
+                        .fixed64_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(sfixed32_required), &self.sfixed32_required_opt())
                 .field(stringify!(sfixed32_optional), &self.sfixed32_optional_opt())
-                .field(stringify!(sfixed32_repeated), &self.sfixed32_repeated_mut())
+                .field(
+                    stringify!(sfixed32_repeated),
+                    &self
+                        .sfixed32_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(sfixed64_required), &self.sfixed64_required_opt())
                 .field(stringify!(sfixed64_optional), &self.sfixed64_optional_opt())
-                .field(stringify!(sfixed64_repeated), &self.sfixed64_repeated_mut())
+                .field(
+                    stringify!(sfixed64_repeated),
+                    &self
+                        .sfixed64_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                )
                 .field(stringify!(f64_required), &self.f64_required_opt())
                 .field(stringify!(f64_optional), &self.f64_optional_opt())
-                .field(stringify!(f64_repeated), &self.f64_repeated_mut());
+                .field(
+                    stringify!(f64_repeated),
+                    &self
+                        .f64_repeated()
+                        .into_iter()
+                        .collect::<::std::vec::Vec<_>>()
+                        .as_slice(),
+                );
             self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
             debug_struct.finish()
         }
