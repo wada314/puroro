@@ -274,7 +274,6 @@ impl OneofField {
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
 
         let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
-        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let enum_item_ident = self.gen_oneof_case_value_ident()?;
 

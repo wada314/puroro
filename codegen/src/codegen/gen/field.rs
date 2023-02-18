@@ -222,31 +222,10 @@ impl Field {
 
     fn gen_message_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {
         debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
         let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
-        let getter_item_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
-                impl ::std::ops::Deref::<Target = str> +
-                    ::std::fmt::Debug +
-                    ::std::cmp::PartialEq
-            })?),
-            FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(parse2(quote! {
-                impl ::std::ops::Deref::<Target = [u8]> +
-                    ::std::fmt::Debug +
-                    ::std::cmp::PartialEq
-            })?),
-            FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-                m.try_upgrade()?.gen_message_struct_type()?
-            }
-            _ => self.r#type()?.rust_type()?,
-        };
         let mut_item_type = self.r#type()?.rust_type()?;
-        let docs = self.gen_message_struct_field_method_doc_attrs()?;
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
@@ -275,10 +254,8 @@ impl Field {
         let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
-        let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
-        let docs = self.gen_message_struct_field_method_doc_attrs()?;
 
         Ok(vec![
             parse2(quote! {
@@ -324,9 +301,7 @@ impl Field {
             _ => self.r#type()?.rust_type()?,
         };
         let into_iter_item_type = match self.r#type()? {
-            FieldType::LengthDelimited(ld_type) => {
-                Rc::new(parse2(quote! { & #index_output_type })?)
-            }
+            FieldType::LengthDelimited(_) => Rc::new(parse2(quote! { & #index_output_type })?),
             _ => self.r#type()?.rust_type()?,
         };
         let docs = self.gen_message_struct_field_method_doc_attrs()?;

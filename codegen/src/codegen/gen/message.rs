@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, CFG_ALLOC,
-    PURORO_INTERNAL, PURORO_LIB,
+    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, PURORO_INTERNAL,
+    PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
@@ -97,11 +97,6 @@ impl Message {
     pub(crate) fn gen_message_struct_items(&self) -> Result<Vec<Item>> {
         let ident = self.gen_message_struct_ident()?;
         let view_type = self.gen_view_struct_type()?;
-
-        let fields_types = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_fields_struct_field_type())
-            .collect::<Result<Vec<_>>>()?;
 
         let fields_or_oneofs_methods = self
             .fields_or_oneofs()?
