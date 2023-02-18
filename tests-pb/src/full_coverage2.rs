@@ -2967,7 +2967,7 @@ pub mod _view {
         }
         pub fn i32_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = i32,
         > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3024,7 +3024,7 @@ pub mod _view {
         }
         pub fn float_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = f32,
         > + ::std::ops::Index<usize, Output = f32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3081,7 +3081,7 @@ pub mod _view {
         }
         pub fn bytes_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = &[u8],
         > + ::std::ops::Index<usize, Output = &[u8]> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3138,7 +3138,7 @@ pub mod _view {
         }
         pub fn string_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = &str,
         > + ::std::ops::Index<usize, Output = &str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3199,7 +3199,7 @@ pub mod _view {
         }
         pub fn enum_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = self::_root::full_coverage2::Enum,
         > + ::std::ops::Index<usize, Output = self::_root::full_coverage2::Enum> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3264,7 +3264,7 @@ pub mod _view {
         }
         pub fn submsg_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = &self::_root::full_coverage2::msg::_view::SubmsgView,
         > + ::std::ops::Index<
             usize,
@@ -3324,7 +3324,7 @@ pub mod _view {
         }
         pub fn i64_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = i64,
         > + ::std::ops::Index<usize, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3381,7 +3381,7 @@ pub mod _view {
         }
         pub fn u32_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = u32,
         > + ::std::ops::Index<usize, Output = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3438,7 +3438,7 @@ pub mod _view {
         }
         pub fn u64_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = u64,
         > + ::std::ops::Index<usize, Output = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3495,7 +3495,7 @@ pub mod _view {
         }
         pub fn s32_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = i32,
         > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3552,7 +3552,7 @@ pub mod _view {
         }
         pub fn s64_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = i64,
         > + ::std::ops::Index<usize, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3609,7 +3609,7 @@ pub mod _view {
         }
         pub fn fixed32_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = u32,
         > + ::std::ops::Index<usize, Output = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3666,7 +3666,7 @@ pub mod _view {
         }
         pub fn fixed64_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = u64,
         > + ::std::ops::Index<usize, Output = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3723,7 +3723,7 @@ pub mod _view {
         }
         pub fn sfixed32_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = i32,
         > + ::std::ops::Index<usize, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3780,7 +3780,7 @@ pub mod _view {
         }
         pub fn sfixed64_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = i64,
         > + ::std::ops::Index<usize, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -3837,7 +3837,7 @@ pub mod _view {
         }
         pub fn f64_repeated(
             &self,
-        ) -> impl ::std::iter::IntoIterator<
+        ) -> impl '_ + ::std::iter::IntoIterator<
             Item = f64,
         > + ::std::ops::Index<usize, Output = f64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};

@@ -387,6 +387,7 @@ impl Field {
         Ok(vec![parse2(quote! {
             #(#docs)*
             pub fn #getter_ident(&self) -> impl
+                '_ +
                 ::std::iter::IntoIterator<Item = #getter_item_type> +
                 ::std::ops::Index<usize, Output = #getter_item_type>
             {
