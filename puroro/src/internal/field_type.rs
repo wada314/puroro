@@ -90,33 +90,33 @@ pub trait FieldType {
 pub trait NonRepeatedFieldType: FieldType {
     /// An optional getter type, which is used by the message struct's
     /// getter methods.
-    /// int32 => Option<i32>
-    /// String => Option<&'a str>
-    /// Message => Option<&'a Message>
+    /// `int32` => `Option<i32>`
+    /// `String` => `Option<&'a str>`
+    /// `Message` => `Option<&'a Message>`
     type GetterOptType<'a>
     where
         Self: 'a;
 
     /// A default field type which can be defined in proto2.
-    /// int32 => i32
-    /// String => &'static str
-    /// Message => unreachable!()
+    /// `int32` => `i32`
+    /// `String` => `&'static str`
+    /// `Message` => `unreachable!()`
     type DefaultValueType;
 
     /// A getter type, which overrides `Self::GetterOptType`'s `None` case
     /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
     /// this benefit so it's still an optional type.
-    /// int32 => i32
-    /// String => &'a str
-    /// Message => Option<&'a Message>
+    /// `int32` => `i32`
+    /// `String` => `&'a str`
+    /// `Message` => `Option<&'a Message>`
     type GetterOrElseType<'a>
     where
         Self: 'a;
 
     /// A mutable getter type.
-    /// int32 => &'a mut i32
-    /// String => &'a mut String
-    /// Message => &'a mut Message
+    /// `int32` => `&'a mut i32`
+    /// `String` => `&'a mut String`
+    /// `Message` => `&'a mut Message`
     type GetterMutType<'a>
     where
         Self: 'a;
