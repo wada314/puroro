@@ -1023,6 +1023,163 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl VersionView {
+        pub fn major(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.major,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn major_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.major,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn major_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.major,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_major(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.major,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_major(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.major,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn minor(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.minor,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn minor_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.minor,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn minor_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.minor,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_minor(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.minor,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_minor(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.minor,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn patch(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.patch,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn patch_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.patch,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn patch_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.patch,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_patch(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.patch,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_patch(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.patch,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn suffix(&self) -> &str {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.suffix,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** A suffix for alpha, beta or rc release, e.g., "alpha-1", "rc2". It should
+ be empty for mainline stable releases.
+*/
+        pub fn suffix_opt(&self) -> ::std::option::Option::<&str> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.suffix,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn suffix_mut(&mut self) -> &mut ::std::string::String {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.suffix,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_suffix(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.suffix,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_suffix(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.suffix,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct CodeGeneratorRequestView {
         fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
@@ -1044,6 +1201,162 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl CodeGeneratorRequestView {
+        /** The .proto files that were explicitly listed on the command-line.  The
+ code generator should generate code only for these files.  Each file's
+ descriptor will be included in proto_file, below.
+*/
+        pub fn file_to_generate(
+            &self,
+        ) -> &[impl ::std::ops::Deref::<
+            Target = str,
+        > + ::std::fmt::Debug + ::std::cmp::PartialEq] {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field(
+                &self.fields.file_to_generate,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn file_to_generate_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec::<::std::string::String> {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field_mut(
+                &mut self.fields.file_to_generate,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn clear_file_to_generate(&mut self) {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::clear(
+                &mut self.fields.file_to_generate,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn parameter(&self) -> &str {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.parameter,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** The generator parameter passed on the command-line.
+*/
+        pub fn parameter_opt(&self) -> ::std::option::Option::<&str> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.parameter,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn parameter_mut(&mut self) -> &mut ::std::string::String {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.parameter,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_parameter(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.parameter,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_parameter(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.parameter,
+                self.shared.bitfield_mut(),
+            )
+        }
+        /** FileDescriptorProtos for all files in files_to_generate and everything
+ they import.  The files will appear in topological order, so each file
+ appears before any file that imports it.
+
+ protoc guarantees that all proto_files will be written after
+ the fields above, even though this is not technically guaranteed by the
+ protobuf wire format.  This theoretically could allow a plugin to stream
+ in the FileDescriptorProtos and handle them one by one rather than read
+ the entire set into memory at once.  However, as of this writing, this
+ is not similarly optimized on protoc's end -- it will store all fields in
+ memory at once before sending them to the plugin.
+
+ Type names of fields and extensions in the FileDescriptorProto are always
+ fully qualified.
+*/
+        pub fn proto_file(
+            &self,
+        ) -> &[self::_root::google::protobuf::FileDescriptorProto] {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field(&self.fields.proto_file, self.shared.bitfield())
+        }
+        pub fn proto_file_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto> {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field_mut(
+                &mut self.fields.proto_file,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn clear_proto_file(&mut self) {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::clear(
+                &mut self.fields.proto_file,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn compiler_version(
+            &self,
+        ) -> ::std::option::Option::<&self::_root::google::protobuf::compiler::Version> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.compiler_version,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** The version number of protocol compiler.
+*/
+        pub fn compiler_version_opt(
+            &self,
+        ) -> ::std::option::Option::<&self::_root::google::protobuf::compiler::Version> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.compiler_version,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn compiler_version_mut(
+            &mut self,
+        ) -> &mut self::_root::google::protobuf::compiler::Version {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.compiler_version,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_compiler_version(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.compiler_version,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_compiler_version(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.compiler_version,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct CodeGeneratorResponseView {
         fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
@@ -1062,6 +1375,117 @@ pub mod _view {
             >,
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    impl CodeGeneratorResponseView {
+        pub fn error(&self) -> &str {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.error,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Error message.  If non-empty, code generation failed.  The plugin process
+ should exit with status code zero even if it reports an error in this way.
+
+ This should be used to indicate errors in .proto files which prevent the
+ code generator from generating correct code.  Errors which indicate a
+ problem in protoc itself -- such as the input CodeGeneratorRequest being
+ unparseable -- should be reported by writing a message to stderr and
+ exiting with a non-zero status code.
+*/
+        pub fn error_opt(&self) -> ::std::option::Option::<&str> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.error,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn error_mut(&mut self) -> &mut ::std::string::String {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.error,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_error(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.error,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_error(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.error,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn supported_features(&self) -> u64 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.supported_features,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** A bitmask of supported features that the code generator supports.
+ This is a bitwise "or" of values from the Feature enum.
+*/
+        pub fn supported_features_opt(&self) -> ::std::option::Option::<u64> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.supported_features,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn supported_features_mut(&mut self) -> &mut u64 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.supported_features,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_supported_features(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.supported_features,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_supported_features(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.supported_features,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn file(
+            &self,
+        ) -> &[self::_root::google::protobuf::compiler::code_generator_response::File] {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
+        }
+        pub fn file_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec::<
+            self::_root::google::protobuf::compiler::code_generator_response::File,
+        > {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field_mut(
+                &mut self.fields.file,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn clear_file(&mut self) {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::clear(&mut self.fields.file, self.shared.bitfield_mut())
+        }
     }
 }
 #[doc(inline)]

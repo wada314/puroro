@@ -374,6 +374,140 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl AnnotationView {
+        /** Identifies the element in the original source .proto file. This field
+ is formatted the same as SourceCodeInfo.Location.path.
+*/
+        pub fn path(&self) -> &[i32] {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
+        }
+        pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field_mut(
+                &mut self.fields.path,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn clear_path(&mut self) {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::clear(&mut self.fields.path, self.shared.bitfield_mut())
+        }
+        pub fn source_file(&self) -> &str {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.source_file,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Identifies the filesystem path to the original source .proto.
+*/
+        pub fn source_file_opt(&self) -> ::std::option::Option::<&str> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.source_file,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn source_file_mut(&mut self) -> &mut ::std::string::String {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.source_file,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_source_file(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.source_file,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_source_file(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.source_file,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn begin(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.begin,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Identifies the starting offset in bytes in the generated code
+ that relates to the identified object.
+*/
+        pub fn begin_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.begin,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn begin_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.begin,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_begin(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.begin,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_begin(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.begin,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn end(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.end,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Identifies the ending offset in bytes in the generated code that
+ relates to the identified offset. The end offset should be one past
+ the last relevant byte (so the length of the text = end - begin).
+*/
+        pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+        }
+        pub fn end_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.end,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_end(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+                .is_some()
+        }
+        pub fn clear_end(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

@@ -287,6 +287,84 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl NamePartView {
+        pub fn name_part(&self) -> &str {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.name_part,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn name_part_opt(&self) -> ::std::option::Option::<&str> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.name_part,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.name_part,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_name_part(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.name_part,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_name_part(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.name_part,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn is_extension(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.is_extension,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn is_extension_opt(&self) -> ::std::option::Option::<bool> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.is_extension,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn is_extension_mut(&mut self) -> &mut bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.is_extension,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_is_extension(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.is_extension,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_is_extension(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.is_extension,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

@@ -553,6 +553,127 @@ pub mod _view {
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
+    impl ExtensionRangeView {
+        pub fn start(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.start,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Inclusive.
+*/
+        pub fn start_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.start,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn start_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.start,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_start(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.start,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_start(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.start,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn end(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.end,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Exclusive.
+*/
+        pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+        }
+        pub fn end_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.end,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_end(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+                .is_some()
+        }
+        pub fn clear_end(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
+        }
+        pub fn options(
+            &self,
+        ) -> ::std::option::Option::<
+            &self::_root::google::protobuf::ExtensionRangeOptions,
+        > {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.options,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn options_opt(
+            &self,
+        ) -> ::std::option::Option::<
+            &self::_root::google::protobuf::ExtensionRangeOptions,
+        > {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.options,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn options_mut(
+            &mut self,
+        ) -> &mut self::_root::google::protobuf::ExtensionRangeOptions {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.options,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_options(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.options,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_options(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.options,
+                self.shared.bitfield_mut(),
+            )
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ReservedRangeView {
         fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
@@ -568,6 +689,79 @@ pub mod _view {
             >,
         >,
         shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    impl ReservedRangeView {
+        pub fn start(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.start,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Inclusive.
+*/
+        pub fn start_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.start,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn start_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.start,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_start(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.start,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn clear_start(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(
+                &mut self.fields.start,
+                self.shared.bitfield_mut(),
+            )
+        }
+        pub fn end(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.end,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Exclusive.
+*/
+        pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+        }
+        pub fn end_mut(&mut self) -> &mut i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_mut(
+                &mut self.fields.end,
+                self.shared.bitfield_mut(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn has_end(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+                .is_some()
+        }
+        pub fn clear_end(&mut self) {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
+        }
     }
 }
 #[doc(inline)]
