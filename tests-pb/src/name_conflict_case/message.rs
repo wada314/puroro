@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct ConflictCase {
-    fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
+    fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -20,6 +20,7 @@ pub struct ConflictCase {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::name_conflict_case::message::_view::ConflictCaseView,
 }
 impl ConflictCase {
     pub fn this_is_message_field(&self) -> i32 {
@@ -163,6 +164,7 @@ impl ::std::clone::Clone for ConflictCase {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -183,6 +185,12 @@ impl ::std::fmt::Debug for ConflictCase {
             .field(stringify!(this_is_message_field), &self.this_is_message_field_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for ConflictCase {
+    type Target = self::_root::name_conflict_case::message::_view::ConflictCaseView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for ConflictCase {
@@ -210,7 +218,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct ConflictCaseView {
-        fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
+        fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -242,6 +250,20 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for ConflictCaseView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields {
+                    this_is_message_field: ::std::clone::Clone::clone(
+                        &self.fields.this_is_message_field,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

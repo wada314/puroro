@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Book {
-    fields: self::_root::library::_fields::BookFields<
+    fields: self::_root::library::_fields::BookFields::<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -293,7 +293,7 @@ impl ::std::cmp::PartialEq for Book {
 }
 #[derive(::std::default::Default)]
 pub struct Author {
-    fields: self::_root::library::_fields::AuthorFields<
+    fields: self::_root::library::_fields::AuthorFields::<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
             self::_pinternal::tags::String,
@@ -486,7 +486,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct BookView {
-        fields: self::_root::library::_fields::BookFields<
+        fields: self::_root::library::_fields::BookFields::<
             self::_pinternal::SingularUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -572,9 +572,23 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for BookView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::library::_fields::BookFields {
+                    title: ::std::clone::Clone::clone(&self.fields.title),
+                    num_pages: ::std::clone::Clone::clone(&self.fields.num_pages),
+                    author: ::std::clone::Clone::clone(&self.fields.author),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct AuthorView {
-        fields: self::_root::library::_fields::AuthorFields<
+        fields: self::_root::library::_fields::AuthorFields::<
             self::_pinternal::SingularUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -605,6 +619,18 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for AuthorView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::library::_fields::AuthorFields {
+                    name: ::std::clone::Clone::clone(&self.fields.name),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

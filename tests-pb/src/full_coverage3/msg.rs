@@ -12,12 +12,13 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
+    fields: self::_root::full_coverage3::msg::_fields::SubmsgFields::<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i64, self::_pinternal::tags::Int64>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::full_coverage3::msg::_view::SubmsgView,
 }
 impl Submsg {
     pub fn i32_unlabeled(&self) -> i32 {
@@ -263,6 +264,7 @@ impl ::std::clone::Clone for Submsg {
                 i64_unlabeled: ::std::clone::Clone::clone(&self.fields.i64_unlabeled),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -285,6 +287,12 @@ impl ::std::fmt::Debug for Submsg {
             .field(stringify!(i64_unlabeled), &self.i64_unlabeled_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Submsg {
+    type Target = self::_root::full_coverage3::msg::_view::SubmsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Submsg {
@@ -314,7 +322,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct SubmsgView {
-        fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
+        fields: self::_root::full_coverage3::msg::_fields::SubmsgFields::<
             self::_pinternal::SingularNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -399,6 +407,22 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for SubmsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::full_coverage3::msg::_fields::SubmsgFields {
+                    i32_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.i32_unlabeled,
+                    ),
+                    i32_optional: ::std::clone::Clone::clone(&self.fields.i32_optional),
+                    i64_unlabeled: ::std::clone::Clone::clone(&self.fields.i64_unlabeled),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

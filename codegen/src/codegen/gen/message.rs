@@ -17,7 +17,7 @@ use super::{
     DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, CFG_ALLOC,
     PURORO_INTERNAL, PURORO_LIB,
 };
-use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Type};
+use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
@@ -73,16 +73,19 @@ impl Message {
             .cloned()
     }
 
+    pub(crate) fn gen_fields_struct_path(&self) -> Result<Rc<Path>> {
+        let parent = self.parent()?.gen_rust_module_path()?;
+        let ident = self.gen_fields_struct_ident()?;
+        Ok(Rc::new(parse2(quote! { #parent :: _fields :: #ident })?))
+    }
+
     pub(crate) fn gen_fields_struct_type(
         &self,
         generics: impl Iterator<Item = Rc<Type>>,
     ) -> Result<Rc<Type>> {
-        let parent = self.parent()?.gen_rust_module_path()?;
-        let ident = self.gen_fields_struct_ident()?;
+        let path = self.gen_fields_struct_path()?;
         let generics = generics.collect::<Vec<_>>();
-        Ok(Rc::new(parse2(
-            quote! { #parent :: _fields :: #ident < #(#generics,)* > },
-        )?))
+        Ok(Rc::new(parse2(quote! { #path :: < #(#generics,)* > })?))
     }
 
     pub(crate) fn gen_view_struct_type(&self) -> Result<Rc<Type>> {
@@ -197,6 +200,8 @@ impl Message {
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
 
+        let clone_impl = self.gen_view_struct_impl_clone()?;
+
         Ok(vec![
             parse2(quote! {
                 #[derive(::std::default::Default)]
@@ -211,6 +216,7 @@ impl Message {
                     #(#oneof_field_methods)*
                 }
             })?,
+            clone_impl.into(),
         ])
     }
 
@@ -434,5 +440,27 @@ impl Message {
             return Ok(Vec::new());
         };
         Ok(sci.gen_doc_attributes()?)
+    }
+
+    fn gen_view_struct_impl_clone(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+        let fields_struct_type = self.gen_fields_struct_path()?;
+        let field_values = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_message_struct_impl_clone_field_value())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            impl ::std::clone::Clone for #ident {
+                fn clone(&self) -> Self {
+                    #[allow(unused)] use #PURORO_INTERNAL::SharedItems as _;
+                    Self {
+                        fields: #fields_struct_type {
+                            #(#field_values,)*
+                        },
+                        shared: ::std::clone::Clone::clone(&self.shared),
+                    }
+                }
+            }
+        })?)
     }
 }

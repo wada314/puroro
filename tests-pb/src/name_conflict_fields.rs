@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Conflict {
-    fields: self::_root::name_conflict_fields::_fields::ConflictFields<
+    fields: self::_root::name_conflict_fields::_fields::ConflictFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -20,6 +20,7 @@ pub struct Conflict {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::name_conflict_fields::_view::ConflictView,
 }
 impl Conflict {
     pub fn this_is_original_message_field(&self) -> i32 {
@@ -163,6 +164,7 @@ impl ::std::clone::Clone for Conflict {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -188,6 +190,12 @@ impl ::std::fmt::Debug for Conflict {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for Conflict {
+    type Target = self::_root::name_conflict_fields::_view::ConflictView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for Conflict {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -201,7 +209,7 @@ impl ::std::cmp::PartialEq for Conflict {
 }
 #[derive(::std::default::Default)]
 pub struct ConflictFields {
-    fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
+    fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -209,6 +217,7 @@ pub struct ConflictFields {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::name_conflict_fields::_view::ConflictFieldsView,
 }
 impl ConflictFields {
     pub fn this_is_fields_message_field(&self) -> i32 {
@@ -352,6 +361,7 @@ impl ::std::clone::Clone for ConflictFields {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -375,6 +385,12 @@ impl ::std::fmt::Debug for ConflictFields {
             );
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for ConflictFields {
+    type Target = self::_root::name_conflict_fields::_view::ConflictFieldsView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for ConflictFields {
@@ -404,7 +420,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct ConflictView {
-        fields: self::_root::name_conflict_fields::_fields::ConflictFields<
+        fields: self::_root::name_conflict_fields::_fields::ConflictFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -440,9 +456,23 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for ConflictView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::name_conflict_fields::_fields::ConflictFields {
+                    this_is_original_message_field: ::std::clone::Clone::clone(
+                        &self.fields.this_is_original_message_field,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ConflictFieldsView {
-        fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
+        fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -474,6 +504,20 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for ConflictFieldsView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields {
+                    this_is_fields_message_field: ::std::clone::Clone::clone(
+                        &self.fields.this_is_fields_message_field,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

@@ -12,10 +12,11 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::self_recursive::_fields::MsgFields<
+    fields: self::_root::self_recursive::_fields::MsgFields::<
         self::_pinternal::SingularHeapMessageField::<self::_root::self_recursive::Msg>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::self_recursive::_view::MsgView,
 }
 impl Msg {
     pub fn recursive_unlabeled(
@@ -163,6 +164,7 @@ impl ::std::clone::Clone for Msg {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -183,6 +185,12 @@ impl ::std::fmt::Debug for Msg {
             .field(stringify!(recursive_unlabeled), &self.recursive_unlabeled_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Msg {
+    type Target = self::_root::self_recursive::_view::MsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Msg {
@@ -210,7 +218,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::self_recursive::_fields::MsgFields<
+        fields: self::_root::self_recursive::_fields::MsgFields::<
             self::_pinternal::SingularHeapMessageField::<
                 self::_root::self_recursive::Msg,
             >,
@@ -244,6 +252,20 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for MsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::self_recursive::_fields::MsgFields {
+                    recursive_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.recursive_unlabeled,
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

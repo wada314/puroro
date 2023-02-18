@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::keywords::_fields::MsgFields<
+    fields: self::_root::keywords::_fields::MsgFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -20,6 +20,7 @@ pub struct Msg {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::keywords::_view::MsgView,
 }
 impl Msg {
     pub fn r#type(&self) -> i32 {
@@ -152,6 +153,7 @@ impl ::std::clone::Clone for Msg {
                 r#type: ::std::clone::Clone::clone(&self.fields.r#type),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -173,6 +175,12 @@ impl ::std::fmt::Debug for Msg {
         debug_struct.finish()
     }
 }
+impl ::std::ops::Deref for Msg {
+    type Target = self::_root::keywords::_view::MsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
+    }
+}
 impl ::std::cmp::PartialEq for Msg {
     fn eq(&self, rhs: &Self) -> bool {
         #[allow(unused)]
@@ -184,7 +192,7 @@ impl ::std::cmp::PartialEq for Msg {
 }
 #[derive(::std::default::Default)]
 pub struct _Self {
-    fields: self::_root::keywords::_fields::SelfFields<
+    fields: self::_root::keywords::_fields::SelfFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -192,6 +200,7 @@ pub struct _Self {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::keywords::_view::SelfView,
 }
 impl _Self {
     pub fn r#type(&self) -> i32 {
@@ -324,6 +333,7 @@ impl ::std::clone::Clone for _Self {
                 r#type: ::std::clone::Clone::clone(&self.fields.r#type),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -343,6 +353,12 @@ impl ::std::fmt::Debug for _Self {
         debug_struct.field(stringify!(r#type), &self.type_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for _Self {
+    type Target = self::_root::keywords::_view::SelfView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for _Self {
@@ -370,7 +386,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::keywords::_fields::MsgFields<
+        fields: self::_root::keywords::_fields::MsgFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -404,9 +420,21 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl ::std::clone::Clone for MsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::keywords::_fields::MsgFields {
+                    r#type: ::std::clone::Clone::clone(&self.fields.r#type),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct SelfView {
-        fields: self::_root::keywords::_fields::SelfFields<
+        fields: self::_root::keywords::_fields::SelfFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -438,6 +466,18 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for SelfView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::keywords::_fields::SelfFields {
+                    r#type: ::std::clone::Clone::clone(&self.fields.r#type),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

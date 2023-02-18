@@ -12,7 +12,7 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    fields: self::_root::full_coverage2::msg::_fields::SubmsgFields<
+    fields: self::_root::full_coverage2::msg::_fields::SubmsgFields::<
         self::_pinternal::OptionalNumericalField::<
             i32,
             self::_pinternal::tags::Int32,
@@ -25,6 +25,7 @@ pub struct Submsg {
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::full_coverage2::msg::_view::SubmsgView,
 }
 impl Submsg {
     pub fn i32_required(&self) -> i32 {
@@ -218,6 +219,7 @@ impl ::std::clone::Clone for Submsg {
                 i64_required: ::std::clone::Clone::clone(&self.fields.i64_required),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -239,6 +241,12 @@ impl ::std::fmt::Debug for Submsg {
             .field(stringify!(i64_required), &self.i64_required_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Submsg {
+    type Target = self::_root::full_coverage2::msg::_view::SubmsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Submsg {
@@ -267,7 +275,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct SubmsgView {
-        fields: self::_root::full_coverage2::msg::_fields::SubmsgFields<
+        fields: self::_root::full_coverage2::msg::_fields::SubmsgFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -327,6 +335,19 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for SubmsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::full_coverage2::msg::_fields::SubmsgFields {
+                    i32_required: ::std::clone::Clone::clone(&self.fields.i32_required),
+                    i64_required: ::std::clone::Clone::clone(&self.fields.i64_required),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

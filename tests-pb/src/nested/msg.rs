@@ -12,10 +12,11 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    fields: self::_root::nested::msg::_fields::SubmsgFields<
+    fields: self::_root::nested::msg::_fields::SubmsgFields::<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::nested::msg::_view::SubmsgView,
 }
 impl Submsg {
     pub fn item_inner(&self) -> i32 {
@@ -157,6 +158,7 @@ impl ::std::clone::Clone for Submsg {
                 item_inner: ::std::clone::Clone::clone(&self.fields.item_inner),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -176,6 +178,12 @@ impl ::std::fmt::Debug for Submsg {
         debug_struct.field(stringify!(item_inner), &self.item_inner_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Submsg {
+    type Target = self::_root::nested::msg::_view::SubmsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Submsg {
@@ -203,7 +211,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct SubmsgView {
-        fields: self::_root::nested::msg::_fields::SubmsgFields<
+        fields: self::_root::nested::msg::_fields::SubmsgFields::<
             self::_pinternal::SingularNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -234,6 +242,18 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for SubmsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::nested::msg::_fields::SubmsgFields {
+                    item_inner: ::std::clone::Clone::clone(&self.fields.item_inner),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

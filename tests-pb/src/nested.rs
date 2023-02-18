@@ -13,10 +13,11 @@ mod _pinternal {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::nested::_fields::MsgFields<
+    fields: self::_root::nested::_fields::MsgFields::<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
+    view: self::_root::nested::_view::MsgView,
 }
 impl Msg {
     pub fn item_outer(&self) -> i32 {
@@ -158,6 +159,7 @@ impl ::std::clone::Clone for Msg {
                 item_outer: ::std::clone::Clone::clone(&self.fields.item_outer),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -177,6 +179,12 @@ impl ::std::fmt::Debug for Msg {
         debug_struct.field(stringify!(item_outer), &self.item_outer_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Msg {
+    type Target = self::_root::nested::_view::MsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Msg {
@@ -204,7 +212,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::nested::_fields::MsgFields<
+        fields: self::_root::nested::_fields::MsgFields::<
             self::_pinternal::SingularNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -235,6 +243,18 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl ::std::clone::Clone for MsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::nested::_fields::MsgFields {
+                    item_outer: ::std::clone::Clone::clone(&self.fields.item_outer),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

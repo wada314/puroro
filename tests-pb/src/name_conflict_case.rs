@@ -13,12 +13,13 @@ mod _pinternal {
 pub mod message;
 #[derive(::std::default::Default)]
 pub struct Message {
-    fields: self::_root::name_conflict_case::_fields::MessageFields<
+    fields: self::_root::name_conflict_case::_fields::MessageFields::<
         self::_root::name_conflict_case::message::Conflict::<
             self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::name_conflict_case::_view::MessageView,
 }
 impl Message {
     pub fn conflict(
@@ -162,6 +163,7 @@ impl ::std::clone::Clone for Message {
                 ),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -183,6 +185,12 @@ impl ::std::fmt::Debug for Message {
             .field(stringify!(this_is_oneof_field), &self.this_is_oneof_field_opt());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Message {
+    type Target = self::_root::name_conflict_case::_view::MessageView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Message {
@@ -210,7 +218,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MessageView {
-        fields: self::_root::name_conflict_case::_fields::MessageFields<
+        fields: self::_root::name_conflict_case::_fields::MessageFields::<
             self::_root::name_conflict_case::message::Conflict::<
                 self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,
             >,
@@ -236,6 +244,21 @@ pub mod _view {
         }
         pub fn has_this_is_oneof_field(&self) -> bool {
             self.this_is_oneof_field_opt().is_some()
+        }
+    }
+    impl ::std::clone::Clone for MessageView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::name_conflict_case::_fields::MessageFields {
+                    conflict: self::_pinternal::OneofUnion::clone(
+                        &self.fields.conflict,
+                        self.shared.bitfield(),
+                    ),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }

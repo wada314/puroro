@@ -13,7 +13,7 @@ mod _pinternal {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    fields: self::_root::full_coverage3::_fields::MsgFields<
+    fields: self::_root::full_coverage3::_fields::MsgFields::<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -160,6 +160,7 @@ pub struct Msg {
         self::_pinternal::RepeatedNumericalField::<f64, self::_pinternal::tags::Double>,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::full_coverage3::_view::MsgView,
 }
 impl Msg {
     pub fn i32_unlabeled(&self) -> i32 {
@@ -2513,6 +2514,7 @@ impl ::std::clone::Clone for Msg {
                 f64_repeated: ::std::clone::Clone::clone(&self.fields.f64_repeated),
             },
             shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
     }
 }
@@ -2580,6 +2582,12 @@ impl ::std::fmt::Debug for Msg {
             .field(stringify!(f64_repeated), &self.f64_repeated());
         self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
         debug_struct.finish()
+    }
+}
+impl ::std::ops::Deref for Msg {
+    type Target = self::_root::full_coverage3::_view::MsgView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Msg {
@@ -2654,7 +2662,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::full_coverage3::_fields::MsgFields<
+        fields: self::_root::full_coverage3::_fields::MsgFields::<
             self::_pinternal::SingularNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -3789,6 +3797,133 @@ pub mod _view {
                 &self.fields.f64_repeated,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl ::std::clone::Clone for MsgView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::full_coverage3::_fields::MsgFields {
+                    i32_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.i32_unlabeled,
+                    ),
+                    i32_optional: ::std::clone::Clone::clone(&self.fields.i32_optional),
+                    i32_repeated: ::std::clone::Clone::clone(&self.fields.i32_repeated),
+                    float_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.float_unlabeled,
+                    ),
+                    float_optional: ::std::clone::Clone::clone(
+                        &self.fields.float_optional,
+                    ),
+                    float_repeated: ::std::clone::Clone::clone(
+                        &self.fields.float_repeated,
+                    ),
+                    bytes_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.bytes_unlabeled,
+                    ),
+                    bytes_optional: ::std::clone::Clone::clone(
+                        &self.fields.bytes_optional,
+                    ),
+                    bytes_repeated: ::std::clone::Clone::clone(
+                        &self.fields.bytes_repeated,
+                    ),
+                    string_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.string_unlabeled,
+                    ),
+                    string_optional: ::std::clone::Clone::clone(
+                        &self.fields.string_optional,
+                    ),
+                    string_repeated: ::std::clone::Clone::clone(
+                        &self.fields.string_repeated,
+                    ),
+                    enum_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.enum_unlabeled,
+                    ),
+                    enum_optional: ::std::clone::Clone::clone(
+                        &self.fields.enum_optional,
+                    ),
+                    enum_repeated: ::std::clone::Clone::clone(
+                        &self.fields.enum_repeated,
+                    ),
+                    submsg_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.submsg_unlabeled,
+                    ),
+                    submsg_optional: ::std::clone::Clone::clone(
+                        &self.fields.submsg_optional,
+                    ),
+                    submsg_repeated: ::std::clone::Clone::clone(
+                        &self.fields.submsg_repeated,
+                    ),
+                    i64_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.i64_unlabeled,
+                    ),
+                    i64_optional: ::std::clone::Clone::clone(&self.fields.i64_optional),
+                    i64_repeated: ::std::clone::Clone::clone(&self.fields.i64_repeated),
+                    u32_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.u32_unlabeled,
+                    ),
+                    u32_optional: ::std::clone::Clone::clone(&self.fields.u32_optional),
+                    u32_repeated: ::std::clone::Clone::clone(&self.fields.u32_repeated),
+                    u64_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.u64_unlabeled,
+                    ),
+                    u64_optional: ::std::clone::Clone::clone(&self.fields.u64_optional),
+                    u64_repeated: ::std::clone::Clone::clone(&self.fields.u64_repeated),
+                    s32_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.s32_unlabeled,
+                    ),
+                    s32_optional: ::std::clone::Clone::clone(&self.fields.s32_optional),
+                    s32_repeated: ::std::clone::Clone::clone(&self.fields.s32_repeated),
+                    s64_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.s64_unlabeled,
+                    ),
+                    s64_optional: ::std::clone::Clone::clone(&self.fields.s64_optional),
+                    s64_repeated: ::std::clone::Clone::clone(&self.fields.s64_repeated),
+                    fixed32_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.fixed32_unlabeled,
+                    ),
+                    fixed32_optional: ::std::clone::Clone::clone(
+                        &self.fields.fixed32_optional,
+                    ),
+                    fixed32_repeated: ::std::clone::Clone::clone(
+                        &self.fields.fixed32_repeated,
+                    ),
+                    fixed64_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.fixed64_unlabeled,
+                    ),
+                    fixed64_optional: ::std::clone::Clone::clone(
+                        &self.fields.fixed64_optional,
+                    ),
+                    fixed64_repeated: ::std::clone::Clone::clone(
+                        &self.fields.fixed64_repeated,
+                    ),
+                    sfixed32_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.sfixed32_unlabeled,
+                    ),
+                    sfixed32_optional: ::std::clone::Clone::clone(
+                        &self.fields.sfixed32_optional,
+                    ),
+                    sfixed32_repeated: ::std::clone::Clone::clone(
+                        &self.fields.sfixed32_repeated,
+                    ),
+                    sfixed64_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.sfixed64_unlabeled,
+                    ),
+                    sfixed64_optional: ::std::clone::Clone::clone(
+                        &self.fields.sfixed64_optional,
+                    ),
+                    sfixed64_repeated: ::std::clone::Clone::clone(
+                        &self.fields.sfixed64_repeated,
+                    ),
+                    f64_unlabeled: ::std::clone::Clone::clone(
+                        &self.fields.f64_unlabeled,
+                    ),
+                    f64_optional: ::std::clone::Clone::clone(&self.fields.f64_optional),
+                    f64_repeated: ::std::clone::Clone::clone(&self.fields.f64_repeated),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
         }
     }
 }
