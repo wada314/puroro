@@ -14,7 +14,7 @@ pub mod code_generator_response;
 #[derive(::std::default::Default)]
 /** The version number of protocol compiler.
 */
-pub struct Version<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Version {
     fields: self::_root::google::protobuf::compiler::_fields::VersionFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -341,7 +341,7 @@ impl ::std::cmp::PartialEq for Version {
 #[derive(::std::default::Default)]
 /** An encoded CodeGeneratorRequest is written to the plugin's stdin.
 */
-pub struct CodeGeneratorRequest<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct CodeGeneratorRequest {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
         self::_pinternal::RepeatedUnsizedField::<
             ::std::string::String,
@@ -698,7 +698,7 @@ impl ::std::cmp::PartialEq for CodeGeneratorRequest {
 #[derive(::std::default::Default)]
 /** The plugin writes an encoded CodeGeneratorResponse to stdout.
 */
-pub struct CodeGeneratorResponse<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct CodeGeneratorResponse {
     fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -983,6 +983,89 @@ impl ::std::cmp::PartialEq for CodeGeneratorResponse {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct VersionView {
+        fields: self::_root::google::protobuf::compiler::_fields::VersionFields<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                2usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                3usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct CodeGeneratorRequestView {
+        fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields<
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::FileDescriptorProto,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::compiler::Version,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct CodeGeneratorResponseView {
+        fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u64,
+                self::_pinternal::tags::UInt64,
+                1usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::compiler::code_generator_response::File,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

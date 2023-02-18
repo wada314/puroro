@@ -24,7 +24,7 @@ pub mod uninterpreted_option;
 /** The protocol compiler can output a FileDescriptorSet containing the .proto
  files it parses.
 */
-pub struct FileDescriptorSet<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct FileDescriptorSet {
     fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::FileDescriptorProto,
@@ -184,7 +184,7 @@ impl ::std::cmp::PartialEq for FileDescriptorSet {
 #[derive(::std::default::Default)]
 /** Describes a complete .proto file.
 */
-pub struct FileDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct FileDescriptorProto {
     fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -862,7 +862,7 @@ impl ::std::cmp::PartialEq for FileDescriptorProto {
 #[derive(::std::default::Default)]
 /** Describes a message type.
 */
-pub struct DescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct DescriptorProto {
     fields: self::_root::google::protobuf::_fields::DescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -1407,7 +1407,7 @@ impl ::std::cmp::PartialEq for DescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
-pub struct ExtensionRangeOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct ExtensionRangeOptions {
     fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::UninterpretedOption,
@@ -1580,7 +1580,7 @@ impl ::std::cmp::PartialEq for ExtensionRangeOptions {
 #[derive(::std::default::Default)]
 /** Describes a field within a message.
 */
-pub struct FieldDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct FieldDescriptorProto {
     fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -2374,7 +2374,7 @@ impl ::std::cmp::PartialEq for FieldDescriptorProto {
 #[derive(::std::default::Default)]
 /** Describes a oneof.
 */
-pub struct OneofDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct OneofDescriptorProto {
     fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -2601,7 +2601,7 @@ impl ::std::cmp::PartialEq for OneofDescriptorProto {
 #[derive(::std::default::Default)]
 /** Describes an enum type.
 */
-pub struct EnumDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct EnumDescriptorProto {
     fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -2959,7 +2959,7 @@ impl ::std::cmp::PartialEq for EnumDescriptorProto {
 #[derive(::std::default::Default)]
 /** Describes a value within an enum.
 */
-pub struct EnumValueDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct EnumValueDescriptorProto {
     fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -3238,7 +3238,7 @@ impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
 #[derive(::std::default::Default)]
 /** Describes a service.
 */
-pub struct ServiceDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct ServiceDescriptorProto {
     fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -3500,7 +3500,7 @@ impl ::std::cmp::PartialEq for ServiceDescriptorProto {
 #[derive(::std::default::Default)]
 /** Describes a method of a service.
 */
-pub struct MethodDescriptorProto<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct MethodDescriptorProto {
     fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -3972,7 +3972,7 @@ impl ::std::cmp::PartialEq for MethodDescriptorProto {
     }
 }
 #[derive(::std::default::Default)]
-pub struct FileOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct FileOptions {
     fields: self::_root::google::protobuf::_fields::FileOptionsFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -5447,7 +5447,7 @@ impl ::std::cmp::PartialEq for FileOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct MessageOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct MessageOptions {
     fields: self::_root::google::protobuf::_fields::MessageOptionsFields<
         self::_pinternal::OptionalNumericalField::<
             bool,
@@ -5915,7 +5915,7 @@ impl ::std::cmp::PartialEq for MessageOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct FieldOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct FieldOptions {
     fields: self::_root::google::protobuf::_fields::FieldOptionsFields<
         self::_pinternal::OptionalNumericalField::<
             self::_root::google::protobuf::field_options::CType,
@@ -6465,7 +6465,7 @@ impl ::std::cmp::PartialEq for FieldOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct OneofOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct OneofOptions {
     fields: self::_root::google::protobuf::_fields::OneofOptionsFields<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::UninterpretedOption,
@@ -6636,7 +6636,7 @@ impl ::std::cmp::PartialEq for OneofOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct EnumOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct EnumOptions {
     fields: self::_root::google::protobuf::_fields::EnumOptionsFields<
         self::_pinternal::OptionalNumericalField::<
             bool,
@@ -6933,7 +6933,7 @@ impl ::std::cmp::PartialEq for EnumOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct EnumValueOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct EnumValueOptions {
     fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields<
         self::_pinternal::OptionalNumericalField::<
             bool,
@@ -7168,7 +7168,7 @@ impl ::std::cmp::PartialEq for EnumValueOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct ServiceOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct ServiceOptions {
     fields: self::_root::google::protobuf::_fields::ServiceOptionsFields<
         self::_pinternal::OptionalNumericalField::<
             bool,
@@ -7403,7 +7403,7 @@ impl ::std::cmp::PartialEq for ServiceOptions {
     }
 }
 #[derive(::std::default::Default)]
-pub struct MethodOptions<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct MethodOptions {
     fields: self::_root::google::protobuf::_fields::MethodOptionsFields<
         self::_pinternal::OptionalNumericalField::<
             bool,
@@ -7720,7 +7720,7 @@ impl ::std::cmp::PartialEq for MethodOptions {
  or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
  in them.
 */
-pub struct UninterpretedOption<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct UninterpretedOption {
     fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::uninterpreted_option::NamePart,
@@ -8249,7 +8249,7 @@ impl ::std::cmp::PartialEq for UninterpretedOption {
 /** Encapsulates information about the original source file from which a
  FileDescriptorProto was generated.
 */
-pub struct SourceCodeInfo<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct SourceCodeInfo {
     fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::source_code_info::Location,
@@ -8459,7 +8459,7 @@ impl ::std::cmp::PartialEq for SourceCodeInfo {
  file. A GeneratedCodeInfo message is associated with only one generated
  source file, but may contain references to different source .proto files.
 */
-pub struct GeneratedCodeInfo<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct GeneratedCodeInfo {
     fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields<
         self::_pinternal::RepeatedMessageField::<
             self::_root::google::protobuf::generated_code_info::Annotation,
@@ -8623,6 +8623,619 @@ impl ::std::cmp::PartialEq for GeneratedCodeInfo {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct FileDescriptorSetView {
+        fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields<
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::FileDescriptorProto,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct FileDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                1usize,
+            >,
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::DescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::EnumDescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::ServiceDescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::FieldDescriptorProto,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::FileOptions,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::SourceCodeInfo,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                2usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct DescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::DescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::FieldDescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::FieldDescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::DescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::EnumDescriptorProto,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::descriptor_proto::ExtensionRange,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::OneofDescriptorProto,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::MessageOptions,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::descriptor_proto::ReservedRange,
+            >,
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct ExtensionRangeOptionsView {
+        fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields<
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct FieldDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::google::protobuf::field_descriptor_proto::Label,
+                self::_pinternal::tags::Enum2::<
+                    self::_root::google::protobuf::field_descriptor_proto::Label,
+                >,
+                2usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::google::protobuf::field_descriptor_proto::Type,
+                self::_pinternal::tags::Enum2::<
+                    self::_root::google::protobuf::field_descriptor_proto::Type,
+                >,
+                3usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                4usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                5usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                6usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                7usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                8usize,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::FieldOptions,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                9usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct OneofDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::OneofOptions,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct EnumDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::EnumValueDescriptorProto,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::EnumOptions,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
+            >,
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct EnumValueDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::EnumValueOptions,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct ServiceDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::MethodDescriptorProto,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::ServiceOptions,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct MethodDescriptorProtoView {
+        fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                1usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                2usize,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::MethodOptions,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                3usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                4usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct FileOptionsView {
+        fields: self::_root::google::protobuf::_fields::FileOptionsFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                2usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                3usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                4usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::google::protobuf::file_options::OptimizeMode,
+                self::_pinternal::tags::Enum2::<
+                    self::_root::google::protobuf::file_options::OptimizeMode,
+                >,
+                5usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                6usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                7usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                8usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                9usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                10usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                11usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                12usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                13usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                14usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                15usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                16usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                17usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                18usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                19usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct MessageOptionsView {
+        fields: self::_root::google::protobuf::_fields::MessageOptionsFields<
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                2usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                3usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct FieldOptionsView {
+        fields: self::_root::google::protobuf::_fields::FieldOptionsFields<
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::google::protobuf::field_options::CType,
+                self::_pinternal::tags::Enum2::<
+                    self::_root::google::protobuf::field_options::CType,
+                >,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::google::protobuf::field_options::JSType,
+                self::_pinternal::tags::Enum2::<
+                    self::_root::google::protobuf::field_options::JSType,
+                >,
+                2usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                3usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                4usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                5usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct OneofOptionsView {
+        fields: self::_root::google::protobuf::_fields::OneofOptionsFields<
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct EnumOptionsView {
+        fields: self::_root::google::protobuf::_fields::EnumOptionsFields<
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                1usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct EnumValueOptionsView {
+        fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields<
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                0usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct ServiceOptionsView {
+        fields: self::_root::google::protobuf::_fields::ServiceOptionsFields<
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                0usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct MethodOptionsView {
+        fields: self::_root::google::protobuf::_fields::MethodOptionsFields<
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::google::protobuf::method_options::IdempotencyLevel,
+                self::_pinternal::tags::Enum2::<
+                    self::_root::google::protobuf::method_options::IdempotencyLevel,
+                >,
+                1usize,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::UninterpretedOption,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct UninterpretedOptionView {
+        fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields<
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::uninterpreted_option::NamePart,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u64,
+                self::_pinternal::tags::UInt64,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::Int64,
+                2usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                f64,
+                self::_pinternal::tags::Double,
+                3usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::vec::Vec<u8>,
+                self::_pinternal::tags::Bytes,
+                4usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                5usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct SourceCodeInfoView {
+        fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields<
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::source_code_info::Location,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct GeneratedCodeInfoView {
+        fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields<
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::google::protobuf::generated_code_info::Annotation,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

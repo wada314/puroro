@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Location<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct Location {
     fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields<
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
@@ -448,6 +448,51 @@ impl ::std::cmp::PartialEq for Location {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct LocationView {
+        fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields<
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                1usize,
+            >,
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

@@ -11,10 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct ConflictCase<
-    #[cfg(any(feature = "allocator_api", doc))]
-    A = ::std::alloc::Global,
-> {
+pub struct ConflictCase {
     fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -23,8 +20,6 @@ pub struct ConflictCase<
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl ConflictCase {
     pub fn this_is_message_field(&self) -> i32 {
@@ -199,6 +194,34 @@ impl ::std::cmp::PartialEq for ConflictCase {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct ConflictCaseView {
+        fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

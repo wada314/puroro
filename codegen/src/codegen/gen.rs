@@ -78,4 +78,5 @@ gen_global_constants! {
         }
     };
     const CFG_ALLOC: CfgAlloc = quote! { #[cfg(any(feature = "allocator_api", doc))] };
+    const CFG_NO_ALLOC: CfgNoAlloc = quote! { #[cfg(not(any(feature = "allocator_api", doc)))] };
 }

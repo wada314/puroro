@@ -11,13 +11,11 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
+pub struct Msg {
     fields: self::_root::self_recursive::_fields::MsgFields<
         self::_pinternal::SingularHeapMessageField::<self::_root::self_recursive::Msg>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl Msg {
     pub fn recursive_unlabeled(
@@ -196,6 +194,32 @@ impl ::std::cmp::PartialEq for Msg {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct MsgView {
+        fields: self::_root::self_recursive::_fields::MsgFields<
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::self_recursive::Msg,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

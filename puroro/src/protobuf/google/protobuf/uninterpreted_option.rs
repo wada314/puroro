@@ -17,7 +17,7 @@ mod _pinternal {
  E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
  "foo.(bar.baz).qux".
 */
-pub struct NamePart<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct NamePart {
     fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -257,6 +257,39 @@ impl ::std::cmp::PartialEq for NamePart {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct NamePartView {
+        fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                bool,
+                self::_pinternal::tags::Bool,
+                1usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

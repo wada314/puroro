@@ -118,10 +118,10 @@ impl Message {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             #(#docs)*
-            pub struct #ident < #CFG_ALLOC A = ::std::alloc::Global > {
+            pub struct #ident/* < #CFG_ALLOC A = ::std::alloc::Global >*/ {
                 fields: #fields_struct_type,
                 shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
-                #CFG_ALLOC alloc: A,
+                //#CFG_ALLOC alloc: A,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -161,6 +161,26 @@ impl Message {
         })?])
     }
 
+    pub(crate) fn gen_view_struct_items(&self) -> Result<Vec<Item>> {
+        let ident = self.gen_view_struct_ident()?;
+
+        let fields_types = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_fields_struct_field_type())
+            .collect::<Result<Vec<_>>>()?;
+        let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
+
+        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
+
+        Ok(vec![parse2(quote! {
+            #[derive(::std::default::Default)]
+            pub struct #ident {
+                fields: #fields_struct_type,
+                shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
+            }
+        })?])
+    }
+
     fn gen_message_struct_ident(&self) -> Result<Ident> {
         Ok(format_ident!(
             "{}",
@@ -174,6 +194,13 @@ impl Message {
     fn gen_fields_struct_ident(&self) -> Result<Ident> {
         Ok(format_ident!(
             "{}Fields",
+            self.name()?.to_camel_case().to_string()
+        ))
+    }
+
+    fn gen_view_struct_ident(&self) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}View",
             self.name()?.to_camel_case().to_string()
         ))
     }

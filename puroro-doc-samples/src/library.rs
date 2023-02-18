@@ -11,7 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Book<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
+pub struct Book {
     fields: self::_root::library::_fields::BookFields<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
@@ -21,8 +21,6 @@ pub struct Book<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Gl
         self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl Book {
     pub fn title(&self) -> &str {
@@ -286,7 +284,7 @@ impl ::std::cmp::PartialEq for Book {
     }
 }
 #[derive(::std::default::Default)]
-pub struct Author<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
+pub struct Author {
     fields: self::_root::library::_fields::AuthorFields<
         self::_pinternal::SingularUnsizedField::<
             ::std::string::String,
@@ -294,8 +292,6 @@ pub struct Author<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl Author {
     pub fn name(&self) -> &str {
@@ -458,6 +454,48 @@ impl ::std::cmp::PartialEq for Author {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct BookView {
+        fields: self::_root::library::_fields::BookFields<
+            self::_pinternal::SingularUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+            self::_pinternal::SingularNumericalField::<
+                u32,
+                self::_pinternal::tags::UInt32,
+            >,
+            self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct AuthorView {
+        fields: self::_root::library::_fields::AuthorFields<
+            self::_pinternal::SingularUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

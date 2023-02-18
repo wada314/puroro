@@ -11,15 +11,13 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
+pub struct Submsg {
     fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i32, self::_pinternal::tags::Int32>,
         self::_pinternal::SingularNumericalField::<i64, self::_pinternal::tags::Int64>,
     >,
     shared: self::_pinternal::SharedItemsImpl<0usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl Submsg {
     pub fn i32_unlabeled(&self) -> i32 {
@@ -300,6 +298,41 @@ impl ::std::cmp::PartialEq for Submsg {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct SubmsgView {
+        fields: self::_root::full_coverage3::msg::_fields::SubmsgFields<
+            self::_pinternal::SingularNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::SingularNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::SingularNumericalField::<
+                i64,
+                self::_pinternal::tags::Int64,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<0usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

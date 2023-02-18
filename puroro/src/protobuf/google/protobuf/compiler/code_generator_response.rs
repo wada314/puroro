@@ -13,7 +13,7 @@ mod _pinternal {
 #[derive(::std::default::Default)]
 /** Represents a single generated file.
 */
-pub struct File<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct File {
     fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
         self::_pinternal::OptionalUnsizedField::<
             ::std::string::String,
@@ -417,6 +417,47 @@ impl ::std::cmp::PartialEq for File {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct FileView {
+        fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields<
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                1usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                2usize,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::GeneratedCodeInfo,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

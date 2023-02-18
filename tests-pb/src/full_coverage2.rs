@@ -12,7 +12,7 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Global> {
+pub struct Msg {
     fields: self::_root::full_coverage2::_fields::MsgFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -205,8 +205,6 @@ pub struct Msg<#[cfg(any(feature = "allocator_api", doc))] A = ::std::alloc::Glo
         self::_pinternal::RepeatedNumericalField::<f64, self::_pinternal::tags::Double>,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl Msg {
     pub fn i32_required(&self) -> i32 {
@@ -2681,6 +2679,248 @@ impl ::std::cmp::PartialEq for Msg {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct MsgView {
+        fields: self::_root::full_coverage2::_fields::MsgFields<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                f32,
+                self::_pinternal::tags::Float,
+                2usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                f32,
+                self::_pinternal::tags::Float,
+                3usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                f32,
+                self::_pinternal::tags::Float,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::vec::Vec<u8>,
+                self::_pinternal::tags::Bytes,
+                4usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::vec::Vec<u8>,
+                self::_pinternal::tags::Bytes,
+                5usize,
+            >,
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::vec::Vec<u8>,
+                self::_pinternal::tags::Bytes,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                6usize,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                7usize,
+            >,
+            self::_pinternal::RepeatedUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::full_coverage2::Enum,
+                self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
+                8usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                self::_root::full_coverage2::Enum,
+                self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
+                9usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                self::_root::full_coverage2::Enum,
+                self::_pinternal::tags::Enum2::<self::_root::full_coverage2::Enum>,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::full_coverage2::msg::Submsg,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::full_coverage2::msg::Submsg,
+            >,
+            self::_pinternal::RepeatedMessageField::<
+                self::_root::full_coverage2::msg::Submsg,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::Int64,
+                10usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::Int64,
+                11usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i64,
+                self::_pinternal::tags::Int64,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u32,
+                self::_pinternal::tags::UInt32,
+                12usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u32,
+                self::_pinternal::tags::UInt32,
+                13usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                u32,
+                self::_pinternal::tags::UInt32,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u64,
+                self::_pinternal::tags::UInt64,
+                14usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u64,
+                self::_pinternal::tags::UInt64,
+                15usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                u64,
+                self::_pinternal::tags::UInt64,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::SInt32,
+                16usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::SInt32,
+                17usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::SInt32,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::SInt64,
+                18usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::SInt64,
+                19usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i64,
+                self::_pinternal::tags::SInt64,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u32,
+                self::_pinternal::tags::Fixed32,
+                20usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u32,
+                self::_pinternal::tags::Fixed32,
+                21usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                u32,
+                self::_pinternal::tags::Fixed32,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u64,
+                self::_pinternal::tags::Fixed64,
+                22usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                u64,
+                self::_pinternal::tags::Fixed64,
+                23usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                u64,
+                self::_pinternal::tags::Fixed64,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::SFixed32,
+                24usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::SFixed32,
+                25usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::SFixed32,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::SFixed64,
+                26usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i64,
+                self::_pinternal::tags::SFixed64,
+                27usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                i64,
+                self::_pinternal::tags::SFixed64,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                f64,
+                self::_pinternal::tags::Double,
+                28usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                f64,
+                self::_pinternal::tags::Double,
+                29usize,
+            >,
+            self::_pinternal::RepeatedNumericalField::<
+                f64,
+                self::_pinternal::tags::Double,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

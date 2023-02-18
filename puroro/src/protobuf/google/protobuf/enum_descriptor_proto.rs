@@ -18,7 +18,7 @@ mod _pinternal {
  is inclusive such that it can appropriately represent the entire int32
  domain.
 */
-pub struct EnumReservedRange<#[cfg(any(feature = "allocator_api", doc))] A> {
+pub struct EnumReservedRange {
     fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -243,6 +243,39 @@ impl ::std::cmp::PartialEq for EnumReservedRange {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct EnumReservedRangeView {
+        fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

@@ -11,10 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Conflict<
-    #[cfg(any(feature = "allocator_api", doc))]
-    A = ::std::alloc::Global,
-> {
+pub struct Conflict {
     fields: self::_root::name_conflict_fields::_fields::ConflictFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -23,8 +20,6 @@ pub struct Conflict<
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl Conflict {
     pub fn this_is_original_message_field(&self) -> i32 {
@@ -205,10 +200,7 @@ impl ::std::cmp::PartialEq for Conflict {
     }
 }
 #[derive(::std::default::Default)]
-pub struct ConflictFields<
-    #[cfg(any(feature = "allocator_api", doc))]
-    A = ::std::alloc::Global,
-> {
+pub struct ConflictFields {
     fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
         self::_pinternal::OptionalNumericalField::<
             i32,
@@ -217,8 +209,6 @@ pub struct ConflictFields<
         >,
     >,
     shared: self::_pinternal::SharedItemsImpl<1usize>,
-    #[cfg(any(feature = "allocator_api", doc))]
-    alloc: A,
 }
 impl ConflictFields {
     pub fn this_is_fields_message_field(&self) -> i32 {
@@ -398,6 +388,45 @@ impl ::std::cmp::PartialEq for ConflictFields {
             && self.shared.unknown_fields() == rhs.shared.unknown_fields()
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct ConflictView {
+        fields: self::_root::name_conflict_fields::_fields::ConflictFields<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    #[derive(::std::default::Default)]
+    pub struct ConflictFieldsView {
+        fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+        >,
+        shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {
