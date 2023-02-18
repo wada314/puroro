@@ -25,6 +25,7 @@ use crate::internal::ser::{FieldData, ScopedIter, WireType};
 use crate::internal::variant::Variant;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
+use ::std::ops::Index;
 
 pub trait FieldType {
     // Deserialization methods
@@ -137,6 +138,14 @@ pub trait NonRepeatedFieldType: FieldType {
 pub trait RepeatedFieldType: FieldType {
     type ScalarType;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
+    type ItemType<'a>
+    where
+        Self: 'a;
+    type RepeatedRustType<'a>: IntoIterator<Item = Self::ItemType<'a>>
+        + Index<usize, Output = Self::ItemType<'a>>
+    where
+        Self: 'a;
+    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_>;
     type ContainerType;
     fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
