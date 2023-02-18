@@ -165,13 +165,13 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::nested::_fields::MsgFields::<
+        pub(super) fields: self::_root::nested::_fields::MsgFields::<
             self::_pinternal::SingularNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<0usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
     impl MsgView {
         pub fn item_outer(&self) -> i32 {

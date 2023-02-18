@@ -203,8 +203,8 @@ impl Message {
             parse2(quote! {
                 #[derive(::std::default::Default)]
                 pub struct #ident {
-                    fields: #fields_struct_type,
-                    shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
+                    pub(super) fields: #fields_struct_type,
+                    pub(super) shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
                 }
             })?,
             parse2(quote! {

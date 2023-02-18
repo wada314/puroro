@@ -1478,7 +1478,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::full_coverage3::_fields::MsgFields::<
+        pub(super) fields: self::_root::full_coverage3::_fields::MsgFields::<
             self::_pinternal::SingularNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -1684,7 +1684,7 @@ pub mod _view {
                 self::_pinternal::tags::Double,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl MsgView {
         pub fn i32_unlabeled(&self) -> i32 {

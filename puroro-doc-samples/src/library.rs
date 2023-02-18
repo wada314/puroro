@@ -364,7 +364,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct BookView {
-        fields: self::_root::library::_fields::BookFields::<
+        pub(super) fields: self::_root::library::_fields::BookFields::<
             self::_pinternal::SingularUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
@@ -375,7 +375,7 @@ pub mod _view {
             >,
             self::_pinternal::SingularHeapMessageField::<self::_root::library::Author>,
         >,
-        shared: self::_pinternal::SharedItemsImpl<0usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
     impl BookView {
         pub fn title(&self) -> &str {
@@ -498,13 +498,13 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct AuthorView {
-        fields: self::_root::library::_fields::AuthorFields::<
+        pub(super) fields: self::_root::library::_fields::AuthorFields::<
             self::_pinternal::SingularUnsizedField::<
                 ::std::string::String,
                 self::_pinternal::tags::String,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<0usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
     impl AuthorView {
         pub fn name(&self) -> &str {

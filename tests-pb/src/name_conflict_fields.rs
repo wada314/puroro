@@ -308,14 +308,14 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct ConflictView {
-        fields: self::_root::name_conflict_fields::_fields::ConflictFields::<
+        pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl ConflictView {
         pub fn this_is_original_message_field(&self) -> i32 {
@@ -393,14 +393,14 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct ConflictFieldsView {
-        fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
+        pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl ConflictFieldsView {
         pub fn this_is_fields_message_field(&self) -> i32 {

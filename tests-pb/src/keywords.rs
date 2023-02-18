@@ -308,14 +308,14 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::keywords::_fields::MsgFields::<
+        pub(super) fields: self::_root::keywords::_fields::MsgFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl MsgView {
         pub fn r#type(&self) -> i32 {
@@ -383,14 +383,14 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct SelfView {
-        fields: self::_root::keywords::_fields::SelfFields::<
+        pub(super) fields: self::_root::keywords::_fields::SelfFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl SelfView {
         pub fn r#type(&self) -> i32 {

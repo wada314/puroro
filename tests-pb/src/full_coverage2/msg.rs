@@ -195,7 +195,7 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct SubmsgView {
-        fields: self::_root::full_coverage2::msg::_fields::SubmsgFields::<
+        pub(super) fields: self::_root::full_coverage2::msg::_fields::SubmsgFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
@@ -207,7 +207,7 @@ pub mod _view {
                 1usize,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl SubmsgView {
         pub fn i32_required(&self) -> i32 {

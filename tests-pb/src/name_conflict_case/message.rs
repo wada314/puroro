@@ -167,14 +167,14 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct ConflictCaseView {
-        fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields::<
+        pub(super) fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields::<
             self::_pinternal::OptionalNumericalField::<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<1usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
     impl ConflictCaseView {
         pub fn this_is_message_field(&self) -> i32 {

@@ -167,12 +167,12 @@ pub mod _view {
     }
     #[derive(::std::default::Default)]
     pub struct MsgView {
-        fields: self::_root::self_recursive::_fields::MsgFields::<
+        pub(super) fields: self::_root::self_recursive::_fields::MsgFields::<
             self::_pinternal::SingularHeapMessageField::<
                 self::_root::self_recursive::Msg,
             >,
         >,
-        shared: self::_pinternal::SharedItemsImpl<0usize>,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
     impl MsgView {
         pub fn recursive_unlabeled(
