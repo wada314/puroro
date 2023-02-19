@@ -1,6 +1,6 @@
 [package]
 name = "puroro"
-version = "0.11.1"
+version = "0.12.0"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2021"
 license = "Apache-2.0"
@@ -14,9 +14,8 @@ readme = "../readme.md"
 thiserror = "1.0"
 either = "1.8"
 bitvec = "1.0"
-#stable_puroro = { package = "puroro", version = "0.11.1", optional = true }
+stable_puroro = { package = "puroro", version = "0.12.0", optional = true }
 #stable_puroro = { git = "https://github.com/wada314/puroro", branch = "master", package = "puroro", optional = true }
-stable_puroro = { git = "https://github.com/wada314/puroro",  package = "puroro", rev = "ee81ed65cf5b73c3645f4e4e9c028633d8327a75", optional = true }
 
 [features]
 default = []

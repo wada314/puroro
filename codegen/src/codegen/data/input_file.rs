@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::{DataTypeBase, Enum, Message, Package, PackageOrMessage, SourceCodeInfo, Syntax};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
+use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
@@ -35,7 +35,7 @@ pub(crate) struct InputFile {
 }
 
 impl InputFile {
-    pub(crate) fn new(proto: &FileDescriptorProto, package: Weak<Package>) -> Rc<Self> {
+    pub(crate) fn new(proto: &FileDescriptorProtoView, package: Weak<Package>) -> Rc<Self> {
         Rc::new_cyclic(|weak| Self {
             cache: Default::default(),
             name: proto.name().to_string(),
@@ -73,9 +73,12 @@ impl InputFile {
                 .source_code_info()
                 .into_iter()
                 .flat_map(|sci| {
-                    sci.location()
-                        .into_iter()
-                        .map(|loc| (loc.path().to_vec(), loc.into()))
+                    sci.location().into_iter().map(|loc| {
+                        (
+                            loc.path().into_iter().cloned().collect::<Vec<_>>(),
+                            loc.into(),
+                        )
+                    })
                 })
                 .collect(),
         })

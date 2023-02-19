@@ -24,7 +24,7 @@ use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
 use ::puroro::protobuf::google::protobuf::compiler::code_generator_response::File;
 use ::puroro::protobuf::google::protobuf::compiler::CodeGeneratorResponse;
-use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
+use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
 use ::quote::quote;
 use ::std::iter;
 use ::std::rc::Rc;
@@ -48,7 +48,7 @@ pub struct CodegenOptions {
 }
 
 pub fn generate_file_names_and_tokens<'a>(
-    files: impl Iterator<Item = &'a FileDescriptorProto>,
+    files: impl Iterator<Item = &'a FileDescriptorProtoView>,
     options: &CodegenOptions,
 ) -> Result<impl IntoIterator<Item = (String, TokenStream)>> {
     let root_package = Package::new_root(files);
@@ -91,7 +91,7 @@ pub fn generate_file_names_and_tokens<'a>(
 }
 
 pub fn generate_output_file_protos<'a>(
-    files: impl Iterator<Item = &'a FileDescriptorProto>,
+    files: impl Iterator<Item = &'a FileDescriptorProtoView>,
     options: &CodegenOptions,
 ) -> Result<CodeGeneratorResponse> {
     let mut cgr = CodeGeneratorResponse::default();
@@ -116,7 +116,7 @@ pub fn generate_output_file_protos<'a>(
 }
 
 pub fn generate_tokens_for_inline<'a>(
-    files: impl Iterator<Item = &'a FileDescriptorProto>,
+    files: impl Iterator<Item = &'a FileDescriptorProtoView>,
     options: &CodegenOptions,
 ) -> Result<TokenStream> {
     let root_package = Package::new_root(files);

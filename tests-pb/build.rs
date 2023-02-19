@@ -69,7 +69,8 @@ fn main() {
 
     // Generate the code, returned by File proto structs.
     let options = CodegenOptions::default();
-    let cgr = generate_output_file_protos(file_descriptor_set.file().iter(), &options).unwrap();
+    let cgr =
+        generate_output_file_protos(file_descriptor_set.file().into_iter(), &options).unwrap();
 
     // Output the File proto structs into the actual filesystem.
     for output_file in cgr.file() {

@@ -16,7 +16,7 @@ use super::super::util::*;
 use super::{DataTypeBase, FieldBase, FieldType, Message, Oneof};
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
+use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProtoView};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
@@ -70,7 +70,7 @@ impl FieldBase for OneofField {
 
 impl OneofField {
     pub(crate) fn new(
-        proto: &FieldDescriptorProto,
+        proto: &FieldDescriptorProtoView,
         oneof: Weak<Oneof>,
         index_in_parent: usize,
     ) -> Rc<Self> {

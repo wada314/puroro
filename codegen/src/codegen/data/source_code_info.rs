@@ -20,8 +20,8 @@ pub(crate) struct SourceCodeInfo {
     pub(crate) trailing_comments: String,
 }
 
-impl From<&source_code_info::Location> for SourceCodeInfo {
-    fn from(info: &source_code_info::Location) -> Self {
+impl From<&source_code_info::LocationView> for SourceCodeInfo {
+    fn from(info: &source_code_info::LocationView) -> Self {
         Self {
             leading_comments: info.leading_comments().to_string(),
             trailing_comments: info.trailing_comments().to_string(),

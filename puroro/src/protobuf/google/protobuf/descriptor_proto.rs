@@ -12,120 +12,55 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct ExtensionRange {
-    fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields<
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        >,
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        >,
-        self::_pinternal::SingularHeapMessageField::<
-            self::_root::google::protobuf::ExtensionRangeOptions,
-        >,
-    >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
 }
 impl ExtensionRange {
-    pub fn start(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.start,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    /** Inclusive.
-*/
-    pub fn start_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
-    }
     pub fn start_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.start,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.start,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_start(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
-            .is_some()
     }
     pub fn clear_start(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.start, self.shared.bitfield_mut())
-    }
-    pub fn end(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.end,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.start,
+            self.view.shared.bitfield_mut(),
         )
-    }
-    /** Exclusive.
-*/
-    pub fn end_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.end,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.end,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_end(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
-            .is_some()
     }
     pub fn clear_end(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
-    }
-    pub fn options(
-        &self,
-    ) -> ::std::option::Option::<&self::_root::google::protobuf::ExtensionRangeOptions> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.options,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.end,
+            self.view.shared.bitfield_mut(),
         )
-    }
-    pub fn options_opt(
-        &self,
-    ) -> ::std::option::Option::<&self::_root::google::protobuf::ExtensionRangeOptions> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.options, self.shared.bitfield())
     }
     pub fn options_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::ExtensionRangeOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.options,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.options,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
-    pub fn has_options(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.options, self.shared.bitfield())
-            .is_some()
-    }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.options, self.shared.bitfield_mut())
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.options,
+            self.view.shared.bitfield_mut(),
+        )
     }
 }
 impl self::_puroro::Message for ExtensionRange {
@@ -160,20 +95,20 @@ impl self::_puroro::Message for ExtensionRange {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.start,
-            self.shared.bitfield(),
+            &self.view.fields.start,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.end,
-            self.shared.bitfield(),
+            &self.view.fields.end,
+            self.view.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
+            &self.view.fields.options,
+            self.view.shared.bitfield(),
             3i32,
             out,
         )?;
@@ -206,22 +141,22 @@ impl self::_pinternal::MessageInternal for ExtensionRange {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.start,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.start,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.end,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.end,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.options,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.options,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -237,7 +172,7 @@ impl self::_pinternal::MessageInternal for ExtensionRange {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -247,22 +182,9 @@ impl self::_pinternal::MessageInternal for ExtensionRange {
 }
 impl ::std::clone::Clone for ExtensionRange {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
-            fields: self::_fields::ExtensionRangeFields {
-                start: ::std::clone::Clone::clone(&self.fields.start),
-                end: ::std::clone::Clone::clone(&self.fields.end),
-                options: ::std::clone::Clone::clone(&self.fields.options),
-            },
-            shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
-    }
-}
-impl ::std::ops::Drop for ExtensionRange {
-    fn drop(&mut self) {
-        #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for ExtensionRange {
@@ -270,24 +192,21 @@ impl ::std::fmt::Debug for ExtensionRange {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        let mut debug_struct = fmt.debug_struct(stringify!(ExtensionRange));
-        debug_struct
-            .field(stringify!(start), &self.start_opt())
-            .field(stringify!(end), &self.end_opt())
-            .field(stringify!(options), &self.options_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-        debug_struct.finish()
+        <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as ::std::fmt::Debug>::fmt(
+            &self.view,
+            fmt,
+        )
+    }
+}
+impl ::std::ops::Deref for ExtensionRange {
+    type Target = self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for ExtensionRange {
     fn eq(&self, rhs: &Self) -> bool {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
-        true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
-            && self.options_opt() == rhs.options_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        &self.view == &rhs.view
     }
 }
 #[derive(::std::default::Default)]
@@ -296,82 +215,38 @@ impl ::std::cmp::PartialEq for ExtensionRange {
  not overlap.
 */
 pub struct ReservedRange {
-    fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields<
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            0usize,
-        >,
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        >,
-    >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView,
 }
 impl ReservedRange {
-    pub fn start(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.start,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    /** Inclusive.
-*/
-    pub fn start_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
-    }
     pub fn start_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.start,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.start,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_start(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.start, self.shared.bitfield())
-            .is_some()
     }
     pub fn clear_start(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.start, self.shared.bitfield_mut())
-    }
-    pub fn end(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.end,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.start,
+            self.view.shared.bitfield_mut(),
         )
-    }
-    /** Exclusive.
-*/
-    pub fn end_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.end,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.end,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
-    pub fn has_end(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
-            .is_some()
-    }
     pub fn clear_end(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.end,
+            self.view.shared.bitfield_mut(),
+        )
     }
 }
 impl self::_puroro::Message for ReservedRange {
@@ -406,14 +281,14 @@ impl self::_puroro::Message for ReservedRange {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.start,
-            self.shared.bitfield(),
+            &self.view.fields.start,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.end,
-            self.shared.bitfield(),
+            &self.view.fields.end,
+            self.view.shared.bitfield(),
             2i32,
             out,
         )?;
@@ -446,15 +321,15 @@ impl self::_pinternal::MessageInternal for ReservedRange {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.start,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.start,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.end,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.end,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -470,7 +345,7 @@ impl self::_pinternal::MessageInternal for ReservedRange {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -480,21 +355,9 @@ impl self::_pinternal::MessageInternal for ReservedRange {
 }
 impl ::std::clone::Clone for ReservedRange {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
-            fields: self::_fields::ReservedRangeFields {
-                start: ::std::clone::Clone::clone(&self.fields.start),
-                end: ::std::clone::Clone::clone(&self.fields.end),
-            },
-            shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
-    }
-}
-impl ::std::ops::Drop for ReservedRange {
-    fn drop(&mut self) {
-        #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for ReservedRange {
@@ -502,24 +365,287 @@ impl ::std::fmt::Debug for ReservedRange {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        let mut debug_struct = fmt.debug_struct(stringify!(ReservedRange));
-        debug_struct
-            .field(stringify!(start), &self.start_opt())
-            .field(stringify!(end), &self.end_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-        debug_struct.finish()
+        <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as ::std::fmt::Debug>::fmt(
+            &self.view,
+            fmt,
+        )
+    }
+}
+impl ::std::ops::Deref for ReservedRange {
+    type Target = self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for ReservedRange {
     fn eq(&self, rhs: &Self) -> bool {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
-        true && self.start_opt() == rhs.start_opt() && self.end_opt() == rhs.end_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        &self.view == &rhs.view
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct ExtensionRangeView {
+        pub(super) fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields::<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+            self::_pinternal::SingularHeapMessageField::<
+                self::_root::google::protobuf::ExtensionRangeOptions,
+            >,
+        >,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    impl ExtensionRangeView {
+        pub fn start(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.start,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Inclusive.
+*/
+        pub fn start_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.start,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn has_start(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.start,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn end(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.end,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Exclusive.
+*/
+        pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+        }
+        pub fn has_end(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+                .is_some()
+        }
+        pub fn options(
+            &self,
+        ) -> ::std::option::Option::<
+            &self::_root::google::protobuf::ExtensionRangeOptions,
+        > {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.options,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        pub fn options_opt(
+            &self,
+        ) -> ::std::option::Option::<
+            &self::_root::google::protobuf::ExtensionRangeOptions,
+        > {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.options,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn has_options(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.options,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+    }
+    impl ::std::clone::Clone for ExtensionRangeView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields {
+                    start: ::std::clone::Clone::clone(&self.fields.start),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                    options: ::std::clone::Clone::clone(&self.fields.options),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
+    impl ::std::ops::Drop for ExtensionRangeView {
+        fn drop(&mut self) {
+            #[allow(unused)]
+            use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        }
+    }
+    impl ::std::fmt::Debug for ExtensionRangeView {
+        fn fmt(
+            &self,
+            fmt: &mut ::std::fmt::Formatter<'_>,
+        ) -> ::std::result::Result<(), ::std::fmt::Error> {
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            let mut debug_struct = fmt.debug_struct(stringify!(ExtensionRangeView));
+            debug_struct
+                .field(stringify!(start), &self.start_opt())
+                .field(stringify!(end), &self.end_opt())
+                .field(stringify!(options), &self.options_opt());
+            self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+            debug_struct.finish()
+        }
+    }
+    impl ::std::cmp::PartialEq for ExtensionRangeView {
+        fn eq(&self, rhs: &Self) -> bool {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::SharedItems as _;
+            true && self.start_opt() == rhs.start_opt()
+                && self.end_opt() == rhs.end_opt()
+                && self.options_opt() == rhs.options_opt()
+                && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    #[derive(::std::default::Default)]
+    pub struct ReservedRangeView {
+        pub(super) fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields::<
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+        >,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    impl ReservedRangeView {
+        pub fn start(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.start,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Inclusive.
+*/
+        pub fn start_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.start,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn has_start(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.start,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn end(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.end,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Exclusive.
+*/
+        pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+        }
+        pub fn has_end(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+                .is_some()
+        }
+    }
+    impl ::std::clone::Clone for ReservedRangeView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields {
+                    start: ::std::clone::Clone::clone(&self.fields.start),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
+    impl ::std::ops::Drop for ReservedRangeView {
+        fn drop(&mut self) {
+            #[allow(unused)]
+            use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        }
+    }
+    impl ::std::fmt::Debug for ReservedRangeView {
+        fn fmt(
+            &self,
+            fmt: &mut ::std::fmt::Formatter<'_>,
+        ) -> ::std::result::Result<(), ::std::fmt::Error> {
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            let mut debug_struct = fmt.debug_struct(stringify!(ReservedRangeView));
+            debug_struct
+                .field(stringify!(start), &self.start_opt())
+                .field(stringify!(end), &self.end_opt());
+            self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+            debug_struct.finish()
+        }
+    }
+    impl ::std::cmp::PartialEq for ReservedRangeView {
+        fn eq(&self, rhs: &Self) -> bool {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::SharedItems as _;
+            true && self.start_opt() == rhs.start_opt()
+                && self.end_opt() == rhs.end_opt()
+                && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {
