@@ -16,6 +16,7 @@ use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
+use crate::repeated::RepeatedFieldView;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
@@ -212,15 +213,11 @@ where
         self.0.as_slice()
     }
 
-    type IntoIterItemType<'a> = &'a <ProtoType::RustOwnedType as Deref>::Target
+    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, ProtoType::RustOwnedType>
     where
         Self: 'a;
-    type IndexOutputType = <ProtoType::RustOwnedType as Deref>::Target;
-    type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustOwnedType>
-    where
-        Self: 'a;
-    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedRustType<'_> {
-        RepeatedField(self.0.as_slice())
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+        RepeatedFieldViewImpl(self.0.as_slice())
     }
 
     type ContainerType = Vec<Self::ScalarType>;
@@ -232,18 +229,24 @@ where
     }
 }
 
-pub struct RepeatedField<'a, T>(pub(crate) &'a [T]);
-impl<'a, T: Deref> IntoIterator for RepeatedField<'a, T> {
+pub struct RepeatedFieldViewImpl<'a, T>(pub(crate) &'a [T]);
+impl<'a, T: Deref> IntoIterator for RepeatedFieldViewImpl<'a, T> {
     type Item = &'a T::Target;
     type IntoIter = Derefed<'a, slice::Iter<'a, T>, T>;
     fn into_iter(self) -> Self::IntoIter {
         Derefed(self.0.into_iter(), PhantomData)
     }
 }
-impl<'a, T: Deref> Index<usize> for RepeatedField<'a, T> {
+impl<'a, T: Deref> Index<usize> for RepeatedFieldViewImpl<'a, T> {
     type Output = T::Target;
     fn index(&self, index: usize) -> &Self::Output {
         self.0.index(index).deref()
+    }
+}
+impl<'a, T: Deref> RepeatedFieldView<'a> for RepeatedFieldViewImpl<'a, T> {
+    type Output = T::Target;
+    fn len(&self) -> usize {
+        self.0.len()
     }
 }
 

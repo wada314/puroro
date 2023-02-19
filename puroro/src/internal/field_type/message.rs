@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::r#unsized::RepeatedField;
+use super::r#unsized::RepeatedFieldViewImpl;
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
 use crate::internal::message_internal::MessageInternal;
@@ -133,14 +133,10 @@ impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for Repeate
         self.0.clear()
     }
 
-    type IntoIterItemType<'a> = &'a M::Target
+    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, M>
     where
         Self: 'a;
-    type IndexOutputType = M::Target;
-    type RepeatedRustType<'a> = RepeatedField<'a, M>
-    where
-        Self: 'a;
-    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedRustType<'_> {
-        RepeatedField(self.0.as_slice())
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+        RepeatedFieldViewImpl(self.0.as_slice())
     }
 }

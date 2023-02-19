@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::Message;
+use ::puroro::{Message, RepeatedFieldView};
 use ::puroro_inline::puroro_inline;
 use ::std::borrow::Cow;
 use ::std::default::Default;
@@ -81,7 +81,10 @@ fn proto2_test3() {
 #[test]
 fn proto2_test4() {
     let mut t4 = p2::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, t4.d());
+    assert_eq!(
+        TEST4_EXPECTED,
+        t4.d().into_iter().cloned().collect::<Vec<_>>()
+    );
     let mut encoded = Vec::new();
     t4.to_bytes(&mut encoded).unwrap();
     assert_eq!(TEST4_INPUT, &encoded);
@@ -138,7 +141,10 @@ fn proto3_test3() {
 #[test]
 fn proto3_test4() {
     let mut t4 = p3::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, t4.d());
+    assert_eq!(
+        TEST4_EXPECTED,
+        t4.d().into_iter().cloned().collect::<Vec<_>>()
+    );
     let mut encoded = Vec::new();
     t4.to_bytes(&mut encoded).unwrap();
     assert_eq!(TEST4_INPUT, &encoded);

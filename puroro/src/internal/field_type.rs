@@ -23,9 +23,9 @@ pub use self::r#unsized::{OptionalUnsizedField, RepeatedUnsizedField, SingularUn
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{FieldData, ScopedIter, WireType};
 use crate::internal::variant::Variant;
+use crate::repeated::RepeatedFieldView;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
-use ::std::ops::Index;
 
 pub trait FieldType {
     // Deserialization methods
@@ -138,15 +138,10 @@ pub trait NonRepeatedFieldType: FieldType {
 pub trait RepeatedFieldType: FieldType {
     type ScalarType;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
-    type IntoIterItemType<'a>
+    type RepeatedFieldViewType<'a>: RepeatedFieldView<'a>
     where
         Self: 'a;
-    type IndexOutputType: ?Sized;
-    type RepeatedRustType<'a>: IntoIterator<Item = Self::IntoIterItemType<'a>>
-        + Index<usize, Output = Self::IndexOutputType>
-    where
-        Self: 'a;
-    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedRustType<'_>;
+    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedFieldViewType<'_>;
     type ContainerType;
     fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);

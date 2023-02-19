@@ -1735,9 +1735,7 @@ pub mod _view {
         }
         pub fn i32_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = i32,
-        > + ::std::ops::Index<usize, Output = i32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.i32_repeated,
@@ -1792,9 +1790,7 @@ pub mod _view {
         }
         pub fn float_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = f32,
-        > + ::std::ops::Index<usize, Output = f32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = f32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.float_repeated,
@@ -1849,9 +1845,7 @@ pub mod _view {
         }
         pub fn bytes_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = &[u8],
-        > + ::std::ops::Index<usize, Output = [u8]> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = [u8]> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.bytes_repeated,
@@ -1906,9 +1900,7 @@ pub mod _view {
         }
         pub fn string_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = &str,
-        > + ::std::ops::Index<usize, Output = str> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.string_repeated,
@@ -1967,9 +1959,10 @@ pub mod _view {
         }
         pub fn enum_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = self::_root::full_coverage3::Enum,
-        > + ::std::ops::Index<usize, Output = self::_root::full_coverage3::Enum> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<
+            '_,
+            Output = self::_root::full_coverage3::Enum,
+        > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.enum_repeated,
@@ -2032,10 +2025,8 @@ pub mod _view {
         }
         pub fn submsg_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = &self::_root::full_coverage3::msg::_view::SubmsgView,
-        > + ::std::ops::Index<
-            usize,
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<
+            '_,
             Output = self::_root::full_coverage3::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
@@ -2092,9 +2083,7 @@ pub mod _view {
         }
         pub fn i64_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = i64,
-        > + ::std::ops::Index<usize, Output = i64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.i64_repeated,
@@ -2149,9 +2138,7 @@ pub mod _view {
         }
         pub fn u32_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = u32,
-        > + ::std::ops::Index<usize, Output = u32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.u32_repeated,
@@ -2206,9 +2193,7 @@ pub mod _view {
         }
         pub fn u64_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = u64,
-        > + ::std::ops::Index<usize, Output = u64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.u64_repeated,
@@ -2263,9 +2248,7 @@ pub mod _view {
         }
         pub fn s32_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = i32,
-        > + ::std::ops::Index<usize, Output = i32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.s32_repeated,
@@ -2320,9 +2303,7 @@ pub mod _view {
         }
         pub fn s64_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = i64,
-        > + ::std::ops::Index<usize, Output = i64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.s64_repeated,
@@ -2377,9 +2358,7 @@ pub mod _view {
         }
         pub fn fixed32_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = u32,
-        > + ::std::ops::Index<usize, Output = u32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.fixed32_repeated,
@@ -2434,9 +2413,7 @@ pub mod _view {
         }
         pub fn fixed64_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = u64,
-        > + ::std::ops::Index<usize, Output = u64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.fixed64_repeated,
@@ -2491,9 +2468,7 @@ pub mod _view {
         }
         pub fn sfixed32_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = i32,
-        > + ::std::ops::Index<usize, Output = i32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.sfixed32_repeated,
@@ -2548,9 +2523,7 @@ pub mod _view {
         }
         pub fn sfixed64_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = i64,
-        > + ::std::ops::Index<usize, Output = i64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.sfixed64_repeated,
@@ -2605,9 +2578,7 @@ pub mod _view {
         }
         pub fn f64_repeated(
             &self,
-        ) -> impl '_ + ::std::iter::IntoIterator<
-            Item = f64,
-        > + ::std::ops::Index<usize, Output = f64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = f64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.f64_repeated,

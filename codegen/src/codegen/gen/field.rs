@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, Field, FieldBase, FieldBaseExt, FieldOrOneofExt, FieldRule, FieldType,
-    LengthDelimitedType, PURORO_INTERNAL,
+    LengthDelimitedType, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
     parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt,
@@ -292,7 +292,7 @@ impl Field {
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
         let field_ident = self.gen_fields_struct_field_ident()?;
-        let index_output_type = match self.r#type()? {
+        let output_type = match self.r#type()? {
             FieldType::LengthDelimited(ld_type) => match ld_type {
                 LengthDelimitedType::String => Rc::new(parse2(quote! { str })?),
                 LengthDelimitedType::Bytes => Rc::new(parse2(quote! { [u8] })?),
@@ -300,17 +300,11 @@ impl Field {
             },
             _ => self.r#type()?.rust_type()?,
         };
-        let into_iter_item_type = match self.r#type()? {
-            FieldType::LengthDelimited(_) => Rc::new(parse2(quote! { & #index_output_type })?),
-            _ => self.r#type()?.rust_type()?,
-        };
         let docs = self.gen_message_struct_field_method_doc_attrs()?;
         Ok(vec![parse2(quote! {
             #(#docs)*
             pub fn #getter_ident(&self) -> impl
-                '_ +
-                ::std::iter::IntoIterator<Item = #into_iter_item_type> +
-                ::std::ops::Index<usize, Output = #index_output_type>
+                '_ + #PURORO_LIB::repeated::RepeatedFieldView<'_, Output = #output_type>
             {
                 use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::get_field2(

@@ -17,9 +17,9 @@ use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, ScopedIter, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
+use crate::repeated::RepeatedFieldView;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
-use ::std::iter;
 use ::std::marker::PhantomData;
 use ::std::ops::Index;
 use ::std::slice;
@@ -293,15 +293,11 @@ where
         self.0.as_slice()
     }
 
-    type IntoIterItemType<'a>= ProtoType::RustType
+    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, ProtoType::RustType>
     where
         Self: 'a;
-    type IndexOutputType = ProtoType::RustType;
-    type RepeatedRustType<'a> = RepeatedField<'a, ProtoType::RustType>
-    where
-        Self: 'a;
-    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedRustType<'_> {
-        RepeatedField(self.0.as_slice())
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+        RepeatedFieldViewImpl(self.0.as_slice())
     }
 
     type ContainerType = Vec<Self::ScalarType>;
@@ -330,17 +326,23 @@ impl CheckNumType for f32 {}
 impl CheckNumType for f64 {}
 impl CheckNumType for bool {}
 
-pub struct RepeatedField<'a, T>(&'a [T]);
-impl<'a, T: Clone> IntoIterator for RepeatedField<'a, T> {
-    type Item = T;
-    type IntoIter = iter::Cloned<slice::Iter<'a, T>>;
+pub struct RepeatedFieldViewImpl<'a, T>(&'a [T]);
+impl<'a, T> IntoIterator for RepeatedFieldViewImpl<'a, T> {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter().cloned()
+        self.0.into_iter()
     }
 }
-impl<'a, T> Index<usize> for RepeatedField<'a, T> {
+impl<'a, T> Index<usize> for RepeatedFieldViewImpl<'a, T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
         &self.0[index]
+    }
+}
+impl<'a, T> RepeatedFieldView<'a> for RepeatedFieldViewImpl<'a, T> {
+    type Output = T;
+    fn len(&self) -> usize {
+        self.0.len()
     }
 }

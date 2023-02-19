@@ -14,7 +14,7 @@
 
 /// About the proto3's default values, check the following official document:
 /// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
-use ::puroro::Message;
+use ::puroro::{Message, RepeatedFieldView};
 use ::puroro_inline::puroro_inline;
 
 const INPUT_FIELD1_I32_ZERO: &[u8] = &[(1 << 3) | 0, 0x00];
@@ -126,19 +126,31 @@ fn test_i32_repeated() {
     let mut msg = <Msg as Default>::default();
 
     *msg.i32_repeated_mut() = vec![10, 20];
-    assert_eq!(&vec![10, 20], msg.i32_repeated());
+    assert_eq!(
+        vec![10, 20],
+        msg.i32_repeated().into_iter().cloned().collect::<Vec<_>>()
+    );
 
     msg.merge_from_bytes_iter(INPUT_FIELD3_I32_ZERO.bytes())
         .unwrap();
-    assert_eq!(&vec![10, 20, 0], msg.i32_repeated());
+    assert_eq!(
+        vec![10, 20, 0],
+        msg.i32_repeated().into_iter().cloned().collect::<Vec<_>>()
+    );
 
     msg.merge_from_bytes_iter(INPUT_FIELD3_I32_ONE.bytes())
         .unwrap();
-    assert_eq!(&vec![10, 20, 0, 1], msg.i32_repeated());
+    assert_eq!(
+        vec![10, 20, 0, 1],
+        msg.i32_repeated().into_iter().cloned().collect::<Vec<_>>()
+    );
 
     msg.merge_from_bytes_iter(INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE.bytes())
         .unwrap();
-    assert_eq!(&vec![10, 20, 0, 1, 0, 1, 2, 3], msg.i32_repeated());
+    assert_eq!(
+        vec![10, 20, 0, 1, 0, 1, 2, 3],
+        msg.i32_repeated().into_iter().cloned().collect::<Vec<_>>()
+    );
 }
 
 #[test]
