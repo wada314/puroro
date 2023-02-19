@@ -381,6 +381,14 @@ pub mod _view {
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
         }
     }
+    impl ::std::borrow::ToOwned for MsgView {
+        type Owned = self::_root::keywords::Msg;
+        fn to_owned(&self) -> Self::Owned {
+            self::_root::keywords::Msg {
+                view: ::std::clone::Clone::clone(self),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct SelfView {
         pub(super) fields: self::_root::keywords::_fields::SelfFields::<
@@ -454,6 +462,14 @@ pub mod _view {
             use self::_pinternal::SharedItems as _;
             true && self.type_opt() == rhs.type_opt()
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    impl ::std::borrow::ToOwned for SelfView {
+        type Owned = self::_root::keywords::_Self;
+        fn to_owned(&self) -> Self::Owned {
+            self::_root::keywords::_Self {
+                view: ::std::clone::Clone::clone(self),
+            }
         }
     }
 }

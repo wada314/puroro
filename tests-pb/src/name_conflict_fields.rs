@@ -391,6 +391,14 @@ pub mod _view {
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
         }
     }
+    impl ::std::borrow::ToOwned for ConflictView {
+        type Owned = self::_root::name_conflict_fields::Conflict;
+        fn to_owned(&self) -> Self::Owned {
+            self::_root::name_conflict_fields::Conflict {
+                view: ::std::clone::Clone::clone(self),
+            }
+        }
+    }
     #[derive(::std::default::Default)]
     pub struct ConflictFieldsView {
         pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
@@ -472,6 +480,14 @@ pub mod _view {
                 && self.this_is_fields_message_field_opt()
                     == rhs.this_is_fields_message_field_opt()
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    impl ::std::borrow::ToOwned for ConflictFieldsView {
+        type Owned = self::_root::name_conflict_fields::ConflictFields;
+        fn to_owned(&self) -> Self::Owned {
+            self::_root::name_conflict_fields::ConflictFields {
+                view: ::std::clone::Clone::clone(self),
+            }
         }
     }
 }

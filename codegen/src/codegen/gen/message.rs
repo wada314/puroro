@@ -27,6 +27,7 @@ use ::std::rc::Rc;
 
 #[derive(Debug, Default)]
 struct Cache {
+    message_struct_path: OnceCell<Rc<Path>>,
     message_struct_type: OnceCell<Rc<Type>>,
     bitfield_size: OnceCell<usize>,
 }
@@ -61,14 +62,25 @@ impl Message {
             .cloned()
     }
 
+    pub(crate) fn gen_message_struct_path(&self) -> Result<Rc<Path>> {
+        self.cache()
+            .get::<Cache>()?
+            .message_struct_path
+            .get_or_try_init(|| {
+                let parent = self.parent()?.gen_rust_module_path()?;
+                let ident = self.gen_message_struct_ident()?;
+                Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
+            })
+            .cloned()
+    }
+
     pub(crate) fn gen_message_struct_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .message_struct_type
             .get_or_try_init(|| {
-                let parent = self.parent()?.gen_rust_module_path()?;
-                let ident = self.gen_message_struct_ident()?;
-                Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
+                let path = self.gen_message_struct_path()?;
+                Ok(Rc::new(parse2(quote! { #path })?))
             })
             .cloned()
     }
@@ -192,6 +204,7 @@ impl Message {
         let drop_impl = self.gen_view_struct_impl_drop()?;
         let debug_impl = self.gen_view_struct_impl_debug()?;
         let partial_eq_impl = self.gen_view_struct_impl_partial_eq()?;
+        let to_owned_impl = self.gen_view_struct_impl_to_owned()?;
 
         Ok(vec![
             parse2(quote! {
@@ -211,6 +224,7 @@ impl Message {
             drop_impl.into(),
             debug_impl.into(),
             partial_eq_impl.into(),
+            to_owned_impl.into(),
         ])
     }
 
@@ -437,6 +451,22 @@ impl Message {
                     true
                         #( && #cmp_exprs)*
                         && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_to_owned(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+        let owned_type = self.gen_message_struct_type()?;
+        let owned_path = self.gen_message_struct_path()?;
+        Ok(parse2(quote! {
+            impl ::std::borrow::ToOwned for #ident {
+                type Owned = #owned_type;
+                fn to_owned(&self) -> Self::Owned {
+                    #owned_path {
+                        view: ::std::clone::Clone::clone(self),
+                    }
                 }
             }
         })?)

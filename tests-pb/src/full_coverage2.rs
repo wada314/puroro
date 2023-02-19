@@ -2956,6 +2956,14 @@ pub mod _view {
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
         }
     }
+    impl ::std::borrow::ToOwned for MsgView {
+        type Owned = self::_root::full_coverage2::Msg;
+        fn to_owned(&self) -> Self::Owned {
+            self::_root::full_coverage2::Msg {
+                view: ::std::clone::Clone::clone(self),
+            }
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;

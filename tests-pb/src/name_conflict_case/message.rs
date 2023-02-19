@@ -246,6 +246,14 @@ pub mod _view {
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
         }
     }
+    impl ::std::borrow::ToOwned for ConflictCaseView {
+        type Owned = self::_root::name_conflict_case::message::ConflictCase;
+        fn to_owned(&self) -> Self::Owned {
+            self::_root::name_conflict_case::message::ConflictCase {
+                view: ::std::clone::Clone::clone(self),
+            }
+        }
+    }
 }
 #[doc(inline)]
 pub use self::_view::*;
