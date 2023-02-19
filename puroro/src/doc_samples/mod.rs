@@ -4,14 +4,14 @@ mod _root {
 }
 mod _puroro {
     #[allow(unused)]
-    pub use ::puroro::*;
+    pub use crate::puroro_for_protobuf::*;
 }
 mod _pinternal {
     #[allow(unused)]
-    pub(crate) use ::puroro::internal::*;
+    pub(crate) use crate::puroro_for_protobuf::internal::*;
 }
 /// Re-exporting puroro
 pub mod puroro {
-    pub use ::puroro::*;
+    pub use crate::puroro_for_protobuf::*;
 }
 pub mod library;

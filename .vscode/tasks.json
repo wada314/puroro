@@ -175,6 +175,27 @@
             },
             "group": "build",
             "label": "rust: cargo run -p update-puroro-protobuf"
+        },
+        {
+            "type": "cargo",
+            "command": "run",
+            "args": [
+                "-p",
+                "update-puroro-doc-samples"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "group": "build",
+            "label": "rust: cargo run -p update-puroro-doc-samples"
         }
     ]
 }
