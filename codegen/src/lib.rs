@@ -19,6 +19,7 @@
 #![feature(result_flattening)]
 #![feature(try_find)]
 #![feature(trait_upcasting)]
+#![feature(allocator_api)]
 
 mod codegen;
 mod error;

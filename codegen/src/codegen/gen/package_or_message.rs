@@ -277,6 +277,33 @@ fn gen_messages_enums_oneofs_in_module(
         .map(|o| Ok(o.gen_oneof_union_items()?.into_iter()))
         .flatten_ok();
 
+    // Message view structs are imported into separte module to avoid name conflict.
+    let view_struct_in_module_items = this
+        .messages()?
+        .map(|m| Ok(m.gen_view_struct_items()?.into_iter()))
+        .flatten_ok()
+        .collect::<Result<Vec<_>>>()?;
+    let view_struct_items = (!view_struct_in_module_items.is_empty())
+        .then(|| -> Result<_> {
+            Ok([
+                Ok(parse2::<Item>(quote! {
+                    #[doc(hidden)]
+                    pub mod _view {
+                        #SUBMODULE_HEADER
+                        #(#view_struct_in_module_items)*
+                    }
+                })?),
+                Ok(parse2::<Item>(quote! {
+                    #[doc(inline)]
+                    pub use self::_view::*;
+                })?),
+            ]
+            .into_iter())
+        })
+        .transpose()?
+        .into_iter()
+        .flatten();
+
     // Message fields structs are imported into separte module to avoid name conflict.
     let fields_struct_in_module_items = this
         .messages()?
@@ -330,6 +357,7 @@ fn gen_messages_enums_oneofs_in_module(
         .flatten();
 
     message_struct_items
+        .chain(view_struct_items)
         .chain(fields_struct_items)
         .chain(enum_items)
         .chain(oneof_union_items)

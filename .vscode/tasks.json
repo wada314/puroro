@@ -160,7 +160,7 @@
             "command": "run",
             "args": [
                 "-p",
-                "update-puroro-protobuf",
+                "update-puroro-protobuf"
             ],
             "problemMatcher": [
                 "$rustc"

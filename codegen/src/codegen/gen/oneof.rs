@@ -179,31 +179,34 @@ impl Oneof {
     }
 
     pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
+        let field_ident = self.gen_fields_struct_field_ident()?;
+
+        Ok(vec![parse2(quote! {
+            pub fn #clear_ident(&mut self) {
+                use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
+                self.view.fields.#field_ident.clear(self.view.shared.bitfield_mut())
+            }
+        })?])
+    }
+
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
-        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
 
         let getter_case_generic_params =
             self.try_map_fields(|f| f.gen_maybe_borrowed_type(None))?;
         let getter_type = self.gen_oneof_case_type(getter_case_generic_params.iter().cloned())?;
 
-        Ok(vec![
-            parse2(quote! {
-                pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
-                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
-                    self.fields.#field_ident.case_ref(self.shared.bitfield())
-                }
-            })?,
-            parse2(quote! {
-                pub fn #clear_ident(&mut self) {
-                    use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
-                    self.fields.#field_ident.clear(self.shared.bitfield_mut())
-                }
-            })?,
-        ])
+        Ok(vec![parse2(quote! {
+            pub fn #getter_ident(&self) -> ::std::option::Option<#getter_type> {
+                use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
+                self.fields.#field_ident.case_ref(self.shared.bitfield())
+            }
+        })?])
     }
 
     pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
@@ -226,8 +229,8 @@ impl Oneof {
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
-                    #field_number => self.fields.#field_ident.deser_from_field_data(
-                        self.shared.bitfield_mut(),
+                    #field_number => self.view.fields.#field_ident.deser_from_field_data(
+                        self.view.shared.bitfield_mut(),
                         #field_data_expr,
                         #case_type::#case_name(()),
                     )?,
@@ -246,17 +249,14 @@ impl Oneof {
         })?)
     }
 
-    pub(crate) fn gen_message_struct_impl_debug_method_call(
-        &self,
-        receiver: &mut Expr,
-    ) -> Result<()> {
+    pub(crate) fn gen_view_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
         for field in self.fields()? {
             field.gen_message_struct_impl_debug_method_call(receiver)?;
         }
         Ok(())
     }
 
-    pub(crate) fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+    pub(crate) fn gen_view_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()

@@ -16,6 +16,7 @@ use crate::tests_pb::full_coverage2::msg::Submsg as Submsg2;
 use crate::tests_pb::full_coverage2::{Enum as Enum2, Msg as Msg2};
 use crate::tests_pb::full_coverage3::msg::Submsg as Submsg3;
 use crate::tests_pb::full_coverage3::{Enum as Enum3, Msg as Msg3};
+use ::puroro::RepeatedFieldView;
 
 #[test]
 fn simple2_get_set_int32() {
@@ -31,7 +32,10 @@ fn simple2_get_set_int32() {
     *msg.i32_optional_mut() = 10;
     msg.i32_repeated_mut().extend([30, 40].iter());
     assert_eq!(10, msg.i32_optional());
-    assert_eq!(&[30, 40], msg.i32_repeated());
+    assert_eq!(
+        vec![30, 40],
+        msg.i32_repeated().into_iter().cloned().collect::<Vec<_>>()
+    );
     assert!(msg.has_i32_optional());
 
     msg.clear_i32_optional();
@@ -60,7 +64,10 @@ fn simple3_get_set_int32() {
     msg.i32_repeated_mut().extend([30, 40].iter());
     assert_eq!(10, msg.i32_optional());
     assert_eq!(20, msg.i32_unlabeled());
-    assert_eq!(&[30, 40], msg.i32_repeated());
+    assert_eq!(
+        vec![30, 40],
+        msg.i32_repeated().into_iter().cloned().collect::<Vec<_>>()
+    );
     assert!(msg.has_i32_optional());
     assert!(msg.has_i32_unlabeled());
 

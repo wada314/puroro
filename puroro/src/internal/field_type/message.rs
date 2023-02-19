@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::r#unsized::RepeatedFieldViewImpl;
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
 use crate::internal::message_internal::MessageInternal;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::ops::Deref;
 
 #[derive(Default, Clone)]
 pub struct SingularHeapMessageField<M>(Option<Box<M>>);
@@ -117,19 +119,24 @@ where
     }
 }
 
-impl<M: MessageInternal + Default + Clone> RepeatedFieldType for RepeatedMessageField<M> {
+impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for RepeatedMessageField<M> {
     type ScalarType = M;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
 
     type ContainerType = Vec<Self::ScalarType>;
-
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
-
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
         self.0.clear()
+    }
+
+    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, M>
+    where
+        Self: 'a;
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+        RepeatedFieldViewImpl(self.0.as_slice())
     }
 }

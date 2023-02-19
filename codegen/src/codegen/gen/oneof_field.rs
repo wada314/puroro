@@ -270,13 +270,38 @@ impl OneofField {
 
     pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let oneof_struct_field_ident = self.oneof()?.gen_fields_struct_field_ident()?;
-        let getter_ident = self.gen_oneof_union_getter_ident()?;
-        let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
-        let has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
 
         let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
+        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
+        let enum_item_ident = self.gen_oneof_case_value_ident()?;
+
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    self.view.fields.#oneof_struct_field_ident.#getter_mut_ident(self.view.shared.bitfield_mut())
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    #[allow(unused)] use ::std::option::Option::Some;
+                    use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItems as _};
+                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.view.shared.bitfield()) {
+                        self.view.fields.#oneof_struct_field_ident.clear(self.view.shared.bitfield_mut())
+                    }
+                }
+            })?,
+        ])
+    }
+
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        let oneof_struct_field_ident = self.oneof()?.gen_fields_struct_field_ident()?;
+        let getter_ident = self.gen_oneof_union_getter_ident()?;
+        let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
+        let has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
+
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
             FieldType::LengthDelimited(LengthDelimitedType::Message(_)) => {
@@ -289,8 +314,6 @@ impl OneofField {
         let getter_opt_type = quote! {
             ::std::option::Option::< #borrowed_type >
         };
-        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
-        let enum_item_ident = self.gen_oneof_case_value_ident()?;
         let docs = self.gen_message_struct_field_method_doc_attrs()?;
 
         Ok(vec![
@@ -308,23 +331,8 @@ impl OneofField {
                 }
             })?,
             parse2(quote! {
-                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                    use #PURORO_INTERNAL::SharedItems as _;
-                    self.fields.#oneof_struct_field_ident.#getter_mut_ident(self.shared.bitfield_mut())
-                }
-            })?,
-            parse2(quote! {
                 pub fn #has_ident(&self) -> bool {
                     self.#getter_opt_ident().is_some()
-                }
-            })?,
-            parse2(quote! {
-                pub fn #clear_ident(&mut self) {
-                    #[allow(unused)] use ::std::option::Option::Some;
-                    use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItems as _};
-                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.shared.bitfield()) {
-                        self.fields.#oneof_struct_field_ident.clear(self.shared.bitfield_mut())
-                    }
                 }
             })?,
         ])

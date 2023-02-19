@@ -33,42 +33,42 @@ pub struct HeapMessageField<M>(Box<M>);
 pub trait OneofFieldType: Default + Clone {
     /// A non-optional getter type, which is mainly used in the case enum's
     /// value type.
-    /// int32 => i32
-    /// String => &'a str
-    /// Message => &'a Message
+    /// `int32` => `i32`
+    /// `String` => `&'a str`
+    /// `Message` => `&'a Message`
     type GetterType<'a>
     where
         Self: 'a;
 
     /// An optional getter type, which is mainly used in the getter methods
     /// of the field in the message struct.
-    /// int32 => Option<i32>
-    /// String => Option<&'a str>
-    /// Message => Option<&'a Message>
+    /// `int32` => `Option<i32>`
+    /// `String` => `Option<&'a str>`
+    /// `Message` => `Option<&'a Message>`
     type GetterOptType<'a>
     where
         Self: 'a;
 
     /// A default field type which can be defined in proto2.
-    /// int32 => i32
-    /// String => &'a str
-    /// Message => unreachable!()
+    /// `int32` => `i32`
+    /// `String` => `&'a str`
+    /// `Message` => `unreachable!()`
     type DefaultValueType: Default;
 
     /// A getter type, which overrides `Self::GetterOptType`'s `None` case
     /// by the `Self::DefaultValueType`. Exceptionally, message type cannot get
     /// this benefit so it's still an optional type.
-    /// int32 => i32
-    /// String => &'a str
-    /// Message => Option<&'a Message>
+    /// `int32` => `i32`
+    /// `String` => `&'a str`
+    /// `Message` => `Option<&'a Message>`
     type GetterOrElseType<'a>
     where
         Self: 'a;
 
     /// A mutable getter type.
-    /// int32 => &'a mut i32
-    /// String => &'a mut String
-    /// Message => &'a mut Message
+    /// `int32` => `&'a mut i32`
+    /// `String` => `&'a mut String`
+    /// `Message` => `&'a mut Message`
     type GetterMutType<'a>
     where
         Self: 'a;
@@ -152,7 +152,7 @@ where
 impl<RustType, ProtoType> OneofFieldType for UnsizedField<RustType, ProtoType>
 where
     RustType: Clone + Default,
-    ProtoType: 'static + tags::UnsizedType<RustType = RustType> + Default + Clone,
+    ProtoType: 'static + tags::UnsizedType<RustOwnedType = RustType> + Default + Clone,
 {
     type GetterType<'a> = ProtoType::RustRefType<'a>
     where

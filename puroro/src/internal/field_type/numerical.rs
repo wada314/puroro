@@ -17,9 +17,12 @@ use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, ScopedIter, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
+use crate::repeated::RepeatedFieldView;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
+use ::std::ops::Index;
+use ::std::slice;
 
 #[derive(Default, Clone)]
 pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -286,17 +289,21 @@ where
     ProtoType: tags::NumericalType,
 {
     type ScalarType = ProtoType::RustType;
-
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
         self.0.as_slice()
     }
 
-    type ContainerType = Vec<Self::ScalarType>;
+    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, ProtoType::RustType>
+    where
+        Self: 'a;
+    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+        RepeatedFieldViewImpl(self.0.as_slice())
+    }
 
+    type ContainerType = Vec<Self::ScalarType>;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
-
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
         self.0.clear()
     }
@@ -318,3 +325,24 @@ impl CheckNumType for u64 {}
 impl CheckNumType for f32 {}
 impl CheckNumType for f64 {}
 impl CheckNumType for bool {}
+
+pub struct RepeatedFieldViewImpl<'a, T>(&'a [T]);
+impl<'a, T> IntoIterator for RepeatedFieldViewImpl<'a, T> {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+impl<'a, T> Index<usize> for RepeatedFieldViewImpl<'a, T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+impl<'a, T> RepeatedFieldView<'a> for RepeatedFieldViewImpl<'a, T> {
+    type Item = T;
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+}

@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![doc = include_str!("lib.md")]
+use ::std::ops::Index;
 
-mod error;
-pub mod internal;
-pub mod message;
-pub mod protobuf;
-pub mod repeated;
+pub trait RepeatedFieldView<'a>:
+    Index<usize, Output = <Self as RepeatedFieldView<'a>>::Item>
+    + IntoIterator<Item = &'a <Self as RepeatedFieldView<'a>>::Item>
+{
+    type Item: 'a + ?Sized;
 
-pub use self::error::PuroroError;
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use crate::message::Message;
-pub use crate::repeated::RepeatedFieldView;
-
-#[cfg(feature = "dev-for-protobuf-use-stable-puroro")]
-mod puroro_for_protobuf {
-    pub use ::stable_puroro::*;
-}
-#[cfg(not(feature = "dev-for-protobuf-use-stable-puroro"))]
-mod puroro_for_protobuf {
-    pub use super::*;
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    fn len(&self) -> usize;
 }

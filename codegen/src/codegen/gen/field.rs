@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, Field, FieldBase, FieldBaseExt, FieldOrOneofExt, FieldRule, FieldType,
-    LengthDelimitedType, PURORO_INTERNAL,
+    LengthDelimitedType, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
     parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt,
@@ -126,6 +126,12 @@ impl Field {
             _ => self.gen_message_struct_field_methods_for_non_repeated(),
         }
     }
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+        match self.rule()? {
+            FieldRule::Repeated => self.gen_view_struct_field_methods_for_repeated(),
+            _ => self.gen_view_struct_field_methods_for_non_repeated(),
+        }
+    }
     pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
@@ -140,8 +146,8 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #number => #PURORO_INTERNAL::FieldType::deser_from_field_data(
-                &mut self.fields.#ident,
-                self.shared.bitfield_mut(),
+                &mut self.view.fields.#ident,
+                self.view.shared.bitfield_mut(),
                 #field_data_expr,
             )?,
         })?)
@@ -151,17 +157,14 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #PURORO_INTERNAL::FieldType::ser_to_write(
-                &self.fields.#ident,
-                self.shared.bitfield(),
+                &self.view.fields.#ident,
+                self.view.shared.bitfield(),
                 #number,
                 #out_expr,
             )?;
         })?)
     }
-    pub(crate) fn gen_message_struct_impl_debug_method_call(
-        &self,
-        receiver: &mut Expr,
-    ) -> Result<()> {
+    pub(crate) fn gen_view_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()> {
         let ident = self.gen_fields_struct_field_ident()?;
         let new_expr: ExprMethodCall = parse2(match self.rule()? {
             FieldRule::Repeated => {
@@ -170,7 +173,10 @@ impl Field {
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
                 quote! {
-                    #receiver.field(stringify!(#ident), &self.#getter_ident())
+                    #receiver.field(
+                        stringify!(#ident),
+                        &self.#getter_ident().into_iter().collect::<::std::vec::Vec<_>>().as_slice()
+                    )
                 }
             }
             _ => {
@@ -183,14 +189,14 @@ impl Field {
         *receiver = new_expr.into();
         Ok(())
     }
-    pub(crate) fn gen_message_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
+    pub(crate) fn gen_view_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
                 let getter_ident = format_ident!(
                     "{}",
                     self.name()?.to_lower_snake_case().escape_rust_keywords()
                 );
-                quote! { self.#getter_ident() == #rhs_expr.#getter_ident() }
+                quote! { self.#getter_ident().into_iter().eq(#rhs_expr.#getter_ident()) }
             }
             _ => {
                 let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
@@ -216,46 +222,16 @@ impl Field {
 
     fn gen_message_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {
         debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
-        let getter_ident = format_ident!(
-            "{}",
-            self.name()?.to_lower_snake_case().escape_rust_keywords()
-        );
         let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
-        let getter_item_type = match self.r#type()? {
-            FieldType::LengthDelimited(LengthDelimitedType::String) => Rc::new(parse2(quote! {
-                impl ::std::ops::Deref::<Target = str> +
-                    ::std::fmt::Debug +
-                    ::std::cmp::PartialEq
-            })?),
-            FieldType::LengthDelimited(LengthDelimitedType::Bytes) => Rc::new(parse2(quote! {
-                impl ::std::ops::Deref::<Target = [u8]> +
-                    ::std::fmt::Debug +
-                    ::std::cmp::PartialEq
-            })?),
-            FieldType::LengthDelimited(LengthDelimitedType::Message(m)) => {
-                m.try_upgrade()?.gen_message_struct_type()?
-            }
-            _ => self.r#type()?.rust_type()?,
-        };
         let mut_item_type = self.r#type()?.rust_type()?;
-        let docs = self.gen_message_struct_field_method_doc_attrs()?;
         Ok(vec![
-            parse2(quote! {
-                #(#docs)*
-                pub fn #getter_ident(&self) -> &[#getter_item_type] {
-                    use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                    RepeatedFieldType::get_field(
-                        &self.fields.#field_ident, self.shared.bitfield(),
-                    )
-                }
-            })?,
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field_mut(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -263,7 +239,7 @@ impl Field {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::clear(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -275,14 +251,80 @@ impl Field {
             self.rule(),
             Ok(FieldRule::Optional | FieldRule::Singular)
         ));
+        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
+        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
+        let field_ident = self.gen_fields_struct_field_ident()?;
+        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
+        let default_fn = self.gen_default_fn()?;
+
+        Ok(vec![
+            parse2(quote! {
+                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::get_field_mut(
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(), #default_fn,
+                    )
+                }
+            })?,
+            parse2(quote! {
+                pub fn #clear_ident(&mut self) {
+                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    NonRepeatedFieldType::clear(
+                        &mut self.view.fields.#field_ident, self.view.shared.bitfield_mut(),
+                    )
+                }
+            })?,
+        ])
+    }
+
+    fn gen_message_struct_field_method_doc_attrs(&self) -> Result<Vec<Attribute>> {
+        let input_file = self.message()?.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(Vec::new());
+        };
+        Ok(sci.gen_doc_attributes()?)
+    }
+
+    fn gen_view_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+        debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
+        let getter_ident = format_ident!(
+            "{}",
+            self.name()?.to_lower_snake_case().escape_rust_keywords()
+        );
+        let field_ident = self.gen_fields_struct_field_ident()?;
+        let output_type = match self.r#type()? {
+            FieldType::LengthDelimited(ld_type) => match ld_type {
+                LengthDelimitedType::String => Rc::new(parse2(quote! { str })?),
+                LengthDelimitedType::Bytes => Rc::new(parse2(quote! { [u8] })?),
+                LengthDelimitedType::Message(m) => m.try_upgrade()?.gen_view_struct_type()?,
+            },
+            _ => self.r#type()?.rust_type()?,
+        };
+        let docs = self.gen_message_struct_field_method_doc_attrs()?;
+        Ok(vec![parse2(quote! {
+            #(#docs)*
+            pub fn #getter_ident(&self) -> impl
+                '_ + #PURORO_LIB::repeated::RepeatedFieldView<'_, Item = #output_type>
+            {
+                use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
+                RepeatedFieldType::get_field2(
+                    &self.fields.#field_ident, self.shared.bitfield(),
+                )
+            }
+        })?])
+    }
+
+    fn gen_view_struct_field_methods_for_non_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+        debug_assert!(matches!(
+            self.rule(),
+            Ok(FieldRule::Optional | FieldRule::Singular)
+        ));
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()
         );
         let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
-        let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
         let getter_has_ident = format_ident!("has_{}", self.name()?.to_lower_snake_case());
-        let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
         let borrowed_type = self.r#type()?.rust_maybe_borrowed_type(None)?;
         let getter_type = match self.r#type()? {
@@ -296,7 +338,6 @@ impl Field {
         let getter_opt_type = Rc::new(quote! {
             ::std::option::Option::< #borrowed_type >
         });
-        let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
         let docs = self.gen_message_struct_field_method_doc_attrs()?;
         let (getter_docs, getter_opt_docs) = if matches!(self.rule()?, FieldRule::Optional) {
@@ -325,14 +366,6 @@ impl Field {
                 }
             })?,
             parse2(quote! {
-                pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
-                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                    NonRepeatedFieldType::get_field_mut(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(), #default_fn,
-                    )
-                }
-            })?,
-            parse2(quote! {
                 pub fn #getter_has_ident(&self) -> bool {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
                     NonRepeatedFieldType::get_field_opt(
@@ -340,22 +373,6 @@ impl Field {
                     ).is_some()
                 }
             })?,
-            parse2(quote! {
-                pub fn #clear_ident(&mut self) {
-                    use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
-                    NonRepeatedFieldType::clear(
-                        &mut self.fields.#field_ident, self.shared.bitfield_mut(),
-                    )
-                }
-            })?,
         ])
-    }
-
-    fn gen_message_struct_field_method_doc_attrs(&self) -> Result<Vec<Attribute>> {
-        let input_file = self.message()?.input_file()?;
-        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
-            return Ok(Vec::new());
-        };
-        Ok(sci.gen_doc_attributes()?)
     }
 }
