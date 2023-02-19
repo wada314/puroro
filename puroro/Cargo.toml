@@ -15,10 +15,8 @@ thiserror = "1.0"
 either = "1.8"
 bitvec = "1.0"
 #stable_puroro = { package = "puroro", version = "0.11.1", optional = true }
-stable_puroro = { git = "https://github.com/wada314/puroro", branch = "master", package = "puroro", optional = true }
-
-[dev-dependencies]
-puroro-doc-samples = { path = "../puroro-doc-samples" }
+#stable_puroro = { git = "https://github.com/wada314/puroro", branch = "master", package = "puroro", optional = true }
+stable_puroro = { git = "https://github.com/wada314/puroro",  package = "puroro", rev = "ee81ed65cf5b73c3645f4e4e9c028633d8327a75", optional = true }
 
 [features]
 default = []

@@ -81,11 +81,11 @@ impl Book {
 The struct also implements [`Clone`], [`Default`], [`PartialEq`] and
 [`Debug`](std::fmt::Debug) standard library traits.
 
-Let's assume the generated code is in `puroro-doc-samples` crate,
+Let's assume the generated code is in `doc_samples` module,
 then you can use the generated protobuf like this:
 
 ```rust
-use ::puroro_doc_samples::library::Book;
+use crate::doc_samples::library::Book;
 
 let mut book = Book::default();
 *book.title_mut() = "The C Programming Language".to_string();
@@ -103,7 +103,7 @@ method to deserialize a message from [`std::io::Read`] bytes stream.
 ```rust
 use puroro::Message; // For from_bytes_iter(), merge_from_bytes_iter() methods
 use std::io::Read; // For bytes() method
-use puroro_doc_samples::library::Book;
+use crate::doc_samples::library::Book;
 
 let input1 = vec![0x10, 0x82, 0x01]; // encoded `num_pages: 130`
 let input2 = vec![0x0a, 0x02, 0x59, 0x6f]; // encoded `title: "Yo"`
@@ -126,7 +126,7 @@ You can serialize the message into [`std::io::Write`] using [`Message::to_bytes(
 
 ```rust
 use puroro::Message; // For to_bytes() method
-use puroro_doc_samples::library::Book;
+use crate::doc_samples::library::Book;
 
 let mut output = vec![];
 let mut book = Book::default();
