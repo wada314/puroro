@@ -26,13 +26,22 @@ message Book {
 A struct like this is output:
 ```rust
 mod library {
+/// A mutable message type
+#[derive(Default)]
 pub struct Book { /* ... */ }
-impl Book {
-    pub fn new() -> Self {
-        // ...
+
+/// An immutable message type view, deref-ed from the `Book` struct.
+pub struct BookView { /* ... */ }
+
+impl Deref for Book {
+    type Target = BookView;
+    fn deref(&self) -> &BookView { 
+        /* ... */ 
 #       todo!()
     }
+}
 
+impl Book {
     pub fn title(&self) -> &str {
         // ...
 #       todo!()
@@ -45,15 +54,6 @@ impl Book {
         // ...
 #       todo!()
     }
-    pub fn title_mut(&mut self) -> &mut String {
-        // ...
-#       todo!()
-    }
-    pub fn clear_title(&mut self) {
-        // ...
-#       todo!()
-    }
-
     pub fn num_pages(&self) -> u32 {
         // ...
 #       todo!()
@@ -63,6 +63,16 @@ impl Book {
 #       todo!()
     }
     pub fn has_num_pages(&self) -> bool {
+        // ...
+#       todo!()
+    }
+}
+impl BookView {
+    pub fn title_mut(&mut self) -> &mut String {
+        // ...
+#       todo!()
+    }
+    pub fn clear_title(&mut self) {
         // ...
 #       todo!()
     }
@@ -78,7 +88,11 @@ impl Book {
 } // mod library
 ```
 
-The struct also implements [`Clone`], [`Default`], [`PartialEq`] and
+The `Book` struct and `BookView` struct's relationship is similar to
+`Vec<T>` and `[T]`. The latter works as an immutable reference type for the former,
+and the latter can be `Deref`-ed from the former.
+
+The `Book` struct also implements [`Clone`], [`Default`], [`PartialEq`] and
 [`Debug`](std::fmt::Debug) standard library traits.
 
 Let's assume the generated code is in `doc_samples` module,
