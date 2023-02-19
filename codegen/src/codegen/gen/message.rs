@@ -122,9 +122,8 @@ impl Message {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             #(#docs)*
-            pub struct #ident/* < #CFG_ALLOC A = ::std::alloc::Global >*/ {
+            pub struct #ident {
                 view: #view_type,
-                //#CFG_ALLOC alloc: A,
             }
         })?;
         let impl_struct = parse2(quote! {
