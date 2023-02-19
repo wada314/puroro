@@ -15,10 +15,10 @@
 use ::std::ops::Index;
 
 pub trait RepeatedFieldView<'a>:
-    Index<usize, Output = <Self as RepeatedFieldView<'a>>::Output>
-    + IntoIterator<Item = &'a <Self as RepeatedFieldView<'a>>::Output>
+    Index<usize, Output = <Self as RepeatedFieldView<'a>>::Item>
+    + IntoIterator<Item = &'a <Self as RepeatedFieldView<'a>>::Item>
 {
-    type Output: 'a + ?Sized;
+    type Item: 'a + ?Sized;
 
     fn is_empty(&self) -> bool {
         self.len() == 0

@@ -304,7 +304,7 @@ impl Field {
         Ok(vec![parse2(quote! {
             #(#docs)*
             pub fn #getter_ident(&self) -> impl
-                '_ + #PURORO_LIB::repeated::RepeatedFieldView<'_, Output = #output_type>
+                '_ + #PURORO_LIB::repeated::RepeatedFieldView<'_, Item = #output_type>
             {
                 use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                 RepeatedFieldType::get_field2(

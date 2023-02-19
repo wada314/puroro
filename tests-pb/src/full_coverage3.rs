@@ -1735,7 +1735,7 @@ pub mod _view {
         }
         pub fn i32_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.i32_repeated,
@@ -1790,7 +1790,7 @@ pub mod _view {
         }
         pub fn float_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = f32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = f32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.float_repeated,
@@ -1845,7 +1845,7 @@ pub mod _view {
         }
         pub fn bytes_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = [u8]> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = [u8]> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.bytes_repeated,
@@ -1900,7 +1900,7 @@ pub mod _view {
         }
         pub fn string_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = str> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.string_repeated,
@@ -1961,7 +1961,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<
             '_,
-            Output = self::_root::full_coverage3::Enum,
+            Item = self::_root::full_coverage3::Enum,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
@@ -2027,7 +2027,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<
             '_,
-            Output = self::_root::full_coverage3::msg::_view::SubmsgView,
+            Item = self::_root::full_coverage3::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
@@ -2083,7 +2083,7 @@ pub mod _view {
         }
         pub fn i64_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.i64_repeated,
@@ -2138,7 +2138,7 @@ pub mod _view {
         }
         pub fn u32_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.u32_repeated,
@@ -2193,7 +2193,7 @@ pub mod _view {
         }
         pub fn u64_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.u64_repeated,
@@ -2248,7 +2248,7 @@ pub mod _view {
         }
         pub fn s32_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.s32_repeated,
@@ -2303,7 +2303,7 @@ pub mod _view {
         }
         pub fn s64_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.s64_repeated,
@@ -2358,7 +2358,7 @@ pub mod _view {
         }
         pub fn fixed32_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = u32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.fixed32_repeated,
@@ -2413,7 +2413,7 @@ pub mod _view {
         }
         pub fn fixed64_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = u64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = u64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.fixed64_repeated,
@@ -2468,7 +2468,7 @@ pub mod _view {
         }
         pub fn sfixed32_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i32> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.sfixed32_repeated,
@@ -2523,7 +2523,7 @@ pub mod _view {
         }
         pub fn sfixed64_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = i64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.sfixed64_repeated,
@@ -2578,7 +2578,7 @@ pub mod _view {
         }
         pub fn f64_repeated(
             &self,
-        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Output = f64> {
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = f64> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field2(
                 &self.fields.f64_repeated,

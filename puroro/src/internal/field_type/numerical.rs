@@ -341,7 +341,7 @@ impl<'a, T> Index<usize> for RepeatedFieldViewImpl<'a, T> {
     }
 }
 impl<'a, T> RepeatedFieldView<'a> for RepeatedFieldViewImpl<'a, T> {
-    type Output = T;
+    type Item = T;
     fn len(&self) -> usize {
         self.0.len()
     }
