@@ -24,7 +24,7 @@ use super::{
     VALUE_FIELD_NUMBER_IN_ENUM_DESCRIPTOR,
 };
 use crate::Result;
-use ::puroro::protobuf::google::protobuf::EnumDescriptorProto;
+use ::puroro::protobuf::google::protobuf::EnumDescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
@@ -40,7 +40,7 @@ pub(crate) struct Enum {
 
 impl Enum {
     pub(crate) fn new(
-        proto: &EnumDescriptorProto,
+        proto: &EnumDescriptorProtoView,
         input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
         index_in_parent: usize,

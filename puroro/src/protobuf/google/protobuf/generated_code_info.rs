@@ -12,149 +12,67 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Annotation {
-    fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields<
-        self::_pinternal::RepeatedNumericalField::<i32, self::_pinternal::tags::Int32>,
-        self::_pinternal::OptionalUnsizedField::<
-            ::std::string::String,
-            self::_pinternal::tags::String,
-            0usize,
-        >,
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            1usize,
-        >,
-        self::_pinternal::OptionalNumericalField::<
-            i32,
-            self::_pinternal::tags::Int32,
-            2usize,
-        >,
-    >,
-    shared: self::_pinternal::SharedItemsImpl<1usize>,
+    view: self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
 }
 impl Annotation {
-    /** Identifies the element in the original source .proto file. This field
- is formatted the same as SourceCodeInfo.Location.path.
-*/
-    pub fn path(&self) -> &[i32] {
-        use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
-    }
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.fields.path,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.path,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn clear_path(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(&mut self.fields.path, self.shared.bitfield_mut())
-    }
-    pub fn source_file(&self) -> &str {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.source_file,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    /** Identifies the filesystem path to the original source .proto.
-*/
-    pub fn source_file_opt(&self) -> ::std::option::Option::<&str> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-            &self.fields.source_file,
-            self.shared.bitfield(),
+        RepeatedFieldType::clear(
+            &mut self.view.fields.path,
+            self.view.shared.bitfield_mut(),
         )
     }
     pub fn source_file_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.source_file,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.source_file,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_source_file(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(
-                &self.fields.source_file,
-                self.shared.bitfield(),
-            )
-            .is_some()
     }
     pub fn clear_source_file(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.fields.source_file,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.source_file,
+            self.view.shared.bitfield_mut(),
         )
-    }
-    pub fn begin(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.begin,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
-        )
-    }
-    /** Identifies the starting offset in bytes in the generated code
- that relates to the identified object.
-*/
-    pub fn begin_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.begin, self.shared.bitfield())
     }
     pub fn begin_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.begin,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.begin,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
-    }
-    pub fn has_begin(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.begin, self.shared.bitfield())
-            .is_some()
     }
     pub fn clear_begin(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.begin, self.shared.bitfield_mut())
-    }
-    pub fn end(&self) -> i32 {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_or_else(
-            &self.fields.end,
-            self.shared.bitfield(),
-            ::std::default::Default::default,
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.begin,
+            self.view.shared.bitfield_mut(),
         )
-    }
-    /** Identifies the ending offset in bytes in the generated code that
- relates to the identified offset. The end offset should be one past
- the last relevant byte (so the length of the text = end - begin).
-*/
-    pub fn end_opt(&self) -> ::std::option::Option::<i32> {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.fields.end,
-            self.shared.bitfield_mut(),
+            &mut self.view.fields.end,
+            self.view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
-    pub fn has_end(&self) -> bool {
-        use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
-            .is_some()
-    }
     pub fn clear_end(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
-        NonRepeatedFieldType::clear(&mut self.fields.end, self.shared.bitfield_mut())
+        NonRepeatedFieldType::clear(
+            &mut self.view.fields.end,
+            self.view.shared.bitfield_mut(),
+        )
     }
 }
 impl self::_puroro::Message for Annotation {
@@ -189,26 +107,26 @@ impl self::_puroro::Message for Annotation {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.path,
-            self.shared.bitfield(),
+            &self.view.fields.path,
+            self.view.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.source_file,
-            self.shared.bitfield(),
+            &self.view.fields.source_file,
+            self.view.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.begin,
-            self.shared.bitfield(),
+            &self.view.fields.begin,
+            self.view.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.fields.end,
-            self.shared.bitfield(),
+            &self.view.fields.end,
+            self.view.shared.bitfield(),
             4i32,
             out,
         )?;
@@ -241,29 +159,29 @@ impl self::_pinternal::MessageInternal for Annotation {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.path,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.path,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.source_file,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.source_file,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.begin,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.begin,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.fields.end,
-                            self.shared.bitfield_mut(),
+                            &mut self.view.fields.end,
+                            self.view.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -279,7 +197,7 @@ impl self::_pinternal::MessageInternal for Annotation {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -289,23 +207,9 @@ impl self::_pinternal::MessageInternal for Annotation {
 }
 impl ::std::clone::Clone for Annotation {
     fn clone(&self) -> Self {
-        #[allow(unused)]
-        use self::_pinternal::SharedItems as _;
         Self {
-            fields: self::_fields::AnnotationFields {
-                path: ::std::clone::Clone::clone(&self.fields.path),
-                source_file: ::std::clone::Clone::clone(&self.fields.source_file),
-                begin: ::std::clone::Clone::clone(&self.fields.begin),
-                end: ::std::clone::Clone::clone(&self.fields.end),
-            },
-            shared: ::std::clone::Clone::clone(&self.shared),
+            view: ::std::clone::Clone::clone(&self.view),
         }
-    }
-}
-impl ::std::ops::Drop for Annotation {
-    fn drop(&mut self) {
-        #[allow(unused)]
-        use self::_pinternal::{OneofUnion as _, SharedItems as _};
     }
 }
 impl ::std::fmt::Debug for Annotation {
@@ -313,28 +217,199 @@ impl ::std::fmt::Debug for Annotation {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        let mut debug_struct = fmt.debug_struct(stringify!(Annotation));
-        debug_struct
-            .field(stringify!(path), &self.path())
-            .field(stringify!(source_file), &self.source_file_opt())
-            .field(stringify!(begin), &self.begin_opt())
-            .field(stringify!(end), &self.end_opt());
-        self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
-        debug_struct.finish()
+        <self::_root::google::protobuf::generated_code_info::_view::AnnotationView as ::std::fmt::Debug>::fmt(
+            &self.view,
+            fmt,
+        )
+    }
+}
+impl ::std::ops::Deref for Annotation {
+    type Target = self::_root::google::protobuf::generated_code_info::_view::AnnotationView;
+    fn deref(&self) -> &Self::Target {
+        &self.view
     }
 }
 impl ::std::cmp::PartialEq for Annotation {
     fn eq(&self, rhs: &Self) -> bool {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::SharedItems as _;
-        true && self.path() == rhs.path()
-            && self.source_file_opt() == rhs.source_file_opt()
-            && self.begin_opt() == rhs.begin_opt() && self.end_opt() == rhs.end_opt()
-            && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        &self.view == &rhs.view
     }
 }
+#[doc(hidden)]
+pub mod _view {
+    mod _root {
+        #[allow(unused)]
+        pub(crate) use super::super::_root::*;
+    }
+    mod _puroro {
+        #[allow(unused)]
+        pub(crate) use super::_root::_puroro::*;
+    }
+    mod _pinternal {
+        #[allow(unused)]
+        pub(crate) use super::_root::_pinternal::*;
+    }
+    #[derive(::std::default::Default)]
+    pub struct AnnotationView {
+        pub(super) fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields::<
+            self::_pinternal::RepeatedNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+            >,
+            self::_pinternal::OptionalUnsizedField::<
+                ::std::string::String,
+                self::_pinternal::tags::String,
+                0usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                1usize,
+            >,
+            self::_pinternal::OptionalNumericalField::<
+                i32,
+                self::_pinternal::tags::Int32,
+                2usize,
+            >,
+        >,
+        pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
+    }
+    impl AnnotationView {
+        /** Identifies the element in the original source .proto file. This field
+ is formatted the same as SourceCodeInfo.Location.path.
+*/
+        pub fn path(
+            &self,
+        ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
+            use self::_pinternal::{RepeatedFieldType, SharedItems as _};
+            RepeatedFieldType::get_field2(&self.fields.path, self.shared.bitfield())
+        }
+        pub fn source_file(&self) -> &str {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.source_file,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Identifies the filesystem path to the original source .proto.
+*/
+        pub fn source_file_opt(&self) -> ::std::option::Option::<&str> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.source_file,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn has_source_file(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.source_file,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn begin(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.begin,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Identifies the starting offset in bytes in the generated code
+ that relates to the identified object.
+*/
+        pub fn begin_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                &self.fields.begin,
+                self.shared.bitfield(),
+            )
+        }
+        pub fn has_begin(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(
+                    &self.fields.begin,
+                    self.shared.bitfield(),
+                )
+                .is_some()
+        }
+        pub fn end(&self) -> i32 {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_or_else(
+                &self.fields.end,
+                self.shared.bitfield(),
+                ::std::default::Default::default,
+            )
+        }
+        /** Identifies the ending offset in bytes in the generated code that
+ relates to the identified offset. The end offset should be one past
+ the last relevant byte (so the length of the text = end - begin).
+*/
+        pub fn end_opt(&self) -> ::std::option::Option::<i32> {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+        }
+        pub fn has_end(&self) -> bool {
+            use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+            NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
+                .is_some()
+        }
+    }
+    impl ::std::clone::Clone for AnnotationView {
+        fn clone(&self) -> Self {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems as _;
+            Self {
+                fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields {
+                    path: ::std::clone::Clone::clone(&self.fields.path),
+                    source_file: ::std::clone::Clone::clone(&self.fields.source_file),
+                    begin: ::std::clone::Clone::clone(&self.fields.begin),
+                    end: ::std::clone::Clone::clone(&self.fields.end),
+                },
+                shared: ::std::clone::Clone::clone(&self.shared),
+            }
+        }
+    }
+    impl ::std::ops::Drop for AnnotationView {
+        fn drop(&mut self) {
+            #[allow(unused)]
+            use self::_pinternal::{OneofUnion as _, SharedItems as _};
+        }
+    }
+    impl ::std::fmt::Debug for AnnotationView {
+        fn fmt(
+            &self,
+            fmt: &mut ::std::fmt::Formatter<'_>,
+        ) -> ::std::result::Result<(), ::std::fmt::Error> {
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            let mut debug_struct = fmt.debug_struct(stringify!(AnnotationView));
+            debug_struct
+                .field(
+                    stringify!(path),
+                    &self.path().into_iter().collect::<::std::vec::Vec<_>>().as_slice(),
+                )
+                .field(stringify!(source_file), &self.source_file_opt())
+                .field(stringify!(begin), &self.begin_opt())
+                .field(stringify!(end), &self.end_opt());
+            self.shared.unknown_fields().debug_struct_fields(&mut debug_struct)?;
+            debug_struct.finish()
+        }
+    }
+    impl ::std::cmp::PartialEq for AnnotationView {
+        fn eq(&self, rhs: &Self) -> bool {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::SharedItems as _;
+            true && self.path().into_iter().eq(rhs.path())
+                && self.source_file_opt() == rhs.source_file_opt()
+                && self.begin_opt() == rhs.begin_opt() && self.end_opt() == rhs.end_opt()
+                && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+}
+#[doc(inline)]
+pub use self::_view::*;
 #[doc(hidden)]
 pub mod _fields {
     mod _root {

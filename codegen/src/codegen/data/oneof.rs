@@ -18,7 +18,7 @@ use super::{
     ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
-use ::puroro::protobuf::google::protobuf::{DescriptorProto, OneofDescriptorProto};
+use ::puroro::protobuf::google::protobuf::{DescriptorProtoView, OneofDescriptorProtoView};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
@@ -33,15 +33,15 @@ pub(crate) struct Oneof {
 
 impl Oneof {
     pub(crate) fn new(
-        message_proto: &DescriptorProto,
-        oneof_proto: &OneofDescriptorProto,
+        message_proto: &DescriptorProtoView,
+        oneof_proto: &OneofDescriptorProtoView,
         oneof_index: usize,
         message: Weak<Message>,
     ) -> Rc<Oneof> {
         Rc::new_cyclic(|weak| {
             let fields = message_proto
                 .field()
-                .iter()
+                .into_iter()
                 .enumerate()
                 .filter(|(_, f)| f.oneof_index() as usize == oneof_index)
                 .map(|(i, f)| OneofField::new(f, Weak::clone(weak), i))

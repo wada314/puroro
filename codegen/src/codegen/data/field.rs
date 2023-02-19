@@ -19,7 +19,7 @@ use super::{
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProto};
+use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProtoView};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
@@ -105,7 +105,7 @@ impl FieldBase for Field {
 
 impl Field {
     pub(crate) fn new(
-        proto: &FieldDescriptorProto,
+        proto: &FieldDescriptorProtoView,
         message: Weak<Message>,
         index_in_parent: usize,
     ) -> Rc<Self> {

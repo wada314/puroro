@@ -19,7 +19,7 @@ use super::{
 use crate::{FatalErrorKind, Result};
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
-use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
+use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
@@ -46,7 +46,9 @@ enum IsRoot {
 }
 
 impl Package {
-    pub(crate) fn new_root<'a>(fds: impl Iterator<Item = &'a FileDescriptorProto>) -> Rc<Package> {
+    pub(crate) fn new_root<'a>(
+        fds: impl Iterator<Item = &'a FileDescriptorProtoView>,
+    ) -> Rc<Package> {
         Rc::new_cyclic(|weak_root| {
             let names_and_fds = fds.map(|fd| {
                 let package_name_iter = fd.package().split('.').filter(|s| !s.is_empty());
@@ -66,7 +68,7 @@ impl Package {
         name: &str,
         weak_root: Weak<Package>,
         parent: Weak<Package>,
-        names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
+        names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProtoView)>,
     ) -> Rc<Self>
     where
         PNI: Iterator<Item = &'a str>,
@@ -88,7 +90,7 @@ impl Package {
     fn new_shared<'a, PNI>(
         weak_self: Weak<Package>,
         weak_root: Weak<Package>,
-        names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProto)>,
+        names_and_fds: impl Iterator<Item = (PNI, &'a FileDescriptorProtoView)>,
         is_root: IsRoot,
     ) -> Package
     where
@@ -246,31 +248,31 @@ mod tests {
     use super::super::{DataTypeBase, Package};
     use crate::Result;
     use ::once_cell::sync::Lazy;
-    use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
+    use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
     use ::std::rc::Rc;
 
-    static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
-        let mut fd = FileDescriptorProto::default();
+    static FD_ROOT: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
+        let mut fd = FileDescriptorProtoView::default();
         *fd.name_mut() = "root_file".to_string();
         fd
     });
 
-    static FD_G_P_DESC: Lazy<FileDescriptorProto> = Lazy::new(|| {
-        let mut fd = FileDescriptorProto::default();
+    static FD_G_P_DESC: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
+        let mut fd = FileDescriptorProtoView::default();
         *fd.name_mut() = "descriptor.proto".to_string();
         *fd.package_mut() = "google.protobuf".to_string();
         fd
     });
 
-    static FD_G_P_EMPTY: Lazy<FileDescriptorProto> = Lazy::new(|| {
-        let mut fd = FileDescriptorProto::default();
+    static FD_G_P_EMPTY: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
+        let mut fd = FileDescriptorProtoView::default();
         *fd.name_mut() = "empty.proto".to_string();
         *fd.package_mut() = "google.protobuf".to_string();
         fd
     });
 
-    static FD_G_P_C_PLUGIN: Lazy<FileDescriptorProto> = Lazy::new(|| {
-        let mut fd = FileDescriptorProto::default();
+    static FD_G_P_C_PLUGIN: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
+        let mut fd = FileDescriptorProtoView::default();
         *fd.name_mut() = "plugin.proto".to_string();
         *fd.package_mut() = "google.protobuf.compiler".to_string();
         fd

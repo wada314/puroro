@@ -19,7 +19,7 @@ use super::{
     MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
-use ::puroro::protobuf::google::protobuf::DescriptorProto;
+use ::puroro::protobuf::google::protobuf::DescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
@@ -39,7 +39,7 @@ pub(crate) struct Message {
 
 impl Message {
     pub(crate) fn new(
-        proto: &DescriptorProto,
+        proto: &DescriptorProtoView,
         input_file: Weak<InputFile>,
         parent: Weak<dyn PackageOrMessage>,
         index_in_parent: usize,
@@ -83,7 +83,7 @@ impl Message {
                 .collect();
             let oneof_num = proto
                 .field()
-                .iter()
+                .into_iter()
                 .filter_map(|f| match (f.oneof_index_opt(), f.proto3_optional()) {
                     (Some(i), false) => Some(i as usize),
                     _ => None,
