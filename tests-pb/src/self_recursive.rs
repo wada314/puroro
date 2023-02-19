@@ -177,7 +177,7 @@ pub mod _view {
     impl MsgView {
         pub fn recursive_unlabeled(
             &self,
-        ) -> ::std::option::Option::<&self::_root::self_recursive::Msg> {
+        ) -> ::std::option::Option::<&self::_root::self_recursive::_view::MsgView> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_or_else(
                 &self.fields.recursive_unlabeled,
@@ -187,7 +187,7 @@ pub mod _view {
         }
         pub fn recursive_unlabeled_opt(
             &self,
-        ) -> ::std::option::Option::<&self::_root::self_recursive::Msg> {
+        ) -> ::std::option::Option::<&self::_root::self_recursive::_view::MsgView> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.recursive_unlabeled,

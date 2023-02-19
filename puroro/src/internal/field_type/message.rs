@@ -85,13 +85,13 @@ where
 
 impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
 where
-    M: MessageInternal + Default,
+    M: MessageInternal + Default + Deref,
 {
-    type GetterOptType<'a> = Option<&'a M>
+    type GetterOptType<'a> = Option<&'a M::Target>
     where
         Self: 'a;
     type DefaultValueType = ();
-    type GetterOrElseType<'a> = Option<&'a M>
+    type GetterOrElseType<'a> = Option<&'a M::Target>
     where
         Self: 'a;
     type GetterMutType<'a> = &'a mut M where Self: 'a;
@@ -104,7 +104,7 @@ where
         self.get_field_opt(bitvec)
     }
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
-        self.0.as_deref()
+        self.0.as_deref().map(Deref::deref)
     }
     fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,

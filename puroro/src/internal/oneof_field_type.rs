@@ -20,6 +20,7 @@ use crate::internal::tags;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
+use ::std::ops::Deref;
 
 #[derive(Default, Clone)]
 pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
@@ -35,7 +36,7 @@ pub trait OneofFieldType: Default + Clone {
     /// value type.
     /// `int32` => `i32`
     /// `String` => `&'a str`
-    /// `Message` => `&'a Message`
+    /// `Message` => `&'a MessageView`
     type GetterType<'a>
     where
         Self: 'a;
@@ -44,7 +45,7 @@ pub trait OneofFieldType: Default + Clone {
     /// of the field in the message struct.
     /// `int32` => `Option<i32>`
     /// `String` => `Option<&'a str>`
-    /// `Message` => `Option<&'a Message>`
+    /// `Message` => `Option<&'a MessageView>`
     type GetterOptType<'a>
     where
         Self: 'a;
@@ -60,7 +61,7 @@ pub trait OneofFieldType: Default + Clone {
     /// this benefit so it's still an optional type.
     /// `int32` => `i32`
     /// `String` => `&'a str`
-    /// `Message` => `Option<&'a Message>`
+    /// `Message` => `Option<&'a MessageView>`
     type GetterOrElseType<'a>
     where
         Self: 'a;
@@ -203,16 +204,16 @@ where
 
 impl<M: MessageInternal + Default> OneofFieldType for HeapMessageField<M>
 where
-    M: Default + Clone,
+    M: Default + Clone + Deref,
 {
-    type GetterType<'a> = &'a M
+    type GetterType<'a> = &'a M::Target
     where
         Self: 'a;
-    type GetterOptType<'a> = Option<&'a M>
+    type GetterOptType<'a> = Option<&'a M::Target>
     where
         Self: 'a;
     type DefaultValueType = ();
-    type GetterOrElseType<'a> = Option<&'a M>
+    type GetterOrElseType<'a> = Option<&'a M::Target>
     where
         Self: 'a;
     type GetterMutType<'a> = &'a mut M

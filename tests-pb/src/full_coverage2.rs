@@ -1986,7 +1986,9 @@ pub mod _view {
         }
         pub fn submsg_required(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_or_else(
                 &self.fields.submsg_required,
@@ -1996,7 +1998,9 @@ pub mod _view {
         }
         pub fn submsg_required_opt(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.submsg_required,
@@ -2013,7 +2017,9 @@ pub mod _view {
         }
         pub fn submsg_optional(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_or_else(
                 &self.fields.submsg_optional,
@@ -2023,7 +2029,9 @@ pub mod _view {
         }
         pub fn submsg_optional_opt(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.submsg_optional,
