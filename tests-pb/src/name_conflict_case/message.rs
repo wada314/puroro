@@ -122,11 +122,20 @@ impl self::_pinternal::MessageInternal for ConflictCase {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<
+    self::_root::name_conflict_case::message::_view::ConflictCaseView,
+> for ConflictCase {
+    fn borrow(
+        &self,
+    ) -> &self::_root::name_conflict_case::message::_view::ConflictCaseView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for ConflictCase {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for ConflictCase {
@@ -201,20 +210,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for ConflictCaseView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields {
-                    this_is_message_field: ::std::clone::Clone::clone(
-                        &self.fields.this_is_message_field,
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for ConflictCaseView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -249,8 +244,17 @@ pub mod _view {
     impl ::std::borrow::ToOwned for ConflictCaseView {
         type Owned = self::_root::name_conflict_case::message::ConflictCase;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::name_conflict_case::message::ConflictCase {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields {
+                        this_is_message_field: ::std::clone::Clone::clone(
+                            &self.fields.this_is_message_field,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }

@@ -122,11 +122,17 @@ impl self::_pinternal::MessageInternal for Conflict {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::name_conflict_fields::_view::ConflictView>
+for Conflict {
+    fn borrow(&self) -> &self::_root::name_conflict_fields::_view::ConflictView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for Conflict {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for Conflict {
@@ -263,11 +269,17 @@ impl self::_pinternal::MessageInternal for ConflictFields {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::name_conflict_fields::_view::ConflictFieldsView>
+for ConflictFields {
+    fn borrow(&self) -> &self::_root::name_conflict_fields::_view::ConflictFieldsView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for ConflictFields {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for ConflictFields {
@@ -344,20 +356,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for ConflictView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::name_conflict_fields::_fields::ConflictFields {
-                    this_is_original_message_field: ::std::clone::Clone::clone(
-                        &self.fields.this_is_original_message_field,
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for ConflictView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -394,8 +392,17 @@ pub mod _view {
     impl ::std::borrow::ToOwned for ConflictView {
         type Owned = self::_root::name_conflict_fields::Conflict;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::name_conflict_fields::Conflict {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::name_conflict_fields::_fields::ConflictFields {
+                        this_is_original_message_field: ::std::clone::Clone::clone(
+                            &self.fields.this_is_original_message_field,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }
@@ -435,20 +442,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for ConflictFieldsView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields {
-                    this_is_fields_message_field: ::std::clone::Clone::clone(
-                        &self.fields.this_is_fields_message_field,
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for ConflictFieldsView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -485,8 +478,17 @@ pub mod _view {
     impl ::std::borrow::ToOwned for ConflictFieldsView {
         type Owned = self::_root::name_conflict_fields::ConflictFields;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::name_conflict_fields::ConflictFields {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields {
+                        this_is_fields_message_field: ::std::clone::Clone::clone(
+                            &self.fields.this_is_fields_message_field,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }

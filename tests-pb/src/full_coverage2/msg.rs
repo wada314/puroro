@@ -150,11 +150,17 @@ impl self::_pinternal::MessageInternal for Submsg {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::full_coverage2::msg::_view::SubmsgView>
+for Submsg {
+    fn borrow(&self) -> &self::_root::full_coverage2::msg::_view::SubmsgView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for Submsg {
@@ -257,19 +263,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for SubmsgView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::full_coverage2::msg::_fields::SubmsgFields {
-                    i32_required: ::std::clone::Clone::clone(&self.fields.i32_required),
-                    i64_required: ::std::clone::Clone::clone(&self.fields.i64_required),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for SubmsgView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -303,8 +296,20 @@ pub mod _view {
     impl ::std::borrow::ToOwned for SubmsgView {
         type Owned = self::_root::full_coverage2::msg::Submsg;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::full_coverage2::msg::Submsg {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::full_coverage2::msg::_fields::SubmsgFields {
+                        i32_required: ::std::clone::Clone::clone(
+                            &self.fields.i32_required,
+                        ),
+                        i64_required: ::std::clone::Clone::clone(
+                            &self.fields.i64_required,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }

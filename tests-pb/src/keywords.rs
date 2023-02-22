@@ -122,11 +122,16 @@ impl self::_pinternal::MessageInternal for Msg {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::keywords::_view::MsgView> for Msg {
+    fn borrow(&self) -> &self::_root::keywords::_view::MsgView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -263,11 +268,16 @@ impl self::_pinternal::MessageInternal for _Self {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::keywords::_view::SelfView> for _Self {
+    fn borrow(&self) -> &self::_root::keywords::_view::SelfView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for _Self {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for _Self {
@@ -342,18 +352,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for MsgView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::keywords::_fields::MsgFields {
-                    r#type: ::std::clone::Clone::clone(&self.fields.r#type),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for MsgView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -384,8 +382,15 @@ pub mod _view {
     impl ::std::borrow::ToOwned for MsgView {
         type Owned = self::_root::keywords::Msg;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::keywords::Msg {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::keywords::_fields::MsgFields {
+                        r#type: ::std::clone::Clone::clone(&self.fields.r#type),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }
@@ -425,18 +430,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for SelfView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::keywords::_fields::SelfFields {
-                    r#type: ::std::clone::Clone::clone(&self.fields.r#type),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for SelfView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -467,8 +460,15 @@ pub mod _view {
     impl ::std::borrow::ToOwned for SelfView {
         type Owned = self::_root::keywords::_Self;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::keywords::_Self {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::keywords::_fields::SelfFields {
+                        r#type: ::std::clone::Clone::clone(&self.fields.r#type),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }

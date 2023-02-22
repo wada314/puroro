@@ -130,11 +130,17 @@ impl self::_pinternal::MessageInternal for Message {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::name_conflict_case::_view::MessageView>
+for Message {
+    fn borrow(&self) -> &self::_root::name_conflict_case::_view::MessageView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for Message {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for Message {
@@ -203,21 +209,6 @@ pub mod _view {
             self.this_is_oneof_field_opt().is_some()
         }
     }
-    impl ::std::clone::Clone for MessageView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::name_conflict_case::_fields::MessageFields {
-                    conflict: self::_pinternal::OneofUnion::clone(
-                        &self.fields.conflict,
-                        self.shared.bitfield(),
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for MessageView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -250,8 +241,18 @@ pub mod _view {
     impl ::std::borrow::ToOwned for MessageView {
         type Owned = self::_root::name_conflict_case::Message;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::name_conflict_case::Message {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::name_conflict_case::_fields::MessageFields {
+                        conflict: self::_pinternal::OneofUnion::clone(
+                            &self.fields.conflict,
+                            self.shared.bitfield(),
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }

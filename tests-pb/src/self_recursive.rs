@@ -122,11 +122,16 @@ impl self::_pinternal::MessageInternal for Msg {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::self_recursive::_view::MsgView> for Msg {
+    fn borrow(&self) -> &self::_root::self_recursive::_view::MsgView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -203,20 +208,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for MsgView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::self_recursive::_fields::MsgFields {
-                    recursive_unlabeled: ::std::clone::Clone::clone(
-                        &self.fields.recursive_unlabeled,
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for MsgView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -248,8 +239,17 @@ pub mod _view {
     impl ::std::borrow::ToOwned for MsgView {
         type Owned = self::_root::self_recursive::Msg;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::self_recursive::Msg {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::self_recursive::_fields::MsgFields {
+                        recursive_unlabeled: ::std::clone::Clone::clone(
+                            &self.fields.recursive_unlabeled,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }

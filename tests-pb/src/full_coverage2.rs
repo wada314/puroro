@@ -1433,11 +1433,16 @@ impl self::_pinternal::MessageInternal for Msg {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::full_coverage2::_view::MsgView> for Msg {
+    fn borrow(&self) -> &self::_root::full_coverage2::_view::MsgView {
+        &self.view
+    }
+}
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.view)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -2609,119 +2614,6 @@ pub mod _view {
             )
         }
     }
-    impl ::std::clone::Clone for MsgView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::full_coverage2::_fields::MsgFields {
-                    i32_required: ::std::clone::Clone::clone(&self.fields.i32_required),
-                    i32_optional: ::std::clone::Clone::clone(&self.fields.i32_optional),
-                    i32_repeated: ::std::clone::Clone::clone(&self.fields.i32_repeated),
-                    float_required: ::std::clone::Clone::clone(
-                        &self.fields.float_required,
-                    ),
-                    float_optional: ::std::clone::Clone::clone(
-                        &self.fields.float_optional,
-                    ),
-                    float_repeated: ::std::clone::Clone::clone(
-                        &self.fields.float_repeated,
-                    ),
-                    bytes_required: ::std::clone::Clone::clone(
-                        &self.fields.bytes_required,
-                    ),
-                    bytes_optional: ::std::clone::Clone::clone(
-                        &self.fields.bytes_optional,
-                    ),
-                    bytes_repeated: ::std::clone::Clone::clone(
-                        &self.fields.bytes_repeated,
-                    ),
-                    string_required: ::std::clone::Clone::clone(
-                        &self.fields.string_required,
-                    ),
-                    string_optional: ::std::clone::Clone::clone(
-                        &self.fields.string_optional,
-                    ),
-                    string_repeated: ::std::clone::Clone::clone(
-                        &self.fields.string_repeated,
-                    ),
-                    enum_required: ::std::clone::Clone::clone(
-                        &self.fields.enum_required,
-                    ),
-                    enum_optional: ::std::clone::Clone::clone(
-                        &self.fields.enum_optional,
-                    ),
-                    enum_repeated: ::std::clone::Clone::clone(
-                        &self.fields.enum_repeated,
-                    ),
-                    submsg_required: ::std::clone::Clone::clone(
-                        &self.fields.submsg_required,
-                    ),
-                    submsg_optional: ::std::clone::Clone::clone(
-                        &self.fields.submsg_optional,
-                    ),
-                    submsg_repeated: ::std::clone::Clone::clone(
-                        &self.fields.submsg_repeated,
-                    ),
-                    i64_required: ::std::clone::Clone::clone(&self.fields.i64_required),
-                    i64_optional: ::std::clone::Clone::clone(&self.fields.i64_optional),
-                    i64_repeated: ::std::clone::Clone::clone(&self.fields.i64_repeated),
-                    u32_required: ::std::clone::Clone::clone(&self.fields.u32_required),
-                    u32_optional: ::std::clone::Clone::clone(&self.fields.u32_optional),
-                    u32_repeated: ::std::clone::Clone::clone(&self.fields.u32_repeated),
-                    u64_required: ::std::clone::Clone::clone(&self.fields.u64_required),
-                    u64_optional: ::std::clone::Clone::clone(&self.fields.u64_optional),
-                    u64_repeated: ::std::clone::Clone::clone(&self.fields.u64_repeated),
-                    s32_required: ::std::clone::Clone::clone(&self.fields.s32_required),
-                    s32_optional: ::std::clone::Clone::clone(&self.fields.s32_optional),
-                    s32_repeated: ::std::clone::Clone::clone(&self.fields.s32_repeated),
-                    s64_required: ::std::clone::Clone::clone(&self.fields.s64_required),
-                    s64_optional: ::std::clone::Clone::clone(&self.fields.s64_optional),
-                    s64_repeated: ::std::clone::Clone::clone(&self.fields.s64_repeated),
-                    fixed32_required: ::std::clone::Clone::clone(
-                        &self.fields.fixed32_required,
-                    ),
-                    fixed32_optional: ::std::clone::Clone::clone(
-                        &self.fields.fixed32_optional,
-                    ),
-                    fixed32_repeated: ::std::clone::Clone::clone(
-                        &self.fields.fixed32_repeated,
-                    ),
-                    fixed64_required: ::std::clone::Clone::clone(
-                        &self.fields.fixed64_required,
-                    ),
-                    fixed64_optional: ::std::clone::Clone::clone(
-                        &self.fields.fixed64_optional,
-                    ),
-                    fixed64_repeated: ::std::clone::Clone::clone(
-                        &self.fields.fixed64_repeated,
-                    ),
-                    sfixed32_required: ::std::clone::Clone::clone(
-                        &self.fields.sfixed32_required,
-                    ),
-                    sfixed32_optional: ::std::clone::Clone::clone(
-                        &self.fields.sfixed32_optional,
-                    ),
-                    sfixed32_repeated: ::std::clone::Clone::clone(
-                        &self.fields.sfixed32_repeated,
-                    ),
-                    sfixed64_required: ::std::clone::Clone::clone(
-                        &self.fields.sfixed64_required,
-                    ),
-                    sfixed64_optional: ::std::clone::Clone::clone(
-                        &self.fields.sfixed64_optional,
-                    ),
-                    sfixed64_repeated: ::std::clone::Clone::clone(
-                        &self.fields.sfixed64_repeated,
-                    ),
-                    f64_required: ::std::clone::Clone::clone(&self.fields.f64_required),
-                    f64_optional: ::std::clone::Clone::clone(&self.fields.f64_optional),
-                    f64_repeated: ::std::clone::Clone::clone(&self.fields.f64_repeated),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for MsgView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -2959,8 +2851,158 @@ pub mod _view {
     impl ::std::borrow::ToOwned for MsgView {
         type Owned = self::_root::full_coverage2::Msg;
         fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
             self::_root::full_coverage2::Msg {
-                view: ::std::clone::Clone::clone(self),
+                view: Self {
+                    fields: self::_root::full_coverage2::_fields::MsgFields {
+                        i32_required: ::std::clone::Clone::clone(
+                            &self.fields.i32_required,
+                        ),
+                        i32_optional: ::std::clone::Clone::clone(
+                            &self.fields.i32_optional,
+                        ),
+                        i32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.i32_repeated,
+                        ),
+                        float_required: ::std::clone::Clone::clone(
+                            &self.fields.float_required,
+                        ),
+                        float_optional: ::std::clone::Clone::clone(
+                            &self.fields.float_optional,
+                        ),
+                        float_repeated: ::std::clone::Clone::clone(
+                            &self.fields.float_repeated,
+                        ),
+                        bytes_required: ::std::clone::Clone::clone(
+                            &self.fields.bytes_required,
+                        ),
+                        bytes_optional: ::std::clone::Clone::clone(
+                            &self.fields.bytes_optional,
+                        ),
+                        bytes_repeated: ::std::clone::Clone::clone(
+                            &self.fields.bytes_repeated,
+                        ),
+                        string_required: ::std::clone::Clone::clone(
+                            &self.fields.string_required,
+                        ),
+                        string_optional: ::std::clone::Clone::clone(
+                            &self.fields.string_optional,
+                        ),
+                        string_repeated: ::std::clone::Clone::clone(
+                            &self.fields.string_repeated,
+                        ),
+                        enum_required: ::std::clone::Clone::clone(
+                            &self.fields.enum_required,
+                        ),
+                        enum_optional: ::std::clone::Clone::clone(
+                            &self.fields.enum_optional,
+                        ),
+                        enum_repeated: ::std::clone::Clone::clone(
+                            &self.fields.enum_repeated,
+                        ),
+                        submsg_required: ::std::clone::Clone::clone(
+                            &self.fields.submsg_required,
+                        ),
+                        submsg_optional: ::std::clone::Clone::clone(
+                            &self.fields.submsg_optional,
+                        ),
+                        submsg_repeated: ::std::clone::Clone::clone(
+                            &self.fields.submsg_repeated,
+                        ),
+                        i64_required: ::std::clone::Clone::clone(
+                            &self.fields.i64_required,
+                        ),
+                        i64_optional: ::std::clone::Clone::clone(
+                            &self.fields.i64_optional,
+                        ),
+                        i64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.i64_repeated,
+                        ),
+                        u32_required: ::std::clone::Clone::clone(
+                            &self.fields.u32_required,
+                        ),
+                        u32_optional: ::std::clone::Clone::clone(
+                            &self.fields.u32_optional,
+                        ),
+                        u32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.u32_repeated,
+                        ),
+                        u64_required: ::std::clone::Clone::clone(
+                            &self.fields.u64_required,
+                        ),
+                        u64_optional: ::std::clone::Clone::clone(
+                            &self.fields.u64_optional,
+                        ),
+                        u64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.u64_repeated,
+                        ),
+                        s32_required: ::std::clone::Clone::clone(
+                            &self.fields.s32_required,
+                        ),
+                        s32_optional: ::std::clone::Clone::clone(
+                            &self.fields.s32_optional,
+                        ),
+                        s32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.s32_repeated,
+                        ),
+                        s64_required: ::std::clone::Clone::clone(
+                            &self.fields.s64_required,
+                        ),
+                        s64_optional: ::std::clone::Clone::clone(
+                            &self.fields.s64_optional,
+                        ),
+                        s64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.s64_repeated,
+                        ),
+                        fixed32_required: ::std::clone::Clone::clone(
+                            &self.fields.fixed32_required,
+                        ),
+                        fixed32_optional: ::std::clone::Clone::clone(
+                            &self.fields.fixed32_optional,
+                        ),
+                        fixed32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.fixed32_repeated,
+                        ),
+                        fixed64_required: ::std::clone::Clone::clone(
+                            &self.fields.fixed64_required,
+                        ),
+                        fixed64_optional: ::std::clone::Clone::clone(
+                            &self.fields.fixed64_optional,
+                        ),
+                        fixed64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.fixed64_repeated,
+                        ),
+                        sfixed32_required: ::std::clone::Clone::clone(
+                            &self.fields.sfixed32_required,
+                        ),
+                        sfixed32_optional: ::std::clone::Clone::clone(
+                            &self.fields.sfixed32_optional,
+                        ),
+                        sfixed32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.sfixed32_repeated,
+                        ),
+                        sfixed64_required: ::std::clone::Clone::clone(
+                            &self.fields.sfixed64_required,
+                        ),
+                        sfixed64_optional: ::std::clone::Clone::clone(
+                            &self.fields.sfixed64_optional,
+                        ),
+                        sfixed64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.sfixed64_repeated,
+                        ),
+                        f64_required: ::std::clone::Clone::clone(
+                            &self.fields.f64_required,
+                        ),
+                        f64_optional: ::std::clone::Clone::clone(
+                            &self.fields.f64_optional,
+                        ),
+                        f64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.f64_repeated,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
             }
         }
     }
