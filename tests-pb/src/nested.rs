@@ -13,22 +13,22 @@ mod _pinternal {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    view: self::_root::nested::_view::MsgView,
+    body: self::_root::nested::_view::MsgView,
 }
 impl Msg {
     pub fn item_outer_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.item_outer,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.item_outer,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_item_outer(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.item_outer,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.item_outer,
+            self.body.shared.bitfield_mut(),
         )
     }
 }
@@ -64,8 +64,8 @@ impl self::_puroro::Message for Msg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.item_outer,
-            self.view.shared.bitfield(),
+            &self.body.fields.item_outer,
+            self.body.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -98,8 +98,8 @@ impl self::_pinternal::MessageInternal for Msg {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.item_outer,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.item_outer,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -115,7 +115,7 @@ impl self::_pinternal::MessageInternal for Msg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -125,14 +125,14 @@ impl self::_pinternal::MessageInternal for Msg {
 }
 impl ::std::borrow::Borrow<self::_root::nested::_view::MsgView> for Msg {
     fn borrow(&self) -> &self::_root::nested::_view::MsgView {
-        &self.view
+        &self.body
     }
 }
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.view)
+        ToOwned::to_owned(&self.body)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -140,18 +140,18 @@ impl ::std::fmt::Debug for Msg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        <self::_root::nested::_view::MsgView as ::std::fmt::Debug>::fmt(&self.view, fmt)
+        <self::_root::nested::_view::MsgView as ::std::fmt::Debug>::fmt(&self.body, fmt)
     }
 }
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::nested::_view::MsgView;
     fn deref(&self) -> &Self::Target {
-        &self.view
+        &self.body
     }
 }
 impl ::std::cmp::PartialEq for Msg {
     fn eq(&self, rhs: &Self) -> bool {
-        &self.view == &rhs.view
+        &self.body == &rhs.body
     }
 }
 #[doc(hidden)]
@@ -236,7 +236,7 @@ pub mod _view {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
             self::_root::nested::Msg {
-                view: Self {
+                body: Self {
                     fields: self::_root::nested::_fields::MsgFields {
                         item_outer: ::std::clone::Clone::clone(&self.fields.item_outer),
                     },

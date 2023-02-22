@@ -136,7 +136,7 @@ impl Message {
             #[derive(::std::default::Default)]
             #(#docs)*
             pub struct #ident {
-                view: #view_type,
+                body: #view_type,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -335,7 +335,7 @@ impl Message {
                             Ok(_) => (),
                             Err(PuroroError::UnknownFieldNumber(field_data)) => {
                                 // Recoverable error. Store the field into unknown_fields.
-                                self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                                self.body.shared.unknown_fields_mut().push(number, field_data)?;
                             }
                             Err(e) => Err(e)?,
                         }
@@ -352,7 +352,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::borrow::Borrow<#view_type> for #ident {
                 fn borrow(&self) -> &#view_type {
-                    &self.view
+                    &self.body
                 }
             }
         })?)
@@ -365,7 +365,7 @@ impl Message {
                 fn clone(&self) -> Self {
                     #[allow(unused)]
                     use ::std::borrow::ToOwned;
-                    ToOwned::to_owned(&self.view)
+                    ToOwned::to_owned(&self.body)
                 }
             }
         })?)
@@ -378,7 +378,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::fmt::Debug for #ident {
                 fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                    <#view_type as ::std::fmt::Debug>::fmt(&self.view, fmt)
+                    <#view_type as ::std::fmt::Debug>::fmt(&self.body, fmt)
                 }
             }
         })?)
@@ -392,7 +392,7 @@ impl Message {
             impl ::std::ops::Deref for #ident {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
-                    &self.view
+                    &self.body
                 }
             }
         })?)
@@ -403,7 +403,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::cmp::PartialEq for #ident {
                 fn eq(&self, rhs: &Self) -> bool {
-                    &self.view == &rhs.view
+                    &self.body == &rhs.body
                 }
             }
         })?)
@@ -484,7 +484,7 @@ impl Message {
                     #[allow(unused)]
                     use #PURORO_INTERNAL::SharedItems;
                     #owned_path {
-                        view: Self {
+                        body: Self {
                             fields: #fields_struct_type {
                                 #(#field_values,)*
                             },

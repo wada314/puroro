@@ -12,22 +12,22 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Submsg {
-    view: self::_root::nested::msg::_view::SubmsgView,
+    body: self::_root::nested::msg::_view::SubmsgView,
 }
 impl Submsg {
     pub fn item_inner_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.item_inner,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.item_inner,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_item_inner(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.item_inner,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.item_inner,
+            self.body.shared.bitfield_mut(),
         )
     }
 }
@@ -63,8 +63,8 @@ impl self::_puroro::Message for Submsg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.item_inner,
-            self.view.shared.bitfield(),
+            &self.body.fields.item_inner,
+            self.body.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -97,8 +97,8 @@ impl self::_pinternal::MessageInternal for Submsg {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.item_inner,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.item_inner,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -114,7 +114,7 @@ impl self::_pinternal::MessageInternal for Submsg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -124,14 +124,14 @@ impl self::_pinternal::MessageInternal for Submsg {
 }
 impl ::std::borrow::Borrow<self::_root::nested::msg::_view::SubmsgView> for Submsg {
     fn borrow(&self) -> &self::_root::nested::msg::_view::SubmsgView {
-        &self.view
+        &self.body
     }
 }
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.view)
+        ToOwned::to_owned(&self.body)
     }
 }
 impl ::std::fmt::Debug for Submsg {
@@ -140,7 +140,7 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::nested::msg::_view::SubmsgView as ::std::fmt::Debug>::fmt(
-            &self.view,
+            &self.body,
             fmt,
         )
     }
@@ -148,12 +148,12 @@ impl ::std::fmt::Debug for Submsg {
 impl ::std::ops::Deref for Submsg {
     type Target = self::_root::nested::msg::_view::SubmsgView;
     fn deref(&self) -> &Self::Target {
-        &self.view
+        &self.body
     }
 }
 impl ::std::cmp::PartialEq for Submsg {
     fn eq(&self, rhs: &Self) -> bool {
-        &self.view == &rhs.view
+        &self.body == &rhs.body
     }
 }
 #[doc(hidden)]
@@ -238,7 +238,7 @@ pub mod _view {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
             self::_root::nested::msg::Submsg {
-                view: Self {
+                body: Self {
                     fields: self::_root::nested::msg::_fields::SubmsgFields {
                         item_inner: ::std::clone::Clone::clone(&self.fields.item_inner),
                     },
