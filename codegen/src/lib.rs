@@ -56,15 +56,15 @@ mod syn {
 pub use crate::error::{FatalErrorKind, GeneratorError};
 pub type Result<T> = ::std::result::Result<T, GeneratorError>;
 
-pub use ::puroro::protobuf::google::protobuf::compiler::code_generator_response::File;
+pub use ::stable_puroro::protobuf::google::protobuf::compiler::code_generator_response::File;
 // SOMEHOW these `pub use`s are causing cargo doc to stack overflow!
 #[doc(hidden)]
-pub use ::puroro::protobuf::google::protobuf::compiler::{
+pub use ::stable_puroro::protobuf::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
 #[doc(hidden)]
-pub use ::puroro::protobuf::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
-pub use ::puroro::protobuf::puroro;
+pub use ::stable_puroro::protobuf::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
+pub use ::stable_puroro::protobuf::puroro;
 
 pub use crate::codegen::generate_output_file_protos;
 pub use crate::codegen::generate_tokens_for_inline;
