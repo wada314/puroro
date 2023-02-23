@@ -27,7 +27,3 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 // Re-exports
 pub use crate::message::Message;
 pub use crate::repeated::RepeatedFieldView;
-
-mod puroro_for_protobuf {
-    pub use super::*;
-}
