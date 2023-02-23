@@ -24,7 +24,6 @@ protoc-bin-vendored = "3.0.0"
 
 [features]
 default = []
-dev-for-protobuf-use-stable-puroro = ["puroro/dev-for-protobuf-use-stable-puroro"]
 
 [lib]
 

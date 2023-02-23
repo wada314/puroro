@@ -22,9 +22,9 @@ use std::process::Command;
 
 fn main() {
     println!("cargo:rerun-if-changed=../puroro");
-    println!("cargo:rerun-if-changed=../puroro-codegen");
+    println!("cargo:rerun-if-changed=../codegen");
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=protos/*.proto");
+    println!("cargo:rerun-if-changed=protos");
 
     let output_rust_path = ["src"].iter().collect::<PathBuf>();
     let file_descriptor_set_file_path = [
