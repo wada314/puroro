@@ -13,169 +13,169 @@ mod _pinternal {
 pub mod msg;
 #[derive(::std::default::Default)]
 pub struct Msg {
-    view: self::_root::full_coverage2::_view::MsgView,
+    body: self::_root::full_coverage2::_view::MsgView,
 }
 impl Msg {
     pub fn i32_required_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.i32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i32_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i32_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.i32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i32_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.i32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i32_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i32_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.i32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i32_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.i32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_i32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.i32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn float_required_mut(&mut self) -> &mut f32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.float_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.float_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_float_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.float_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.float_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn float_optional_mut(&mut self) -> &mut f32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.float_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.float_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_float_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.float_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.float_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.float_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.float_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_float_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.float_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.float_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn bytes_required_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.bytes_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.bytes_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_bytes_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.bytes_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.bytes_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn bytes_optional_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.bytes_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.bytes_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_bytes_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.bytes_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.bytes_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<::std::vec::Vec<u8>> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.bytes_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.bytes_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_bytes_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.bytes_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.bytes_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn string_required_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.string_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.string_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_string_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.string_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.string_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn string_optional_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.string_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.string_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_string_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.string_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.string_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn string_repeated_mut(
@@ -183,45 +183,45 @@ impl Msg {
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.string_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.string_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_string_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.string_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.string_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn enum_required_mut(&mut self) -> &mut self::_root::full_coverage2::Enum {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.enum_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.enum_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_enum_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.enum_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.enum_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn enum_optional_mut(&mut self) -> &mut self::_root::full_coverage2::Enum {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.enum_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.enum_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_enum_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.enum_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.enum_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn enum_repeated_mut(
@@ -229,15 +229,15 @@ impl Msg {
     ) -> &mut ::std::vec::Vec::<self::_root::full_coverage2::Enum> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.enum_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.enum_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_enum_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.enum_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.enum_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn submsg_required_mut(
@@ -245,16 +245,16 @@ impl Msg {
     ) -> &mut self::_root::full_coverage2::msg::Submsg {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.submsg_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.submsg_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_submsg_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.submsg_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.submsg_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn submsg_optional_mut(
@@ -262,16 +262,16 @@ impl Msg {
     ) -> &mut self::_root::full_coverage2::msg::Submsg {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.submsg_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.submsg_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_submsg_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.submsg_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.submsg_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn submsg_repeated_mut(
@@ -279,455 +279,455 @@ impl Msg {
     ) -> &mut ::std::vec::Vec::<self::_root::full_coverage2::msg::Submsg> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.submsg_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.submsg_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_submsg_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.submsg_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.submsg_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn i64_required_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.i64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i64_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i64_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.i64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i64_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn i64_optional_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.i64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i64_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i64_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.i64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i64_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.i64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_i64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.i64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.i64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn u32_required_mut(&mut self) -> &mut u32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.u32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u32_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_u32_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.u32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u32_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn u32_optional_mut(&mut self) -> &mut u32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.u32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u32_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_u32_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.u32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u32_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.u32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_u32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.u32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn u64_required_mut(&mut self) -> &mut u64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.u64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u64_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_u64_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.u64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u64_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn u64_optional_mut(&mut self) -> &mut u64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.u64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u64_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_u64_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.u64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u64_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.u64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_u64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.u64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.u64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn s32_required_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.s32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s32_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_s32_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.s32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s32_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn s32_optional_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.s32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s32_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_s32_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.s32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s32_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.s32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_s32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.s32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn s64_required_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.s64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s64_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_s64_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.s64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s64_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn s64_optional_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.s64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s64_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_s64_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.s64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s64_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.s64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_s64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.s64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.s64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn fixed32_required_mut(&mut self) -> &mut u32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.fixed32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed32_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_fixed32_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.fixed32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed32_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn fixed32_optional_mut(&mut self) -> &mut u32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.fixed32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed32_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_fixed32_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.fixed32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed32_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.fixed32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_fixed32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.fixed32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn fixed64_required_mut(&mut self) -> &mut u64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.fixed64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed64_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_fixed64_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.fixed64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed64_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn fixed64_optional_mut(&mut self) -> &mut u64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.fixed64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed64_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_fixed64_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.fixed64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed64_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.fixed64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_fixed64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.fixed64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.fixed64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn sfixed32_required_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.sfixed32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed32_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_sfixed32_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.sfixed32_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed32_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn sfixed32_optional_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.sfixed32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed32_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_sfixed32_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.sfixed32_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed32_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.sfixed32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_sfixed32_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.sfixed32_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed32_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn sfixed64_required_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.sfixed64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed64_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_sfixed64_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.sfixed64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed64_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn sfixed64_optional_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.sfixed64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed64_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_sfixed64_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.sfixed64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed64_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.sfixed64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_sfixed64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.sfixed64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.sfixed64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn f64_required_mut(&mut self) -> &mut f64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.f64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.f64_required,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_f64_required(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.f64_required,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.f64_required,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn f64_optional_mut(&mut self) -> &mut f64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.f64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.f64_optional,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_f64_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.f64_optional,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.f64_optional,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.f64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.f64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_f64_repeated(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.f64_repeated,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.f64_repeated,
+            self.body.shared.bitfield_mut(),
         )
     }
 }
@@ -763,290 +763,290 @@ impl self::_puroro::Message for Msg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.i32_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.i32_required,
+            self.body.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.i32_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.i32_optional,
+            self.body.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.i32_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.i32_repeated,
+            self.body.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.float_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.float_required,
+            self.body.shared.bitfield(),
             11i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.float_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.float_optional,
+            self.body.shared.bitfield(),
             12i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.float_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.float_repeated,
+            self.body.shared.bitfield(),
             13i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.bytes_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.bytes_required,
+            self.body.shared.bitfield(),
             21i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.bytes_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.bytes_optional,
+            self.body.shared.bitfield(),
             22i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.bytes_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.bytes_repeated,
+            self.body.shared.bitfield(),
             23i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.string_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.string_required,
+            self.body.shared.bitfield(),
             31i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.string_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.string_optional,
+            self.body.shared.bitfield(),
             32i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.string_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.string_repeated,
+            self.body.shared.bitfield(),
             33i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.enum_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.enum_required,
+            self.body.shared.bitfield(),
             41i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.enum_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.enum_optional,
+            self.body.shared.bitfield(),
             42i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.enum_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.enum_repeated,
+            self.body.shared.bitfield(),
             43i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.submsg_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.submsg_required,
+            self.body.shared.bitfield(),
             51i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.submsg_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.submsg_optional,
+            self.body.shared.bitfield(),
             52i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.submsg_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.submsg_repeated,
+            self.body.shared.bitfield(),
             53i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.i64_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.i64_required,
+            self.body.shared.bitfield(),
             101i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.i64_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.i64_optional,
+            self.body.shared.bitfield(),
             102i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.i64_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.i64_repeated,
+            self.body.shared.bitfield(),
             103i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.u32_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.u32_required,
+            self.body.shared.bitfield(),
             111i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.u32_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.u32_optional,
+            self.body.shared.bitfield(),
             112i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.u32_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.u32_repeated,
+            self.body.shared.bitfield(),
             113i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.u64_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.u64_required,
+            self.body.shared.bitfield(),
             121i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.u64_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.u64_optional,
+            self.body.shared.bitfield(),
             122i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.u64_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.u64_repeated,
+            self.body.shared.bitfield(),
             123i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.s32_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.s32_required,
+            self.body.shared.bitfield(),
             131i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.s32_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.s32_optional,
+            self.body.shared.bitfield(),
             132i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.s32_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.s32_repeated,
+            self.body.shared.bitfield(),
             133i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.s64_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.s64_required,
+            self.body.shared.bitfield(),
             141i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.s64_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.s64_optional,
+            self.body.shared.bitfield(),
             142i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.s64_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.s64_repeated,
+            self.body.shared.bitfield(),
             143i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.fixed32_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.fixed32_required,
+            self.body.shared.bitfield(),
             151i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.fixed32_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.fixed32_optional,
+            self.body.shared.bitfield(),
             152i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.fixed32_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.fixed32_repeated,
+            self.body.shared.bitfield(),
             153i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.fixed64_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.fixed64_required,
+            self.body.shared.bitfield(),
             161i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.fixed64_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.fixed64_optional,
+            self.body.shared.bitfield(),
             162i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.fixed64_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.fixed64_repeated,
+            self.body.shared.bitfield(),
             163i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.sfixed32_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.sfixed32_required,
+            self.body.shared.bitfield(),
             171i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.sfixed32_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.sfixed32_optional,
+            self.body.shared.bitfield(),
             172i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.sfixed32_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.sfixed32_repeated,
+            self.body.shared.bitfield(),
             173i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.sfixed64_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.sfixed64_required,
+            self.body.shared.bitfield(),
             181i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.sfixed64_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.sfixed64_optional,
+            self.body.shared.bitfield(),
             182i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.sfixed64_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.sfixed64_repeated,
+            self.body.shared.bitfield(),
             183i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.f64_required,
-            self.view.shared.bitfield(),
+            &self.body.fields.f64_required,
+            self.body.shared.bitfield(),
             191i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.f64_optional,
-            self.view.shared.bitfield(),
+            &self.body.fields.f64_optional,
+            self.body.shared.bitfield(),
             192i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.f64_repeated,
-            self.view.shared.bitfield(),
+            &self.body.fields.f64_repeated,
+            self.body.shared.bitfield(),
             193i32,
             out,
         )?;
@@ -1079,337 +1079,337 @@ impl self::_pinternal::MessageInternal for Msg {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.i32_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.i32_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.i32_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.i32_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.i32_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.i32_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     11i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.float_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.float_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     12i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.float_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.float_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     13i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.float_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.float_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     21i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.bytes_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.bytes_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     22i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.bytes_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.bytes_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     23i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.bytes_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.bytes_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     31i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.string_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.string_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     32i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.string_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.string_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     33i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.string_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.string_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     41i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.enum_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.enum_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     42i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.enum_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.enum_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     43i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.enum_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.enum_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     51i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.submsg_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.submsg_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     52i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.submsg_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.submsg_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     53i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.submsg_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.submsg_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     101i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.i64_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.i64_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     102i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.i64_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.i64_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     103i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.i64_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.i64_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     111i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.u32_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.u32_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     112i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.u32_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.u32_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     113i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.u32_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.u32_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     121i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.u64_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.u64_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     122i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.u64_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.u64_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     123i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.u64_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.u64_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     131i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.s32_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.s32_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     132i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.s32_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.s32_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     133i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.s32_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.s32_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     141i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.s64_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.s64_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     142i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.s64_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.s64_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     143i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.s64_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.s64_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     151i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.fixed32_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.fixed32_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     152i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.fixed32_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.fixed32_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     153i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.fixed32_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.fixed32_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     161i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.fixed64_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.fixed64_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     162i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.fixed64_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.fixed64_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     163i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.fixed64_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.fixed64_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     171i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.sfixed32_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.sfixed32_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     172i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.sfixed32_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.sfixed32_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     173i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.sfixed32_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.sfixed32_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     181i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.sfixed64_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.sfixed64_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     182i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.sfixed64_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.sfixed64_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     183i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.sfixed64_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.sfixed64_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     191i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.f64_required,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.f64_required,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     192i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.f64_optional,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.f64_optional,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     193i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.f64_repeated,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.f64_repeated,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -1425,7 +1425,7 @@ impl self::_pinternal::MessageInternal for Msg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -1433,11 +1433,16 @@ impl self::_pinternal::MessageInternal for Msg {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::full_coverage2::_view::MsgView> for Msg {
+    fn borrow(&self) -> &self::_root::full_coverage2::_view::MsgView {
+        &self.body
+    }
+}
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.body)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -1446,7 +1451,7 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::full_coverage2::_view::MsgView as ::std::fmt::Debug>::fmt(
-            &self.view,
+            &self.body,
             fmt,
         )
     }
@@ -1454,12 +1459,12 @@ impl ::std::fmt::Debug for Msg {
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::full_coverage2::_view::MsgView;
     fn deref(&self) -> &Self::Target {
-        &self.view
+        &self.body
     }
 }
 impl ::std::cmp::PartialEq for Msg {
     fn eq(&self, rhs: &Self) -> bool {
-        &self.view == &rhs.view
+        &self.body == &rhs.body
     }
 }
 #[doc(hidden)]
@@ -1986,7 +1991,9 @@ pub mod _view {
         }
         pub fn submsg_required(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_or_else(
                 &self.fields.submsg_required,
@@ -1996,7 +2003,9 @@ pub mod _view {
         }
         pub fn submsg_required_opt(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.submsg_required,
@@ -2013,7 +2022,9 @@ pub mod _view {
         }
         pub fn submsg_optional(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_or_else(
                 &self.fields.submsg_optional,
@@ -2023,7 +2034,9 @@ pub mod _view {
         }
         pub fn submsg_optional_opt(
             &self,
-        ) -> ::std::option::Option::<&self::_root::full_coverage2::msg::Submsg> {
+        ) -> ::std::option::Option::<
+            &self::_root::full_coverage2::msg::_view::SubmsgView,
+        > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.submsg_optional,
@@ -2601,119 +2614,6 @@ pub mod _view {
             )
         }
     }
-    impl ::std::clone::Clone for MsgView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::full_coverage2::_fields::MsgFields {
-                    i32_required: ::std::clone::Clone::clone(&self.fields.i32_required),
-                    i32_optional: ::std::clone::Clone::clone(&self.fields.i32_optional),
-                    i32_repeated: ::std::clone::Clone::clone(&self.fields.i32_repeated),
-                    float_required: ::std::clone::Clone::clone(
-                        &self.fields.float_required,
-                    ),
-                    float_optional: ::std::clone::Clone::clone(
-                        &self.fields.float_optional,
-                    ),
-                    float_repeated: ::std::clone::Clone::clone(
-                        &self.fields.float_repeated,
-                    ),
-                    bytes_required: ::std::clone::Clone::clone(
-                        &self.fields.bytes_required,
-                    ),
-                    bytes_optional: ::std::clone::Clone::clone(
-                        &self.fields.bytes_optional,
-                    ),
-                    bytes_repeated: ::std::clone::Clone::clone(
-                        &self.fields.bytes_repeated,
-                    ),
-                    string_required: ::std::clone::Clone::clone(
-                        &self.fields.string_required,
-                    ),
-                    string_optional: ::std::clone::Clone::clone(
-                        &self.fields.string_optional,
-                    ),
-                    string_repeated: ::std::clone::Clone::clone(
-                        &self.fields.string_repeated,
-                    ),
-                    enum_required: ::std::clone::Clone::clone(
-                        &self.fields.enum_required,
-                    ),
-                    enum_optional: ::std::clone::Clone::clone(
-                        &self.fields.enum_optional,
-                    ),
-                    enum_repeated: ::std::clone::Clone::clone(
-                        &self.fields.enum_repeated,
-                    ),
-                    submsg_required: ::std::clone::Clone::clone(
-                        &self.fields.submsg_required,
-                    ),
-                    submsg_optional: ::std::clone::Clone::clone(
-                        &self.fields.submsg_optional,
-                    ),
-                    submsg_repeated: ::std::clone::Clone::clone(
-                        &self.fields.submsg_repeated,
-                    ),
-                    i64_required: ::std::clone::Clone::clone(&self.fields.i64_required),
-                    i64_optional: ::std::clone::Clone::clone(&self.fields.i64_optional),
-                    i64_repeated: ::std::clone::Clone::clone(&self.fields.i64_repeated),
-                    u32_required: ::std::clone::Clone::clone(&self.fields.u32_required),
-                    u32_optional: ::std::clone::Clone::clone(&self.fields.u32_optional),
-                    u32_repeated: ::std::clone::Clone::clone(&self.fields.u32_repeated),
-                    u64_required: ::std::clone::Clone::clone(&self.fields.u64_required),
-                    u64_optional: ::std::clone::Clone::clone(&self.fields.u64_optional),
-                    u64_repeated: ::std::clone::Clone::clone(&self.fields.u64_repeated),
-                    s32_required: ::std::clone::Clone::clone(&self.fields.s32_required),
-                    s32_optional: ::std::clone::Clone::clone(&self.fields.s32_optional),
-                    s32_repeated: ::std::clone::Clone::clone(&self.fields.s32_repeated),
-                    s64_required: ::std::clone::Clone::clone(&self.fields.s64_required),
-                    s64_optional: ::std::clone::Clone::clone(&self.fields.s64_optional),
-                    s64_repeated: ::std::clone::Clone::clone(&self.fields.s64_repeated),
-                    fixed32_required: ::std::clone::Clone::clone(
-                        &self.fields.fixed32_required,
-                    ),
-                    fixed32_optional: ::std::clone::Clone::clone(
-                        &self.fields.fixed32_optional,
-                    ),
-                    fixed32_repeated: ::std::clone::Clone::clone(
-                        &self.fields.fixed32_repeated,
-                    ),
-                    fixed64_required: ::std::clone::Clone::clone(
-                        &self.fields.fixed64_required,
-                    ),
-                    fixed64_optional: ::std::clone::Clone::clone(
-                        &self.fields.fixed64_optional,
-                    ),
-                    fixed64_repeated: ::std::clone::Clone::clone(
-                        &self.fields.fixed64_repeated,
-                    ),
-                    sfixed32_required: ::std::clone::Clone::clone(
-                        &self.fields.sfixed32_required,
-                    ),
-                    sfixed32_optional: ::std::clone::Clone::clone(
-                        &self.fields.sfixed32_optional,
-                    ),
-                    sfixed32_repeated: ::std::clone::Clone::clone(
-                        &self.fields.sfixed32_repeated,
-                    ),
-                    sfixed64_required: ::std::clone::Clone::clone(
-                        &self.fields.sfixed64_required,
-                    ),
-                    sfixed64_optional: ::std::clone::Clone::clone(
-                        &self.fields.sfixed64_optional,
-                    ),
-                    sfixed64_repeated: ::std::clone::Clone::clone(
-                        &self.fields.sfixed64_repeated,
-                    ),
-                    f64_required: ::std::clone::Clone::clone(&self.fields.f64_required),
-                    f64_optional: ::std::clone::Clone::clone(&self.fields.f64_optional),
-                    f64_repeated: ::std::clone::Clone::clone(&self.fields.f64_repeated),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for MsgView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -2946,6 +2846,164 @@ pub mod _view {
                 && self.f64_optional_opt() == rhs.f64_optional_opt()
                 && self.f64_repeated().into_iter().eq(rhs.f64_repeated())
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    impl ::std::borrow::ToOwned for MsgView {
+        type Owned = self::_root::full_coverage2::Msg;
+        fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
+            self::_root::full_coverage2::Msg {
+                body: Self {
+                    fields: self::_root::full_coverage2::_fields::MsgFields {
+                        i32_required: ::std::clone::Clone::clone(
+                            &self.fields.i32_required,
+                        ),
+                        i32_optional: ::std::clone::Clone::clone(
+                            &self.fields.i32_optional,
+                        ),
+                        i32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.i32_repeated,
+                        ),
+                        float_required: ::std::clone::Clone::clone(
+                            &self.fields.float_required,
+                        ),
+                        float_optional: ::std::clone::Clone::clone(
+                            &self.fields.float_optional,
+                        ),
+                        float_repeated: ::std::clone::Clone::clone(
+                            &self.fields.float_repeated,
+                        ),
+                        bytes_required: ::std::clone::Clone::clone(
+                            &self.fields.bytes_required,
+                        ),
+                        bytes_optional: ::std::clone::Clone::clone(
+                            &self.fields.bytes_optional,
+                        ),
+                        bytes_repeated: ::std::clone::Clone::clone(
+                            &self.fields.bytes_repeated,
+                        ),
+                        string_required: ::std::clone::Clone::clone(
+                            &self.fields.string_required,
+                        ),
+                        string_optional: ::std::clone::Clone::clone(
+                            &self.fields.string_optional,
+                        ),
+                        string_repeated: ::std::clone::Clone::clone(
+                            &self.fields.string_repeated,
+                        ),
+                        enum_required: ::std::clone::Clone::clone(
+                            &self.fields.enum_required,
+                        ),
+                        enum_optional: ::std::clone::Clone::clone(
+                            &self.fields.enum_optional,
+                        ),
+                        enum_repeated: ::std::clone::Clone::clone(
+                            &self.fields.enum_repeated,
+                        ),
+                        submsg_required: ::std::clone::Clone::clone(
+                            &self.fields.submsg_required,
+                        ),
+                        submsg_optional: ::std::clone::Clone::clone(
+                            &self.fields.submsg_optional,
+                        ),
+                        submsg_repeated: ::std::clone::Clone::clone(
+                            &self.fields.submsg_repeated,
+                        ),
+                        i64_required: ::std::clone::Clone::clone(
+                            &self.fields.i64_required,
+                        ),
+                        i64_optional: ::std::clone::Clone::clone(
+                            &self.fields.i64_optional,
+                        ),
+                        i64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.i64_repeated,
+                        ),
+                        u32_required: ::std::clone::Clone::clone(
+                            &self.fields.u32_required,
+                        ),
+                        u32_optional: ::std::clone::Clone::clone(
+                            &self.fields.u32_optional,
+                        ),
+                        u32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.u32_repeated,
+                        ),
+                        u64_required: ::std::clone::Clone::clone(
+                            &self.fields.u64_required,
+                        ),
+                        u64_optional: ::std::clone::Clone::clone(
+                            &self.fields.u64_optional,
+                        ),
+                        u64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.u64_repeated,
+                        ),
+                        s32_required: ::std::clone::Clone::clone(
+                            &self.fields.s32_required,
+                        ),
+                        s32_optional: ::std::clone::Clone::clone(
+                            &self.fields.s32_optional,
+                        ),
+                        s32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.s32_repeated,
+                        ),
+                        s64_required: ::std::clone::Clone::clone(
+                            &self.fields.s64_required,
+                        ),
+                        s64_optional: ::std::clone::Clone::clone(
+                            &self.fields.s64_optional,
+                        ),
+                        s64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.s64_repeated,
+                        ),
+                        fixed32_required: ::std::clone::Clone::clone(
+                            &self.fields.fixed32_required,
+                        ),
+                        fixed32_optional: ::std::clone::Clone::clone(
+                            &self.fields.fixed32_optional,
+                        ),
+                        fixed32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.fixed32_repeated,
+                        ),
+                        fixed64_required: ::std::clone::Clone::clone(
+                            &self.fields.fixed64_required,
+                        ),
+                        fixed64_optional: ::std::clone::Clone::clone(
+                            &self.fields.fixed64_optional,
+                        ),
+                        fixed64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.fixed64_repeated,
+                        ),
+                        sfixed32_required: ::std::clone::Clone::clone(
+                            &self.fields.sfixed32_required,
+                        ),
+                        sfixed32_optional: ::std::clone::Clone::clone(
+                            &self.fields.sfixed32_optional,
+                        ),
+                        sfixed32_repeated: ::std::clone::Clone::clone(
+                            &self.fields.sfixed32_repeated,
+                        ),
+                        sfixed64_required: ::std::clone::Clone::clone(
+                            &self.fields.sfixed64_required,
+                        ),
+                        sfixed64_optional: ::std::clone::Clone::clone(
+                            &self.fields.sfixed64_optional,
+                        ),
+                        sfixed64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.sfixed64_repeated,
+                        ),
+                        f64_required: ::std::clone::Clone::clone(
+                            &self.fields.f64_required,
+                        ),
+                        f64_optional: ::std::clone::Clone::clone(
+                            &self.fields.f64_optional,
+                        ),
+                        f64_repeated: ::std::clone::Clone::clone(
+                            &self.fields.f64_repeated,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
+            }
         }
     }
 }

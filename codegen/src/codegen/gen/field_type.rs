@@ -110,7 +110,7 @@ impl LengthDelimitedType {
             String => quote! { &#lt str },
             Bytes => quote! { &#lt [u8] },
             Message(m) => {
-                let ty = m.try_upgrade()?.gen_message_struct_type()?;
+                let ty = m.try_upgrade()?.gen_view_struct_type()?;
                 quote! { &#lt #ty }
             }
         })?))

@@ -92,7 +92,7 @@ pub trait NonRepeatedFieldType: FieldType {
     /// getter methods.
     /// `int32` => `Option<i32>`
     /// `String` => `Option<&'a str>`
-    /// `Message` => `Option<&'a Message>`
+    /// `Message` => `Option<&'a MessageView>`
     type GetterOptType<'a>
     where
         Self: 'a;
@@ -108,7 +108,7 @@ pub trait NonRepeatedFieldType: FieldType {
     /// this benefit so it's still an optional type.
     /// `int32` => `i32`
     /// `String` => `&'a str`
-    /// `Message` => `Option<&'a Message>`
+    /// `Message` => `Option<&'a MessageView>`
     type GetterOrElseType<'a>
     where
         Self: 'a;

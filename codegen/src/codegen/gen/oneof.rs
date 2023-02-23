@@ -185,7 +185,7 @@ impl Oneof {
         Ok(vec![parse2(quote! {
             pub fn #clear_ident(&mut self) {
                 use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
-                self.view.fields.#field_ident.clear(self.view.shared.bitfield_mut())
+                self.body.fields.#field_ident.clear(self.body.shared.bitfield_mut())
             }
         })?])
     }
@@ -229,8 +229,8 @@ impl Oneof {
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
-                    #field_number => self.view.fields.#field_ident.deser_from_field_data(
-                        self.view.shared.bitfield_mut(),
+                    #field_number => self.body.fields.#field_ident.deser_from_field_data(
+                        self.body.shared.bitfield_mut(),
                         #field_data_expr,
                         #case_type::#case_name(()),
                     )?,

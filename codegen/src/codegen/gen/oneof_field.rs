@@ -281,15 +281,15 @@ impl OneofField {
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                     use #PURORO_INTERNAL::SharedItems as _;
-                    self.view.fields.#oneof_struct_field_ident.#getter_mut_ident(self.view.shared.bitfield_mut())
+                    self.body.fields.#oneof_struct_field_ident.#getter_mut_ident(self.body.shared.bitfield_mut())
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     #[allow(unused)] use ::std::option::Option::Some;
                     use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItems as _};
-                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.view.shared.bitfield()) {
-                        self.view.fields.#oneof_struct_field_ident.clear(self.view.shared.bitfield_mut())
+                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.body.shared.bitfield()) {
+                        self.body.fields.#oneof_struct_field_ident.clear(self.body.shared.bitfield_mut())
                     }
                 }
             })?,

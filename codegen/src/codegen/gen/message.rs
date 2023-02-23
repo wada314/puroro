@@ -27,6 +27,7 @@ use ::std::rc::Rc;
 
 #[derive(Debug, Default)]
 struct Cache {
+    message_struct_path: OnceCell<Rc<Path>>,
     message_struct_type: OnceCell<Rc<Type>>,
     bitfield_size: OnceCell<usize>,
 }
@@ -61,14 +62,25 @@ impl Message {
             .cloned()
     }
 
+    pub(crate) fn gen_message_struct_path(&self) -> Result<Rc<Path>> {
+        self.cache()
+            .get::<Cache>()?
+            .message_struct_path
+            .get_or_try_init(|| {
+                let parent = self.parent()?.gen_rust_module_path()?;
+                let ident = self.gen_message_struct_ident()?;
+                Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
+            })
+            .cloned()
+    }
+
     pub(crate) fn gen_message_struct_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .message_struct_type
             .get_or_try_init(|| {
-                let parent = self.parent()?.gen_rust_module_path()?;
-                let ident = self.gen_message_struct_ident()?;
-                Ok(Rc::new(parse2(quote! { #parent :: #ident })?))
+                let path = self.gen_message_struct_path()?;
+                Ok(Rc::new(parse2(quote! { #path })?))
             })
             .cloned()
     }
@@ -113,6 +125,7 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
         let message_impl = self.gen_message_struct_message_impl()?;
         let message_internal_impl = self.gen_message_struct_message_internal_impl()?;
+        let borrow_impl = self.gen_message_struct_impl_borrow()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
@@ -123,7 +136,7 @@ impl Message {
             #[derive(::std::default::Default)]
             #(#docs)*
             pub struct #ident {
-                view: #view_type,
+                body: #view_type,
             }
         })?;
         let impl_struct = parse2(quote! {
@@ -137,6 +150,7 @@ impl Message {
             impl_struct,
             message_impl.into(),
             message_internal_impl.into(),
+            borrow_impl.into(),
             clone_impl.into(),
             debug_impl.into(),
             deref_impl.into(),
@@ -188,10 +202,10 @@ impl Message {
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
 
-        let clone_impl = self.gen_view_struct_impl_clone()?;
         let drop_impl = self.gen_view_struct_impl_drop()?;
         let debug_impl = self.gen_view_struct_impl_debug()?;
         let partial_eq_impl = self.gen_view_struct_impl_partial_eq()?;
+        let to_owned_impl = self.gen_view_struct_impl_to_owned()?;
 
         Ok(vec![
             parse2(quote! {
@@ -207,10 +221,10 @@ impl Message {
                     #(#oneof_field_methods)*
                 }
             })?,
-            clone_impl.into(),
             drop_impl.into(),
             debug_impl.into(),
             partial_eq_impl.into(),
+            to_owned_impl.into(),
         ])
     }
 
@@ -321,7 +335,7 @@ impl Message {
                             Ok(_) => (),
                             Err(PuroroError::UnknownFieldNumber(field_data)) => {
                                 // Recoverable error. Store the field into unknown_fields.
-                                self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                                self.body.shared.unknown_fields_mut().push(number, field_data)?;
                             }
                             Err(e) => Err(e)?,
                         }
@@ -332,14 +346,26 @@ impl Message {
         })?)
     }
 
+    fn gen_message_struct_impl_borrow(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+        Ok(parse2(quote! {
+            impl ::std::borrow::Borrow<#view_type> for #ident {
+                fn borrow(&self) -> &#view_type {
+                    &self.body
+                }
+            }
+        })?)
+    }
+
     fn gen_message_struct_impl_clone(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
         Ok(parse2(quote! {
             impl ::std::clone::Clone for #ident {
                 fn clone(&self) -> Self {
-                    Self {
-                        view: ::std::clone::Clone::clone(&self.view),
-                    }
+                    #[allow(unused)]
+                    use ::std::borrow::ToOwned;
+                    ToOwned::to_owned(&self.body)
                 }
             }
         })?)
@@ -352,7 +378,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::fmt::Debug for #ident {
                 fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                    <#view_type as ::std::fmt::Debug>::fmt(&self.view, fmt)
+                    <#view_type as ::std::fmt::Debug>::fmt(&self.body, fmt)
                 }
             }
         })?)
@@ -366,7 +392,7 @@ impl Message {
             impl ::std::ops::Deref for #ident {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
-                    &self.view
+                    &self.body
                 }
             }
         })?)
@@ -377,7 +403,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::cmp::PartialEq for #ident {
                 fn eq(&self, rhs: &Self) -> bool {
-                    &self.view == &rhs.view
+                    &self.body == &rhs.body
                 }
             }
         })?)
@@ -442,33 +468,39 @@ impl Message {
         })?)
     }
 
-    fn gen_message_struct_doc_attrs(&self) -> Result<Vec<Attribute>> {
-        let input_file = self.input_file()?;
-        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
-            return Ok(Vec::new());
-        };
-        Ok(sci.gen_doc_attributes()?)
-    }
-
-    fn gen_view_struct_impl_clone(&self) -> Result<ItemImpl> {
+    fn gen_view_struct_impl_to_owned(&self) -> Result<ItemImpl> {
         let ident = self.gen_view_struct_ident()?;
+        let owned_type = self.gen_message_struct_type()?;
+        let owned_path = self.gen_message_struct_path()?;
         let fields_struct_type = self.gen_fields_struct_path()?;
         let field_values = self
             .fields_or_oneofs()?
             .map(|fo| fo.gen_message_struct_impl_clone_field_value())
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl ::std::clone::Clone for #ident {
-                fn clone(&self) -> Self {
-                    #[allow(unused)] use #PURORO_INTERNAL::SharedItems as _;
-                    Self {
-                        fields: #fields_struct_type {
-                            #(#field_values,)*
+            impl ::std::borrow::ToOwned for #ident {
+                type Owned = #owned_type;
+                fn to_owned(&self) -> Self::Owned {
+                    #[allow(unused)]
+                    use #PURORO_INTERNAL::SharedItems;
+                    #owned_path {
+                        body: Self {
+                            fields: #fields_struct_type {
+                                #(#field_values,)*
+                            },
+                            shared: ::std::clone::Clone::clone(&self.shared),
                         },
-                        shared: ::std::clone::Clone::clone(&self.shared),
                     }
                 }
             }
         })?)
+    }
+
+    fn gen_message_struct_doc_attrs(&self) -> Result<Vec<Attribute>> {
+        let input_file = self.input_file()?;
+        let Some(sci) = input_file.source_code_info(self.location_path()?)? else {
+            return Ok(Vec::new());
+        };
+        Ok(sci.gen_doc_attributes()?)
     }
 }

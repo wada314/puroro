@@ -248,31 +248,32 @@ mod tests {
     use super::super::{DataTypeBase, Package};
     use crate::Result;
     use ::once_cell::sync::Lazy;
-    use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
+    use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
     use ::std::rc::Rc;
+    use ::std::ops::Deref;
 
-    static FD_ROOT: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
-        let mut fd = FileDescriptorProtoView::default();
+    static FD_ROOT: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
         *fd.name_mut() = "root_file".to_string();
         fd
     });
 
-    static FD_G_P_DESC: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
-        let mut fd = FileDescriptorProtoView::default();
+    static FD_G_P_DESC: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
         *fd.name_mut() = "descriptor.proto".to_string();
         *fd.package_mut() = "google.protobuf".to_string();
         fd
     });
 
-    static FD_G_P_EMPTY: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
-        let mut fd = FileDescriptorProtoView::default();
+    static FD_G_P_EMPTY: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
         *fd.name_mut() = "empty.proto".to_string();
         *fd.package_mut() = "google.protobuf".to_string();
         fd
     });
 
-    static FD_G_P_C_PLUGIN: Lazy<FileDescriptorProtoView> = Lazy::new(|| {
-        let mut fd = FileDescriptorProtoView::default();
+    static FD_G_P_C_PLUGIN: Lazy<FileDescriptorProto> = Lazy::new(|| {
+        let mut fd = FileDescriptorProto::default();
         *fd.name_mut() = "plugin.proto".to_string();
         *fd.package_mut() = "google.protobuf.compiler".to_string();
         fd
@@ -287,7 +288,7 @@ mod tests {
 
     #[test]
     fn test_make_package_empty() -> Result<()> {
-        let files = [Lazy::force(&FD_ROOT)];
+        let files = [Lazy::force(&FD_ROOT).deref()];
         let root_package = Package::new_root(files.into_iter());
         let root_files = root_package.files()?.collect::<Vec<_>>();
 
@@ -299,7 +300,7 @@ mod tests {
 
     #[test]
     fn test_make_package_single() -> Result<()> {
-        let files = [Lazy::force(&FD_G_P_DESC)];
+        let files = [Lazy::force(&FD_G_P_DESC).deref()];
         let root_package = Package::new_root(files.into_iter());
         let root_files = root_package.files()?.collect::<Vec<_>>();
 
@@ -326,10 +327,10 @@ mod tests {
     #[test]
     fn test_make_package_many() -> Result<()> {
         let files = [
-            Lazy::force(&FD_G_P_DESC),
-            Lazy::force(&FD_ROOT),
-            Lazy::force(&FD_G_P_EMPTY),
-            Lazy::force(&FD_G_P_C_PLUGIN),
+            Lazy::force(&FD_G_P_DESC).deref(),
+            Lazy::force(&FD_ROOT).deref(),
+            Lazy::force(&FD_G_P_EMPTY).deref(),
+            Lazy::force(&FD_G_P_C_PLUGIN).deref(),
         ];
         let root_package = Package::new_root(files.into_iter());
 
