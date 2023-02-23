@@ -23,7 +23,13 @@
             "command": "build",
             "args": [
                 "--features",
-                "dev-for-protobuf-use-stable-puroro"
+                "dev-for-protobuf-use-stable-puroro",
+                "--config",
+                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "--config",
+                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "--config",
+                "patch.crates-io.stable_puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -64,7 +70,13 @@
             "command": "test",
             "args": [
                 "--features",
-                "dev-for-protobuf-use-stable-puroro"
+                "dev-for-protobuf-use-stable-puroro",
+                "--config",
+                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "--config",
+                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "--config",
+                "patch.crates-io.stable_puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -114,7 +126,13 @@
                 "-p",
                 "tests",
                 "--features",
-                "dev-for-protobuf-use-stable-puroro"
+                "dev-for-protobuf-use-stable-puroro",
+                "--config",
+                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "--config",
+                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "--config",
+                "patch.crates-io.stable_puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -160,7 +178,15 @@
             "command": "run",
             "args": [
                 "-p",
-                "update-puroro-protobuf"
+                "update-puroro-protobuf",
+                "--features",
+                "dev-for-protobuf-use-stable-puroro",
+                "--config",
+                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "--config",
+                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "--config",
+                "patch.crates-io.stable_puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -181,7 +207,15 @@
             "command": "run",
             "args": [
                 "-p",
-                "update-puroro-doc-samples"
+                "update-puroro-doc-samples",
+                "--features",
+                "dev-for-protobuf-use-stable-puroro",
+                "--config",
+                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "--config",
+                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "--config",
+                "patch.crates-io.stable_puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
