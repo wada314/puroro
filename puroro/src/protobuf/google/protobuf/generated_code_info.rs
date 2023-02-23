@@ -290,7 +290,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.path, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
         }
         pub fn source_file(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};

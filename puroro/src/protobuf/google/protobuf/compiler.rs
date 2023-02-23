@@ -914,7 +914,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.file_to_generate,
                 self.shared.bitfield(),
             )
@@ -966,10 +966,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::FileDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
-                &self.fields.proto_file,
-                self.shared.bitfield(),
-            )
+            RepeatedFieldType::get_field(&self.fields.proto_file, self.shared.bitfield())
         }
         pub fn compiler_version(
             &self,
@@ -1161,7 +1158,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::compiler::code_generator_response::_view::FileView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.file, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
         }
     }
     impl ::std::ops::Drop for CodeGeneratorResponseView {

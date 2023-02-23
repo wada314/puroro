@@ -208,19 +208,14 @@ where
     ProtoType::RustOwnedType: PartialEq + Default + Clone,
     ProtoType: tags::UnsizedType,
 {
-    type ScalarType = ProtoType::RustOwnedType;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
-        self.0.as_slice()
-    }
-
     type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, ProtoType::RustOwnedType>
     where
         Self: 'a;
-    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
         RepeatedFieldViewImpl(self.0.as_slice())
     }
 
-    type ContainerType = Vec<Self::ScalarType>;
+    type ContainerType = Vec<ProtoType::RustOwnedType>;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }

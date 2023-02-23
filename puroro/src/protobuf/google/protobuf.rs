@@ -5651,7 +5651,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::FileDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.file, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
         }
     }
     impl ::std::ops::Drop for FileDescriptorSetView {
@@ -5808,10 +5808,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
-                &self.fields.dependency,
-                self.shared.bitfield(),
-            )
+            RepeatedFieldType::get_field(&self.fields.dependency, self.shared.bitfield())
         }
         /** Indexes of the public imported files in the dependency list above.
 */
@@ -5819,7 +5816,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.public_dependency,
                 self.shared.bitfield(),
             )
@@ -5831,7 +5828,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.weak_dependency,
                 self.shared.bitfield(),
             )
@@ -5845,7 +5842,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::DescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.message_type,
                 self.shared.bitfield(),
             )
@@ -5857,7 +5854,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::EnumDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.enum_type, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.enum_type, self.shared.bitfield())
         }
         pub fn service(
             &self,
@@ -5866,7 +5863,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::ServiceDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.service, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.service, self.shared.bitfield())
         }
         pub fn extension(
             &self,
@@ -5875,7 +5872,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::FieldDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.extension, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.extension, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -6174,7 +6171,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::FieldDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.field, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.field, self.shared.bitfield())
         }
         pub fn extension(
             &self,
@@ -6183,7 +6180,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::FieldDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.extension, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.extension, self.shared.bitfield())
         }
         pub fn nested_type(
             &self,
@@ -6192,7 +6189,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::DescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.nested_type,
                 self.shared.bitfield(),
             )
@@ -6204,7 +6201,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::EnumDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.enum_type, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.enum_type, self.shared.bitfield())
         }
         pub fn extension_range(
             &self,
@@ -6213,7 +6210,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.extension_range,
                 self.shared.bitfield(),
             )
@@ -6225,10 +6222,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::OneofDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
-                &self.fields.oneof_decl,
-                self.shared.bitfield(),
-            )
+            RepeatedFieldType::get_field(&self.fields.oneof_decl, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -6268,7 +6262,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.reserved_range,
                 self.shared.bitfield(),
             )
@@ -6280,7 +6274,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.reserved_name,
                 self.shared.bitfield(),
             )
@@ -6435,7 +6429,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -7133,7 +7127,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.value, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.value, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -7177,7 +7171,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.reserved_range,
                 self.shared.bitfield(),
             )
@@ -7189,7 +7183,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.reserved_name,
                 self.shared.bitfield(),
             )
@@ -7467,7 +7461,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::MethodDescriptorProtoView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.method, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.method, self.shared.bitfield())
         }
         pub fn options(
             &self,
@@ -8475,7 +8469,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -8831,7 +8825,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9172,7 +9166,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9267,7 +9261,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9409,7 +9403,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9527,7 +9521,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9640,7 +9634,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9791,7 +9785,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::_view::UninterpretedOptionView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
@@ -9904,7 +9898,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.name, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.name, self.shared.bitfield())
         }
         pub fn identifier_value(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -10185,7 +10179,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::source_code_info::_view::LocationView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.location, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.location, self.shared.bitfield())
         }
     }
     impl ::std::ops::Drop for SourceCodeInfoView {
@@ -10258,10 +10252,7 @@ pub mod _view {
             Item = self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
-                &self.fields.annotation,
-                self.shared.bitfield(),
-            )
+            RepeatedFieldType::get_field(&self.fields.annotation, self.shared.bitfield())
         }
     }
     impl ::std::ops::Drop for GeneratedCodeInfoView {

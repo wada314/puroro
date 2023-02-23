@@ -342,7 +342,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.path, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.path, self.shared.bitfield())
         }
         /** Always has exactly three or four elements: start line, start column,
  end line (optional, otherwise assumed same as start line), end column.
@@ -354,7 +354,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = i32> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(&self.fields.span, self.shared.bitfield())
+            RepeatedFieldType::get_field(&self.fields.span, self.shared.bitfield())
         }
         pub fn leading_comments(&self) -> &str {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -454,7 +454,7 @@ pub mod _view {
             &self,
         ) -> impl '_ + self::_puroro::repeated::RepeatedFieldView<'_, Item = str> {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-            RepeatedFieldType::get_field2(
+            RepeatedFieldType::get_field(
                 &self.fields.leading_detached_comments,
                 self.shared.bitfield(),
             )
