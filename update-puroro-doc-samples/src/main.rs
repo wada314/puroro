@@ -73,7 +73,7 @@ fn main() {
     // Generate the code, returned by File proto structs.
     let mut options = CodegenOptions::default();
     options.root_file_name = Some("mod.rs".to_string());
-    options.puroro_library_path = Some("crate::puroro_for_protobuf".to_string());
+    options.puroro_library_path = Some("crate".to_string());
     let cgr =
         generate_output_file_protos(file_descriptor_set.file().into_iter(), &options).unwrap();
     let output_files = cgr.file();
