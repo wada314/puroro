@@ -120,12 +120,7 @@ where
 }
 
 impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for RepeatedMessageField<M> {
-    type ScalarType = M;
-    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> &[Self::ScalarType] {
-        self.0.as_slice()
-    }
-
-    type ContainerType = Vec<Self::ScalarType>;
+    type ContainerType = Vec<M>;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
@@ -136,7 +131,7 @@ impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for Repeate
     type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, M>
     where
         Self: 'a;
-    fn get_field2<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
+    fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
         RepeatedFieldViewImpl(self.0.as_slice())
     }
 }

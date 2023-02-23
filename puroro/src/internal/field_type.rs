@@ -136,12 +136,10 @@ pub trait NonRepeatedFieldType: FieldType {
 }
 
 pub trait RepeatedFieldType: FieldType {
-    type ScalarType;
-    fn get_field<B: BitSlice>(&self, bitvec: &B) -> &[Self::ScalarType];
     type RepeatedFieldViewType<'a>: RepeatedFieldView<'a>
     where
         Self: 'a;
-    fn get_field2<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedFieldViewType<'_>;
+    fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedFieldViewType<'_>;
     type ContainerType;
     fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);

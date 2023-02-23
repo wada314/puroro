@@ -307,7 +307,7 @@ impl Field {
                 '_ + #PURORO_LIB::repeated::RepeatedFieldView<'_, Item = #output_type>
             {
                 use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
-                RepeatedFieldType::get_field2(
+                RepeatedFieldType::get_field(
                     &self.fields.#field_ident, self.shared.bitfield(),
                 )
             }
