@@ -14,7 +14,6 @@
 
 #![doc = include_str!("lib.md")]
 
-// #[cfg(doctest)]
 pub mod doc_samples;
 mod error;
 pub mod internal;
