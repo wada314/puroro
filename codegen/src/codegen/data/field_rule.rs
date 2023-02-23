@@ -14,7 +14,7 @@
 
 use super::Syntax;
 use crate::{FatalErrorKind, Result};
-use ::puroro::protobuf::google::protobuf::field_descriptor_proto;
+use ::stable_puroro::protobuf::google::protobuf::field_descriptor_proto;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum FieldRule {

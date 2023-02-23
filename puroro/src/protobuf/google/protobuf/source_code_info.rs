@@ -12,65 +12,65 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Location {
-    view: self::_root::google::protobuf::source_code_info::_view::LocationView,
+    body: self::_root::google::protobuf::source_code_info::_view::LocationView,
 }
 impl Location {
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.path,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.path,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_path(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.path,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.path,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.span,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.span,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_span(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.span,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.span,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.leading_comments,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.leading_comments,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_leading_comments(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.leading_comments,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.leading_comments,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.trailing_comments,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.trailing_comments,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_trailing_comments(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.trailing_comments,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.trailing_comments,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn leading_detached_comments_mut(
@@ -78,15 +78,15 @@ impl Location {
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.view.fields.leading_detached_comments,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.leading_detached_comments,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn clear_leading_detached_comments(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.view.fields.leading_detached_comments,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.leading_detached_comments,
+            self.body.shared.bitfield_mut(),
         )
     }
 }
@@ -122,32 +122,32 @@ impl self::_puroro::Message for Location {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.path,
-            self.view.shared.bitfield(),
+            &self.body.fields.path,
+            self.body.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.span,
-            self.view.shared.bitfield(),
+            &self.body.fields.span,
+            self.body.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.leading_comments,
-            self.view.shared.bitfield(),
+            &self.body.fields.leading_comments,
+            self.body.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.trailing_comments,
-            self.view.shared.bitfield(),
+            &self.body.fields.trailing_comments,
+            self.body.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.leading_detached_comments,
-            self.view.shared.bitfield(),
+            &self.body.fields.leading_detached_comments,
+            self.body.shared.bitfield(),
             6i32,
             out,
         )?;
@@ -180,36 +180,36 @@ impl self::_pinternal::MessageInternal for Location {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.path,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.path,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.span,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.span,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.leading_comments,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.leading_comments,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.trailing_comments,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.trailing_comments,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.leading_detached_comments,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.leading_detached_comments,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -225,7 +225,7 @@ impl self::_pinternal::MessageInternal for Location {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -233,11 +233,20 @@ impl self::_pinternal::MessageInternal for Location {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<
+    self::_root::google::protobuf::source_code_info::_view::LocationView,
+> for Location {
+    fn borrow(
+        &self,
+    ) -> &self::_root::google::protobuf::source_code_info::_view::LocationView {
+        &self.body
+    }
+}
 impl ::std::clone::Clone for Location {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.body)
     }
 }
 impl ::std::fmt::Debug for Location {
@@ -246,7 +255,7 @@ impl ::std::fmt::Debug for Location {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::source_code_info::_view::LocationView as ::std::fmt::Debug>::fmt(
-            &self.view,
+            &self.body,
             fmt,
         )
     }
@@ -254,12 +263,12 @@ impl ::std::fmt::Debug for Location {
 impl ::std::ops::Deref for Location {
     type Target = self::_root::google::protobuf::source_code_info::_view::LocationView;
     fn deref(&self) -> &Self::Target {
-        &self.view
+        &self.body
     }
 }
 impl ::std::cmp::PartialEq for Location {
     fn eq(&self, rhs: &Self) -> bool {
-        &self.view == &rhs.view
+        &self.body == &rhs.body
     }
 }
 #[doc(hidden)]
@@ -451,28 +460,6 @@ pub mod _view {
             )
         }
     }
-    impl ::std::clone::Clone for LocationView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields {
-                    path: ::std::clone::Clone::clone(&self.fields.path),
-                    span: ::std::clone::Clone::clone(&self.fields.span),
-                    leading_comments: ::std::clone::Clone::clone(
-                        &self.fields.leading_comments,
-                    ),
-                    trailing_comments: ::std::clone::Clone::clone(
-                        &self.fields.trailing_comments,
-                    ),
-                    leading_detached_comments: ::std::clone::Clone::clone(
-                        &self.fields.leading_detached_comments,
-                    ),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for LocationView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -523,6 +510,31 @@ pub mod _view {
                     .into_iter()
                     .eq(rhs.leading_detached_comments())
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    impl ::std::borrow::ToOwned for LocationView {
+        type Owned = self::_root::google::protobuf::source_code_info::Location;
+        fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
+            self::_root::google::protobuf::source_code_info::Location {
+                body: Self {
+                    fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields {
+                        path: ::std::clone::Clone::clone(&self.fields.path),
+                        span: ::std::clone::Clone::clone(&self.fields.span),
+                        leading_comments: ::std::clone::Clone::clone(
+                            &self.fields.leading_comments,
+                        ),
+                        trailing_comments: ::std::clone::Clone::clone(
+                            &self.fields.trailing_comments,
+                        ),
+                        leading_detached_comments: ::std::clone::Clone::clone(
+                            &self.fields.leading_detached_comments,
+                        ),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
+            }
         }
     }
 }

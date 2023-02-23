@@ -12,52 +12,52 @@ mod _pinternal {
 }
 #[derive(::std::default::Default)]
 pub struct Book {
-    view: self::_root::library::_view::BookView,
+    body: self::_root::library::_view::BookView,
 }
 impl Book {
     pub fn title_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.title,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.title,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_title(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.title,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.title,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn num_pages_mut(&mut self) -> &mut u32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.num_pages,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.num_pages,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_num_pages(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.num_pages,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.num_pages,
+            self.body.shared.bitfield_mut(),
         )
     }
     pub fn author_mut(&mut self) -> &mut self::_root::library::Author {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.author,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.author,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_author(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.author,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.author,
+            self.body.shared.bitfield_mut(),
         )
     }
 }
@@ -93,20 +93,20 @@ impl self::_puroro::Message for Book {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.title,
-            self.view.shared.bitfield(),
+            &self.body.fields.title,
+            self.body.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.num_pages,
-            self.view.shared.bitfield(),
+            &self.body.fields.num_pages,
+            self.body.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.author,
-            self.view.shared.bitfield(),
+            &self.body.fields.author,
+            self.body.shared.bitfield(),
             3i32,
             out,
         )?;
@@ -139,22 +139,22 @@ impl self::_pinternal::MessageInternal for Book {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.title,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.title,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.num_pages,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.num_pages,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.author,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.author,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -170,7 +170,7 @@ impl self::_pinternal::MessageInternal for Book {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -178,11 +178,16 @@ impl self::_pinternal::MessageInternal for Book {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::library::_view::BookView> for Book {
+    fn borrow(&self) -> &self::_root::library::_view::BookView {
+        &self.body
+    }
+}
 impl ::std::clone::Clone for Book {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.body)
     }
 }
 impl ::std::fmt::Debug for Book {
@@ -191,7 +196,7 @@ impl ::std::fmt::Debug for Book {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::library::_view::BookView as ::std::fmt::Debug>::fmt(
-            &self.view,
+            &self.body,
             fmt,
         )
     }
@@ -199,32 +204,32 @@ impl ::std::fmt::Debug for Book {
 impl ::std::ops::Deref for Book {
     type Target = self::_root::library::_view::BookView;
     fn deref(&self) -> &Self::Target {
-        &self.view
+        &self.body
     }
 }
 impl ::std::cmp::PartialEq for Book {
     fn eq(&self, rhs: &Self) -> bool {
-        &self.view == &rhs.view
+        &self.body == &rhs.body
     }
 }
 #[derive(::std::default::Default)]
 pub struct Author {
-    view: self::_root::library::_view::AuthorView,
+    body: self::_root::library::_view::AuthorView,
 }
 impl Author {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
-            &mut self.view.fields.name,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.name,
+            self.body.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::clear(
-            &mut self.view.fields.name,
-            self.view.shared.bitfield_mut(),
+            &mut self.body.fields.name,
+            self.body.shared.bitfield_mut(),
         )
     }
 }
@@ -260,8 +265,8 @@ impl self::_puroro::Message for Author {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.view.fields.name,
-            self.view.shared.bitfield(),
+            &self.body.fields.name,
+            self.body.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -294,8 +299,8 @@ impl self::_pinternal::MessageInternal for Author {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.view.fields.name,
-                            self.view.shared.bitfield_mut(),
+                            &mut self.body.fields.name,
+                            self.body.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -311,7 +316,7 @@ impl self::_pinternal::MessageInternal for Author {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.view.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -319,11 +324,16 @@ impl self::_pinternal::MessageInternal for Author {
         Ok(())
     }
 }
+impl ::std::borrow::Borrow<self::_root::library::_view::AuthorView> for Author {
+    fn borrow(&self) -> &self::_root::library::_view::AuthorView {
+        &self.body
+    }
+}
 impl ::std::clone::Clone for Author {
     fn clone(&self) -> Self {
-        Self {
-            view: ::std::clone::Clone::clone(&self.view),
-        }
+        #[allow(unused)]
+        use ::std::borrow::ToOwned;
+        ToOwned::to_owned(&self.body)
     }
 }
 impl ::std::fmt::Debug for Author {
@@ -332,7 +342,7 @@ impl ::std::fmt::Debug for Author {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::library::_view::AuthorView as ::std::fmt::Debug>::fmt(
-            &self.view,
+            &self.body,
             fmt,
         )
     }
@@ -340,12 +350,12 @@ impl ::std::fmt::Debug for Author {
 impl ::std::ops::Deref for Author {
     type Target = self::_root::library::_view::AuthorView;
     fn deref(&self) -> &Self::Target {
-        &self.view
+        &self.body
     }
 }
 impl ::std::cmp::PartialEq for Author {
     fn eq(&self, rhs: &Self) -> bool {
-        &self.view == &rhs.view
+        &self.body == &rhs.body
     }
 }
 #[doc(hidden)]
@@ -424,7 +434,9 @@ pub mod _view {
                 )
                 .is_some()
         }
-        pub fn author(&self) -> ::std::option::Option::<&self::_root::library::Author> {
+        pub fn author(
+            &self,
+        ) -> ::std::option::Option::<&self::_root::library::_view::AuthorView> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_or_else(
                 &self.fields.author,
@@ -434,7 +446,7 @@ pub mod _view {
         }
         pub fn author_opt(
             &self,
-        ) -> ::std::option::Option::<&self::_root::library::Author> {
+        ) -> ::std::option::Option::<&self::_root::library::_view::AuthorView> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.author,
@@ -448,20 +460,6 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
-        }
-    }
-    impl ::std::clone::Clone for BookView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::library::_fields::BookFields {
-                    title: ::std::clone::Clone::clone(&self.fields.title),
-                    num_pages: ::std::clone::Clone::clone(&self.fields.num_pages),
-                    author: ::std::clone::Clone::clone(&self.fields.author),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
         }
     }
     impl ::std::ops::Drop for BookView {
@@ -494,6 +492,23 @@ pub mod _view {
                 && self.num_pages_opt() == rhs.num_pages_opt()
                 && self.author_opt() == rhs.author_opt()
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    impl ::std::borrow::ToOwned for BookView {
+        type Owned = self::_root::library::Book;
+        fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
+            self::_root::library::Book {
+                body: Self {
+                    fields: self::_root::library::_fields::BookFields {
+                        title: ::std::clone::Clone::clone(&self.fields.title),
+                        num_pages: ::std::clone::Clone::clone(&self.fields.num_pages),
+                        author: ::std::clone::Clone::clone(&self.fields.author),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
+            }
         }
     }
     #[derive(::std::default::Default)]
@@ -531,18 +546,6 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl ::std::clone::Clone for AuthorView {
-        fn clone(&self) -> Self {
-            #[allow(unused)]
-            use self::_pinternal::SharedItems as _;
-            Self {
-                fields: self::_root::library::_fields::AuthorFields {
-                    name: ::std::clone::Clone::clone(&self.fields.name),
-                },
-                shared: ::std::clone::Clone::clone(&self.shared),
-            }
-        }
-    }
     impl ::std::ops::Drop for AuthorView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -568,6 +571,21 @@ pub mod _view {
             use self::_pinternal::SharedItems as _;
             true && self.name_opt() == rhs.name_opt()
                 && self.shared.unknown_fields() == rhs.shared.unknown_fields()
+        }
+    }
+    impl ::std::borrow::ToOwned for AuthorView {
+        type Owned = self::_root::library::Author;
+        fn to_owned(&self) -> Self::Owned {
+            #[allow(unused)]
+            use self::_pinternal::SharedItems;
+            self::_root::library::Author {
+                body: Self {
+                    fields: self::_root::library::_fields::AuthorFields {
+                        name: ::std::clone::Clone::clone(&self.fields.name),
+                    },
+                    shared: ::std::clone::Clone::clone(&self.shared),
+                },
+            }
         }
     }
 }

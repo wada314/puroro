@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::protobuf::google::protobuf::source_code_info;
+use ::stable_puroro::protobuf::google::protobuf::source_code_info;
 
 #[derive(Debug, Clone)]
 pub(crate) struct SourceCodeInfo {

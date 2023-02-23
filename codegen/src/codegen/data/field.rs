@@ -19,7 +19,9 @@ use super::{
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
-use ::puroro::protobuf::google::protobuf::{field_descriptor_proto, FieldDescriptorProtoView};
+use ::stable_puroro::protobuf::google::protobuf::{
+    field_descriptor_proto, FieldDescriptorProtoView,
+};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 
