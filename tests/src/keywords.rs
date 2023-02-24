@@ -11,8 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg {
+pub struct Msg<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::keywords::_view::MsgView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Msg {
     pub fn type_mut(&mut self) -> &mut i32 {
@@ -157,8 +159,10 @@ impl ::std::cmp::PartialEq for Msg {
     }
 }
 #[derive(::std::default::Default)]
-pub struct _Self {
+pub struct _Self<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::keywords::_view::SelfView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl _Self {
     pub fn type_mut(&mut self) -> &mut i32 {

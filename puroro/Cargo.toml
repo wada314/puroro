@@ -14,7 +14,8 @@ readme = "../readme.md"
 thiserror = "1.0"
 either = "1.8"
 bitvec = "1.0"
+bumpalo = { version = "3.12", optional = true, features = ["collections", "boxed"] }
 
 [features]
 default = []
-allocator_api = []
+bumpalo = ["dep:bumpalo"]

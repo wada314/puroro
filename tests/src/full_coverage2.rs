@@ -12,8 +12,10 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg {
+pub struct Msg<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::full_coverage2::_view::MsgView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Msg {
     pub fn i32_required_mut(&mut self) -> &mut i32 {

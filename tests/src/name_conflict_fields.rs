@@ -11,8 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Conflict {
+pub struct Conflict<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::name_conflict_fields::_view::ConflictView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Conflict {
     pub fn this_is_original_message_field_mut(&mut self) -> &mut i32 {
@@ -158,8 +160,10 @@ impl ::std::cmp::PartialEq for Conflict {
     }
 }
 #[derive(::std::default::Default)]
-pub struct ConflictFields {
+pub struct ConflictFields<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::name_conflict_fields::_view::ConflictFieldsView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl ConflictFields {
     pub fn this_is_fields_message_field_mut(&mut self) -> &mut i32 {

@@ -11,8 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg {
+pub struct Submsg<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::nested::msg::_view::SubmsgView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Submsg {
     pub fn item_inner_mut(&mut self) -> &mut i32 {

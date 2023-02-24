@@ -11,8 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct ConflictCase {
+pub struct ConflictCase<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::name_conflict_case::message::_view::ConflictCaseView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl ConflictCase {
     pub fn this_is_message_field_mut(&mut self) -> &mut i32 {

@@ -12,8 +12,10 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg {
+pub struct Msg<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::nested::_view::MsgView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Msg {
     pub fn item_outer_mut(&mut self) -> &mut i32 {

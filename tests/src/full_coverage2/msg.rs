@@ -11,8 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg {
+pub struct Submsg<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::full_coverage2::msg::_view::SubmsgView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Submsg {
     pub fn i32_required_mut(&mut self) -> &mut i32 {

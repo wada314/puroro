@@ -12,8 +12,10 @@ mod _pinternal {
 }
 pub mod message;
 #[derive(::std::default::Default)]
-pub struct Message {
+pub struct Message<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::name_conflict_case::_view::MessageView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Message {
     pub fn clear_conflict(&mut self) {

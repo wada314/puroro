@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, PURORO_INTERNAL,
-    PURORO_LIB,
+    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, CFG_BUMPALO,
+    PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
@@ -135,8 +135,9 @@ impl Message {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             #(#docs)*
-            pub struct #ident {
+            pub struct #ident<#CFG_BUMPALO B = ()> {
                 body: #view_type,
+                #CFG_BUMPALO bump: B,
             }
         })?;
         let impl_struct = parse2(quote! {

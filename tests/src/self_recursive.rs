@@ -11,8 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg {
+pub struct Msg<#[cfg(feature = "bumpalo")] B = ()> {
     body: self::_root::self_recursive::_view::MsgView,
+    #[cfg(feature = "bumpalo")]
+    bump: B,
 }
 impl Msg {
     pub fn recursive_unlabeled_mut(&mut self) -> &mut self::_root::self_recursive::Msg {

@@ -77,4 +77,5 @@ gen_global_constants! {
             pub(crate) use super::#PURORO_ROOT_IDENT::#PURORO_INTERNAL_IDENT::*;
         }
     };
+    const CFG_BUMPALO: CfgBumpalo = quote! { #[cfg(feature="bumpalo")] };
 }
