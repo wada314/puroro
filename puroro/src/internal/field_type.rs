@@ -26,6 +26,7 @@ use crate::internal::variant::Variant;
 use crate::repeated::RepeatedFieldView;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
+use ::std::mem::forget;
 
 pub trait FieldType {
     // Deserialization methods
@@ -143,4 +144,26 @@ pub trait RepeatedFieldType: FieldType {
     type ContainerType;
     fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
+}
+
+struct NoAllocVec<T> {
+    ptr: *mut T,
+    length: usize,
+    capacity: usize,
+}
+impl<T> From<Vec<T>> for NoAllocVec<T> {
+    fn from(mut value: Vec<T>) -> Self {
+        let ret = NoAllocVec {
+            ptr: value.as_mut_ptr(),
+            length: value.len(),
+            capacity: value.capacity(),
+        };
+        forget(value);
+        ret
+    }
+}
+impl<T> From<NoAllocVec<T>> for Vec<T> {
+    fn from(value: NoAllocVec<T>) -> Self {
+        unsafe { Vec::from_raw_parts(value.ptr, value.length, value.capacity) }
+    }
 }
