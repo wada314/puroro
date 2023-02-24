@@ -57,7 +57,7 @@ protoc-bin-vendored = "3.0.0"
 ```
 
 As a last step, create a file `build.rs` under the crate root directory.
-Check [our sample build.rs](./tests-pb/build.rs) and just copy and paste.
+Check [our sample build.rs](./tests/build.rs) and just copy and paste.
 
 Once you have finished these steps, the directory should be like this:
 
@@ -80,7 +80,6 @@ your own crate. Congraturations!
 - inline -- Provides a proc macro to directly write proto code in rust code.
 Currently only used by testing purpose, not published.
 - tests -- Test cases
-- tests-pb -- Compiling .pb files used by tests crate
 
 # TODOs
 - proto2
