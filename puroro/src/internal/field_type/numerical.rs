@@ -143,7 +143,9 @@ where
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
-        self.0.push(variant.get::<ProtoType>()?);
+        let mut vec: Vec<_> = self.0.into();
+        vec.push(variant.get::<ProtoType>()?);
+        self.0 = vec.into();
         Ok(())
     }
 
@@ -152,19 +154,23 @@ where
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
+        let mut vec: Vec<_> = self.0.into();
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
-            self.0.push(var.get::<ProtoType>()?)
+            vec.push(var.get::<ProtoType>()?)
         }
+        self.0 = vec.into();
         Ok(())
     }
     fn deser_from_bits32<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
-        self.0
-            .push(<ProtoType as tags::NumericalType>::from_bits32(bits)?);
+        let mut vec: Vec<_> = self.0.into();
+        vec.push(<ProtoType as tags::NumericalType>::from_bits32(bits)?);
+        self.0 = vec.into();
         Ok(())
     }
     fn deser_from_bits64<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
-        self.0
-            .push(<ProtoType as tags::NumericalType>::from_bits64(bits)?);
+        let mut vec: Vec<_> = self.0.into();
+        vec.push(<ProtoType as tags::NumericalType>::from_bits64(bits)?);
+        self.0 = vec.into();
         Ok(())
     }
     fn ser_to_write<W: Write, B: BitSlice>(
@@ -296,7 +302,7 @@ where
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
-        RepeatedFieldViewImpl(self.0.as_slice())
+        RepeatedFieldViewImpl(&self.0)
     }
 
     type ContainerType = Vec<ProtoType::RustType>;

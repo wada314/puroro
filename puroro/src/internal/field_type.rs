@@ -27,6 +27,7 @@ use crate::repeated::RepeatedFieldView;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::mem::forget;
+use ::std::ops::Deref;
 
 pub trait FieldType {
     // Deserialization methods
@@ -165,5 +166,18 @@ impl<T> From<Vec<T>> for NoAllocVec<T> {
 impl<T> From<NoAllocVec<T>> for Vec<T> {
     fn from(value: NoAllocVec<T>) -> Self {
         unsafe { Vec::from_raw_parts(value.ptr, value.length, value.capacity) }
+    }
+}
+impl<T> Deref for NoAllocVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        unsafe { std::slice::from_raw_parts(self.ptr, self.length) }
+    }
+}
+impl<'a, T> IntoIterator for &'a NoAllocVec<T> {
+    type Item = &'a T;
+    type IntoIter = ::std::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.deref().into_iter()
     }
 }
