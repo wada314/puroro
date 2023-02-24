@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tests_pb::self_recursive::Msg;
+use ::tests::self_recursive::Msg;
 
 #[test]
 fn test_new() {
-    let msg = Msg::default();
-    let msg: Msg;
+    let _ = Msg::default();
+    let _msg: Msg;
 }

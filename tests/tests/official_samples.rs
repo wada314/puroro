@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::{Message, RepeatedFieldView};
+use ::puroro::Message;
 use ::puroro_inline::puroro_inline;
-use ::std::borrow::Cow;
-use ::std::default::Default;
 use ::std::io::Read;
 /// The sample cases documented in the Protobuf official encoding document:
 /// https://developers.google.com/protocol-buffers/docs/encoding
@@ -61,7 +59,7 @@ fn proto2_test1() {
 
 #[test]
 fn proto2_test2() {
-    let mut t2 = p2::Test2::from_bytes_iter(TEST2_INPUT.bytes()).unwrap();
+    let t2 = p2::Test2::from_bytes_iter(TEST2_INPUT.bytes()).unwrap();
     assert_eq!(TEST2_EXPECTED.to_string(), t2.b());
     let mut encoded = Vec::new();
     t2.to_bytes(&mut encoded).unwrap();
@@ -70,7 +68,7 @@ fn proto2_test2() {
 
 #[test]
 fn proto2_test3() {
-    let mut t3 = p2::Test3::from_bytes_iter(TEST3_INPUT.bytes()).unwrap();
+    let t3 = p2::Test3::from_bytes_iter(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c().is_some());
     assert_eq!(TEST3_EXPECTED, t3.c().unwrap().a());
     let mut encoded = Vec::new();
@@ -80,7 +78,7 @@ fn proto2_test3() {
 
 #[test]
 fn proto2_test4() {
-    let mut t4 = p2::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
+    let t4 = p2::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
     assert_eq!(
         TEST4_EXPECTED,
         t4.d().into_iter().cloned().collect::<Vec<_>>()
@@ -121,7 +119,7 @@ fn proto3_test1() {
 
 #[test]
 fn proto3_test2() {
-    let mut t2 = p3::Test2::from_bytes_iter(TEST2_INPUT.bytes()).unwrap();
+    let t2 = p3::Test2::from_bytes_iter(TEST2_INPUT.bytes()).unwrap();
     assert_eq!(TEST2_EXPECTED, t2.b());
     let mut encoded = Vec::new();
     t2.to_bytes(&mut encoded).unwrap();
@@ -130,7 +128,7 @@ fn proto3_test2() {
 
 #[test]
 fn proto3_test3() {
-    let mut t3 = p3::Test3::from_bytes_iter(TEST3_INPUT.bytes()).unwrap();
+    let t3 = p3::Test3::from_bytes_iter(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c().is_some());
     assert_eq!(TEST3_EXPECTED, t3.c().unwrap().a());
     let mut encoded = Vec::new();
@@ -140,7 +138,7 @@ fn proto3_test3() {
 
 #[test]
 fn proto3_test4() {
-    let mut t4 = p3::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
+    let t4 = p3::Test4::from_bytes_iter(TEST4_INPUT.bytes()).unwrap();
     assert_eq!(
         TEST4_EXPECTED,
         t4.d().into_iter().cloned().collect::<Vec<_>>()

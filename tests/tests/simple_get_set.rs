@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tests_pb::full_coverage2::msg::Submsg as Submsg2;
-use crate::tests_pb::full_coverage2::{Enum as Enum2, Msg as Msg2};
-use crate::tests_pb::full_coverage3::msg::Submsg as Submsg3;
-use crate::tests_pb::full_coverage3::{Enum as Enum3, Msg as Msg3};
 use ::puroro::RepeatedFieldView;
+use ::tests::full_coverage2::Msg as Msg2;
+use ::tests::full_coverage3::Msg as Msg3;
 
 #[test]
 fn simple2_get_set_int32() {

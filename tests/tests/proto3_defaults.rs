@@ -14,7 +14,7 @@
 
 /// About the proto3's default values, check the following official document:
 /// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
-use ::puroro::{Message, RepeatedFieldView};
+use ::puroro::Message;
 use ::puroro_inline::puroro_inline;
 
 const INPUT_FIELD1_I32_ZERO: &[u8] = &[(1 << 3) | 0, 0x00];
@@ -26,8 +26,6 @@ const INPUT_FIELD2_I32_ONE: &[u8] = &[(2 << 3) | 0, 0x01];
 const INPUT_FIELD3_I32_ZERO: &[u8] = &[(3 << 3) | 0, 0x00];
 const INPUT_FIELD3_I32_ONE: &[u8] = &[(3 << 3) | 0, 0x01];
 const INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE: &[u8] = &[(3 << 3) | 2, 0x04, 0x00, 0x01, 0x02, 0x03];
-const INPUT_FIELD4_F32_ZERO: &[u8] = &[(4 << 3) | 5, 0x00, 0x00, 0x00, 0x00];
-const INPUT_FIELD4_F32_ONE: &[u8] = &[(4 << 3) | 5, 0x00, 0x00, 0x80, 0x3F]; // 0x3F80_0000 == 1.0f32
 const INPUT_FIELD5_STRING_EMPTY: &[u8] = &[(5 << 3) | 0x02, 0x00];
 const INPUT_FIELD5_STRING_TEST2: &[u8] = &[
     (5 << 3) | 0x02,
@@ -38,7 +36,6 @@ const INPUT_FIELD5_STRING_TEST2: &[u8] = &[
     't' as u8,
     '2' as u8,
 ];
-const INPUT_FIELDS6_MSG_EMPTY: &[u8] = &[(6 << 3) | 0x02, 0x00];
 const INPUT_FIELDS6_MSG_FIELD1_I32_ZERO: &[u8] = &[(6 << 3) | 0x02, 0x02, (1 << 3) | 0, 0x00];
 const INPUT_FIELDS6_MSG_FIELD1_I32_ONE: &[u8] = &[(6 << 3) | 0x02, 0x02, (1 << 3) | 0, 0x01];
 
@@ -59,7 +56,7 @@ message Submsg {
     int32 i32_unlabeled = 1;
 }
 "#}
-use proto3_defaults::{Msg, Submsg};
+use proto3_defaults::Msg;
 
 #[test]
 fn test_i32_unlabeled() {

@@ -53,7 +53,7 @@ enum Enum {
 }
 "#}
 
-use unknown_fields::{msg::Submsg, Enum, Msg};
+use unknown_fields::Msg;
 
 #[test]
 fn test_unknown_field_number_is_ignored() {

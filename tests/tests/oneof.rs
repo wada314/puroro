@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::Message;
 use ::puroro_inline::puroro_inline;
 
 puroro_inline! {r#"
@@ -136,7 +135,7 @@ message Submsg {
 use oneofs3::msg::{
     GroupOneCase as GroupOneCase3, GroupThreeCase as GroupThreeCase3, GroupTwoCase as GroupTwoCase3,
 };
-use oneofs3::{Msg as Msg3, Submsg as Submsg3};
+use oneofs3::Msg as Msg3;
 
 #[test]
 fn test_oneof3() {

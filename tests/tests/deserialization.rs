@@ -49,7 +49,7 @@ enum Enum {
 }
 "#}
 
-use deser_tests2::{msg::Submsg, Enum, Msg};
+use deser_tests2::Msg;
 
 #[test]
 fn test_empty() {

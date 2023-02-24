@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::Message;
 use ::puroro_inline::puroro_inline2;
 use ::std::convert::{TryFrom, TryInto};
 

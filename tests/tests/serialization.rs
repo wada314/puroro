@@ -46,7 +46,7 @@ enum Enum {
 }
 "#}
 
-use ser_tests2::{msg::Submsg as Submsg2, Enum as Enum2, Msg as Msg2};
+use ser_tests2::Msg as Msg2;
 
 #[test]
 fn test_empty2() {
