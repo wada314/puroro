@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::Message as _;
 use ::puroro_inline::puroro_inline;
 
 puroro_inline! {r#"
@@ -102,7 +101,7 @@ use proto2_defaults::{Msg, MyEnum};
 
 #[test]
 fn test_simple_int32() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     // Check struct fields has specified default values
     assert_eq!(0, msg.i32_default());
@@ -125,7 +124,7 @@ fn test_simple_int32() {
 
 #[test]
 fn test_simple_uint32() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(0, msg.u32_default());
     assert_eq!(0, msg.u32_0());
@@ -143,7 +142,7 @@ fn test_simple_uint32() {
 
 #[test]
 fn test_simple_int64() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(0, msg.i64_default());
     assert_eq!(0, msg.i64_0());
@@ -165,7 +164,7 @@ fn test_simple_int64() {
 
 #[test]
 fn test_simple_uint64() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(0, msg.u64_default());
     assert_eq!(0, msg.u64_0());
@@ -183,7 +182,7 @@ fn test_simple_uint64() {
 
 #[test]
 fn test_simple_float() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(0.0, msg.f32_default());
     assert_eq!(0.0, msg.f32_0());
@@ -215,7 +214,7 @@ fn test_simple_float() {
 
 #[test]
 fn test_simple_bool() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(false, msg.bool_default());
     assert_eq!(false, msg.bool_false());
@@ -227,7 +226,7 @@ fn test_simple_bool() {
 
 #[test]
 fn test_simple_string() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!("", msg.string_default());
     assert_eq!("", msg.string_empty());
@@ -247,7 +246,7 @@ fn test_simple_string() {
 
 #[test]
 fn test_simple_bytes() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(b"", msg.bytes_default());
     assert_eq!(b"", msg.bytes_empty());
@@ -267,7 +266,7 @@ fn test_simple_bytes() {
 
 #[test]
 fn test_simple_enum() {
-    let mut msg = Msg::default();
+    let msg = Msg::default();
 
     assert_eq!(MyEnum::One, msg.enum_default());
     assert_eq!(MyEnum::One, msg.enum_one());

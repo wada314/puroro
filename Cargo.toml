@@ -6,7 +6,6 @@ members = [
     "update-puroro-doc-samples",
     "update-puroro-protobuf",
     "tests",
-    "tests-pb",
 ]
 default-members = [
     "puroro",
@@ -15,5 +14,4 @@ default-members = [
 #    "update-puroro-doc-samples",
 #    "update-puroro-protobuf",
     "tests",
-    "tests-pb",
 ]
