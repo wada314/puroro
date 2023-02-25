@@ -138,36 +138,40 @@ impl Package {
 
     // Will no one use this???
     #[allow(unused)]
-    fn files(&self) -> Result<impl '_ + Iterator<Item = Rc<InputFile>>> {
-        Ok(self.files.iter().cloned())
+    fn files(&self) -> Result<impl Iterator<Item = &Rc<InputFile>>> {
+        Ok(self.files.iter())
     }
 
-    fn messages(&self) -> Result<impl '_ + Iterator<Item = Rc<Message>>> {
-        self.messages
+    fn messages(&self) -> Result<impl Iterator<Item = &Rc<Message>>> {
+        Ok(self
+            .messages
             .get_or_try_init(|| {
                 self.files
                     .iter()
                     .map(|f| f.messages())
                     .flatten_ok()
+                    .map(|f| f.cloned())
                     .try_collect()
-            })
-            .map(|v| v.iter().cloned())
+            })?
+            .iter())
     }
 
-    fn enums(&self) -> Result<impl '_ + Iterator<Item = Rc<Enum>>> {
-        self.enums
+    fn enums(&self) -> Result<impl Iterator<Item = &Rc<Enum>>> {
+        Ok(self
+            .enums
             .get_or_try_init(|| {
                 self.files
                     .iter()
                     .map(|f| f.enums())
                     .flatten_ok()
+                    .map(|o| o.cloned())
                     .try_collect()
-            })
-            .map(|v| v.iter().cloned())
+            })?
+            .iter())
     }
 
-    fn subpackages(&self) -> Result<impl '_ + Iterator<Item = Rc<Package>>> {
-        Ok(self.subpackages.iter().cloned())
+    fn subpackages(&self) -> Result<impl Iterator<Item = &Rc<Package>>> {
+        Ok(self.subpackages.iter())
     }
 
     fn root(&self) -> Result<Rc<Package>> {
@@ -219,17 +223,17 @@ impl PackageOrMessage for Package {
         PackageOrMessageCase::Package(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Message>>>> {
         Ok(Box::new(self.messages()?))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Enum>>>> {
         Ok(Box::new(self.enums()?))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Oneof>>>> {
         Ok(Box::new(iter::empty()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>> {
-        Ok(Box::new(self.subpackages()?.map(|p| p as Rc<Package>)))
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Package>>>> {
+        Ok(Box::new(self.subpackages()?))
     }
     fn root_package(&self) -> Result<Rc<Package>> {
         self.root()
@@ -279,12 +283,12 @@ mod tests {
         fd
     });
 
-    trait IteratorExt: Sized + Iterator<Item = Rc<Package>> {
+    trait IteratorExt<'a>: Sized + Iterator<Item = &'a Rc<Package>> {
         fn find_subp(&mut self, name: &str) -> Option<Rc<Package>> {
-            self.find(|p| p.name().is_ok_and(|n| n == name))
+            self.find(|p| p.name().is_ok_and(|n| n == name)).cloned()
         }
     }
-    impl<T: Iterator<Item = Rc<Package>>> IteratorExt for T {}
+    impl<'a, T: Iterator<Item = &'a Rc<Package>>> IteratorExt<'a> for T {}
 
     #[test]
     fn test_make_package_empty() -> Result<()> {

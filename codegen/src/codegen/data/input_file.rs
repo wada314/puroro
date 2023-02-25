@@ -100,11 +100,11 @@ impl InputFile {
             .get_or_try_init(|| self.syntax.as_str().try_into())
             .cloned()
     }
-    pub(crate) fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
-        Ok(Box::new(self.messages.iter().cloned()))
+    pub(crate) fn messages(&self) -> Result<impl Iterator<Item = &Rc<Message>>> {
+        Ok(Box::new(self.messages.iter()))
     }
-    pub(crate) fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
-        Ok(Box::new(self.enums.iter().cloned()))
+    pub(crate) fn enums(&self) -> Result<impl Iterator<Item = &Rc<Enum>>> {
+        Ok(Box::new(self.enums.iter()))
     }
     #[cfg(test)]
     pub(crate) fn package(&self) -> Result<Rc<Package>> {

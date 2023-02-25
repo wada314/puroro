@@ -268,7 +268,7 @@ impl Oneof {
 
     fn try_map_fields<F, R>(&self, f: F) -> Result<Vec<R>>
     where
-        F: FnMut(Rc<OneofField>) -> Result<R>,
+        F: FnMut(&Rc<OneofField>) -> Result<R>,
     {
         self.fields()?.map(f).collect::<Result<Vec<_>>>()
     }

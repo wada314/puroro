@@ -132,16 +132,16 @@ impl PackageOrMessage for Message {
         PackageOrMessageCase::Message(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
-        Ok(Box::new(self.messages.iter().cloned()))
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Message>>>> {
+        Ok(Box::new(self.messages.iter()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
-        Ok(Box::new(self.enums.iter().cloned()))
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Enum>>>> {
+        Ok(Box::new(self.enums.iter()))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
-        Ok(Box::new(self.oneofs.iter().cloned()))
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Oneof>>>> {
+        Ok(Box::new(self.oneofs.iter()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Package>>>> {
         Ok(Box::new(iter::empty()))
     }
     fn root_package(&self) -> Result<Rc<Package>> {
@@ -175,11 +175,8 @@ impl Message {
             .map(|o| Rc::deref(o) as &dyn FieldOrOneof);
         Ok(Box::new(fields.chain(oneofs)))
     }
-    pub(crate) fn all_fields(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn FieldBase>>> {
-        let direct_fields = self
-            .fields
-            .iter()
-            .map(|f| Rc::clone(f) as Rc<dyn FieldBase>);
+    pub(crate) fn all_fields(&self) -> Result<impl Iterator<Item = &dyn FieldBase>> {
+        let direct_fields = self.fields.iter().map(|f| Rc::deref(f) as &dyn FieldBase);
         // let oneof_fields = self.oneofs()?.map(|o| o.fields())
         todo!();
         Ok(direct_fields)
