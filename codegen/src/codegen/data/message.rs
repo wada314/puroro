@@ -28,6 +28,7 @@ use ::std::rc::{Rc, Weak};
 pub(crate) struct Message {
     cache: AnonymousCache,
     name: String,
+    /// Not including the oneof fields.
     fields: Vec<Rc<Field>>,
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
@@ -157,9 +158,11 @@ impl Message {
     pub(crate) fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
+    /// Not including the oneof fields.
     pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Field>>>> {
         Ok(Box::new(self.fields.iter().cloned()))
     }
+    /// Not including the fields belonging to any oneofs.
     pub(crate) fn fields_or_oneofs(
         &self,
     ) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {
