@@ -14,14 +14,15 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
-    PackageOrMessageCase, MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
+    DataTypeBase, Enum, Field, FieldBase, FieldOrOneof, InputFile, Oneof, Package,
+    PackageOrMessage, PackageOrMessageCase, MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
     MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
 use ::stable_puroro::protobuf::google::protobuf::DescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
+use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 
 #[derive(Debug)]
@@ -159,22 +160,29 @@ impl Message {
         Ok(self.parent.try_upgrade()?)
     }
     /// Not including the oneof fields.
-    pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Field>>>> {
-        Ok(Box::new(self.fields.iter().cloned()))
+    pub(crate) fn fields(&self) -> Result<impl Iterator<Item = &Rc<Field>>> {
+        Ok(self.fields.iter())
     }
     /// Not including the fields belonging to any oneofs.
-    pub(crate) fn fields_or_oneofs(
-        &self,
-    ) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {
+    pub(crate) fn fields_or_oneofs(&self) -> Result<impl Iterator<Item = &dyn FieldOrOneof>> {
         let fields = self
             .fields
             .iter()
-            .map(|f| f.clone() as Rc<dyn FieldOrOneof>);
+            .map(|f| Rc::deref(f) as &dyn FieldOrOneof);
         let oneofs = self
             .oneofs
             .iter()
-            .map(|o| o.clone() as Rc<dyn FieldOrOneof>);
+            .map(|o| Rc::deref(o) as &dyn FieldOrOneof);
         Ok(Box::new(fields.chain(oneofs)))
+    }
+    pub(crate) fn all_fields(&self) -> Result<impl '_ + Iterator<Item = Rc<dyn FieldBase>>> {
+        let direct_fields = self
+            .fields
+            .iter()
+            .map(|f| Rc::clone(f) as Rc<dyn FieldBase>);
+        // let oneof_fields = self.oneofs()?.map(|o| o.fields())
+        todo!();
+        Ok(direct_fields)
     }
     pub(crate) fn location_path(&self) -> Result<Box<dyn Iterator<Item = i32>>> {
         Ok(match self.parent()?.either() {
