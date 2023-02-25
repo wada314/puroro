@@ -19,6 +19,7 @@ use super::{
     MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
+use itertools::Itertools;
 use ::stable_puroro::protobuf::google::protobuf::DescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
@@ -177,7 +178,7 @@ impl Message {
     }
     pub(crate) fn all_fields(&self) -> Result<impl Iterator<Item = &dyn FieldBase>> {
         let direct_fields = self.fields.iter().map(|f| Rc::deref(f) as &dyn FieldBase);
-        // let oneof_fields = self.oneofs()?.map(|o| o.fields())
+        let oneof_fields = self.oneofs()?.map(|o| o.fields()).flatten_ok()
         todo!();
         Ok(direct_fields)
     }
