@@ -26,8 +26,6 @@ use crate::internal::variant::Variant;
 use crate::repeated::RepeatedFieldView;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
-use ::std::mem::forget;
-use ::std::ops::Deref;
 
 pub trait FieldType {
     // Deserialization methods
@@ -145,39 +143,4 @@ pub trait RepeatedFieldType: FieldType {
     type ContainerType;
     fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
-}
-
-struct NoAllocVec<T> {
-    ptr: *mut T,
-    length: usize,
-    capacity: usize,
-}
-impl<T> From<Vec<T>> for NoAllocVec<T> {
-    fn from(mut value: Vec<T>) -> Self {
-        let ret = NoAllocVec {
-            ptr: value.as_mut_ptr(),
-            length: value.len(),
-            capacity: value.capacity(),
-        };
-        forget(value);
-        ret
-    }
-}
-impl<T> From<NoAllocVec<T>> for Vec<T> {
-    fn from(value: NoAllocVec<T>) -> Self {
-        unsafe { Vec::from_raw_parts(value.ptr, value.length, value.capacity) }
-    }
-}
-impl<T> Deref for NoAllocVec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        unsafe { std::slice::from_raw_parts(self.ptr, self.length) }
-    }
-}
-impl<'a, T> IntoIterator for &'a NoAllocVec<T> {
-    type Item = &'a T;
-    type IntoIter = ::std::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.deref().into_iter()
-    }
 }

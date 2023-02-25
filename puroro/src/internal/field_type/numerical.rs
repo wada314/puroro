@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{FieldType, NoAllocVec, NonRepeatedFieldType, RepeatedFieldType};
+use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
+use crate::internal::alloc::NoAllocVec;
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, ScopedIter, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
 use crate::repeated::RepeatedFieldView;
 use crate::Result;
-#[cfg(feature = "bumpalo")]
-use ::bumpalo::collections::Vec as BVec;
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 use ::std::ops::Index;
