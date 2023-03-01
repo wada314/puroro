@@ -730,6 +730,54 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const I32_REQUIRED_FIELD_NUMBER: i32 = 1i32;
+    pub const I32_OPTIONAL_FIELD_NUMBER: i32 = 2i32;
+    pub const I32_REPEATED_FIELD_NUMBER: i32 = 3i32;
+    pub const FLOAT_REQUIRED_FIELD_NUMBER: i32 = 11i32;
+    pub const FLOAT_OPTIONAL_FIELD_NUMBER: i32 = 12i32;
+    pub const FLOAT_REPEATED_FIELD_NUMBER: i32 = 13i32;
+    pub const BYTES_REQUIRED_FIELD_NUMBER: i32 = 21i32;
+    pub const BYTES_OPTIONAL_FIELD_NUMBER: i32 = 22i32;
+    pub const BYTES_REPEATED_FIELD_NUMBER: i32 = 23i32;
+    pub const STRING_REQUIRED_FIELD_NUMBER: i32 = 31i32;
+    pub const STRING_OPTIONAL_FIELD_NUMBER: i32 = 32i32;
+    pub const STRING_REPEATED_FIELD_NUMBER: i32 = 33i32;
+    pub const ENUM_REQUIRED_FIELD_NUMBER: i32 = 41i32;
+    pub const ENUM_OPTIONAL_FIELD_NUMBER: i32 = 42i32;
+    pub const ENUM_REPEATED_FIELD_NUMBER: i32 = 43i32;
+    pub const SUBMSG_REQUIRED_FIELD_NUMBER: i32 = 51i32;
+    pub const SUBMSG_OPTIONAL_FIELD_NUMBER: i32 = 52i32;
+    pub const SUBMSG_REPEATED_FIELD_NUMBER: i32 = 53i32;
+    pub const I64_REQUIRED_FIELD_NUMBER: i32 = 101i32;
+    pub const I64_OPTIONAL_FIELD_NUMBER: i32 = 102i32;
+    pub const I64_REPEATED_FIELD_NUMBER: i32 = 103i32;
+    pub const U32_REQUIRED_FIELD_NUMBER: i32 = 111i32;
+    pub const U32_OPTIONAL_FIELD_NUMBER: i32 = 112i32;
+    pub const U32_REPEATED_FIELD_NUMBER: i32 = 113i32;
+    pub const U64_REQUIRED_FIELD_NUMBER: i32 = 121i32;
+    pub const U64_OPTIONAL_FIELD_NUMBER: i32 = 122i32;
+    pub const U64_REPEATED_FIELD_NUMBER: i32 = 123i32;
+    pub const S32_REQUIRED_FIELD_NUMBER: i32 = 131i32;
+    pub const S32_OPTIONAL_FIELD_NUMBER: i32 = 132i32;
+    pub const S32_REPEATED_FIELD_NUMBER: i32 = 133i32;
+    pub const S64_REQUIRED_FIELD_NUMBER: i32 = 141i32;
+    pub const S64_OPTIONAL_FIELD_NUMBER: i32 = 142i32;
+    pub const S64_REPEATED_FIELD_NUMBER: i32 = 143i32;
+    pub const FIXED32_REQUIRED_FIELD_NUMBER: i32 = 151i32;
+    pub const FIXED32_OPTIONAL_FIELD_NUMBER: i32 = 152i32;
+    pub const FIXED32_REPEATED_FIELD_NUMBER: i32 = 153i32;
+    pub const FIXED64_REQUIRED_FIELD_NUMBER: i32 = 161i32;
+    pub const FIXED64_OPTIONAL_FIELD_NUMBER: i32 = 162i32;
+    pub const FIXED64_REPEATED_FIELD_NUMBER: i32 = 163i32;
+    pub const SFIXED32_REQUIRED_FIELD_NUMBER: i32 = 171i32;
+    pub const SFIXED32_OPTIONAL_FIELD_NUMBER: i32 = 172i32;
+    pub const SFIXED32_REPEATED_FIELD_NUMBER: i32 = 173i32;
+    pub const SFIXED64_REQUIRED_FIELD_NUMBER: i32 = 181i32;
+    pub const SFIXED64_OPTIONAL_FIELD_NUMBER: i32 = 182i32;
+    pub const SFIXED64_REPEATED_FIELD_NUMBER: i32 = 183i32;
+    pub const F64_REQUIRED_FIELD_NUMBER: i32 = 191i32;
+    pub const F64_OPTIONAL_FIELD_NUMBER: i32 = 192i32;
+    pub const F64_REPEATED_FIELD_NUMBER: i32 = 193i32;
 }
 impl self::_puroro::Message for Msg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

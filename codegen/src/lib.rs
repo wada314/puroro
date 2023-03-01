@@ -27,7 +27,8 @@ mod error;
 mod syn {
     pub(crate) use ::syn::{
         parse2, parse_str, Arm, Attribute, Expr, ExprMethodCall, Field, FieldValue, File, Ident,
-        ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
+        ImplItemConst, ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt,
+        Type,
     };
     pub(crate) struct NamedField(::syn::Field);
     impl ::syn::parse::Parse for NamedField {

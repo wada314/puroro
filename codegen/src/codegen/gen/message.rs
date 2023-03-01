@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt, PURORO_INTERNAL,
-    PURORO_LIB,
+    DataTypeBase, FieldBaseExt, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt,
+    PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
@@ -123,6 +123,10 @@ impl Message {
             .map(|f| Ok(f?.gen_message_struct_methods()?.into_iter()))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
+        let constants = self
+            .all_fields()?
+            .map(|f| f.gen_message_struct_const_field_number())
+            .collect::<Result<Vec<_>>>()?;
         let message_impl = self.gen_message_struct_message_impl()?;
         let message_internal_impl = self.gen_message_struct_message_internal_impl()?;
         let borrow_impl = self.gen_message_struct_impl_borrow()?;
@@ -143,6 +147,7 @@ impl Message {
             impl #ident {
                 #(#fields_or_oneofs_methods)*
                 #(#oneof_field_methods)*
+                #(#constants)*
             }
         })?;
         Ok(vec![

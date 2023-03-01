@@ -30,6 +30,7 @@ impl Conflict {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const THIS_IS_ORIGINAL_MESSAGE_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for Conflict {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -177,6 +178,7 @@ impl ConflictFields {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const THIS_IS_FIELDS_MESSAGE_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for ConflictFields {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

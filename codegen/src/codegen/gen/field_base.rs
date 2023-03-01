@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{Bits32Type, Bits64Type, FieldType, LengthDelimitedType, VariantType};
 use crate::codegen::data::FieldBase;
-use crate::syn::{parse2, Expr};
+use crate::syn::{parse2, Expr, ImplItemConst};
 use crate::{FatalErrorKind, Result};
 use ::proc_macro2::Span;
 use ::quote::{format_ident, quote};
@@ -114,6 +114,14 @@ pub(crate) trait FieldBaseExt: FieldBase {
             },
         )?)
     }
+
+    fn gen_message_struct_const_field_number(&self) -> Result<ImplItemConst> {
+        let const_name = format_ident!("{}_FIELD_NUMBER", self.name()?.to_upper_snake_case());
+        let number = self.number()?;
+        Ok(parse2(quote! {
+            pub const #const_name: i32 = #number;
+        })?)
+    }
 }
 
-impl<T: FieldBase> FieldBaseExt for T {}
+impl<T: ?Sized + FieldBase> FieldBaseExt for T {}
