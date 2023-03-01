@@ -51,6 +51,8 @@ impl NamePart {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_PART_FIELD_NUMBER: i32 = 1i32;
+    pub const IS_EXTENSION_FIELD_NUMBER: i32 = 2i32;
 }
 impl self::_puroro::Message for NamePart {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

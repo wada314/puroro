@@ -73,8 +73,8 @@ impl FieldOrOneof for Oneof {
 }
 
 impl Oneof {
-    pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<OneofField>>>> {
-        Ok(Box::new(self.fields.iter().cloned()))
+    pub(crate) fn fields(&self) -> Result<impl Iterator<Item = &Rc<OneofField>>> {
+        Ok(Box::new(self.fields.iter()))
     }
     pub(crate) fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.try_upgrade()?)

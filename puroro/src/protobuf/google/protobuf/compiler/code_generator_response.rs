@@ -79,6 +79,10 @@ impl File {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const INSERTION_POINT_FIELD_NUMBER: i32 = 2i32;
+    pub const CONTENT_FIELD_NUMBER: i32 = 15i32;
+    pub const GENERATED_CODE_INFO_FIELD_NUMBER: i32 = 16i32;
 }
 impl self::_puroro::Message for File {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

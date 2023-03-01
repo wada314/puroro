@@ -14,20 +14,23 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, Enum, Field, FieldOrOneof, InputFile, Oneof, Package, PackageOrMessage,
-    PackageOrMessageCase, MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
+    DataTypeBase, Enum, Field, FieldBase, FieldOrOneof, InputFile, Oneof, Package,
+    PackageOrMessage, PackageOrMessageCase, MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR,
     MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
 use ::stable_puroro::protobuf::google::protobuf::DescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
+use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
+use itertools::Itertools;
 
 #[derive(Debug)]
 pub(crate) struct Message {
     cache: AnonymousCache,
     name: String,
+    /// Not including the oneof fields.
     fields: Vec<Rc<Field>>,
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
@@ -130,16 +133,16 @@ impl PackageOrMessage for Message {
         PackageOrMessageCase::Message(self)
     }
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>> {
-        Ok(Box::new(self.messages.iter().cloned()))
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Message>>>> {
+        Ok(Box::new(self.messages.iter()))
     }
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>> {
-        Ok(Box::new(self.enums.iter().cloned()))
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Enum>>>> {
+        Ok(Box::new(self.enums.iter()))
     }
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>> {
-        Ok(Box::new(self.oneofs.iter().cloned()))
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Oneof>>>> {
+        Ok(Box::new(self.oneofs.iter()))
     }
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>> {
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Package>>>> {
         Ok(Box::new(iter::empty()))
     }
     fn root_package(&self) -> Result<Rc<Package>> {
@@ -157,21 +160,40 @@ impl Message {
     pub(crate) fn parent(&self) -> Result<Rc<dyn PackageOrMessage>> {
         Ok(self.parent.try_upgrade()?)
     }
-    pub(crate) fn fields(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Field>>>> {
-        Ok(Box::new(self.fields.iter().cloned()))
+    /// Not including the oneof fields.
+    pub(crate) fn fields(&self) -> Result<impl Iterator<Item = &Rc<Field>>> {
+        Ok(self.fields.iter())
     }
-    pub(crate) fn fields_or_oneofs(
-        &self,
-    ) -> Result<Box<dyn '_ + Iterator<Item = Rc<dyn FieldOrOneof>>>> {
+    /// Not including the fields belonging to any oneofs.
+    pub(crate) fn fields_or_oneofs(&self) -> Result<impl Iterator<Item = &dyn FieldOrOneof>> {
         let fields = self
             .fields
             .iter()
-            .map(|f| f.clone() as Rc<dyn FieldOrOneof>);
+            .map(|f| Rc::deref(f) as &dyn FieldOrOneof);
         let oneofs = self
             .oneofs
             .iter()
-            .map(|o| o.clone() as Rc<dyn FieldOrOneof>);
+            .map(|o| Rc::deref(o) as &dyn FieldOrOneof);
         Ok(Box::new(fields.chain(oneofs)))
+    }
+    pub(crate) fn all_fields(&self) -> Result<impl Iterator<Item = Rc<dyn FieldBase>>> {
+        let direct_fields_vec = self
+            .fields
+            .iter()
+            .map(|f| Rc::clone(f) as Rc<dyn FieldBase>)
+            .collect::<Vec<_>>();
+        let oneof_fields_vec = self
+            .oneofs()?
+            .map(|o| o.fields())
+            .flatten_ok()
+            .map_ok(|f| Rc::clone(f) as Rc<dyn FieldBase>)
+            .collect::<Result<Vec<_>>>()?;
+        let result_vec = {
+            let (mut v1, mut v2) = (direct_fields_vec, oneof_fields_vec);
+            v1.append(&mut v2);
+            v1
+        };
+        Ok(result_vec.into_iter())
     }
     pub(crate) fn location_path(&self) -> Result<Box<dyn Iterator<Item = i32>>> {
         Ok(match self.parent()?.either() {

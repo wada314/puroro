@@ -62,6 +62,9 @@ impl ExtensionRange {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const START_FIELD_NUMBER: i32 = 1i32;
+    pub const END_FIELD_NUMBER: i32 = 2i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for ExtensionRange {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -257,6 +260,8 @@ impl ReservedRange {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const START_FIELD_NUMBER: i32 = 1i32;
+    pub const END_FIELD_NUMBER: i32 = 2i32;
 }
 impl self::_puroro::Message for ReservedRange {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

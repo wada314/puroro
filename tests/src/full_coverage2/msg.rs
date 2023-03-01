@@ -45,6 +45,8 @@ impl Submsg {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const I32_REQUIRED_FIELD_NUMBER: i32 = 1i32;
+    pub const I64_REQUIRED_FIELD_NUMBER: i32 = 101i32;
 }
 impl self::_puroro::Message for Submsg {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

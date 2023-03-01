@@ -27,7 +27,8 @@ mod error;
 mod syn {
     pub(crate) use ::syn::{
         parse2, parse_str, Arm, Attribute, Expr, ExprMethodCall, Field, FieldValue, File, Ident,
-        ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt, Type,
+        ImplItemConst, ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt,
+        Type,
     };
     pub(crate) struct NamedField(::syn::Field);
     impl ::syn::parse::Parse for NamedField {
@@ -54,6 +55,7 @@ mod syn {
 }
 
 pub use crate::error::{FatalErrorKind, GeneratorError};
+pub use ::stable_puroro as puroro;
 pub type Result<T> = ::std::result::Result<T, GeneratorError>;
 
 pub use ::stable_puroro::protobuf::google::protobuf::compiler::code_generator_response::File;
@@ -64,7 +66,6 @@ pub use ::stable_puroro::protobuf::google::protobuf::compiler::{
 };
 #[doc(hidden)]
 pub use ::stable_puroro::protobuf::google::protobuf::{FileDescriptorProto, FileDescriptorSet};
-pub use ::stable_puroro::protobuf::puroro;
 
 pub use crate::codegen::generate_output_file_protos;
 pub use crate::codegen::generate_tokens_for_inline;

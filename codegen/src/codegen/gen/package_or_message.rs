@@ -163,11 +163,11 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
 
         let submodule_sources = self
             .subpackages()?
-            .map(|p| Ok(p as Rc<dyn PackageOrMessage>))
+            .map(|p| Ok(Rc::clone(p) as Rc<dyn PackageOrMessage>))
             .chain(
                 self.messages()?
                     .filter_map(|m| match m.should_generate_module_file() {
-                        Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
+                        Ok(true) => Some(Ok(Rc::clone(m) as Rc<dyn PackageOrMessage>)),
                         Ok(false) => None,
                         Err(e) => Some(Err(e)),
                     }),
@@ -191,11 +191,11 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
     fn gen_inline_code(&self, puroro_library_path: Option<&str>) -> Result<TokenStream> {
         let submodule_sources = self
             .subpackages()?
-            .map(|p| Ok(p as Rc<dyn PackageOrMessage>))
+            .map(|p| Ok(Rc::clone(p) as Rc<dyn PackageOrMessage>))
             .chain(
                 self.messages()?
                     .filter_map(|m| match m.should_generate_module_file() {
-                        Ok(true) => Some(Ok(m as Rc<dyn PackageOrMessage>)),
+                        Ok(true) => Some(Ok(Rc::clone(m) as Rc<dyn PackageOrMessage>)),
                         Ok(false) => None,
                         Err(e) => Some(Err(e)),
                     }),

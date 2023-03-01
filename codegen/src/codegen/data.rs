@@ -39,15 +39,18 @@ pub(crate) use self::package_or_message::*;
 pub(crate) use self::source_code_info::*;
 
 use super::util::AnonymousCache;
+use crate::puroro::protobuf::google::protobuf::{
+    DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
+};
 use crate::{FatalErrorKind, GeneratorError, Result};
 
-const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 4;
-const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 3;
-const ENUM_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = 5;
-const ENUM_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 4;
-const ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 8;
-const FIELD_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = 2;
-const VALUE_FIELD_NUMBER_IN_ENUM_DESCRIPTOR: i32 = 2;
+const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = FileDescriptorProto::MESSAGE_TYPE_FIELD_NUMBER;
+const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = DescriptorProto::NESTED_TYPE_FIELD_NUMBER;
+const ENUM_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = FileDescriptorProto::ENUM_TYPE_FIELD_NUMBER;
+const ENUM_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = DescriptorProto::ENUM_TYPE_FIELD_NUMBER;
+const ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = DescriptorProto::ONEOF_DECL_FIELD_NUMBER;
+const FIELD_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = DescriptorProto::FIELD_FIELD_NUMBER;
+const VALUE_FIELD_NUMBER_IN_ENUM_DESCRIPTOR: i32 = EnumDescriptorProto::VALUE_FIELD_NUMBER;
 
 pub(crate) trait DataTypeBase {
     fn cache(&self) -> &AnonymousCache;

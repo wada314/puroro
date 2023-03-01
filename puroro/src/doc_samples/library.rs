@@ -60,6 +60,9 @@ impl Book {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const TITLE_FIELD_NUMBER: i32 = 1i32;
+    pub const NUM_PAGES_FIELD_NUMBER: i32 = 2i32;
+    pub const AUTHOR_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for Book {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -232,6 +235,7 @@ impl Author {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for Author {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

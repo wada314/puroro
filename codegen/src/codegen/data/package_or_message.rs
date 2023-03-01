@@ -15,15 +15,16 @@
 use super::{DataTypeBase, Enum, Message, MessageOrEnumCase, Oneof, Package, PackageOrMessageCase};
 use crate::{FatalErrorKind, Result};
 use ::std::fmt::Debug;
+use ::std::ops::Deref;
 use ::std::rc::Rc;
 
 pub(crate) trait PackageOrMessage: DataTypeBase + Debug {
     fn either(&self) -> PackageOrMessageCase<&Package, &Message>;
 
-    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Message>>>>;
-    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Enum>>>>;
-    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Oneof>>>>;
-    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = Rc<Package>>>>;
+    fn messages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Message>>>>;
+    fn enums(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Enum>>>>;
+    fn oneofs(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Oneof>>>>;
+    fn subpackages(&self) -> Result<Box<dyn '_ + Iterator<Item = &Rc<Package>>>>;
     fn root_package(&self) -> Result<Rc<Package>>;
     fn parent(&self) -> Result<Option<Rc<dyn PackageOrMessage>>>;
 
@@ -36,20 +37,27 @@ pub(crate) trait PackageOrMessage: DataTypeBase + Debug {
         let mut stack = self.subpackages()?.collect::<Vec<_>>();
         while let Some(p) = stack.pop() {
             stack.extend(p.subpackages()?);
-            ret.push(p as Rc<Package>);
+            ret.push(Rc::clone(p));
         }
         Ok(ret)
     }
 
     fn all_child_messages(&self) -> Result<Vec<Rc<Message>>> {
-        let mut ret = self.messages()?.collect::<Vec<_>>();
-        let messages_iter = self.messages()?.map(|m| m as Rc<dyn PackageOrMessage>);
-        let packages_iter = self.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>);
+        let mut ret = self.messages()?.cloned().collect::<Vec<_>>();
+        let messages_iter = self
+            .messages()?
+            .map(|m| Rc::deref(m) as &dyn PackageOrMessage);
+        let packages_iter = self
+            .subpackages()?
+            .map(|p| Rc::deref(p) as &dyn PackageOrMessage);
         let mut stack = messages_iter.chain(packages_iter).collect::<Vec<_>>();
         while let Some(p) = stack.pop() {
-            stack.extend(p.messages()?.map(|m| m as Rc<dyn PackageOrMessage>));
-            stack.extend(p.subpackages()?.map(|p| p as Rc<dyn PackageOrMessage>));
-            ret.extend(p.messages()?);
+            stack.extend(p.messages()?.map(|m| Rc::deref(m) as &dyn PackageOrMessage));
+            stack.extend(
+                p.subpackages()?
+                    .map(|p| Rc::deref(p) as &dyn PackageOrMessage),
+            );
+            ret.extend(p.messages()?.cloned());
         }
         Ok(ret)
     }
@@ -81,12 +89,12 @@ pub(crate) trait PackageOrMessage: DataTypeBase + Debug {
                 .messages()?
                 .try_find(|m| -> Result<_> { Ok(m.name()? == type_name) })?
             {
-                return Ok(MessageOrEnumCase::Message(m));
-            } else if let Some(m) = self
+                return Ok(MessageOrEnumCase::Message(Rc::clone(m)));
+            } else if let Some(e) = self
                 .enums()?
                 .try_find(|e| -> Result<_> { Ok(e.name()? == type_name) })?
             {
-                return Ok(MessageOrEnumCase::Enum(m));
+                return Ok(MessageOrEnumCase::Enum(Rc::clone(e)));
             }
         }
         Err(FatalErrorKind::UnknownTypeName {
