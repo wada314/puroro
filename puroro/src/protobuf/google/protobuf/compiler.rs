@@ -78,6 +78,10 @@ impl Version {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const MAJOR_FIELD_NUMBER: i32 = 1i32;
+    pub const MINOR_FIELD_NUMBER: i32 = 2i32;
+    pub const PATCH_FIELD_NUMBER: i32 = 3i32;
+    pub const SUFFIX_FIELD_NUMBER: i32 = 4i32;
 }
 impl self::_puroro::Message for Version {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -315,6 +319,10 @@ impl CodeGeneratorRequest {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const FILE_TO_GENERATE_FIELD_NUMBER: i32 = 1i32;
+    pub const PARAMETER_FIELD_NUMBER: i32 = 2i32;
+    pub const PROTO_FILE_FIELD_NUMBER: i32 = 15i32;
+    pub const COMPILER_VERSION_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for CodeGeneratorRequest {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -539,6 +547,9 @@ impl CodeGeneratorResponse {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const ERROR_FIELD_NUMBER: i32 = 1i32;
+    pub const SUPPORTED_FEATURES_FIELD_NUMBER: i32 = 2i32;
+    pub const FILE_FIELD_NUMBER: i32 = 15i32;
 }
 impl self::_puroro::Message for CodeGeneratorResponse {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

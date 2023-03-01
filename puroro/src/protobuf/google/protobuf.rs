@@ -44,6 +44,7 @@ impl FileDescriptorSet {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const FILE_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for FileDescriptorSet {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -361,6 +362,18 @@ impl FileDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const PACKAGE_FIELD_NUMBER: i32 = 2i32;
+    pub const DEPENDENCY_FIELD_NUMBER: i32 = 3i32;
+    pub const PUBLIC_DEPENDENCY_FIELD_NUMBER: i32 = 10i32;
+    pub const WEAK_DEPENDENCY_FIELD_NUMBER: i32 = 11i32;
+    pub const MESSAGE_TYPE_FIELD_NUMBER: i32 = 4i32;
+    pub const ENUM_TYPE_FIELD_NUMBER: i32 = 5i32;
+    pub const SERVICE_FIELD_NUMBER: i32 = 6i32;
+    pub const EXTENSION_FIELD_NUMBER: i32 = 7i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 8i32;
+    pub const SOURCE_CODE_INFO_FIELD_NUMBER: i32 = 9i32;
+    pub const SYNTAX_FIELD_NUMBER: i32 = 12i32;
 }
 impl self::_puroro::Message for FileDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -800,6 +813,16 @@ impl DescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const FIELD_FIELD_NUMBER: i32 = 2i32;
+    pub const EXTENSION_FIELD_NUMBER: i32 = 6i32;
+    pub const NESTED_TYPE_FIELD_NUMBER: i32 = 3i32;
+    pub const ENUM_TYPE_FIELD_NUMBER: i32 = 4i32;
+    pub const EXTENSION_RANGE_FIELD_NUMBER: i32 = 5i32;
+    pub const ONEOF_DECL_FIELD_NUMBER: i32 = 8i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 7i32;
+    pub const RESERVED_RANGE_FIELD_NUMBER: i32 = 9i32;
+    pub const RESERVED_NAME_FIELD_NUMBER: i32 = 10i32;
 }
 impl self::_puroro::Message for DescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -1065,6 +1088,7 @@ impl ExtensionRangeOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for ExtensionRangeOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -1371,6 +1395,17 @@ impl FieldDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const NUMBER_FIELD_NUMBER: i32 = 3i32;
+    pub const LABEL_FIELD_NUMBER: i32 = 4i32;
+    pub const TYPE_FIELD_NUMBER: i32 = 5i32;
+    pub const TYPE_NAME_FIELD_NUMBER: i32 = 6i32;
+    pub const EXTENDEE_FIELD_NUMBER: i32 = 2i32;
+    pub const DEFAULT_VALUE_FIELD_NUMBER: i32 = 7i32;
+    pub const ONEOF_INDEX_FIELD_NUMBER: i32 = 9i32;
+    pub const JSON_NAME_FIELD_NUMBER: i32 = 10i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 8i32;
+    pub const PROTO3_OPTIONAL_FIELD_NUMBER: i32 = 17i32;
 }
 impl self::_puroro::Message for FieldDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -1666,6 +1701,8 @@ impl OneofDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 2i32;
 }
 impl self::_puroro::Message for OneofDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -1896,6 +1933,11 @@ impl EnumDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const VALUE_FIELD_NUMBER: i32 = 2i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
+    pub const RESERVED_RANGE_FIELD_NUMBER: i32 = 4i32;
+    pub const RESERVED_NAME_FIELD_NUMBER: i32 = 5i32;
 }
 impl self::_puroro::Message for EnumDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -2129,6 +2171,9 @@ impl EnumValueDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const NUMBER_FIELD_NUMBER: i32 = 2i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for EnumValueDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -2338,6 +2383,9 @@ impl ServiceDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const METHOD_FIELD_NUMBER: i32 = 2i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for ServiceDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -2591,6 +2639,12 @@ impl MethodDescriptorProto {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 1i32;
+    pub const INPUT_TYPE_FIELD_NUMBER: i32 = 2i32;
+    pub const OUTPUT_TYPE_FIELD_NUMBER: i32 = 3i32;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 4i32;
+    pub const CLIENT_STREAMING_FIELD_NUMBER: i32 = 5i32;
+    pub const SERVER_STREAMING_FIELD_NUMBER: i32 = 6i32;
 }
 impl self::_puroro::Message for MethodDescriptorProto {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -3109,6 +3163,27 @@ impl FileOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const JAVA_PACKAGE_FIELD_NUMBER: i32 = 1i32;
+    pub const JAVA_OUTER_CLASSNAME_FIELD_NUMBER: i32 = 8i32;
+    pub const JAVA_MULTIPLE_FILES_FIELD_NUMBER: i32 = 10i32;
+    pub const JAVA_GENERATE_EQUALS_AND_HASH_FIELD_NUMBER: i32 = 20i32;
+    pub const JAVA_STRING_CHECK_UTF8_FIELD_NUMBER: i32 = 27i32;
+    pub const OPTIMIZE_FOR_FIELD_NUMBER: i32 = 9i32;
+    pub const GO_PACKAGE_FIELD_NUMBER: i32 = 11i32;
+    pub const CC_GENERIC_SERVICES_FIELD_NUMBER: i32 = 16i32;
+    pub const JAVA_GENERIC_SERVICES_FIELD_NUMBER: i32 = 17i32;
+    pub const PY_GENERIC_SERVICES_FIELD_NUMBER: i32 = 18i32;
+    pub const PHP_GENERIC_SERVICES_FIELD_NUMBER: i32 = 42i32;
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 23i32;
+    pub const CC_ENABLE_ARENAS_FIELD_NUMBER: i32 = 31i32;
+    pub const OBJC_CLASS_PREFIX_FIELD_NUMBER: i32 = 36i32;
+    pub const CSHARP_NAMESPACE_FIELD_NUMBER: i32 = 37i32;
+    pub const SWIFT_PREFIX_FIELD_NUMBER: i32 = 39i32;
+    pub const PHP_CLASS_PREFIX_FIELD_NUMBER: i32 = 40i32;
+    pub const PHP_NAMESPACE_FIELD_NUMBER: i32 = 41i32;
+    pub const PHP_METADATA_NAMESPACE_FIELD_NUMBER: i32 = 44i32;
+    pub const RUBY_PACKAGE_FIELD_NUMBER: i32 = 45i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for FileOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -3577,6 +3652,11 @@ impl MessageOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const MESSAGE_SET_WIRE_FORMAT_FIELD_NUMBER: i32 = 1i32;
+    pub const NO_STANDARD_DESCRIPTOR_ACCESSOR_FIELD_NUMBER: i32 = 2i32;
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 3i32;
+    pub const MAP_ENTRY_FIELD_NUMBER: i32 = 7i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for MessageOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -3871,6 +3951,13 @@ impl FieldOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const CTYPE_FIELD_NUMBER: i32 = 1i32;
+    pub const PACKED_FIELD_NUMBER: i32 = 2i32;
+    pub const JSTYPE_FIELD_NUMBER: i32 = 6i32;
+    pub const LAZY_FIELD_NUMBER: i32 = 5i32;
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 3i32;
+    pub const WEAK_FIELD_NUMBER: i32 = 10i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for FieldOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -4097,6 +4184,7 @@ impl OneofOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for OneofOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -4275,6 +4363,9 @@ impl EnumOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const ALLOW_ALIAS_FIELD_NUMBER: i32 = 2i32;
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 3i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for EnumOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -4464,6 +4555,8 @@ impl EnumValueOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 1i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for EnumValueOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -4640,6 +4733,8 @@ impl ServiceOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 33i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for ServiceOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -4835,6 +4930,9 @@ impl MethodOptions {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const DEPRECATED_FIELD_NUMBER: i32 = 33i32;
+    pub const IDEMPOTENCY_LEVEL_FIELD_NUMBER: i32 = 34i32;
+    pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for MethodOptions {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -5108,6 +5206,13 @@ impl UninterpretedOption {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const NAME_FIELD_NUMBER: i32 = 2i32;
+    pub const IDENTIFIER_VALUE_FIELD_NUMBER: i32 = 3i32;
+    pub const POSITIVE_INT_VALUE_FIELD_NUMBER: i32 = 4i32;
+    pub const NEGATIVE_INT_VALUE_FIELD_NUMBER: i32 = 5i32;
+    pub const DOUBLE_VALUE_FIELD_NUMBER: i32 = 6i32;
+    pub const STRING_VALUE_FIELD_NUMBER: i32 = 7i32;
+    pub const AGGREGATE_VALUE_FIELD_NUMBER: i32 = 8i32;
 }
 impl self::_puroro::Message for UninterpretedOption {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -5339,6 +5444,7 @@ impl SourceCodeInfo {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const LOCATION_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for SourceCodeInfo {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
@@ -5493,6 +5599,7 @@ impl GeneratedCodeInfo {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const ANNOTATION_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for GeneratedCodeInfo {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

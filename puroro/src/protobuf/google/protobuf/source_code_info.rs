@@ -89,6 +89,11 @@ impl Location {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const PATH_FIELD_NUMBER: i32 = 1i32;
+    pub const SPAN_FIELD_NUMBER: i32 = 2i32;
+    pub const LEADING_COMMENTS_FIELD_NUMBER: i32 = 3i32;
+    pub const TRAILING_COMMENTS_FIELD_NUMBER: i32 = 4i32;
+    pub const LEADING_DETACHED_COMMENTS_FIELD_NUMBER: i32 = 6i32;
 }
 impl self::_puroro::Message for Location {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(

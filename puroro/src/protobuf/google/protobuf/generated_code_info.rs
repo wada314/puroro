@@ -74,6 +74,10 @@ impl Annotation {
             self.body.shared.bitfield_mut(),
         )
     }
+    pub const PATH_FIELD_NUMBER: i32 = 1i32;
+    pub const SOURCE_FILE_FIELD_NUMBER: i32 = 2i32;
+    pub const BEGIN_FIELD_NUMBER: i32 = 3i32;
+    pub const END_FIELD_NUMBER: i32 = 4i32;
 }
 impl self::_puroro::Message for Annotation {
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
