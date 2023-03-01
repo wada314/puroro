@@ -19,12 +19,12 @@ use super::{
     MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
-use itertools::Itertools;
 use ::stable_puroro::protobuf::google::protobuf::DescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
+use itertools::Itertools;
 
 #[derive(Debug)]
 pub(crate) struct Message {
@@ -176,11 +176,24 @@ impl Message {
             .map(|o| Rc::deref(o) as &dyn FieldOrOneof);
         Ok(Box::new(fields.chain(oneofs)))
     }
-    pub(crate) fn all_fields(&self) -> Result<impl Iterator<Item = &dyn FieldBase>> {
-        let direct_fields = self.fields.iter().map(|f| Rc::deref(f) as &dyn FieldBase);
-        let oneof_fields = self.oneofs()?.map(|o| o.fields()).flatten_ok()
-        todo!();
-        Ok(direct_fields)
+    pub(crate) fn all_fields(&self) -> Result<impl Iterator<Item = Rc<dyn FieldBase>>> {
+        let direct_fields_vec = self
+            .fields
+            .iter()
+            .map(|f| Rc::clone(f) as Rc<dyn FieldBase>)
+            .collect::<Vec<_>>();
+        let oneof_fields_vec = self
+            .oneofs()?
+            .map(|o| o.fields())
+            .flatten_ok()
+            .map_ok(|f| Rc::clone(f) as Rc<dyn FieldBase>)
+            .collect::<Result<Vec<_>>>()?;
+        let result_vec = {
+            let (mut v1, mut v2) = (direct_fields_vec, oneof_fields_vec);
+            v1.append(&mut v2);
+            v1
+        };
+        Ok(result_vec.into_iter())
     }
     pub(crate) fn location_path(&self) -> Result<Box<dyn Iterator<Item = i32>>> {
         Ok(match self.parent()?.either() {
