@@ -14,6 +14,7 @@
 
 pub mod alloc;
 pub mod bitvec;
+pub mod detach_alloc;
 pub mod field_type;
 pub mod message_internal;
 pub mod oneof_field_type;
