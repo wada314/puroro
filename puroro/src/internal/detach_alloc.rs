@@ -16,9 +16,14 @@ use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
 
 pub trait DetachAlloc {
+    type Detached: AttachAlloc<Self::Allocator, Attached = Self>;
     type Allocator;
-    type Detached;
-    fn detach(self) -> Self::Detached;
+    fn detach(self) -> (Self::Detached, Self::Allocator);
+}
+
+pub trait AttachAlloc<A> {
+    type Attached: DetachAlloc<Allocator = A, Detached = Self>;
+    fn attach(self, allocator: A) -> Self::Attached;
 }
 
 pub struct RefMut<'a, D: DetachAlloc> {
@@ -42,7 +47,7 @@ impl<'a, D: DetachAlloc> DerefMut for RefMut<'a, D> {
 impl<'a, D: DetachAlloc> Drop for RefMut<'a, D> {
     fn drop(&mut self) {
         unsafe {
-            *self.src = ManuallyDrop::take(&mut self.tmp).detach();
+            *self.src = ManuallyDrop::take(&mut self.tmp).detach().0;
         }
     }
 }
