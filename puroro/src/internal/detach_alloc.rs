@@ -21,9 +21,17 @@ pub trait DetachAlloc {
     fn detach(self) -> (Self::Detached, Self::Allocator);
 }
 
+// PROBLEM: Ownership is unclear...
 pub trait AttachAlloc<A> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
     fn attach(self, allocator: A) -> Self::Attached;
+    fn shallow_clone(&self) -> Self;
+    fn create_ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached> {
+        RefMut {
+            tmp: ManuallyDrop::new(self.shallow_clone().attach(allocator)),
+            src: self,
+        }
+    }
 }
 
 pub struct RefMut<'a, D: DetachAlloc> {
