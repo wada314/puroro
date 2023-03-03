@@ -12,19 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
-#![doc = include_str!("lib.md")]
+#[cfg(feature = "allocator_api")]
+pub struct NoAllocVec<T>(Vec<T, ()>);
 
-pub mod doc_samples;
-mod error;
-pub mod internal;
-pub mod message;
-pub mod protobuf;
-pub mod repeated;
-
-pub use self::error::PuroroError;
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use crate::message::Message;
-pub use crate::repeated::RepeatedFieldView;
+#[cfg(not(feature = "allocator_api"))]
+pub struct NoAllocVec<T>(Vec<T>);
