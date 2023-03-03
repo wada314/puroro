@@ -13,7 +13,30 @@
 // limitations under the License.
 
 #[cfg(feature = "allocator_api")]
-pub struct NoAllocVec<T>(Vec<T, ()>);
+use ::std::alloc::Allocator;
+use ::std::ops::Deref;
+
+#[cfg(feature = "allocator_api")]
+pub struct NoAllocVec<T>(*mut T, usize, usize);
 
 #[cfg(not(feature = "allocator_api"))]
 pub struct NoAllocVec<T>(Vec<T>);
+
+#[cfg(feature = "allocator_api")]
+pub struct VecMutRef<'a, T, A: Allocator>(&'a mut NoAllocVec<T>, Vec<T, A>);
+
+#[cfg(feature = "allocator_api")]
+impl<T> Deref for NoAllocVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        unsafe { ::std::slice::from_raw_parts(self.0, self.1) }
+    }
+}
+
+#[cfg(not(feature = "allocator_api"))]
+impl<T> Deref for NoAllocVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        self.0.as_slice()
+    }
+}

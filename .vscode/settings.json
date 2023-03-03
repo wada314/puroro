@@ -1,0 +1,8 @@
+{
+    "rust-analyzer.check.features": [
+        "allocator_api"
+    ],
+    "rust-analyzer.cargo.features": [
+        "allocator_api"
+    ]
+}
