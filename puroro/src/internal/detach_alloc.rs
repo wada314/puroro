@@ -21,15 +21,23 @@ pub trait DetachAlloc {
     fn detach(self) -> (Self::Detached, Self::Allocator);
 }
 
-pub trait AttachAlloc<A> {
+pub unsafe trait AttachAlloc<A> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
-    fn attach(self, allocator: A) -> Self::Attached;
-    fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached>;
+    unsafe fn attach(self, allocator: A) -> Self::Attached;
+    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached>;
 }
 
 pub struct RefMut<'a, D: DetachAlloc> {
     tmp: ManuallyDrop<D>,
     src: &'a mut D::Detached,
+}
+impl<'a, D: DetachAlloc> RefMut<'a, D> {
+    pub fn new(src: &'a mut D::Detached, tmp: ManuallyDrop<D>) -> Self {
+        Self {
+            tmp,
+            src,
+        }
+    }
 }
 
 impl<'a, D: DetachAlloc> Deref for RefMut<'a, D> {
