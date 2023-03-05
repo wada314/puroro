@@ -19,11 +19,18 @@ use ::std::mem::ManuallyDrop;
 use ::std::ops::Deref;
 
 pub struct NoAllocVec<T>(*mut T, usize, usize);
+pub struct NoAllocBox<T: ?Sized>(*mut T);
 
 impl<T> Deref for NoAllocVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         unsafe { ::std::slice::from_raw_parts(self.0, self.1) }
+    }
+}
+impl<T> Deref for NoAllocBox<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*self.0 }
     }
 }
 
@@ -67,5 +74,45 @@ unsafe impl<T> AttachAlloc<()> for NoAllocVec<T> {
     unsafe fn ref_mut(&mut self, _allocator: ()) -> RefMut<Self::Attached> {
         let tmp = ManuallyDrop::new(Vec::from_raw_parts(self.0, self.1, self.2));
         RefMut::new(self, tmp)
+    }
+}
+
+#[cfg(feature = "allocator_api")]
+impl<T, A: Allocator> DetachAlloc for Box<T, A> {
+    type Detached = NoAllocBox<T>;
+    type Allocator = A;
+    fn detach(self) -> (Self::Detached, Self::Allocator) {
+        let (ptr, allocator) = Box::into_raw_with_allocator(self);
+        (NoAllocBox(ptr), allocator)
+    }
+}
+#[cfg(feature = "allocator_api")]
+unsafe impl<T, A: Allocator> AttachAlloc<A> for NoAllocBox<T> {
+    type Attached = Box<T, A>;
+    unsafe fn attach(self, allocator: A) -> Self::Attached {
+        Box::from_raw_in(self.0, allocator)
+    }
+    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached> {
+        RefMut::new(self, ManuallyDrop::new(Box::from_raw_in(self.0, allocator)))
+    }
+}
+
+#[cfg(not(feature = "allocator_api"))]
+impl<T> DetachAlloc for Box<T> {
+    type Detached = NoAllocBox<T>;
+    type Allocator = ();
+    fn detach(self) -> (Self::Detached, Self::Allocator) {
+        let ptr = Box::into_raw(self);
+        (NoAllocBox(ptr), ())
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+unsafe impl<T> AttachAlloc<()> for NoAllocBox<T> {
+    type Attached = Box<T>;
+    unsafe fn attach(self, _allocator: ()) -> Self::Attached {
+        Box::from_raw(self.0)
+    }
+    unsafe fn ref_mut(&mut self, _allocator: ()) -> RefMut<Self::Attached> {
+        RefMut::new(self, ManuallyDrop::new(Box::from_raw(self.0)))
     }
 }
