@@ -53,7 +53,7 @@ impl<T> DetachAlloc for Vec<T> {
     type Detached = NoAllocVec<T>;
     type Allocator = ();
     fn detach(self) -> (Self::Detached, Self::Allocator) {
-        let (ptr, length, capacity) = self.into_raw_parts_with();
+        let (ptr, length, capacity) = self.into_raw_parts_with_alloc();
         (NoAllocVec(ptr, length, capacity), ())
     }
 }
