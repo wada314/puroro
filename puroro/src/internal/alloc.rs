@@ -52,18 +52,19 @@ unsafe impl<T, A: Allocator> AttachAlloc<A> for NoAllocVec<T> {
 impl<T> DetachAlloc for Vec<T> {
     type Detached = NoAllocVec<T>;
     type Allocator = ();
-    fn detach(self) -> (Self::Detached, Self::Allocator) {
-        let (ptr, length, capacity) = self.into_raw_parts_with_alloc();
+    fn detach(mut self) -> (Self::Detached, Self::Allocator) {
+        let (ptr, length, capacity) = (self.as_mut_ptr(), self.len(), self.capacity());
+        ::std::mem::forget(self);
         (NoAllocVec(ptr, length, capacity), ())
     }
 }
 #[cfg(not(feature = "allocator_api"))]
 unsafe impl<T> AttachAlloc<()> for NoAllocVec<T> {
     type Attached = Vec<T>;
-    unsafe fn attach(self, allocator: ()) -> Self::Attached {
+    unsafe fn attach(self, _allocator: ()) -> Self::Attached {
         Vec::from_raw_parts(self.0, self.1, self.2)
     }
-    unsafe fn ref_mut(&mut self, allocator: ()) -> RefMut<Self::Attached> {
+    unsafe fn ref_mut(&mut self, _allocator: ()) -> RefMut<Self::Attached> {
         let tmp = ManuallyDrop::new(Vec::from_raw_parts(self.0, self.1, self.2));
         RefMut::new(self, tmp)
     }
