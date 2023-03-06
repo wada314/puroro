@@ -104,7 +104,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_unlabeled_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
+    pub fn bytes_unlabeled_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = std::vec::Vec::<u8>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.bytes_unlabeled,
@@ -119,7 +123,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_optional_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
+    pub fn bytes_optional_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = std::vec::Vec::<u8>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.bytes_optional,
@@ -148,7 +156,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+    pub fn string_unlabeled_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.string_unlabeled,
@@ -163,7 +175,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn string_optional_mut(&mut self) -> &mut ::std::string::String {
+    pub fn string_optional_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.string_optional,
@@ -242,7 +258,9 @@ impl Msg {
     }
     pub fn submsg_unlabeled_mut(
         &mut self,
-    ) -> &mut self::_root::full_coverage3::msg::Submsg {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::full_coverage3::msg::Submsg,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.submsg_unlabeled,
@@ -259,7 +277,9 @@ impl Msg {
     }
     pub fn submsg_optional_mut(
         &mut self,
-    ) -> &mut self::_root::full_coverage3::msg::Submsg {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::full_coverage3::msg::Submsg,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.submsg_optional,

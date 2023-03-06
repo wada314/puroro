@@ -15,7 +15,11 @@ pub struct Msg {
     body: self::_root::self_recursive::_view::MsgView,
 }
 impl Msg {
-    pub fn recursive_unlabeled_mut(&mut self) -> &mut self::_root::self_recursive::Msg {
+    pub fn recursive_unlabeled_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::self_recursive::Msg,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         NonRepeatedFieldType::get_field_mut(
             &mut self.body.fields.recursive_unlabeled,

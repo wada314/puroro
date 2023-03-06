@@ -117,13 +117,13 @@ impl LengthDelimitedType {
     }
     fn rust_mut_ref_type(&self) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
-        Ok(Rc::new(parse2(match self {
-            String => quote! { &mut ::std::string::String },
-            Bytes => quote! { &mut ::std::vec::Vec::<u8> },
-            Message(m) => {
-                let ty = m.try_upgrade()?.gen_message_struct_type()?;
-                quote! { &mut #ty }
-            }
+        let target_ty = match self {
+            String => Rc::new(parse2(quote! { ::std::string::String })?),
+            Bytes => Rc::new(parse2(quote! { std::vec::Vec::<u8> })?),
+            Message(m) => m.try_upgrade()?.gen_message_struct_type()?,
+        };
+        Ok(Rc::new(parse2(quote! {
+            impl '_ + ::std::ops::Deref<Target=#target_ty> + ::std::ops::DerefMut
         })?))
     }
     fn tag_type(&self) -> Result<Rc<Type>> {
