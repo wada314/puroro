@@ -228,7 +228,10 @@ impl Field {
         let mut_item_type = self.r#type()?.rust_type()?;
         Ok(vec![
             parse2(quote! {
-                pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
+                pub fn #getter_mut_ident(&mut self) -> impl '_ + ::std::ops::Deref<
+                    Target=::std::vec::Vec::<#mut_item_type>
+                > + ::std::ops::DerefMut
+                {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field_mut(
                         &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),

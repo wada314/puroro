@@ -46,7 +46,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn i32_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.i32_repeated,
@@ -90,7 +94,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f32> {
+    pub fn float_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<f32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.float_repeated,
@@ -142,7 +150,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<::std::vec::Vec<u8>> {
+    pub fn bytes_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::vec::Vec<u8>>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.bytes_repeated,
@@ -196,7 +208,9 @@ impl Msg {
     }
     pub fn string_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::string::String>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.string_repeated,
@@ -242,7 +256,9 @@ impl Msg {
     }
     pub fn enum_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::full_coverage2::Enum> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::full_coverage2::Enum>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.enum_repeated,
@@ -296,7 +312,9 @@ impl Msg {
     }
     pub fn submsg_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::full_coverage2::msg::Submsg> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::full_coverage2::msg::Submsg>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.submsg_repeated,
@@ -340,7 +358,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
+    pub fn i64_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i64>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.i64_repeated,
@@ -384,7 +406,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
+    pub fn u32_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<u32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.u32_repeated,
@@ -428,7 +454,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
+    pub fn u64_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<u64>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.u64_repeated,
@@ -472,7 +502,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn s32_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.s32_repeated,
@@ -516,7 +550,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
+    pub fn s64_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i64>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.s64_repeated,
@@ -560,7 +598,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
+    pub fn fixed32_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<u32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.fixed32_repeated,
@@ -604,7 +646,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
+    pub fn fixed64_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<u64>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.fixed64_repeated,
@@ -648,7 +694,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn sfixed32_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.sfixed32_repeated,
@@ -692,7 +742,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
+    pub fn sfixed64_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i64>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.sfixed64_repeated,
@@ -736,7 +790,11 @@ impl Msg {
             self.body.shared.bitfield_mut(),
         )
     }
-    pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f64> {
+    pub fn f64_repeated_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<f64>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.body.fields.f64_repeated,
