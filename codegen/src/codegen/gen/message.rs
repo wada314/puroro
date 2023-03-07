@@ -139,9 +139,7 @@ impl Message {
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
             #(#docs)*
-            pub struct #ident {
-                body: #view_type,
-            }
+            pub struct #ident(::std::boxed::Box<#view_type>);
         })?;
         let impl_struct = parse2(quote! {
             impl #ident {
@@ -357,7 +355,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::borrow::Borrow<#view_type> for #ident {
                 fn borrow(&self) -> &#view_type {
-                    &self.body
+                    self
                 }
             }
         })?)
@@ -368,9 +366,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::clone::Clone for #ident {
                 fn clone(&self) -> Self {
-                    #[allow(unused)]
-                    use ::std::borrow::ToOwned;
-                    ToOwned::to_owned(&self.body)
+                    Self (self.0.clone())
                 }
             }
         })?)
@@ -383,7 +379,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::fmt::Debug for #ident {
                 fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                    <#view_type as ::std::fmt::Debug>::fmt(&self.body, fmt)
+                    <#view_type as ::std::fmt::Debug>::fmt(&self.0, fmt)
                 }
             }
         })?)
@@ -397,7 +393,7 @@ impl Message {
             impl ::std::ops::Deref for #ident {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
-                    &self.body
+                    &self.0
                 }
             }
         })?)
@@ -408,7 +404,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::cmp::PartialEq for #ident {
                 fn eq(&self, rhs: &Self) -> bool {
-                    &self.body == &rhs.body
+                    &self.0 == &rhs.0
                 }
             }
         })?)
