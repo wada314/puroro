@@ -12,20 +12,18 @@ mod _pinternal {
 }
 pub mod message;
 #[derive(::std::default::Default)]
-pub struct Message {
-    body: self::_root::name_conflict_case::_view::MessageView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct Message(
+    ::std::boxed::Box<self::_root::name_conflict_case::_view::MessageView>,
+);
 impl Message {
     pub fn clear_conflict(&mut self) {
         use self::_pinternal::{SharedItems as _, OneofUnion as _};
-        self.body.fields.conflict.clear(self.body.shared.bitfield_mut())
+        self.fields.conflict.clear(self.0.shared.bitfield_mut())
     }
     pub fn this_is_oneof_field_mut(&mut self) -> &mut i32 {
         use self::_pinternal::SharedItems as _;
-        self.body
-            .fields
-            .conflict
-            .this_is_oneof_field_mut(self.body.shared.bitfield_mut())
+        self.fields.conflict.this_is_oneof_field_mut(self.0.shared.bitfield_mut())
     }
     pub fn clear_this_is_oneof_field(&mut self) {
         #[allow(unused)]
@@ -35,8 +33,8 @@ impl Message {
             self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(
                 _,
             ),
-        ) = OneofCase::from_bitslice(self.body.shared.bitfield()) {
-            self.body.fields.conflict.clear(self.body.shared.bitfield_mut())
+        ) = OneofCase::from_bitslice(self.shared.bitfield()) {
+            self.fields.conflict.clear(self.0.shared.bitfield_mut())
         }
     }
     pub const THIS_IS_ONEOF_FIELD_FIELD_NUMBER: i32 = 1i32;
@@ -102,11 +100,10 @@ impl self::_pinternal::MessageInternal for Message {
                 match number {
                     1i32 => {
                         self
-                            .body
                             .fields
                             .conflict
                             .deser_from_field_data(
-                                self.body.shared.bitfield_mut(),
+                                self.0.shared.bitfield_mut(),
                                 field_data,
                                 self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
                             )?
@@ -123,7 +120,7 @@ impl self::_pinternal::MessageInternal for Message {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -134,14 +131,14 @@ impl self::_pinternal::MessageInternal for Message {
 impl ::std::borrow::Borrow<self::_root::name_conflict_case::_view::MessageView>
 for Message {
     fn borrow(&self) -> &self::_root::name_conflict_case::_view::MessageView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for Message {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::name_conflict_case::_view::MessageView as ToOwned>::to_owned(&self)
     }
 }
 impl ::std::fmt::Debug for Message {
@@ -150,7 +147,7 @@ impl ::std::fmt::Debug for Message {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::name_conflict_case::_view::MessageView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -158,12 +155,7 @@ impl ::std::fmt::Debug for Message {
 impl ::std::ops::Deref for Message {
     type Target = self::_root::name_conflict_case::_view::MessageView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for Message {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        &self
     }
 }
 #[doc(hidden)]
@@ -244,8 +236,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::name_conflict_case::Message {
-                body: Self {
+            self::_root::name_conflict_case::Message(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::name_conflict_case::_fields::MessageFields {
                         conflict: self::_pinternal::OneofUnion::clone(
                             &self.fields.conflict,
@@ -253,8 +245,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

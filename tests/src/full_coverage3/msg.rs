@@ -11,53 +11,66 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Submsg {
-    body: self::_root::full_coverage3::msg::_view::SubmsgView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct Submsg(
+    ::std::boxed::Box<self::_root::full_coverage3::msg::_view::SubmsgView>,
+);
 impl Submsg {
     pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.i32_unlabeled,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.i32_unlabeled,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i32_unlabeled(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.i32_unlabeled,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.i32_unlabeled,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn i32_optional_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.i32_optional,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.i32_optional,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i32_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.i32_optional,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.i32_optional,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.i64_unlabeled,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.i64_unlabeled,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_i64_unlabeled(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.i64_unlabeled,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.i64_unlabeled,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const I32_UNLABELED_FIELD_NUMBER: i32 = 1i32;
@@ -96,20 +109,20 @@ impl self::_puroro::Message for Submsg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.i32_unlabeled,
-            self.body.shared.bitfield(),
+            &self.fields.i32_unlabeled,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.i32_optional,
-            self.body.shared.bitfield(),
+            &self.fields.i32_optional,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.i64_unlabeled,
-            self.body.shared.bitfield(),
+            &self.fields.i64_unlabeled,
+            self.shared.bitfield(),
             101i32,
             out,
         )?;
@@ -142,22 +155,22 @@ impl self::_pinternal::MessageInternal for Submsg {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.i32_unlabeled,
-                            self.body.shared.bitfield_mut(),
+                            &mut self.0.fields.i32_unlabeled,
+                            self.0.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.i32_optional,
-                            self.body.shared.bitfield_mut(),
+                            &mut self.0.fields.i32_optional,
+                            self.0.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     101i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.i64_unlabeled,
-                            self.body.shared.bitfield_mut(),
+                            &mut self.0.fields.i64_unlabeled,
+                            self.0.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -173,7 +186,7 @@ impl self::_pinternal::MessageInternal for Submsg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -184,14 +197,14 @@ impl self::_pinternal::MessageInternal for Submsg {
 impl ::std::borrow::Borrow<self::_root::full_coverage3::msg::_view::SubmsgView>
 for Submsg {
     fn borrow(&self) -> &self::_root::full_coverage3::msg::_view::SubmsgView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for Submsg {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::full_coverage3::msg::_view::SubmsgView as ToOwned>::to_owned(&self)
     }
 }
 impl ::std::fmt::Debug for Submsg {
@@ -200,7 +213,7 @@ impl ::std::fmt::Debug for Submsg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::full_coverage3::msg::_view::SubmsgView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -208,12 +221,7 @@ impl ::std::fmt::Debug for Submsg {
 impl ::std::ops::Deref for Submsg {
     type Target = self::_root::full_coverage3::msg::_view::SubmsgView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for Submsg {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        &self
     }
 }
 #[doc(hidden)]
@@ -356,8 +364,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::full_coverage3::msg::Submsg {
-                body: Self {
+            self::_root::full_coverage3::msg::Submsg(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::full_coverage3::msg::_fields::SubmsgFields {
                         i32_unlabeled: ::std::clone::Clone::clone(
                             &self.fields.i32_unlabeled,
@@ -370,8 +378,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

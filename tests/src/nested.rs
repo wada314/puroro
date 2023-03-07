@@ -12,23 +12,24 @@ mod _pinternal {
 }
 pub mod msg;
 #[derive(::std::default::Default)]
-pub struct Msg {
-    body: self::_root::nested::_view::MsgView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct Msg(::std::boxed::Box<self::_root::nested::_view::MsgView>);
 impl Msg {
     pub fn item_outer_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::nested::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.item_outer,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.item_outer,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_item_outer(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::nested::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.item_outer,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.item_outer,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const ITEM_OUTER_FIELD_NUMBER: i32 = 1i32;
@@ -65,8 +66,8 @@ impl self::_puroro::Message for Msg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.item_outer,
-            self.body.shared.bitfield(),
+            &self.fields.item_outer,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -99,8 +100,8 @@ impl self::_pinternal::MessageInternal for Msg {
                 match number {
                     1i32 => {
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.item_outer,
-                            self.body.shared.bitfield_mut(),
+                            &mut self.0.fields.item_outer,
+                            self.0.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -116,7 +117,7 @@ impl self::_pinternal::MessageInternal for Msg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -126,14 +127,14 @@ impl self::_pinternal::MessageInternal for Msg {
 }
 impl ::std::borrow::Borrow<self::_root::nested::_view::MsgView> for Msg {
     fn borrow(&self) -> &self::_root::nested::_view::MsgView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::nested::_view::MsgView as ToOwned>::to_owned(&self)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -141,18 +142,13 @@ impl ::std::fmt::Debug for Msg {
         &self,
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        <self::_root::nested::_view::MsgView as ::std::fmt::Debug>::fmt(&self.body, fmt)
+        <self::_root::nested::_view::MsgView as ::std::fmt::Debug>::fmt(&self, fmt)
     }
 }
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::nested::_view::MsgView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for Msg {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        &self
     }
 }
 #[doc(hidden)]
@@ -236,14 +232,14 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::nested::Msg {
-                body: Self {
+            self::_root::nested::Msg(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::nested::_fields::MsgFields {
                         item_outer: ::std::clone::Clone::clone(&self.fields.item_outer),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

@@ -146,8 +146,8 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #number => #PURORO_INTERNAL::FieldType::deser_from_field_data(
-                &mut self.body.fields.#ident,
-                self.body.shared.bitfield_mut(),
+                &mut self.0.fields.#ident,
+                self.0.shared.bitfield_mut(),
                 #field_data_expr,
             )?,
         })?)
@@ -157,8 +157,8 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #PURORO_INTERNAL::FieldType::ser_to_write(
-                &self.body.fields.#ident,
-                self.body.shared.bitfield(),
+                &self.fields.#ident,
+                self.shared.bitfield(),
                 #number,
                 #out_expr,
             )?;
@@ -231,7 +231,7 @@ impl Field {
                 pub fn #getter_mut_ident(&mut self) -> &mut ::std::vec::Vec::<#mut_item_type> {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field_mut(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),
+                        &mut self.0.fields.#field_ident, self.0.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -239,7 +239,7 @@ impl Field {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::clear(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),
+                        &mut self.0.fields.#field_ident, self.0.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -256,21 +256,24 @@ impl Field {
         let field_ident = self.gen_fields_struct_field_ident()?;
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
+        let view_type = self.message()?.gen_view_struct_type()?;
 
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    let mut_view: &mut #view_type = &mut self.0;
                     NonRepeatedFieldType::get_field_mut(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(), #default_fn,
+                        &mut mut_view.fields.#field_ident, mut_view.shared.bitfield_mut(), #default_fn,
                     )
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    let mut_view: &mut #view_type = &mut self.0;
                     NonRepeatedFieldType::clear(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),
+                        &mut mut_view.fields.#field_ident, mut_view.shared.bitfield_mut(),
                     )
                 }
             })?,
