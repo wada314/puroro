@@ -395,7 +395,7 @@ impl Message {
             impl ::std::ops::Deref for #ident {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
-                    &self
+                    <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
                 }
             }
         })?)

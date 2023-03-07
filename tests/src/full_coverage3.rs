@@ -1189,338 +1189,434 @@ impl self::_pinternal::MessageInternal for Msg {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i32_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i32_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i32_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i32_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i32_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i32_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     11i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.float_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.float_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     12i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.float_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.float_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     13i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.float_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.float_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     21i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.bytes_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.bytes_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     22i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.bytes_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.bytes_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     23i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.bytes_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.bytes_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     31i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.string_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.string_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     32i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.string_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.string_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     33i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.string_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.string_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     41i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.enum_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.enum_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     42i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.enum_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.enum_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     43i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.enum_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.enum_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     51i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.submsg_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.submsg_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     52i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.submsg_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.submsg_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     53i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.submsg_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.submsg_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     101i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     102i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i64_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i64_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     103i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i64_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i64_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     111i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.u32_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.u32_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     112i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.u32_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.u32_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     113i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.u32_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.u32_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     121i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.u64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.u64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     122i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.u64_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.u64_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     123i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.u64_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.u64_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     131i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.s32_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.s32_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     132i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.s32_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.s32_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     133i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.s32_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.s32_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     141i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.s64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.s64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     142i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.s64_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.s64_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     143i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.s64_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.s64_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     151i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.fixed32_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.fixed32_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     152i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.fixed32_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.fixed32_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     153i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.fixed32_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.fixed32_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     161i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.fixed64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.fixed64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     162i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.fixed64_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.fixed64_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     163i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.fixed64_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.fixed64_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     171i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.sfixed32_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.sfixed32_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     172i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.sfixed32_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.sfixed32_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     173i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.sfixed32_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.sfixed32_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     181i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.sfixed64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.sfixed64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     182i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.sfixed64_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.sfixed64_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     183i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.sfixed64_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.sfixed64_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     191i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.f64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.f64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     192i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.f64_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.f64_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     193i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.f64_repeated,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.f64_repeated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -1570,7 +1666,7 @@ impl ::std::fmt::Debug for Msg {
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::full_coverage3::_view::MsgView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]

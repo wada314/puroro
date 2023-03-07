@@ -18,23 +18,29 @@ pub struct Message(
 );
 impl Message {
     pub fn clear_conflict(&mut self) {
+        let view_ref: &mut self::_root::name_conflict_case::_view::MessageView = &mut self
+            .0;
         use self::_pinternal::{SharedItems as _, OneofUnion as _};
-        self.fields.conflict.clear(self.0.shared.bitfield_mut())
+        view_ref.fields.conflict.clear(view_ref.shared.bitfield_mut())
     }
     pub fn this_is_oneof_field_mut(&mut self) -> &mut i32 {
+        let view_ref: &mut self::_root::name_conflict_case::_view::MessageView = &mut self
+            .0;
         use self::_pinternal::SharedItems as _;
-        self.fields.conflict.this_is_oneof_field_mut(self.0.shared.bitfield_mut())
+        view_ref.fields.conflict.this_is_oneof_field_mut(view_ref.shared.bitfield_mut())
     }
     pub fn clear_this_is_oneof_field(&mut self) {
         #[allow(unused)]
         use ::std::option::Option::Some;
         use self::_pinternal::{OneofCase, OneofUnion as _, SharedItems as _};
+        let view_ref: &mut self::_root::name_conflict_case::_view::MessageView = &mut self
+            .0;
         if let Some(
             self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(
                 _,
             ),
-        ) = OneofCase::from_bitslice(self.shared.bitfield()) {
-            self.fields.conflict.clear(self.0.shared.bitfield_mut())
+        ) = OneofCase::from_bitslice(view_ref.shared.bitfield()) {
+            view_ref.fields.conflict.clear(view_ref.shared.bitfield_mut())
         }
     }
     pub const THIS_IS_ONEOF_FIELD_FIELD_NUMBER: i32 = 1i32;
@@ -99,11 +105,13 @@ impl self::_pinternal::MessageInternal for Message {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
-                        self
+                        let view_ref: &mut self::_root::name_conflict_case::_view::MessageView = &mut self
+                            .0;
+                        view_ref
                             .fields
                             .conflict
                             .deser_from_field_data(
-                                self.0.shared.bitfield_mut(),
+                                view_ref.shared.bitfield_mut(),
                                 field_data,
                                 self::_root::name_conflict_case::message::_case::ConflictCase::ThisIsOneofField(()),
                             )?
@@ -155,7 +163,7 @@ impl ::std::fmt::Debug for Message {
 impl ::std::ops::Deref for Message {
     type Target = self::_root::name_conflict_case::_view::MessageView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]

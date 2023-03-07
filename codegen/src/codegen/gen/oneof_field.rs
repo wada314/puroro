@@ -276,20 +276,23 @@ impl OneofField {
         let case_type = self.oneof()?.gen_oneof_case_type(iter::empty())?;
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let enum_item_ident = self.gen_oneof_case_value_ident()?;
+        let view_type = self.message()?.gen_view_struct_type()?;
 
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
+                    let view_ref: &mut #view_type = &mut self.0;
                     use #PURORO_INTERNAL::SharedItems as _;
-                    self.fields.#oneof_struct_field_ident.#getter_mut_ident(self.0.shared.bitfield_mut())
+                    view_ref.fields.#oneof_struct_field_ident.#getter_mut_ident(view_ref.shared.bitfield_mut())
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     #[allow(unused)] use ::std::option::Option::Some;
                     use #PURORO_INTERNAL::{OneofCase, OneofUnion as _, SharedItems as _};
-                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(self.shared.bitfield()) {
-                        self.fields.#oneof_struct_field_ident.clear(self.0.shared.bitfield_mut())
+                    let view_ref: &mut #view_type = &mut self.0;
+                    if let Some(#case_type::#enum_item_ident(_)) = OneofCase::from_bitslice(view_ref.shared.bitfield()) {
+                        view_ref.fields.#oneof_struct_field_ident.clear(view_ref.shared.bitfield_mut())
                     }
                 }
             })?,

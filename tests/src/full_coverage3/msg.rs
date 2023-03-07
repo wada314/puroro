@@ -154,23 +154,29 @@ impl self::_pinternal::MessageInternal for Submsg {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i32_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i32_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i32_optional,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i32_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     101i32 => {
+                        let view_ref: &mut self::_root::full_coverage3::msg::_view::SubmsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.i64_unlabeled,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.i64_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -221,7 +227,7 @@ impl ::std::fmt::Debug for Submsg {
 impl ::std::ops::Deref for Submsg {
     type Target = self::_root::full_coverage3::msg::_view::SubmsgView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]

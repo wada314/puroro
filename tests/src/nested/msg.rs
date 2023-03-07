@@ -98,9 +98,11 @@ impl self::_pinternal::MessageInternal for Submsg {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::nested::msg::_view::SubmsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.item_inner,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.item_inner,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -150,7 +152,7 @@ impl ::std::fmt::Debug for Submsg {
 impl ::std::ops::Deref for Submsg {
     type Target = self::_root::nested::msg::_view::SubmsgView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]

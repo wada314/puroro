@@ -102,9 +102,11 @@ impl self::_pinternal::MessageInternal for Conflict {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::name_conflict_fields::_view::ConflictView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.this_is_original_message_field,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.this_is_original_message_field,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -157,7 +159,7 @@ impl ::std::fmt::Debug for Conflict {
 impl ::std::ops::Deref for Conflict {
     type Target = self::_root::name_conflict_fields::_view::ConflictView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
@@ -252,9 +254,11 @@ impl self::_pinternal::MessageInternal for ConflictFields {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::name_conflict_fields::_view::ConflictFieldsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.this_is_fields_message_field,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.this_is_fields_message_field,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -307,7 +311,7 @@ impl ::std::fmt::Debug for ConflictFields {
 impl ::std::ops::Deref for ConflictFields {
     type Target = self::_root::name_conflict_fields::_view::ConflictFieldsView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]

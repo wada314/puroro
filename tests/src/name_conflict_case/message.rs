@@ -102,9 +102,11 @@ impl self::_pinternal::MessageInternal for ConflictCase {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::name_conflict_case::message::_view::ConflictCaseView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.0.fields.this_is_message_field,
-                            self.0.shared.bitfield_mut(),
+                            &mut view_ref.fields.this_is_message_field,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -160,7 +162,7 @@ impl ::std::fmt::Debug for ConflictCase {
 impl ::std::ops::Deref for ConflictCase {
     type Target = self::_root::name_conflict_case::message::_view::ConflictCaseView;
     fn deref(&self) -> &Self::Target {
-        &self
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]

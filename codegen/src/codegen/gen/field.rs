@@ -144,12 +144,16 @@ impl Field {
     ) -> Result<Arm> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
+        let view_type = self.message()?.gen_view_struct_type()?;
         Ok(parse2(quote! {
-            #number => #PURORO_INTERNAL::FieldType::deser_from_field_data(
-                &mut self.0.fields.#ident,
-                self.0.shared.bitfield_mut(),
-                #field_data_expr,
-            )?,
+            #number => {
+                let view_ref: &mut #view_type = &mut self.0;
+                #PURORO_INTERNAL::FieldType::deser_from_field_data(
+                    &mut view_ref.fields.#ident,
+                    view_ref.shared.bitfield_mut(),
+                    #field_data_expr,
+                )?
+            }
         })?)
     }
     pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
