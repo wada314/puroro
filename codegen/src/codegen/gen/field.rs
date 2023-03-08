@@ -91,7 +91,7 @@ impl Field {
         let bitfield_index = self.bitfield_index_for_optional()?.unwrap_or(usize::MAX);
         let type_name_segment: PathSegment = parse2(match (self.rule()?, self.r#type()?) {
             (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                SingularHeapMessageField::<#primitive_type>
+                SingularMessageField::<#primitive_type>
             },
             (Repeated, LengthDelimited(Message(_))) => quote! {
                 RepeatedMessageField::<#primitive_type>

@@ -1751,10 +1751,10 @@ pub mod _view {
                 self::_root::full_coverage3::Enum,
                 self::_pinternal::tags::Enum3::<self::_root::full_coverage3::Enum>,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::full_coverage3::msg::Submsg,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::full_coverage3::msg::Submsg,
             >,
             self::_pinternal::RepeatedMessageField::<
