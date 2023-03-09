@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Global;
 use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
 
@@ -21,7 +23,14 @@ pub trait DetachAlloc {
     fn detach(self) -> (Self::Detached, Self::Allocator);
 }
 
-pub unsafe trait AttachAlloc<A> {
+#[cfg(feature = "allocator_api")]
+pub unsafe trait AttachAlloc<A = Global> {
+    type Attached: DetachAlloc<Allocator = A, Detached = Self>;
+    unsafe fn attach(self, allocator: A) -> Self::Attached;
+    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached>;
+}
+#[cfg(not(feature = "allocator_api"))]
+pub unsafe trait AttachAlloc<A = ()> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
     unsafe fn attach(self, allocator: A) -> Self::Attached;
     unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached>;
@@ -33,10 +42,7 @@ pub struct RefMut<'a, D: DetachAlloc> {
 }
 impl<'a, D: DetachAlloc> RefMut<'a, D> {
     pub fn new(src: &'a mut D::Detached, tmp: ManuallyDrop<D>) -> Self {
-        Self {
-            tmp,
-            src,
-        }
+        Self { tmp, src }
     }
 }
 

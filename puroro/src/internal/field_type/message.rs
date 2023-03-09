@@ -14,28 +14,33 @@
 
 use super::r#unsized::RepeatedFieldViewImpl;
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
+use crate::internal::alloc::NoAllocBox;
 use crate::internal::bitvec::BitSlice;
+use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc, RefMut};
 use crate::internal::message_internal::MessageInternal;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 use ::std::ops::Deref;
 
-#[derive(Default, Clone)]
-pub struct SingularMessageField<M>(Option<M>);
+#[derive(Default)]
+pub struct SingularMessageField<MV>(Option<NoAllocBox<MV>>);
 #[derive(Default, Clone)]
 pub struct RepeatedMessageField<M>(Vec<M>);
 
-impl<M> FieldType for SingularMessageField<M>
+impl<MV> FieldType for SingularMessageField<MV>
 where
-    M: MessageInternal + Default,
+    MV: MessageInternal + Default,
+    NoAllocBox<MV>: AttachAlloc,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        let msg = self.0.get_or_insert_with(Default::default);
+        let msg = self
+            .0
+            .get_or_insert_with(|| Box::<MV>::default().detach().0);
         Ok(msg.merge_from_scoped_bytes_iter(iter)?)
     }
 
@@ -83,18 +88,19 @@ where
     }
 }
 
-impl<M> NonRepeatedFieldType for SingularMessageField<M>
+impl<MV> NonRepeatedFieldType for SingularMessageField<MV>
 where
-    M: MessageInternal + Default + Deref,
+    MV: MessageInternal + Default,
+    NoAllocBox<MV>: AttachAlloc,
 {
-    type GetterOptType<'a> = Option<&'a M::Target>
+    type GetterOptType<'a> = Option<&'a MV>
     where
         Self: 'a;
     type DefaultValueType = ();
-    type GetterOrElseType<'a> = Option<&'a M::Target>
+    type GetterOrElseType<'a> = Option<&'a MV>
     where
         Self: 'a;
-    type GetterMutType<'a> = &'a mut M where Self: 'a;
+    type GetterMutType<'a> = RefMut<'a, <NoAllocBox::<MV> as AttachAlloc>::Attached> where Self: 'a;
 
     fn get_field_or_else<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a self,
@@ -111,7 +117,11 @@ where
         _bitvec: &mut B,
         _default: D,
     ) -> Self::GetterMutType<'a> {
-        self.0.get_or_insert_with(Default::default)
+        unsafe {
+            self.0
+                .get_or_insert_with(|| <Box<MV> as Default>::default().detach().0)
+                .ref_mut(Default::default())
+        }
     }
 
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
