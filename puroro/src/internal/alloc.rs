@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc, RefMut};
+use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc};
 #[cfg(feature = "allocator_api")]
 use ::std::alloc::Allocator;
 use ::std::mem::ManuallyDrop;
@@ -49,9 +49,8 @@ unsafe impl<T, A: Allocator> AttachAlloc<A> for NoAllocVec<T> {
     unsafe fn attach(self, allocator: A) -> Self::Attached {
         Vec::from_raw_parts_in(self.0, self.1, self.2, allocator)
     }
-    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached> {
-        let tmp = ManuallyDrop::new(Vec::from_raw_parts_in(self.0, self.1, self.2, allocator));
-        RefMut::new(self, tmp)
+    unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached> {
+        ManuallyDrop::new(Self(self.0, self.1, self.2).attach(allocator))
     }
 }
 
@@ -71,9 +70,8 @@ unsafe impl<T> AttachAlloc<()> for NoAllocVec<T> {
     unsafe fn attach(self, _allocator: ()) -> Self::Attached {
         Vec::from_raw_parts(self.0, self.1, self.2)
     }
-    unsafe fn ref_mut(&mut self, _allocator: ()) -> RefMut<Self::Attached> {
-        let tmp = ManuallyDrop::new(Vec::from_raw_parts(self.0, self.1, self.2));
-        RefMut::new(self, tmp)
+    unsafe fn make_nodrop_copy(&self, _allocator: ()) -> ManuallyDrop<Self::Attached> {
+        ManuallyDrop::new(Self(self.0, self.1, self.2).attach(()))
     }
 }
 
@@ -92,8 +90,8 @@ unsafe impl<T, A: Allocator> AttachAlloc<A> for NoAllocBox<T> {
     unsafe fn attach(self, allocator: A) -> Self::Attached {
         Box::from_raw_in(self.0, allocator)
     }
-    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<Self::Attached> {
-        RefMut::new(self, ManuallyDrop::new(Box::from_raw_in(self.0, allocator)))
+    unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached> {
+        ManuallyDrop::new(Self(self.0).attach(allocator))
     }
 }
 
@@ -112,7 +110,7 @@ unsafe impl<T> AttachAlloc<()> for NoAllocBox<T> {
     unsafe fn attach(self, _allocator: ()) -> Self::Attached {
         Box::from_raw(self.0)
     }
-    unsafe fn ref_mut(&mut self, _allocator: ()) -> RefMut<Self::Attached> {
-        RefMut::new(self, ManuallyDrop::new(Box::from_raw(self.0)))
+    unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached> {
+        ManuallyDrop::new(Self(self.0).attach())
     }
 }

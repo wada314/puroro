@@ -258,9 +258,12 @@ impl Message {
 
     fn gen_message_struct_impl_message(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
 
         Ok(parse2(quote! {
             impl #PURORO_LIB::Message for #ident {
+                type ViewType = #view_type;
+
                 fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> #PURORO_LIB::Result<Self> {
                     let mut msg = <Self as ::std::default::Default>::default();
                     msg.merge_from_bytes_iter(iter)?;
@@ -332,6 +335,10 @@ impl Message {
                     }
                     Ok(())
                 }
+
+                fn from_boxed_view(v: ::std::boxed::Box<<Self as #PURORO_LIB::Message>::ViewType>) -> Self {
+                    Self(v)
+                }
             }
         })?)
     }
@@ -391,6 +398,7 @@ impl Message {
 
     fn gen_view_struct_impl_message_view(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
+        let message_type = self.gen_message_struct_type()?;
         let out_ident = quote! { out };
         let out_expr = parse2(quote! { out })?;
         let ser_stmts = self
@@ -400,6 +408,8 @@ impl Message {
 
         Ok(parse2(quote! {
             impl #PURORO_LIB::MessageView for #ident {
+                type MessageType = #message_type;
+
                 fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
                     #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
                     use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};

@@ -27,8 +27,11 @@ pub trait MessageInternal: crate::Message {
         msg.merge_from_scoped_bytes_iter(scoped_iter)?;
         Ok(msg)
     }
+
     fn merge_from_scoped_bytes_iter<'a, I: Iterator<Item = IoResult<u8>>>(
         &mut self,
         scoped_iter: &mut ScopedIter<'a, I>,
     ) -> Result<()>;
+
+    fn from_boxed_view(v: Box<Self::ViewType>) -> Self;
 }

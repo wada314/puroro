@@ -14,12 +14,41 @@
 
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
+use ::std::mem::ManuallyDrop;
+use ::std::ops::{Deref, DerefMut};
+use std::marker::PhantomData;
 
 pub trait Message: Sized {
+    type ViewType: MessageView;
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(iter: I) -> Result<Self>;
     fn merge_from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(&mut self, iter: I) -> Result<()>;
 }
 
 pub trait MessageView {
+    type MessageType: Message;
     fn to_bytes<W: Write>(&self, out: &mut W) -> Result<()>;
+}
+
+pub struct RefMut<'a, M> {
+    tmp: ManuallyDrop<M>,
+    _phantom: PhantomData<&'a ()>,
+}
+impl<M> RefMut<'_, M> {
+    pub fn new(tmp: ManuallyDrop<M>) -> Self {
+        Self {
+            tmp,
+            _phantom: PhantomData,
+        }
+    }
+}
+impl<M> Deref for RefMut<'_, M> {
+    type Target = M;
+    fn deref(&self) -> &Self::Target {
+        &self.tmp
+    }
+}
+impl<M> DerefMut for RefMut<'_, M> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.tmp
+    }
 }
