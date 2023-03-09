@@ -31,7 +31,6 @@ pub struct RepeatedMessageField<M>(Vec<M>);
 impl<MV> FieldType for SingularMessageField<MV>
 where
     MV: MessageInternal + Default,
-    NoAllocBox<MV>: AttachAlloc,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
@@ -91,7 +90,6 @@ where
 impl<MV> NonRepeatedFieldType for SingularMessageField<MV>
 where
     MV: MessageInternal + Default,
-    NoAllocBox<MV>: AttachAlloc,
 {
     type GetterOptType<'a> = Option<&'a MV>
     where
