@@ -143,3 +143,10 @@ impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for Repeate
         RepeatedFieldViewImpl(self.0.as_slice())
     }
 }
+
+#[cfg(not(feature = "allocator_api"))]
+impl<MV: Clone> Clone for SingularMessageField<MV> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
