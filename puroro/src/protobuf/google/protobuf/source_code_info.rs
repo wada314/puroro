@@ -18,7 +18,11 @@ pub struct Location(
     >,
 );
 impl Location {
-    pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn path_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.path,
@@ -29,7 +33,11 @@ impl Location {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.path, self.0.shared.bitfield_mut())
     }
-    pub fn span_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn span_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.span,
@@ -40,7 +48,11 @@ impl Location {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.span, self.0.shared.bitfield_mut())
     }
-    pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
+    pub fn leading_comments_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::source_code_info::_view::LocationView = &mut self
             .0;
@@ -59,7 +71,11 @@ impl Location {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
+    pub fn trailing_comments_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::source_code_info::_view::LocationView = &mut self
             .0;
@@ -80,7 +96,9 @@ impl Location {
     }
     pub fn leading_detached_comments_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::string::String>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.leading_detached_comments,

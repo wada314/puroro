@@ -76,7 +76,7 @@ pub enum FatalErrorKind {
     #[error(r#"An error from puroro: "{source}""#)]
     PuroroError {
         #[from]
-        source: crate::puroro::PuroroError,
+        source: ::puroro::PuroroError,
     },
     #[error(r#"Expected the field descriptor's type_name field is filled, but is not"#)]
     MissingTypeName,
@@ -117,7 +117,7 @@ macro_rules! impl_from_from {
 }
 impl_from_from!(::std::fmt::Error);
 impl_from_from!(::std::io::Error);
-impl_from_from!(crate::puroro::PuroroError);
+impl_from_from!(::puroro::PuroroError);
 impl_from_from!(::std::string::FromUtf8Error);
 impl_from_from!(::std::num::ParseIntError);
 impl_from_from!(::std::num::ParseFloatError);

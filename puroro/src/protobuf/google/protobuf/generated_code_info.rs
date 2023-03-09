@@ -18,7 +18,11 @@ pub struct Annotation(
     >,
 );
 impl Annotation {
-    pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn path_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.path,
@@ -29,7 +33,11 @@ impl Annotation {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.path, self.0.shared.bitfield_mut())
     }
-    pub fn source_file_mut(&mut self) -> &mut ::std::string::String {
+    pub fn source_file_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
             .0;

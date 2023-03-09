@@ -58,7 +58,9 @@ impl ExtensionRange {
     }
     pub fn options_mut(
         &mut self,
-    ) -> &mut self::_root::google::protobuf::ExtensionRangeOptions {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::ExtensionRangeOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView = &mut self
             .0;
@@ -463,7 +465,7 @@ pub mod _view {
                 1usize,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::ExtensionRangeOptions,
+                self::_root::google::protobuf::_view::ExtensionRangeOptionsView,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,

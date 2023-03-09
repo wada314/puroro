@@ -22,10 +22,10 @@ use self::gen::PackageOrMessageExt as _;
 use crate::Result;
 use ::itertools::Itertools;
 use ::proc_macro2::TokenStream;
+use ::puroro::protobuf::google::protobuf::compiler::code_generator_response::File;
+use ::puroro::protobuf::google::protobuf::compiler::CodeGeneratorResponse;
+use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
 use ::quote::quote;
-use ::stable_puroro::protobuf::google::protobuf::compiler::code_generator_response::File;
-use ::stable_puroro::protobuf::google::protobuf::compiler::CodeGeneratorResponse;
-use ::stable_puroro::protobuf::google::protobuf::FileDescriptorProtoView;
 use ::std::iter;
 use ::std::rc::Rc;
 

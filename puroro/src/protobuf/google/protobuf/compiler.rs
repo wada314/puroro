@@ -76,7 +76,11 @@ impl Version {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn suffix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn suffix_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::VersionView = &mut self
             .0;
@@ -282,7 +286,9 @@ pub struct CodeGeneratorRequest(
 impl CodeGeneratorRequest {
     pub fn file_to_generate_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::string::String>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.file_to_generate,
@@ -296,7 +302,11 @@ impl CodeGeneratorRequest {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn parameter_mut(&mut self) -> &mut ::std::string::String {
+    pub fn parameter_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView = &mut self
             .0;
@@ -317,7 +327,9 @@ impl CodeGeneratorRequest {
     }
     pub fn proto_file_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.proto_file,
@@ -333,7 +345,9 @@ impl CodeGeneratorRequest {
     }
     pub fn compiler_version_mut(
         &mut self,
-    ) -> &mut self::_root::google::protobuf::compiler::Version {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::compiler::Version,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView = &mut self
             .0;
@@ -540,7 +554,11 @@ pub struct CodeGeneratorResponse(
     >,
 );
 impl CodeGeneratorResponse {
-    pub fn error_mut(&mut self) -> &mut ::std::string::String {
+    pub fn error_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView = &mut self
             .0;
@@ -580,9 +598,11 @@ impl CodeGeneratorResponse {
     }
     pub fn file_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::compiler::code_generator_response::File,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::compiler::code_generator_response::File,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.file,
@@ -960,7 +980,7 @@ pub mod _view {
                 self::_root::google::protobuf::FileDescriptorProto,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::compiler::Version,
+                self::_root::google::protobuf::compiler::_view::VersionView,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,

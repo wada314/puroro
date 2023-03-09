@@ -24,7 +24,11 @@ pub struct NamePart(
     >,
 );
 impl NamePart {
-    pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_part_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
             .0;

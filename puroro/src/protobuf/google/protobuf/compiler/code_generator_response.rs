@@ -20,7 +20,11 @@ pub struct File(
     >,
 );
 impl File {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -39,7 +43,11 @@ impl File {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn insertion_point_mut(&mut self) -> &mut ::std::string::String {
+    pub fn insertion_point_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -58,7 +66,11 @@ impl File {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn content_mut(&mut self) -> &mut ::std::string::String {
+    pub fn content_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -79,7 +91,9 @@ impl File {
     }
     pub fn generated_code_info_mut(
         &mut self,
-    ) -> &mut self::_root::google::protobuf::GeneratedCodeInfo {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::GeneratedCodeInfo,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -309,7 +323,7 @@ pub mod _view {
                 2usize,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::GeneratedCodeInfo,
+                self::_root::google::protobuf::_view::GeneratedCodeInfoView,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,

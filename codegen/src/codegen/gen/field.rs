@@ -87,11 +87,12 @@ impl Field {
         use FieldType::*;
         use LengthDelimitedType::*;
         let primitive_type = self.r#type()?.rust_type()?;
+        let no_alloc_type = self.r#type()?.rust_no_alloc_type()?;
         let tag_type = self.r#type()?.tag_type()?;
         let bitfield_index = self.bitfield_index_for_optional()?.unwrap_or(usize::MAX);
         let type_name_segment: PathSegment = parse2(match (self.rule()?, self.r#type()?) {
             (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                SingularMessageField::<#primitive_type>
+                SingularMessageField::<#no_alloc_type>
             },
             (Repeated, LengthDelimited(Message(_))) => quote! {
                 RepeatedMessageField::<#primitive_type>

@@ -19,7 +19,7 @@ use super::{
 use crate::{FatalErrorKind, Result};
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
-use ::stable_puroro::protobuf::google::protobuf::FileDescriptorProtoView;
+use ::puroro::protobuf::google::protobuf::FileDescriptorProtoView;
 use ::std::fmt::Debug;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
@@ -252,7 +252,7 @@ mod tests {
     use super::super::{DataTypeBase, Package};
     use crate::Result;
     use ::once_cell::sync::Lazy;
-    use ::stable_puroro::protobuf::google::protobuf::FileDescriptorProto;
+    use ::puroro::protobuf::google::protobuf::FileDescriptorProto;
     use ::std::ops::Deref;
     use ::std::rc::Rc;
 

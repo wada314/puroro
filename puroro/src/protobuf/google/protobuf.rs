@@ -31,7 +31,9 @@ pub struct FileDescriptorSet(
 impl FileDescriptorSet {
     pub fn file_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.file,
@@ -177,7 +179,11 @@ pub struct FileDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FileDescriptorProtoView>,
 );
 impl FileDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -196,7 +202,11 @@ impl FileDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn package_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -215,7 +225,11 @@ impl FileDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn dependency_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::string::String>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.dependency,
@@ -229,7 +243,11 @@ impl FileDescriptorProto {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn public_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn public_dependency_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.public_dependency,
@@ -243,7 +261,11 @@ impl FileDescriptorProto {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn weak_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn weak_dependency_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<i32>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.weak_dependency,
@@ -259,7 +281,9 @@ impl FileDescriptorProto {
     }
     pub fn message_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.message_type,
@@ -275,7 +299,9 @@ impl FileDescriptorProto {
     }
     pub fn enum_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.enum_type,
@@ -291,7 +317,9 @@ impl FileDescriptorProto {
     }
     pub fn service_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::ServiceDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::ServiceDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.service,
@@ -307,7 +335,9 @@ impl FileDescriptorProto {
     }
     pub fn extension_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.extension,
@@ -321,7 +351,11 @@ impl FileDescriptorProto {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::FileOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::FileOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -342,7 +376,9 @@ impl FileDescriptorProto {
     }
     pub fn source_code_info_mut(
         &mut self,
-    ) -> &mut self::_root::google::protobuf::SourceCodeInfo {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::SourceCodeInfo,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -361,7 +397,11 @@ impl FileDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn syntax_mut(&mut self) -> &mut ::std::string::String {
+    pub fn syntax_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -691,7 +731,11 @@ pub struct DescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::DescriptorProtoView>,
 );
 impl DescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
             .0;
@@ -712,7 +756,9 @@ impl DescriptorProto {
     }
     pub fn field_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.field,
@@ -725,7 +771,9 @@ impl DescriptorProto {
     }
     pub fn extension_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.extension,
@@ -741,7 +789,9 @@ impl DescriptorProto {
     }
     pub fn nested_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.nested_type,
@@ -757,7 +807,9 @@ impl DescriptorProto {
     }
     pub fn enum_type_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.enum_type,
@@ -773,9 +825,11 @@ impl DescriptorProto {
     }
     pub fn extension_range_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::descriptor_proto::ExtensionRange,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::descriptor_proto::ExtensionRange,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.extension_range,
@@ -791,7 +845,9 @@ impl DescriptorProto {
     }
     pub fn oneof_decl_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::OneofDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::OneofDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.oneof_decl,
@@ -805,7 +861,11 @@ impl DescriptorProto {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::MessageOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::MessageOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
             .0;
@@ -826,9 +886,11 @@ impl DescriptorProto {
     }
     pub fn reserved_range_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::descriptor_proto::ReservedRange,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::descriptor_proto::ReservedRange,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.reserved_range,
@@ -844,7 +906,9 @@ impl DescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::string::String>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.reserved_name,
@@ -1137,7 +1201,9 @@ pub struct ExtensionRangeOptions(
 impl ExtensionRangeOptions {
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -1289,7 +1355,11 @@ pub struct FieldDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FieldDescriptorProtoView>,
 );
 impl FieldDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1369,7 +1439,11 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn type_name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn type_name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1388,7 +1462,11 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn extendee_mut(&mut self) -> &mut ::std::string::String {
+    pub fn extendee_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1407,7 +1485,11 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn default_value_mut(&mut self) -> &mut ::std::string::String {
+    pub fn default_value_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1445,7 +1527,11 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn json_name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn json_name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1464,7 +1550,11 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::FieldOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::FieldOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1798,7 +1888,11 @@ pub struct OneofDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::OneofDescriptorProtoView>,
 );
 impl OneofDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
             .0;
@@ -1817,7 +1911,11 @@ impl OneofDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::OneofOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::OneofOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
             .0;
@@ -1988,7 +2086,11 @@ pub struct EnumDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumDescriptorProtoView>,
 );
 impl EnumDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
             .0;
@@ -2009,9 +2111,11 @@ impl EnumDescriptorProto {
     }
     pub fn value_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::EnumValueDescriptorProto,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::EnumValueDescriptorProto,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.value,
@@ -2022,7 +2126,11 @@ impl EnumDescriptorProto {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.value, self.0.shared.bitfield_mut())
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::EnumOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::EnumOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
             .0;
@@ -2043,9 +2151,11 @@ impl EnumDescriptorProto {
     }
     pub fn reserved_range_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.reserved_range,
@@ -2061,7 +2171,9 @@ impl EnumDescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<::std::string::String>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.reserved_name,
@@ -2274,7 +2386,11 @@ pub struct EnumValueDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueDescriptorProtoView>,
 );
 impl EnumValueDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
             .0;
@@ -2314,7 +2430,9 @@ impl EnumValueDescriptorProto {
     }
     pub fn options_mut(
         &mut self,
-    ) -> &mut self::_root::google::protobuf::EnumValueOptions {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::EnumValueOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
             .0;
@@ -2503,7 +2621,11 @@ pub struct ServiceDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceDescriptorProtoView>,
 );
 impl ServiceDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
             .0;
@@ -2524,7 +2646,9 @@ impl ServiceDescriptorProto {
     }
     pub fn method_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::MethodDescriptorProto> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::MethodDescriptorProto>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.method,
@@ -2535,7 +2659,11 @@ impl ServiceDescriptorProto {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.method, self.0.shared.bitfield_mut())
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::ServiceOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::ServiceOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
             .0;
@@ -2724,7 +2852,11 @@ pub struct MethodDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::MethodDescriptorProtoView>,
 );
 impl MethodDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -2743,7 +2875,11 @@ impl MethodDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn input_type_mut(&mut self) -> &mut ::std::string::String {
+    pub fn input_type_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -2762,7 +2898,11 @@ impl MethodDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn output_type_mut(&mut self) -> &mut ::std::string::String {
+    pub fn output_type_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -2781,7 +2921,11 @@ impl MethodDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::MethodOptions {
+    pub fn options_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::google::protobuf::MethodOptions,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -3054,7 +3198,11 @@ pub struct FileOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FileOptionsView>,
 );
 impl FileOptions {
-    pub fn java_package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn java_package_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3073,7 +3221,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn java_outer_classname_mut(&mut self) -> &mut ::std::string::String {
+    pub fn java_outer_classname_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3170,7 +3322,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn go_package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn go_package_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3303,7 +3459,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn objc_class_prefix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn objc_class_prefix_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3322,7 +3482,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn csharp_namespace_mut(&mut self) -> &mut ::std::string::String {
+    pub fn csharp_namespace_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3341,7 +3505,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn swift_prefix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn swift_prefix_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3360,7 +3528,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn php_class_prefix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn php_class_prefix_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3379,7 +3551,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn php_namespace_mut(&mut self) -> &mut ::std::string::String {
+    pub fn php_namespace_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3398,7 +3574,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn php_metadata_namespace_mut(&mut self) -> &mut ::std::string::String {
+    pub fn php_metadata_namespace_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3417,7 +3597,11 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn ruby_package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn ruby_package_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3438,7 +3622,9 @@ impl FileOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -3983,7 +4169,9 @@ impl MessageOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -4314,7 +4502,9 @@ impl FieldOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -4559,7 +4749,9 @@ pub struct OneofOptions(
 impl OneofOptions {
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -4746,7 +4938,9 @@ impl EnumOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -4946,7 +5140,9 @@ impl EnumValueOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -5130,7 +5326,9 @@ impl ServiceOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -5337,7 +5535,9 @@ impl MethodOptions {
     }
     pub fn uninterpreted_option_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.uninterpreted_option,
@@ -5525,9 +5725,11 @@ pub struct UninterpretedOption(
 impl UninterpretedOption {
     pub fn name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::uninterpreted_option::NamePart,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::uninterpreted_option::NamePart,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.name,
@@ -5538,7 +5740,11 @@ impl UninterpretedOption {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.name, self.0.shared.bitfield_mut())
     }
-    pub fn identifier_value_mut(&mut self) -> &mut ::std::string::String {
+    pub fn identifier_value_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
             .0;
@@ -5614,7 +5820,11 @@ impl UninterpretedOption {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn string_value_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
+    pub fn string_value_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = std::vec::Vec::<u8>,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
             .0;
@@ -5633,7 +5843,11 @@ impl UninterpretedOption {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn aggregate_value_mut(&mut self) -> &mut ::std::string::String {
+    pub fn aggregate_value_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
             .0;
@@ -5886,9 +6100,11 @@ pub struct SourceCodeInfo(
 impl SourceCodeInfo {
     pub fn location_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::source_code_info::Location,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::source_code_info::Location,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.location,
@@ -6041,9 +6257,11 @@ pub struct GeneratedCodeInfo(
 impl GeneratedCodeInfo {
     pub fn annotation_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<
-        self::_root::google::protobuf::generated_code_info::Annotation,
-    > {
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::vec::Vec::<
+            self::_root::google::protobuf::generated_code_info::Annotation,
+        >,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.annotation,
@@ -6302,10 +6520,10 @@ pub mod _view {
                 self::_root::google::protobuf::FieldDescriptorProto,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::FileOptions,
+                self::_root::google::protobuf::_view::FileOptionsView,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::SourceCodeInfo,
+                self::_root::google::protobuf::_view::SourceCodeInfoView,
             >,
             self::_pinternal::OptionalUnsizedField::<
                 ::std::string::String,
@@ -6692,7 +6910,7 @@ pub mod _view {
                 self::_root::google::protobuf::OneofDescriptorProto,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::MessageOptions,
+                self::_root::google::protobuf::_view::MessageOptionsView,
             >,
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::descriptor_proto::ReservedRange,
@@ -7106,7 +7324,7 @@ pub mod _view {
                 8usize,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::FieldOptions,
+                self::_root::google::protobuf::_view::FieldOptionsView,
             >,
             self::_pinternal::OptionalNumericalField::<
                 bool,
@@ -7528,7 +7746,7 @@ pub mod _view {
                 0usize,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::OneofOptions,
+                self::_root::google::protobuf::_view::OneofOptionsView,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
@@ -7648,7 +7866,7 @@ pub mod _view {
                 self::_root::google::protobuf::EnumValueDescriptorProto,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::EnumOptions,
+                self::_root::google::protobuf::_view::EnumOptionsView,
             >,
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
@@ -7843,7 +8061,7 @@ pub mod _view {
                 1usize,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::EnumValueOptions,
+                self::_root::google::protobuf::_view::EnumValueOptionsView,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
@@ -7989,7 +8207,7 @@ pub mod _view {
                 self::_root::google::protobuf::MethodDescriptorProto,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::ServiceOptions,
+                self::_root::google::protobuf::_view::ServiceOptionsView,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
@@ -8131,7 +8349,7 @@ pub mod _view {
                 2usize,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::google::protobuf::MethodOptions,
+                self::_root::google::protobuf::_view::MethodOptionsView,
             >,
             self::_pinternal::OptionalNumericalField::<
                 bool,

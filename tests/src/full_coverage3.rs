@@ -1830,10 +1830,10 @@ pub mod _view {
                 self::_pinternal::tags::Enum3::<self::_root::full_coverage3::Enum>,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::full_coverage3::msg::Submsg,
+                self::_root::full_coverage3::msg::_view::SubmsgView,
             >,
             self::_pinternal::SingularMessageField::<
-                self::_root::full_coverage3::msg::Submsg,
+                self::_root::full_coverage3::msg::_view::SubmsgView,
             >,
             self::_pinternal::RepeatedMessageField::<
                 self::_root::full_coverage3::msg::Submsg,

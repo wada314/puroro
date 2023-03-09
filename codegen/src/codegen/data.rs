@@ -39,10 +39,10 @@ pub(crate) use self::package_or_message::*;
 pub(crate) use self::source_code_info::*;
 
 use super::util::AnonymousCache;
-use crate::puroro::protobuf::google::protobuf::{
+use crate::{FatalErrorKind, GeneratorError, Result};
+use ::puroro::protobuf::google::protobuf::{
     DescriptorProto, EnumDescriptorProto, FileDescriptorProto,
 };
-use crate::{FatalErrorKind, GeneratorError, Result};
 
 const MESSAGE_FIELD_NUMBER_IN_FILE_DESCRIPTOR: i32 = FileDescriptorProto::MESSAGE_TYPE_FIELD_NUMBER;
 const MESSAGE_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR: i32 = DescriptorProto::NESTED_TYPE_FIELD_NUMBER;

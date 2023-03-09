@@ -14,7 +14,11 @@ mod _pinternal {
 #[derive(::std::cmp::PartialEq)]
 pub struct Book(::std::boxed::Box<self::_root::library::_view::BookView>);
 impl Book {
-    pub fn title_mut(&mut self) -> &mut ::std::string::String {
+    pub fn title_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::library::_view::BookView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -48,7 +52,11 @@ impl Book {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn author_mut(&mut self) -> &mut self::_root::library::Author {
+    pub fn author_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = self::_root::library::Author,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::library::_view::BookView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -222,7 +230,11 @@ impl ::std::ops::Deref for Book {
 #[derive(::std::cmp::PartialEq)]
 pub struct Author(::std::boxed::Box<self::_root::library::_view::AuthorView>);
 impl Author {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(
+        &mut self,
+    ) -> impl '_ + ::std::ops::Deref<
+        Target = ::std::string::String,
+    > + ::std::ops::DerefMut {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::library::_view::AuthorView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -385,7 +397,9 @@ pub mod _view {
                 u32,
                 self::_pinternal::tags::UInt32,
             >,
-            self::_pinternal::SingularMessageField::<self::_root::library::Author>,
+            self::_pinternal::SingularMessageField::<
+                self::_root::library::_view::AuthorView,
+            >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }

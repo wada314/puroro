@@ -176,7 +176,9 @@ pub mod _view {
     #[derive(::std::default::Default)]
     pub struct MsgView {
         pub(super) fields: self::_root::self_recursive::_fields::MsgFields::<
-            self::_pinternal::SingularMessageField::<self::_root::self_recursive::Msg>,
+            self::_pinternal::SingularMessageField::<
+                self::_root::self_recursive::_view::MsgView,
+            >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }

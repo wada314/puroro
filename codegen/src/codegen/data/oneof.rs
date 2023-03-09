@@ -18,7 +18,7 @@ use super::{
     ONEOF_FIELD_NUMBER_IN_MESSAGE_DESCRIPTOR,
 };
 use crate::Result;
-use ::stable_puroro::protobuf::google::protobuf::{DescriptorProtoView, OneofDescriptorProtoView};
+use ::puroro::protobuf::google::protobuf::{DescriptorProtoView, OneofDescriptorProtoView};
 use ::std::fmt::Debug;
 use ::std::rc::{Rc, Weak};
 

@@ -4,6 +4,10 @@
         {
             "type": "cargo",
             "command": "build",
+            "args": [
+                "--config",
+                "patch.crates-io.puroro.path=\"puroro\"",
+            ],
             "problemMatcher": [
                 "$rustc"
             ],
@@ -23,11 +27,11 @@
             "command": "build",
             "args": [
                 "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "patch.crates-io.puroro.git=\"https://github.com/wada314/puroro\"",
                 "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "patch.crates-io.puroro.branch=\"master\"",
                 "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "patch.crates-io.puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -46,6 +50,10 @@
         {
             "type": "cargo",
             "command": "test",
+            "args": [
+                "--config",
+                "patch.crates-io.puroro.path=\"puroro\"",
+            ],
             "problemMatcher": [
                 "$rustc"
             ],
@@ -68,11 +76,11 @@
             "command": "test",
             "args": [
                 "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "patch.crates-io.puroro.git=\"https://github.com/wada314/puroro\"",
                 "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "patch.crates-io.puroro.branch=\"master\"",
                 "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "patch.crates-io.puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -96,7 +104,9 @@
             "command": "test",
             "args": [
                 "-p",
-                "tests"
+                "tests",
+                "--config",
+                "patch.crates-io.puroro.path=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -122,11 +132,11 @@
                 "-p",
                 "tests",
                 "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "patch.crates-io.puroro.git=\"https://github.com/wada314/puroro\"",
                 "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "patch.crates-io.puroro.branch=\"master\"",
                 "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "patch.crates-io.puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -151,7 +161,9 @@
             "args": [
                 "-p",
                 "puroro",
-                "--no-deps"
+                "--no-deps",
+                "--config",
+                "patch.crates-io.puroro.path=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -174,11 +186,11 @@
                 "-p",
                 "update-puroro-protobuf",
                 "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "patch.crates-io.puroro.git=\"https://github.com/wada314/puroro\"",
                 "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "patch.crates-io.puroro.branch=\"master\"",
                 "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "patch.crates-io.puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -201,11 +213,11 @@
                 "-p",
                 "update-puroro-doc-samples",
                 "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
+                "patch.crates-io.puroro.git=\"https://github.com/wada314/puroro\"",
                 "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
+                "patch.crates-io.puroro.branch=\"master\"",
                 "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "patch.crates-io.puroro.package=\"puroro\"",
             ],
             "problemMatcher": [
                 "$rustc"

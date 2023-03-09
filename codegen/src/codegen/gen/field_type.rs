@@ -29,6 +29,15 @@ impl FieldType {
             Bits64(b) => b.rust_type(),
         }
     }
+    pub(crate) fn rust_no_alloc_type(&self) -> Result<Rc<Type>> {
+        use FieldType::*;
+        match self {
+            Variant(v) => v.rust_type(),
+            LengthDelimited(ld) => ld.rust_no_alloc_type(),
+            Bits32(b) => b.rust_type(),
+            Bits64(b) => b.rust_type(),
+        }
+    }
     pub(crate) fn rust_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         if let FieldType::LengthDelimited(ref ld) = self {
             ld.rust_maybe_borrowed_type(lt)
@@ -103,6 +112,14 @@ impl LengthDelimitedType {
                 return Ok(m.try_upgrade()?.gen_message_struct_type()?);
             }
         })?))
+    }
+    fn rust_no_alloc_type(&self) -> Result<Rc<Type>> {
+        use LengthDelimitedType::*;
+        Ok(match self {
+            String => Rc::new(parse2(quote! { str })?),
+            Bytes => Rc::new(parse2(quote! { [u8] })?),
+            Message(m) => m.try_upgrade()?.gen_view_struct_type()?,
+        })
     }
     fn rust_maybe_borrowed_type(&self, lt: Option<Lifetime>) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
