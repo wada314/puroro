@@ -68,18 +68,6 @@ impl self::_puroro::Message for Message {
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
     }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self.fields.conflict.ser_to_write(self.shared.bitfield(), out)?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
-    }
 }
 impl self::_pinternal::MessageInternal for Message {
     fn merge_from_scoped_bytes_iter<
@@ -208,6 +196,20 @@ pub mod _view {
         }
         pub fn has_this_is_oneof_field(&self) -> bool {
             self.this_is_oneof_field_opt().is_some()
+        }
+    }
+    impl self::_puroro::MessageView for Message {
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self.fields.conflict.ser_to_write(self.shared.bitfield(), out)?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
         }
     }
     impl ::std::ops::Drop for MessageView {

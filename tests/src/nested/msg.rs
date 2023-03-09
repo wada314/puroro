@@ -56,23 +56,6 @@ impl self::_puroro::Message for Submsg {
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
     }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.item_inner,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
-    }
 }
 impl self::_pinternal::MessageInternal for Submsg {
     fn merge_from_scoped_bytes_iter<
@@ -202,6 +185,25 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for Submsg {
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.item_inner,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
         }
     }
     impl ::std::ops::Drop for SubmsgView {

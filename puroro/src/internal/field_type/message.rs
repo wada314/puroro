@@ -19,27 +19,26 @@ use crate::internal::bitvec::BitSlice;
 use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc, RefMut};
 use crate::internal::message_internal::MessageInternal;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
+use crate::message::MessageView;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
-use ::std::ops::Deref;
 
 #[derive(Default)]
 pub struct SingularMessageField<MV>(Option<NoAllocBox<MV>>);
 #[derive(Default, Clone)]
-pub struct RepeatedMessageField<M>(Vec<M>);
+pub struct RepeatedMessageField<MV>(Vec<MV>);
 
-impl<MV> FieldType for SingularMessageField<MV>
+impl<MV, M> FieldType for SingularMessageField<MV>
 where
-    MV: MessageInternal + Default,
+    MV: MessageView + AttachAlloc<Attached = M>,
+    M: MessageInternal + Default,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        let msg = self
-            .0
-            .get_or_insert_with(|| Box::<MV>::default().detach().0);
+        let msg = self.0.get_or_insert_with(|| <M as Default>::default());
         Ok(msg.merge_from_scoped_bytes_iter(iter)?)
     }
 
@@ -58,8 +57,9 @@ where
     }
 }
 
-impl<M> FieldType for RepeatedMessageField<M>
+impl<MV, M> FieldType for RepeatedMessageField<MV>
 where
+    MV: MessageView + AttachAlloc<Attached = M>,
     M: MessageInternal + Default,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -67,7 +67,7 @@ where
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        let msg = M::from_scoped_bytes_iter(iter)?;
+        let msg = <<MV as AttachAlloc>::Attached as MessageInternal>::from_scoped_bytes_iter(iter)?;
         self.0.push(msg);
         Ok(())
     }
@@ -87,9 +87,10 @@ where
     }
 }
 
-impl<MV> NonRepeatedFieldType for SingularMessageField<MV>
+impl<MV, M> NonRepeatedFieldType for SingularMessageField<MV>
 where
-    MV: MessageInternal + Default,
+    MV: MessageView + AttachAlloc<Attached = M>,
+    M: MessageInternal + Default,
 {
     type GetterOptType<'a> = Option<&'a MV>
     where
@@ -98,7 +99,7 @@ where
     type GetterOrElseType<'a> = Option<&'a MV>
     where
         Self: 'a;
-    type GetterMutType<'a> = RefMut<'a, <NoAllocBox::<MV> as AttachAlloc>::Attached> where Self: 'a;
+    type GetterMutType<'a> = RefMut<'a, <MV as AttachAlloc>::Attached> where Self: 'a;
 
     fn get_field_or_else<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a self,
@@ -127,8 +128,12 @@ where
     }
 }
 
-impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for RepeatedMessageField<M> {
-    type ContainerType = Vec<M>;
+impl<MV, M> RepeatedFieldType for RepeatedMessageField<MV>
+where
+    MV: MessageView + Default + AttachAlloc,
+    <MV as AttachAlloc>::Attached: MessageInternal,
+{
+    type ContainerType = Vec<MV>;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0
     }
@@ -136,7 +141,7 @@ impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for Repeate
         self.0.clear()
     }
 
-    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, M>
+    type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, MV>
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
