@@ -181,11 +181,13 @@ impl Oneof {
     pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
+        let view_type = self.message()?.gen_view_struct_type()?;
 
         Ok(vec![parse2(quote! {
             pub fn #clear_ident(&mut self) {
+                let view_ref: &mut #view_type = &mut self.0;
                 use #PURORO_INTERNAL::{SharedItems as _, OneofUnion as _};
-                self.body.fields.#field_ident.clear(self.body.shared.bitfield_mut())
+                view_ref.fields.#field_ident.clear(view_ref.shared.bitfield_mut())
             }
         })?])
     }
@@ -226,14 +228,19 @@ impl Oneof {
         let case_type = self.gen_oneof_case_type(iter::empty())?;
         let case_names = self.try_map_fields(|f| f.gen_oneof_case_value_ident())?;
 
+        let view_type = self.message()?.gen_view_struct_type()?;
+
         iter::zip(field_numbers.into_iter(), case_names.into_iter())
             .map(|(field_number, case_name)| {
                 Ok(parse2(quote! {
-                    #field_number => self.body.fields.#field_ident.deser_from_field_data(
-                        self.body.shared.bitfield_mut(),
-                        #field_data_expr,
-                        #case_type::#case_name(()),
-                    )?,
+                    #field_number => {
+                        let view_ref: &mut #view_type = &mut self.0;
+                        view_ref.fields.#field_ident.deser_from_field_data(
+                            view_ref.shared.bitfield_mut(),
+                            #field_data_expr,
+                            #case_type::#case_name(()),
+                        )?
+                    }
                 })?)
             })
             .collect::<Result<Vec<_>>>()

@@ -22,11 +22,11 @@ use ::std::io::{Result as IoResult, Write};
 use ::std::ops::Deref;
 
 #[derive(Default, Clone)]
-pub struct SingularHeapMessageField<M>(Option<Box<M>>);
+pub struct SingularMessageField<M>(Option<M>);
 #[derive(Default, Clone)]
 pub struct RepeatedMessageField<M>(Vec<M>);
 
-impl<M> FieldType for SingularHeapMessageField<M>
+impl<M> FieldType for SingularMessageField<M>
 where
     M: MessageInternal + Default,
 {
@@ -35,7 +35,7 @@ where
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        let msg = self.0.get_or_insert_with(Default::default).as_mut();
+        let msg = self.0.get_or_insert_with(Default::default);
         Ok(msg.merge_from_scoped_bytes_iter(iter)?)
     }
 
@@ -83,7 +83,7 @@ where
     }
 }
 
-impl<M> NonRepeatedFieldType for SingularHeapMessageField<M>
+impl<M> NonRepeatedFieldType for SingularMessageField<M>
 where
     M: MessageInternal + Default + Deref,
 {
@@ -104,7 +104,7 @@ where
         self.get_field_opt(bitvec)
     }
     fn get_field_opt<B: BitSlice>(&self, _bitvec: &B) -> Self::GetterOptType<'_> {
-        self.0.as_deref().map(Deref::deref)
+        self.0.as_deref()
     }
     fn get_field_mut<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a mut self,

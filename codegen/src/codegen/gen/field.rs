@@ -91,7 +91,7 @@ impl Field {
         let bitfield_index = self.bitfield_index_for_optional()?.unwrap_or(usize::MAX);
         let type_name_segment: PathSegment = parse2(match (self.rule()?, self.r#type()?) {
             (Optional | Singular, LengthDelimited(Message(_))) => quote! {
-                SingularHeapMessageField::<#primitive_type>
+                SingularMessageField::<#primitive_type>
             },
             (Repeated, LengthDelimited(Message(_))) => quote! {
                 RepeatedMessageField::<#primitive_type>
@@ -144,12 +144,16 @@ impl Field {
     ) -> Result<Arm> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
+        let view_type = self.message()?.gen_view_struct_type()?;
         Ok(parse2(quote! {
-            #number => #PURORO_INTERNAL::FieldType::deser_from_field_data(
-                &mut self.body.fields.#ident,
-                self.body.shared.bitfield_mut(),
-                #field_data_expr,
-            )?,
+            #number => {
+                let view_ref: &mut #view_type = &mut self.0;
+                #PURORO_INTERNAL::FieldType::deser_from_field_data(
+                    &mut view_ref.fields.#ident,
+                    view_ref.shared.bitfield_mut(),
+                    #field_data_expr,
+                )?
+            }
         })?)
     }
     pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
@@ -157,8 +161,8 @@ impl Field {
         let number = self.number()?;
         Ok(parse2(quote! {
             #PURORO_INTERNAL::FieldType::ser_to_write(
-                &self.body.fields.#ident,
-                self.body.shared.bitfield(),
+                &self.fields.#ident,
+                self.shared.bitfield(),
                 #number,
                 #out_expr,
             )?;
@@ -234,7 +238,7 @@ impl Field {
                 {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::get_field_mut(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),
+                        &mut self.0.fields.#field_ident, self.0.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -242,7 +246,7 @@ impl Field {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{RepeatedFieldType, SharedItems as _};
                     RepeatedFieldType::clear(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),
+                        &mut self.0.fields.#field_ident, self.0.shared.bitfield_mut(),
                     )
                 }
             })?,
@@ -259,21 +263,24 @@ impl Field {
         let field_ident = self.gen_fields_struct_field_ident()?;
         let getter_mut_type = self.r#type()?.rust_mut_ref_type()?;
         let default_fn = self.gen_default_fn()?;
+        let view_type = self.message()?.gen_view_struct_type()?;
 
         Ok(vec![
             parse2(quote! {
                 pub fn #getter_mut_ident(&mut self) -> #getter_mut_type {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    let mut_view: &mut #view_type = &mut self.0;
                     NonRepeatedFieldType::get_field_mut(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(), #default_fn,
+                        &mut mut_view.fields.#field_ident, mut_view.shared.bitfield_mut(), #default_fn,
                     )
                 }
             })?,
             parse2(quote! {
                 pub fn #clear_ident(&mut self) {
                     use #PURORO_INTERNAL::{NonRepeatedFieldType, SharedItems as _};
+                    let mut_view: &mut #view_type = &mut self.0;
                     NonRepeatedFieldType::clear(
-                        &mut self.body.fields.#field_ident, self.body.shared.bitfield_mut(),
+                        &mut mut_view.fields.#field_ident, mut_view.shared.bitfield_mut(),
                     )
                 }
             })?,

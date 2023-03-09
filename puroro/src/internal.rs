@@ -30,7 +30,7 @@ pub use self::bitvec::{BitArray, BitSlice};
 pub use self::field_type::{
     FieldType, NonRepeatedFieldType, OptionalNumericalField, OptionalUnsizedField,
     RepeatedFieldType, RepeatedMessageField, RepeatedNumericalField, RepeatedUnsizedField,
-    SingularHeapMessageField, SingularNumericalField, SingularUnsizedField,
+    SingularMessageField, SingularNumericalField, SingularUnsizedField,
 };
 pub use self::message_internal::MessageInternal;
 pub use self::oneof_field_type::{HeapMessageField, NumericalField, OneofFieldType, UnsizedField};

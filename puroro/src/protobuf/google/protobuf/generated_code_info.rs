@@ -11,67 +11,79 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Annotation {
-    body: self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct Annotation(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
+    >,
+);
 impl Annotation {
     pub fn path_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.path,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.path,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_path(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(
-            &mut self.body.fields.path,
-            self.body.shared.bitfield_mut(),
-        )
+        RepeatedFieldType::clear(&mut self.0.fields.path, self.0.shared.bitfield_mut())
     }
     pub fn source_file_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.source_file,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.source_file,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_source_file(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.source_file,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.source_file,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn begin_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.begin,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.begin,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_begin(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.begin,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.begin,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.end,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.end,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_end(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.end,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.end,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const PATH_FIELD_NUMBER: i32 = 1i32;
@@ -111,26 +123,26 @@ impl self::_puroro::Message for Annotation {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.path,
-            self.body.shared.bitfield(),
+            &self.fields.path,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.source_file,
-            self.body.shared.bitfield(),
+            &self.fields.source_file,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.begin,
-            self.body.shared.bitfield(),
+            &self.fields.begin,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.end,
-            self.body.shared.bitfield(),
+            &self.fields.end,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
@@ -162,30 +174,38 @@ impl self::_pinternal::MessageInternal for Annotation {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.path,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.path,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.source_file,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.source_file,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.begin,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.begin,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.end,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.end,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -201,7 +221,7 @@ impl self::_pinternal::MessageInternal for Annotation {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -215,14 +235,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::generated_code_info::_view::AnnotationView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for Annotation {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::generated_code_info::_view::AnnotationView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for Annotation {
@@ -231,7 +253,7 @@ impl ::std::fmt::Debug for Annotation {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::generated_code_info::_view::AnnotationView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -239,12 +261,7 @@ impl ::std::fmt::Debug for Annotation {
 impl ::std::ops::Deref for Annotation {
     type Target = self::_root::google::protobuf::generated_code_info::_view::AnnotationView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for Annotation {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]
@@ -410,8 +427,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::generated_code_info::Annotation {
-                body: Self {
+            self::_root::google::protobuf::generated_code_info::Annotation(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields {
                         path: ::std::clone::Clone::clone(&self.fields.path),
                         source_file: ::std::clone::Clone::clone(
@@ -421,8 +438,8 @@ pub mod _view {
                         end: ::std::clone::Clone::clone(&self.fields.end),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }
