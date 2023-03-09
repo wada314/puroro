@@ -28,18 +28,17 @@ pub struct SingularMessageField<MV>(Option<NoAllocBox<MV>>);
 #[derive(Default, Clone)]
 pub struct RepeatedMessageField<MV>(Vec<MV>);
 
-impl<MV> FieldType for SingularMessageField<MV>
+impl<MV, M> FieldType for SingularMessageField<MV>
 where
-    MV: MessageView + Default,
+    MV: MessageView + Default + ToOwned<Owned = M>,
 {
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        let msg = self
-            .0
-            .get_or_insert_with(|| <Box<MV> as Default>::default().detach());
+        let no_alloc_box = self.0.get_or_insert_with(|| Box::<MV>::default().detach());
+        let msg = 
         Ok(msg.merge_from_scoped_bytes_iter(iter)?)
     }
 
