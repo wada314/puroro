@@ -11,72 +11,91 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Represents a single generated file.
 */
-pub struct File {
-    body: self::_root::google::protobuf::compiler::code_generator_response::_view::FileView,
-}
+pub struct File(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::compiler::code_generator_response::_view::FileView,
+    >,
+);
 impl File {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn insertion_point_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.insertion_point,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.insertion_point,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_insertion_point(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.insertion_point,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.insertion_point,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn content_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.content,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.content,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_content(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.content,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.content,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn generated_code_info_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::GeneratedCodeInfo {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.generated_code_info,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.generated_code_info,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_generated_code_info(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.generated_code_info,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.generated_code_info,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -116,26 +135,26 @@ impl self::_puroro::Message for File {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.insertion_point,
-            self.body.shared.bitfield(),
+            &self.fields.insertion_point,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.content,
-            self.body.shared.bitfield(),
+            &self.fields.content,
+            self.shared.bitfield(),
             15i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.generated_code_info,
-            self.body.shared.bitfield(),
+            &self.fields.generated_code_info,
+            self.shared.bitfield(),
             16i32,
             out,
         )?;
@@ -167,30 +186,38 @@ impl self::_pinternal::MessageInternal for File {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.insertion_point,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.insertion_point,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     15i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.content,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.content,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     16i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.generated_code_info,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.generated_code_info,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -206,7 +233,7 @@ impl self::_pinternal::MessageInternal for File {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -220,14 +247,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::compiler::code_generator_response::_view::FileView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for File {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::compiler::code_generator_response::_view::FileView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for File {
@@ -236,7 +265,7 @@ impl ::std::fmt::Debug for File {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::compiler::code_generator_response::_view::FileView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -244,12 +273,7 @@ impl ::std::fmt::Debug for File {
 impl ::std::ops::Deref for File {
     type Target = self::_root::google::protobuf::compiler::code_generator_response::_view::FileView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for File {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]
@@ -284,7 +308,7 @@ pub mod _view {
                 self::_pinternal::tags::String,
                 2usize,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::GeneratedCodeInfo,
             >,
         >,
@@ -487,8 +511,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::compiler::code_generator_response::File {
-                body: Self {
+            self::_root::google::protobuf::compiler::code_generator_response::File(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         insertion_point: ::std::clone::Clone::clone(
@@ -500,8 +524,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

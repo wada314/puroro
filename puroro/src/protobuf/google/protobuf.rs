@@ -21,28 +21,26 @@ pub mod method_options;
 pub mod source_code_info;
 pub mod uninterpreted_option;
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** The protocol compiler can output a FileDescriptorSet containing the .proto
  files it parses.
 */
-pub struct FileDescriptorSet {
-    body: self::_root::google::protobuf::_view::FileDescriptorSetView,
-}
+pub struct FileDescriptorSet(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FileDescriptorSetView>,
+);
 impl FileDescriptorSet {
     pub fn file_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FileDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.file,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.file,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_file(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(
-            &mut self.body.fields.file,
-            self.body.shared.bitfield_mut(),
-        )
+        RepeatedFieldType::clear(&mut self.0.fields.file, self.0.shared.bitfield_mut())
     }
     pub const FILE_FIELD_NUMBER: i32 = 1i32;
 }
@@ -78,8 +76,8 @@ impl self::_puroro::Message for FileDescriptorSet {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.file,
-            self.body.shared.bitfield(),
+            &self.fields.file,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -111,9 +109,11 @@ impl self::_pinternal::MessageInternal for FileDescriptorSet {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorSetView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.file,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.file,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -129,7 +129,7 @@ impl self::_pinternal::MessageInternal for FileDescriptorSet {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -140,14 +140,16 @@ impl self::_pinternal::MessageInternal for FileDescriptorSet {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FileDescriptorSetView>
 for FileDescriptorSet {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::FileDescriptorSetView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for FileDescriptorSet {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::FileDescriptorSetView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for FileDescriptorSet {
@@ -156,7 +158,7 @@ impl ::std::fmt::Debug for FileDescriptorSet {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::FileDescriptorSetView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -164,91 +166,95 @@ impl ::std::fmt::Debug for FileDescriptorSet {
 impl ::std::ops::Deref for FileDescriptorSet {
     type Target = self::_root::google::protobuf::_view::FileDescriptorSetView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for FileDescriptorSet {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a complete .proto file.
 */
-pub struct FileDescriptorProto {
-    body: self::_root::google::protobuf::_view::FileDescriptorProtoView,
-}
+pub struct FileDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FileDescriptorProtoView>,
+);
 impl FileDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.package,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_package(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.package,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.dependency,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.dependency,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_dependency(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.dependency,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.dependency,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn public_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.public_dependency,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.public_dependency,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_public_dependency(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.public_dependency,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.public_dependency,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn weak_dependency_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.weak_dependency,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.weak_dependency,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_weak_dependency(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.weak_dependency,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.weak_dependency,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn message_type_mut(
@@ -256,15 +262,15 @@ impl FileDescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.message_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.message_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_message_type(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.message_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.message_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn enum_type_mut(
@@ -272,15 +278,15 @@ impl FileDescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.enum_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.enum_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_enum_type(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.enum_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.enum_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn service_mut(
@@ -288,15 +294,15 @@ impl FileDescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::ServiceDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.service,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.service,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_service(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.service,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.service,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn extension_mut(
@@ -304,62 +310,74 @@ impl FileDescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.extension,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.extension,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_extension(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.extension,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.extension,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::FileOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn source_code_info_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::SourceCodeInfo {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.source_code_info,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.source_code_info,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_source_code_info(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.source_code_info,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.source_code_info,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn syntax_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.syntax,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.syntax,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_syntax(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.syntax,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.syntax,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -407,74 +425,74 @@ impl self::_puroro::Message for FileDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.package,
-            self.body.shared.bitfield(),
+            &self.fields.package,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.dependency,
-            self.body.shared.bitfield(),
+            &self.fields.dependency,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.public_dependency,
-            self.body.shared.bitfield(),
+            &self.fields.public_dependency,
+            self.shared.bitfield(),
             10i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.weak_dependency,
-            self.body.shared.bitfield(),
+            &self.fields.weak_dependency,
+            self.shared.bitfield(),
             11i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.message_type,
-            self.body.shared.bitfield(),
+            &self.fields.message_type,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.enum_type,
-            self.body.shared.bitfield(),
+            &self.fields.enum_type,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.service,
-            self.body.shared.bitfield(),
+            &self.fields.service,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.extension,
-            self.body.shared.bitfield(),
+            &self.fields.extension,
+            self.shared.bitfield(),
             7i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             8i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.source_code_info,
-            self.body.shared.bitfield(),
+            &self.fields.source_code_info,
+            self.shared.bitfield(),
             9i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.syntax,
-            self.body.shared.bitfield(),
+            &self.fields.syntax,
+            self.shared.bitfield(),
             12i32,
             out,
         )?;
@@ -506,86 +524,110 @@ impl self::_pinternal::MessageInternal for FileDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.package,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.package,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.dependency,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.dependency,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     10i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.public_dependency,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.public_dependency,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     11i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.weak_dependency,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.weak_dependency,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.message_type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.message_type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.enum_type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.enum_type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.service,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.service,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     7i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.extension,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.extension,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     8i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     9i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.source_code_info,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.source_code_info,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     12i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.syntax,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.syntax,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -601,7 +643,7 @@ impl self::_pinternal::MessageInternal for FileDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -612,14 +654,16 @@ impl self::_pinternal::MessageInternal for FileDescriptorProto {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FileDescriptorProtoView>
 for FileDescriptorProto {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::FileDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for FileDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::FileDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for FileDescriptorProto {
@@ -628,7 +672,7 @@ impl ::std::fmt::Debug for FileDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::FileDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -636,34 +680,34 @@ impl ::std::fmt::Debug for FileDescriptorProto {
 impl ::std::ops::Deref for FileDescriptorProto {
     type Target = self::_root::google::protobuf::_view::FileDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for FileDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a message type.
 */
-pub struct DescriptorProto {
-    body: self::_root::google::protobuf::_view::DescriptorProtoView,
-}
+pub struct DescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::DescriptorProtoView>,
+);
 impl DescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn field_mut(
@@ -671,31 +715,28 @@ impl DescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.field,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.field,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_field(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(
-            &mut self.body.fields.field,
-            self.body.shared.bitfield_mut(),
-        )
+        RepeatedFieldType::clear(&mut self.0.fields.field, self.0.shared.bitfield_mut())
     }
     pub fn extension_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::FieldDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.extension,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.extension,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_extension(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.extension,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.extension,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn nested_type_mut(
@@ -703,15 +744,15 @@ impl DescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::DescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.nested_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.nested_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_nested_type(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.nested_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.nested_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn enum_type_mut(
@@ -719,15 +760,15 @@ impl DescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::EnumDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.enum_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.enum_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_enum_type(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.enum_type,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.enum_type,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn extension_range_mut(
@@ -737,15 +778,15 @@ impl DescriptorProto {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.extension_range,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.extension_range,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_extension_range(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.extension_range,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.extension_range,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn oneof_decl_mut(
@@ -753,30 +794,34 @@ impl DescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::OneofDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.oneof_decl,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.oneof_decl,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_oneof_decl(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.oneof_decl,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.oneof_decl,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::MessageOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn reserved_range_mut(
@@ -786,15 +831,15 @@ impl DescriptorProto {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.reserved_range,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_range,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_reserved_range(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.reserved_range,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_range,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn reserved_name_mut(
@@ -802,15 +847,15 @@ impl DescriptorProto {
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.reserved_name,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_name,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_reserved_name(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.reserved_name,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_name,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -856,62 +901,62 @@ impl self::_puroro::Message for DescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.field,
-            self.body.shared.bitfield(),
+            &self.fields.field,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.extension,
-            self.body.shared.bitfield(),
+            &self.fields.extension,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.nested_type,
-            self.body.shared.bitfield(),
+            &self.fields.nested_type,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.enum_type,
-            self.body.shared.bitfield(),
+            &self.fields.enum_type,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.extension_range,
-            self.body.shared.bitfield(),
+            &self.fields.extension_range,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.oneof_decl,
-            self.body.shared.bitfield(),
+            &self.fields.oneof_decl,
+            self.shared.bitfield(),
             8i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             7i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.reserved_range,
-            self.body.shared.bitfield(),
+            &self.fields.reserved_range,
+            self.shared.bitfield(),
             9i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.reserved_name,
-            self.body.shared.bitfield(),
+            &self.fields.reserved_name,
+            self.shared.bitfield(),
             10i32,
             out,
         )?;
@@ -943,72 +988,92 @@ impl self::_pinternal::MessageInternal for DescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.field,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.field,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.extension,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.extension,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.nested_type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.nested_type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.enum_type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.enum_type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.extension_range,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.extension_range,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     8i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.oneof_decl,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.oneof_decl,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     7i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     9i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.reserved_range,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.reserved_range,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     10i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.reserved_name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.reserved_name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -1024,7 +1089,7 @@ impl self::_pinternal::MessageInternal for DescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -1035,14 +1100,16 @@ impl self::_pinternal::MessageInternal for DescriptorProto {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::DescriptorProtoView>
 for DescriptorProto {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::DescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for DescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::DescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for DescriptorProto {
@@ -1051,7 +1118,7 @@ impl ::std::fmt::Debug for DescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::DescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -1059,33 +1126,29 @@ impl ::std::fmt::Debug for DescriptorProto {
 impl ::std::ops::Deref for DescriptorProto {
     type Target = self::_root::google::protobuf::_view::DescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for DescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct ExtensionRangeOptions {
-    body: self::_root::google::protobuf::_view::ExtensionRangeOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct ExtensionRangeOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::ExtensionRangeOptionsView>,
+);
 impl ExtensionRangeOptions {
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
@@ -1122,8 +1185,8 @@ impl self::_puroro::Message for ExtensionRangeOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -1155,9 +1218,11 @@ impl self::_pinternal::MessageInternal for ExtensionRangeOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::ExtensionRangeOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -1173,7 +1238,7 @@ impl self::_pinternal::MessageInternal for ExtensionRangeOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -1187,14 +1252,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::_view::ExtensionRangeOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for ExtensionRangeOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for ExtensionRangeOptions {
@@ -1203,7 +1270,7 @@ impl ::std::fmt::Debug for ExtensionRangeOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -1211,188 +1278,228 @@ impl ::std::fmt::Debug for ExtensionRangeOptions {
 impl ::std::ops::Deref for ExtensionRangeOptions {
     type Target = self::_root::google::protobuf::_view::ExtensionRangeOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for ExtensionRangeOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a field within a message.
 */
-pub struct FieldDescriptorProto {
-    body: self::_root::google::protobuf::_view::FieldDescriptorProtoView,
-}
+pub struct FieldDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FieldDescriptorProtoView>,
+);
 impl FieldDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn number_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.number,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.number,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_number(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.number,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.number,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn label_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_descriptor_proto::Label {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.label,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.label,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_label(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.label,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.label,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn type_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_descriptor_proto::Type {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.r#type,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.r#type,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_type(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.r#type,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.r#type,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn type_name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.type_name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.type_name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_type_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.type_name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.type_name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn extendee_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.extendee,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.extendee,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_extendee(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.extendee,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.extendee,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn default_value_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.default_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.default_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_default_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.default_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.default_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn oneof_index_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.oneof_index,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.oneof_index,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_oneof_index(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.oneof_index,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.oneof_index,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn json_name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.json_name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.json_name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_json_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.json_name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.json_name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::FieldOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn proto3_optional_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.proto3_optional,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.proto3_optional,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_proto3_optional(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.proto3_optional,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.proto3_optional,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -1439,68 +1546,68 @@ impl self::_puroro::Message for FieldDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.number,
-            self.body.shared.bitfield(),
+            &self.fields.number,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.label,
-            self.body.shared.bitfield(),
+            &self.fields.label,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.r#type,
-            self.body.shared.bitfield(),
+            &self.fields.r#type,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.type_name,
-            self.body.shared.bitfield(),
+            &self.fields.type_name,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.extendee,
-            self.body.shared.bitfield(),
+            &self.fields.extendee,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.default_value,
-            self.body.shared.bitfield(),
+            &self.fields.default_value,
+            self.shared.bitfield(),
             7i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.oneof_index,
-            self.body.shared.bitfield(),
+            &self.fields.oneof_index,
+            self.shared.bitfield(),
             9i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.json_name,
-            self.body.shared.bitfield(),
+            &self.fields.json_name,
+            self.shared.bitfield(),
             10i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             8i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.proto3_optional,
-            self.body.shared.bitfield(),
+            &self.fields.proto3_optional,
+            self.shared.bitfield(),
             17i32,
             out,
         )?;
@@ -1532,79 +1639,101 @@ impl self::_pinternal::MessageInternal for FieldDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.number,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.number,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.label,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.label,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.r#type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.r#type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.type_name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.type_name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.extendee,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.extendee,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     7i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.default_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.default_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     9i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.oneof_index,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.oneof_index,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     10i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.json_name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.json_name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     8i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     17i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.proto3_optional,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.proto3_optional,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -1620,7 +1749,7 @@ impl self::_pinternal::MessageInternal for FieldDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -1632,14 +1761,16 @@ impl ::std::borrow::Borrow<
     self::_root::google::protobuf::_view::FieldDescriptorProtoView,
 > for FieldDescriptorProto {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::FieldDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for FieldDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::FieldDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for FieldDescriptorProto {
@@ -1648,7 +1779,7 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::FieldDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -1656,49 +1787,53 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
 impl ::std::ops::Deref for FieldDescriptorProto {
     type Target = self::_root::google::protobuf::_view::FieldDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for FieldDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a oneof.
 */
-pub struct OneofDescriptorProto {
-    body: self::_root::google::protobuf::_view::OneofDescriptorProtoView,
-}
+pub struct OneofDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::OneofDescriptorProtoView>,
+);
 impl OneofDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::OneofOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -1736,14 +1871,14 @@ impl self::_puroro::Message for OneofDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
@@ -1775,16 +1910,20 @@ impl self::_pinternal::MessageInternal for OneofDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -1800,7 +1939,7 @@ impl self::_pinternal::MessageInternal for OneofDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -1812,14 +1951,16 @@ impl ::std::borrow::Borrow<
     self::_root::google::protobuf::_view::OneofDescriptorProtoView,
 > for OneofDescriptorProto {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::OneofDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for OneofDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::OneofDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for OneofDescriptorProto {
@@ -1828,7 +1969,7 @@ impl ::std::fmt::Debug for OneofDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::OneofDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -1836,34 +1977,34 @@ impl ::std::fmt::Debug for OneofDescriptorProto {
 impl ::std::ops::Deref for OneofDescriptorProto {
     type Target = self::_root::google::protobuf::_view::OneofDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for OneofDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes an enum type.
 */
-pub struct EnumDescriptorProto {
-    body: self::_root::google::protobuf::_view::EnumDescriptorProtoView,
-}
+pub struct EnumDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumDescriptorProtoView>,
+);
 impl EnumDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn value_mut(
@@ -1873,30 +2014,31 @@ impl EnumDescriptorProto {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.value,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.value,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_value(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(
-            &mut self.body.fields.value,
-            self.body.shared.bitfield_mut(),
-        )
+        RepeatedFieldType::clear(&mut self.0.fields.value, self.0.shared.bitfield_mut())
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::EnumOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn reserved_range_mut(
@@ -1906,15 +2048,15 @@ impl EnumDescriptorProto {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.reserved_range,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_range,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_reserved_range(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.reserved_range,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_range,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn reserved_name_mut(
@@ -1922,15 +2064,15 @@ impl EnumDescriptorProto {
     ) -> &mut ::std::vec::Vec::<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.reserved_name,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_name,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_reserved_name(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.reserved_name,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.reserved_name,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -1971,32 +2113,32 @@ impl self::_puroro::Message for EnumDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.value,
-            self.body.shared.bitfield(),
+            &self.fields.value,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.reserved_range,
-            self.body.shared.bitfield(),
+            &self.fields.reserved_range,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.reserved_name,
-            self.body.shared.bitfield(),
+            &self.fields.reserved_name,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
@@ -2028,37 +2170,47 @@ impl self::_pinternal::MessageInternal for EnumDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.reserved_range,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.reserved_range,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.reserved_name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.reserved_name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -2074,7 +2226,7 @@ impl self::_pinternal::MessageInternal for EnumDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -2085,14 +2237,16 @@ impl self::_pinternal::MessageInternal for EnumDescriptorProto {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::EnumDescriptorProtoView>
 for EnumDescriptorProto {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::EnumDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for EnumDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::EnumDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for EnumDescriptorProto {
@@ -2101,7 +2255,7 @@ impl ::std::fmt::Debug for EnumDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::EnumDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -2109,66 +2263,74 @@ impl ::std::fmt::Debug for EnumDescriptorProto {
 impl ::std::ops::Deref for EnumDescriptorProto {
     type Target = self::_root::google::protobuf::_view::EnumDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for EnumDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a value within an enum.
 */
-pub struct EnumValueDescriptorProto {
-    body: self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
-}
+pub struct EnumValueDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueDescriptorProtoView>,
+);
 impl EnumValueDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn number_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.number,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.number,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_number(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.number,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.number,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn options_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::EnumValueOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -2207,20 +2369,20 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.number,
-            self.body.shared.bitfield(),
+            &self.fields.number,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
@@ -2252,23 +2414,29 @@ impl self::_pinternal::MessageInternal for EnumValueDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.number,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.number,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -2284,7 +2452,7 @@ impl self::_pinternal::MessageInternal for EnumValueDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -2298,14 +2466,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::_view::EnumValueDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for EnumValueDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for EnumValueDescriptorProto {
@@ -2314,7 +2484,7 @@ impl ::std::fmt::Debug for EnumValueDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -2322,34 +2492,34 @@ impl ::std::fmt::Debug for EnumValueDescriptorProto {
 impl ::std::ops::Deref for EnumValueDescriptorProto {
     type Target = self::_root::google::protobuf::_view::EnumValueDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a service.
 */
-pub struct ServiceDescriptorProto {
-    body: self::_root::google::protobuf::_view::ServiceDescriptorProtoView,
-}
+pub struct ServiceDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceDescriptorProtoView>,
+);
 impl ServiceDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn method_mut(
@@ -2357,30 +2527,31 @@ impl ServiceDescriptorProto {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::MethodDescriptorProto> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.method,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.method,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_method(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(
-            &mut self.body.fields.method,
-            self.body.shared.bitfield_mut(),
-        )
+        RepeatedFieldType::clear(&mut self.0.fields.method, self.0.shared.bitfield_mut())
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::ServiceOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -2419,20 +2590,20 @@ impl self::_puroro::Message for ServiceDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.method,
-            self.body.shared.bitfield(),
+            &self.fields.method,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
@@ -2464,23 +2635,29 @@ impl self::_pinternal::MessageInternal for ServiceDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.method,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.method,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -2496,7 +2673,7 @@ impl self::_pinternal::MessageInternal for ServiceDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -2510,14 +2687,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::_view::ServiceDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for ServiceDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for ServiceDescriptorProto {
@@ -2526,7 +2705,7 @@ impl ::std::fmt::Debug for ServiceDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -2534,109 +2713,129 @@ impl ::std::fmt::Debug for ServiceDescriptorProto {
 impl ::std::ops::Deref for ServiceDescriptorProto {
     type Target = self::_root::google::protobuf::_view::ServiceDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for ServiceDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes a method of a service.
 */
-pub struct MethodDescriptorProto {
-    body: self::_root::google::protobuf::_view::MethodDescriptorProtoView,
-}
+pub struct MethodDescriptorProto(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::MethodDescriptorProtoView>,
+);
 impl MethodDescriptorProto {
     pub fn name_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn input_type_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.input_type,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.input_type,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_input_type(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.input_type,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.input_type,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn output_type_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.output_type,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.output_type,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_output_type(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.output_type,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.output_type,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn options_mut(&mut self) -> &mut self::_root::google::protobuf::MethodOptions {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_options(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.options,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.options,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn client_streaming_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.client_streaming,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.client_streaming,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_client_streaming(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.client_streaming,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.client_streaming,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn server_streaming_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.server_streaming,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.server_streaming,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_server_streaming(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.server_streaming,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.server_streaming,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 1i32;
@@ -2678,38 +2877,38 @@ impl self::_puroro::Message for MethodDescriptorProto {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.input_type,
-            self.body.shared.bitfield(),
+            &self.fields.input_type,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.output_type,
-            self.body.shared.bitfield(),
+            &self.fields.output_type,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.options,
-            self.body.shared.bitfield(),
+            &self.fields.options,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.client_streaming,
-            self.body.shared.bitfield(),
+            &self.fields.client_streaming,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.server_streaming,
-            self.body.shared.bitfield(),
+            &self.fields.server_streaming,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
@@ -2741,44 +2940,56 @@ impl self::_pinternal::MessageInternal for MethodDescriptorProto {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.input_type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.input_type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.output_type,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.output_type,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.options,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.options,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.client_streaming,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.client_streaming,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.server_streaming,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.server_streaming,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -2794,7 +3005,7 @@ impl self::_pinternal::MessageInternal for MethodDescriptorProto {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -2808,14 +3019,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::_view::MethodDescriptorProtoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for MethodDescriptorProto {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::MethodDescriptorProtoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for MethodDescriptorProto {
@@ -2824,7 +3037,7 @@ impl ::std::fmt::Debug for MethodDescriptorProto {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::MethodDescriptorProtoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -2832,319 +3045,395 @@ impl ::std::fmt::Debug for MethodDescriptorProto {
 impl ::std::ops::Deref for MethodDescriptorProto {
     type Target = self::_root::google::protobuf::_view::MethodDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for MethodDescriptorProto {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct FileOptions {
-    body: self::_root::google::protobuf::_view::FileOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct FileOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FileOptionsView>,
+);
 impl FileOptions {
     pub fn java_package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.java_package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_package,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_java_package(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.java_package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_package,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn java_outer_classname_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.java_outer_classname,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_outer_classname,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_java_outer_classname(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.java_outer_classname,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_outer_classname,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn java_multiple_files_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.java_multiple_files,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_multiple_files,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_java_multiple_files(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.java_multiple_files,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_multiple_files,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn java_generate_equals_and_hash_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.java_generate_equals_and_hash,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_generate_equals_and_hash,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_java_generate_equals_and_hash(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.java_generate_equals_and_hash,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_generate_equals_and_hash,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn java_string_check_utf8_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.java_string_check_utf8,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_string_check_utf8,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_java_string_check_utf8(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.java_string_check_utf8,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_string_check_utf8,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn optimize_for_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::file_options::OptimizeMode {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.optimize_for,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.optimize_for,
+            mut_view.shared.bitfield_mut(),
             || self::_root::google::protobuf::file_options::OptimizeMode::Speed,
         )
     }
     pub fn clear_optimize_for(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.optimize_for,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.optimize_for,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn go_package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.go_package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.go_package,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_go_package(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.go_package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.go_package,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn cc_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.cc_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.cc_generic_services,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_cc_generic_services(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.cc_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.cc_generic_services,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn java_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.java_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_generic_services,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_java_generic_services(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.java_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.java_generic_services,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn py_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.py_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.py_generic_services,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_py_generic_services(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.py_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.py_generic_services,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn php_generic_services_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.php_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_generic_services,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_php_generic_services(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.php_generic_services,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_generic_services,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn cc_enable_arenas_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.cc_enable_arenas,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.cc_enable_arenas,
+            mut_view.shared.bitfield_mut(),
             || true,
         )
     }
     pub fn clear_cc_enable_arenas(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.cc_enable_arenas,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.cc_enable_arenas,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn objc_class_prefix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.objc_class_prefix,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.objc_class_prefix,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_objc_class_prefix(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.objc_class_prefix,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.objc_class_prefix,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn csharp_namespace_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.csharp_namespace,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.csharp_namespace,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_csharp_namespace(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.csharp_namespace,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.csharp_namespace,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn swift_prefix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.swift_prefix,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.swift_prefix,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_swift_prefix(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.swift_prefix,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.swift_prefix,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn php_class_prefix_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.php_class_prefix,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_class_prefix,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_php_class_prefix(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.php_class_prefix,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_class_prefix,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn php_namespace_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.php_namespace,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_namespace,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_php_namespace(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.php_namespace,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_namespace,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn php_metadata_namespace_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.php_metadata_namespace,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_metadata_namespace,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_php_metadata_namespace(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.php_metadata_namespace,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.php_metadata_namespace,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn ruby_package_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.ruby_package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.ruby_package,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_ruby_package(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.ruby_package,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.ruby_package,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -3152,15 +3441,15 @@ impl FileOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const JAVA_PACKAGE_FIELD_NUMBER: i32 = 1i32;
@@ -3217,128 +3506,128 @@ impl self::_puroro::Message for FileOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.java_package,
-            self.body.shared.bitfield(),
+            &self.fields.java_package,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.java_outer_classname,
-            self.body.shared.bitfield(),
+            &self.fields.java_outer_classname,
+            self.shared.bitfield(),
             8i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.java_multiple_files,
-            self.body.shared.bitfield(),
+            &self.fields.java_multiple_files,
+            self.shared.bitfield(),
             10i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.java_generate_equals_and_hash,
-            self.body.shared.bitfield(),
+            &self.fields.java_generate_equals_and_hash,
+            self.shared.bitfield(),
             20i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.java_string_check_utf8,
-            self.body.shared.bitfield(),
+            &self.fields.java_string_check_utf8,
+            self.shared.bitfield(),
             27i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.optimize_for,
-            self.body.shared.bitfield(),
+            &self.fields.optimize_for,
+            self.shared.bitfield(),
             9i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.go_package,
-            self.body.shared.bitfield(),
+            &self.fields.go_package,
+            self.shared.bitfield(),
             11i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.cc_generic_services,
-            self.body.shared.bitfield(),
+            &self.fields.cc_generic_services,
+            self.shared.bitfield(),
             16i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.java_generic_services,
-            self.body.shared.bitfield(),
+            &self.fields.java_generic_services,
+            self.shared.bitfield(),
             17i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.py_generic_services,
-            self.body.shared.bitfield(),
+            &self.fields.py_generic_services,
+            self.shared.bitfield(),
             18i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.php_generic_services,
-            self.body.shared.bitfield(),
+            &self.fields.php_generic_services,
+            self.shared.bitfield(),
             42i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             23i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.cc_enable_arenas,
-            self.body.shared.bitfield(),
+            &self.fields.cc_enable_arenas,
+            self.shared.bitfield(),
             31i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.objc_class_prefix,
-            self.body.shared.bitfield(),
+            &self.fields.objc_class_prefix,
+            self.shared.bitfield(),
             36i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.csharp_namespace,
-            self.body.shared.bitfield(),
+            &self.fields.csharp_namespace,
+            self.shared.bitfield(),
             37i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.swift_prefix,
-            self.body.shared.bitfield(),
+            &self.fields.swift_prefix,
+            self.shared.bitfield(),
             39i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.php_class_prefix,
-            self.body.shared.bitfield(),
+            &self.fields.php_class_prefix,
+            self.shared.bitfield(),
             40i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.php_namespace,
-            self.body.shared.bitfield(),
+            &self.fields.php_namespace,
+            self.shared.bitfield(),
             41i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.php_metadata_namespace,
-            self.body.shared.bitfield(),
+            &self.fields.php_metadata_namespace,
+            self.shared.bitfield(),
             44i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.ruby_package,
-            self.body.shared.bitfield(),
+            &self.fields.ruby_package,
+            self.shared.bitfield(),
             45i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -3370,149 +3659,191 @@ impl self::_pinternal::MessageInternal for FileOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.java_package,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.java_package,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     8i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.java_outer_classname,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.java_outer_classname,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     10i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.java_multiple_files,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.java_multiple_files,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     20i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.java_generate_equals_and_hash,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.java_generate_equals_and_hash,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     27i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.java_string_check_utf8,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.java_string_check_utf8,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     9i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.optimize_for,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.optimize_for,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     11i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.go_package,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.go_package,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     16i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.cc_generic_services,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.cc_generic_services,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     17i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.java_generic_services,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.java_generic_services,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     18i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.py_generic_services,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.py_generic_services,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     42i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.php_generic_services,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.php_generic_services,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     23i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     31i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.cc_enable_arenas,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.cc_enable_arenas,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     36i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.objc_class_prefix,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.objc_class_prefix,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     37i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.csharp_namespace,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.csharp_namespace,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     39i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.swift_prefix,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.swift_prefix,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     40i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.php_class_prefix,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.php_class_prefix,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     41i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.php_namespace,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.php_namespace,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     44i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.php_metadata_namespace,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.php_metadata_namespace,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     45i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.ruby_package,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.ruby_package,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -3528,7 +3859,7 @@ impl self::_pinternal::MessageInternal for FileOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -3539,14 +3870,16 @@ impl self::_pinternal::MessageInternal for FileOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FileOptionsView>
 for FileOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::FileOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for FileOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::FileOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for FileOptions {
@@ -3555,7 +3888,7 @@ impl ::std::fmt::Debug for FileOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::FileOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -3563,77 +3896,89 @@ impl ::std::fmt::Debug for FileOptions {
 impl ::std::ops::Deref for FileOptions {
     type Target = self::_root::google::protobuf::_view::FileOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for FileOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct MessageOptions {
-    body: self::_root::google::protobuf::_view::MessageOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct MessageOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::MessageOptionsView>,
+);
 impl MessageOptions {
     pub fn message_set_wire_format_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.message_set_wire_format,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.message_set_wire_format,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_message_set_wire_format(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.message_set_wire_format,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.message_set_wire_format,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn no_standard_descriptor_accessor_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.no_standard_descriptor_accessor,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.no_standard_descriptor_accessor,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_no_standard_descriptor_accessor(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.no_standard_descriptor_accessor,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.no_standard_descriptor_accessor,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn map_entry_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.map_entry,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.map_entry,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_map_entry(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.map_entry,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.map_entry,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -3641,15 +3986,15 @@ impl MessageOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const MESSAGE_SET_WIRE_FORMAT_FIELD_NUMBER: i32 = 1i32;
@@ -3690,32 +4035,32 @@ impl self::_puroro::Message for MessageOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.message_set_wire_format,
-            self.body.shared.bitfield(),
+            &self.fields.message_set_wire_format,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.no_standard_descriptor_accessor,
-            self.body.shared.bitfield(),
+            &self.fields.no_standard_descriptor_accessor,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.map_entry,
-            self.body.shared.bitfield(),
+            &self.fields.map_entry,
+            self.shared.bitfield(),
             7i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -3747,37 +4092,47 @@ impl self::_pinternal::MessageInternal for MessageOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.message_set_wire_format,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.message_set_wire_format,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.no_standard_descriptor_accessor,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.no_standard_descriptor_accessor,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     7i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.map_entry,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.map_entry,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MessageOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -3793,7 +4148,7 @@ impl self::_pinternal::MessageInternal for MessageOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -3804,14 +4159,16 @@ impl self::_pinternal::MessageInternal for MessageOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::MessageOptionsView>
 for MessageOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::MessageOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for MessageOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::MessageOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for MessageOptions {
@@ -3820,7 +4177,7 @@ impl ::std::fmt::Debug for MessageOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::MessageOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -3828,111 +4185,131 @@ impl ::std::fmt::Debug for MessageOptions {
 impl ::std::ops::Deref for MessageOptions {
     type Target = self::_root::google::protobuf::_view::MessageOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for MessageOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct FieldOptions {
-    body: self::_root::google::protobuf::_view::FieldOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct FieldOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FieldOptionsView>,
+);
 impl FieldOptions {
     pub fn ctype_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_options::CType {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.ctype,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.ctype,
+            mut_view.shared.bitfield_mut(),
             || self::_root::google::protobuf::field_options::CType::String,
         )
     }
     pub fn clear_ctype(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.ctype,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.ctype,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn packed_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.packed,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.packed,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_packed(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.packed,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.packed,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn jstype_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::field_options::JSType {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.jstype,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.jstype,
+            mut_view.shared.bitfield_mut(),
             || self::_root::google::protobuf::field_options::JSType::JsNormal,
         )
     }
     pub fn clear_jstype(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.jstype,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.jstype,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn lazy_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.lazy,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.lazy,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_lazy(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.lazy,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.lazy,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn weak_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.weak,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.weak,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_weak(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.weak,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.weak,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -3940,15 +4317,15 @@ impl FieldOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const CTYPE_FIELD_NUMBER: i32 = 1i32;
@@ -3991,44 +4368,44 @@ impl self::_puroro::Message for FieldOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.ctype,
-            self.body.shared.bitfield(),
+            &self.fields.ctype,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.packed,
-            self.body.shared.bitfield(),
+            &self.fields.packed,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.jstype,
-            self.body.shared.bitfield(),
+            &self.fields.jstype,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.lazy,
-            self.body.shared.bitfield(),
+            &self.fields.lazy,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.weak,
-            self.body.shared.bitfield(),
+            &self.fields.weak,
+            self.shared.bitfield(),
             10i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -4060,51 +4437,65 @@ impl self::_pinternal::MessageInternal for FieldOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.ctype,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.ctype,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.packed,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.packed,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.jstype,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.jstype,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.lazy,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.lazy,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     10i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.weak,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.weak,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::FieldOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -4120,7 +4511,7 @@ impl self::_pinternal::MessageInternal for FieldOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -4131,14 +4522,16 @@ impl self::_pinternal::MessageInternal for FieldOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FieldOptionsView>
 for FieldOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::FieldOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for FieldOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::FieldOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for FieldOptions {
@@ -4147,7 +4540,7 @@ impl ::std::fmt::Debug for FieldOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::FieldOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -4155,33 +4548,29 @@ impl ::std::fmt::Debug for FieldOptions {
 impl ::std::ops::Deref for FieldOptions {
     type Target = self::_root::google::protobuf::_view::FieldOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for FieldOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct OneofOptions {
-    body: self::_root::google::protobuf::_view::OneofOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct OneofOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::OneofOptionsView>,
+);
 impl OneofOptions {
     pub fn uninterpreted_option_mut(
         &mut self,
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
@@ -4218,8 +4607,8 @@ impl self::_puroro::Message for OneofOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -4251,9 +4640,11 @@ impl self::_pinternal::MessageInternal for OneofOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::OneofOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -4269,7 +4660,7 @@ impl self::_pinternal::MessageInternal for OneofOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -4280,14 +4671,16 @@ impl self::_pinternal::MessageInternal for OneofOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::OneofOptionsView>
 for OneofOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::OneofOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for OneofOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::OneofOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for OneofOptions {
@@ -4296,7 +4689,7 @@ impl ::std::fmt::Debug for OneofOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::OneofOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -4304,47 +4697,51 @@ impl ::std::fmt::Debug for OneofOptions {
 impl ::std::ops::Deref for OneofOptions {
     type Target = self::_root::google::protobuf::_view::OneofOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for OneofOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct EnumOptions {
-    body: self::_root::google::protobuf::_view::EnumOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct EnumOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumOptionsView>,
+);
 impl EnumOptions {
     pub fn allow_alias_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.allow_alias,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.allow_alias,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_allow_alias(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.allow_alias,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.allow_alias,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -4352,15 +4749,15 @@ impl EnumOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const ALLOW_ALIAS_FIELD_NUMBER: i32 = 2i32;
@@ -4399,20 +4796,20 @@ impl self::_puroro::Message for EnumOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.allow_alias,
-            self.body.shared.bitfield(),
+            &self.fields.allow_alias,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -4444,23 +4841,29 @@ impl self::_pinternal::MessageInternal for EnumOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.allow_alias,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.allow_alias,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -4476,7 +4879,7 @@ impl self::_pinternal::MessageInternal for EnumOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -4487,14 +4890,16 @@ impl self::_pinternal::MessageInternal for EnumOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::EnumOptionsView>
 for EnumOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::EnumOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for EnumOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::EnumOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for EnumOptions {
@@ -4503,7 +4908,7 @@ impl ::std::fmt::Debug for EnumOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::EnumOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -4511,32 +4916,32 @@ impl ::std::fmt::Debug for EnumOptions {
 impl ::std::ops::Deref for EnumOptions {
     type Target = self::_root::google::protobuf::_view::EnumOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for EnumOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct EnumValueOptions {
-    body: self::_root::google::protobuf::_view::EnumValueOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct EnumValueOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueOptionsView>,
+);
 impl EnumValueOptions {
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::EnumValueOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -4544,15 +4949,15 @@ impl EnumValueOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const DEPRECATED_FIELD_NUMBER: i32 = 1i32;
@@ -4590,14 +4995,14 @@ impl self::_puroro::Message for EnumValueOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -4629,16 +5034,20 @@ impl self::_pinternal::MessageInternal for EnumValueOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumValueOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::EnumValueOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -4654,7 +5063,7 @@ impl self::_pinternal::MessageInternal for EnumValueOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -4665,14 +5074,16 @@ impl self::_pinternal::MessageInternal for EnumValueOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::EnumValueOptionsView>
 for EnumValueOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::EnumValueOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for EnumValueOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::EnumValueOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for EnumValueOptions {
@@ -4681,7 +5092,7 @@ impl ::std::fmt::Debug for EnumValueOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::EnumValueOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -4689,32 +5100,32 @@ impl ::std::fmt::Debug for EnumValueOptions {
 impl ::std::ops::Deref for EnumValueOptions {
     type Target = self::_root::google::protobuf::_view::EnumValueOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for EnumValueOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct ServiceOptions {
-    body: self::_root::google::protobuf::_view::ServiceOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct ServiceOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceOptionsView>,
+);
 impl ServiceOptions {
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::ServiceOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::ServiceOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -4722,15 +5133,15 @@ impl ServiceOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const DEPRECATED_FIELD_NUMBER: i32 = 33i32;
@@ -4768,14 +5179,14 @@ impl self::_puroro::Message for ServiceOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             33i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -4807,16 +5218,20 @@ impl self::_pinternal::MessageInternal for ServiceOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     33i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::ServiceOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::ServiceOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -4832,7 +5247,7 @@ impl self::_pinternal::MessageInternal for ServiceOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -4843,14 +5258,16 @@ impl self::_pinternal::MessageInternal for ServiceOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::ServiceOptionsView>
 for ServiceOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::ServiceOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for ServiceOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::ServiceOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for ServiceOptions {
@@ -4859,7 +5276,7 @@ impl ::std::fmt::Debug for ServiceOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::ServiceOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -4867,41 +5284,43 @@ impl ::std::fmt::Debug for ServiceOptions {
 impl ::std::ops::Deref for ServiceOptions {
     type Target = self::_root::google::protobuf::_view::ServiceOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for ServiceOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
-pub struct MethodOptions {
-    body: self::_root::google::protobuf::_view::MethodOptionsView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct MethodOptions(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::MethodOptionsView>,
+);
 impl MethodOptions {
     pub fn deprecated_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
             || false,
         )
     }
     pub fn clear_deprecated(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.deprecated,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.deprecated,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn idempotency_level_mut(
         &mut self,
     ) -> &mut self::_root::google::protobuf::method_options::IdempotencyLevel {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.idempotency_level,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.idempotency_level,
+            mut_view.shared.bitfield_mut(),
             || {
                 self::_root::google::protobuf::method_options::IdempotencyLevel::IdempotencyUnknown
             },
@@ -4909,9 +5328,11 @@ impl MethodOptions {
     }
     pub fn clear_idempotency_level(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.idempotency_level,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.idempotency_level,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn uninterpreted_option_mut(
@@ -4919,15 +5340,15 @@ impl MethodOptions {
     ) -> &mut ::std::vec::Vec::<self::_root::google::protobuf::UninterpretedOption> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_uninterpreted_option(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.uninterpreted_option,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const DEPRECATED_FIELD_NUMBER: i32 = 33i32;
@@ -4966,20 +5387,20 @@ impl self::_puroro::Message for MethodOptions {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.deprecated,
-            self.body.shared.bitfield(),
+            &self.fields.deprecated,
+            self.shared.bitfield(),
             33i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.idempotency_level,
-            self.body.shared.bitfield(),
+            &self.fields.idempotency_level,
+            self.shared.bitfield(),
             34i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.uninterpreted_option,
-            self.body.shared.bitfield(),
+            &self.fields.uninterpreted_option,
+            self.shared.bitfield(),
             999i32,
             out,
         )?;
@@ -5011,23 +5432,29 @@ impl self::_pinternal::MessageInternal for MethodOptions {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     33i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.deprecated,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.deprecated,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     34i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.idempotency_level,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.idempotency_level,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     999i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::MethodOptionsView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.uninterpreted_option,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.uninterpreted_option,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -5043,7 +5470,7 @@ impl self::_pinternal::MessageInternal for MethodOptions {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -5054,14 +5481,16 @@ impl self::_pinternal::MessageInternal for MethodOptions {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::MethodOptionsView>
 for MethodOptions {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::MethodOptionsView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for MethodOptions {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::MethodOptionsView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for MethodOptions {
@@ -5070,7 +5499,7 @@ impl ::std::fmt::Debug for MethodOptions {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::MethodOptionsView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -5078,15 +5507,11 @@ impl ::std::fmt::Debug for MethodOptions {
 impl ::std::ops::Deref for MethodOptions {
     type Target = self::_root::google::protobuf::_view::MethodOptionsView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for MethodOptions {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** A message representing a option the parser does not recognize. This only
  appears in options protos created by the compiler::Parser class.
  DescriptorPool resolves these when building Descriptor objects. Therefore,
@@ -5094,9 +5519,9 @@ impl ::std::cmp::PartialEq for MethodOptions {
  or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
  in them.
 */
-pub struct UninterpretedOption {
-    body: self::_root::google::protobuf::_view::UninterpretedOptionView,
-}
+pub struct UninterpretedOption(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::UninterpretedOptionView>,
+);
 impl UninterpretedOption {
     pub fn name_mut(
         &mut self,
@@ -5105,105 +5530,126 @@ impl UninterpretedOption {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.name,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_name(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
-        RepeatedFieldType::clear(
-            &mut self.body.fields.name,
-            self.body.shared.bitfield_mut(),
-        )
+        RepeatedFieldType::clear(&mut self.0.fields.name, self.0.shared.bitfield_mut())
     }
     pub fn identifier_value_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.identifier_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.identifier_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_identifier_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.identifier_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.identifier_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn positive_int_value_mut(&mut self) -> &mut u64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.positive_int_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.positive_int_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_positive_int_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.positive_int_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.positive_int_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn negative_int_value_mut(&mut self) -> &mut i64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.negative_int_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.negative_int_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_negative_int_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.negative_int_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.negative_int_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn double_value_mut(&mut self) -> &mut f64 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.double_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.double_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_double_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.double_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.double_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn string_value_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.string_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.string_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_string_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.string_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.string_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn aggregate_value_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.aggregate_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.aggregate_value,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_aggregate_value(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.aggregate_value,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.aggregate_value,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_FIELD_NUMBER: i32 = 2i32;
@@ -5246,44 +5692,44 @@ impl self::_puroro::Message for UninterpretedOption {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name,
-            self.body.shared.bitfield(),
+            &self.fields.name,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.identifier_value,
-            self.body.shared.bitfield(),
+            &self.fields.identifier_value,
+            self.shared.bitfield(),
             3i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.positive_int_value,
-            self.body.shared.bitfield(),
+            &self.fields.positive_int_value,
+            self.shared.bitfield(),
             4i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.negative_int_value,
-            self.body.shared.bitfield(),
+            &self.fields.negative_int_value,
+            self.shared.bitfield(),
             5i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.double_value,
-            self.body.shared.bitfield(),
+            &self.fields.double_value,
+            self.shared.bitfield(),
             6i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.string_value,
-            self.body.shared.bitfield(),
+            &self.fields.string_value,
+            self.shared.bitfield(),
             7i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.aggregate_value,
-            self.body.shared.bitfield(),
+            &self.fields.aggregate_value,
+            self.shared.bitfield(),
             8i32,
             out,
         )?;
@@ -5315,51 +5761,65 @@ impl self::_pinternal::MessageInternal for UninterpretedOption {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     3i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.identifier_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.identifier_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     4i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.positive_int_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.positive_int_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     5i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.negative_int_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.negative_int_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     6i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.double_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.double_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     7i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.string_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.string_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     8i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.aggregate_value,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.aggregate_value,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -5375,7 +5835,7 @@ impl self::_pinternal::MessageInternal for UninterpretedOption {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -5386,14 +5846,16 @@ impl self::_pinternal::MessageInternal for UninterpretedOption {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::UninterpretedOptionView>
 for UninterpretedOption {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::UninterpretedOptionView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for UninterpretedOption {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::UninterpretedOptionView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for UninterpretedOption {
@@ -5402,7 +5864,7 @@ impl ::std::fmt::Debug for UninterpretedOption {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::UninterpretedOptionView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -5410,21 +5872,17 @@ impl ::std::fmt::Debug for UninterpretedOption {
 impl ::std::ops::Deref for UninterpretedOption {
     type Target = self::_root::google::protobuf::_view::UninterpretedOptionView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for UninterpretedOption {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Encapsulates information about the original source file from which a
  FileDescriptorProto was generated.
 */
-pub struct SourceCodeInfo {
-    body: self::_root::google::protobuf::_view::SourceCodeInfoView,
-}
+pub struct SourceCodeInfo(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::SourceCodeInfoView>,
+);
 impl SourceCodeInfo {
     pub fn location_mut(
         &mut self,
@@ -5433,15 +5891,15 @@ impl SourceCodeInfo {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.location,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.location,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_location(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.location,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.location,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const LOCATION_FIELD_NUMBER: i32 = 1i32;
@@ -5478,8 +5936,8 @@ impl self::_puroro::Message for SourceCodeInfo {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.location,
-            self.body.shared.bitfield(),
+            &self.fields.location,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -5511,9 +5969,11 @@ impl self::_pinternal::MessageInternal for SourceCodeInfo {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::SourceCodeInfoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.location,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.location,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -5529,7 +5989,7 @@ impl self::_pinternal::MessageInternal for SourceCodeInfo {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -5540,14 +6000,16 @@ impl self::_pinternal::MessageInternal for SourceCodeInfo {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::SourceCodeInfoView>
 for SourceCodeInfo {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::SourceCodeInfoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for SourceCodeInfo {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::SourceCodeInfoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for SourceCodeInfo {
@@ -5556,7 +6018,7 @@ impl ::std::fmt::Debug for SourceCodeInfo {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::SourceCodeInfoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -5564,22 +6026,18 @@ impl ::std::fmt::Debug for SourceCodeInfo {
 impl ::std::ops::Deref for SourceCodeInfo {
     type Target = self::_root::google::protobuf::_view::SourceCodeInfoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for SourceCodeInfo {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Describes the relationship between generated code and its original source
  file. A GeneratedCodeInfo message is associated with only one generated
  source file, but may contain references to different source .proto files.
 */
-pub struct GeneratedCodeInfo {
-    body: self::_root::google::protobuf::_view::GeneratedCodeInfoView,
-}
+pub struct GeneratedCodeInfo(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::GeneratedCodeInfoView>,
+);
 impl GeneratedCodeInfo {
     pub fn annotation_mut(
         &mut self,
@@ -5588,15 +6046,15 @@ impl GeneratedCodeInfo {
     > {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
-            &mut self.body.fields.annotation,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.annotation,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub fn clear_annotation(&mut self) {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(
-            &mut self.body.fields.annotation,
-            self.body.shared.bitfield_mut(),
+            &mut self.0.fields.annotation,
+            self.0.shared.bitfield_mut(),
         )
     }
     pub const ANNOTATION_FIELD_NUMBER: i32 = 1i32;
@@ -5633,8 +6091,8 @@ impl self::_puroro::Message for GeneratedCodeInfo {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.annotation,
-            self.body.shared.bitfield(),
+            &self.fields.annotation,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -5666,9 +6124,11 @@ impl self::_pinternal::MessageInternal for GeneratedCodeInfo {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::_view::GeneratedCodeInfoView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.annotation,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.annotation,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -5684,7 +6144,7 @@ impl self::_pinternal::MessageInternal for GeneratedCodeInfo {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -5695,14 +6155,16 @@ impl self::_pinternal::MessageInternal for GeneratedCodeInfo {
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::GeneratedCodeInfoView>
 for GeneratedCodeInfo {
     fn borrow(&self) -> &self::_root::google::protobuf::_view::GeneratedCodeInfoView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for GeneratedCodeInfo {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::_view::GeneratedCodeInfoView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for GeneratedCodeInfo {
@@ -5711,7 +6173,7 @@ impl ::std::fmt::Debug for GeneratedCodeInfo {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::_view::GeneratedCodeInfoView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -5719,12 +6181,7 @@ impl ::std::fmt::Debug for GeneratedCodeInfo {
 impl ::std::ops::Deref for GeneratedCodeInfo {
     type Target = self::_root::google::protobuf::_view::GeneratedCodeInfoView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for GeneratedCodeInfo {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]
@@ -5797,14 +6254,14 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::FileDescriptorSet {
-                body: Self {
+            self::_root::google::protobuf::FileDescriptorSet(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields {
                         file: ::std::clone::Clone::clone(&self.fields.file),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -5844,10 +6301,10 @@ pub mod _view {
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::FieldDescriptorProto,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::FileOptions,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::SourceCodeInfo,
             >,
             self::_pinternal::OptionalUnsizedField::<
@@ -6179,8 +6636,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::FileDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::FileDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         package: ::std::clone::Clone::clone(&self.fields.package),
@@ -6204,8 +6661,8 @@ pub mod _view {
                         syntax: ::std::clone::Clone::clone(&self.fields.syntax),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -6234,7 +6691,7 @@ pub mod _view {
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::OneofDescriptorProto,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::MessageOptions,
             >,
             self::_pinternal::RepeatedMessageField::<
@@ -6490,8 +6947,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::DescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::DescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::DescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         field: ::std::clone::Clone::clone(&self.fields.field),
@@ -6513,8 +6970,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -6584,16 +7041,16 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::ExtensionRangeOptions {
-                body: Self {
+            self::_root::google::protobuf::ExtensionRangeOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields {
                         uninterpreted_option: ::std::clone::Clone::clone(
                             &self.fields.uninterpreted_option,
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -6648,7 +7105,7 @@ pub mod _view {
                 self::_pinternal::tags::String,
                 8usize,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::FieldOptions,
             >,
             self::_pinternal::OptionalNumericalField::<
@@ -7036,8 +7493,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::FieldDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::FieldDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         number: ::std::clone::Clone::clone(&self.fields.number),
@@ -7058,8 +7515,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -7070,7 +7527,7 @@ pub mod _view {
                 self::_pinternal::tags::String,
                 0usize,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::OneofOptions,
             >,
         >,
@@ -7168,15 +7625,15 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::OneofDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::OneofDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         options: ::std::clone::Clone::clone(&self.fields.options),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -7190,7 +7647,7 @@ pub mod _view {
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::EnumValueDescriptorProto,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::EnumOptions,
             >,
             self::_pinternal::RepeatedMessageField::<
@@ -7354,8 +7811,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::EnumDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::EnumDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         value: ::std::clone::Clone::clone(&self.fields.value),
@@ -7368,8 +7825,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -7385,7 +7842,7 @@ pub mod _view {
                 self::_pinternal::tags::Int32,
                 1usize,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::EnumValueOptions,
             >,
         >,
@@ -7508,16 +7965,16 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::EnumValueDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::EnumValueDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         number: ::std::clone::Clone::clone(&self.fields.number),
                         options: ::std::clone::Clone::clone(&self.fields.options),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -7531,7 +7988,7 @@ pub mod _view {
             self::_pinternal::RepeatedMessageField::<
                 self::_root::google::protobuf::MethodDescriptorProto,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::ServiceOptions,
             >,
         >,
@@ -7643,16 +8100,16 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::ServiceDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::ServiceDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         method: ::std::clone::Clone::clone(&self.fields.method),
                         options: ::std::clone::Clone::clone(&self.fields.options),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -7673,7 +8130,7 @@ pub mod _view {
                 self::_pinternal::tags::String,
                 2usize,
             >,
-            self::_pinternal::SingularHeapMessageField::<
+            self::_pinternal::SingularMessageField::<
                 self::_root::google::protobuf::MethodOptions,
             >,
             self::_pinternal::OptionalNumericalField::<
@@ -7888,8 +8345,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::MethodDescriptorProto {
-                body: Self {
+            self::_root::google::protobuf::MethodDescriptorProto(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         input_type: ::std::clone::Clone::clone(&self.fields.input_type),
@@ -7905,8 +8362,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -8681,8 +9138,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::FileOptions {
-                body: Self {
+            self::_root::google::protobuf::FileOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::FileOptionsFields {
                         java_package: ::std::clone::Clone::clone(
                             &self.fields.java_package,
@@ -8745,8 +9202,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -8995,8 +9452,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::MessageOptions {
-                body: Self {
+            self::_root::google::protobuf::MessageOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::MessageOptionsFields {
                         message_set_wire_format: ::std::clone::Clone::clone(
                             &self.fields.message_set_wire_format,
@@ -9011,8 +9468,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -9331,8 +9788,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::FieldOptions {
-                body: Self {
+            self::_root::google::protobuf::FieldOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::FieldOptionsFields {
                         ctype: ::std::clone::Clone::clone(&self.fields.ctype),
                         packed: ::std::clone::Clone::clone(&self.fields.packed),
@@ -9345,8 +9802,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -9415,16 +9872,16 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::OneofOptions {
-                body: Self {
+            self::_root::google::protobuf::OneofOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::OneofOptionsFields {
                         uninterpreted_option: ::std::clone::Clone::clone(
                             &self.fields.uninterpreted_option,
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -9560,8 +10017,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::EnumOptions {
-                body: Self {
+            self::_root::google::protobuf::EnumOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::EnumOptionsFields {
                         allow_alias: ::std::clone::Clone::clone(
                             &self.fields.allow_alias,
@@ -9572,8 +10029,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -9676,8 +10133,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::EnumValueOptions {
-                body: Self {
+            self::_root::google::protobuf::EnumValueOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields {
                         deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
                         uninterpreted_option: ::std::clone::Clone::clone(
@@ -9685,8 +10142,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -9789,8 +10246,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::ServiceOptions {
-                body: Self {
+            self::_root::google::protobuf::ServiceOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::ServiceOptionsFields {
                         deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
                         uninterpreted_option: ::std::clone::Clone::clone(
@@ -9798,8 +10255,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -9942,8 +10399,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::MethodOptions {
-                body: Self {
+            self::_root::google::protobuf::MethodOptions(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::MethodOptionsFields {
                         deprecated: ::std::clone::Clone::clone(&self.fields.deprecated),
                         idempotency_level: ::std::clone::Clone::clone(
@@ -9954,8 +10411,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -10197,8 +10654,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::UninterpretedOption {
-                body: Self {
+            self::_root::google::protobuf::UninterpretedOption(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields {
                         name: ::std::clone::Clone::clone(&self.fields.name),
                         identifier_value: ::std::clone::Clone::clone(
@@ -10221,8 +10678,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -10329,14 +10786,14 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::SourceCodeInfo {
-                body: Self {
+            self::_root::google::protobuf::SourceCodeInfo(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields {
                         location: ::std::clone::Clone::clone(&self.fields.location),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
     #[derive(::std::default::Default)]
@@ -10402,14 +10859,14 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::GeneratedCodeInfo {
-                body: Self {
+            self::_root::google::protobuf::GeneratedCodeInfo(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields {
                         annotation: ::std::clone::Clone::clone(&self.fields.annotation),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

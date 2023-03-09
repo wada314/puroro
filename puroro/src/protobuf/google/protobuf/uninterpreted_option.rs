@@ -11,44 +11,55 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** The name of the uninterpreted option.  Each string represents a segment in
  a dot-separated name.  is_extension is true iff a segment represents an
  extension (denoted with parentheses in options specs in .proto files).
  E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
  "foo.(bar.baz).qux".
 */
-pub struct NamePart {
-    body: self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
-}
+pub struct NamePart(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
+    >,
+);
 impl NamePart {
     pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.name_part,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name_part,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_name_part(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.name_part,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.name_part,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn is_extension_mut(&mut self) -> &mut bool {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.is_extension,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.is_extension,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_is_extension(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.is_extension,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.is_extension,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const NAME_PART_FIELD_NUMBER: i32 = 1i32;
@@ -86,14 +97,14 @@ impl self::_puroro::Message for NamePart {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.name_part,
-            self.body.shared.bitfield(),
+            &self.fields.name_part,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.is_extension,
-            self.body.shared.bitfield(),
+            &self.fields.is_extension,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
@@ -125,16 +136,20 @@ impl self::_pinternal::MessageInternal for NamePart {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.name_part,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.name_part,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.is_extension,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.is_extension,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -150,7 +165,7 @@ impl self::_pinternal::MessageInternal for NamePart {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -164,14 +179,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::uninterpreted_option::_view::NamePartView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for NamePart {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for NamePart {
@@ -180,7 +197,7 @@ impl ::std::fmt::Debug for NamePart {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -188,12 +205,7 @@ impl ::std::fmt::Debug for NamePart {
 impl ::std::ops::Deref for NamePart {
     type Target = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for NamePart {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]
@@ -309,8 +321,8 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::uninterpreted_option::NamePart {
-                body: Self {
+            self::_root::google::protobuf::uninterpreted_option::NamePart(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields {
                         name_part: ::std::clone::Clone::clone(&self.fields.name_part),
                         is_extension: ::std::clone::Clone::clone(
@@ -318,8 +330,8 @@ pub mod _view {
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

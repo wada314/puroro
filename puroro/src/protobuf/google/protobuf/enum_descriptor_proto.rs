@@ -11,6 +11,7 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
 /** Range of reserved numeric values. Reserved values may not be used by
  entries in the same enum. Reserved ranges may not overlap.
 
@@ -18,38 +19,48 @@ mod _pinternal {
  is inclusive such that it can appropriately represent the entire int32
  domain.
 */
-pub struct EnumReservedRange {
-    body: self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
-}
+pub struct EnumReservedRange(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
+    >,
+);
 impl EnumReservedRange {
     pub fn start_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.start,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.start,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_start(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.start,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.start,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub fn end_mut(&mut self) -> &mut i32 {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView = &mut self
+            .0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.end,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.end,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_end(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView = &mut self
+            .0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.end,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.end,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const START_FIELD_NUMBER: i32 = 1i32;
@@ -87,14 +98,14 @@ impl self::_puroro::Message for EnumReservedRange {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.start,
-            self.body.shared.bitfield(),
+            &self.fields.start,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.end,
-            self.body.shared.bitfield(),
+            &self.fields.end,
+            self.shared.bitfield(),
             2i32,
             out,
         )?;
@@ -126,16 +137,20 @@ impl self::_pinternal::MessageInternal for EnumReservedRange {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.start,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.start,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
                     2i32 => {
+                        let view_ref: &mut self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.end,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.end,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -151,7 +166,7 @@ impl self::_pinternal::MessageInternal for EnumReservedRange {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -165,14 +180,16 @@ impl ::std::borrow::Borrow<
     fn borrow(
         &self,
     ) -> &self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for EnumReservedRange {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView as ToOwned>::to_owned(
+            &self,
+        )
     }
 }
 impl ::std::fmt::Debug for EnumReservedRange {
@@ -181,7 +198,7 @@ impl ::std::fmt::Debug for EnumReservedRange {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -189,12 +206,7 @@ impl ::std::fmt::Debug for EnumReservedRange {
 impl ::std::ops::Deref for EnumReservedRange {
     type Target = self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for EnumReservedRange {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]
@@ -308,15 +320,15 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange {
-                body: Self {
+            self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields {
                         start: ::std::clone::Clone::clone(&self.fields.start),
                         end: ::std::clone::Clone::clone(&self.fields.end),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

@@ -11,23 +11,24 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[derive(::std::default::Default)]
-pub struct Msg {
-    body: self::_root::self_recursive::_view::MsgView,
-}
+#[derive(::std::cmp::PartialEq)]
+pub struct Msg(::std::boxed::Box<self::_root::self_recursive::_view::MsgView>);
 impl Msg {
     pub fn recursive_unlabeled_mut(&mut self) -> &mut self::_root::self_recursive::Msg {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::self_recursive::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
-            &mut self.body.fields.recursive_unlabeled,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.recursive_unlabeled,
+            mut_view.shared.bitfield_mut(),
             ::std::default::Default::default,
         )
     }
     pub fn clear_recursive_unlabeled(&mut self) {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
+        let mut_view: &mut self::_root::self_recursive::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::clear(
-            &mut self.body.fields.recursive_unlabeled,
-            self.body.shared.bitfield_mut(),
+            &mut mut_view.fields.recursive_unlabeled,
+            mut_view.shared.bitfield_mut(),
         )
     }
     pub const RECURSIVE_UNLABELED_FIELD_NUMBER: i32 = 1i32;
@@ -64,8 +65,8 @@ impl self::_puroro::Message for Msg {
         use self::_pinternal::OneofUnion as _;
         use self::_pinternal::{SharedItems as _, UnknownFields as _};
         self::_pinternal::FieldType::ser_to_write(
-            &self.body.fields.recursive_unlabeled,
-            self.body.shared.bitfield(),
+            &self.fields.recursive_unlabeled,
+            self.shared.bitfield(),
             1i32,
             out,
         )?;
@@ -97,9 +98,11 @@ impl self::_pinternal::MessageInternal for Msg {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
+                        let view_ref: &mut self::_root::self_recursive::_view::MsgView = &mut self
+                            .0;
                         self::_pinternal::FieldType::deser_from_field_data(
-                            &mut self.body.fields.recursive_unlabeled,
-                            self.body.shared.bitfield_mut(),
+                            &mut view_ref.fields.recursive_unlabeled,
+                            view_ref.shared.bitfield_mut(),
                             field_data,
                         )?
                     }
@@ -115,7 +118,7 @@ impl self::_pinternal::MessageInternal for Msg {
             match result {
                 Ok(_) => {}
                 Err(PuroroError::UnknownFieldNumber(field_data)) => {
-                    self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                    self.0.shared.unknown_fields_mut().push(number, field_data)?;
                 }
                 Err(e) => Err(e)?,
             }
@@ -125,14 +128,14 @@ impl self::_pinternal::MessageInternal for Msg {
 }
 impl ::std::borrow::Borrow<self::_root::self_recursive::_view::MsgView> for Msg {
     fn borrow(&self) -> &self::_root::self_recursive::_view::MsgView {
-        &self.body
+        &self
     }
 }
 impl ::std::clone::Clone for Msg {
     fn clone(&self) -> Self {
         #[allow(unused)]
         use ::std::borrow::ToOwned;
-        ToOwned::to_owned(&self.body)
+        <self::_root::self_recursive::_view::MsgView as ToOwned>::to_owned(&self)
     }
 }
 impl ::std::fmt::Debug for Msg {
@@ -141,7 +144,7 @@ impl ::std::fmt::Debug for Msg {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::self_recursive::_view::MsgView as ::std::fmt::Debug>::fmt(
-            &self.body,
+            &self,
             fmt,
         )
     }
@@ -149,12 +152,7 @@ impl ::std::fmt::Debug for Msg {
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::self_recursive::_view::MsgView;
     fn deref(&self) -> &Self::Target {
-        &self.body
-    }
-}
-impl ::std::cmp::PartialEq for Msg {
-    fn eq(&self, rhs: &Self) -> bool {
-        &self.body == &rhs.body
+        <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
 #[doc(hidden)]
@@ -174,9 +172,7 @@ pub mod _view {
     #[derive(::std::default::Default)]
     pub struct MsgView {
         pub(super) fields: self::_root::self_recursive::_fields::MsgFields::<
-            self::_pinternal::SingularHeapMessageField::<
-                self::_root::self_recursive::Msg,
-            >,
+            self::_pinternal::SingularMessageField::<self::_root::self_recursive::Msg>,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
@@ -242,16 +238,16 @@ pub mod _view {
         fn to_owned(&self) -> Self::Owned {
             #[allow(unused)]
             use self::_pinternal::SharedItems;
-            self::_root::self_recursive::Msg {
-                body: Self {
+            self::_root::self_recursive::Msg(
+                ::std::boxed::Box::new(Self {
                     fields: self::_root::self_recursive::_fields::MsgFields {
                         recursive_unlabeled: ::std::clone::Clone::clone(
                             &self.fields.recursive_unlabeled,
                         ),
                     },
                     shared: ::std::clone::Clone::clone(&self.shared),
-                },
-            }
+                }),
+            )
         }
     }
 }

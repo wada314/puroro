@@ -16,7 +16,7 @@ mod message;
 mod numerical;
 mod r#unsized;
 
-pub use self::message::{RepeatedMessageField, SingularHeapMessageField};
+pub use self::message::{RepeatedMessageField, SingularMessageField};
 pub use self::numerical::{OptionalNumericalField, RepeatedNumericalField, SingularNumericalField};
 pub use self::r#unsized::{OptionalUnsizedField, RepeatedUnsizedField, SingularUnsizedField};
 

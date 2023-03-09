@@ -133,15 +133,13 @@ impl Message {
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
-        let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
         let docs = self.gen_message_struct_doc_attrs()?;
 
         let item_struct = parse2(quote! {
             #[derive(::std::default::Default)]
+            #[derive(::std::cmp::PartialEq)]
             #(#docs)*
-            pub struct #ident {
-                body: #view_type,
-            }
+            pub struct #ident(::std::boxed::Box<#view_type>);
         })?;
         let impl_struct = parse2(quote! {
             impl #ident {
@@ -159,7 +157,6 @@ impl Message {
             clone_impl.into(),
             debug_impl.into(),
             deref_impl.into(),
-            partial_eq_impl.into(),
         ])
     }
 
@@ -340,7 +337,7 @@ impl Message {
                             Ok(_) => (),
                             Err(PuroroError::UnknownFieldNumber(field_data)) => {
                                 // Recoverable error. Store the field into unknown_fields.
-                                self.body.shared.unknown_fields_mut().push(number, field_data)?;
+                                self.0.shared.unknown_fields_mut().push(number, field_data)?;
                             }
                             Err(e) => Err(e)?,
                         }
@@ -357,7 +354,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::borrow::Borrow<#view_type> for #ident {
                 fn borrow(&self) -> &#view_type {
-                    &self.body
+                    &self
                 }
             }
         })?)
@@ -365,12 +362,13 @@ impl Message {
 
     fn gen_message_struct_impl_clone(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
         Ok(parse2(quote! {
             impl ::std::clone::Clone for #ident {
                 fn clone(&self) -> Self {
                     #[allow(unused)]
                     use ::std::borrow::ToOwned;
-                    ToOwned::to_owned(&self.body)
+                    <#view_type as ToOwned>::to_owned(&self)
                 }
             }
         })?)
@@ -383,7 +381,7 @@ impl Message {
         Ok(parse2(quote! {
             impl ::std::fmt::Debug for #ident {
                 fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-                    <#view_type as ::std::fmt::Debug>::fmt(&self.body, fmt)
+                    <#view_type as ::std::fmt::Debug>::fmt(&self, fmt)
                 }
             }
         })?)
@@ -397,18 +395,7 @@ impl Message {
             impl ::std::ops::Deref for #ident {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
-                    &self.body
-                }
-            }
-        })?)
-    }
-
-    fn gen_message_struct_impl_partial_eq(&self) -> Result<ItemImpl> {
-        let ident = self.gen_message_struct_ident()?;
-        Ok(parse2(quote! {
-            impl ::std::cmp::PartialEq for #ident {
-                fn eq(&self, rhs: &Self) -> bool {
-                    &self.body == &rhs.body
+                    <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
                 }
             }
         })?)
@@ -488,14 +475,14 @@ impl Message {
                 fn to_owned(&self) -> Self::Owned {
                     #[allow(unused)]
                     use #PURORO_INTERNAL::SharedItems;
-                    #owned_path {
-                        body: Self {
+                    #owned_path (
+                        ::std::boxed::Box::new(Self {
                             fields: #fields_struct_type {
                                 #(#field_values,)*
                             },
                             shared: ::std::clone::Clone::clone(&self.shared),
-                        },
-                    }
+                        })
+                    )
                 }
             }
         })?)
