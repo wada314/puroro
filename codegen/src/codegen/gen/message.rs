@@ -127,8 +127,8 @@ impl Message {
             .all_fields()?
             .map(|f| f.gen_message_struct_const_field_number())
             .collect::<Result<Vec<_>>>()?;
-        let message_impl = self.gen_message_struct_message_impl()?;
-        let message_internal_impl = self.gen_message_struct_message_internal_impl()?;
+        let message_impl = self.gen_message_struct_impl_message()?;
+        let message_internal_impl = self.gen_message_struct_impl_message_internal()?;
         let borrow_impl = self.gen_message_struct_impl_borrow()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
@@ -204,6 +204,7 @@ impl Message {
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
 
+        let message_view_impl = self.gen_view_struct_impl_message_view()?;
         let drop_impl = self.gen_view_struct_impl_drop()?;
         let debug_impl = self.gen_view_struct_impl_debug()?;
         let partial_eq_impl = self.gen_view_struct_impl_partial_eq()?;
@@ -223,6 +224,7 @@ impl Message {
                     #(#oneof_field_methods)*
                 }
             })?,
+            message_view_impl.into(),
             drop_impl.into(),
             debug_impl.into(),
             partial_eq_impl.into(),
@@ -254,14 +256,8 @@ impl Message {
         ))
     }
 
-    fn gen_message_struct_message_impl(&self) -> Result<ItemImpl> {
+    fn gen_message_struct_impl_message(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
-        let out_ident = quote! { out };
-        let out_expr = parse2(quote! { out })?;
-        let ser_stmts = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_message_struct_impl_message_ser_stmt(&out_expr))
-            .collect::<Result<Vec<_>>>()?;
 
         Ok(parse2(quote! {
             impl #PURORO_LIB::Message for #ident {
@@ -281,19 +277,11 @@ impl Message {
                     scoped_iter.drop_and_check_scope_completed()?;
                     Ok(())
                 }
-
-                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
-                    #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
-                    #(#ser_stmts)*
-                    self.shared.unknown_fields().ser_to_write(#out_ident)?;
-                    ::std::result::Result::Ok(())
-                }
             }
         })?)
     }
 
-    fn gen_message_struct_message_internal_impl(&self) -> Result<ItemImpl> {
+    fn gen_message_struct_impl_message_internal(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
         let field_data_ident: Ident = parse2(quote! { field_data })?;
         let field_data_expr = parse2(quote! { field_data })?;
@@ -396,6 +384,28 @@ impl Message {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
                     <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_message_view(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let out_ident = quote! { out };
+        let out_expr = parse2(quote! { out })?;
+        let ser_stmts = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_view_struct_impl_message_view_ser_stmt(&out_expr))
+            .collect::<Result<Vec<_>>>()?;
+
+        Ok(parse2(quote! {
+            impl #PURORO_LIB::MessageView for #ident {
+                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
+                    #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
+                    #(#ser_stmts)*
+                    self.shared.unknown_fields().ser_to_write(#out_ident)?;
+                    ::std::result::Result::Ok(())
                 }
             }
         })?)

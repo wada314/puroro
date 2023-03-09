@@ -18,5 +18,8 @@ use ::std::io::{Result as IoResult, Write};
 pub trait Message: Sized {
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(iter: I) -> Result<Self>;
     fn merge_from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(&mut self, iter: I) -> Result<()>;
+}
+
+pub trait MessageView {
     fn to_bytes<W: Write>(&self, out: &mut W) -> Result<()>;
 }

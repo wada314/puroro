@@ -157,7 +157,10 @@ impl Field {
             }
         })?)
     }
-    pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+    pub(crate) fn gen_view_struct_impl_message_view_ser_stmt(
+        &self,
+        out_expr: &Expr,
+    ) -> Result<Stmt> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
         Ok(parse2(quote! {

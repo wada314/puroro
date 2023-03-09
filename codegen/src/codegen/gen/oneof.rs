@@ -246,7 +246,10 @@ impl Oneof {
             .collect::<Result<Vec<_>>>()
     }
 
-    pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+    pub(crate) fn gen_view_struct_impl_message_view_ser_stmt(
+        &self,
+        out_expr: &Expr,
+    ) -> Result<Stmt> {
         let field_ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             self.fields.#field_ident.ser_to_write(
