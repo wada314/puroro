@@ -397,7 +397,7 @@ impl Message {
     }
 
     fn gen_view_struct_impl_message_view(&self) -> Result<ItemImpl> {
-        let ident = self.gen_message_struct_ident()?;
+        let ident = self.gen_view_struct_ident()?;
         let message_type = self.gen_message_struct_type()?;
         let out_ident = quote! { out };
         let out_expr = parse2(quote! { out })?;
