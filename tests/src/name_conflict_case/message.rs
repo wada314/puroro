@@ -38,6 +38,7 @@ impl ConflictCase {
     pub const THIS_IS_MESSAGE_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for ConflictCase {
+    type ViewType = self::_root::name_conflict_case::message::_view::ConflictCaseView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -111,6 +112,11 @@ impl self::_pinternal::MessageInternal for ConflictCase {
             }
         }
         Ok(())
+    }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
     }
 }
 impl ::std::borrow::Borrow<
@@ -199,6 +205,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for ConflictCase {
+        type MessageType = self::_root::name_conflict_case::message::ConflictCase;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]

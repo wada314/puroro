@@ -38,6 +38,7 @@ impl Conflict {
     pub const THIS_IS_ORIGINAL_MESSAGE_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for Conflict {
+    type ViewType = self::_root::name_conflict_fields::_view::ConflictView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -112,6 +113,11 @@ impl self::_pinternal::MessageInternal for Conflict {
         }
         Ok(())
     }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
+    }
 }
 impl ::std::borrow::Borrow<self::_root::name_conflict_fields::_view::ConflictView>
 for Conflict {
@@ -173,6 +179,7 @@ impl ConflictFields {
     pub const THIS_IS_FIELDS_MESSAGE_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for ConflictFields {
+    type ViewType = self::_root::name_conflict_fields::_view::ConflictFieldsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -246,6 +253,11 @@ impl self::_pinternal::MessageInternal for ConflictFields {
             }
         }
         Ok(())
+    }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
     }
 }
 impl ::std::borrow::Borrow<self::_root::name_conflict_fields::_view::ConflictFieldsView>
@@ -333,6 +345,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for Conflict {
+        type MessageType = self::_root::name_conflict_fields::Conflict;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]
@@ -438,6 +451,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for ConflictFields {
+        type MessageType = self::_root::name_conflict_fields::ConflictFields;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]

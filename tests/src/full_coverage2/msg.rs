@@ -58,6 +58,7 @@ impl Submsg {
     pub const I64_REQUIRED_FIELD_NUMBER: i32 = 101i32;
 }
 impl self::_puroro::Message for Submsg {
+    type ViewType = self::_root::full_coverage2::msg::_view::SubmsgView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -140,6 +141,11 @@ impl self::_pinternal::MessageInternal for Submsg {
             }
         }
         Ok(())
+    }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
     }
 }
 impl ::std::borrow::Borrow<self::_root::full_coverage2::msg::_view::SubmsgView>
@@ -251,6 +257,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for Submsg {
+        type MessageType = self::_root::full_coverage2::msg::Submsg;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]

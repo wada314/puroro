@@ -35,6 +35,7 @@ impl Msg {
     pub const ITEM_OUTER_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for Msg {
+    type ViewType = self::_root::nested::_view::MsgView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -108,6 +109,11 @@ impl self::_pinternal::MessageInternal for Msg {
             }
         }
         Ok(())
+    }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
     }
 }
 impl ::std::borrow::Borrow<self::_root::nested::_view::MsgView> for Msg {
@@ -186,6 +192,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for Msg {
+        type MessageType = self::_root::nested::Msg;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]

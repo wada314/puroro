@@ -34,6 +34,7 @@ impl Msg {
     pub const TYPE_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for Msg {
+    type ViewType = self::_root::keywords::_view::MsgView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -108,6 +109,11 @@ impl self::_pinternal::MessageInternal for Msg {
         }
         Ok(())
     }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
+    }
 }
 impl ::std::borrow::Borrow<self::_root::keywords::_view::MsgView> for Msg {
     fn borrow(&self) -> &self::_root::keywords::_view::MsgView {
@@ -159,6 +165,7 @@ impl _Self {
     pub const TYPE_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for _Self {
+    type ViewType = self::_root::keywords::_view::SelfView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -232,6 +239,11 @@ impl self::_pinternal::MessageInternal for _Self {
             }
         }
         Ok(())
+    }
+    fn from_boxed_view(
+        v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
+    ) -> Self {
+        Self(v)
     }
 }
 impl ::std::borrow::Borrow<self::_root::keywords::_view::SelfView> for _Self {
@@ -311,6 +323,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for Msg {
+        type MessageType = self::_root::keywords::Msg;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]
@@ -408,6 +421,7 @@ pub mod _view {
         }
     }
     impl self::_puroro::MessageView for _Self {
+        type MessageType = self::_root::keywords::_Self;
         fn to_bytes<W: ::std::io::Write>(
             &self,
             #[allow(unused)]
