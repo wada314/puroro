@@ -155,11 +155,14 @@ where
 
 // NOT SAFE!! needs revisit...
 #[cfg(feature = "allocator_api")]
-impl<MV: Clone> Clone for SingularMessageField<MV> {
+impl<MV> Clone for SingularMessageField<MV>
+where
+    MV: ToOwned,
+{
     fn clone(&self) -> Self {
         self.0.as_ref().map(|nab| {
             let md_b = unsafe { nab.make_nodrop_copy(Global::default()) };
-            let cloned = Box::clone(&md_b);
+            let cloned = <MV as ToOwned>::to_owned(&md_b);
             cloned.detach().0
         })
     }

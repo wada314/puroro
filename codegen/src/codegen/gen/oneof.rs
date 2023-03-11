@@ -211,7 +211,7 @@ impl Oneof {
         })?])
     }
 
-    pub(crate) fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
+    pub(crate) fn gen_view_struct_impl_to_owned_field_value(&self) -> Result<FieldValue> {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             #ident: #PURORO_INTERNAL::OneofUnion::clone(&self.fields.#ident, self.shared.bitfield())

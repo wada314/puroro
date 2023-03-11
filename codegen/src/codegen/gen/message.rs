@@ -487,7 +487,7 @@ impl Message {
         let fields_struct_type = self.gen_fields_struct_path()?;
         let field_values = self
             .fields_or_oneofs()?
-            .map(|fo| fo.gen_message_struct_impl_clone_field_value())
+            .map(|fo| fo.gen_view_struct_impl_to_owned_field_value())
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl ::std::borrow::ToOwned for #ident {
