@@ -114,3 +114,10 @@ unsafe impl<T> AttachAlloc<()> for NoAllocBox<T> {
         ManuallyDrop::new(Self(self.0).attach(()))
     }
 }
+
+impl<T: Clone> Clone for NoAllocBox<T> {
+    fn clone(&self) -> Self {
+        let b = Box::new(T::clone(unsafe { &*self.0 }));
+        b.detach().0
+    }
+}

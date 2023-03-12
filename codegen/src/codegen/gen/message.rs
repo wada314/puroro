@@ -339,6 +339,10 @@ impl Message {
                 fn from_boxed_view(v: ::std::boxed::Box<<Self as #PURORO_LIB::Message>::ViewType>) -> Self {
                     Self(v)
                 }
+
+                fn into_boxed_view(self) -> ::std::boxed::Box<<Self as #PURORO_LIB::Message>::ViewType> {
+                    self.0
+                }
             }
         })?)
     }

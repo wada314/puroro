@@ -115,6 +115,11 @@ impl self::_pinternal::MessageInternal for Msg {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::nested::_view::MsgView> for Msg {
     fn borrow(&self) -> &self::_root::nested::_view::MsgView {
@@ -191,7 +196,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for Msg {
+    impl self::_puroro::MessageView for MsgView {
         type MessageType = self::_root::nested::Msg;
         fn to_bytes<W: ::std::io::Write>(
             &self,

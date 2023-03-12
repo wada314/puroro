@@ -127,6 +127,11 @@ impl self::_pinternal::MessageInternal for FileDescriptorSet {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FileDescriptorSetView>
 for FileDescriptorSet {
@@ -602,6 +607,11 @@ impl self::_pinternal::MessageInternal for FileDescriptorProto {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FileDescriptorProtoView>
 for FileDescriptorProto {
@@ -1007,6 +1017,11 @@ impl self::_pinternal::MessageInternal for DescriptorProto {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::DescriptorProtoView>
 for DescriptorProto {
@@ -1146,6 +1161,11 @@ impl self::_pinternal::MessageInternal for ExtensionRangeOptions {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<
@@ -1611,6 +1631,11 @@ impl self::_pinternal::MessageInternal for FieldDescriptorProto {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<
     self::_root::google::protobuf::_view::FieldDescriptorProtoView,
@@ -1791,6 +1816,11 @@ impl self::_pinternal::MessageInternal for OneofDescriptorProto {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<
@@ -2058,6 +2088,11 @@ impl self::_pinternal::MessageInternal for EnumDescriptorProto {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::EnumDescriptorProtoView>
 for EnumDescriptorProto {
@@ -2267,6 +2302,11 @@ impl self::_pinternal::MessageInternal for EnumValueDescriptorProto {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<
     self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
@@ -2474,6 +2514,11 @@ impl self::_pinternal::MessageInternal for ServiceDescriptorProto {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<
@@ -2781,6 +2826,11 @@ impl self::_pinternal::MessageInternal for MethodDescriptorProto {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<
@@ -3547,6 +3597,11 @@ impl self::_pinternal::MessageInternal for FileOptions {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FileOptionsView>
 for FileOptions {
@@ -3802,6 +3857,11 @@ impl self::_pinternal::MessageInternal for MessageOptions {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::MessageOptionsView>
@@ -4121,6 +4181,11 @@ impl self::_pinternal::MessageInternal for FieldOptions {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::FieldOptionsView>
 for FieldOptions {
@@ -4260,6 +4325,11 @@ impl self::_pinternal::MessageInternal for OneofOptions {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::OneofOptionsView>
@@ -4459,6 +4529,11 @@ impl self::_pinternal::MessageInternal for EnumOptions {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::EnumOptionsView>
 for EnumOptions {
@@ -4628,6 +4703,11 @@ impl self::_pinternal::MessageInternal for EnumValueOptions {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::EnumValueOptionsView>
 for EnumValueOptions {
@@ -4796,6 +4876,11 @@ impl self::_pinternal::MessageInternal for ServiceOptions {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::ServiceOptionsView>
@@ -4998,6 +5083,11 @@ impl self::_pinternal::MessageInternal for MethodOptions {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::MethodOptionsView>
@@ -5331,6 +5421,11 @@ impl self::_pinternal::MessageInternal for UninterpretedOption {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::UninterpretedOptionView>
 for UninterpretedOption {
@@ -5475,6 +5570,11 @@ impl self::_pinternal::MessageInternal for SourceCodeInfo {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::SourceCodeInfoView>
@@ -5621,6 +5721,11 @@ impl self::_pinternal::MessageInternal for GeneratedCodeInfo {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::_view::GeneratedCodeInfoView>

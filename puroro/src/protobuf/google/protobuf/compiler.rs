@@ -212,6 +212,11 @@ impl self::_pinternal::MessageInternal for Version {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::google::protobuf::compiler::_view::VersionView>
 for Version {
@@ -450,6 +455,11 @@ impl self::_pinternal::MessageInternal for CodeGeneratorRequest {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<
     self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView,
@@ -657,6 +667,11 @@ impl self::_pinternal::MessageInternal for CodeGeneratorResponse {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<

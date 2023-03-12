@@ -235,6 +235,11 @@ impl self::_pinternal::MessageInternal for Location {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<
     self::_root::google::protobuf::source_code_info::_view::LocationView,

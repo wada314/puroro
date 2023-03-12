@@ -129,6 +129,11 @@ impl self::_pinternal::MessageInternal for Message {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::name_conflict_case::_view::MessageView>
 for Message {
@@ -204,7 +209,7 @@ pub mod _view {
             self.this_is_oneof_field_opt().is_some()
         }
     }
-    impl self::_puroro::MessageView for Message {
+    impl self::_puroro::MessageView for MessageView {
         type MessageType = self::_root::name_conflict_case::Message;
         fn to_bytes<W: ::std::io::Write>(
             &self,

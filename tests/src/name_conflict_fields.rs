@@ -118,6 +118,11 @@ impl self::_pinternal::MessageInternal for Conflict {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::name_conflict_fields::_view::ConflictView>
 for Conflict {
@@ -259,6 +264,11 @@ impl self::_pinternal::MessageInternal for ConflictFields {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::name_conflict_fields::_view::ConflictFieldsView>
 for ConflictFields {
@@ -344,7 +354,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for Conflict {
+    impl self::_puroro::MessageView for ConflictView {
         type MessageType = self::_root::name_conflict_fields::Conflict;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -450,7 +460,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ConflictFields {
+    impl self::_puroro::MessageView for ConflictFieldsView {
         type MessageType = self::_root::name_conflict_fields::ConflictFields;
         fn to_bytes<W: ::std::io::Write>(
             &self,

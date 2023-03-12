@@ -176,6 +176,11 @@ impl self::_pinternal::MessageInternal for Book {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::library::_view::BookView> for Book {
     fn borrow(&self) -> &self::_root::library::_view::BookView {
@@ -310,6 +315,11 @@ impl self::_pinternal::MessageInternal for Author {
         v: ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType>,
     ) -> Self {
         Self(v)
+    }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
     }
 }
 impl ::std::borrow::Borrow<self::_root::library::_view::AuthorView> for Author {

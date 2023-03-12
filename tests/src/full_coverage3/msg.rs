@@ -176,6 +176,11 @@ impl self::_pinternal::MessageInternal for Submsg {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<self::_root::full_coverage3::msg::_view::SubmsgView>
 for Submsg {
@@ -310,7 +315,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for Submsg {
+    impl self::_puroro::MessageView for SubmsgView {
         type MessageType = self::_root::full_coverage3::msg::Submsg;
         fn to_bytes<W: ::std::io::Write>(
             &self,

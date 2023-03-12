@@ -118,6 +118,11 @@ impl self::_pinternal::MessageInternal for ConflictCase {
     ) -> Self {
         Self(v)
     }
+    fn into_boxed_view(
+        self,
+    ) -> ::std::boxed::Box<<Self as self::_puroro::Message>::ViewType> {
+        self.0
+    }
 }
 impl ::std::borrow::Borrow<
     self::_root::name_conflict_case::message::_view::ConflictCaseView,
@@ -204,7 +209,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ConflictCase {
+    impl self::_puroro::MessageView for ConflictCaseView {
         type MessageType = self::_root::name_conflict_case::message::ConflictCase;
         fn to_bytes<W: ::std::io::Write>(
             &self,

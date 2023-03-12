@@ -34,4 +34,5 @@ pub trait MessageInternal: crate::Message {
     ) -> Result<()>;
 
     fn from_boxed_view(v: Box<Self::ViewType>) -> Self;
+    fn into_boxed_view(self) -> Box<Self::ViewType>;
 }
