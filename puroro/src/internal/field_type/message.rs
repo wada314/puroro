@@ -159,14 +159,13 @@ where
 #[cfg(feature = "allocator_api")]
 impl<MV> Clone for SingularMessageField<MV>
 where
-    MV: ToOwned,
-    <MV as ToOwned>::Owned: MessageInternal<ViewType = MV>,
+    MV: Clone,
 {
     fn clone(&self) -> Self {
-        SingularMessageField(self.0.as_ref().map(|nab| {
-            let md_b = unsafe { nab.make_nodrop_copy(Global::default()) };
-            let cloned = <MV as ToOwned>::to_owned(&md_b);
-            cloned.into_boxed_view().detach().0
+        SingularMessageField(self.0.as_ref().map(|na_b| {
+            let md_b: ManuallyDrop<Box<MV>> = unsafe { na_b.make_nodrop_copy(Global::default()) };
+            let cloned_box = Box::new(<MV as Clone>::clone(&md_b));
+            cloned_box.detach_alloc().0
         }))
     }
 }
