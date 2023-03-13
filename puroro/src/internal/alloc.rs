@@ -110,7 +110,7 @@ unsafe impl<T> AttachAlloc<()> for NoAllocBox<T> {
     unsafe fn attach(self, _allocator: ()) -> Self::Attached {
         Box::from_raw(self.0)
     }
-    unsafe fn make_nodrop_copy(&self, allocator: ()) -> ManuallyDrop<Self::Attached> {
+    unsafe fn make_nodrop_copy(&self, _allocator: ()) -> ManuallyDrop<Self::Attached> {
         ManuallyDrop::new(Self(self.0).attach(()))
     }
 }
