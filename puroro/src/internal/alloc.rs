@@ -15,6 +15,7 @@
 use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc};
 #[cfg(feature = "allocator_api")]
 use ::std::alloc::Allocator;
+use ::std::borrow::Borrow;
 use ::std::mem::ManuallyDrop;
 use ::std::ops::Deref;
 
@@ -120,4 +121,19 @@ impl<T: Clone> Clone for NoAllocBox<T> {
         let b = Box::new(T::clone(unsafe { &*self.0 }));
         b.detach().0
     }
+}
+
+#[cfg(feature = "allocator_api")]
+pub trait CloneIn {
+    fn clone_in<A: Allocator>(&self, allocator: A) -> Self;
+}
+#[cfg(feature = "allocator_api")]
+pub trait ToOwnedIn {
+    type Owned: Borrow<Self>;
+    fn to_owned_in<A: Allocator>(&self, allocator: A) -> Self::Owned;
+}
+#[cfg(feature = "allocator_api")]
+pub trait DefaultIn {
+    type Allocator: Allocator;
+    fn default_in(allocator: Self::Allocator) -> Self;
 }
