@@ -140,6 +140,7 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
         };
         let header = if self.is_root()? {
             quote! {
+                #![cfg_attr(feature = "allocator_api", feature(allocator_api))]
                 mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
                     pub(crate) use super::*;

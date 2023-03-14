@@ -20,3 +20,4 @@ protoc-bin-vendored = "3.0.0"
 
 [features]
 default = []
+allocator_api = ["puroro/allocator_api"]
