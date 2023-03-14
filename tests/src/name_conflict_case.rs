@@ -12,13 +12,10 @@ mod _pinternal {
 }
 pub mod message;
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
 pub struct Message<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::name_conflict_case::_view::MessageView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Message(
     ::std::boxed::Box<self::_root::name_conflict_case::_view::MessageView>,
 );
@@ -174,6 +171,27 @@ impl ::std::ops::Deref for Message {
     type Target = self::_root::name_conflict_case::_view::MessageView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Message {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::name_conflict_case::_view::MessageView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Message<A2>> for self::Message<A1> {
+    fn eq(&self, rhs: &self::Message<A2>) -> bool {
+        <self::_root::name_conflict_case::_view::MessageView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]

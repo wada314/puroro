@@ -12,13 +12,10 @@ mod _pinternal {
 }
 pub mod msg;
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::nested::_view::MsgView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg(::std::boxed::Box<self::_root::nested::_view::MsgView>);
 impl Msg {
     pub fn item_outer_mut(&mut self) -> &mut i32 {
@@ -156,6 +153,27 @@ impl ::std::ops::Deref for Msg {
     type Target = self::_root::nested::_view::MsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::nested::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Msg<A2>> for self::Msg<A1> {
+    fn eq(&self, rhs: &self::Msg<A2>) -> bool {
+        <self::_root::nested::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]

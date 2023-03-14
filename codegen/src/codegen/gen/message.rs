@@ -134,17 +134,17 @@ impl Message {
         let debug_impl = self.gen_message_struct_impl_debug()?;
         let default_impl = self.gen_message_struct_impl_default()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
+        let partial_eq_no_alloc_impl = self.gen_message_struct_impl_partial_eq_no_alloc()?;
+        let partial_eq_alloc_impl = self.gen_message_struct_impl_partial_eq_alloc()?;
         let docs = self.gen_message_struct_doc_attrs()?;
 
         let item_struct_no_alloc = parse2(quote! {
             #CFG_NO_ALLOCATOR
-            #[derive(::std::cmp::PartialEq)]
             #(#docs)*
             pub struct #ident(::std::boxed::Box<#view_type>);
         })?;
         let item_struct_alloc = parse2(quote! {
             #CFG_ALLOCATOR
-            #[derive(::std::cmp::PartialEq)]
             #(#docs)*
             pub struct #ident<A: ::std::alloc::Allocator = ::std::alloc::Global>(
                 ::std::boxed::Box<#view_type, A>
@@ -168,6 +168,8 @@ impl Message {
             debug_impl.into(),
             default_impl.into(),
             deref_impl.into(),
+            partial_eq_no_alloc_impl.into(),
+            partial_eq_alloc_impl.into(),
         ])
     }
 
@@ -417,6 +419,36 @@ impl Message {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
                     <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+                }
+            }
+        })?)
+    }
+
+    fn gen_message_struct_impl_partial_eq_no_alloc(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+
+        Ok(parse2(quote! {
+            #CFG_NO_ALLOCATOR
+            impl ::std::cmp::PartialEq for #ident {
+                fn eq(&self, rhs: &Self) -> bool {
+                    <#view_type as ::std::cmp::PartialEq>::eq(&self.0, &rhs.0)
+                }
+            }
+        })?)
+    }
+
+    fn gen_message_struct_impl_partial_eq_alloc(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+
+        Ok(parse2(quote! {
+            #CFG_ALLOCATOR
+            impl<A1: ::std::alloc::Allocator, A2: ::std::alloc::Allocator>
+            ::std::cmp::PartialEq<self::#ident<A2>> for self::#ident<A1>
+            {
+                fn eq(&self, rhs: &self::#ident<A2>) -> bool {
+                    <#view_type as ::std::cmp::PartialEq>::eq(&self.0, &rhs.0)
                 }
             }
         })?)

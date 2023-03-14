@@ -11,13 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
 pub struct Conflict<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Conflict(
     ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictView>,
 );
@@ -167,14 +164,32 @@ impl ::std::ops::Deref for Conflict {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Conflict {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::name_conflict_fields::_view::ConflictView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Conflict<A2>> for self::Conflict<A1> {
+    fn eq(&self, rhs: &self::Conflict<A2>) -> bool {
+        <self::_root::name_conflict_fields::_view::ConflictView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
 pub struct ConflictFields<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictFieldsView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct ConflictFields(
     ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictFieldsView>,
 );
@@ -322,6 +337,27 @@ impl ::std::ops::Deref for ConflictFields {
     type Target = self::_root::name_conflict_fields::_view::ConflictFieldsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for ConflictFields {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::name_conflict_fields::_view::ConflictFieldsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::ConflictFields<A2>> for self::ConflictFields<A1> {
+    fn eq(&self, rhs: &self::ConflictFields<A2>) -> bool {
+        <self::_root::name_conflict_fields::_view::ConflictFieldsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]

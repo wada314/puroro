@@ -11,13 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
 pub struct Submsg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::full_coverage3::msg::_view::SubmsgView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Submsg(
     ::std::boxed::Box<self::_root::full_coverage3::msg::_view::SubmsgView>,
 );
@@ -221,6 +218,27 @@ impl ::std::ops::Deref for Submsg {
     type Target = self::_root::full_coverage3::msg::_view::SubmsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::full_coverage3::msg::_view::SubmsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Submsg<A2>> for self::Submsg<A1> {
+    fn eq(&self, rhs: &self::Submsg<A2>) -> bool {
+        <self::_root::full_coverage3::msg::_view::SubmsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]

@@ -11,13 +11,10 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::keywords::_view::MsgView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg(::std::boxed::Box<self::_root::keywords::_view::MsgView>);
 impl Msg {
     pub fn type_mut(&mut self) -> &mut i32 {
@@ -157,14 +154,32 @@ impl ::std::ops::Deref for Msg {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::keywords::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[cfg(feature = "allocator_api")]
-#[derive(::std::cmp::PartialEq)]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Msg<A2>> for self::Msg<A1> {
+    fn eq(&self, rhs: &self::Msg<A2>) -> bool {
+        <self::_root::keywords::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
 pub struct _Self<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::keywords::_view::SelfView, A>,
 );
 #[cfg(not(feature = "allocator_api"))]
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct _Self(::std::boxed::Box<self::_root::keywords::_view::SelfView>);
 impl _Self {
     pub fn type_mut(&mut self) -> &mut i32 {
@@ -302,6 +317,27 @@ impl ::std::ops::Deref for _Self {
     type Target = self::_root::keywords::_view::SelfView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for _Self {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::keywords::_view::SelfView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::_Self<A2>> for self::_Self<A1> {
+    fn eq(&self, rhs: &self::_Self<A2>) -> bool {
+        <self::_root::keywords::_view::SelfView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
