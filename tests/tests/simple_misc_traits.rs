@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
+
 use ::tests::full_coverage2::Msg as Msg2;
 use ::tests::full_coverage3::Msg as Msg3;
 

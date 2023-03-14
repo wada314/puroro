@@ -11,7 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Conflict<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictView, A>,
@@ -157,6 +156,11 @@ impl ::std::fmt::Debug for Conflict {
         )
     }
 }
+impl ::std::default::Default for Conflict {
+    fn default() -> Self {
+        Self(::std::boxed::Box::new(::std::default::Default::default()))
+    }
+}
 impl ::std::ops::Deref for Conflict {
     type Target = self::_root::name_conflict_fields::_view::ConflictView;
     fn deref(&self) -> &Self::Target {
@@ -164,7 +168,6 @@ impl ::std::ops::Deref for Conflict {
     }
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct ConflictFields<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictFieldsView, A>,
@@ -308,6 +311,11 @@ impl ::std::fmt::Debug for ConflictFields {
             &self,
             fmt,
         )
+    }
+}
+impl ::std::default::Default for ConflictFields {
+    fn default() -> Self {
+        Self(::std::boxed::Box::new(::std::default::Default::default()))
     }
 }
 impl ::std::ops::Deref for ConflictFields {

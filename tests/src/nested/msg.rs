@@ -11,7 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Submsg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::nested::msg::_view::SubmsgView, A>,
@@ -148,6 +147,11 @@ impl ::std::fmt::Debug for Submsg {
             &self,
             fmt,
         )
+    }
+}
+impl ::std::default::Default for Submsg {
+    fn default() -> Self {
+        Self(::std::boxed::Box::new(::std::default::Default::default()))
     }
 }
 impl ::std::ops::Deref for Submsg {

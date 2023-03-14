@@ -132,6 +132,7 @@ impl Message {
         let borrow_impl = self.gen_message_struct_impl_borrow()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
+        let default_impl = self.gen_message_struct_impl_default()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
         let docs = self.gen_message_struct_doc_attrs()?;
 
@@ -144,7 +145,6 @@ impl Message {
         })?;
         let item_struct_alloc = parse2(quote! {
             #CFG_ALLOCATOR
-            #[derive(::std::default::Default)]
             #[derive(::std::cmp::PartialEq)]
             #(#docs)*
             pub struct #ident<A: ::std::alloc::Allocator = ::std::alloc::Global>(
@@ -167,6 +167,7 @@ impl Message {
             borrow_impl.into(),
             clone_impl.into(),
             debug_impl.into(),
+            default_impl.into(),
             deref_impl.into(),
         ])
     }
@@ -392,6 +393,17 @@ impl Message {
             impl ::std::fmt::Debug for #ident {
                 fn fmt(&self, fmt: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
                     <#view_type as ::std::fmt::Debug>::fmt(&self, fmt)
+                }
+            }
+        })?)
+    }
+
+    fn gen_message_struct_impl_default(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        Ok(parse2(quote! {
+            impl ::std::default::Default for #ident {
+                fn default() -> Self {
+                    Self(::std::boxed::Box::new(::std::default::Default::default()))
                 }
             }
         })?)

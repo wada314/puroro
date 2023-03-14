@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
+
 /// About the proto3's default values, check the following official document:
 /// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
 use ::puroro::Message;

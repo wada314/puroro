@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
+
 use ::puroro_inline::puroro_inline2;
 use ::std::convert::{TryFrom, TryInto};
 

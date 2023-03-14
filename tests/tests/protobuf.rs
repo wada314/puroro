@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
+
 use ::puroro::protobuf::google::protobuf::DescriptorProto;
 use ::puroro::protobuf::puroro::Message;
 use ::std::io::Read;

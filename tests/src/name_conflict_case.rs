@@ -12,7 +12,6 @@ mod _pinternal {
 }
 pub mod message;
 #[cfg(feature = "allocator_api")]
-#[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Message<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::name_conflict_case::_view::MessageView, A>,
@@ -164,6 +163,11 @@ impl ::std::fmt::Debug for Message {
             &self,
             fmt,
         )
+    }
+}
+impl ::std::default::Default for Message {
+    fn default() -> Self {
+        Self(::std::boxed::Box::new(::std::default::Default::default()))
     }
 }
 impl ::std::ops::Deref for Message {

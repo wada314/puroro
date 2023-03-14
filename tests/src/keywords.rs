@@ -11,7 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Msg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::keywords::_view::MsgView, A>,
@@ -147,6 +146,11 @@ impl ::std::fmt::Debug for Msg {
         <self::_root::keywords::_view::MsgView as ::std::fmt::Debug>::fmt(&self, fmt)
     }
 }
+impl ::std::default::Default for Msg {
+    fn default() -> Self {
+        Self(::std::boxed::Box::new(::std::default::Default::default()))
+    }
+}
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::keywords::_view::MsgView;
     fn deref(&self) -> &Self::Target {
@@ -154,7 +158,6 @@ impl ::std::ops::Deref for Msg {
     }
 }
 #[cfg(feature = "allocator_api")]
-#[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct _Self<A: ::std::alloc::Allocator = ::std::alloc::Global>(
     ::std::boxed::Box<self::_root::keywords::_view::SelfView, A>,
@@ -288,6 +291,11 @@ impl ::std::fmt::Debug for _Self {
         fmt: &mut ::std::fmt::Formatter<'_>,
     ) -> ::std::result::Result<(), ::std::fmt::Error> {
         <self::_root::keywords::_view::SelfView as ::std::fmt::Debug>::fmt(&self, fmt)
+    }
+}
+impl ::std::default::Default for _Self {
+    fn default() -> Self {
+        Self(::std::boxed::Box::new(::std::default::Default::default()))
     }
 }
 impl ::std::ops::Deref for _Self {
