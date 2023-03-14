@@ -10,6 +10,13 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
+#[cfg(feature = "allocator_api")]
+#[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
+pub struct Msg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::keywords::_view::MsgView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 #[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Msg(::std::boxed::Box<self::_root::keywords::_view::MsgView>);
@@ -146,6 +153,13 @@ impl ::std::ops::Deref for Msg {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+#[cfg(feature = "allocator_api")]
+#[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
+pub struct _Self<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::keywords::_view::SelfView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 #[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct _Self(::std::boxed::Box<self::_root::keywords::_view::SelfView>);

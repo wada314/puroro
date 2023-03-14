@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, FieldBaseExt, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt,
-    PURORO_INTERNAL, PURORO_LIB,
+    CFG_ALLOCATOR, CFG_NO_ALLOCATOR, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
@@ -135,13 +135,23 @@ impl Message {
         let deref_impl = self.gen_message_struct_impl_deref()?;
         let docs = self.gen_message_struct_doc_attrs()?;
 
-        let item_struct = parse2(quote! {
+        let item_struct_no_alloc = parse2(quote! {
+            #CFG_NO_ALLOCATOR
             #[derive(::std::default::Default)]
             #[derive(::std::cmp::PartialEq)]
             #(#docs)*
             pub struct #ident(::std::boxed::Box<#view_type>);
         })?;
-        let impl_struct = parse2(quote! {
+        let item_struct_alloc = parse2(quote! {
+            #CFG_ALLOCATOR
+            #[derive(::std::default::Default)]
+            #[derive(::std::cmp::PartialEq)]
+            #(#docs)*
+            pub struct #ident<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+                ::std::boxed::Box<#view_type, A>
+            );
+        })?;
+        let impl_struct_no_alloc = parse2(quote! {
             impl #ident {
                 #(#fields_or_oneofs_methods)*
                 #(#oneof_field_methods)*
@@ -149,8 +159,9 @@ impl Message {
             }
         })?;
         Ok(vec![
-            item_struct,
-            impl_struct,
+            item_struct_alloc,
+            item_struct_no_alloc,
+            impl_struct_no_alloc,
             message_impl.into(),
             message_internal_impl.into(),
             borrow_impl.into(),

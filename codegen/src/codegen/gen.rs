@@ -77,4 +77,6 @@ gen_global_constants! {
             pub(crate) use super::#PURORO_ROOT_IDENT::#PURORO_INTERNAL_IDENT::*;
         }
     };
+    const CFG_ALLOCATOR: CfgAllocator = quote! { #[cfg(feature = "allocator_api")] };
+    const CFG_NO_ALLOCATOR: CfgNoAllocator = quote! { #[cfg(not(feature = "allocator_api"))] };
 }

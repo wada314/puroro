@@ -10,6 +10,13 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
+#[cfg(feature = "allocator_api")]
+#[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
+pub struct Submsg<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::nested::msg::_view::SubmsgView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 #[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Submsg(::std::boxed::Box<self::_root::nested::msg::_view::SubmsgView>);

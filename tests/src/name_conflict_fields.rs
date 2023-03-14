@@ -10,6 +10,13 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
+#[cfg(feature = "allocator_api")]
+#[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
+pub struct Conflict<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 #[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Conflict(
@@ -156,6 +163,13 @@ impl ::std::ops::Deref for Conflict {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+#[cfg(feature = "allocator_api")]
+#[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
+pub struct ConflictFields<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::name_conflict_fields::_view::ConflictFieldsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 #[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct ConflictFields(

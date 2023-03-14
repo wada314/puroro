@@ -11,6 +11,13 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod message;
+#[cfg(feature = "allocator_api")]
+#[derive(::std::default::Default)]
+#[derive(::std::cmp::PartialEq)]
+pub struct Message<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::name_conflict_case::_view::MessageView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 #[derive(::std::default::Default)]
 #[derive(::std::cmp::PartialEq)]
 pub struct Message(
