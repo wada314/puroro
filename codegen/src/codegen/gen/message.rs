@@ -138,7 +138,6 @@ impl Message {
 
         let item_struct_no_alloc = parse2(quote! {
             #CFG_NO_ALLOCATOR
-            #[derive(::std::default::Default)]
             #[derive(::std::cmp::PartialEq)]
             #(#docs)*
             pub struct #ident(::std::boxed::Box<#view_type>);
