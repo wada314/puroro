@@ -21,8 +21,6 @@ use crate::internal::message_internal::MessageInternal;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::message::{Message, MessageView, RefMut};
 use crate::Result;
-#[cfg(feature = "allocator_api")]
-use ::std::alloc::Global;
 use ::std::io::{Result as IoResult, Write};
 use ::std::mem::ManuallyDrop;
 use ::std::ops::Deref;

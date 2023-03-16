@@ -132,7 +132,7 @@ impl Message {
         let borrow_impl = self.gen_message_struct_impl_borrow()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
-        let default_impl = self.gen_message_struct_impl_default()?;
+        let default_impls = self.gen_message_struct_impl_default()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
         let partial_eq_impls = self.gen_message_struct_impl_partial_eq()?;
         let docs = self.gen_message_struct_doc_attrs()?;
@@ -165,10 +165,10 @@ impl Message {
             borrow_impl.into(),
             clone_impl.into(),
             debug_impl.into(),
-            default_impl.into(),
             deref_impl.into(),
         ]
         .into_iter()
+        .chain(default_impls.into_iter().map_into())
         .chain(partial_eq_impls.into_iter().map_into())
         .collect::<Vec<_>>())
     }
@@ -399,15 +399,30 @@ impl Message {
         })?)
     }
 
-    fn gen_message_struct_impl_default(&self) -> Result<ItemImpl> {
+    fn gen_message_struct_impl_default(&self) -> Result<impl IntoIterator<Item = ItemImpl>> {
         let ident = self.gen_message_struct_ident()?;
-        Ok(parse2(quote! {
-            impl ::std::default::Default for #ident {
-                fn default() -> Self {
-                    Self(::std::boxed::Box::new(::std::default::Default::default()))
+        let view_type = self.gen_view_struct_type()?;
+        Ok([
+            parse2(quote! {
+                impl ::std::default::Default for self::#ident {
+                    fn default() -> Self {
+                        Self(::std::boxed::Box::new(
+                            <#view_type as ::std::default::Default>::default()
+                        ))
+                    }
                 }
-            }
-        })?)
+            })?,
+            parse2(quote! {
+                #CFG_ALLOCATOR
+                impl<A: ::std::alloc::Allocator>
+                    #PURORO_LIB::DefaultIn<A> for self::#ident::<A>
+                {
+                    fn default_in(_allocator: A) -> Self {
+                        todo!()
+                    }
+                }
+            })?,
+        ])
     }
 
     fn gen_message_struct_impl_deref(&self) -> Result<ItemImpl> {

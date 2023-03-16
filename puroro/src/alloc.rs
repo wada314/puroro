@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
-#![doc = include_str!("lib.md")]
+use ::std::alloc::Allocator;
+use ::std::borrow::Borrow;
 
-#[cfg(feature = "allocator_api")]
-pub mod alloc;
-pub mod doc_samples;
-mod error;
-pub mod internal;
-pub mod message;
-pub mod protobuf;
-pub mod repeated;
+pub trait CloneIn {
+    fn clone_in<A: Allocator>(&self, allocator: A) -> Self;
+}
 
-pub use self::error::PuroroError;
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
+pub trait ToOwnedIn {
+    type Owned: Borrow<Self>;
+    fn to_owned_in<A: Allocator>(&self, allocator: A) -> Self::Owned;
+}
 
-// Re-exports
-#[cfg(feature = "allocator_api")]
-pub use crate::alloc::{CloneIn, DefaultIn, ToOwnedIn};
-pub use crate::message::{Message, MessageView};
-pub use crate::repeated::RepeatedFieldView;
+pub trait DefaultIn<A: Allocator> {
+    fn default_in(allocator: A) -> Self;
+}

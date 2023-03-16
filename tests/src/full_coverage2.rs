@@ -1456,15 +1456,25 @@ impl ::std::fmt::Debug for Msg {
         )
     }
 }
-impl ::std::default::Default for Msg {
-    fn default() -> Self {
-        Self(::std::boxed::Box::new(::std::default::Default::default()))
-    }
-}
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::full_coverage2::_view::MsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::default::Default for self::Msg {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::full_coverage2::_view::MsgView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A: ::std::alloc::Allocator> self::_puroro::DefaultIn<A> for self::Msg::<A> {
+    fn default_in(_allocator: A) -> Self {
+        todo!()
     }
 }
 #[cfg(not(feature = "allocator_api"))]

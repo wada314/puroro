@@ -162,15 +162,25 @@ impl ::std::fmt::Debug for Message {
         )
     }
 }
-impl ::std::default::Default for Message {
-    fn default() -> Self {
-        Self(::std::boxed::Box::new(::std::default::Default::default()))
-    }
-}
 impl ::std::ops::Deref for Message {
     type Target = self::_root::name_conflict_case::_view::MessageView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::default::Default for self::Message {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::name_conflict_case::_view::MessageView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A: ::std::alloc::Allocator> self::_puroro::DefaultIn<A> for self::Message::<A> {
+    fn default_in(_allocator: A) -> Self {
+        todo!()
     }
 }
 #[cfg(not(feature = "allocator_api"))]

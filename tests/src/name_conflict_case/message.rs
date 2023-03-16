@@ -159,15 +159,26 @@ impl ::std::fmt::Debug for ConflictCase {
         )
     }
 }
-impl ::std::default::Default for ConflictCase {
-    fn default() -> Self {
-        Self(::std::boxed::Box::new(::std::default::Default::default()))
-    }
-}
 impl ::std::ops::Deref for ConflictCase {
     type Target = self::_root::name_conflict_case::message::_view::ConflictCaseView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::default::Default for self::ConflictCase {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::name_conflict_case::message::_view::ConflictCaseView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A: ::std::alloc::Allocator> self::_puroro::DefaultIn<A>
+for self::ConflictCase::<A> {
+    fn default_in(_allocator: A) -> Self {
+        todo!()
     }
 }
 #[cfg(not(feature = "allocator_api"))]
