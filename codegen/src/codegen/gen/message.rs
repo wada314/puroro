@@ -414,11 +414,16 @@ impl Message {
             })?,
             parse2(quote! {
                 #CFG_ALLOCATOR
-                impl<A: ::std::alloc::Allocator>
-                    #PURORO_LIB::DefaultIn<A> for self::#ident::<A>
+                impl<A> #PURORO_LIB::DefaultIn<A> for self::#ident::<A>
+                where
+                    A: ::std::alloc::Allocator + ::std::clone::Clone,
+                    #view_type: #PURORO_LIB::DefaultIn<A>,
                 {
-                    fn default_in(_allocator: A) -> Self {
-                        todo!()
+                    fn default_in(allocator: A) -> Self {
+                        Self(::std::boxed::Box::new_in(
+                            <#view_type as #PURORO_LIB::DefaultIn<A>>::default_in(::std::clone::Clone::clone(&allocator)),
+                            ::std::clone::Clone::clone(&allocator),
+                        ))
                     }
                 }
             })?,

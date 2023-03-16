@@ -160,9 +160,20 @@ impl ::std::default::Default for self::Msg {
     }
 }
 #[cfg(feature = "allocator_api")]
-impl<A: ::std::alloc::Allocator> self::_puroro::DefaultIn<A> for self::Msg::<A> {
-    fn default_in(_allocator: A) -> Self {
-        todo!()
+impl<A> self::_puroro::DefaultIn<A> for self::Msg::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::nested::_view::MsgView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::nested::_view::MsgView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
     }
 }
 #[cfg(not(feature = "allocator_api"))]

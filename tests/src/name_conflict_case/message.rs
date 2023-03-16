@@ -175,10 +175,22 @@ impl ::std::default::Default for self::ConflictCase {
     }
 }
 #[cfg(feature = "allocator_api")]
-impl<A: ::std::alloc::Allocator> self::_puroro::DefaultIn<A>
-for self::ConflictCase::<A> {
-    fn default_in(_allocator: A) -> Self {
-        todo!()
+impl<A> self::_puroro::DefaultIn<A> for self::ConflictCase::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::name_conflict_case::message::_view::ConflictCaseView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::name_conflict_case::message::_view::ConflictCaseView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
     }
 }
 #[cfg(not(feature = "allocator_api"))]
