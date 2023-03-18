@@ -18,8 +18,8 @@ use super::{
     LengthDelimitedType, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
-    parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt,
-    Type,
+    parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, Ident, ImplItemMethod, PathSegment,
+    Stmt, Type,
 };
 use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -221,6 +221,17 @@ impl Field {
         let ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             #ident: #PURORO_INTERNAL::FieldType::new(#bitvec_mut_expr)
+        })?)
+    }
+
+    pub(crate) fn gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+        &self,
+        bitvec_mut_expr: &Expr,
+        allocator_ident: &Ident,
+    ) -> Result<Stmt> {
+        let ident = self.gen_fields_struct_field_ident()?;
+        Ok(parse2(quote! {
+            let (#ident, #allocator_ident) = #PURORO_INTERNAL::FieldType::new_in(#bitvec_mut_expr, #allocator_ident);
         })?)
     }
 

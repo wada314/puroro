@@ -375,7 +375,26 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (start, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (end, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::enum_descriptor_proto::_fields::EnumReservedRangeFields {
+                        start,
+                        end,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for EnumReservedRangeView {

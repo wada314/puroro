@@ -6957,7 +6957,21 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (file, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::FileDescriptorSetFields {
+                        file,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for FileDescriptorSetView {
@@ -7388,7 +7402,76 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (package, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (dependency, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (public_dependency, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (weak_dependency, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (message_type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (enum_type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (service, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (extension, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (source_code_info, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (syntax, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::FileDescriptorProtoFields {
+                        name,
+                        package,
+                        dependency,
+                        public_dependency,
+                        weak_dependency,
+                        message_type,
+                        enum_type,
+                        service,
+                        extension,
+                        options,
+                        source_code_info,
+                        syntax,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for FileDescriptorProtoView {
@@ -7799,7 +7882,66 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (field, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (extension, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (nested_type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (enum_type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (extension_range, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (oneof_decl, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (reserved_range, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (reserved_name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::DescriptorProtoFields {
+                        name,
+                        field,
+                        extension,
+                        nested_type,
+                        enum_type,
+                        extension_range,
+                        oneof_decl,
+                        options,
+                        reserved_range,
+                        reserved_name,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for DescriptorProtoView {
@@ -7992,7 +8134,21 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields {
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for ExtensionRangeOptionsView {
@@ -8538,7 +8694,71 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (number, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (label, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (r#type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (type_name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (extendee, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (default_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (oneof_index, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (json_name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (proto3_optional, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::FieldDescriptorProtoFields {
+                        name,
+                        number,
+                        label,
+                        r#type,
+                        type_name,
+                        extendee,
+                        default_value,
+                        oneof_index,
+                        json_name,
+                        options,
+                        proto3_optional,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for FieldDescriptorProtoView {
@@ -8731,7 +8951,26 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::OneofDescriptorProtoFields {
+                        name,
+                        options,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for OneofDescriptorProtoView {
@@ -8959,7 +9198,41 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (reserved_range, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (reserved_name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::EnumDescriptorProtoFields {
+                        name,
+                        value,
+                        options,
+                        reserved_range,
+                        reserved_name,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for EnumDescriptorProtoView {
@@ -9183,7 +9456,31 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (number, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields {
+                        name,
+                        number,
+                        options,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for EnumValueDescriptorProtoView {
@@ -9365,7 +9662,31 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (method, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields {
+                        name,
+                        method,
+                        options,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for ServiceDescriptorProtoView {
@@ -9680,7 +10001,46 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (input_type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (output_type, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (options, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (client_streaming, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (server_streaming, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::MethodDescriptorProtoFields {
+                        name,
+                        input_type,
+                        output_type,
+                        options,
+                        client_streaming,
+                        server_streaming,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for MethodDescriptorProtoView {
@@ -10622,7 +10982,121 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (java_package, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (java_outer_classname, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (java_multiple_files, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (java_generate_equals_and_hash, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (java_string_check_utf8, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (optimize_for, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (go_package, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (cc_generic_services, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (java_generic_services, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (py_generic_services, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (php_generic_services, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (cc_enable_arenas, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (objc_class_prefix, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (csharp_namespace, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (swift_prefix, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (php_class_prefix, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (php_namespace, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (php_metadata_namespace, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (ruby_package, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::FileOptionsFields {
+                        java_package,
+                        java_outer_classname,
+                        java_multiple_files,
+                        java_generate_equals_and_hash,
+                        java_string_check_utf8,
+                        optimize_for,
+                        go_package,
+                        cc_generic_services,
+                        java_generic_services,
+                        py_generic_services,
+                        php_generic_services,
+                        deprecated,
+                        cc_enable_arenas,
+                        objc_class_prefix,
+                        csharp_namespace,
+                        swift_prefix,
+                        php_class_prefix,
+                        php_namespace,
+                        php_metadata_namespace,
+                        ruby_package,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for FileOptionsView {
@@ -11048,7 +11522,41 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (message_set_wire_format, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (no_standard_descriptor_accessor, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (map_entry, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::MessageOptionsFields {
+                        message_set_wire_format,
+                        no_standard_descriptor_accessor,
+                        deprecated,
+                        map_entry,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for MessageOptionsView {
@@ -11469,7 +11977,51 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (ctype, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (packed, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (jstype, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (lazy, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (weak, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::FieldOptionsFields {
+                        ctype,
+                        packed,
+                        jstype,
+                        lazy,
+                        deprecated,
+                        weak,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for FieldOptionsView {
@@ -11602,7 +12154,21 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::OneofOptionsFields {
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for OneofOptionsView {
@@ -11796,7 +12362,31 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (allow_alias, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::EnumOptionsFields {
+                        allow_alias,
+                        deprecated,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for EnumOptionsView {
@@ -11959,7 +12549,26 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::EnumValueOptionsFields {
+                        deprecated,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for EnumValueOptionsView {
@@ -12117,7 +12726,26 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::ServiceOptionsFields {
+                        deprecated,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for ServiceOptionsView {
@@ -12322,7 +12950,31 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (deprecated, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (idempotency_level, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (uninterpreted_option, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::MethodOptionsFields {
+                        deprecated,
+                        idempotency_level,
+                        uninterpreted_option,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for MethodOptionsView {
@@ -12657,7 +13309,51 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (identifier_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (positive_int_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (negative_int_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (double_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (string_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (aggregate_value, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::UninterpretedOptionFields {
+                        name,
+                        identifier_value,
+                        positive_int_value,
+                        negative_int_value,
+                        double_value,
+                        string_value,
+                        aggregate_value,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for UninterpretedOptionView {
@@ -12833,7 +13529,21 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (location, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::SourceCodeInfoFields {
+                        location,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for SourceCodeInfoView {
@@ -12942,7 +13652,21 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (annotation, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::_fields::GeneratedCodeInfoFields {
+                        annotation,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for GeneratedCodeInfoView {

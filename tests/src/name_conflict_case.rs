@@ -287,7 +287,21 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (conflict, _allocator) = self::_pinternal::OneofUnion::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::name_conflict_case::_fields::MessageFields {
+                        conflict,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for MessageView {

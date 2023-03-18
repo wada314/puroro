@@ -412,7 +412,31 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (i32_unlabeled, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (i32_optional, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (i64_unlabeled, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::full_coverage3::msg::_fields::SubmsgFields {
+                        i32_unlabeled,
+                        i32_optional,
+                        i64_unlabeled,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for SubmsgView {

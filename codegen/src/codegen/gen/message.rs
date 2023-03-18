@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldBaseExt, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt,
-    CFG_ALLOCATOR, CFG_NO_ALLOCATOR, PURORO_INTERNAL, PURORO_LIB,
+    DataTypeBase, FieldBaseExt, FieldOrOneof, FieldOrOneofExt, Message, PackageOrMessage,
+    PackageOrMessageExt, CFG_ALLOCATOR, CFG_NO_ALLOCATOR, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
@@ -500,15 +500,19 @@ impl Message {
     fn gen_view_struct_impl_message_view_internal(&self) -> Result<ItemImpl> {
         let ident = self.gen_view_struct_ident()?;
         let bitvec_mut_expr: Expr = parse2(quote! { shared.bitfield_mut() })?;
+        let allocator_ident = format_ident!("_allocator");
         let fields_path = self.gen_fields_struct_path()?;
-        let new_field_values = self
-            .fields_or_oneofs()?
-            .map(|fo| {
-                fo.gen_view_struct_impl_message_view_internal_new_boxed_field_value(
-                    &bitvec_mut_expr,
-                )
-            })
-            .collect::<Result<Vec<_>>>()?;
+        let field_idents =
+            self.try_map_fields_or_oneofs(|fo| fo.gen_fields_struct_field_ident())?;
+        let new_field_values = self.try_map_fields_or_oneofs(|fo| {
+            fo.gen_view_struct_impl_message_view_internal_new_boxed_field_value(&bitvec_mut_expr)
+        })?;
+        let new_in_boxed_stmts = self.try_map_fields_or_oneofs(|fo| {
+            fo.gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+                &bitvec_mut_expr,
+                &allocator_ident,
+            )
+        })?;
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
 
         Ok(parse2(quote! {
@@ -527,7 +531,18 @@ impl Message {
 
                 #CFG_ALLOCATOR
                 fn new_boxed_in<A: ::std::alloc::Allocator>(_allocator: A) -> ::std::boxed::Box<Self, A> {
-                    todo!()
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    let mut shared: #PURORO_INTERNAL::SharedItemsImpl::<#bitfield_size_in_u32_array> = ::std::default::Default::default();
+                    let (fields, allocator) = {
+                        #(#new_in_boxed_stmts)*
+                        (#fields_path {
+                            #(#field_idents),*
+                        }, _allocator)
+                    };
+                    ::std::boxed::Box::new_in(Self {
+                        fields,
+                        shared,
+                    }, allocator)
                 }
             }
         })?)
@@ -626,5 +641,12 @@ impl Message {
             return Ok(Vec::new());
         };
         Ok(sci.gen_doc_attributes()?)
+    }
+
+    fn try_map_fields_or_oneofs<F, R>(&self, f: F) -> Result<Vec<R>>
+    where
+        F: FnMut(&dyn FieldOrOneof) -> Result<R>,
+    {
+        self.fields_or_oneofs()?.map(f).collect::<Result<Vec<_>>>()
     }
 }

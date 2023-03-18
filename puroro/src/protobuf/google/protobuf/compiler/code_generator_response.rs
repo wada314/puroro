@@ -575,7 +575,36 @@ pub mod _view {
         fn new_boxed_in<A: ::std::alloc::Allocator>(
             _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let (fields, allocator) = {
+                let (name, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (insertion_point, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (content, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                let (generated_code_info, _allocator) = self::_pinternal::FieldType::new_in(
+                    shared.bitfield_mut(),
+                    _allocator,
+                );
+                (
+                    self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields {
+                        name,
+                        insertion_point,
+                        content,
+                        generated_code_info,
+                    },
+                    _allocator,
+                )
+            };
+            ::std::boxed::Box::new_in(Self { fields, shared }, allocator)
         }
     }
     impl ::std::ops::Drop for FileView {

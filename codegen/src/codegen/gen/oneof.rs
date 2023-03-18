@@ -286,6 +286,17 @@ impl Oneof {
         })?)
     }
 
+    pub(crate) fn gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+        &self,
+        bitvec_mut_expr: &Expr,
+        allocator_ident: &Ident,
+    ) -> Result<Stmt> {
+        let ident = self.gen_fields_struct_field_ident()?;
+        Ok(parse2(quote! {
+            let (#ident, #allocator_ident) = #PURORO_INTERNAL::OneofUnion::new_in(#bitvec_mut_expr, #allocator_ident);
+        })?)
+    }
+
     fn try_map_fields<F, R>(&self, f: F) -> Result<Vec<R>>
     where
         F: FnMut(&Rc<OneofField>) -> Result<R>,
