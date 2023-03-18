@@ -40,7 +40,7 @@ pub trait MessageInternal: crate::Message {
 }
 
 pub trait MessageViewInternal: crate::MessageView {
-fn new_boxed() -> Box<Self>;
+    fn new_boxed() -> Box<Self>;
     #[cfg(feature = "allocator_api")]
     fn new_boxed_in<A: Allocator>(allocator: A) -> Box<Self, A>;
 }

@@ -10,8 +10,21 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+#[cfg(feature = "allocator_api")]
+/** Range of reserved numeric values. Reserved values may not be used by
+ entries in the same enum. Reserved ranges may not overlap.
+
+ Note that this is distinct from DescriptorProto.ReservedRange in that it
+ is inclusive such that it can appropriately represent the entire int32
+ domain.
+*/
+pub struct EnumReservedRange<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Range of reserved numeric values. Reserved values may not be used by
  entries in the same enum. Reserved ranges may not overlap.
 
@@ -197,6 +210,55 @@ impl ::std::ops::Deref for EnumReservedRange {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+impl ::std::default::Default for self::EnumReservedRange {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::EnumReservedRange::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for EnumReservedRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::EnumReservedRange<A2>> for self::EnumReservedRange<A1> {
+    fn eq(&self, rhs: &self::EnumReservedRange<A2>) -> bool {
+        <self::_root::google::protobuf::enum_descriptor_proto::_view::EnumReservedRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[doc(hidden)]
 pub mod _view {
     mod _root {
@@ -273,7 +335,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for EnumReservedRangeView {
+    impl self::_puroro::MessageView for self::EnumReservedRangeView {
         type MessageType = self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -297,6 +359,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumReservedRangeView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for EnumReservedRangeView {

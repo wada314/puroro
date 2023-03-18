@@ -10,8 +10,11 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+#[cfg(feature = "allocator_api")]
+pub struct Book<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::library::_view::BookView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct Book(::std::boxed::Box<self::_root::library::_view::BookView>);
 impl Book {
     pub fn title_mut(
@@ -208,8 +211,58 @@ impl ::std::ops::Deref for Book {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::Book {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::library::_view::BookView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::Book::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::library::_view::BookView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::library::_view::BookView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Book {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::library::_view::BookView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Book<A2>> for self::Book<A1> {
+    fn eq(&self, rhs: &self::Book<A2>) -> bool {
+        <self::_root::library::_view::BookView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct Author<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::library::_view::AuthorView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct Author(::std::boxed::Box<self::_root::library::_view::AuthorView>);
 impl Author {
     pub fn name_mut(
@@ -348,6 +401,53 @@ impl ::std::ops::Deref for Author {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+impl ::std::default::Default for self::Author {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::library::_view::AuthorView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::Author::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::library::_view::AuthorView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::library::_view::AuthorView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Author {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::library::_view::AuthorView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Author<A2>> for self::Author<A1> {
+    fn eq(&self, rhs: &self::Author<A2>) -> bool {
+        <self::_root::library::_view::AuthorView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[doc(hidden)]
 pub mod _view {
     mod _root {
@@ -454,7 +554,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for BookView {
+    impl self::_puroro::MessageView for self::BookView {
         type MessageType = self::_root::library::Book;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -484,6 +584,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::BookView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for BookView {
@@ -570,7 +681,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for AuthorView {
+    impl self::_puroro::MessageView for self::AuthorView {
         type MessageType = self::_root::library::Author;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -588,6 +699,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::AuthorView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for AuthorView {

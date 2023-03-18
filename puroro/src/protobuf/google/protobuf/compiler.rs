@@ -11,8 +11,13 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod code_generator_response;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+#[cfg(feature = "allocator_api")]
+/** The version number of protocol compiler.
+*/
+pub struct Version<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::compiler::_view::VersionView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** The version number of protocol compiler.
 */
 pub struct Version(
@@ -250,8 +255,65 @@ impl ::std::ops::Deref for Version {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::Version {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::compiler::_view::VersionView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::Version::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::compiler::_view::VersionView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::compiler::_view::VersionView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for Version {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::VersionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::Version<A2>> for self::Version<A1> {
+    fn eq(&self, rhs: &self::Version<A2>) -> bool {
+        <self::_root::google::protobuf::compiler::_view::VersionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** An encoded CodeGeneratorRequest is written to the plugin's stdin.
+*/
+pub struct CodeGeneratorRequest<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** An encoded CodeGeneratorRequest is written to the plugin's stdin.
 */
 pub struct CodeGeneratorRequest(
@@ -496,8 +558,66 @@ impl ::std::ops::Deref for CodeGeneratorRequest {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::CodeGeneratorRequest {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::CodeGeneratorRequest::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for CodeGeneratorRequest {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::CodeGeneratorRequest<A2>>
+for self::CodeGeneratorRequest<A1> {
+    fn eq(&self, rhs: &self::CodeGeneratorRequest<A2>) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** The plugin writes an encoded CodeGeneratorResponse to stdout.
+*/
+pub struct CodeGeneratorResponse<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** The plugin writes an encoded CodeGeneratorResponse to stdout.
 */
 pub struct CodeGeneratorResponse(
@@ -709,6 +829,56 @@ impl ::std::ops::Deref for CodeGeneratorResponse {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+impl ::std::default::Default for self::CodeGeneratorResponse {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::CodeGeneratorResponse::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for CodeGeneratorResponse {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::CodeGeneratorResponse<A2>>
+for self::CodeGeneratorResponse<A1> {
+    fn eq(&self, rhs: &self::CodeGeneratorResponse<A2>) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[doc(hidden)]
 pub mod _view {
     mod _root {
@@ -846,7 +1016,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for VersionView {
+    impl self::_puroro::MessageView for self::VersionView {
         type MessageType = self::_root::google::protobuf::compiler::Version;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -882,6 +1052,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::VersionView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for VersionView {
@@ -1054,7 +1235,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for CodeGeneratorRequestView {
+    impl self::_puroro::MessageView for self::CodeGeneratorRequestView {
         type MessageType = self::_root::google::protobuf::compiler::CodeGeneratorRequest;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -1090,6 +1271,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::CodeGeneratorRequestView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for CodeGeneratorRequestView {
@@ -1251,7 +1443,7 @@ pub mod _view {
             RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
         }
     }
-    impl self::_puroro::MessageView for CodeGeneratorResponseView {
+    impl self::_puroro::MessageView for self::CodeGeneratorResponseView {
         type MessageType = self::_root::google::protobuf::compiler::CodeGeneratorResponse;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -1281,6 +1473,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::CodeGeneratorResponseView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for CodeGeneratorResponseView {

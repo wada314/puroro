@@ -10,8 +10,20 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+#[cfg(feature = "allocator_api")]
+/** The name of the uninterpreted option.  Each string represents a segment in
+ a dot-separated name.  is_extension is true iff a segment represents an
+ extension (denoted with parentheses in options specs in .proto files).
+ E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
+ "foo.(bar.baz).qux".
+*/
+pub struct NamePart<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::uninterpreted_option::_view::NamePartView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** The name of the uninterpreted option.  Each string represents a segment in
  a dot-separated name.  is_extension is true iff a segment represents an
  extension (denoted with parentheses in options specs in .proto files).
@@ -200,6 +212,55 @@ impl ::std::ops::Deref for NamePart {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+impl ::std::default::Default for self::NamePart {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::NamePart::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::uninterpreted_option::_view::NamePartView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for NamePart {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::NamePart<A2>> for self::NamePart<A1> {
+    fn eq(&self, rhs: &self::NamePart<A2>) -> bool {
+        <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[doc(hidden)]
 pub mod _view {
     mod _root {
@@ -278,7 +339,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for NamePartView {
+    impl self::_puroro::MessageView for self::NamePartView {
         type MessageType = self::_root::google::protobuf::uninterpreted_option::NamePart;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -302,6 +363,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::NamePartView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for NamePartView {

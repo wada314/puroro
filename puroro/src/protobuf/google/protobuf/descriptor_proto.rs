@@ -10,8 +10,14 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+#[cfg(feature = "allocator_api")]
+pub struct ExtensionRange<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct ExtensionRange(
     ::std::boxed::Box<
         self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
@@ -223,8 +229,67 @@ impl ::std::ops::Deref for ExtensionRange {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::ExtensionRange {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::ExtensionRange::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for ExtensionRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::ExtensionRange<A2>> for self::ExtensionRange<A1> {
+    fn eq(&self, rhs: &self::ExtensionRange<A2>) -> bool {
+        <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Range of reserved tag numbers. Reserved tag numbers may not be used by
+ fields or extension ranges in the same message. Reserved ranges may
+ not overlap.
+*/
+pub struct ReservedRange<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Range of reserved tag numbers. Reserved tag numbers may not be used by
  fields or extension ranges in the same message. Reserved ranges may
  not overlap.
@@ -407,6 +472,55 @@ impl ::std::ops::Deref for ReservedRange {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+impl ::std::default::Default for self::ReservedRange {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::ReservedRange::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for ReservedRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::ReservedRange<A2>> for self::ReservedRange<A1> {
+    fn eq(&self, rhs: &self::ReservedRange<A2>) -> bool {
+        <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[doc(hidden)]
 pub mod _view {
     mod _root {
@@ -517,7 +631,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ExtensionRangeView {
+    impl self::_puroro::MessageView for self::ExtensionRangeView {
         type MessageType = self::_root::google::protobuf::descriptor_proto::ExtensionRange;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -547,6 +661,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ExtensionRangeView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ExtensionRangeView {
@@ -660,7 +785,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ReservedRangeView {
+    impl self::_puroro::MessageView for self::ReservedRangeView {
         type MessageType = self::_root::google::protobuf::descriptor_proto::ReservedRange;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -684,6 +809,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ReservedRangeView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ReservedRangeView {

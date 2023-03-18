@@ -20,8 +20,14 @@ pub mod generated_code_info;
 pub mod method_options;
 pub mod source_code_info;
 pub mod uninterpreted_option;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+#[cfg(feature = "allocator_api")]
+/** The protocol compiler can output a FileDescriptorSet containing the .proto
+ files it parses.
+*/
+pub struct FileDescriptorSet<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FileDescriptorSetView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** The protocol compiler can output a FileDescriptorSet containing the .proto
  files it parses.
 */
@@ -165,8 +171,62 @@ impl ::std::ops::Deref for FileDescriptorSet {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::FileDescriptorSet {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::FileDescriptorSetView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::FileDescriptorSet::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::FileDescriptorSetView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::FileDescriptorSetView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for FileDescriptorSet {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FileDescriptorSetView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::FileDescriptorSet<A2>> for self::FileDescriptorSet<A1> {
+    fn eq(&self, rhs: &self::FileDescriptorSet<A2>) -> bool {
+        <self::_root::google::protobuf::_view::FileDescriptorSetView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a complete .proto file.
+*/
+pub struct FileDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FileDescriptorProtoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a complete .proto file.
 */
 pub struct FileDescriptorProto(
@@ -645,8 +705,63 @@ impl ::std::ops::Deref for FileDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::FileDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::FileDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::FileDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::FileDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::FileDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for FileDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FileDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::FileDescriptorProto<A2>>
+for self::FileDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::FileDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::FileDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a message type.
+*/
+pub struct DescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::DescriptorProtoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a message type.
 */
 pub struct DescriptorProto(
@@ -1055,8 +1170,60 @@ impl ::std::ops::Deref for DescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::DescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::DescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::DescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::DescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::DescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for DescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::DescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::DescriptorProto<A2>> for self::DescriptorProto<A1> {
+    fn eq(&self, rhs: &self::DescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::DescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct ExtensionRangeOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::ExtensionRangeOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct ExtensionRangeOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::ExtensionRangeOptionsView>,
 );
@@ -1203,8 +1370,63 @@ impl ::std::ops::Deref for ExtensionRangeOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::ExtensionRangeOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::ExtensionRangeOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::ExtensionRangeOptionsView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for ExtensionRangeOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::ExtensionRangeOptions<A2>>
+for self::ExtensionRangeOptions<A1> {
+    fn eq(&self, rhs: &self::ExtensionRangeOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a field within a message.
+*/
+pub struct FieldDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FieldDescriptorProtoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a field within a message.
 */
 pub struct FieldDescriptorProto(
@@ -1670,8 +1892,63 @@ impl ::std::ops::Deref for FieldDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::FieldDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::FieldDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::FieldDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::FieldDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::FieldDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for FieldDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FieldDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::FieldDescriptorProto<A2>>
+for self::FieldDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::FieldDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::FieldDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a oneof.
+*/
+pub struct OneofDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::OneofDescriptorProtoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a oneof.
 */
 pub struct OneofDescriptorProto(
@@ -1856,8 +2133,63 @@ impl ::std::ops::Deref for OneofDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::OneofDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::OneofDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::OneofDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::OneofDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::OneofDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for OneofDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::OneofDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::OneofDescriptorProto<A2>>
+for self::OneofDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::OneofDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::OneofDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes an enum type.
+*/
+pub struct EnumDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumDescriptorProtoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes an enum type.
 */
 pub struct EnumDescriptorProto(
@@ -2126,8 +2458,66 @@ impl ::std::ops::Deref for EnumDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::EnumDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::EnumDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::EnumDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::EnumDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::EnumDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for EnumDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::EnumDescriptorProto<A2>>
+for self::EnumDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::EnumDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::EnumDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a value within an enum.
+*/
+pub struct EnumValueDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::_view::EnumValueDescriptorProtoView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a value within an enum.
 */
 pub struct EnumValueDescriptorProto(
@@ -2343,8 +2733,66 @@ impl ::std::ops::Deref for EnumValueDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::EnumValueDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::EnumValueDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::EnumValueDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::EnumValueDescriptorProto<A2>>
+for self::EnumValueDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::EnumValueDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a service.
+*/
+pub struct ServiceDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<
+        self::_root::google::protobuf::_view::ServiceDescriptorProtoView,
+        A,
+    >,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a service.
 */
 pub struct ServiceDescriptorProto(
@@ -2556,8 +3004,63 @@ impl ::std::ops::Deref for ServiceDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::ServiceDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::ServiceDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::ServiceDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for ServiceDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::ServiceDescriptorProto<A2>>
+for self::ServiceDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::ServiceDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes a method of a service.
+*/
+pub struct MethodDescriptorProto<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::MethodDescriptorProtoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes a method of a service.
 */
 pub struct MethodDescriptorProto(
@@ -2868,8 +3371,61 @@ impl ::std::ops::Deref for MethodDescriptorProto {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::MethodDescriptorProto {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::MethodDescriptorProtoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::MethodDescriptorProto::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::MethodDescriptorProtoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::MethodDescriptorProtoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for MethodDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::MethodDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::MethodDescriptorProto<A2>>
+for self::MethodDescriptorProto<A1> {
+    fn eq(&self, rhs: &self::MethodDescriptorProto<A2>) -> bool {
+        <self::_root::google::protobuf::_view::MethodDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct FileOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FileOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct FileOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FileOptionsView>,
 );
@@ -3635,8 +4191,58 @@ impl ::std::ops::Deref for FileOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::FileOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::FileOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::FileOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::FileOptionsView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::FileOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for FileOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FileOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::FileOptions<A2>> for self::FileOptions<A1> {
+    fn eq(&self, rhs: &self::FileOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::FileOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct MessageOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::MessageOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct MessageOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::MessageOptionsView>,
 );
@@ -3896,8 +4502,60 @@ impl ::std::ops::Deref for MessageOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::MessageOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::MessageOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::MessageOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::MessageOptionsView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::MessageOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for MessageOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::MessageOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::MessageOptions<A2>> for self::MessageOptions<A1> {
+    fn eq(&self, rhs: &self::MessageOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::MessageOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct FieldOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::FieldOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct FieldOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FieldOptionsView>,
 );
@@ -4219,8 +4877,58 @@ impl ::std::ops::Deref for FieldOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::FieldOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::FieldOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::FieldOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::FieldOptionsView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::FieldOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for FieldOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FieldOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::FieldOptions<A2>> for self::FieldOptions<A1> {
+    fn eq(&self, rhs: &self::FieldOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::FieldOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct OneofOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::OneofOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct OneofOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::OneofOptionsView>,
 );
@@ -4364,8 +5072,58 @@ impl ::std::ops::Deref for OneofOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::OneofOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::OneofOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::OneofOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::OneofOptionsView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::OneofOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for OneofOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::OneofOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::OneofOptions<A2>> for self::OneofOptions<A1> {
+    fn eq(&self, rhs: &self::OneofOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::OneofOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct EnumOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct EnumOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumOptionsView>,
 );
@@ -4567,8 +5325,58 @@ impl ::std::ops::Deref for EnumOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::EnumOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::EnumOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::EnumOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::EnumOptionsView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::EnumOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for EnumOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::EnumOptions<A2>> for self::EnumOptions<A1> {
+    fn eq(&self, rhs: &self::EnumOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::EnumOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct EnumValueOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct EnumValueOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueOptionsView>,
 );
@@ -4741,8 +5549,60 @@ impl ::std::ops::Deref for EnumValueOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::EnumValueOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::EnumValueOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::EnumValueOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::EnumValueOptionsView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::EnumValueOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for EnumValueOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumValueOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::EnumValueOptions<A2>> for self::EnumValueOptions<A1> {
+    fn eq(&self, rhs: &self::EnumValueOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::EnumValueOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct ServiceOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct ServiceOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceOptionsView>,
 );
@@ -4915,8 +5775,60 @@ impl ::std::ops::Deref for ServiceOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::ServiceOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::ServiceOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::ServiceOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::ServiceOptionsView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::ServiceOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for ServiceOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::ServiceOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::ServiceOptions<A2>> for self::ServiceOptions<A1> {
+    fn eq(&self, rhs: &self::ServiceOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::ServiceOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+pub struct MethodOptions<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::MethodOptionsView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 pub struct MethodOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::MethodOptionsView>,
 );
@@ -5122,8 +6034,65 @@ impl ::std::ops::Deref for MethodOptions {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::MethodOptions {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::MethodOptionsView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::MethodOptions::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::MethodOptionsView: self::_puroro::DefaultIn<A>,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::MethodOptionsView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for MethodOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::MethodOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::MethodOptions<A2>> for self::MethodOptions<A1> {
+    fn eq(&self, rhs: &self::MethodOptions<A2>) -> bool {
+        <self::_root::google::protobuf::_view::MethodOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** A message representing a option the parser does not recognize. This only
+ appears in options protos created by the compiler::Parser class.
+ DescriptorPool resolves these when building Descriptor objects. Therefore,
+ options protos in descriptor objects (e.g. returned by Descriptor::options(),
+ or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
+ in them.
+*/
+pub struct UninterpretedOption<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::UninterpretedOptionView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** A message representing a option the parser does not recognize. This only
  appears in options protos created by the compiler::Parser class.
  DescriptorPool resolves these when building Descriptor objects. Therefore,
@@ -5459,8 +6428,64 @@ impl ::std::ops::Deref for UninterpretedOption {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::UninterpretedOption {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::UninterpretedOptionView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::UninterpretedOption::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::UninterpretedOptionView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::UninterpretedOptionView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for UninterpretedOption {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::UninterpretedOptionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::UninterpretedOption<A2>>
+for self::UninterpretedOption<A1> {
+    fn eq(&self, rhs: &self::UninterpretedOption<A2>) -> bool {
+        <self::_root::google::protobuf::_view::UninterpretedOptionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Encapsulates information about the original source file from which a
+ FileDescriptorProto was generated.
+*/
+pub struct SourceCodeInfo<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::SourceCodeInfoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Encapsulates information about the original source file from which a
  FileDescriptorProto was generated.
 */
@@ -5609,8 +6634,64 @@ impl ::std::ops::Deref for SourceCodeInfo {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::default::Default for self::SourceCodeInfo {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::SourceCodeInfoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::SourceCodeInfo::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::SourceCodeInfoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::SourceCodeInfoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for SourceCodeInfo {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::SourceCodeInfoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::SourceCodeInfo<A2>> for self::SourceCodeInfo<A1> {
+    fn eq(&self, rhs: &self::SourceCodeInfo<A2>) -> bool {
+        <self::_root::google::protobuf::_view::SourceCodeInfoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+/** Describes the relationship between generated code and its original source
+ file. A GeneratedCodeInfo message is associated with only one generated
+ source file, but may contain references to different source .proto files.
+*/
+pub struct GeneratedCodeInfo<A: ::std::alloc::Allocator = ::std::alloc::Global>(
+    ::std::boxed::Box<self::_root::google::protobuf::_view::GeneratedCodeInfoView, A>,
+);
+#[cfg(not(feature = "allocator_api"))]
 /** Describes the relationship between generated code and its original source
  file. A GeneratedCodeInfo message is associated with only one generated
  source file, but may contain references to different source .proto files.
@@ -5760,6 +6841,55 @@ impl ::std::ops::Deref for GeneratedCodeInfo {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
+impl ::std::default::Default for self::GeneratedCodeInfo {
+    fn default() -> Self {
+        Self(
+            ::std::boxed::Box::new(
+                <self::_root::google::protobuf::_view::GeneratedCodeInfoView as ::std::default::Default>::default(),
+            ),
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<A> self::_puroro::DefaultIn<A> for self::GeneratedCodeInfo::<A>
+where
+    A: ::std::alloc::Allocator + ::std::clone::Clone,
+    self::_root::google::protobuf::_view::GeneratedCodeInfoView: self::_puroro::DefaultIn<
+        A,
+    >,
+{
+    fn default_in(allocator: A) -> Self {
+        Self(
+            ::std::boxed::Box::new_in(
+                <self::_root::google::protobuf::_view::GeneratedCodeInfoView as self::_puroro::DefaultIn<
+                    A,
+                >>::default_in(::std::clone::Clone::clone(&allocator)),
+                ::std::clone::Clone::clone(&allocator),
+            ),
+        )
+    }
+}
+#[cfg(not(feature = "allocator_api"))]
+impl ::std::cmp::PartialEq for GeneratedCodeInfo {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::GeneratedCodeInfoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
+#[cfg(feature = "allocator_api")]
+impl<
+    A1: ::std::alloc::Allocator,
+    A2: ::std::alloc::Allocator,
+> ::std::cmp::PartialEq<self::GeneratedCodeInfo<A2>> for self::GeneratedCodeInfo<A1> {
+    fn eq(&self, rhs: &self::GeneratedCodeInfo<A2>) -> bool {
+        <self::_root::google::protobuf::_view::GeneratedCodeInfoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 #[doc(hidden)]
 pub mod _view {
     mod _root {
@@ -5794,7 +6924,7 @@ pub mod _view {
             RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
         }
     }
-    impl self::_puroro::MessageView for FileDescriptorSetView {
+    impl self::_puroro::MessageView for self::FileDescriptorSetView {
         type MessageType = self::_root::google::protobuf::FileDescriptorSet;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -5812,6 +6942,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FileDescriptorSetView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for FileDescriptorSetView {
@@ -6128,7 +7269,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for FileDescriptorProtoView {
+    impl self::_puroro::MessageView for self::FileDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::FileDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -6212,6 +7353,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FileDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for FileDescriptorProtoView {
@@ -6526,7 +7678,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for DescriptorProtoView {
+    impl self::_puroro::MessageView for self::DescriptorProtoView {
         type MessageType = self::_root::google::protobuf::DescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -6598,6 +7750,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::DescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for DescriptorProtoView {
@@ -6755,7 +7918,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for ExtensionRangeOptionsView {
+    impl self::_puroro::MessageView for self::ExtensionRangeOptionsView {
         type MessageType = self::_root::google::protobuf::ExtensionRangeOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -6773,6 +7936,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ExtensionRangeOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ExtensionRangeOptionsView {
@@ -7215,7 +8389,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for FieldDescriptorProtoView {
+    impl self::_puroro::MessageView for self::FieldDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::FieldDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -7293,6 +8467,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FieldDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for FieldDescriptorProtoView {
@@ -7445,7 +8630,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for OneofDescriptorProtoView {
+    impl self::_puroro::MessageView for self::OneofDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::OneofDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -7469,6 +8654,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::OneofDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for OneofDescriptorProtoView {
@@ -7635,7 +8831,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for EnumDescriptorProtoView {
+    impl self::_puroro::MessageView for self::EnumDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::EnumDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -7677,6 +8873,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for EnumDescriptorProtoView {
@@ -7853,7 +9060,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for EnumValueDescriptorProtoView {
+    impl self::_puroro::MessageView for self::EnumValueDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::EnumValueDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -7883,6 +9090,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumValueDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for EnumValueDescriptorProtoView {
@@ -8017,7 +9235,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ServiceDescriptorProtoView {
+    impl self::_puroro::MessageView for self::ServiceDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::ServiceDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -8047,6 +9265,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ServiceDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ServiceDescriptorProtoView {
@@ -8291,7 +9520,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for MethodDescriptorProtoView {
+    impl self::_puroro::MessageView for self::MethodDescriptorProtoView {
         type MessageType = self::_root::google::protobuf::MethodDescriptorProto;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -8339,6 +9568,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MethodDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for MethodDescriptorProtoView {
@@ -9079,7 +10319,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for FileOptionsView {
+    impl self::_puroro::MessageView for self::FileOptionsView {
         type MessageType = self::_root::google::protobuf::FileOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -9217,6 +10457,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FileOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for FileOptionsView {
@@ -9575,7 +10826,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for MessageOptionsView {
+    impl self::_puroro::MessageView for self::MessageOptionsView {
         type MessageType = self::_root::google::protobuf::MessageOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -9617,6 +10868,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MessageOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for MessageOptionsView {
@@ -9960,7 +11222,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for FieldOptionsView {
+    impl self::_puroro::MessageView for self::FieldOptionsView {
         type MessageType = self::_root::google::protobuf::FieldOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -10014,6 +11276,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FieldOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for FieldOptionsView {
@@ -10111,7 +11384,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for OneofOptionsView {
+    impl self::_puroro::MessageView for self::OneofOptionsView {
         type MessageType = self::_root::google::protobuf::OneofOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -10129,6 +11402,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::OneofOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for OneofOptionsView {
@@ -10273,7 +11557,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for EnumOptionsView {
+    impl self::_puroro::MessageView for self::EnumOptionsView {
         type MessageType = self::_root::google::protobuf::EnumOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -10303,6 +11587,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for EnumOptionsView {
@@ -10423,7 +11718,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for EnumValueOptionsView {
+    impl self::_puroro::MessageView for self::EnumValueOptionsView {
         type MessageType = self::_root::google::protobuf::EnumValueOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -10447,6 +11742,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumValueOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for EnumValueOptionsView {
@@ -10562,7 +11868,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for ServiceOptionsView {
+    impl self::_puroro::MessageView for self::ServiceOptionsView {
         type MessageType = self::_root::google::protobuf::ServiceOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -10586,6 +11892,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ServiceOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ServiceOptionsView {
@@ -10739,7 +12056,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for MethodOptionsView {
+    impl self::_puroro::MessageView for self::MethodOptionsView {
         type MessageType = self::_root::google::protobuf::MethodOptions;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -10769,6 +12086,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MethodOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for MethodOptionsView {
@@ -11022,7 +12350,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for UninterpretedOptionView {
+    impl self::_puroro::MessageView for self::UninterpretedOptionView {
         type MessageType = self::_root::google::protobuf::UninterpretedOption;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -11076,6 +12404,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::UninterpretedOptionView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for UninterpretedOptionView {
@@ -11218,7 +12557,7 @@ pub mod _view {
             RepeatedFieldType::get_field(&self.fields.location, self.shared.bitfield())
         }
     }
-    impl self::_puroro::MessageView for SourceCodeInfoView {
+    impl self::_puroro::MessageView for self::SourceCodeInfoView {
         type MessageType = self::_root::google::protobuf::SourceCodeInfo;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -11236,6 +12575,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::SourceCodeInfoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for SourceCodeInfoView {
@@ -11311,7 +12661,7 @@ pub mod _view {
             RepeatedFieldType::get_field(&self.fields.annotation, self.shared.bitfield())
         }
     }
-    impl self::_puroro::MessageView for GeneratedCodeInfoView {
+    impl self::_puroro::MessageView for self::GeneratedCodeInfoView {
         type MessageType = self::_root::google::protobuf::GeneratedCodeInfo;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -11329,6 +12679,17 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::GeneratedCodeInfoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            todo!()
+        }
+        #[cfg(feature = "allocator_api")]
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for GeneratedCodeInfoView {
