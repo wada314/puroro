@@ -502,8 +502,12 @@ impl Message {
 
         Ok(parse2(quote! {
             impl #PURORO_INTERNAL::MessageViewInternal for self::#ident {
+                fn new_boxed<A: ::std::alloc::Allocator>(allocator: A) -> ::std::boxed::Box<Self> {
+                    todo!()
+                }
+
                 #CFG_ALLOCATOR
-                fn new_in<A: ::std::alloc::Allocator>(allocator: A) -> ::std::boxed::Box<Self, A> {
+                fn new_boxed_in<A: ::std::alloc::Allocator>(allocator: A) -> ::std::boxed::Box<Self, A> {
                     todo!()
                 }
             }

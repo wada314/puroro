@@ -17,7 +17,7 @@ use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::alloc::NoAllocBox;
 use crate::internal::bitvec::BitSlice;
 use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc};
-use crate::internal::message_internal::MessageInternal;
+use crate::internal::message_internal::{MessageInternal, MessageViewInternal};
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::message::{Message, MessageView, RefMut};
 use crate::Result;
@@ -34,16 +34,16 @@ pub struct RepeatedMessageField<M>(Vec<M>);
 
 impl<MV, M> FieldType for SingularMessageField<MV>
 where
-    MV: MessageView<MessageType = M> + Default,
+    MV: MessageView<MessageType = M> + MessageViewInternal,
     M: Message<ViewType = MV> + MessageInternal,
 {
-    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(None)
     }
 
     #[cfg(feature = "allocator_api")]
-    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+    fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
+        (Self(None), allocator)
     }
 
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -75,13 +75,13 @@ where
     MV: MessageView<MessageType = M> + Default,
     M: Message<ViewType = MV> + MessageInternal + Default + Deref<Target = MV>,
 {
-    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default())
     }
 
     #[cfg(feature = "allocator_api")]
-    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+    fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
+        (Self(Default::default()), allocator)
     }
 
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -111,7 +111,7 @@ where
 
 impl<MV, M> NonRepeatedFieldType for SingularMessageField<MV>
 where
-    MV: MessageView<MessageType = M> + Default,
+    MV: MessageView<MessageType = M> + MessageViewInternal,
     M: Message<ViewType = MV> + MessageInternal,
 {
     type GetterOptType<'a> = Option<&'a MV>
@@ -138,9 +138,7 @@ where
         _bitvec: &mut B,
         _default: D,
     ) -> Self::GetterMutType<'a> {
-        let noalloc_boxed_view = self
-            .0
-            .get_or_insert_with(|| <Box<MV> as Default>::default().detach().0);
+        let noalloc_boxed_view = self.0.get_or_insert_with(|| MV::new_boxed().detach().0);
         let nodrop_message = ManuallyDrop::new(M::from_boxed_view(unsafe {
             ManuallyDrop::into_inner(noalloc_boxed_view.make_nodrop_copy(Default::default()))
         }));
