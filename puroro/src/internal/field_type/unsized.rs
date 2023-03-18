@@ -29,6 +29,7 @@ use ::std::slice;
 pub struct SingularUnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
 pub struct OptionalUnsizedField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+    // TODO: This can be MaybeUninit
     RustType,
     PhantomData<ProtoType>,
 );
@@ -40,13 +41,13 @@ where
     RustType: Default + PartialEq,
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
-    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
-    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+    fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
+        (Self(Default::default(), PhantomData), allocator)
     }
 
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -77,15 +78,18 @@ where
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalUnsizedField<RustType, ProtoType, BITFIELD_INDEX>
 where
+    RustType: Default,
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
     fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+        bitvec.set(BITFIELD_INDEX, false);
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
     fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+        bitvec.set(BITFIELD_INDEX, false);
+        (Self(Default::default(), PhantomData), allocator)
     }
 
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
@@ -115,13 +119,13 @@ impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType
 where
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
-    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
-    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+    fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
+        (Self(Default::default(), PhantomData), allocator)
     }
 
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
