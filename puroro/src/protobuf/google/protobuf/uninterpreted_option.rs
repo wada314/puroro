@@ -367,11 +367,17 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::NamePartView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields {
+                name_part: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                is_extension: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }

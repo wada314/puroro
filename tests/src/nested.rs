@@ -267,8 +267,16 @@ pub mod _view {
         }
     }
     impl self::_pinternal::MessageViewInternal for self::MsgView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::nested::_fields::MsgFields {
+                item_outer: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
         #[cfg(feature = "allocator_api")]
-        fn new_in<A: ::std::alloc::Allocator>(
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
             allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()

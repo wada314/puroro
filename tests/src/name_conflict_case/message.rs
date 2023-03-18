@@ -285,8 +285,18 @@ pub mod _view {
         }
     }
     impl self::_pinternal::MessageViewInternal for self::ConflictCaseView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::name_conflict_case::message::_fields::ConflictCaseFields {
+                this_is_message_field: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
         #[cfg(feature = "allocator_api")]
-        fn new_in<A: ::std::alloc::Allocator>(
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
             allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
@@ -448,6 +458,18 @@ impl<TThisIsOneofField> self::_pinternal::OneofUnion for Conflict<TThisIsOneofFi
 where
     TThisIsOneofField: self::_pinternal::OneofFieldType,
 {
+    fn new<B: self::_pinternal::BitSlice>(bits: &mut B) -> Self {
+        bits.set_range(0usize..2usize, 0);
+        Self { _none: () }
+    }
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: self::_pinternal::BitSlice, A: ::std::alloc::Allocator>(
+        bits: &mut B,
+        allocator: A,
+    ) -> (Self, A) {
+        bits.set_range(0usize..2usize, 0);
+        (Self { _none: () }, allocator)
+    }
     type Case = self::_root::name_conflict_case::message::_case::ConflictCase;
     type CaseRef<'a> = self::_root::name_conflict_case::message::_case::ConflictCase::<
         <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterType::<'a>,

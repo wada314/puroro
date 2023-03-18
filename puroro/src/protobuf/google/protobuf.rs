@@ -6946,11 +6946,16 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::FileDescriptorSetView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FileDescriptorSetFields {
+                file: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -7357,11 +7362,31 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::FileDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FileDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                dependency: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                public_dependency: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                weak_dependency: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                message_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                service: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extension: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                source_code_info: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                syntax: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -7754,11 +7779,25 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::DescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::DescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                field: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extension: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                nested_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extension_range: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                oneof_decl: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_range: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -7940,11 +7979,18 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::ExtensionRangeOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields {
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -8471,11 +8517,26 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::FieldDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FieldDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                number: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                label: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                r#type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                type_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extendee: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                default_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                oneof_index: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                json_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                proto3_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -8658,11 +8719,17 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::OneofDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::OneofDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -8877,11 +8944,20 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::EnumDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_range: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -9094,11 +9170,18 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::EnumValueDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                number: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -9269,11 +9352,18 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::ServiceDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                method: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -9572,11 +9662,23 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::MethodDescriptorProtoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::MethodDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                input_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                output_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                client_streaming: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                server_streaming: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -10461,11 +10563,64 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::FileOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FileOptionsFields {
+                java_package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                java_outer_classname: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_multiple_files: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_generate_equals_and_hash: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_string_check_utf8: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                optimize_for: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                go_package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                cc_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                py_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                php_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                cc_enable_arenas: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                objc_class_prefix: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                csharp_namespace: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                swift_prefix: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                php_class_prefix: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                php_namespace: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                php_metadata_namespace: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                ruby_package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -10872,11 +11027,26 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::MessageOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::MessageOptionsFields {
+                message_set_wire_format: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                no_standard_descriptor_accessor: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                map_entry: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -11280,11 +11450,24 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::FieldOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FieldOptionsFields {
+                ctype: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                packed: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                jstype: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                lazy: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                weak: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -11406,11 +11589,18 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::OneofOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::OneofOptionsFields {
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -11591,11 +11781,20 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::EnumOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumOptionsFields {
+                allow_alias: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -11746,11 +11945,19 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::EnumValueOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumValueOptionsFields {
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -11896,11 +12103,19 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::ServiceOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::ServiceOptionsFields {
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -12090,11 +12305,22 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::MethodOptionsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::MethodOptionsFields {
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                idempotency_level: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -12408,11 +12634,28 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::UninterpretedOptionView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::UninterpretedOptionFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                identifier_value: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                positive_int_value: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                negative_int_value: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                double_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                string_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                aggregate_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -12579,11 +12822,16 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::SourceCodeInfoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::SourceCodeInfoFields {
+                location: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -12683,11 +12931,16 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::GeneratedCodeInfoView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::GeneratedCodeInfoFields {
+                annotation: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }

@@ -665,11 +665,18 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::ExtensionRangeView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields {
+                start: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                end: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -813,11 +820,17 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::ReservedRangeView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields {
+                start: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                end: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }

@@ -1056,11 +1056,19 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::VersionView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::_fields::VersionFields {
+                major: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                minor: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                patch: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                suffix: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -1275,11 +1283,21 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::CodeGeneratorRequestView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields {
+                file_to_generate: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                parameter: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                proto_file: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                compiler_version: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }
@@ -1477,11 +1495,20 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::CodeGeneratorResponseView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields {
+                error: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                supported_features: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                file: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }

@@ -477,8 +477,18 @@ pub mod _view {
         }
     }
     impl self::_pinternal::MessageViewInternal for self::ConflictView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::name_conflict_fields::_fields::ConflictFields {
+                this_is_original_message_field: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
         #[cfg(feature = "allocator_api")]
-        fn new_in<A: ::std::alloc::Allocator>(
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
             allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
@@ -591,8 +601,18 @@ pub mod _view {
         }
     }
     impl self::_pinternal::MessageViewInternal for self::ConflictFieldsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::name_conflict_fields::_fields::ConflictFieldsFields {
+                this_is_fields_message_field: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
         #[cfg(feature = "allocator_api")]
-        fn new_in<A: ::std::alloc::Allocator>(
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
             allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()

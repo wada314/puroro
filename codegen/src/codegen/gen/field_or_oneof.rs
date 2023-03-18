@@ -40,6 +40,10 @@ pub(crate) trait FieldOrOneofExt {
     fn gen_view_struct_impl_to_owned_field_value(&self) -> Result<FieldValue>;
     fn gen_view_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
     fn gen_view_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
+    fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue>;
 }
 
 #[derive(Debug, Default)]
@@ -145,6 +149,20 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
         match self.either() {
             FieldOrOneofCase::Field(f) => f.gen_view_struct_impl_partial_eq_cmp(rhs_expr),
             FieldOrOneofCase::Oneof(o) => o.gen_view_struct_impl_partial_eq_cmp(rhs_expr),
+        }
+    }
+
+    fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => {
+                f.gen_view_struct_impl_message_view_internal_new_boxed_field_value(bitvec_mut_expr)
+            }
+            FieldOrOneofCase::Oneof(o) => {
+                o.gen_view_struct_impl_message_view_internal_new_boxed_field_value(bitvec_mut_expr)
+            }
         }
     }
 }

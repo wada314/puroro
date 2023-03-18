@@ -559,11 +559,21 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::FileView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                insertion_point: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                content: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                generated_code_info: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }

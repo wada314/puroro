@@ -566,11 +566,26 @@ pub mod _view {
     }
     impl self::_pinternal::MessageViewInternal for self::LocationView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
-            todo!()
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::source_code_info::_fields::LocationFields {
+                path: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                span: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                leading_comments: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                trailing_comments: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                leading_detached_comments: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
         #[cfg(feature = "allocator_api")]
         fn new_boxed_in<A: ::std::alloc::Allocator>(
-            allocator: A,
+            _allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()
         }

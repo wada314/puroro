@@ -499,15 +499,34 @@ impl Message {
 
     fn gen_view_struct_impl_message_view_internal(&self) -> Result<ItemImpl> {
         let ident = self.gen_view_struct_ident()?;
+        let bitvec_mut_expr: Expr = parse2(quote! { shared.bitfield_mut() })?;
+        let fields_path = self.gen_fields_struct_path()?;
+        let new_field_values = self
+            .fields_or_oneofs()?
+            .map(|fo| {
+                fo.gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+                    &bitvec_mut_expr,
+                )
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
 
         Ok(parse2(quote! {
             impl #PURORO_INTERNAL::MessageViewInternal for self::#ident {
                 fn new_boxed() -> ::std::boxed::Box<Self> {
-                    todo!()
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    let mut shared: #PURORO_INTERNAL::SharedItemsImpl::<#bitfield_size_in_u32_array> = ::std::default::Default::default();
+                    let fields = #fields_path {
+                        #(#new_field_values),*
+                    };
+                    ::std::boxed::Box::new(Self {
+                        fields,
+                        shared,
+                    })
                 }
 
                 #CFG_ALLOCATOR
-                fn new_boxed_in<A: ::std::alloc::Allocator>(allocator: A) -> ::std::boxed::Box<Self, A> {
+                fn new_boxed_in<A: ::std::alloc::Allocator>(_allocator: A) -> ::std::boxed::Box<Self, A> {
                     todo!()
                 }
             }

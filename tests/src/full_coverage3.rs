@@ -2944,8 +2944,91 @@ pub mod _view {
         }
     }
     impl self::_pinternal::MessageViewInternal for self::MsgView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::full_coverage3::_fields::MsgFields {
+                i32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i32_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                float_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                float_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                float_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                bytes_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                bytes_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                bytes_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                string_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                string_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                string_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                submsg_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                submsg_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                submsg_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u32_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s32_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                fixed32_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed32_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed32_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed64_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed64_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed64_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed32_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed32_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed32_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed64_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed64_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed64_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                f64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                f64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                f64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
         #[cfg(feature = "allocator_api")]
-        fn new_in<A: ::std::alloc::Allocator>(
+        fn new_boxed_in<A: ::std::alloc::Allocator>(
             allocator: A,
         ) -> ::std::boxed::Box<Self, A> {
             todo!()

@@ -197,6 +197,7 @@ impl Field {
         *receiver = new_expr.into();
         Ok(())
     }
+
     pub(crate) fn gen_view_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr> {
         Ok(parse2(match self.rule()? {
             FieldRule::Repeated => {
@@ -210,6 +211,16 @@ impl Field {
                 let getter_opt_ident = format_ident!("{}_opt", self.name()?.to_lower_snake_case());
                 quote! { self.#getter_opt_ident() == #rhs_expr.#getter_opt_ident() }
             }
+        })?)
+    }
+
+    pub(crate) fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue> {
+        let ident = self.gen_fields_struct_field_ident()?;
+        Ok(parse2(quote! {
+            #ident: #PURORO_INTERNAL::FieldType::new(#bitvec_mut_expr)
         })?)
     }
 
