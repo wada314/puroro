@@ -30,6 +30,7 @@ use ::std::slice;
 pub struct SingularNumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 #[derive(Default, Clone)]
 pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usize>(
+    // TODO: This can be MaybeUninit
     RustType,
     PhantomData<ProtoType>,
 );
@@ -41,13 +42,13 @@ where
     RustType: PartialEq + Default + Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
-    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
-    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+    fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
+        (Self(Default::default(), PhantomData), allocator)
     }
 
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
@@ -102,16 +103,18 @@ where
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
-    RustType: Clone,
+    RustType: Clone + Default,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+        bitvec.set(BITFIELD_INDEX, false);
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
     fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+        bitvec.set(BITFIELD_INDEX, false);
+        (Self(Default::default(), PhantomData), allocator)
     }
 
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
@@ -158,13 +161,13 @@ where
     RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
-    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
-        todo!()
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
-    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
-        todo!()
+    fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
+        (Self(Default::default(), PhantomData), allocator)
     }
 
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
@@ -274,7 +277,7 @@ where
 impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
     for OptionalNumericalField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
-    ProtoType::RustType: Clone,
+    ProtoType::RustType: Clone + Default,
     ProtoType: tags::NumericalType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustType>
