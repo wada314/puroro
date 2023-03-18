@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
+use crate::internal::alloc::NoAllocVec;
 use crate::internal::bitvec::BitSlice;
+use crate::internal::detach_alloc::DetachAlloc;
 use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, ScopedIter, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
@@ -34,8 +36,10 @@ pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usi
     RustType,
     PhantomData<ProtoType>,
 );
-#[derive(Default, Clone)]
-pub struct RepeatedNumericalField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
+pub struct RepeatedNumericalField<RustType, ProtoType>(
+    NoAllocVec<RustType>,
+    PhantomData<ProtoType>,
+);
 
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
@@ -162,12 +166,16 @@ where
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
-        Self(Default::default(), PhantomData)
+        let vec = Vec::new();
+        let (no_alloc_vec, _) = DetachAlloc::detach(vec);
+        Self(no_alloc_vec, PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]
     fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
-        (Self(Default::default(), PhantomData), allocator)
+        let vec = Vec::new_in(allocator);
+        let (no_alloc_vec, allocator) = DetachAlloc::detach(vec);
+        (Self(no_alloc_vec, PhantomData), allocator)
     }
 
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {

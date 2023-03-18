@@ -15,6 +15,7 @@
 #[cfg(feature = "allocator_api")]
 use ::std::alloc::Global;
 use ::std::mem::ManuallyDrop;
+use ::std::ops::{Deref, DerefMut};
 
 pub trait DetachAlloc {
     type Detached: AttachAlloc<Self::Allocator, Attached = Self>;
@@ -27,10 +28,53 @@ pub unsafe trait AttachAlloc<A = Global> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
     unsafe fn attach(self, allocator: A) -> Self::Attached;
     unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached>;
+    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<'_, Self::Attached> {
+        RefMut {
+            tmp: self.make_nodrop_copy(allocator),
+            src: self,
+        }
+    }
 }
 #[cfg(not(feature = "allocator_api"))]
 pub unsafe trait AttachAlloc<A = ()> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
     unsafe fn attach(self, allocator: A) -> Self::Attached;
     unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached>;
+    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<'_, Self::Attached> {
+        RefMut {
+            tmp: self.make_nodrop_copy(allocator),
+            src: self,
+        }
+    }
+}
+
+pub struct RefMut<'a, T>
+where
+    T: DetachAlloc,
+{
+    tmp: ManuallyDrop<T>,
+    src: &'a mut T::Detached,
+}
+impl<T: DetachAlloc> Deref for RefMut<'_, T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.tmp
+    }
+}
+impl<T: DetachAlloc> DerefMut for RefMut<'_, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.tmp
+    }
+}
+impl<T: DetachAlloc> Drop for RefMut<'_, T> {
+    fn drop(&mut self) {
+        *self.src = unsafe { ManuallyDrop::take(&mut self.tmp) }.detach().0;
+    }
+}
+impl<T: DetachAlloc> RefMut<'_, T> {
+    pub fn retrieve_allocator(mut this: Self) -> T::Allocator {
+        let (detached, allocator) = unsafe { ManuallyDrop::take(&mut this.tmp) }.detach();
+        *this.src = detached;
+        allocator
+    }
 }
