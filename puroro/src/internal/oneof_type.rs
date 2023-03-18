@@ -15,14 +15,21 @@
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{FieldData, ScopedIter};
 use crate::Result;
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Allocator;
 use ::std::io::{Result as IoResult, Write};
 
-pub trait OneofUnion {
+pub trait OneofUnion: Sized {
+    fn new<B: BitSlice>(bits: &mut B) -> Self;
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bits: &mut B, allocator: A) -> (Self, A);
+
     type Case: OneofCase;
     type CaseRef<'a>
     where
         Self: 'a;
     fn case_ref<B: BitSlice>(&self, bits: &B) -> Option<Self::CaseRef<'_>>;
+
     fn clear<B: BitSlice>(&mut self, bits: &mut B);
     fn clone<B: BitSlice>(&self, bits: &B) -> Self;
 

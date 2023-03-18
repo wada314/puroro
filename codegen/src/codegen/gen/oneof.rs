@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{
     DataTypeBase, FieldBase, FieldOrOneofExt, Oneof, OneofField, PackageOrMessageExt,
-    PURORO_INTERNAL, PURORO_LIB,
+    CFG_ALLOCATOR, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
     parse2, Arm, Attribute, Expr, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, Stmt, Type,
@@ -338,6 +338,17 @@ impl Oneof {
             for #union_ident< #(#generic_params),* >
             where #( #generic_param_bounds, )*
             {
+                fn new<B: #PURORO_INTERNAL::BitSlice>(bits: &mut B) -> Self {
+                    bits.set_range(#bitfield_begin..#bitfield_end, 0);
+                    Self { _none: (), }
+                }
+
+                #CFG_ALLOCATOR
+                fn new_in<B: #PURORO_INTERNAL::BitSlice, A: ::std::alloc::Allocator>(bits: &mut B, allocator: A) -> (Self, A) {
+                    bits.set_range(#bitfield_begin..#bitfield_end, 0);
+                    (Self { _none: (), }, allocator)
+                }
+
                 type Case = #case_type;
                 type CaseRef<'a> = #case_ref_type
                 where Self: 'a;
