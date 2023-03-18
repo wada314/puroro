@@ -365,7 +365,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for SubmsgView {
+    impl self::_puroro::MessageView for self::SubmsgView {
         type MessageType = self::_root::full_coverage3::msg::Submsg;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -395,6 +395,14 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::SubmsgView {
+        #[cfg(feature = "allocator_api")]
+        fn new_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for SubmsgView {

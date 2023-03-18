@@ -218,6 +218,7 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
 
         let message_view_impl = self.gen_view_struct_impl_message_view()?;
+        let message_view_internal_impl = self.gen_view_struct_impl_message_view_internal()?;
         let drop_impl = self.gen_view_struct_impl_drop()?;
         let debug_impl = self.gen_view_struct_impl_debug()?;
         let partial_eq_impl = self.gen_view_struct_impl_partial_eq()?;
@@ -238,6 +239,7 @@ impl Message {
                 }
             })?,
             message_view_impl.into(),
+            message_view_internal_impl.into(),
             drop_impl.into(),
             debug_impl.into(),
             partial_eq_impl.into(),
@@ -481,7 +483,7 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
 
         Ok(parse2(quote! {
-            impl #PURORO_LIB::MessageView for #ident {
+            impl #PURORO_LIB::MessageView for self::#ident {
                 type MessageType = #message_type;
 
                 fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
@@ -490,6 +492,19 @@ impl Message {
                     #(#ser_stmts)*
                     self.shared.unknown_fields().ser_to_write(#out_ident)?;
                     ::std::result::Result::Ok(())
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_message_view_internal(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+
+        Ok(parse2(quote! {
+            impl #PURORO_INTERNAL::MessageViewInternal for self::#ident {
+                #CFG_ALLOCATOR
+                fn new_in<A: ::std::alloc::Allocator>(allocator: A) -> ::std::boxed::Box<Self, A> {
+                    todo!()
                 }
             }
         })?)

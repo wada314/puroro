@@ -456,7 +456,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ConflictView {
+    impl self::_puroro::MessageView for self::ConflictView {
         type MessageType = self::_root::name_conflict_fields::Conflict;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -474,6 +474,14 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ConflictView {
+        #[cfg(feature = "allocator_api")]
+        fn new_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ConflictView {
@@ -562,7 +570,7 @@ pub mod _view {
                 .is_some()
         }
     }
-    impl self::_puroro::MessageView for ConflictFieldsView {
+    impl self::_puroro::MessageView for self::ConflictFieldsView {
         type MessageType = self::_root::name_conflict_fields::ConflictFields;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -580,6 +588,14 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ConflictFieldsView {
+        #[cfg(feature = "allocator_api")]
+        fn new_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for ConflictFieldsView {

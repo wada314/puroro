@@ -259,7 +259,7 @@ pub mod _view {
             self.this_is_oneof_field_opt().is_some()
         }
     }
-    impl self::_puroro::MessageView for MessageView {
+    impl self::_puroro::MessageView for self::MessageView {
         type MessageType = self::_root::name_conflict_case::Message;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -272,6 +272,14 @@ pub mod _view {
             self.fields.conflict.ser_to_write(self.shared.bitfield(), out)?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MessageView {
+        #[cfg(feature = "allocator_api")]
+        fn new_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for MessageView {

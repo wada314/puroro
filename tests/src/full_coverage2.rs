@@ -2656,7 +2656,7 @@ pub mod _view {
             )
         }
     }
-    impl self::_puroro::MessageView for MsgView {
+    impl self::_puroro::MessageView for self::MsgView {
         type MessageType = self::_root::full_coverage2::Msg;
         fn to_bytes<W: ::std::io::Write>(
             &self,
@@ -2956,6 +2956,14 @@ pub mod _view {
             )?;
             self.shared.unknown_fields().ser_to_write(out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MsgView {
+        #[cfg(feature = "allocator_api")]
+        fn new_in<A: ::std::alloc::Allocator>(
+            allocator: A,
+        ) -> ::std::boxed::Box<Self, A> {
+            todo!()
         }
     }
     impl ::std::ops::Drop for MsgView {
