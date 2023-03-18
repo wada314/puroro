@@ -21,6 +21,8 @@ use crate::internal::message_internal::MessageInternal;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::message::{Message, MessageView, RefMut};
 use crate::Result;
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Allocator;
 use ::std::io::{Result as IoResult, Write};
 use ::std::mem::ManuallyDrop;
 use ::std::ops::Deref;
@@ -35,6 +37,15 @@ where
     MV: MessageView<MessageType = M> + Default,
     M: Message<ViewType = MV> + MessageInternal,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
@@ -64,6 +75,15 @@ where
     MV: MessageView<MessageType = M> + Default,
     M: Message<ViewType = MV> + MessageInternal + Default + Deref<Target = MV>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,

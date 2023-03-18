@@ -25,9 +25,15 @@ use crate::internal::ser::{FieldData, ScopedIter, WireType};
 use crate::internal::variant::Variant;
 use crate::repeated::RepeatedFieldView;
 use crate::{PuroroError, Result};
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Allocator;
 use ::std::io::{Result as IoResult, Write};
 
-pub trait FieldType {
+pub trait FieldType: Sized {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self;
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A);
+
     // Deserialization methods
 
     fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(

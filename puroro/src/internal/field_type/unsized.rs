@@ -18,6 +18,8 @@ use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
 use crate::repeated::RepeatedFieldView;
 use crate::Result;
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Allocator;
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 use ::std::ops::{Deref, Index};
@@ -38,6 +40,15 @@ where
     RustType: Default + PartialEq,
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
@@ -68,6 +79,15 @@ impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
 where
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
@@ -95,6 +115,15 @@ impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType
 where
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,

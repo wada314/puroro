@@ -19,6 +19,8 @@ use crate::internal::tags;
 use crate::internal::variant::Variant;
 use crate::repeated::RepeatedFieldView;
 use crate::Result;
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Allocator;
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
 use ::std::ops::Index;
@@ -39,6 +41,15 @@ where
     RustType: PartialEq + Default + Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         let v = variant.get::<ProtoType>()?;
         if v != RustType::default() {
@@ -94,6 +105,15 @@ where
     RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
         bitvec.set(BITFIELD_INDEX, true);
@@ -138,6 +158,15 @@ where
     RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        todo!()
+    }
+
+    #[cfg(feature = "allocator_api")]
+    fn new_in<B: BitSlice, A: Allocator>(bitvec: &mut B, allocator: A) -> (Self, A) {
+        todo!()
+    }
+
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0.push(variant.get::<ProtoType>()?);
         Ok(())
