@@ -15,6 +15,7 @@
 use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc};
 #[cfg(feature = "allocator_api")]
 use ::std::alloc::Allocator;
+use ::std::default::Default;
 use ::std::mem::ManuallyDrop;
 use ::std::ops::Deref;
 
@@ -115,9 +116,29 @@ unsafe impl<T> AttachAlloc<()> for NoAllocBox<T> {
     }
 }
 
+impl<T: Clone> Clone for NoAllocVec<T> {
+    fn clone(&self) -> Self {
+        let slice: &[T] = self;
+        let vec = slice.to_owned();
+        vec.detach().0
+    }
+}
 impl<T: Clone> Clone for NoAllocBox<T> {
     fn clone(&self) -> Self {
         let b = Box::new(T::clone(unsafe { &*self.0 }));
         b.detach().0
+    }
+}
+
+impl<T> Default for NoAllocVec<T> {
+    fn default() -> Self {
+        let vec = Vec::default();
+        vec.detach().0
+    }
+}
+impl<T: Default> Default for NoAllocBox<T> {
+    fn default() -> Self {
+        let boxed = Box::new(T::default());
+        boxed.detach().0
     }
 }

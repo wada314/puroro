@@ -146,7 +146,9 @@ pub trait RepeatedFieldType: FieldType {
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, bitvec: &B) -> Self::RepeatedFieldViewType<'_>;
-    type ContainerType;
-    fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> &mut Self::ContainerType;
+    type ContainerMutType<'a>
+    where
+        Self: 'a;
+    fn get_field_mut<B: BitSlice>(&mut self, bitvec: &mut B) -> Self::ContainerMutType<'_>;
     fn clear<B: BitSlice>(&mut self, bitvec: &mut B);
 }

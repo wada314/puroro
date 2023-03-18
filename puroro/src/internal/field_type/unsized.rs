@@ -248,8 +248,8 @@ where
         RepeatedFieldViewImpl(self.0.as_slice())
     }
 
-    type ContainerType = Vec<ProtoType::RustOwnedType>;
-    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+    type ContainerMutType<'a> = &'a mut Vec<ProtoType::RustOwnedType> where Self: 'a;
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> Self::ContainerMutType<'_> {
         &mut self.0
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {

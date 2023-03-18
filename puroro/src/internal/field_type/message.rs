@@ -155,8 +155,8 @@ where
     MV: MessageView<MessageType = M> + Default,
     M: Message<ViewType = MV> + MessageInternal + Default + Deref<Target = MV>,
 {
-    type ContainerType = Vec<M>;
-    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
+    type ContainerMutType<'a> = &'a mut Vec<M> where Self: 'a;
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> Self::ContainerMutType<'_> {
         &mut self.0
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {

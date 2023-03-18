@@ -28,7 +28,7 @@ pub unsafe trait AttachAlloc<A = Global> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
     unsafe fn attach(self, allocator: A) -> Self::Attached;
     unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached>;
-    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<'_, Self::Attached> {
+    unsafe fn ref_mut_in(&mut self, allocator: A) -> RefMut<'_, Self::Attached> {
         RefMut {
             tmp: self.make_nodrop_copy(allocator),
             src: self,
@@ -38,11 +38,11 @@ pub unsafe trait AttachAlloc<A = Global> {
 #[cfg(not(feature = "allocator_api"))]
 pub unsafe trait AttachAlloc<A = ()> {
     type Attached: DetachAlloc<Allocator = A, Detached = Self>;
-    unsafe fn attach(self, allocator: A) -> Self::Attached;
-    unsafe fn make_nodrop_copy(&self, allocator: A) -> ManuallyDrop<Self::Attached>;
-    unsafe fn ref_mut(&mut self, allocator: A) -> RefMut<'_, Self::Attached> {
+    unsafe fn attach(self, _allocator: A) -> Self::Attached;
+    unsafe fn make_nodrop_copy(&self, _allocator: A) -> ManuallyDrop<Self::Attached>;
+    unsafe fn ref_mut_in(&mut self, _allocator: A) -> RefMut<'_, Self::Attached> {
         RefMut {
-            tmp: self.make_nodrop_copy(allocator),
+            tmp: self.make_nodrop_copy(_allocator),
             src: self,
         }
     }

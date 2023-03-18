@@ -15,7 +15,7 @@
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::alloc::NoAllocVec;
 use crate::internal::bitvec::BitSlice;
-use crate::internal::detach_alloc::DetachAlloc;
+use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc, RefMut};
 use crate::internal::ser::{ser_numerical_shared, ser_wire_and_number, ScopedIter, WireType};
 use crate::internal::tags;
 use crate::internal::variant::Variant;
@@ -36,10 +36,20 @@ pub struct OptionalNumericalField<RustType, ProtoType, const BITFIELD_INDEX: usi
     RustType,
     PhantomData<ProtoType>,
 );
+#[derive(Default, Clone)]
 pub struct RepeatedNumericalField<RustType, ProtoType>(
     NoAllocVec<RustType>,
     PhantomData<ProtoType>,
 );
+
+impl<RustType, ProtoType> RepeatedNumericalField<RustType, ProtoType> {
+    unsafe fn ref_mut(&mut self) -> RefMut<'_, Vec<RustType>> {
+        self.0.ref_mut_in(Default::default())
+    }
+    unsafe fn ref_mut_in<A: Allocator>(&mut self, allocator: A) -> RefMut<'_, Vec<RustType, A>> {
+        self.0.ref_mut_in(allocator)
+    }
+}
 
 impl<RustType, ProtoType> FieldType for SingularNumericalField<RustType, ProtoType>
 where
@@ -179,7 +189,7 @@ where
     }
 
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
-        self.0.push(variant.get::<ProtoType>()?);
+        unsafe { self.ref_mut() }.push(variant.get::<ProtoType>()?);
         Ok(())
     }
 
@@ -188,19 +198,18 @@ where
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
+        let mut vec = unsafe { self.ref_mut() };
         while let Some(var) = Variant::decode_bytes(iter.by_ref())? {
-            self.0.push(var.get::<ProtoType>()?)
+            vec.push(var.get::<ProtoType>()?)
         }
         Ok(())
     }
     fn deser_from_bits32<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 4]) -> Result<()> {
-        self.0
-            .push(<ProtoType as tags::NumericalType>::from_bits32(bits)?);
+        unsafe { self.ref_mut() }.push(<ProtoType as tags::NumericalType>::from_bits32(bits)?);
         Ok(())
     }
     fn deser_from_bits64<B: BitSlice>(&mut self, _bitvec: &mut B, bits: [u8; 8]) -> Result<()> {
-        self.0
-            .push(<ProtoType as tags::NumericalType>::from_bits64(bits)?);
+        unsafe { self.ref_mut() }.push(<ProtoType as tags::NumericalType>::from_bits64(bits)?);
         Ok(())
     }
     fn ser_to_write<W: Write, B: BitSlice>(
@@ -209,14 +218,15 @@ where
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        if let Some(first) = self.0.first() {
+        let slice: &[RustType] = &self.0;
+        if let Some(first) = slice.first() {
             match ProtoType::to_wire_type(first.clone())? {
                 tags::NumericalWireType::Variant(_) => {
                     // write as length delimited
                     ser_wire_and_number(WireType::LengthDelimited, number, out)?;
 
                     let mut tempvec = Vec::new();
-                    for item in &self.0 {
+                    for item in slice {
                         if let tags::NumericalWireType::Variant(bits) =
                             <ProtoType as tags::NumericalType>::to_wire_type(item.clone())?
                         {
@@ -231,7 +241,7 @@ where
                     out.write_all(&tempvec)?;
                 }
                 tags::NumericalWireType::Bits32(_) | tags::NumericalWireType::Bits64(_) => {
-                    for item in &self.0 {
+                    for item in slice {
                         ser_numerical_shared::<_, ProtoType, _>(item.clone(), number, out)?;
                     }
                 }
@@ -332,15 +342,15 @@ where
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
-        RepeatedFieldViewImpl(self.0.as_slice())
+        RepeatedFieldViewImpl(&self.0)
     }
 
-    type ContainerType = Vec<ProtoType::RustType>;
-    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
-        &mut self.0
+    type ContainerMutType<'a> = RefMut<'a, Vec<ProtoType::RustType>> where Self: 'a;
+    fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> Self::ContainerMutType<'_> {
+        unsafe { self.ref_mut() }
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0.clear()
+        unsafe { self.ref_mut() }.clear()
     }
 }
 
