@@ -83,7 +83,10 @@ pub fn generate_file_names_and_tokens<'a>(
                     options.root_file_name.as_deref(),
                 )?
                 .to_string();
-            let file_content = item.gen_module_file(options.puroro_library_path.as_deref())?;
+            let file_content = item.gen_module_file(
+                options.puroro_library_path.as_deref(),
+                options.root_file_name.is_none(),
+            )?;
             Ok((file_name, quote! { #file_content }))
         })
         .map(|rr| rr.flatten())

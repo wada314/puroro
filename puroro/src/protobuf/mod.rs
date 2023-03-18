@@ -1,4 +1,3 @@
-#![cfg_attr(feature = "allocator_api", feature(allocator_api))]
 mod _root {
     #[allow(unused)]
     pub(crate) use super::*;

@@ -35,7 +35,11 @@ pub(crate) trait PackageOrMessageExt {
     ) -> Result<&str>;
     fn module_file_dir(&self, root_module_name: Option<&str>) -> Result<&str>;
     fn gen_rust_module_path(&self) -> Result<Rc<Path>>;
-    fn gen_module_file(&self, puroro_library_path: Option<&str>) -> Result<File>;
+    fn gen_module_file(
+        &self,
+        puroro_library_path: Option<&str>,
+        use_crate_level_attributes: bool,
+    ) -> Result<File>;
     fn gen_inline_code(&self, puroro_library_path: Option<&str>) -> Result<TokenStream>;
 }
 
@@ -132,15 +136,25 @@ impl<T: ?Sized + PackageOrMessage> PackageOrMessageExt for T {
             .cloned()
     }
 
-    fn gen_module_file(&self, puroro_library_path: Option<&str>) -> Result<File> {
+    fn gen_module_file(
+        &self,
+        puroro_library_path: Option<&str>,
+        use_crate_level_attributes: bool,
+    ) -> Result<File> {
         let puroro_library_path: Path = if let Some(puroro_library_path) = puroro_library_path {
             parse_str(puroro_library_path)?
         } else {
             parse2(quote! { ::puroro })?
         };
+        let maybe_crate_level_attributes =
+            (use_crate_level_attributes && self.is_root()?).then(|| {
+                quote! {
+                    #![cfg_attr(feature = "allocator_api", feature(allocator_api))]
+                }
+            });
         let header = if self.is_root()? {
             quote! {
-                #![cfg_attr(feature = "allocator_api", feature(allocator_api))]
+                #maybe_crate_level_attributes
                 mod #PURORO_ROOT_IDENT {
                     #[allow(unused)]
                     pub(crate) use super::*;
