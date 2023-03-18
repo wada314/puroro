@@ -175,14 +175,9 @@ impl Message {
 
     pub(crate) fn gen_fields_struct_items(&self) -> Result<Vec<Item>> {
         let ident = self.gen_fields_struct_ident()?;
-        let generics = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_fields_struct_generic_param_ident())
-            .collect::<Result<Vec<_>>>()?;
-        let fields = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_fields_struct_field())
-            .collect::<Result<Vec<_>>>()?;
+        let generics =
+            self.try_map_fields_or_oneofs(|fo| fo.gen_fields_struct_generic_param_ident())?;
+        let fields = self.try_map_fields_or_oneofs(|fo| fo.gen_fields_struct_field())?;
 
         Ok(vec![parse2(quote! {
             #[derive(::std::default::Default)]
@@ -195,10 +190,7 @@ impl Message {
     pub(crate) fn gen_view_struct_items(&self) -> Result<Vec<Item>> {
         let ident = self.gen_view_struct_ident()?;
 
-        let fields_types = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_fields_struct_field_type())
-            .collect::<Result<Vec<_>>>()?;
+        let fields_types = self.try_map_fields_or_oneofs(|fo| fo.gen_fields_struct_field_type())?;
         let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
 
         let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
@@ -477,10 +469,9 @@ impl Message {
         let message_type = self.gen_message_struct_type()?;
         let out_ident = quote! { out };
         let out_expr = parse2(quote! { out })?;
-        let ser_stmts = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_view_struct_impl_message_view_ser_stmt(&out_expr))
-            .collect::<Result<Vec<_>>>()?;
+        let ser_stmts = self.try_map_fields_or_oneofs(|fo| {
+            fo.gen_view_struct_impl_message_view_ser_stmt(&out_expr)
+        })?;
 
         Ok(parse2(quote! {
             impl #PURORO_LIB::MessageView for self::#ident {
@@ -589,10 +580,8 @@ impl Message {
     fn gen_view_struct_impl_partial_eq(&self) -> Result<ItemImpl> {
         let ident = self.gen_view_struct_ident()?;
         let rhs_expr = parse2(quote! { rhs })?;
-        let cmp_exprs = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_view_struct_impl_partial_eq_cmp(&rhs_expr))
-            .collect::<Result<Vec<_>>>()?;
+        let cmp_exprs =
+            self.try_map_fields_or_oneofs(|fo| fo.gen_view_struct_impl_partial_eq_cmp(&rhs_expr))?;
         Ok(parse2(quote! {
             impl ::std::cmp::PartialEq for #ident {
                 fn eq(&self, rhs: &Self) -> bool {
@@ -612,10 +601,8 @@ impl Message {
         let owned_type = self.gen_message_struct_type()?;
         let owned_path = self.gen_message_struct_path()?;
         let fields_struct_type = self.gen_fields_struct_path()?;
-        let field_values = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_view_struct_impl_to_owned_field_value())
-            .collect::<Result<Vec<_>>>()?;
+        let field_values =
+            self.try_map_fields_or_oneofs(|fo| fo.gen_view_struct_impl_to_owned_field_value())?;
         Ok(parse2(quote! {
             impl ::std::borrow::ToOwned for #ident {
                 type Owned = #owned_type;
