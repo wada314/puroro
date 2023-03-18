@@ -176,9 +176,7 @@ where
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
     fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
-        let vec = Vec::new();
-        let (no_alloc_vec, _) = DetachAlloc::detach(vec);
-        Self(no_alloc_vec, PhantomData)
+        Self(Default::default(), PhantomData)
     }
 
     #[cfg(feature = "allocator_api")]

@@ -136,7 +136,9 @@ where
 
     #[cfg(feature = "allocator_api")]
     fn new_in<B: BitSlice, A: Allocator>(_bitvec: &mut B, allocator: A) -> (Self, A) {
-        (Self(Default::default(), PhantomData), allocator)
+        let vec = Vec::new_in(allocator);
+        let (no_alloc_vec, allocator) = DetachAlloc::detach(vec);
+        (Self(no_alloc_vec, PhantomData), allocator)
     }
 
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(

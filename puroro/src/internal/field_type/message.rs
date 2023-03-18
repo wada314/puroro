@@ -14,12 +14,12 @@
 
 use super::r#unsized::RepeatedFieldViewImpl;
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
-use crate::internal::alloc::NoAllocBox;
+use crate::internal::alloc::{NoAllocBox, NoAllocVec};
 use crate::internal::bitvec::BitSlice;
-use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc};
+use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc, RefMut};
 use crate::internal::message_internal::{MessageInternal, MessageViewInternal};
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
-use crate::message::{Message, MessageView, RefMut};
+use crate::message::{Message, MessageView, RefMut as RefMut2};
 use crate::Result;
 #[cfg(feature = "allocator_api")]
 use ::std::alloc::Allocator;
@@ -30,7 +30,16 @@ use ::std::ops::Deref;
 #[derive(Default)]
 pub struct SingularMessageField<MV>(Option<NoAllocBox<MV>>);
 #[derive(Default, Clone)]
-pub struct RepeatedMessageField<M>(Vec<M>);
+pub struct RepeatedMessageField<M>(NoAllocVec<M>);
+
+impl<M> RepeatedMessageField<M> {
+    unsafe fn ref_mut(&mut self) -> RefMut<'_, Vec<M>> {
+        self.0.ref_mut_in(Default::default())
+    }
+    unsafe fn ref_mut_in<A: Allocator>(&mut self, allocator: A) -> RefMut<'_, Vec<M, A>> {
+        self.0.ref_mut_in(allocator)
+    }
+}
 
 impl<MV, M> FieldType for SingularMessageField<MV>
 where
@@ -90,7 +99,7 @@ where
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
         let msg = <M as MessageInternal>::from_scoped_bytes_iter(iter)?;
-        self.0.push(msg);
+        unsafe { self.ref_mut() }.push(msg);
         Ok(())
     }
 
@@ -100,7 +109,8 @@ where
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        for message in &self.0 {
+        let slice: &[M] = &self.0;
+        for message in slice {
             let mut vec = Vec::new();
             message.to_bytes(&mut vec)?;
             ser_bytes_shared(vec.as_slice(), number, out)?;
@@ -121,7 +131,7 @@ where
     type GetterOrElseType<'a> = Option<&'a MV>
     where
         Self: 'a;
-    type GetterMutType<'a> = RefMut<'a, M> where Self: 'a;
+    type GetterMutType<'a> = RefMut2<'a, M> where Self: 'a;
 
     fn get_field_or_else<'a, B: BitSlice, D: FnOnce() -> Self::DefaultValueType>(
         &'a self,
@@ -142,7 +152,7 @@ where
         let nodrop_message = ManuallyDrop::new(M::from_boxed_view(unsafe {
             ManuallyDrop::into_inner(noalloc_boxed_view.make_nodrop_copy(Default::default()))
         }));
-        RefMut::new(nodrop_message)
+        RefMut2::new(nodrop_message)
     }
 
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
@@ -155,19 +165,19 @@ where
     MV: MessageView<MessageType = M> + Default,
     M: Message<ViewType = MV> + MessageInternal + Default + Deref<Target = MV>,
 {
-    type ContainerMutType<'a> = &'a mut Vec<M> where Self: 'a;
+    type ContainerMutType<'a> = RefMut<'a, Vec<M>> where Self: 'a;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> Self::ContainerMutType<'_> {
-        &mut self.0
+        unsafe { self.ref_mut() }
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0.clear()
+        unsafe { self.ref_mut() }.clear()
     }
 
     type RepeatedFieldViewType<'a> = RepeatedFieldViewImpl<'a, MV::MessageType>
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
-        RepeatedFieldViewImpl(self.0.as_slice())
+        RepeatedFieldViewImpl(&self.0)
     }
 }
 
