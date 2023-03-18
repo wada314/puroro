@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
+use crate::internal::alloc::NoAllocVec;
 use crate::internal::bitvec::BitSlice;
+use crate::internal::detach_alloc::{AttachAlloc, DetachAlloc, RefMut};
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
 use crate::repeated::RepeatedFieldView;
@@ -34,7 +36,16 @@ pub struct OptionalUnsizedField<RustType, ProtoType, const BITFIELD_INDEX: usize
     PhantomData<ProtoType>,
 );
 #[derive(Default, Clone)]
-pub struct RepeatedUnsizedField<RustType, ProtoType>(Vec<RustType>, PhantomData<ProtoType>);
+pub struct RepeatedUnsizedField<RustType, ProtoType>(NoAllocVec<RustType>, PhantomData<ProtoType>);
+
+impl<RustType, ProtoType> RepeatedUnsizedField<RustType, ProtoType> {
+    unsafe fn ref_mut(&mut self) -> RefMut<'_, Vec<RustType>> {
+        self.0.ref_mut_in(Default::default())
+    }
+    unsafe fn ref_mut_in<A: Allocator>(&mut self, allocator: A) -> RefMut<'_, Vec<RustType, A>> {
+        self.0.ref_mut_in(allocator)
+    }
+}
 
 impl<RustType, ProtoType> FieldType for SingularUnsizedField<RustType, ProtoType>
 where
@@ -133,7 +144,7 @@ where
         _bitvec: &mut B,
         iter: &mut ScopedIter<'a, I>,
     ) -> Result<()> {
-        self.0.push(ProtoType::from_bytes_iter(iter)?);
+        unsafe { self.ref_mut() }.push(ProtoType::from_bytes_iter(iter)?);
         Ok(())
     }
 
@@ -143,7 +154,8 @@ where
         number: i32,
         out: &mut W,
     ) -> Result<()> {
-        for val in &self.0 {
+        let slice: &[RustType] = &self.0;
+        for val in slice {
             ser_bytes_shared(ProtoType::to_bytes_slice(val)?, number, out)?;
         }
         Ok(())
@@ -245,15 +257,15 @@ where
     where
         Self: 'a;
     fn get_field<B: BitSlice>(&self, _bitvec: &B) -> Self::RepeatedFieldViewType<'_> {
-        RepeatedFieldViewImpl(self.0.as_slice())
+        RepeatedFieldViewImpl(&self.0)
     }
 
-    type ContainerMutType<'a> = &'a mut Vec<ProtoType::RustOwnedType> where Self: 'a;
+    type ContainerMutType<'a> = RefMut<'a, Vec<ProtoType::RustOwnedType>> where Self: 'a;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> Self::ContainerMutType<'_> {
-        &mut self.0
+        unsafe { self.ref_mut() }
     }
     fn clear<B: BitSlice>(&mut self, _bitvec: &mut B) {
-        self.0.clear()
+        unsafe { self.ref_mut() }.clear()
     }
 }
 
