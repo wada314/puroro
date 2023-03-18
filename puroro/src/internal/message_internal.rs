@@ -14,6 +14,8 @@
 
 use crate::internal::ScopedIter;
 use crate::Result;
+#[cfg(feature = "allocator_api")]
+use ::std::alloc::Allocator;
 use ::std::io::Result as IoResult;
 
 pub trait MessageInternal: crate::Message {
@@ -35,4 +37,9 @@ pub trait MessageInternal: crate::Message {
 
     fn from_boxed_view(v: Box<Self::ViewType>) -> Self;
     fn into_boxed_view(self) -> Box<Self::ViewType>;
+}
+
+pub trait MessageViewInternal: crate::MessageView {
+    #[cfg(feature = "allocator_api")]
+    fn new_in<A: Allocator>(allocator: A) -> Box<Self, A>;
 }
