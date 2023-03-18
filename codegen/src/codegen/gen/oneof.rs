@@ -286,7 +286,7 @@ impl Oneof {
         })?)
     }
 
-    pub(crate) fn gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+    pub(crate) fn gen_view_struct_impl_message_view_internal_new_boxed_in_var(
         &self,
         bitvec_mut_expr: &Expr,
         allocator_ident: &Ident,

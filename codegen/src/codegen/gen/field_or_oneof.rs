@@ -44,7 +44,7 @@ pub(crate) trait FieldOrOneofExt {
         &self,
         bitvec_mut_expr: &Expr,
     ) -> Result<FieldValue>;
-    fn gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+    fn gen_view_struct_impl_message_view_internal_new_boxed_in_var(
         &self,
         bitvec_mut_expr: &Expr,
         allocator_ident: &Ident,
@@ -171,19 +171,19 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
         }
     }
 
-    fn gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+    fn gen_view_struct_impl_message_view_internal_new_boxed_in_var(
         &self,
         bitvec_mut_expr: &Expr,
         allocator_ident: &Ident,
     ) -> Result<Stmt> {
         match self.either() {
             FieldOrOneofCase::Field(f) => f
-                .gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+                .gen_view_struct_impl_message_view_internal_new_boxed_in_var(
                     bitvec_mut_expr,
                     allocator_ident,
                 ),
             FieldOrOneofCase::Oneof(o) => o
-                .gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+                .gen_view_struct_impl_message_view_internal_new_boxed_in_var(
                     bitvec_mut_expr,
                     allocator_ident,
                 ),

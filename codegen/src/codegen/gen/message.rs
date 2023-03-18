@@ -508,7 +508,7 @@ impl Message {
             fo.gen_view_struct_impl_message_view_internal_new_boxed_field_value(&bitvec_mut_expr)
         })?;
         let new_in_boxed_stmts = self.try_map_fields_or_oneofs(|fo| {
-            fo.gen_view_struct_impl_message_view_internal_new_in_boxed_var(
+            fo.gen_view_struct_impl_message_view_internal_new_boxed_in_var(
                 &bitvec_mut_expr,
                 &allocator_ident,
             )
