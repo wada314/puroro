@@ -246,7 +246,10 @@ impl Oneof {
             .collect::<Result<Vec<_>>>()
     }
 
-    pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+    pub(crate) fn gen_view_struct_impl_message_view_ser_stmt(
+        &self,
+        out_expr: &Expr,
+    ) -> Result<Stmt> {
         let field_ident = self.gen_fields_struct_field_ident()?;
         Ok(parse2(quote! {
             self.fields.#field_ident.ser_to_write(
@@ -270,6 +273,16 @@ impl Oneof {
         );
         Ok(parse2(quote! {
             self.#getter_ident() == #rhs_expr.#getter_ident()
+        })?)
+    }
+
+    pub(crate) fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue> {
+        let ident = self.gen_fields_struct_field_ident()?;
+        Ok(parse2(quote! {
+            #ident: #PURORO_INTERNAL::OneofUnion::new(#bitvec_mut_expr)
         })?)
     }
 
@@ -335,6 +348,11 @@ impl Oneof {
             for #union_ident< #(#generic_params),* >
             where #( #generic_param_bounds, )*
             {
+                fn new<B: #PURORO_INTERNAL::BitSlice>(bits: &mut B) -> Self {
+                    bits.set_range(#bitfield_begin..#bitfield_end, 0);
+                    Self { _none: (), }
+                }
+
                 type Case = #case_type;
                 type CaseRef<'a> = #case_ref_type
                 where Self: 'a;

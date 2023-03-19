@@ -38,6 +38,10 @@ where
     RustType: Default + PartialEq,
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
@@ -66,8 +70,14 @@ where
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalUnsizedField<RustType, ProtoType, BITFIELD_INDEX>
 where
+    RustType: Default,
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        bitvec.set(BITFIELD_INDEX, false);
+        Self(Default::default(), PhantomData)
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         bitvec: &mut B,
@@ -95,6 +105,10 @@ impl<RustType, ProtoType> FieldType for RepeatedUnsizedField<RustType, ProtoType
 where
     ProtoType: tags::UnsizedType<RustOwnedType = RustType>,
 {
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,

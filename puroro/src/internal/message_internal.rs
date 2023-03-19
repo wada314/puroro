@@ -32,3 +32,7 @@ pub trait MessageInternal: crate::Message {
         scoped_iter: &mut ScopedIter<'a, I>,
     ) -> Result<()>;
 }
+
+pub trait MessageViewInternal: crate::MessageView {
+    fn new_boxed() -> Box<Self>;
+}

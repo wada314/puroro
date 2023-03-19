@@ -14,8 +14,8 @@
 
 use super::super::util::*;
 use super::{
-    DataTypeBase, FieldBaseExt, FieldOrOneofExt, Message, PackageOrMessage, PackageOrMessageExt,
-    PURORO_INTERNAL, PURORO_LIB,
+    DataTypeBase, FieldBaseExt, FieldOrOneof, FieldOrOneofExt, Message, PackageOrMessage,
+    PackageOrMessageExt, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{parse2, Attribute, Expr, Ident, Item, ItemImpl, Path, Type};
 use crate::Result;
@@ -132,12 +132,12 @@ impl Message {
         let borrow_impl = self.gen_message_struct_impl_borrow()?;
         let clone_impl = self.gen_message_struct_impl_clone()?;
         let debug_impl = self.gen_message_struct_impl_debug()?;
+        let default_impl = self.gen_message_struct_impl_default()?;
         let deref_impl = self.gen_message_struct_impl_deref()?;
+        let partial_eq_impl = self.gen_message_struct_impl_partial_eq()?;
         let docs = self.gen_message_struct_doc_attrs()?;
 
         let item_struct = parse2(quote! {
-            #[derive(::std::default::Default)]
-            #[derive(::std::cmp::PartialEq)]
             #(#docs)*
             pub struct #ident(::std::boxed::Box<#view_type>);
         })?;
@@ -156,7 +156,9 @@ impl Message {
             borrow_impl.into(),
             clone_impl.into(),
             debug_impl.into(),
+            default_impl.into(),
             deref_impl.into(),
+            partial_eq_impl.into(),
         ])
     }
 
@@ -172,7 +174,6 @@ impl Message {
             .collect::<Result<Vec<_>>>()?;
 
         Ok(vec![parse2(quote! {
-            #[derive(::std::default::Default)]
             pub struct #ident <#(#generics),*> {
                 #(#fields,)*
             }
@@ -204,6 +205,8 @@ impl Message {
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
 
+        let message_view_impl = self.gen_view_struct_impl_message_view()?;
+        let message_view_internal_impl = self.gen_view_struct_impl_message_view_internal()?;
         let drop_impl = self.gen_view_struct_impl_drop()?;
         let debug_impl = self.gen_view_struct_impl_debug()?;
         let partial_eq_impl = self.gen_view_struct_impl_partial_eq()?;
@@ -211,7 +214,6 @@ impl Message {
 
         Ok(vec![
             parse2(quote! {
-                #[derive(::std::default::Default)]
                 pub struct #ident {
                     pub(super) fields: #fields_struct_type,
                     pub(super) shared: #PURORO_INTERNAL::SharedItemsImpl<#bitfield_size_in_u32_array>,
@@ -223,6 +225,8 @@ impl Message {
                     #(#oneof_field_methods)*
                 }
             })?,
+            message_view_impl.into(),
+            message_view_internal_impl.into(),
             drop_impl.into(),
             debug_impl.into(),
             partial_eq_impl.into(),
@@ -256,15 +260,12 @@ impl Message {
 
     fn gen_message_struct_message_impl(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
-        let out_ident = quote! { out };
-        let out_expr = parse2(quote! { out })?;
-        let ser_stmts = self
-            .fields_or_oneofs()?
-            .map(|fo| fo.gen_message_struct_impl_message_ser_stmt(&out_expr))
-            .collect::<Result<Vec<_>>>()?;
+        let view_type = self.gen_view_struct_type()?;
 
         Ok(parse2(quote! {
             impl #PURORO_LIB::Message for #ident {
+                type ViewType = #view_type;
+
                 fn from_bytes_iter<I: ::std::iter::Iterator<Item=::std::io::Result<u8>>>(iter: I) -> #PURORO_LIB::Result<Self> {
                     let mut msg = <Self as ::std::default::Default>::default();
                     msg.merge_from_bytes_iter(iter)?;
@@ -280,14 +281,6 @@ impl Message {
                     <Self as #PURORO_INTERNAL::MessageInternal>::merge_from_scoped_bytes_iter(self, &mut scoped_iter)?;
                     scoped_iter.drop_and_check_scope_completed()?;
                     Ok(())
-                }
-
-                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
-                    #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
-                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
-                    #(#ser_stmts)*
-                    self.shared.unknown_fields().ser_to_write(#out_ident)?;
-                    ::std::result::Result::Ok(())
                 }
             }
         })?)
@@ -387,6 +380,18 @@ impl Message {
         })?)
     }
 
+    fn gen_message_struct_impl_default(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+        Ok(parse2(quote! {
+            impl ::std::default::Default for self::#ident {
+                fn default() -> Self {
+                    Self(<#view_type as #PURORO_INTERNAL::MessageViewInternal>::new_boxed())
+                }
+            }
+        })?)
+    }
+
     fn gen_message_struct_impl_deref(&self) -> Result<ItemImpl> {
         let ident = self.gen_message_struct_ident()?;
         let view_type = self.gen_view_struct_type()?;
@@ -396,6 +401,69 @@ impl Message {
                 type Target = #view_type;
                 fn deref(&self) -> &Self::Target {
                     <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+                }
+            }
+        })?)
+    }
+
+    fn gen_message_struct_impl_partial_eq(&self) -> Result<ItemImpl> {
+        let ident = self.gen_message_struct_ident()?;
+        let view_type = self.gen_view_struct_type()?;
+
+        Ok(parse2(quote! {
+            impl ::std::cmp::PartialEq for #ident {
+                fn eq(&self, rhs: &Self) -> bool {
+                    <#view_type as ::std::cmp::PartialEq>::eq(&self.0, &rhs.0)
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_message_view(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+        let message_type = self.gen_message_struct_type()?;
+        let out_ident = quote! { out };
+        let out_expr = parse2(quote! { out })?;
+        let ser_stmts = self.try_map_fields_or_oneofs(|fo| {
+            fo.gen_view_struct_impl_message_view_ser_stmt(&out_expr)
+        })?;
+
+        Ok(parse2(quote! {
+            impl #PURORO_LIB::MessageView for self::#ident {
+                type MessageType = #message_type;
+
+                fn to_bytes<W: ::std::io::Write>(&self, #[allow(unused)] #out_ident: &mut W) -> #PURORO_LIB::Result<()> {
+                    #[allow(unused)] use #PURORO_INTERNAL::OneofUnion as _;
+                    use #PURORO_INTERNAL::{SharedItems as _, UnknownFields as _};
+                    #(#ser_stmts)*
+                    self.shared.unknown_fields().ser_to_write(#out_ident)?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+        })?)
+    }
+
+    fn gen_view_struct_impl_message_view_internal(&self) -> Result<ItemImpl> {
+        let ident = self.gen_view_struct_ident()?;
+        let bitvec_mut_expr: Expr = parse2(quote! { shared.bitfield_mut() })?;
+        let fields_path = self.gen_fields_struct_path()?;
+        let new_field_values = self.try_map_fields_or_oneofs(|fo| {
+            fo.gen_view_struct_impl_message_view_internal_new_boxed_field_value(&bitvec_mut_expr)
+        })?;
+        let bitfield_size_in_u32_array = (self.bitfield_size()? + 31) / 32;
+
+        Ok(parse2(quote! {
+            impl #PURORO_INTERNAL::MessageViewInternal for self::#ident {
+                fn new_boxed() -> ::std::boxed::Box<Self> {
+                    use #PURORO_INTERNAL::SharedItems as _;
+                    let mut shared: #PURORO_INTERNAL::SharedItemsImpl::<#bitfield_size_in_u32_array> = ::std::default::Default::default();
+                    let fields = #fields_path {
+                        #(#new_field_values),*
+                    };
+                    ::std::boxed::Box::new(Self {
+                        fields,
+                        shared,
+                    })
                 }
             }
         })?)
@@ -494,5 +562,12 @@ impl Message {
             return Ok(Vec::new());
         };
         Ok(sci.gen_doc_attributes()?)
+    }
+
+    fn try_map_fields_or_oneofs<F, R>(&self, f: F) -> Result<Vec<R>>
+    where
+        F: FnMut(&dyn FieldOrOneof) -> Result<R>,
+    {
+        self.fields_or_oneofs()?.map(f).collect::<Result<Vec<_>>>()
     }
 }

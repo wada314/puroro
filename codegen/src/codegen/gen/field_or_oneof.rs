@@ -36,9 +36,13 @@ pub(crate) trait FieldOrOneofExt {
         &self,
         field_data_expr: &Expr,
     ) -> Result<Vec<Arm>>;
-    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue>;
+    fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue>;
     fn gen_view_struct_impl_debug_method_call(&self, receiver: &mut Expr) -> Result<()>;
+    fn gen_view_struct_impl_message_view_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt>;
     fn gen_view_struct_impl_partial_eq_cmp(&self, rhs_expr: &Expr) -> Result<Expr>;
 }
 
@@ -120,13 +124,6 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
         }
     }
 
-    fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
-        match self.either() {
-            FieldOrOneofCase::Field(f) => f.gen_message_struct_impl_message_ser_stmt(out_expr),
-            FieldOrOneofCase::Oneof(o) => o.gen_message_struct_impl_message_ser_stmt(out_expr),
-        }
-    }
-
     fn gen_message_struct_impl_clone_field_value(&self) -> Result<FieldValue> {
         match self.either() {
             FieldOrOneofCase::Field(f) => f.gen_message_struct_impl_clone_field_value(),
@@ -145,6 +142,27 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
         match self.either() {
             FieldOrOneofCase::Field(f) => f.gen_view_struct_impl_partial_eq_cmp(rhs_expr),
             FieldOrOneofCase::Oneof(o) => o.gen_view_struct_impl_partial_eq_cmp(rhs_expr),
+        }
+    }
+
+    fn gen_view_struct_impl_message_view_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => f.gen_view_struct_impl_message_view_ser_stmt(out_expr),
+            FieldOrOneofCase::Oneof(o) => o.gen_view_struct_impl_message_view_ser_stmt(out_expr),
+        }
+    }
+
+    fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue> {
+        match self.either() {
+            FieldOrOneofCase::Field(f) => {
+                f.gen_view_struct_impl_message_view_internal_new_boxed_field_value(bitvec_mut_expr)
+            }
+            FieldOrOneofCase::Oneof(o) => {
+                o.gen_view_struct_impl_message_view_internal_new_boxed_field_value(bitvec_mut_expr)
+            }
         }
     }
 }

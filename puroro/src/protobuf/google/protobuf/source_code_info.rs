@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Location(
     ::std::boxed::Box<
         self::_root::google::protobuf::source_code_info::_view::LocationView,
@@ -101,6 +99,7 @@ impl Location {
     pub const LEADING_DETACHED_COMMENTS_FIELD_NUMBER: i32 = 6i32;
 }
 impl self::_puroro::Message for Location {
+    type ViewType = self::_root::google::protobuf::source_code_info::_view::LocationView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -122,47 +121,6 @@ impl self::_puroro::Message for Location {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.path,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.span,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.leading_comments,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.trailing_comments,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.leading_detached_comments,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for Location {
@@ -282,10 +240,25 @@ impl ::std::fmt::Debug for Location {
         )
     }
 }
+impl ::std::default::Default for self::Location {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::source_code_info::_view::LocationView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Location {
     type Target = self::_root::google::protobuf::source_code_info::_view::LocationView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Location {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::source_code_info::_view::LocationView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -302,7 +275,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct LocationView {
         pub(super) fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields::<
             self::_pinternal::RepeatedNumericalField::<
@@ -477,6 +449,70 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::LocationView {
+        type MessageType = self::_root::google::protobuf::source_code_info::Location;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.path,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.span,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.leading_comments,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.trailing_comments,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.leading_detached_comments,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::LocationView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::source_code_info::_fields::LocationFields {
+                path: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                span: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                leading_comments: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                trailing_comments: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                leading_detached_comments: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for LocationView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -571,7 +607,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct LocationFields<
         TPath,
         TSpan,

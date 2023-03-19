@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Submsg(
     ::std::boxed::Box<self::_root::full_coverage2::msg::_view::SubmsgView>,
 );
@@ -58,6 +56,7 @@ impl Submsg {
     pub const I64_REQUIRED_FIELD_NUMBER: i32 = 101i32;
 }
 impl self::_puroro::Message for Submsg {
+    type ViewType = self::_root::full_coverage2::msg::_view::SubmsgView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -79,29 +78,6 @@ impl self::_puroro::Message for Submsg {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_required,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i64_required,
-            self.shared.bitfield(),
-            101i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for Submsg {
@@ -189,10 +165,25 @@ impl ::std::fmt::Debug for Submsg {
         )
     }
 }
+impl ::std::default::Default for self::Submsg {
+    fn default() -> Self {
+        Self(
+            <self::_root::full_coverage2::msg::_view::SubmsgView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Submsg {
     type Target = self::_root::full_coverage2::msg::_view::SubmsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Submsg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::full_coverage2::msg::_view::SubmsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -209,7 +200,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct SubmsgView {
         pub(super) fields: self::_root::full_coverage2::msg::_fields::SubmsgFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -271,6 +261,43 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::SubmsgView {
+        type MessageType = self::_root::full_coverage2::msg::Submsg;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i32_required,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i64_required,
+                self.shared.bitfield(),
+                101i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::SubmsgView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::full_coverage2::msg::_fields::SubmsgFields {
+                i32_required: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_required: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for SubmsgView {
@@ -340,7 +367,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct SubmsgFields<TI32Required, TI64Required> {
         pub i32_required: TI32Required,
         pub i64_required: TI64Required,

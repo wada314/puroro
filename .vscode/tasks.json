@@ -220,6 +220,14 @@
             },
             "group": "build",
             "label": "rust: cargo run -p update-puroro-doc-samples"
-        }
+        },
+        {
+            "group": "build",
+            "label": "rust: generate in-puroro protobufs",
+            "dependsOn": [
+                "rust: cargo run -p update-puroro-protobuf",
+                "rust: cargo run -p update-puroro-doc-samples"
+            ]
+        },
     ]
 }

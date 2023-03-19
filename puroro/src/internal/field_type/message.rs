@@ -17,6 +17,7 @@ use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
 use crate::internal::bitvec::BitSlice;
 use crate::internal::message_internal::MessageInternal;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
+use crate::message::MessageView;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 use ::std::ops::Deref;
@@ -28,8 +29,13 @@ pub struct RepeatedMessageField<M>(Vec<M>);
 
 impl<M> FieldType for SingularMessageField<M>
 where
-    M: MessageInternal + Default,
+    M: MessageInternal + Default + Deref,
+    <M as Deref>::Target: MessageView,
 {
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(None)
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
@@ -56,8 +62,13 @@ where
 
 impl<M> FieldType for RepeatedMessageField<M>
 where
-    M: MessageInternal + Default,
+    M: MessageInternal + Default + Deref,
+    <M as Deref>::Target: MessageView,
 {
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default())
+    }
+
     fn deser_from_ld_scoped_iter<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(
         &mut self,
         _bitvec: &mut B,
@@ -86,6 +97,7 @@ where
 impl<M> NonRepeatedFieldType for SingularMessageField<M>
 where
     M: MessageInternal + Default + Deref,
+    <M as Deref>::Target: MessageView,
 {
     type GetterOptType<'a> = Option<&'a M::Target>
     where
@@ -119,7 +131,11 @@ where
     }
 }
 
-impl<M: MessageInternal + Default + Clone + Deref> RepeatedFieldType for RepeatedMessageField<M> {
+impl<M> RepeatedFieldType for RepeatedMessageField<M>
+where
+    M: MessageInternal + Default + Clone + Deref,
+    <M as Deref>::Target: MessageView,
+{
     type ContainerType = Vec<M>;
     fn get_field_mut<B: BitSlice>(&mut self, _bitvec: &mut B) -> &mut Self::ContainerType {
         &mut self.0

@@ -11,8 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod msg;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg(::std::boxed::Box<self::_root::full_coverage3::_view::MsgView>);
 impl Msg {
     pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
@@ -843,6 +841,7 @@ impl Msg {
     pub const F64_REPEATED_FIELD_NUMBER: i32 = 193i32;
 }
 impl self::_puroro::Message for Msg {
+    type ViewType = self::_root::full_coverage3::_view::MsgView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -864,305 +863,6 @@ impl self::_puroro::Message for Msg {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_unlabeled,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_optional,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i32_repeated,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.float_unlabeled,
-            self.shared.bitfield(),
-            11i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.float_optional,
-            self.shared.bitfield(),
-            12i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.float_repeated,
-            self.shared.bitfield(),
-            13i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.bytes_unlabeled,
-            self.shared.bitfield(),
-            21i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.bytes_optional,
-            self.shared.bitfield(),
-            22i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.bytes_repeated,
-            self.shared.bitfield(),
-            23i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.string_unlabeled,
-            self.shared.bitfield(),
-            31i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.string_optional,
-            self.shared.bitfield(),
-            32i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.string_repeated,
-            self.shared.bitfield(),
-            33i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.enum_unlabeled,
-            self.shared.bitfield(),
-            41i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.enum_optional,
-            self.shared.bitfield(),
-            42i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.enum_repeated,
-            self.shared.bitfield(),
-            43i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.submsg_unlabeled,
-            self.shared.bitfield(),
-            51i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.submsg_optional,
-            self.shared.bitfield(),
-            52i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.submsg_repeated,
-            self.shared.bitfield(),
-            53i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i64_unlabeled,
-            self.shared.bitfield(),
-            101i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i64_optional,
-            self.shared.bitfield(),
-            102i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.i64_repeated,
-            self.shared.bitfield(),
-            103i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.u32_unlabeled,
-            self.shared.bitfield(),
-            111i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.u32_optional,
-            self.shared.bitfield(),
-            112i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.u32_repeated,
-            self.shared.bitfield(),
-            113i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.u64_unlabeled,
-            self.shared.bitfield(),
-            121i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.u64_optional,
-            self.shared.bitfield(),
-            122i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.u64_repeated,
-            self.shared.bitfield(),
-            123i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.s32_unlabeled,
-            self.shared.bitfield(),
-            131i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.s32_optional,
-            self.shared.bitfield(),
-            132i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.s32_repeated,
-            self.shared.bitfield(),
-            133i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.s64_unlabeled,
-            self.shared.bitfield(),
-            141i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.s64_optional,
-            self.shared.bitfield(),
-            142i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.s64_repeated,
-            self.shared.bitfield(),
-            143i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.fixed32_unlabeled,
-            self.shared.bitfield(),
-            151i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.fixed32_optional,
-            self.shared.bitfield(),
-            152i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.fixed32_repeated,
-            self.shared.bitfield(),
-            153i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.fixed64_unlabeled,
-            self.shared.bitfield(),
-            161i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.fixed64_optional,
-            self.shared.bitfield(),
-            162i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.fixed64_repeated,
-            self.shared.bitfield(),
-            163i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.sfixed32_unlabeled,
-            self.shared.bitfield(),
-            171i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.sfixed32_optional,
-            self.shared.bitfield(),
-            172i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.sfixed32_repeated,
-            self.shared.bitfield(),
-            173i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.sfixed64_unlabeled,
-            self.shared.bitfield(),
-            181i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.sfixed64_optional,
-            self.shared.bitfield(),
-            182i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.sfixed64_repeated,
-            self.shared.bitfield(),
-            183i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.f64_unlabeled,
-            self.shared.bitfield(),
-            191i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.f64_optional,
-            self.shared.bitfield(),
-            192i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.f64_repeated,
-            self.shared.bitfield(),
-            193i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for Msg {
@@ -1663,10 +1363,25 @@ impl ::std::fmt::Debug for Msg {
         )
     }
 }
+impl ::std::default::Default for self::Msg {
+    fn default() -> Self {
+        Self(
+            <self::_root::full_coverage3::_view::MsgView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::full_coverage3::_view::MsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::full_coverage3::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -1683,7 +1398,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MsgView {
         pub(super) fields: self::_root::full_coverage3::_fields::MsgFields::<
             self::_pinternal::SingularNumericalField::<
@@ -2801,6 +2515,393 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::MsgView {
+        type MessageType = self::_root::full_coverage3::Msg;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i32_unlabeled,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i32_optional,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i32_repeated,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.float_unlabeled,
+                self.shared.bitfield(),
+                11i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.float_optional,
+                self.shared.bitfield(),
+                12i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.float_repeated,
+                self.shared.bitfield(),
+                13i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.bytes_unlabeled,
+                self.shared.bitfield(),
+                21i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.bytes_optional,
+                self.shared.bitfield(),
+                22i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.bytes_repeated,
+                self.shared.bitfield(),
+                23i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.string_unlabeled,
+                self.shared.bitfield(),
+                31i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.string_optional,
+                self.shared.bitfield(),
+                32i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.string_repeated,
+                self.shared.bitfield(),
+                33i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.enum_unlabeled,
+                self.shared.bitfield(),
+                41i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.enum_optional,
+                self.shared.bitfield(),
+                42i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.enum_repeated,
+                self.shared.bitfield(),
+                43i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.submsg_unlabeled,
+                self.shared.bitfield(),
+                51i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.submsg_optional,
+                self.shared.bitfield(),
+                52i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.submsg_repeated,
+                self.shared.bitfield(),
+                53i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i64_unlabeled,
+                self.shared.bitfield(),
+                101i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i64_optional,
+                self.shared.bitfield(),
+                102i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.i64_repeated,
+                self.shared.bitfield(),
+                103i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.u32_unlabeled,
+                self.shared.bitfield(),
+                111i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.u32_optional,
+                self.shared.bitfield(),
+                112i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.u32_repeated,
+                self.shared.bitfield(),
+                113i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.u64_unlabeled,
+                self.shared.bitfield(),
+                121i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.u64_optional,
+                self.shared.bitfield(),
+                122i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.u64_repeated,
+                self.shared.bitfield(),
+                123i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.s32_unlabeled,
+                self.shared.bitfield(),
+                131i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.s32_optional,
+                self.shared.bitfield(),
+                132i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.s32_repeated,
+                self.shared.bitfield(),
+                133i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.s64_unlabeled,
+                self.shared.bitfield(),
+                141i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.s64_optional,
+                self.shared.bitfield(),
+                142i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.s64_repeated,
+                self.shared.bitfield(),
+                143i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.fixed32_unlabeled,
+                self.shared.bitfield(),
+                151i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.fixed32_optional,
+                self.shared.bitfield(),
+                152i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.fixed32_repeated,
+                self.shared.bitfield(),
+                153i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.fixed64_unlabeled,
+                self.shared.bitfield(),
+                161i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.fixed64_optional,
+                self.shared.bitfield(),
+                162i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.fixed64_repeated,
+                self.shared.bitfield(),
+                163i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.sfixed32_unlabeled,
+                self.shared.bitfield(),
+                171i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.sfixed32_optional,
+                self.shared.bitfield(),
+                172i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.sfixed32_repeated,
+                self.shared.bitfield(),
+                173i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.sfixed64_unlabeled,
+                self.shared.bitfield(),
+                181i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.sfixed64_optional,
+                self.shared.bitfield(),
+                182i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.sfixed64_repeated,
+                self.shared.bitfield(),
+                183i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.f64_unlabeled,
+                self.shared.bitfield(),
+                191i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.f64_optional,
+                self.shared.bitfield(),
+                192i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.f64_repeated,
+                self.shared.bitfield(),
+                193i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MsgView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::full_coverage3::_fields::MsgFields {
+                i32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i32_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                float_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                float_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                float_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                bytes_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                bytes_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                bytes_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                string_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                string_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                string_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                submsg_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                submsg_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                submsg_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                i64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u32_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                u64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s32_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                s64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                fixed32_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed32_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed32_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed64_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed64_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                fixed64_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed32_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed32_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed32_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed64_unlabeled: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed64_optional: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                sfixed64_repeated: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                f64_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                f64_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                f64_repeated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for MsgView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -3210,7 +3311,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MsgFields<
         TI32Unlabeled,
         TI32Optional,

@@ -18,6 +18,8 @@ use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 
 pub trait OneofUnion {
+    fn new<B: BitSlice>(bits: &mut B) -> Self;
+
     type Case: OneofCase;
     type CaseRef<'a>
     where

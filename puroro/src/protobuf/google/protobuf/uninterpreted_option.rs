@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 /** The name of the uninterpreted option.  Each string represents a segment in
  a dot-separated name.  is_extension is true iff a segment represents an
  extension (denoted with parentheses in options specs in .proto files).
@@ -66,6 +64,7 @@ impl NamePart {
     pub const IS_EXTENSION_FIELD_NUMBER: i32 = 2i32;
 }
 impl self::_puroro::Message for NamePart {
+    type ViewType = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -87,29 +86,6 @@ impl self::_puroro::Message for NamePart {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name_part,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.is_extension,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for NamePart {
@@ -202,10 +178,25 @@ impl ::std::fmt::Debug for NamePart {
         )
     }
 }
+impl ::std::default::Default for self::NamePart {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for NamePart {
     type Target = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for NamePart {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -222,7 +213,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct NamePartView {
         pub(super) fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -284,6 +274,43 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::NamePartView {
+        type MessageType = self::_root::google::protobuf::uninterpreted_option::NamePart;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name_part,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.is_extension,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::NamePartView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields {
+                name_part: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                is_extension: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for NamePartView {
@@ -351,7 +378,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct NamePartFields<TNamePart, TIsExtension> {
         pub name_part: TNamePart,
         pub is_extension: TIsExtension,

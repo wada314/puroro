@@ -156,7 +156,10 @@ impl Field {
             }
         })?)
     }
-    pub(crate) fn gen_message_struct_impl_message_ser_stmt(&self, out_expr: &Expr) -> Result<Stmt> {
+    pub(crate) fn gen_view_struct_impl_message_view_ser_stmt(
+        &self,
+        out_expr: &Expr,
+    ) -> Result<Stmt> {
         let ident = self.gen_fields_struct_field_ident()?;
         let number = self.number()?;
         Ok(parse2(quote! {
@@ -222,6 +225,16 @@ impl Field {
             alloc
         };
         Ok(alloc.maybe_optional)
+    }
+
+    pub(crate) fn gen_view_struct_impl_message_view_internal_new_boxed_field_value(
+        &self,
+        bitvec_mut_expr: &Expr,
+    ) -> Result<FieldValue> {
+        let ident = self.gen_fields_struct_field_ident()?;
+        Ok(parse2(quote! {
+            #ident: #PURORO_INTERNAL::FieldType::new(#bitvec_mut_expr)
+        })?)
     }
 
     fn gen_message_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {

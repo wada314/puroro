@@ -131,9 +131,9 @@ impl OneofField {
                     let r#type = self.r#type()?;
                     parse2(match r#type {
                         LengthDelimited(Message(m)) => {
-                            let message_path = m.try_upgrade()?.gen_message_struct_type()?;
+                            let message_type = m.try_upgrade()?.gen_message_struct_type()?;
                             quote! {
-                                HeapMessageField::< #message_path >
+                                MessageField::< #message_type >
                             }
                         }
                         Variant(_) | Bits32(_) | Bits64(_) => {

@@ -11,8 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod code_generator_response;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 /** The version number of protocol compiler.
 */
 pub struct Version(
@@ -101,6 +99,7 @@ impl Version {
     pub const SUFFIX_FIELD_NUMBER: i32 = 4i32;
 }
 impl self::_puroro::Message for Version {
+    type ViewType = self::_root::google::protobuf::compiler::_view::VersionView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -122,41 +121,6 @@ impl self::_puroro::Message for Version {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.major,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.minor,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.patch,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.suffix,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for Version {
@@ -264,14 +228,27 @@ impl ::std::fmt::Debug for Version {
         )
     }
 }
+impl ::std::default::Default for self::Version {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::compiler::_view::VersionView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Version {
     type Target = self::_root::google::protobuf::compiler::_view::VersionView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for Version {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::VersionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** An encoded CodeGeneratorRequest is written to the plugin's stdin.
 */
 pub struct CodeGeneratorRequest(
@@ -358,6 +335,7 @@ impl CodeGeneratorRequest {
     pub const COMPILER_VERSION_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for CodeGeneratorRequest {
+    type ViewType = self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -379,41 +357,6 @@ impl self::_puroro::Message for CodeGeneratorRequest {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.file_to_generate,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.parameter,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.proto_file,
-            self.shared.bitfield(),
-            15i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.compiler_version,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for CodeGeneratorRequest {
@@ -524,14 +467,27 @@ impl ::std::fmt::Debug for CodeGeneratorRequest {
         )
     }
 }
+impl ::std::default::Default for self::CodeGeneratorRequest {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for CodeGeneratorRequest {
     type Target = self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for CodeGeneratorRequest {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** The plugin writes an encoded CodeGeneratorResponse to stdout.
 */
 pub struct CodeGeneratorResponse(
@@ -598,6 +554,7 @@ impl CodeGeneratorResponse {
     pub const FILE_FIELD_NUMBER: i32 = 15i32;
 }
 impl self::_puroro::Message for CodeGeneratorResponse {
+    type ViewType = self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -619,35 +576,6 @@ impl self::_puroro::Message for CodeGeneratorResponse {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.error,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.supported_features,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.file,
-            self.shared.bitfield(),
-            15i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for CodeGeneratorResponse {
@@ -749,10 +677,25 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
         )
     }
 }
+impl ::std::default::Default for self::CodeGeneratorResponse {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for CodeGeneratorResponse {
     type Target = self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for CodeGeneratorResponse {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -769,7 +712,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct VersionView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::VersionFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -892,6 +834,57 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::VersionView {
+        type MessageType = self::_root::google::protobuf::compiler::Version;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.major,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.minor,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.patch,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.suffix,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::VersionView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::_fields::VersionFields {
+                major: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                minor: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                patch: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                suffix: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for VersionView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -944,7 +937,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorRequestView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields::<
             self::_pinternal::RepeatedUnsizedField::<
@@ -1062,6 +1054,59 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::CodeGeneratorRequestView {
+        type MessageType = self::_root::google::protobuf::compiler::CodeGeneratorRequest;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.file_to_generate,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.parameter,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.proto_file,
+                self.shared.bitfield(),
+                15i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.compiler_version,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::CodeGeneratorRequestView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields {
+                file_to_generate: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                parameter: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                proto_file: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                compiler_version: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for CodeGeneratorRequestView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -1133,7 +1178,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorResponseView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -1221,6 +1265,52 @@ pub mod _view {
             RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
         }
     }
+    impl self::_puroro::MessageView for self::CodeGeneratorResponseView {
+        type MessageType = self::_root::google::protobuf::compiler::CodeGeneratorResponse;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.error,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.supported_features,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.file,
+                self.shared.bitfield(),
+                15i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::CodeGeneratorResponseView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields {
+                error: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                supported_features: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                file: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for CodeGeneratorResponseView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -1293,14 +1383,12 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct VersionFields<TMajor, TMinor, TPatch, TSuffix> {
         pub major: TMajor,
         pub minor: TMinor,
         pub patch: TPatch,
         pub suffix: TSuffix,
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorRequestFields<
         TFileToGenerate,
         TParameter,
@@ -1312,7 +1400,6 @@ pub mod _fields {
         pub proto_file: TProtoFile,
         pub compiler_version: TCompilerVersion,
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorResponseFields<TError, TSupportedFeatures, TFile> {
         pub error: TError,
         pub supported_features: TSupportedFeatures,

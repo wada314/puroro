@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct ConflictCase(
     ::std::boxed::Box<self::_root::name_conflict_case::message::_view::ConflictCaseView>,
 );
@@ -38,6 +36,7 @@ impl ConflictCase {
     pub const THIS_IS_MESSAGE_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for ConflictCase {
+    type ViewType = self::_root::name_conflict_case::message::_view::ConflictCaseView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -59,23 +58,6 @@ impl self::_puroro::Message for ConflictCase {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.this_is_message_field,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for ConflictCase {
@@ -159,10 +141,25 @@ impl ::std::fmt::Debug for ConflictCase {
         )
     }
 }
+impl ::std::default::Default for self::ConflictCase {
+    fn default() -> Self {
+        Self(
+            <self::_root::name_conflict_case::message::_view::ConflictCaseView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for ConflictCase {
     type Target = self::_root::name_conflict_case::message::_view::ConflictCaseView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for ConflictCase {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::name_conflict_case::message::_view::ConflictCaseView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -179,7 +176,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct ConflictCaseView {
         pub(super) fields: self::_root::name_conflict_case::message::_fields::ConflictCaseFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -213,6 +209,38 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::ConflictCaseView {
+        type MessageType = self::_root::name_conflict_case::message::ConflictCase;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.this_is_message_field,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ConflictCaseView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::name_conflict_case::message::_fields::ConflictCaseFields {
+                this_is_message_field: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for ConflictCaseView {
@@ -280,7 +308,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct ConflictCaseFields<TThisIsMessageField> {
         pub this_is_message_field: TThisIsMessageField,
     }
@@ -371,6 +398,10 @@ impl<TThisIsOneofField> self::_pinternal::OneofUnion for Conflict<TThisIsOneofFi
 where
     TThisIsOneofField: self::_pinternal::OneofFieldType,
 {
+    fn new<B: self::_pinternal::BitSlice>(bits: &mut B) -> Self {
+        bits.set_range(0usize..2usize, 0);
+        Self { _none: () }
+    }
     type Case = self::_root::name_conflict_case::message::_case::ConflictCase;
     type CaseRef<'a> = self::_root::name_conflict_case::message::_case::ConflictCase::<
         <TThisIsOneofField as self::_pinternal::OneofFieldType>::GetterType::<'a>,

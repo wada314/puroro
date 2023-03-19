@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct ExtensionRange(
     ::std::boxed::Box<
         self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView,
@@ -82,6 +80,7 @@ impl ExtensionRange {
     pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for ExtensionRange {
+    type ViewType = self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -103,35 +102,6 @@ impl self::_puroro::Message for ExtensionRange {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.start,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.end,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for ExtensionRange {
@@ -233,14 +203,27 @@ impl ::std::fmt::Debug for ExtensionRange {
         )
     }
 }
+impl ::std::default::Default for self::ExtensionRange {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for ExtensionRange {
     type Target = self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for ExtensionRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::descriptor_proto::_view::ExtensionRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Range of reserved tag numbers. Reserved tag numbers may not be used by
  fields or extension ranges in the same message. Reserved ranges may
  not overlap.
@@ -293,6 +276,7 @@ impl ReservedRange {
     pub const END_FIELD_NUMBER: i32 = 2i32;
 }
 impl self::_puroro::Message for ReservedRange {
+    type ViewType = self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -314,29 +298,6 @@ impl self::_puroro::Message for ReservedRange {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.start,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.end,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for ReservedRange {
@@ -429,10 +390,25 @@ impl ::std::fmt::Debug for ReservedRange {
         )
     }
 }
+impl ::std::default::Default for self::ReservedRange {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for ReservedRange {
     type Target = self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for ReservedRange {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::descriptor_proto::_view::ReservedRangeView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -449,7 +425,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct ExtensionRangeView {
         pub(super) fields: self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -545,6 +520,50 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::ExtensionRangeView {
+        type MessageType = self::_root::google::protobuf::descriptor_proto::ExtensionRange;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.start,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.end,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ExtensionRangeView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::descriptor_proto::_fields::ExtensionRangeFields {
+                start: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                end: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for ExtensionRangeView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -594,7 +613,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct ReservedRangeView {
         pub(super) fields: self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -654,6 +672,43 @@ pub mod _view {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(&self.fields.end, self.shared.bitfield())
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::ReservedRangeView {
+        type MessageType = self::_root::google::protobuf::descriptor_proto::ReservedRange;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.start,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.end,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ReservedRangeView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::descriptor_proto::_fields::ReservedRangeFields {
+                start: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                end: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for ReservedRangeView {
@@ -719,13 +774,11 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct ExtensionRangeFields<TStart, TEnd, TOptions> {
         pub start: TStart,
         pub end: TEnd,
         pub options: TOptions,
     }
-    #[derive(::std::default::Default)]
     pub struct ReservedRangeFields<TStart, TEnd> {
         pub start: TStart,
         pub end: TEnd,
