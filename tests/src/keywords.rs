@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg(::std::boxed::Box<self::_root::keywords::_view::MsgView>);
 impl Msg {
     pub fn type_mut(&mut self) -> &mut i32 {
@@ -130,14 +128,27 @@ impl ::std::fmt::Debug for Msg {
         <self::_root::keywords::_view::MsgView as ::std::fmt::Debug>::fmt(&self, fmt)
     }
 }
+impl ::std::default::Default for self::Msg {
+    fn default() -> Self {
+        Self(
+            <self::_root::keywords::_view::MsgView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::keywords::_view::MsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::keywords::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct _Self(::std::boxed::Box<self::_root::keywords::_view::SelfView>);
 impl _Self {
     pub fn type_mut(&mut self) -> &mut i32 {
@@ -256,10 +267,25 @@ impl ::std::fmt::Debug for _Self {
         <self::_root::keywords::_view::SelfView as ::std::fmt::Debug>::fmt(&self, fmt)
     }
 }
+impl ::std::default::Default for self::_Self {
+    fn default() -> Self {
+        Self(
+            <self::_root::keywords::_view::SelfView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for _Self {
     type Target = self::_root::keywords::_view::SelfView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for _Self {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::keywords::_view::SelfView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -276,7 +302,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MsgView {
         pub(super) fields: self::_root::keywords::_fields::MsgFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -384,7 +409,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct SelfView {
         pub(super) fields: self::_root::keywords::_fields::SelfFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -509,11 +533,9 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MsgFields<TType> {
         pub r#type: TType,
     }
-    #[derive(::std::default::Default)]
     pub struct SelfFields<TType> {
         pub r#type: TType,
     }

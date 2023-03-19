@@ -11,8 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod message;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Message(
     ::std::boxed::Box<self::_root::name_conflict_case::_view::MessageView>,
 );
@@ -149,10 +147,25 @@ impl ::std::fmt::Debug for Message {
         )
     }
 }
+impl ::std::default::Default for self::Message {
+    fn default() -> Self {
+        Self(
+            <self::_root::name_conflict_case::_view::MessageView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Message {
     type Target = self::_root::name_conflict_case::_view::MessageView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Message {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::name_conflict_case::_view::MessageView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -169,7 +182,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MessageView {
         pub(super) fields: self::_root::name_conflict_case::_fields::MessageFields::<
             self::_root::name_conflict_case::message::Conflict::<
@@ -288,7 +300,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MessageFields<TConflict> {
         pub conflict: TConflict,
     }

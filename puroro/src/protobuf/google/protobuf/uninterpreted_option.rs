@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 /** The name of the uninterpreted option.  Each string represents a segment in
  a dot-separated name.  is_extension is true iff a segment represents an
  extension (denoted with parentheses in options specs in .proto files).
@@ -180,10 +178,25 @@ impl ::std::fmt::Debug for NamePart {
         )
     }
 }
+impl ::std::default::Default for self::NamePart {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for NamePart {
     type Target = self::_root::google::protobuf::uninterpreted_option::_view::NamePartView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for NamePart {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::uninterpreted_option::_view::NamePartView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -200,7 +213,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct NamePartView {
         pub(super) fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -366,7 +378,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct NamePartFields<TNamePart, TIsExtension> {
         pub name_part: TNamePart,
         pub is_extension: TIsExtension,

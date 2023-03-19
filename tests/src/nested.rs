@@ -11,8 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod msg;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Msg(::std::boxed::Box<self::_root::nested::_view::MsgView>);
 impl Msg {
     pub fn item_outer_mut(&mut self) -> &mut i32 {
@@ -131,10 +129,25 @@ impl ::std::fmt::Debug for Msg {
         <self::_root::nested::_view::MsgView as ::std::fmt::Debug>::fmt(&self, fmt)
     }
 }
+impl ::std::default::Default for self::Msg {
+    fn default() -> Self {
+        Self(
+            <self::_root::nested::_view::MsgView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Msg {
     type Target = self::_root::nested::_view::MsgView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Msg {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::nested::_view::MsgView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -151,7 +164,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MsgView {
         pub(super) fields: self::_root::nested::_fields::MsgFields::<
             self::_pinternal::SingularNumericalField::<
@@ -275,7 +287,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct MsgFields<TItemOuter> {
         pub item_outer: TItemOuter,
     }

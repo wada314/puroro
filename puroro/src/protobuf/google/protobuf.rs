@@ -20,8 +20,6 @@ pub mod generated_code_info;
 pub mod method_options;
 pub mod source_code_info;
 pub mod uninterpreted_option;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 /** The protocol compiler can output a FileDescriptorSet containing the .proto
  files it parses.
 */
@@ -147,14 +145,27 @@ impl ::std::fmt::Debug for FileDescriptorSet {
         )
     }
 }
+impl ::std::default::Default for self::FileDescriptorSet {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::FileDescriptorSetView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for FileDescriptorSet {
     type Target = self::_root::google::protobuf::_view::FileDescriptorSetView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for FileDescriptorSet {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FileDescriptorSetView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a complete .proto file.
 */
 pub struct FileDescriptorProto(
@@ -579,14 +590,27 @@ impl ::std::fmt::Debug for FileDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::FileDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::FileDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for FileDescriptorProto {
     type Target = self::_root::google::protobuf::_view::FileDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for FileDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FileDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a message type.
 */
 pub struct DescriptorProto(
@@ -955,14 +979,27 @@ impl ::std::fmt::Debug for DescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::DescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::DescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for DescriptorProto {
     type Target = self::_root::google::protobuf::_view::DescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for DescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::DescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct ExtensionRangeOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::ExtensionRangeOptionsView>,
 );
@@ -1091,14 +1128,27 @@ impl ::std::fmt::Debug for ExtensionRangeOptions {
         )
     }
 }
+impl ::std::default::Default for self::ExtensionRangeOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for ExtensionRangeOptions {
     type Target = self::_root::google::protobuf::_view::ExtensionRangeOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for ExtensionRangeOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::ExtensionRangeOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a field within a message.
 */
 pub struct FieldDescriptorProto(
@@ -1524,14 +1574,27 @@ impl ::std::fmt::Debug for FieldDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::FieldDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::FieldDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for FieldDescriptorProto {
     type Target = self::_root::google::protobuf::_view::FieldDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for FieldDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FieldDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a oneof.
 */
 pub struct OneofDescriptorProto(
@@ -1692,14 +1755,27 @@ impl ::std::fmt::Debug for OneofDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::OneofDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::OneofDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for OneofDescriptorProto {
     type Target = self::_root::google::protobuf::_view::OneofDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for OneofDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::OneofDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes an enum type.
 */
 pub struct EnumDescriptorProto(
@@ -1938,14 +2014,27 @@ impl ::std::fmt::Debug for EnumDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::EnumDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::EnumDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for EnumDescriptorProto {
     type Target = self::_root::google::protobuf::_view::EnumDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for EnumDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a value within an enum.
 */
 pub struct EnumValueDescriptorProto(
@@ -2139,14 +2228,27 @@ impl ::std::fmt::Debug for EnumValueDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::EnumValueDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for EnumValueDescriptorProto {
     type Target = self::_root::google::protobuf::_view::EnumValueDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for EnumValueDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumValueDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a service.
 */
 pub struct ServiceDescriptorProto(
@@ -2332,14 +2434,27 @@ impl ::std::fmt::Debug for ServiceDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::ServiceDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for ServiceDescriptorProto {
     type Target = self::_root::google::protobuf::_view::ServiceDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for ServiceDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::ServiceDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes a method of a service.
 */
 pub struct MethodDescriptorProto(
@@ -2618,14 +2733,27 @@ impl ::std::fmt::Debug for MethodDescriptorProto {
         )
     }
 }
+impl ::std::default::Default for self::MethodDescriptorProto {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::MethodDescriptorProtoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for MethodDescriptorProto {
     type Target = self::_root::google::protobuf::_view::MethodDescriptorProtoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for MethodDescriptorProto {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::MethodDescriptorProtoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct FileOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FileOptionsView>,
 );
@@ -3333,14 +3461,27 @@ impl ::std::fmt::Debug for FileOptions {
         )
     }
 }
+impl ::std::default::Default for self::FileOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::FileOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for FileOptions {
     type Target = self::_root::google::protobuf::_view::FileOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for FileOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FileOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct MessageOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::MessageOptionsView>,
 );
@@ -3582,14 +3723,27 @@ impl ::std::fmt::Debug for MessageOptions {
         )
     }
 }
+impl ::std::default::Default for self::MessageOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::MessageOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for MessageOptions {
     type Target = self::_root::google::protobuf::_view::MessageOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for MessageOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::MessageOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct FieldOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FieldOptionsView>,
 );
@@ -3893,14 +4047,27 @@ impl ::std::fmt::Debug for FieldOptions {
         )
     }
 }
+impl ::std::default::Default for self::FieldOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::FieldOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for FieldOptions {
     type Target = self::_root::google::protobuf::_view::FieldOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for FieldOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::FieldOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct OneofOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::OneofOptionsView>,
 );
@@ -4026,14 +4193,27 @@ impl ::std::fmt::Debug for OneofOptions {
         )
     }
 }
+impl ::std::default::Default for self::OneofOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::OneofOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for OneofOptions {
     type Target = self::_root::google::protobuf::_view::OneofOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for OneofOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::OneofOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct EnumOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumOptionsView>,
 );
@@ -4217,14 +4397,27 @@ impl ::std::fmt::Debug for EnumOptions {
         )
     }
 }
+impl ::std::default::Default for self::EnumOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::EnumOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for EnumOptions {
     type Target = self::_root::google::protobuf::_view::EnumOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for EnumOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct EnumValueOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueOptionsView>,
 );
@@ -4379,14 +4572,27 @@ impl ::std::fmt::Debug for EnumValueOptions {
         )
     }
 }
+impl ::std::default::Default for self::EnumValueOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::EnumValueOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for EnumValueOptions {
     type Target = self::_root::google::protobuf::_view::EnumValueOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for EnumValueOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::EnumValueOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct ServiceOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceOptionsView>,
 );
@@ -4541,14 +4747,27 @@ impl ::std::fmt::Debug for ServiceOptions {
         )
     }
 }
+impl ::std::default::Default for self::ServiceOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::ServiceOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for ServiceOptions {
     type Target = self::_root::google::protobuf::_view::ServiceOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for ServiceOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::ServiceOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 pub struct MethodOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::MethodOptionsView>,
 );
@@ -4736,14 +4955,27 @@ impl ::std::fmt::Debug for MethodOptions {
         )
     }
 }
+impl ::std::default::Default for self::MethodOptions {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::MethodOptionsView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for MethodOptions {
     type Target = self::_root::google::protobuf::_view::MethodOptionsView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for MethodOptions {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::MethodOptionsView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** A message representing a option the parser does not recognize. This only
  appears in options protos created by the compiler::Parser class.
  DescriptorPool resolves these when building Descriptor objects. Therefore,
@@ -5049,14 +5281,27 @@ impl ::std::fmt::Debug for UninterpretedOption {
         )
     }
 }
+impl ::std::default::Default for self::UninterpretedOption {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::UninterpretedOptionView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for UninterpretedOption {
     type Target = self::_root::google::protobuf::_view::UninterpretedOptionView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for UninterpretedOption {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::UninterpretedOptionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Encapsulates information about the original source file from which a
  FileDescriptorProto was generated.
 */
@@ -5187,14 +5432,27 @@ impl ::std::fmt::Debug for SourceCodeInfo {
         )
     }
 }
+impl ::std::default::Default for self::SourceCodeInfo {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::SourceCodeInfoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for SourceCodeInfo {
     type Target = self::_root::google::protobuf::_view::SourceCodeInfoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for SourceCodeInfo {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::SourceCodeInfoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** Describes the relationship between generated code and its original source
  file. A GeneratedCodeInfo message is associated with only one generated
  source file, but may contain references to different source .proto files.
@@ -5326,10 +5584,25 @@ impl ::std::fmt::Debug for GeneratedCodeInfo {
         )
     }
 }
+impl ::std::default::Default for self::GeneratedCodeInfo {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::_view::GeneratedCodeInfoView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for GeneratedCodeInfo {
     type Target = self::_root::google::protobuf::_view::GeneratedCodeInfoView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for GeneratedCodeInfo {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::_view::GeneratedCodeInfoView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -5346,7 +5619,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct FileDescriptorSetView {
         pub(super) fields: self::_root::google::protobuf::_fields::FileDescriptorSetFields::<
             self::_pinternal::RepeatedMessageField::<
@@ -5442,7 +5714,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct FileDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -5954,7 +6225,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct DescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::DescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -6356,7 +6626,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct ExtensionRangeOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields::<
             self::_pinternal::RepeatedMessageField::<
@@ -6467,7 +6736,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct FieldDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -7033,7 +7301,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct OneofDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -7187,7 +7454,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct EnumDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -7438,7 +7704,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct EnumValueDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -7630,7 +7895,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct ServiceDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -7809,7 +8073,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct MethodDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -8130,7 +8393,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct FileOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::FileOptionsFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -9168,7 +9430,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct MessageOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::MessageOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -9498,7 +9759,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct FieldOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::FieldOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -9906,7 +10166,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct OneofOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::OneofOptionsFields::<
             self::_pinternal::RepeatedMessageField::<
@@ -10016,7 +10275,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct EnumOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::EnumOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -10211,7 +10469,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct EnumValueOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::EnumValueOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -10363,7 +10620,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct ServiceOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::ServiceOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -10515,7 +10771,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct MethodOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::MethodOptionsFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -10719,7 +10974,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct UninterpretedOptionView {
         pub(super) fields: self::_root::google::protobuf::_fields::UninterpretedOptionFields::<
             self::_pinternal::RepeatedMessageField::<
@@ -11064,7 +11318,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct SourceCodeInfoView {
         pub(super) fields: self::_root::google::protobuf::_fields::SourceCodeInfoFields::<
             self::_pinternal::RepeatedMessageField::<
@@ -11208,7 +11461,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct GeneratedCodeInfoView {
         pub(super) fields: self::_root::google::protobuf::_fields::GeneratedCodeInfoFields::<
             self::_pinternal::RepeatedMessageField::<
@@ -11328,11 +11580,9 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct FileDescriptorSetFields<TFile> {
         pub file: TFile,
     }
-    #[derive(::std::default::Default)]
     pub struct FileDescriptorProtoFields<
         TName,
         TPackage,
@@ -11360,7 +11610,6 @@ pub mod _fields {
         pub source_code_info: TSourceCodeInfo,
         pub syntax: TSyntax,
     }
-    #[derive(::std::default::Default)]
     pub struct DescriptorProtoFields<
         TName,
         TField,
@@ -11384,11 +11633,9 @@ pub mod _fields {
         pub reserved_range: TReservedRange,
         pub reserved_name: TReservedName,
     }
-    #[derive(::std::default::Default)]
     pub struct ExtensionRangeOptionsFields<TUninterpretedOption> {
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct FieldDescriptorProtoFields<
         TName,
         TNumber,
@@ -11414,12 +11661,10 @@ pub mod _fields {
         pub options: TOptions,
         pub proto3_optional: TProto3Optional,
     }
-    #[derive(::std::default::Default)]
     pub struct OneofDescriptorProtoFields<TName, TOptions> {
         pub name: TName,
         pub options: TOptions,
     }
-    #[derive(::std::default::Default)]
     pub struct EnumDescriptorProtoFields<
         TName,
         TValue,
@@ -11433,19 +11678,16 @@ pub mod _fields {
         pub reserved_range: TReservedRange,
         pub reserved_name: TReservedName,
     }
-    #[derive(::std::default::Default)]
     pub struct EnumValueDescriptorProtoFields<TName, TNumber, TOptions> {
         pub name: TName,
         pub number: TNumber,
         pub options: TOptions,
     }
-    #[derive(::std::default::Default)]
     pub struct ServiceDescriptorProtoFields<TName, TMethod, TOptions> {
         pub name: TName,
         pub method: TMethod,
         pub options: TOptions,
     }
-    #[derive(::std::default::Default)]
     pub struct MethodDescriptorProtoFields<
         TName,
         TInputType,
@@ -11461,7 +11703,6 @@ pub mod _fields {
         pub client_streaming: TClientStreaming,
         pub server_streaming: TServerStreaming,
     }
-    #[derive(::std::default::Default)]
     pub struct FileOptionsFields<
         TJavaPackage,
         TJavaOuterClassname,
@@ -11507,7 +11748,6 @@ pub mod _fields {
         pub ruby_package: TRubyPackage,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct MessageOptionsFields<
         TMessageSetWireFormat,
         TNoStandardDescriptorAccessor,
@@ -11521,7 +11761,6 @@ pub mod _fields {
         pub map_entry: TMapEntry,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct FieldOptionsFields<
         TCtype,
         TPacked,
@@ -11539,27 +11778,22 @@ pub mod _fields {
         pub weak: TWeak,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct OneofOptionsFields<TUninterpretedOption> {
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct EnumOptionsFields<TAllowAlias, TDeprecated, TUninterpretedOption> {
         pub allow_alias: TAllowAlias,
         pub deprecated: TDeprecated,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct EnumValueOptionsFields<TDeprecated, TUninterpretedOption> {
         pub deprecated: TDeprecated,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct ServiceOptionsFields<TDeprecated, TUninterpretedOption> {
         pub deprecated: TDeprecated,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct MethodOptionsFields<
         TDeprecated,
         TIdempotencyLevel,
@@ -11569,7 +11803,6 @@ pub mod _fields {
         pub idempotency_level: TIdempotencyLevel,
         pub uninterpreted_option: TUninterpretedOption,
     }
-    #[derive(::std::default::Default)]
     pub struct UninterpretedOptionFields<
         TName,
         TIdentifierValue,
@@ -11587,11 +11820,9 @@ pub mod _fields {
         pub string_value: TStringValue,
         pub aggregate_value: TAggregateValue,
     }
-    #[derive(::std::default::Default)]
     pub struct SourceCodeInfoFields<TLocation> {
         pub location: TLocation,
     }
-    #[derive(::std::default::Default)]
     pub struct GeneratedCodeInfoFields<TAnnotation> {
         pub annotation: TAnnotation,
     }

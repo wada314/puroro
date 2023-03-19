@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Annotation(
     ::std::boxed::Box<
         self::_root::google::protobuf::generated_code_info::_view::AnnotationView,
@@ -224,10 +222,25 @@ impl ::std::fmt::Debug for Annotation {
         )
     }
 }
+impl ::std::default::Default for self::Annotation {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::generated_code_info::_view::AnnotationView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Annotation {
     type Target = self::_root::google::protobuf::generated_code_info::_view::AnnotationView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Annotation {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::generated_code_info::_view::AnnotationView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -244,7 +257,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct AnnotationView {
         pub(super) fields: self::_root::google::protobuf::generated_code_info::_fields::AnnotationFields::<
             self::_pinternal::RepeatedNumericalField::<
@@ -476,7 +488,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct AnnotationFields<TPath, TSourceFile, TBegin, TEnd> {
         pub path: TPath,
         pub source_file: TSourceFile,

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::Message;
+use ::puroro::{Message, MessageView};
 use ::puroro_inline::puroro_inline;
 use ::std::io::Read;
 /// The sample cases documented in the Protobuf official encoding document:

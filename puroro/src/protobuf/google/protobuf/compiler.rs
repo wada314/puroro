@@ -11,8 +11,6 @@ mod _pinternal {
     pub(crate) use super::_root::_pinternal::*;
 }
 pub mod code_generator_response;
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 /** The version number of protocol compiler.
 */
 pub struct Version(
@@ -230,14 +228,27 @@ impl ::std::fmt::Debug for Version {
         )
     }
 }
+impl ::std::default::Default for self::Version {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::compiler::_view::VersionView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Version {
     type Target = self::_root::google::protobuf::compiler::_view::VersionView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for Version {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::VersionView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** An encoded CodeGeneratorRequest is written to the plugin's stdin.
 */
 pub struct CodeGeneratorRequest(
@@ -456,14 +467,27 @@ impl ::std::fmt::Debug for CodeGeneratorRequest {
         )
     }
 }
+impl ::std::default::Default for self::CodeGeneratorRequest {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for CodeGeneratorRequest {
     type Target = self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
     }
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
+impl ::std::cmp::PartialEq for CodeGeneratorRequest {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
+    }
+}
 /** The plugin writes an encoded CodeGeneratorResponse to stdout.
 */
 pub struct CodeGeneratorResponse(
@@ -653,10 +677,25 @@ impl ::std::fmt::Debug for CodeGeneratorResponse {
         )
     }
 }
+impl ::std::default::Default for self::CodeGeneratorResponse {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for CodeGeneratorResponse {
     type Target = self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for CodeGeneratorResponse {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -673,7 +712,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct VersionView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::VersionFields::<
             self::_pinternal::OptionalNumericalField::<
@@ -899,7 +937,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorRequestView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields::<
             self::_pinternal::RepeatedUnsizedField::<
@@ -1141,7 +1178,6 @@ pub mod _view {
             )
         }
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorResponseView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields::<
             self::_pinternal::OptionalUnsizedField::<
@@ -1347,14 +1383,12 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct VersionFields<TMajor, TMinor, TPatch, TSuffix> {
         pub major: TMajor,
         pub minor: TMinor,
         pub patch: TPatch,
         pub suffix: TSuffix,
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorRequestFields<
         TFileToGenerate,
         TParameter,
@@ -1366,7 +1400,6 @@ pub mod _fields {
         pub proto_file: TProtoFile,
         pub compiler_version: TCompilerVersion,
     }
-    #[derive(::std::default::Default)]
     pub struct CodeGeneratorResponseFields<TError, TSupportedFeatures, TFile> {
         pub error: TError,
         pub supported_features: TSupportedFeatures,

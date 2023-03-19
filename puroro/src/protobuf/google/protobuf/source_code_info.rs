@@ -10,8 +10,6 @@ mod _pinternal {
     #[allow(unused)]
     pub(crate) use super::_root::_pinternal::*;
 }
-#[derive(::std::default::Default)]
-#[derive(::std::cmp::PartialEq)]
 pub struct Location(
     ::std::boxed::Box<
         self::_root::google::protobuf::source_code_info::_view::LocationView,
@@ -242,10 +240,25 @@ impl ::std::fmt::Debug for Location {
         )
     }
 }
+impl ::std::default::Default for self::Location {
+    fn default() -> Self {
+        Self(
+            <self::_root::google::protobuf::source_code_info::_view::LocationView as self::_pinternal::MessageViewInternal>::new_boxed(),
+        )
+    }
+}
 impl ::std::ops::Deref for Location {
     type Target = self::_root::google::protobuf::source_code_info::_view::LocationView;
     fn deref(&self) -> &Self::Target {
         <::std::boxed::Box<_> as ::std::ops::Deref>::deref(&self.0)
+    }
+}
+impl ::std::cmp::PartialEq for Location {
+    fn eq(&self, rhs: &Self) -> bool {
+        <self::_root::google::protobuf::source_code_info::_view::LocationView as ::std::cmp::PartialEq>::eq(
+            &self.0,
+            &rhs.0,
+        )
     }
 }
 #[doc(hidden)]
@@ -262,7 +275,6 @@ pub mod _view {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct LocationView {
         pub(super) fields: self::_root::google::protobuf::source_code_info::_fields::LocationFields::<
             self::_pinternal::RepeatedNumericalField::<
@@ -595,7 +607,6 @@ pub mod _fields {
         #[allow(unused)]
         pub(crate) use super::_root::_pinternal::*;
     }
-    #[derive(::std::default::Default)]
     pub struct LocationFields<
         TPath,
         TSpan,

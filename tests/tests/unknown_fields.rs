@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro::{Message, RepeatedFieldView};
+use ::puroro::{Message, MessageView, RepeatedFieldView};
 use ::puroro_inline::puroro_inline;
 use ::std::io::Read;
 
