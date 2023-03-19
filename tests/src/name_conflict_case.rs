@@ -46,6 +46,7 @@ impl Message {
     pub const THIS_IS_ONEOF_FIELD_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for Message {
+    type ViewType = self::_root::name_conflict_case::_view::MessageView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -67,18 +68,6 @@ impl self::_puroro::Message for Message {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self.fields.conflict.ser_to_write(self.shared.bitfield(), out)?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for Message {
@@ -208,6 +197,31 @@ pub mod _view {
         }
         pub fn has_this_is_oneof_field(&self) -> bool {
             self.this_is_oneof_field_opt().is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::MessageView {
+        type MessageType = self::_root::name_conflict_case::Message;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self.fields.conflict.ser_to_write(self.shared.bitfield(), out)?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MessageView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::name_conflict_case::_fields::MessageFields {
+                conflict: self::_pinternal::OneofUnion::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for MessageView {

@@ -39,6 +39,10 @@ where
     RustType: PartialEq + Default + Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
+    }
+
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         let v = variant.get::<ProtoType>()?;
         if v != RustType::default() {
@@ -91,9 +95,14 @@ where
 impl<RustType, ProtoType, const BITFIELD_INDEX: usize> FieldType
     for OptionalNumericalField<RustType, ProtoType, BITFIELD_INDEX>
 where
-    RustType: Clone,
+    RustType: Clone + Default,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self {
+        bitvec.set(BITFIELD_INDEX, false);
+        Self(Default::default(), PhantomData)
+    }
+
     fn deser_from_variant<B: BitSlice>(&mut self, bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0 = variant.get::<ProtoType>()?;
         bitvec.set(BITFIELD_INDEX, true);
@@ -138,6 +147,10 @@ where
     RustType: Clone,
     ProtoType: tags::NumericalType<RustType = RustType>,
 {
+    fn new<B: BitSlice>(_bitvec: &mut B) -> Self {
+        Self(Default::default(), PhantomData)
+    }
+
     fn deser_from_variant<B: BitSlice>(&mut self, _bitvec: &mut B, variant: Variant) -> Result<()> {
         self.0.push(variant.get::<ProtoType>()?);
         Ok(())
@@ -245,7 +258,7 @@ where
 impl<ProtoType, const BITFIELD_INDEX: usize> NonRepeatedFieldType
     for OptionalNumericalField<ProtoType::RustType, ProtoType, BITFIELD_INDEX>
 where
-    ProtoType::RustType: Clone,
+    ProtoType::RustType: Clone + Default,
     ProtoType: tags::NumericalType,
 {
     type GetterOptType<'a> = Option<ProtoType::RustType>

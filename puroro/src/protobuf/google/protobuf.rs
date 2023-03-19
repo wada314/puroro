@@ -45,6 +45,7 @@ impl FileDescriptorSet {
     pub const FILE_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for FileDescriptorSet {
+    type ViewType = self::_root::google::protobuf::_view::FileDescriptorSetView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -66,23 +67,6 @@ impl self::_puroro::Message for FileDescriptorSet {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.file,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for FileDescriptorSet {
@@ -394,6 +378,7 @@ impl FileDescriptorProto {
     pub const SYNTAX_FIELD_NUMBER: i32 = 12i32;
 }
 impl self::_puroro::Message for FileDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::FileDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -415,89 +400,6 @@ impl self::_puroro::Message for FileDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.package,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.dependency,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.public_dependency,
-            self.shared.bitfield(),
-            10i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.weak_dependency,
-            self.shared.bitfield(),
-            11i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.message_type,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.enum_type,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.service,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.extension,
-            self.shared.bitfield(),
-            7i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            8i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.source_code_info,
-            self.shared.bitfield(),
-            9i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.syntax,
-            self.shared.bitfield(),
-            12i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for FileDescriptorProto {
@@ -870,6 +772,7 @@ impl DescriptorProto {
     pub const RESERVED_NAME_FIELD_NUMBER: i32 = 10i32;
 }
 impl self::_puroro::Message for DescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::DescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -891,77 +794,6 @@ impl self::_puroro::Message for DescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.field,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.extension,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.nested_type,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.enum_type,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.extension_range,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.oneof_decl,
-            self.shared.bitfield(),
-            8i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            7i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.reserved_range,
-            self.shared.bitfield(),
-            9i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.reserved_name,
-            self.shared.bitfield(),
-            10i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for DescriptorProto {
@@ -1154,6 +986,7 @@ impl ExtensionRangeOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for ExtensionRangeOptions {
+    type ViewType = self::_root::google::protobuf::_view::ExtensionRangeOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -1175,23 +1008,6 @@ impl self::_puroro::Message for ExtensionRangeOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for ExtensionRangeOptions {
@@ -1515,6 +1331,7 @@ impl FieldDescriptorProto {
     pub const PROTO3_OPTIONAL_FIELD_NUMBER: i32 = 17i32;
 }
 impl self::_puroro::Message for FieldDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::FieldDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -1536,83 +1353,6 @@ impl self::_puroro::Message for FieldDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.number,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.label,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.r#type,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.type_name,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.extendee,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.default_value,
-            self.shared.bitfield(),
-            7i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.oneof_index,
-            self.shared.bitfield(),
-            9i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.json_name,
-            self.shared.bitfield(),
-            10i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            8i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.proto3_optional,
-            self.shared.bitfield(),
-            17i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for FieldDescriptorProto {
@@ -1840,6 +1580,7 @@ impl OneofDescriptorProto {
     pub const OPTIONS_FIELD_NUMBER: i32 = 2i32;
 }
 impl self::_puroro::Message for OneofDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::OneofDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -1861,29 +1602,6 @@ impl self::_puroro::Message for OneofDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for OneofDescriptorProto {
@@ -2082,6 +1800,7 @@ impl EnumDescriptorProto {
     pub const RESERVED_NAME_FIELD_NUMBER: i32 = 5i32;
 }
 impl self::_puroro::Message for EnumDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::EnumDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -2103,47 +1822,6 @@ impl self::_puroro::Message for EnumDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.value,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.reserved_range,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.reserved_name,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for EnumDescriptorProto {
@@ -2338,6 +2016,7 @@ impl EnumValueDescriptorProto {
     pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for EnumValueDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::EnumValueDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -2359,35 +2038,6 @@ impl self::_puroro::Message for EnumValueDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.number,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for EnumValueDescriptorProto {
@@ -2559,6 +2209,7 @@ impl ServiceDescriptorProto {
     pub const OPTIONS_FIELD_NUMBER: i32 = 3i32;
 }
 impl self::_puroro::Message for ServiceDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::ServiceDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -2580,35 +2231,6 @@ impl self::_puroro::Message for ServiceDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.method,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for ServiceDescriptorProto {
@@ -2846,6 +2468,7 @@ impl MethodDescriptorProto {
     pub const SERVER_STREAMING_FIELD_NUMBER: i32 = 6i32;
 }
 impl self::_puroro::Message for MethodDescriptorProto {
+    type ViewType = self::_root::google::protobuf::_view::MethodDescriptorProtoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -2867,53 +2490,6 @@ impl self::_puroro::Message for MethodDescriptorProto {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.input_type,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.output_type,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.options,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.client_streaming,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.server_streaming,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for MethodDescriptorProto {
@@ -3475,6 +3051,7 @@ impl FileOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for FileOptions {
+    type ViewType = self::_root::google::protobuf::_view::FileOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -3496,143 +3073,6 @@ impl self::_puroro::Message for FileOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.java_package,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.java_outer_classname,
-            self.shared.bitfield(),
-            8i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.java_multiple_files,
-            self.shared.bitfield(),
-            10i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.java_generate_equals_and_hash,
-            self.shared.bitfield(),
-            20i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.java_string_check_utf8,
-            self.shared.bitfield(),
-            27i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.optimize_for,
-            self.shared.bitfield(),
-            9i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.go_package,
-            self.shared.bitfield(),
-            11i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.cc_generic_services,
-            self.shared.bitfield(),
-            16i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.java_generic_services,
-            self.shared.bitfield(),
-            17i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.py_generic_services,
-            self.shared.bitfield(),
-            18i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.php_generic_services,
-            self.shared.bitfield(),
-            42i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            23i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.cc_enable_arenas,
-            self.shared.bitfield(),
-            31i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.objc_class_prefix,
-            self.shared.bitfield(),
-            36i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.csharp_namespace,
-            self.shared.bitfield(),
-            37i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.swift_prefix,
-            self.shared.bitfield(),
-            39i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.php_class_prefix,
-            self.shared.bitfield(),
-            40i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.php_namespace,
-            self.shared.bitfield(),
-            41i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.php_metadata_namespace,
-            self.shared.bitfield(),
-            44i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.ruby_package,
-            self.shared.bitfield(),
-            45i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for FileOptions {
@@ -4004,6 +3444,7 @@ impl MessageOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for MessageOptions {
+    type ViewType = self::_root::google::protobuf::_view::MessageOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -4025,47 +3466,6 @@ impl self::_puroro::Message for MessageOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.message_set_wire_format,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.no_standard_descriptor_accessor,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.map_entry,
-            self.shared.bitfield(),
-            7i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for MessageOptions {
@@ -4337,6 +3737,7 @@ impl FieldOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for FieldOptions {
+    type ViewType = self::_root::google::protobuf::_view::FieldOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -4358,59 +3759,6 @@ impl self::_puroro::Message for FieldOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.ctype,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.packed,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.jstype,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.lazy,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.weak,
-            self.shared.bitfield(),
-            10i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for FieldOptions {
@@ -4576,6 +3924,7 @@ impl OneofOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for OneofOptions {
+    type ViewType = self::_root::google::protobuf::_view::OneofOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -4597,23 +3946,6 @@ impl self::_puroro::Message for OneofOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for OneofOptions {
@@ -4765,6 +4097,7 @@ impl EnumOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for EnumOptions {
+    type ViewType = self::_root::google::protobuf::_view::EnumOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -4786,35 +4119,6 @@ impl self::_puroro::Message for EnumOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.allow_alias,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for EnumOptions {
@@ -4964,6 +4268,7 @@ impl EnumValueOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for EnumValueOptions {
+    type ViewType = self::_root::google::protobuf::_view::EnumValueOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -4985,29 +4290,6 @@ impl self::_puroro::Message for EnumValueOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for EnumValueOptions {
@@ -5148,6 +4430,7 @@ impl ServiceOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for ServiceOptions {
+    type ViewType = self::_root::google::protobuf::_view::ServiceOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -5169,29 +4452,6 @@ impl self::_puroro::Message for ServiceOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            33i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for ServiceOptions {
@@ -5356,6 +4616,7 @@ impl MethodOptions {
     pub const UNINTERPRETED_OPTION_FIELD_NUMBER: i32 = 999i32;
 }
 impl self::_puroro::Message for MethodOptions {
+    type ViewType = self::_root::google::protobuf::_view::MethodOptionsView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -5377,35 +4638,6 @@ impl self::_puroro::Message for MethodOptions {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.deprecated,
-            self.shared.bitfield(),
-            33i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.idempotency_level,
-            self.shared.bitfield(),
-            34i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.uninterpreted_option,
-            self.shared.bitfield(),
-            999i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for MethodOptions {
@@ -5661,6 +4893,7 @@ impl UninterpretedOption {
     pub const AGGREGATE_VALUE_FIELD_NUMBER: i32 = 8i32;
 }
 impl self::_puroro::Message for UninterpretedOption {
+    type ViewType = self::_root::google::protobuf::_view::UninterpretedOptionView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -5682,59 +4915,6 @@ impl self::_puroro::Message for UninterpretedOption {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.name,
-            self.shared.bitfield(),
-            2i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.identifier_value,
-            self.shared.bitfield(),
-            3i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.positive_int_value,
-            self.shared.bitfield(),
-            4i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.negative_int_value,
-            self.shared.bitfield(),
-            5i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.double_value,
-            self.shared.bitfield(),
-            6i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.string_value,
-            self.shared.bitfield(),
-            7i32,
-            out,
-        )?;
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.aggregate_value,
-            self.shared.bitfield(),
-            8i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for UninterpretedOption {
@@ -5905,6 +5085,7 @@ impl SourceCodeInfo {
     pub const LOCATION_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for SourceCodeInfo {
+    type ViewType = self::_root::google::protobuf::_view::SourceCodeInfoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -5926,23 +5107,6 @@ impl self::_puroro::Message for SourceCodeInfo {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.location,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for SourceCodeInfo {
@@ -6060,6 +5224,7 @@ impl GeneratedCodeInfo {
     pub const ANNOTATION_FIELD_NUMBER: i32 = 1i32;
 }
 impl self::_puroro::Message for GeneratedCodeInfo {
+    type ViewType = self::_root::google::protobuf::_view::GeneratedCodeInfoView;
     fn from_bytes_iter<I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>>(
         iter: I,
     ) -> self::_puroro::Result<Self> {
@@ -6081,23 +5246,6 @@ impl self::_puroro::Message for GeneratedCodeInfo {
         )?;
         scoped_iter.drop_and_check_scope_completed()?;
         Ok(())
-    }
-    fn to_bytes<W: ::std::io::Write>(
-        &self,
-        #[allow(unused)]
-        out: &mut W,
-    ) -> self::_puroro::Result<()> {
-        #[allow(unused)]
-        use self::_pinternal::OneofUnion as _;
-        use self::_pinternal::{SharedItems as _, UnknownFields as _};
-        self::_pinternal::FieldType::ser_to_write(
-            &self.fields.annotation,
-            self.shared.bitfield(),
-            1i32,
-            out,
-        )?;
-        self.shared.unknown_fields().ser_to_write(out)?;
-        ::std::result::Result::Ok(())
     }
 }
 impl self::_pinternal::MessageInternal for GeneratedCodeInfo {
@@ -6216,6 +5364,36 @@ pub mod _view {
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field(&self.fields.file, self.shared.bitfield())
+        }
+    }
+    impl self::_puroro::MessageView for self::FileDescriptorSetView {
+        type MessageType = self::_root::google::protobuf::FileDescriptorSet;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.file,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FileDescriptorSetView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FileDescriptorSetFields {
+                file: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for FileDescriptorSetView {
@@ -6532,6 +5710,117 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::FileDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::FileDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.package,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.dependency,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.public_dependency,
+                self.shared.bitfield(),
+                10i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.weak_dependency,
+                self.shared.bitfield(),
+                11i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.message_type,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.enum_type,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.service,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.extension,
+                self.shared.bitfield(),
+                7i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                8i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.source_code_info,
+                self.shared.bitfield(),
+                9i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.syntax,
+                self.shared.bitfield(),
+                12i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FileDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FileDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                dependency: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                public_dependency: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                weak_dependency: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                message_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                service: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extension: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                source_code_info: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                syntax: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for FileDescriptorProtoView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -6844,6 +6133,99 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::DescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::DescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.field,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.extension,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.nested_type,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.enum_type,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.extension_range,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.oneof_decl,
+                self.shared.bitfield(),
+                8i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                7i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.reserved_range,
+                self.shared.bitfield(),
+                9i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.reserved_name,
+                self.shared.bitfield(),
+                10i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::DescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::DescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                field: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extension: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                nested_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                enum_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extension_range: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                oneof_decl: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_range: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for DescriptorProtoView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -6997,6 +6379,38 @@ pub mod _view {
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl self::_puroro::MessageView for self::ExtensionRangeOptionsView {
+        type MessageType = self::_root::google::protobuf::ExtensionRangeOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ExtensionRangeOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::ExtensionRangeOptionsFields {
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for ExtensionRangeOptionsView {
@@ -7439,6 +6853,106 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::FieldDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::FieldDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.number,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.label,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.r#type,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.type_name,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.extendee,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.default_value,
+                self.shared.bitfield(),
+                7i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.oneof_index,
+                self.shared.bitfield(),
+                9i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.json_name,
+                self.shared.bitfield(),
+                10i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                8i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.proto3_optional,
+                self.shared.bitfield(),
+                17i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FieldDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FieldDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                number: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                label: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                r#type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                type_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                extendee: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                default_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                oneof_index: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                json_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                proto3_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for FieldDescriptorProtoView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -7587,6 +7101,43 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::OneofDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::OneofDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::OneofDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::OneofDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for OneofDescriptorProtoView {
@@ -7751,6 +7302,64 @@ pub mod _view {
                 &self.fields.reserved_name,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl self::_puroro::MessageView for self::EnumDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::EnumDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.value,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.reserved_range,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.reserved_name,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_range: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                reserved_name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for EnumDescriptorProtoView {
@@ -7927,6 +7536,50 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::EnumValueDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::EnumValueDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.number,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumValueDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                number: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for EnumValueDescriptorProtoView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -8057,6 +7710,50 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::ServiceDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::ServiceDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.method,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ServiceDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                method: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for ServiceDescriptorProtoView {
@@ -8299,6 +7996,73 @@ pub mod _view {
                     self.shared.bitfield(),
                 )
                 .is_some()
+        }
+    }
+    impl self::_puroro::MessageView for self::MethodDescriptorProtoView {
+        type MessageType = self::_root::google::protobuf::MethodDescriptorProto;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.input_type,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.output_type,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.options,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.client_streaming,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.server_streaming,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MethodDescriptorProtoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::MethodDescriptorProtoFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                input_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                output_type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                options: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                client_streaming: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                server_streaming: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for MethodDescriptorProtoView {
@@ -9039,6 +8803,204 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::FileOptionsView {
+        type MessageType = self::_root::google::protobuf::FileOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.java_package,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.java_outer_classname,
+                self.shared.bitfield(),
+                8i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.java_multiple_files,
+                self.shared.bitfield(),
+                10i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.java_generate_equals_and_hash,
+                self.shared.bitfield(),
+                20i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.java_string_check_utf8,
+                self.shared.bitfield(),
+                27i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.optimize_for,
+                self.shared.bitfield(),
+                9i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.go_package,
+                self.shared.bitfield(),
+                11i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.cc_generic_services,
+                self.shared.bitfield(),
+                16i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.java_generic_services,
+                self.shared.bitfield(),
+                17i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.py_generic_services,
+                self.shared.bitfield(),
+                18i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.php_generic_services,
+                self.shared.bitfield(),
+                42i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                23i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.cc_enable_arenas,
+                self.shared.bitfield(),
+                31i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.objc_class_prefix,
+                self.shared.bitfield(),
+                36i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.csharp_namespace,
+                self.shared.bitfield(),
+                37i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.swift_prefix,
+                self.shared.bitfield(),
+                39i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.php_class_prefix,
+                self.shared.bitfield(),
+                40i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.php_namespace,
+                self.shared.bitfield(),
+                41i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.php_metadata_namespace,
+                self.shared.bitfield(),
+                44i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.ruby_package,
+                self.shared.bitfield(),
+                45i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FileOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FileOptionsFields {
+                java_package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                java_outer_classname: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_multiple_files: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_generate_equals_and_hash: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_string_check_utf8: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                optimize_for: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                go_package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                cc_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                java_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                py_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                php_generic_services: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                cc_enable_arenas: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                objc_class_prefix: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                csharp_namespace: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                swift_prefix: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                php_class_prefix: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                php_namespace: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                php_metadata_namespace: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                ruby_package: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for FileOptionsView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -9395,6 +9357,70 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::MessageOptionsView {
+        type MessageType = self::_root::google::protobuf::MessageOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.message_set_wire_format,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.no_standard_descriptor_accessor,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.map_entry,
+                self.shared.bitfield(),
+                7i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MessageOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::MessageOptionsFields {
+                message_set_wire_format: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                no_standard_descriptor_accessor: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                map_entry: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for MessageOptionsView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -9736,6 +9762,80 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::FieldOptionsView {
+        type MessageType = self::_root::google::protobuf::FieldOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.ctype,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.packed,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.jstype,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.lazy,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.weak,
+                self.shared.bitfield(),
+                10i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::FieldOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::FieldOptionsFields {
+                ctype: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                packed: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                jstype: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                lazy: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                weak: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for FieldOptionsView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -9829,6 +9929,38 @@ pub mod _view {
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl self::_puroro::MessageView for self::OneofOptionsView {
+        type MessageType = self::_root::google::protobuf::OneofOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::OneofOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::OneofOptionsFields {
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for OneofOptionsView {
@@ -9973,6 +10105,52 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::EnumOptionsView {
+        type MessageType = self::_root::google::protobuf::EnumOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.allow_alias,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumOptionsFields {
+                allow_alias: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for EnumOptionsView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -10091,6 +10269,45 @@ pub mod _view {
             )
         }
     }
+    impl self::_puroro::MessageView for self::EnumValueOptionsView {
+        type MessageType = self::_root::google::protobuf::EnumValueOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::EnumValueOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::EnumValueOptionsFields {
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for EnumValueOptionsView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -10202,6 +10419,45 @@ pub mod _view {
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl self::_puroro::MessageView for self::ServiceOptionsView {
+        type MessageType = self::_root::google::protobuf::ServiceOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                33i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::ServiceOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::ServiceOptionsFields {
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for ServiceOptionsView {
@@ -10353,6 +10609,54 @@ pub mod _view {
                 &self.fields.uninterpreted_option,
                 self.shared.bitfield(),
             )
+        }
+    }
+    impl self::_puroro::MessageView for self::MethodOptionsView {
+        type MessageType = self::_root::google::protobuf::MethodOptions;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.deprecated,
+                self.shared.bitfield(),
+                33i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.idempotency_level,
+                self.shared.bitfield(),
+                34i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.uninterpreted_option,
+                self.shared.bitfield(),
+                999i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::MethodOptionsView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::MethodOptionsFields {
+                deprecated: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                idempotency_level: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                uninterpreted_option: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for MethodOptionsView {
@@ -10606,6 +10910,84 @@ pub mod _view {
                 .is_some()
         }
     }
+    impl self::_puroro::MessageView for self::UninterpretedOptionView {
+        type MessageType = self::_root::google::protobuf::UninterpretedOption;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.name,
+                self.shared.bitfield(),
+                2i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.identifier_value,
+                self.shared.bitfield(),
+                3i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.positive_int_value,
+                self.shared.bitfield(),
+                4i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.negative_int_value,
+                self.shared.bitfield(),
+                5i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.double_value,
+                self.shared.bitfield(),
+                6i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.string_value,
+                self.shared.bitfield(),
+                7i32,
+                out,
+            )?;
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.aggregate_value,
+                self.shared.bitfield(),
+                8i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::UninterpretedOptionView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::UninterpretedOptionFields {
+                name: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                identifier_value: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                positive_int_value: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                negative_int_value: self::_pinternal::FieldType::new(
+                    shared.bitfield_mut(),
+                ),
+                double_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                string_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+                aggregate_value: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for UninterpretedOptionView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -10746,6 +11128,36 @@ pub mod _view {
             RepeatedFieldType::get_field(&self.fields.location, self.shared.bitfield())
         }
     }
+    impl self::_puroro::MessageView for self::SourceCodeInfoView {
+        type MessageType = self::_root::google::protobuf::SourceCodeInfo;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.location,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::SourceCodeInfoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::SourceCodeInfoFields {
+                location: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
+        }
+    }
     impl ::std::ops::Drop for SourceCodeInfoView {
         fn drop(&mut self) {
             #[allow(unused)]
@@ -10817,6 +11229,36 @@ pub mod _view {
         > {
             use self::_pinternal::{RepeatedFieldType, SharedItems as _};
             RepeatedFieldType::get_field(&self.fields.annotation, self.shared.bitfield())
+        }
+    }
+    impl self::_puroro::MessageView for self::GeneratedCodeInfoView {
+        type MessageType = self::_root::google::protobuf::GeneratedCodeInfo;
+        fn to_bytes<W: ::std::io::Write>(
+            &self,
+            #[allow(unused)]
+            out: &mut W,
+        ) -> self::_puroro::Result<()> {
+            #[allow(unused)]
+            use self::_pinternal::OneofUnion as _;
+            use self::_pinternal::{SharedItems as _, UnknownFields as _};
+            self::_pinternal::FieldType::ser_to_write(
+                &self.fields.annotation,
+                self.shared.bitfield(),
+                1i32,
+                out,
+            )?;
+            self.shared.unknown_fields().ser_to_write(out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    impl self::_pinternal::MessageViewInternal for self::GeneratedCodeInfoView {
+        fn new_boxed() -> ::std::boxed::Box<Self> {
+            use self::_pinternal::SharedItems as _;
+            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let fields = self::_root::google::protobuf::_fields::GeneratedCodeInfoFields {
+                annotation: self::_pinternal::FieldType::new(shared.bitfield_mut()),
+            };
+            ::std::boxed::Box::new(Self { fields, shared })
         }
     }
     impl ::std::ops::Drop for GeneratedCodeInfoView {

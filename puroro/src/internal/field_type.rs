@@ -27,7 +27,9 @@ use crate::repeated::RepeatedFieldView;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 
-pub trait FieldType {
+pub trait FieldType: Sized {
+    fn new<B: BitSlice>(bitvec: &mut B) -> Self;
+
     // Deserialization methods
 
     fn deser_from_field_data<'a, I: Iterator<Item = IoResult<u8>>, B: BitSlice>(

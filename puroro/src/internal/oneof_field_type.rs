@@ -17,6 +17,7 @@ use crate::internal::ser::{
     ser_bytes_shared, ser_numerical_shared, FieldData, ScopedIter, WireType,
 };
 use crate::internal::tags;
+use crate::message::MessageView;
 use crate::{PuroroError, Result};
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;
@@ -202,9 +203,10 @@ where
     }
 }
 
-impl<M: MessageInternal + Default> OneofFieldType for HeapMessageField<M>
+impl<M> OneofFieldType for HeapMessageField<M>
 where
-    M: Default + Clone + Deref,
+    M: MessageInternal + Default + Clone + Deref,
+    <M as Deref>::Target: MessageView,
 {
     type GetterType<'a> = &'a M::Target
     where

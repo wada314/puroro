@@ -30,7 +30,7 @@ pub use self::field_type::{
     RepeatedFieldType, RepeatedMessageField, RepeatedNumericalField, RepeatedUnsizedField,
     SingularMessageField, SingularNumericalField, SingularUnsizedField,
 };
-pub use self::message_internal::MessageInternal;
+pub use self::message_internal::{MessageInternal, MessageViewInternal};
 pub use self::oneof_field_type::{HeapMessageField, NumericalField, OneofFieldType, UnsizedField};
 pub use self::oneof_type::{OneofCase, OneofUnion};
 pub use self::ser::{PosIter, ScopedIter};
