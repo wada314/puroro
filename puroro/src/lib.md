@@ -139,10 +139,10 @@ assert_eq!(130, book.num_pages());
 
 # Serializing
 
-You can serialize the message into [`std::io::Write`] using [`Message::to_bytes()`] method.
+You can serialize the message into [`std::io::Write`] using [`MessageView::to_bytes()`] method.
 
 ```rust
-use puroro::Message; // For to_bytes() method
+use puroro::MessageView; // For to_bytes() method
 # use puroro::doc_samples;
 use doc_samples::library::Book;
 
