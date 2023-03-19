@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::puroro_codegen::puroro::Message;
+use ::puroro_codegen::puroro::{Message, MessageView};
 use ::puroro_codegen::{generate_output_file_protos, CodeGeneratorRequest, CodegenOptions, Result};
 use ::std::io::Read;
 use ::std::io::{stdin, stdout};
