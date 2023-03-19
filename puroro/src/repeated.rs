@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::ops::Index;
+use ::std::ops::{Deref, DerefMut, Index};
 
 pub trait RepeatedFieldView<'a>:
     Index<usize, Output = <Self as RepeatedFieldView<'a>>::Item>
@@ -24,4 +24,13 @@ pub trait RepeatedFieldView<'a>:
         self.len() == 0
     }
     fn len(&self) -> usize;
+}
+
+pub trait RepeatedFieldViewMut<'a>: RepeatedFieldView<'a> {
+    type OwnedItem: 'a + Sized;
+    type MutRef<'b>: 'b + Deref<Target = Self::OwnedItem> + DerefMut
+    where
+        Self: 'b;
+    fn add(&mut self) -> Self::MutRef<'_>;
+    fn clear(&mut self);
 }
