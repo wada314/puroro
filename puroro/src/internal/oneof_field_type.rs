@@ -30,7 +30,7 @@ pub struct NumericalField<RustType, ProtoType>(RustType, PhantomData<ProtoType>)
 pub struct UnsizedField<RustType, ProtoType>(RustType, PhantomData<ProtoType>);
 
 #[derive(Default, Clone)]
-pub struct HeapMessageField<M>(Box<M>);
+pub struct MessageField<M>(M);
 
 pub trait OneofFieldType: Default + Clone {
     /// A non-optional getter type, which is mainly used in the case enum's
@@ -203,7 +203,7 @@ where
     }
 }
 
-impl<M> OneofFieldType for HeapMessageField<M>
+impl<M> OneofFieldType for MessageField<M>
 where
     M: MessageInternal + Default + Clone + Deref,
     <M as Deref>::Target: MessageView,
@@ -242,8 +242,7 @@ where
         field_data: FieldData<ScopedIter<'a, I>>,
     ) -> Result<()> {
         if let FieldData::LengthDelimited(mut iter) = field_data {
-            let msg = self.0.as_mut();
-            msg.merge_from_scoped_bytes_iter(&mut iter)?;
+            self.0.merge_from_scoped_bytes_iter(&mut iter)?;
             iter.drop_and_check_scope_completed()?;
             Ok(())
         } else {
