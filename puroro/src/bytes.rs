@@ -100,6 +100,14 @@ impl Write for Bytes {
     }
 }
 
+impl From<&[u8]> for Bytes {
+    fn from(value: &[u8]) -> Self {
+        let mut bytes = Bytes::new();
+        bytes.extend_from_slice(value);
+        bytes
+    }
+}
+
 impl Bytes {
     fn maybe_ptr_cap(&self) -> Option<&PtrCap> {
         (self.length as usize > PTR_CAP_SIZE).then(|| unsafe { &self.maybe_ptr_cap.ptr_cap })
