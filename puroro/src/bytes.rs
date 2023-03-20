@@ -20,6 +20,7 @@
 
 use ::std::alloc;
 use ::std::alloc::Layout;
+use ::std::io::Write;
 use ::std::mem;
 use ::std::ops::Deref;
 use ::std::ptr;
@@ -50,6 +51,7 @@ union MaybePtrCap {
     ptr_cap: PtrCap,
     bytes: [u8; PTR_CAP_SIZE],
 }
+
 enum Case<'a> {
     PtrCap(Vec<u8>),
     Bytes(&'a [u8], &'a [u8]),
@@ -84,6 +86,17 @@ impl Deref for Bytes {
 impl Drop for Bytes {
     fn drop(&mut self) {
         unsafe { self.maybe_drop_nocleanup() }
+    }
+}
+
+impl Write for Bytes {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.extend_from_slice(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
     }
 }
 
@@ -182,5 +195,10 @@ impl Bytes {
                 }
             }
         }
+    }
+
+    pub fn clear(&mut self) {
+        self.case(); // drop vec
+        self.length = 0;
     }
 }
