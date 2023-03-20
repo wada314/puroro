@@ -14,6 +14,7 @@
 
 #![doc = include_str!("lib.md")]
 
+pub mod bytes;
 pub mod doc_samples;
 mod error;
 pub mod internal;
