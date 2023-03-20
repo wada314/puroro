@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #![doc = include_str!("lib.md")]
+#![feature(vec_into_raw_parts)]
 
 pub mod bytes;
 pub mod doc_samples;
