@@ -18,15 +18,10 @@
 //! the item type is limited to `u8` type, so we can make a special
 //! optimized version for it.
 
-use ::std::alloc;
-use ::std::alloc::Layout;
 use ::std::io::Write;
-use ::std::mem;
-use ::std::ops::Deref;
-use ::std::ptr;
+use ::std::ops::{Deref, DerefMut};
 use ::std::ptr::NonNull;
 use ::std::slice;
-use std::ops::DerefMut;
 
 /// An optimized `Vec<u8>` for protobuf `bytes` field type.
 ///
