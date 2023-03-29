@@ -181,12 +181,22 @@ impl Bytes {
                 let mut vec =
                     unsafe { Vec::from_raw_parts(ptr.as_ptr(), length, (*capacity) as usize) };
                 vec.extend_from_slice(other);
-                let new_parts = vec.into_raw_parts();
-                *ptr = unsafe { NonNull::new_unchecked(new_parts.0) };
-                *capacity = new_parts.2.try_into().unwrap();
-                self.length = new_parts.1.try_into().unwrap();
+                unsafe { self.write_back_vec(vec) };
             }
-            CaseMut::Bytes(_) => todo!(),
+            CaseMut::Bytes(bytes) => {
+                let new_len = length + other.len();
+                if new_len > PTR_CAP_SIZE {
+                    let mut vec = Vec::with_capacity(new_len);
+                    vec.extend_from_slice(&bytes[..length]);
+                    vec.extend_from_slice(other);
+                    unsafe {
+                        self.write_back_vec(vec);
+                    }
+                } else {
+                    bytes[length..new_len].copy_from_slice(other);
+                    self.length = new_len.try_into().unwrap();
+                }
+            }
         }
     }
 
