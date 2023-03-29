@@ -26,6 +26,7 @@ use ::std::ops::Deref;
 use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::slice;
+use std::ops::DerefMut;
 
 /// An optimized `Vec<u8>` for protobuf `bytes` field type.
 ///
@@ -53,12 +54,12 @@ union MaybePtrCap {
 }
 
 enum Case<'a> {
-    PtrCap(Vec<u8>),
-    Bytes(&'a [u8], &'a [u8]),
+    PtrCap(&'a PtrCap),
+    Bytes(&'a [u8; PTR_CAP_SIZE]),
 }
 enum CaseMut<'a> {
-    PtrCap(Vec<u8>),
-    Bytes(&'a mut [u8], &'a mut [u8]),
+    PtrCap(&'a mut PtrCap),
+    Bytes(&'a mut [u8; PTR_CAP_SIZE]),
 }
 
 impl Default for Bytes {
@@ -70,15 +71,22 @@ impl Default for Bytes {
 impl Deref for Bytes {
     type Target = [u8];
     fn deref(&self) -> &Self::Target {
-        if self.length as usize <= PTR_CAP_SIZE {
-            unsafe { &self.maybe_ptr_cap.bytes }
-        } else {
-            unsafe {
-                slice::from_raw_parts(
-                    self.maybe_ptr_cap.ptr_cap.ptr.as_ptr(),
-                    self.length as usize,
-                )
-            }
+        match self.case() {
+            Case::PtrCap(PtrCap { ptr, .. }) => unsafe {
+                slice::from_raw_parts_mut(ptr.as_ptr(), self.length as usize)
+            },
+            Case::Bytes(bytes) => bytes,
+        }
+    }
+}
+
+impl DerefMut for Bytes {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self.case_mut() {
+            CaseMut::PtrCap(PtrCap { ptr, .. }) => unsafe {
+                slice::from_raw_parts_mut(ptr.as_ptr(), self.length as usize)
+            },
+            CaseMut::Bytes(bytes) => bytes,
         }
     }
 }
@@ -115,35 +123,17 @@ impl Bytes {
     fn case(&self) -> Case<'_> {
         let length = self.length as usize;
         if length <= PTR_CAP_SIZE {
-            unsafe {
-                let (first, last) = self.maybe_ptr_cap.bytes.split_at(length);
-                Case::Bytes(first, last)
-            }
+            unsafe { Case::Bytes(&self.maybe_ptr_cap.bytes) }
         } else {
-            Case::PtrCap(unsafe {
-                Vec::from_raw_parts(
-                    self.maybe_ptr_cap.ptr_cap.ptr.as_ptr(),
-                    length,
-                    self.maybe_ptr_cap.ptr_cap.capacity as usize,
-                )
-            })
+            unsafe { Case::PtrCap(&self.maybe_ptr_cap.ptr_cap) }
         }
     }
     fn case_mut(&mut self) -> CaseMut<'_> {
         let length = self.length as usize;
         if length <= PTR_CAP_SIZE {
-            unsafe {
-                let (first, last) = self.maybe_ptr_cap.bytes.split_at_mut(length);
-                CaseMut::Bytes(first, last)
-            }
+            unsafe { CaseMut::Bytes(&mut self.maybe_ptr_cap.bytes) }
         } else {
-            CaseMut::PtrCap(unsafe {
-                Vec::from_raw_parts(
-                    self.maybe_ptr_cap.ptr_cap.ptr.as_ptr(),
-                    length,
-                    self.maybe_ptr_cap.ptr_cap.capacity as usize,
-                )
-            })
+            unsafe { CaseMut::PtrCap(&mut self.maybe_ptr_cap.ptr_cap) }
         }
     }
     unsafe fn maybe_drop_nocleanup(&self) {
@@ -185,23 +175,18 @@ impl Bytes {
     }
 
     pub fn extend_from_slice(&mut self, other: &[u8]) {
+        let length = self.length as usize;
         match self.case_mut() {
-            CaseMut::PtrCap(mut tmp_vec) => {
-                tmp_vec.extend_from_slice(other);
-                unsafe { self.write_back_vec(tmp_vec) };
+            CaseMut::PtrCap(PtrCap { ptr, capacity }) => {
+                let mut vec =
+                    unsafe { Vec::from_raw_parts(ptr.as_ptr(), length, (*capacity) as usize) };
+                vec.extend_from_slice(other);
+                let new_parts = vec.into_raw_parts();
+                *ptr = unsafe { NonNull::new_unchecked(new_parts.0) };
+                *capacity = new_parts.2.try_into().unwrap();
+                self.length = new_parts.1.try_into().unwrap();
             }
-            CaseMut::Bytes(first, last) => {
-                if other.len() <= last.len() {
-                    unsafe {
-                        ptr::copy_nonoverlapping(other.as_ptr(), last.as_mut_ptr(), other.len())
-                    }
-                } else {
-                    let mut new_vec = Vec::with_capacity(first.len() + other.len());
-                    new_vec.extend_from_slice(first);
-                    new_vec.extend_from_slice(other);
-                    unsafe { self.write_back_vec(new_vec) }
-                }
-            }
+            CaseMut::Bytes(_) => todo!(),
         }
     }
 
