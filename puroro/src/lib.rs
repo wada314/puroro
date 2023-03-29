@@ -22,6 +22,7 @@ pub mod internal;
 pub mod message;
 pub mod protobuf;
 pub mod repeated;
+pub mod string;
 
 pub use self::error::PuroroError;
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
