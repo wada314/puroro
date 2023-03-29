@@ -82,9 +82,10 @@ impl Deref for Bytes {
 
 impl DerefMut for Bytes {
     fn deref_mut(&mut self) -> &mut Self::Target {
+        let length = self.length as usize;
         match self.case_mut() {
             CaseMut::PtrCap(PtrCap { ptr, .. }) => unsafe {
-                slice::from_raw_parts_mut(ptr.as_ptr(), self.length as usize)
+                slice::from_raw_parts_mut(ptr.as_ptr(), length)
             },
             CaseMut::Bytes(bytes) => bytes,
         }
@@ -117,9 +118,6 @@ impl From<&[u8]> for Bytes {
 }
 
 impl Bytes {
-    fn maybe_ptr_cap(&self) -> Option<&PtrCap> {
-        (self.length as usize > PTR_CAP_SIZE).then(|| unsafe { &self.maybe_ptr_cap.ptr_cap })
-    }
     fn case(&self) -> Case<'_> {
         let length = self.length as usize;
         if length <= PTR_CAP_SIZE {
@@ -137,11 +135,10 @@ impl Bytes {
         }
     }
     unsafe fn maybe_drop_nocleanup(&self) {
-        if let Some(PtrCap { ptr, capacity }) = self.maybe_ptr_cap().cloned() {
-            alloc::dealloc(
-                ptr.as_ptr(),
-                Layout::from_size_align_unchecked(capacity as usize, mem::align_of::<u8>()),
-            )
+        if let Case::PtrCap(PtrCap { ptr, capacity }) = self.case() {
+            unsafe {
+                Vec::from_raw_parts(ptr.as_ptr(), self.length as usize, *capacity as usize);
+            }
         }
     }
     unsafe fn write_back_vec(&mut self, vec: Vec<u8>) {
@@ -154,6 +151,8 @@ impl Bytes {
                 self.maybe_ptr_cap.bytes.as_mut_ptr(),
                 length_usize,
             );
+            // Reconstruct the given vec to release the buffer.
+            Vec::from_raw_parts(ptr, length_usize, capacity_usize);
         } else {
             self.maybe_ptr_cap = MaybePtrCap {
                 ptr_cap: PtrCap {
