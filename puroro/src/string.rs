@@ -52,3 +52,17 @@ impl DerefMut for String {
         unsafe { ::std::str::from_utf8_unchecked_mut(bytes) }
     }
 }
+
+impl<'a> From<&'a str> for String {
+    fn from(value: &'a str) -> Self {
+        let mut string = Self::new();
+        string.push_str(value);
+        string
+    }
+}
+
+impl String {
+    pub fn push_str(&mut self, string: &str) {
+        self.bytes.extend_from_slice(string.as_bytes())
+    }
+}
