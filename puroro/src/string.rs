@@ -18,11 +18,20 @@
 //! So we can make a special optimized version for it.
 
 use crate::bytes::Bytes;
+use ::std::error::Error;
+use ::std::fmt::Display;
 use ::std::ops::{Deref, DerefMut};
-use ::std::string::FromUtf8Error;
+use ::std::str::Utf8Error;
 
+#[derive(Clone, PartialEq)]
 pub struct String {
     bytes: Bytes,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FromUtf8Error {
+    bytes: Bytes,
+    error: ::std::str::Utf8Error,
 }
 
 impl String {
@@ -66,14 +75,23 @@ impl String {
     pub fn from_utf8(bytes: Bytes) -> Result<Self, FromUtf8Error> {
         match ::std::str::from_utf8(&bytes) {
             Ok(..) => Ok(String { bytes }),
-            Err(error) => Err(FromUtf8Error {
-                bytes: bytes.to_vec(),
-                error,
-            }),
+            Err(error) => Err(FromUtf8Error { bytes, error }),
         }
     }
 
     pub fn push_str(&mut self, string: &str) {
         self.bytes.extend_from_slice(string.as_bytes())
+    }
+}
+
+impl Display for FromUtf8Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        <Utf8Error as Display>::fmt(&self.error, f)
+    }
+}
+
+impl Error for FromUtf8Error {
+    fn description(&self) -> &str {
+        "invalid utf-8"
     }
 }

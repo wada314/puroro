@@ -18,7 +18,7 @@ pub struct File(
     >,
 );
 impl File {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -37,7 +37,7 @@ impl File {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn insertion_point_mut(&mut self) -> &mut ::std::string::String {
+    pub fn insertion_point_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -56,7 +56,7 @@ impl File {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn content_mut(&mut self) -> &mut ::std::string::String {
+    pub fn content_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::code_generator_response::_view::FileView = &mut self
             .0;
@@ -272,17 +272,17 @@ pub mod _view {
     pub struct FileView {
         pub(super) fields: self::_root::google::protobuf::compiler::code_generator_response::_fields::FileFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 1usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 2usize,
             >,

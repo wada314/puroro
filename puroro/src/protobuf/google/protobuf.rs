@@ -172,7 +172,7 @@ pub struct FileDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FileDescriptorProtoView>,
 );
 impl FileDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -191,7 +191,7 @@ impl FileDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn package_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -210,7 +210,7 @@ impl FileDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<::std::string::String> {
+    pub fn dependency_mut(&mut self) -> &mut ::std::vec::Vec::<self::_puroro::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.dependency,
@@ -356,7 +356,7 @@ impl FileDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn syntax_mut(&mut self) -> &mut ::std::string::String {
+    pub fn syntax_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileDescriptorProtoView = &mut self
             .0;
@@ -617,7 +617,7 @@ pub struct DescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::DescriptorProtoView>,
 );
 impl DescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::DescriptorProtoView = &mut self
             .0;
@@ -770,7 +770,7 @@ impl DescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> &mut ::std::vec::Vec::<self::_puroro::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.reserved_name,
@@ -1155,7 +1155,7 @@ pub struct FieldDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FieldDescriptorProtoView>,
 );
 impl FieldDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1235,7 +1235,7 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn type_name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn type_name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1254,7 +1254,7 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn extendee_mut(&mut self) -> &mut ::std::string::String {
+    pub fn extendee_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1273,7 +1273,7 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn default_value_mut(&mut self) -> &mut ::std::string::String {
+    pub fn default_value_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1311,7 +1311,7 @@ impl FieldDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn json_name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn json_name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FieldDescriptorProtoView = &mut self
             .0;
@@ -1601,7 +1601,7 @@ pub struct OneofDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::OneofDescriptorProtoView>,
 );
 impl OneofDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::OneofDescriptorProtoView = &mut self
             .0;
@@ -1782,7 +1782,7 @@ pub struct EnumDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumDescriptorProtoView>,
 );
 impl EnumDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::EnumDescriptorProtoView = &mut self
             .0;
@@ -1855,7 +1855,7 @@ impl EnumDescriptorProto {
     }
     pub fn reserved_name_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> &mut ::std::vec::Vec::<self::_puroro::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.reserved_name,
@@ -2041,7 +2041,7 @@ pub struct EnumValueDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::EnumValueDescriptorProtoView>,
 );
 impl EnumValueDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::EnumValueDescriptorProtoView = &mut self
             .0;
@@ -2255,7 +2255,7 @@ pub struct ServiceDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::ServiceDescriptorProtoView>,
 );
 impl ServiceDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::ServiceDescriptorProtoView = &mut self
             .0;
@@ -2461,7 +2461,7 @@ pub struct MethodDescriptorProto(
     ::std::boxed::Box<self::_root::google::protobuf::_view::MethodDescriptorProtoView>,
 );
 impl MethodDescriptorProto {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -2480,7 +2480,7 @@ impl MethodDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn input_type_mut(&mut self) -> &mut ::std::string::String {
+    pub fn input_type_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -2499,7 +2499,7 @@ impl MethodDescriptorProto {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn output_type_mut(&mut self) -> &mut ::std::string::String {
+    pub fn output_type_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::MethodDescriptorProtoView = &mut self
             .0;
@@ -2758,7 +2758,7 @@ pub struct FileOptions(
     ::std::boxed::Box<self::_root::google::protobuf::_view::FileOptionsView>,
 );
 impl FileOptions {
-    pub fn java_package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn java_package_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -2777,7 +2777,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn java_outer_classname_mut(&mut self) -> &mut ::std::string::String {
+    pub fn java_outer_classname_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -2874,7 +2874,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn go_package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn go_package_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3007,7 +3007,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn objc_class_prefix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn objc_class_prefix_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3026,7 +3026,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn csharp_namespace_mut(&mut self) -> &mut ::std::string::String {
+    pub fn csharp_namespace_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3045,7 +3045,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn swift_prefix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn swift_prefix_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3064,7 +3064,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn php_class_prefix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn php_class_prefix_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3083,7 +3083,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn php_namespace_mut(&mut self) -> &mut ::std::string::String {
+    pub fn php_namespace_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3102,7 +3102,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn php_metadata_namespace_mut(&mut self) -> &mut ::std::string::String {
+    pub fn php_metadata_namespace_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -3121,7 +3121,7 @@ impl FileOptions {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn ruby_package_mut(&mut self) -> &mut ::std::string::String {
+    pub fn ruby_package_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::FileOptionsView = &mut self
             .0;
@@ -5002,7 +5002,7 @@ impl UninterpretedOption {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.name, self.0.shared.bitfield_mut())
     }
-    pub fn identifier_value_mut(&mut self) -> &mut ::std::string::String {
+    pub fn identifier_value_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
             .0;
@@ -5078,7 +5078,7 @@ impl UninterpretedOption {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn string_value_mut(&mut self) -> &mut ::std::vec::Vec::<u8> {
+    pub fn string_value_mut(&mut self) -> &mut self::_puroro::Bytes {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
             .0;
@@ -5097,7 +5097,7 @@ impl UninterpretedOption {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn aggregate_value_mut(&mut self) -> &mut ::std::string::String {
+    pub fn aggregate_value_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::_view::UninterpretedOptionView = &mut self
             .0;
@@ -5717,17 +5717,17 @@ pub mod _view {
     pub struct FileDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::FileDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 1usize,
             >,
             self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
             self::_pinternal::RepeatedNumericalField::<
@@ -5757,7 +5757,7 @@ pub mod _view {
                 self::_root::google::protobuf::SourceCodeInfo,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 2usize,
             >,
@@ -6228,7 +6228,7 @@ pub mod _view {
     pub struct DescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::DescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -6257,7 +6257,7 @@ pub mod _view {
                 self::_root::google::protobuf::descriptor_proto::ReservedRange,
             >,
             self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
         >,
@@ -6739,7 +6739,7 @@ pub mod _view {
     pub struct FieldDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::FieldDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -6763,17 +6763,17 @@ pub mod _view {
                 3usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 4usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 5usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 6usize,
             >,
@@ -6783,7 +6783,7 @@ pub mod _view {
                 7usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 8usize,
             >,
@@ -7304,7 +7304,7 @@ pub mod _view {
     pub struct OneofDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::OneofDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -7457,7 +7457,7 @@ pub mod _view {
     pub struct EnumDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::EnumDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -7471,7 +7471,7 @@ pub mod _view {
                 self::_root::google::protobuf::enum_descriptor_proto::EnumReservedRange,
             >,
             self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
         >,
@@ -7707,7 +7707,7 @@ pub mod _view {
     pub struct EnumValueDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::EnumValueDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -7898,7 +7898,7 @@ pub mod _view {
     pub struct ServiceDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::ServiceDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -8076,17 +8076,17 @@ pub mod _view {
     pub struct MethodDescriptorProtoView {
         pub(super) fields: self::_root::google::protobuf::_fields::MethodDescriptorProtoFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 1usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 2usize,
             >,
@@ -8396,12 +8396,12 @@ pub mod _view {
     pub struct FileOptionsView {
         pub(super) fields: self::_root::google::protobuf::_fields::FileOptionsFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 1usize,
             >,
@@ -8428,7 +8428,7 @@ pub mod _view {
                 5usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 6usize,
             >,
@@ -8463,37 +8463,37 @@ pub mod _view {
                 12usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 13usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 14usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 15usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 16usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 17usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 18usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 19usize,
             >,
@@ -10980,7 +10980,7 @@ pub mod _view {
                 self::_root::google::protobuf::uninterpreted_option::NamePart,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -11000,12 +11000,12 @@ pub mod _view {
                 3usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::vec::Vec<u8>,
+                self::_puroro::Bytes,
                 self::_pinternal::tags::Bytes,
                 4usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 5usize,
             >,

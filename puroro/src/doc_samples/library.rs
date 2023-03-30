@@ -12,7 +12,7 @@ mod _pinternal {
 }
 pub struct Book(::std::boxed::Box<self::_root::library::_view::BookView>);
 impl Book {
-    pub fn title_mut(&mut self) -> &mut ::std::string::String {
+    pub fn title_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::library::_view::BookView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -205,7 +205,7 @@ impl ::std::cmp::PartialEq for Book {
 }
 pub struct Author(::std::boxed::Box<self::_root::library::_view::AuthorView>);
 impl Author {
-    pub fn name_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::library::_view::AuthorView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -359,7 +359,7 @@ pub mod _view {
     pub struct BookView {
         pub(super) fields: self::_root::library::_fields::BookFields::<
             self::_pinternal::SingularUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
             self::_pinternal::SingularNumericalField::<
@@ -541,7 +541,7 @@ pub mod _view {
     pub struct AuthorView {
         pub(super) fields: self::_root::library::_fields::AuthorFields::<
             self::_pinternal::SingularUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
         >,

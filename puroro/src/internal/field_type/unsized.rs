@@ -13,12 +13,10 @@
 // limitations under the License.
 
 use super::{FieldType, NonRepeatedFieldType, RepeatedFieldType};
-use crate::bytes::Bytes;
 use crate::internal::bitvec::BitSlice;
 use crate::internal::ser::{ser_bytes_shared, ScopedIter};
 use crate::internal::tags;
 use crate::repeated::RepeatedFieldView;
-use crate::string::String as PuroroString;
 use crate::Result;
 use ::std::io::{Result as IoResult, Write};
 use ::std::marker::PhantomData;

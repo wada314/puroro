@@ -38,7 +38,7 @@ impl Location {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.span, self.0.shared.bitfield_mut())
     }
-    pub fn leading_comments_mut(&mut self) -> &mut ::std::string::String {
+    pub fn leading_comments_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::source_code_info::_view::LocationView = &mut self
             .0;
@@ -57,7 +57,7 @@ impl Location {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn trailing_comments_mut(&mut self) -> &mut ::std::string::String {
+    pub fn trailing_comments_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::source_code_info::_view::LocationView = &mut self
             .0;
@@ -78,7 +78,7 @@ impl Location {
     }
     pub fn leading_detached_comments_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> &mut ::std::vec::Vec::<self::_puroro::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.leading_detached_comments,
@@ -286,17 +286,17 @@ pub mod _view {
                 self::_pinternal::tags::Int32,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 1usize,
             >,
             self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
         >,

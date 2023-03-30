@@ -18,6 +18,7 @@
 //! the item type is limited to `u8` type, so we can make a special
 //! optimized version for it.
 
+use ::std::fmt::{Debug, Display};
 use ::std::io::Write;
 use ::std::ops::{Deref, DerefMut};
 use ::std::ptr::NonNull;
@@ -55,6 +56,25 @@ enum Case<'a> {
 enum CaseMut<'a> {
     PtrCap(&'a mut PtrCap),
     Bytes(&'a mut [u8; PTR_CAP_SIZE]),
+}
+
+impl Clone for Bytes {
+    fn clone(&self) -> Self {
+        match self.case() {
+            Case::PtrCap(_) => unsafe {
+                let vec = self.assume_is_vec();
+                let cloned_vec = vec.clone();
+                ::std::mem::forget(vec);
+                let mut cloned = Self::new();
+                cloned.write_back_vec(cloned_vec);
+                cloned
+            },
+            Case::Bytes(&bytes) => Self {
+                maybe_ptr_cap: MaybePtrCap { bytes },
+                length: self.length,
+            },
+        }
+    }
 }
 
 impl Default for Bytes {
@@ -148,6 +168,20 @@ impl FromIterator<u8> for Bytes {
         let mut bytes = Self::new();
         bytes.extend(iter);
         bytes
+    }
+}
+
+impl PartialEq for Bytes {
+    fn eq(&self, other: &Self) -> bool {
+        <[u8] as PartialEq>::eq(self, other)
+    }
+}
+
+impl Eq for Bytes {}
+
+impl Debug for Bytes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        <[u8] as Debug>::fmt(&self, f)
     }
 }
 
