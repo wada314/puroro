@@ -62,7 +62,7 @@ fn test_oneof2() {
     assert!(matches!(msg.group_one(), Some(GroupOneCase2::G1Int32(100))));
     assert_eq!(msg.g1_int32(), 100);
     assert!(!msg.has_g1_string());
-    *msg.g1_string_mut() = "Test".to_string();
+    *msg.g1_string_mut() = "Test".into();
     assert!(matches!(
         msg.group_one(),
         Some(GroupOneCase2::G1String("Test"))
@@ -79,7 +79,7 @@ fn test_oneof2() {
     assert_eq!(msg.g2_f32(), 100.0);
     assert!(!msg.has_g2_string());
     assert!(!msg.has_g2_submsg());
-    *msg.g2_string_mut() = "Test".to_string();
+    *msg.g2_string_mut() = "Test".into();
     assert_eq!(msg.group_two(), Some(GroupTwoCase2::G2String("Test")));
     assert_eq!(msg.g2_string(), "Test");
     assert!(!msg.has_g2_f32());
@@ -157,7 +157,7 @@ fn test_oneof3() {
     assert!(matches!(msg.group_one(), Some(GroupOneCase3::G1Int32(100))));
     assert_eq!(msg.g1_int32(), 100);
     assert!(!msg.has_g1_string());
-    *msg.g1_string_mut() = "Test".to_string();
+    *msg.g1_string_mut() = "Test".into();
     assert!(matches!(
         msg.group_one(),
         Some(GroupOneCase3::G1String("Test"))
@@ -174,7 +174,7 @@ fn test_oneof3() {
     assert_eq!(msg.g2_f32(), 100.0);
     assert!(!msg.has_g2_string());
     assert!(!msg.has_g2_submsg());
-    *msg.g2_string_mut() = "Test".to_string();
+    *msg.g2_string_mut() = "Test".into();
     assert_eq!(msg.group_two(), Some(GroupTwoCase3::G2String("Test")));
     assert_eq!(msg.g2_string(), "Test");
     assert!(!msg.has_g2_f32());

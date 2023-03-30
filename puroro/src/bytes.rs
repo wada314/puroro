@@ -18,7 +18,7 @@
 //! the item type is limited to `u8` type, so we can make a special
 //! optimized version for it.
 
-use ::std::fmt::{Debug, Display};
+use ::std::fmt::Debug;
 use ::std::io::Write;
 use ::std::ops::{Deref, DerefMut};
 use ::std::ptr::NonNull;
@@ -157,9 +157,11 @@ impl Extend<u8> for Bytes {
         }
 
         // the bytes contents is now guaranteed to be on the heap memory.
-        let mut vec = unsafe { self.assume_is_vec() };
-        vec.extend(iter);
-        unsafe { self.write_back_vec(vec) };
+        if (self.length as usize) > PTR_CAP_SIZE {
+            let mut vec = unsafe { self.assume_is_vec() };
+            vec.extend(iter);
+            unsafe { self.write_back_vec(vec) };
+        }
     }
 }
 

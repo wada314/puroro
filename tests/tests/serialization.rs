@@ -162,7 +162,7 @@ fn test_ser_and_then_deser() {
         .extend(vec![10.0, 20.0].into_iter());
     *msg.string_unlabeled_mut() = "test".into();
     msg.string_repeated_mut()
-        .extend(vec!["abc".to_string(), "def".to_string()].into_iter());
+        .extend(vec!["abc".into(), "def".into()].into_iter());
     *msg.submsg_unlabeled_mut().i32_unlabeled_mut() = 100;
     msg.submsg_repeated_mut()
         .extend(vec![100, 200].into_iter().map(|i| {

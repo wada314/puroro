@@ -71,6 +71,18 @@ impl<'a> From<&'a str> for String {
     }
 }
 
+impl PartialEq<str> for String {
+    fn eq(&self, other: &str) -> bool {
+        <str as PartialEq>::eq(self, other)
+    }
+}
+
+impl PartialEq<String> for str {
+    fn eq(&self, other: &String) -> bool {
+        <str as PartialEq>::eq(self, other)
+    }
+}
+
 impl String {
     pub fn from_utf8(bytes: Bytes) -> Result<Self, FromUtf8Error> {
         match ::std::str::from_utf8(&bytes) {
