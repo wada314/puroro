@@ -19,6 +19,7 @@
 
 use crate::bytes::Bytes;
 use ::std::ops::{Deref, DerefMut};
+use ::std::string::FromUtf8Error;
 
 pub struct String {
     bytes: Bytes,
@@ -62,6 +63,16 @@ impl<'a> From<&'a str> for String {
 }
 
 impl String {
+    pub fn from_utf8(bytes: Bytes) -> Result<Self, FromUtf8Error> {
+        match ::std::str::from_utf8(&bytes) {
+            Ok(..) => Ok(String { bytes }),
+            Err(error) => Err(FromUtf8Error {
+                bytes: bytes.to_vec(),
+                error,
+            }),
+        }
+    }
+
     pub fn push_str(&mut self, string: &str) {
         self.bytes.extend_from_slice(string.as_bytes())
     }

@@ -310,8 +310,8 @@ impl UnsizedType for String {
     }
 
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType> {
-        let bytes = bytes.collect::<IoResult<Vec<_>>>()?;
-        Ok(::std::string::String::from_utf8(bytes)?)
+        let bytes = bytes.collect::<IoResult<PuroroBytes>>()?;
+        Ok(PuroroString::from_utf8(bytes)?)
     }
     fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]> {
         Ok(val.as_bytes())
