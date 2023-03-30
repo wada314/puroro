@@ -318,11 +318,11 @@ impl UnsizedType for String {
     }
 }
 impl UnsizedType for Bytes {
-    type RustOwnedType = Vec<u8>;
+    type RustOwnedType = PuroroBytes;
     type RustRefType<'a> = &'a [u8]
     where
         Self: 'a;
-    type RustMutType<'a> = &'a mut Vec<u8>
+    type RustMutType<'a> = &'a mut PuroroBytes
     where
         Self: 'a;
     type DefaultValueType = &'static [u8];
@@ -334,17 +334,17 @@ impl UnsizedType for Bytes {
         val
     }
     fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType {
-        default.to_vec()
+        default.into()
     }
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a> {
         default
     }
 
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType> {
-        Ok(bytes.collect::<IoResult<Vec<_>>>()?)
+        Ok(bytes.collect::<IoResult<PuroroBytes>>()?)
     }
     fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]> {
-        Ok(val.as_slice())
+        Ok(&val)
     }
 }
 
