@@ -18,6 +18,8 @@ use crate::{PuroroError, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 use ::std::ops::Deref;
+use crate::string::String as PuroroString;
+use crate::bytes::Bytes as PuroroBytes;
 
 // Variants
 #[derive(Default, Clone)]
@@ -285,11 +287,11 @@ impl NumericalType for SFixed64 {
     }
 }
 impl UnsizedType for String {
-    type RustOwnedType = ::std::string::String;
+    type RustOwnedType = crate::string::String;
     type RustRefType<'a> = &'a str
     where
         Self: 'a;
-    type RustMutType<'a> = &'a mut ::std::string::String 
+    type RustMutType<'a> = &'a mut crate::string::String 
     where
         Self: 'a;
     type DefaultValueType = &'static str;
@@ -301,7 +303,7 @@ impl UnsizedType for String {
         val
     }
     fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType {
-        default.to_string()
+        default.into()
     }
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a> {
         default

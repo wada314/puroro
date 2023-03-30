@@ -28,5 +28,7 @@ pub use self::error::PuroroError;
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
+pub use crate::bytes::Bytes;
 pub use crate::message::{Message, MessageView};
 pub use crate::repeated::RepeatedFieldView;
+pub use crate::string::String;

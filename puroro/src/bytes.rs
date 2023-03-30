@@ -112,6 +112,45 @@ impl From<&[u8]> for Bytes {
     }
 }
 
+impl Extend<u8> for Bytes {
+    fn extend<T: IntoIterator<Item = u8>>(&mut self, into_iter: T) {
+        let mut iter = into_iter.into_iter().fuse();
+
+        // while shorter than the threshold
+        while (self.length as usize) < PTR_CAP_SIZE {
+            if let Some(b) = iter.next() {
+                let mut bytes_array = unsafe { self.maybe_ptr_cap.bytes };
+                bytes_array[self.length as usize] = b;
+                self.length += 1;
+            } else {
+                break;
+            }
+        }
+
+        // when stepping over the threshold
+        if (self.length as usize) == PTR_CAP_SIZE {
+            if let Some(b) = iter.next() {
+                let mut vec = unsafe { self.maybe_ptr_cap.bytes }.to_vec();
+                vec.push(b);
+                unsafe { self.write_back_vec(vec) };
+            }
+        }
+
+        // the bytes contents is now guaranteed to be on the heap memory.
+        let mut vec = unsafe { self.assume_is_vec() };
+        vec.extend(iter);
+        unsafe { self.write_back_vec(vec) };
+    }
+}
+
+impl FromIterator<u8> for Bytes {
+    fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
+        let mut bytes = Self::new();
+        bytes.extend(iter);
+        bytes
+    }
+}
+
 impl Bytes {
     fn case(&self) -> Case<'_> {
         let length = self.length as usize;
@@ -135,6 +174,10 @@ impl Bytes {
                 Vec::from_raw_parts(ptr.as_ptr(), self.length as usize, *capacity as usize);
             }
         }
+    }
+    unsafe fn assume_is_vec(&self) -> Vec<u8> {
+        let PtrCap { ptr, capacity } = self.maybe_ptr_cap.ptr_cap;
+        Vec::from_raw_parts(ptr.as_ptr(), self.length as usize, capacity as usize)
     }
     unsafe fn write_back_vec(&mut self, vec: Vec<u8>) {
         let (ptr, length_usize, capacity_usize) = vec.into_raw_parts();
