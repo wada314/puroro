@@ -132,6 +132,25 @@ impl From<&[u8]> for Bytes {
     }
 }
 
+impl From<&Vec<u8>> for Bytes {
+    fn from(value: &Vec<u8>) -> Self {
+        value.as_slice().into()
+    }
+}
+
+impl From<Vec<u8>> for Bytes {
+    fn from(value: Vec<u8>) -> Self {
+        let mut bytes = Bytes::new();
+        if value.len() <= PTR_CAP_SIZE {
+            bytes.length = value.len().try_into().unwrap();
+            unsafe { &mut bytes.maybe_ptr_cap.bytes[..(value.len())] }.copy_from_slice(&value);
+        } else {
+            unsafe { bytes.write_back_vec(value) };
+        }
+        bytes
+    }
+}
+
 impl Extend<u8> for Bytes {
     fn extend<T: IntoIterator<Item = u8>>(&mut self, into_iter: T) {
         let mut iter = into_iter.into_iter().fuse();

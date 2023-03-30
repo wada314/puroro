@@ -71,6 +71,20 @@ impl<'a> From<&'a str> for String {
     }
 }
 
+impl From<::std::string::String> for String {
+    fn from(value: ::std::string::String) -> Self {
+        Self {
+            bytes: value.into_bytes().into(),
+        }
+    }
+}
+
+impl From<&::std::string::String> for String {
+    fn from(value: &::std::string::String) -> Self {
+        value.as_str().into()
+    }
+}
+
 impl PartialEq<str> for String {
     fn eq(&self, other: &str) -> bool {
         <str as PartialEq>::eq(self, other)
