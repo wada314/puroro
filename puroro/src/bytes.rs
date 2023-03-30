@@ -90,7 +90,7 @@ impl Deref for Bytes {
             Case::PtrCap(PtrCap { ptr, .. }) => unsafe {
                 slice::from_raw_parts_mut(ptr.as_ptr(), self.length as usize)
             },
-            Case::Bytes(bytes) => bytes,
+            Case::Bytes(bytes) => &bytes[..(self.length as usize)],
         }
     }
 }
@@ -102,7 +102,7 @@ impl DerefMut for Bytes {
             CaseMut::PtrCap(PtrCap { ptr, .. }) => unsafe {
                 slice::from_raw_parts_mut(ptr.as_ptr(), length)
             },
-            CaseMut::Bytes(bytes) => bytes,
+            CaseMut::Bytes(bytes) => &mut bytes[..(length)],
         }
     }
 }
@@ -139,7 +139,7 @@ impl Extend<u8> for Bytes {
         // while shorter than the threshold
         while (self.length as usize) < PTR_CAP_SIZE {
             if let Some(b) = iter.next() {
-                let mut bytes_array = unsafe { self.maybe_ptr_cap.bytes };
+                let bytes_array = unsafe { &mut self.maybe_ptr_cap.bytes };
                 bytes_array[self.length as usize] = b;
                 self.length += 1;
             } else {
@@ -156,8 +156,8 @@ impl Extend<u8> for Bytes {
             }
         }
 
-        // the bytes contents is now guaranteed to be on the heap memory.
         if (self.length as usize) > PTR_CAP_SIZE {
+            // the bytes contents is now guaranteed to be on the heap memory.
             let mut vec = unsafe { self.assume_is_vec() };
             vec.extend(iter);
             unsafe { self.write_back_vec(vec) };
