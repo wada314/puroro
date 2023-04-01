@@ -12,17 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! A customized version of `std::string::String`
-//! for use in protobuf field type `string`.
-//! The `string` type in protobuf can only have max 2^32 - 1 bytes length.
-//! So we can make a special optimized version for it.
-
 use crate::bytes::Bytes;
 use ::std::error::Error;
 use ::std::fmt::Display;
 use ::std::ops::{Deref, DerefMut};
 use ::std::str::Utf8Error;
 
+/// A puroro-specialized `String` type.
+///
+/// The main implementation differences from the [`::std::string::String`] are:
+///
+/// - Protocol buffer's string type only allows up to 2^32 - 1
+/// (2^32 maybe? unsure) length. So for the string capacity and length, this
+/// string is using `u32` instead of `usize` to reduce the memory footprint.
+/// - Assuming the considerable ratio of the strings used in protobuf is
+/// very short. So this string type do not allocate the heap memory for the
+/// string body while the string length is shorter or equal to
+/// `size_of::<usize>() + size_of::<u32>()` (typically it's 12 bytes).
+///
+/// The most of the methods in [`::std::string::String`] should have been
+/// technically implementable for this type toop, though those have not
+/// been implemented yet because just I'm lazy.
 #[derive(Clone, PartialEq)]
 pub struct String {
     bytes: Bytes,
