@@ -28,7 +28,7 @@ use ::std::str::Utf8Error;
 /// - Assuming the considerable ratio of the strings used in protobuf is
 /// very short. So this string type do not allocate the heap memory for the
 /// string body while the string length is shorter or equal to
-/// `size_of::<usize>() + size_of::<u32>()` (typically it's 12 bytes).
+/// `size_of::<*mut u8>() + size_of::<u32>()` (typically it's 12 bytes).
 ///
 /// The most of the methods in [`::std::string::String`] should have been
 /// technically implementable for this type toop, though those have not

@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! A customized version of `std::vec::Vec<u8>`
-//! for use in protobuf field type `bytes`.
-//! The `bytes` type in protobuf can only have max 2^32 - 1 length, and
-//! the item type is limited to `u8` type, so we can make a special
-//! optimized version for it.
-
 use ::std::fmt::Debug;
 use ::std::io::Write;
 use ::std::ops::{Deref, DerefMut};
@@ -30,7 +24,7 @@ use ::std::slice;
 /// and the capacity of the buffer is `u32` instead of `usize`.
 ///
 /// Also, it does not allocate heap memory until its length become longer than
-/// the `sizeof::<*mut u8>() + sizeof::<u32>()` value.
+/// the `size_of::<*mut u8>() + size_of::<u32>()` value.
 #[repr(C)]
 pub struct Bytes {
     maybe_ptr_cap: MaybePtrCap,
