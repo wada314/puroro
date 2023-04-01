@@ -192,6 +192,12 @@ impl PartialEq for Bytes {
     }
 }
 
+impl PartialEq<[u8]> for Bytes {
+    fn eq(&self, other: &[u8]) -> bool {
+        <[u8] as PartialEq>::eq(self, other)
+    }
+}
+
 impl Eq for Bytes {}
 
 impl Debug for Bytes {
@@ -289,5 +295,49 @@ impl Bytes {
     pub fn clear(&mut self) {
         self.case(); // drop vec
         self.length = 0;
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Bytes;
+
+    #[test]
+    fn test_new() {
+        let new_bytes = Bytes::new();
+        assert_eq!(&new_bytes, &[] as &[u8]);
+    }
+
+    #[test]
+    fn test_extend_slice() {
+        let mut bytes = Bytes::new();
+        assert_eq!(&bytes, [].as_slice());
+
+        bytes.extend_from_slice(&[0]);
+        assert_eq!(&bytes, [0].as_slice());
+
+        bytes.extend_from_slice(&[1, 2]);
+        assert_eq!(&bytes, [0, 1, 2].as_slice());
+    }
+
+    #[test]
+    fn test_extend_slice_11() {
+        let mut bytes: Bytes = b"0123456789".as_slice().into();
+        bytes.extend_from_slice(b"a");
+        assert_eq!(&bytes, b"0123456789a".as_slice());
+    }
+
+    #[test]
+    fn test_extend_slice_12() {
+        let mut bytes: Bytes = b"0123456789".as_slice().into();
+        bytes.extend_from_slice(b"ab");
+        assert_eq!(&bytes, b"0123456789ab".as_slice());
+    }
+
+    #[test]
+    fn test_extend_slice_13() {
+        let mut bytes: Bytes = b"0123456789".as_slice().into();
+        bytes.extend_from_slice(b"abc");
+        assert_eq!(&bytes, b"0123456789abc".as_slice());
     }
 }
