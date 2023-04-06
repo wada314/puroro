@@ -31,7 +31,7 @@ use ::std::str::Utf8Error;
 /// `size_of::<*mut u8>() + size_of::<u32>()` (typically it's 12 bytes).
 ///
 /// The most of the methods in [`::std::string::String`] should have been
-/// technically implementable for this type toop, though those have not
+/// technically implementable for this type too, though those have not
 /// been implemented yet because just I'm lazy.
 #[derive(Clone, PartialEq)]
 pub struct String {
@@ -42,14 +42,6 @@ pub struct String {
 pub struct FromUtf8Error {
     bytes: Bytes,
     error: ::std::str::Utf8Error,
-}
-
-impl String {
-    pub fn new() -> Self {
-        Self {
-            bytes: Bytes::new(),
-        }
-    }
 }
 
 impl Default for String {
@@ -108,6 +100,12 @@ impl PartialEq<String> for str {
 }
 
 impl String {
+    pub const fn new() -> Self {
+        Self {
+            bytes: Bytes::new(),
+        }
+    }
+
     pub fn from_utf8(bytes: Bytes) -> Result<Self, FromUtf8Error> {
         match ::std::str::from_utf8(&bytes) {
             Ok(..) => Ok(String { bytes }),
