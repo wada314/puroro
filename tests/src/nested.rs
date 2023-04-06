@@ -290,6 +290,14 @@ pub mod _fields {
     pub struct MsgFields<TItemOuter> {
         pub item_outer: TItemOuter,
     }
+    impl<TItemOuter: ::std::default::Default> ::std::default::Default
+    for self::MsgFields<TItemOuter> {
+        fn default() -> Self {
+            Self {
+                item_outer: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

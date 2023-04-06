@@ -298,6 +298,14 @@ pub mod _fields {
     pub struct MsgFields<TRecursiveUnlabeled> {
         pub recursive_unlabeled: TRecursiveUnlabeled,
     }
+    impl<TRecursiveUnlabeled: ::std::default::Default> ::std::default::Default
+    for self::MsgFields<TRecursiveUnlabeled> {
+        fn default() -> Self {
+            Self {
+                recursive_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

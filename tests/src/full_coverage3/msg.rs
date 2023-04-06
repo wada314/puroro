@@ -438,6 +438,20 @@ pub mod _fields {
         pub i32_optional: TI32Optional,
         pub i64_unlabeled: TI64Unlabeled,
     }
+    impl<
+        TI32Unlabeled: ::std::default::Default,
+        TI32Optional: ::std::default::Default,
+        TI64Unlabeled: ::std::default::Default,
+    > ::std::default::Default
+    for self::SubmsgFields<TI32Unlabeled, TI32Optional, TI64Unlabeled> {
+        fn default() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i64_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

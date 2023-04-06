@@ -173,11 +173,16 @@ impl Message {
             .map(|fo| fo.gen_fields_struct_field())
             .collect::<Result<Vec<_>>>()?;
 
-        Ok(vec![parse2(quote! {
-            pub struct #ident <#(#generics),*> {
-                #(#fields,)*
-            }
-        })?])
+        let default_impl = self.gen_fields_struct_impl_default()?;
+
+        Ok(vec![
+            parse2(quote! {
+                pub struct #ident <#(#generics),*> {
+                    #(#fields,)*
+                }
+            })?,
+            default_impl.into(),
+        ])
     }
 
     pub(crate) fn gen_view_struct_items(&self) -> Result<Vec<Item>> {
@@ -551,6 +556,31 @@ impl Message {
                             shared: ::std::clone::Clone::clone(&self.shared),
                         })
                     )
+                }
+            }
+        })?)
+    }
+
+    fn gen_fields_struct_impl_default(&self) -> Result<ItemImpl> {
+        let ident = self.gen_fields_struct_ident()?;
+
+        let generics = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_fields_struct_generic_param_ident())
+            .collect::<Result<Vec<_>>>()?;
+        let field_idents = self
+            .fields_or_oneofs()?
+            .map(|fo| fo.gen_fields_struct_field_ident())
+            .collect::<Result<Vec<_>>>()?;
+
+        Ok(parse2(quote! {
+            impl <#(#generics: ::std::default::Default),*> ::std::default::Default
+            for self::#ident <#(#generics),*>
+            {
+                fn default() -> Self {
+                    Self {
+                        #(#field_idents: ::std::default::Default::default(),)*
+                    }
                 }
             }
         })?)

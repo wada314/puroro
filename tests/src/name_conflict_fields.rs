@@ -578,8 +578,24 @@ pub mod _fields {
     pub struct ConflictFields<TThisIsOriginalMessageField> {
         pub this_is_original_message_field: TThisIsOriginalMessageField,
     }
+    impl<TThisIsOriginalMessageField: ::std::default::Default> ::std::default::Default
+    for self::ConflictFields<TThisIsOriginalMessageField> {
+        fn default() -> Self {
+            Self {
+                this_is_original_message_field: ::std::default::Default::default(),
+            }
+        }
+    }
     pub struct ConflictFieldsFields<TThisIsFieldsMessageField> {
         pub this_is_fields_message_field: TThisIsFieldsMessageField,
+    }
+    impl<TThisIsFieldsMessageField: ::std::default::Default> ::std::default::Default
+    for self::ConflictFieldsFields<TThisIsFieldsMessageField> {
+        fn default() -> Self {
+            Self {
+                this_is_fields_message_field: ::std::default::Default::default(),
+            }
+        }
     }
 }
 #[doc(hidden)]

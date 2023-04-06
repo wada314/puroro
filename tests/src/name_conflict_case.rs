@@ -303,6 +303,14 @@ pub mod _fields {
     pub struct MessageFields<TConflict> {
         pub conflict: TConflict,
     }
+    impl<TConflict: ::std::default::Default> ::std::default::Default
+    for self::MessageFields<TConflict> {
+        fn default() -> Self {
+            Self {
+                conflict: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

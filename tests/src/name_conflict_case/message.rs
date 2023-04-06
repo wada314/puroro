@@ -311,6 +311,14 @@ pub mod _fields {
     pub struct ConflictCaseFields<TThisIsMessageField> {
         pub this_is_message_field: TThisIsMessageField,
     }
+    impl<TThisIsMessageField: ::std::default::Default> ::std::default::Default
+    for self::ConflictCaseFields<TThisIsMessageField> {
+        fn default() -> Self {
+            Self {
+                this_is_message_field: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

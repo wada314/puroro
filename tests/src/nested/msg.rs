@@ -292,6 +292,14 @@ pub mod _fields {
     pub struct SubmsgFields<TItemInner> {
         pub item_inner: TItemInner,
     }
+    impl<TItemInner: ::std::default::Default> ::std::default::Default
+    for self::SubmsgFields<TItemInner> {
+        fn default() -> Self {
+            Self {
+                item_inner: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

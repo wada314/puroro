@@ -371,6 +371,17 @@ pub mod _fields {
         pub i32_required: TI32Required,
         pub i64_required: TI64Required,
     }
+    impl<
+        TI32Required: ::std::default::Default,
+        TI64Required: ::std::default::Default,
+    > ::std::default::Default for self::SubmsgFields<TI32Required, TI64Required> {
+        fn default() -> Self {
+            Self {
+                i32_required: ::std::default::Default::default(),
+                i64_required: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 #[doc(hidden)]
 pub use self::_fields::*;

@@ -536,8 +536,24 @@ pub mod _fields {
     pub struct MsgFields<TType> {
         pub r#type: TType,
     }
+    impl<TType: ::std::default::Default> ::std::default::Default
+    for self::MsgFields<TType> {
+        fn default() -> Self {
+            Self {
+                r#type: ::std::default::Default::default(),
+            }
+        }
+    }
     pub struct SelfFields<TType> {
         pub r#type: TType,
+    }
+    impl<TType: ::std::default::Default> ::std::default::Default
+    for self::SelfFields<TType> {
+        fn default() -> Self {
+            Self {
+                r#type: ::std::default::Default::default(),
+            }
+        }
     }
 }
 #[doc(hidden)]
