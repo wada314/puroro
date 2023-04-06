@@ -25,13 +25,14 @@ use ::std::slice;
 ///
 /// Also, it does not allocate heap memory until its length become longer than
 /// the `size_of::<*mut u8>() + size_of::<u32>()` value.
-#[repr(C)]
+#[repr(C, align(8))]
 pub struct Bytes {
     maybe_ptr_cap: MaybePtrCap,
     length: u32,
 }
 
 #[derive(Clone, Copy)]
+#[repr(C, packed(4))]
 struct PtrCap {
     ptr: NonNull<u8>,
     capacity: u32,
@@ -44,11 +45,17 @@ union MaybePtrCap {
 }
 
 enum Case<'a> {
-    PtrCap(&'a PtrCap),
+    PtrCap(
+        // #[repr(packed)] struct cannot make a reference!
+        PtrCap,
+    ),
     Bytes(&'a [u8; PTR_CAP_SIZE]),
 }
 enum CaseMut<'a> {
-    PtrCap(&'a mut PtrCap),
+    PtrCap(
+        // #[repr(packed)] struct cannot make a reference!
+        PtrCap,
+    ),
     Bytes(&'a mut [u8; PTR_CAP_SIZE]),
 }
 
@@ -212,7 +219,7 @@ impl Bytes {
         if length <= PTR_CAP_SIZE {
             unsafe { Case::Bytes(&self.maybe_ptr_cap.bytes) }
         } else {
-            unsafe { Case::PtrCap(&self.maybe_ptr_cap.ptr_cap) }
+            unsafe { Case::PtrCap(self.maybe_ptr_cap.ptr_cap) }
         }
     }
     fn case_mut(&mut self) -> CaseMut<'_> {
@@ -220,13 +227,13 @@ impl Bytes {
         if length <= PTR_CAP_SIZE {
             unsafe { CaseMut::Bytes(&mut self.maybe_ptr_cap.bytes) }
         } else {
-            unsafe { CaseMut::PtrCap(&mut self.maybe_ptr_cap.ptr_cap) }
+            unsafe { CaseMut::PtrCap(self.maybe_ptr_cap.ptr_cap) }
         }
     }
     unsafe fn maybe_drop_nocleanup(&self) {
         if let Case::PtrCap(PtrCap { ptr, capacity }) = self.case() {
             unsafe {
-                Vec::from_raw_parts(ptr.as_ptr(), self.length as usize, *capacity as usize);
+                Vec::from_raw_parts(ptr.as_ptr(), self.length as usize, capacity as usize);
             }
         }
     }
@@ -271,7 +278,7 @@ impl Bytes {
         match self.case_mut() {
             CaseMut::PtrCap(PtrCap { ptr, capacity }) => {
                 let mut vec =
-                    unsafe { Vec::from_raw_parts(ptr.as_ptr(), length, (*capacity) as usize) };
+                    unsafe { Vec::from_raw_parts(ptr.as_ptr(), length, capacity as usize) };
                 vec.extend_from_slice(other);
                 unsafe { self.write_back_vec(vec) };
             }
@@ -339,5 +346,11 @@ mod test {
         let mut bytes: Bytes = b"0123456789".as_slice().into();
         bytes.extend_from_slice(b"abc");
         assert_eq!(&bytes, b"0123456789abc".as_slice());
+    }
+
+    #[test]
+    fn test_layout() {
+        assert_eq!(16, ::std::mem::size_of::<Bytes>());
+        assert_eq!(8, ::std::mem::align_of::<Bytes>());
     }
 }
