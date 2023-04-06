@@ -27,7 +27,7 @@ impl Annotation {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::clear(&mut self.0.fields.path, self.0.shared.bitfield_mut())
     }
-    pub fn source_file_mut(&mut self) -> &mut ::std::string::String {
+    pub fn source_file_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::generated_code_info::_view::AnnotationView = &mut self
             .0;
@@ -264,7 +264,7 @@ pub mod _view {
                 self::_pinternal::tags::Int32,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,

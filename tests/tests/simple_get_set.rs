@@ -88,7 +88,7 @@ fn simple2_get_set_string() {
     assert_eq!("", msg.string_optional());
     assert!(msg.has_string_optional());
 
-    *msg.string_optional_mut() = "test1".to_string();
+    *msg.string_optional_mut() = "test1".into();
     assert_eq!("test1", msg.string_optional());
     assert!(msg.has_string_optional());
 
@@ -113,10 +113,10 @@ fn simple3_get_set_string() {
     assert_eq!("", msg.string_unlabeled());
     assert!(!msg.has_string_unlabeled());
 
-    *msg.string_optional_mut() = "test1".to_string();
+    *msg.string_optional_mut() = "test1".into();
     assert_eq!("test1", msg.string_optional());
     assert!(msg.has_string_optional());
-    *msg.string_unlabeled_mut() = "test2".to_string();
+    *msg.string_unlabeled_mut() = "test2".into();
     assert_eq!("test2", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
 

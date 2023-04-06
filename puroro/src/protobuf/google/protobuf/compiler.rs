@@ -74,7 +74,7 @@ impl Version {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn suffix_mut(&mut self) -> &mut ::std::string::String {
+    pub fn suffix_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::VersionView = &mut self
             .0;
@@ -259,7 +259,7 @@ pub struct CodeGeneratorRequest(
 impl CodeGeneratorRequest {
     pub fn file_to_generate_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<::std::string::String> {
+    ) -> &mut ::std::vec::Vec::<self::_puroro::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.file_to_generate,
@@ -273,7 +273,7 @@ impl CodeGeneratorRequest {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn parameter_mut(&mut self) -> &mut ::std::string::String {
+    pub fn parameter_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::CodeGeneratorRequestView = &mut self
             .0;
@@ -496,7 +496,7 @@ pub struct CodeGeneratorResponse(
     >,
 );
 impl CodeGeneratorResponse {
-    pub fn error_mut(&mut self) -> &mut ::std::string::String {
+    pub fn error_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::compiler::_view::CodeGeneratorResponseView = &mut self
             .0;
@@ -730,7 +730,7 @@ pub mod _view {
                 2usize,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 3usize,
             >,
@@ -940,11 +940,11 @@ pub mod _view {
     pub struct CodeGeneratorRequestView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorRequestFields::<
             self::_pinternal::RepeatedUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,
@@ -1181,7 +1181,7 @@ pub mod _view {
     pub struct CodeGeneratorResponseView {
         pub(super) fields: self::_root::google::protobuf::compiler::_fields::CodeGeneratorResponseFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,

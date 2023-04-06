@@ -22,7 +22,7 @@ pub struct NamePart(
     >,
 );
 impl NamePart {
-    pub fn name_part_mut(&mut self) -> &mut ::std::string::String {
+    pub fn name_part_mut(&mut self) -> &mut self::_puroro::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::google::protobuf::uninterpreted_option::_view::NamePartView = &mut self
             .0;
@@ -216,7 +216,7 @@ pub mod _view {
     pub struct NamePartView {
         pub(super) fields: self::_root::google::protobuf::uninterpreted_option::_fields::NamePartFields::<
             self::_pinternal::OptionalUnsizedField::<
-                ::std::string::String,
+                self::_puroro::String,
                 self::_pinternal::tags::String,
                 0usize,
             >,

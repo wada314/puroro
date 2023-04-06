@@ -69,7 +69,7 @@ impl Book {
     }
 }
 impl BookView {
-    pub fn title_mut(&mut self) -> &mut String {
+    pub fn title_mut(&mut self) -> &mut ::puroro::String {
         // ...
 #       todo!()
     }
@@ -104,7 +104,7 @@ then you can use the generated protobuf like this:
 use doc_samples::library::Book;
 
 let mut book = Book::default();
-*book.title_mut() = "The C Programming Language".to_string();
+*book.title_mut() = "The C Programming Language".into();
 // We are not setting the number of pages here.
 
 assert_eq!("The C Programming Language", book.title());
@@ -149,7 +149,7 @@ use doc_samples::library::Book;
 let mut output = vec![];
 let mut book = Book::default();
 
-*book.title_mut() = "Yo".to_string();
+*book.title_mut() = "Yo".into();
 book.to_bytes(&mut output).unwrap();
 
 assert_eq!(vec![0x0a, 0x02, 0x59, 0x6f], output);
