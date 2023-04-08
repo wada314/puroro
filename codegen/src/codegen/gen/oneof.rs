@@ -170,7 +170,7 @@ impl Oneof {
         ])
     }
 
-    pub(crate) fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn gen_message_struct_field_type(&self) -> Result<Rc<Type>> {
         let generic_params = self
             .fields()?
             .map(|f| f.gen_oneof_union_field_type())

@@ -190,7 +190,7 @@ impl Message {
 
         let fields_types = self
             .fields_or_oneofs()?
-            .map(|fo| fo.gen_fields_struct_field_type())
+            .map(|fo| fo.gen_message_struct_field_type())
             .collect::<Result<Vec<_>>>()?;
         let fields_struct_type = self.gen_fields_struct_type(fields_types.into_iter())?;
 

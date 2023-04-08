@@ -26,7 +26,7 @@ use ::std::rc::Rc;
 pub(crate) trait FieldOrOneofExt {
     fn gen_fields_struct_field_ident(&self) -> Result<Rc<Ident>>;
     fn gen_fields_struct_generic_param_ident(&self) -> Result<Rc<Ident>>;
-    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
+    fn gen_message_struct_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<SynField>;
 
     fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
@@ -75,13 +75,13 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
             .cloned()
     }
 
-    fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+    fn gen_message_struct_field_type(&self) -> Result<Rc<Type>> {
         self.cache()
             .get::<Cache>()?
             .fields_struct_field_type
             .get_or_try_init(|| match self.either() {
-                FieldOrOneofCase::Field(f) => f.gen_fields_struct_field_type(),
-                FieldOrOneofCase::Oneof(o) => o.gen_fields_struct_field_type(),
+                FieldOrOneofCase::Field(f) => f.gen_message_struct_field_type(),
+                FieldOrOneofCase::Oneof(o) => o.gen_message_struct_field_type(),
             })
             .cloned()
     }

@@ -82,7 +82,7 @@ impl Field {
         }
     }
 
-    pub(crate) fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>> {
+    pub(crate) fn gen_message_struct_field_type(&self) -> Result<Rc<Type>> {
         use FieldRule::*;
         use FieldType::*;
         use LengthDelimitedType::*;
