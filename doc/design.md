@@ -72,3 +72,12 @@ The typical usecase of the protobuf I've seen in the actual product is something
 The server sometimes just returns the backend-backend server's call result `***Response` proto type, or do a simple re-packing into another `***Response` proto type.
 Even in such cases, we need to deserialize the proto, allocate & initialize a message type, and then serialize it again.
 If we can keep the original encoded bytes in the immutable message type, then the serialize operation will be just returning the stored bytes. If we use the lazy decode method discussed above, we don't even need to deserialize the message.
+
+## Deserialization source: Read, a slice, slices
+
+### `::std::io::Read` (or `::futures::io::AsyncReadEx`)
+
+pros:
+
+cons:
+- Always copies into the owned buffer.
