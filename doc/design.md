@@ -78,6 +78,12 @@ If we can keep the original encoded bytes in the immutable message type, then th
 ### `::std::io::Read` (or `::futures::io::AsyncReadEx`)
 
 pros:
+- Highly generic format which is supporting the most of the realistic situation.
 
 cons:
 - Always copies into the owned buffer.
+
+### `&[u8]`
+pros:
+- `string` & `bytes` field can just store the reference to the buffer, no need to allocate on heap.
+
