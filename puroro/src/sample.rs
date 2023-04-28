@@ -46,4 +46,4 @@ pub trait PersonTrait: Message {
     }
 }
 
-impl PersonTrait for dyn Message {}
+impl<M: Message> PersonTrait for M {}
