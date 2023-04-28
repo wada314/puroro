@@ -22,6 +22,7 @@ pub mod internal;
 pub mod message;
 pub mod protobuf;
 pub mod repeated;
+mod sample;
 pub mod string;
 
 pub use self::error::PuroroError;
