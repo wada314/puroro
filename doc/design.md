@@ -87,3 +87,5 @@ cons:
 pros:
 - `string` & `bytes` field can just store the reference to the buffer, no need to allocate on heap.
 
+cons:
+- Needs complex treatment for the child message type. Protobuf spec allows a singular message field type to appear in multiple places in the input bytes, so the child message field type must accept multiple `&[u8]`s as an initializer input.
