@@ -34,16 +34,30 @@ pub trait Message {
     fn try_get_message(&self) -> Result<&dyn Message>;
 }
 
-pub trait PersonTrait: Message {
-    fn try_age(&self) -> Result<u32> {
-        <Self as Message>::try_get_u32(self)
-    }
-    fn try_name(&self) -> Result<&str> {
-        <Self as Message>::try_get_string(self)
-    }
-    fn try_partner(&self) -> Result<&dyn PersonTrait> {
-        <Self as Message>::try_get_message(self).map(|m| m as &dyn PersonTrait)
+pub trait PersonTrait {
+    fn try_age(&self) -> Result<u32>;
+    fn try_name(&self) -> Result<&str>;
+    fn try_partner(&self) -> Result<&dyn PersonTrait>;
+}
+
+#[repr(transparent)]
+struct PersonWrapper<M>(M);
+impl<M> ::std::ops::Deref for PersonWrapper<M> {
+    type Target = M;
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
-impl<M: Message> PersonTrait for M {}
+impl<M: Message> PersonTrait for PersonWrapper<M> {
+    fn try_age(&self) -> Result<u32> {
+        <M as Message>::try_get_u32(&self.0)
+    }
+    fn try_name(&self) -> Result<&str> {
+        <M as Message>::try_get_string(&self.0)
+    }
+    fn try_partner(&self) -> Result<&dyn PersonTrait> {
+        // NEEDFIX
+        <M as Message>::try_get_message(&self.0)
+    }
+}
