@@ -1,17 +1,7 @@
 [workspace]
 members = [
     "puroro",
-    "codegen",
-    "inline",
-    "update-puroro-doc-samples",
-    "update-puroro-protobuf",
-    "tests",
 ]
 default-members = [
     "puroro",
-    "codegen",
-    "inline",
-#    "update-puroro-doc-samples",
-#    "update-puroro-protobuf",
-    "tests",
 ]

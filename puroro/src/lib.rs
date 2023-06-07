@@ -11,24 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#![doc = include_str!("lib.md")]
-#![feature(vec_into_raw_parts)]
-
-pub mod bytes;
-pub mod doc_samples;
-mod error;
-pub mod internal;
-pub mod message;
-pub mod protobuf;
-pub mod repeated;
-pub mod string;
-
-pub use self::error::PuroroError;
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
-// Re-exports
-pub use crate::bytes::Bytes;
-pub use crate::message::{Message, MessageView};
-pub use crate::repeated::RepeatedFieldView;
-pub use crate::string::String;
