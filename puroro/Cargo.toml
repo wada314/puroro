@@ -10,6 +10,8 @@ readme = "../readme.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+
 [dependencies]
 thiserror = "1.0"
 
