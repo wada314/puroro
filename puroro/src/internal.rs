@@ -12,8 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![feature(allocator_api)]
-#![feature(slice_as_chunks)]
-
-pub mod internal;
-pub mod string;
+pub mod variant;
