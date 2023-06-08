@@ -17,4 +17,3 @@ thiserror = "1.0"
 
 [features]
 default = []
-allocator_api = []
