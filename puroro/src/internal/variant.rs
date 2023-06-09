@@ -41,21 +41,28 @@ impl<T: BufRead> BufReadExt for T {
             return <Self as ReadExt>::read_variant(self);
         };
         let a = u32::from_le_bytes(*four_bytes);
-        if (a & 0x8888) == 0x8888 {
+        if (a & 0x80_80_80_80) == 0x80_80_80_80 {
             // The variant is longer than 4 bytes. Fallback to naive implementation.
             return <Self as ReadExt>::read_variant(self);
         }
 
-        // No early-return or branch after here for optimization!
+        // For optimization, no early-return or branch after here!
 
         let connected_7bits_x4 = (a & 0x00_00_00_7F)
             | ((a & 0x00_00_7F_00) >> 1)
             | ((a & 0x00_7F_00_00) >> 2)
             | ((a & 0x7F_00_00_00) >> 3);
-        let mask = 0x00_00_00_7F
-            | u32::wrapping_neg(a & 0x00_00_00_80)
-            | u32::wrapping_neg((a & 0x00_00_80_00) >> 1)
-            | u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
+        let mask = 
+            // Assuming 7 bits each for a, b, c, d,
+            // [a...ab...bc...cd...d]
+            // [1.............10...0]
+            u32::wrapping_neg(a & 0x00_00_00_80)
+            // [1........10........0]
+            & u32::wrapping_neg((a & 0x00_00_80_00) >> 1)
+            // [1...10.............0]
+            & u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
+        
+        let load_bytes_num = 
 
         todo!()
     }
