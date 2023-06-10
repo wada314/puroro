@@ -62,8 +62,10 @@ impl<T: BufRead> BufReadExt for T {
             // [1...10.............0]
             & u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
         
-        let load_bytes_num = 
+        let load_bytes_num_index = (((a & 0x00_00_00_80) >> 15) | ((a & 0x00_00_80_00) >> 31) | ((a & 0x00_80_00_00) >> 47)) as usize;
+        let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
-        todo!()
+        self.consume(load_bytes_num);
+        Ok(Variant(((connected_7bits_x4 & mask) as u64).to_le_bytes()))
     }
 }
