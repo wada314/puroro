@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::io::{BufRead, Read, Result as IoResult};
+use ::std::io::{BufRead, Read};
+use crate::{DeserResult, DeserError};
 
 pub struct Variant([u8; 8]);
 
 trait ReadExt {
-    fn read_variant(&mut self) -> IoResult<Variant>;
+    fn read_variant(&mut self) -> DeserResult<Variant>;
 }
 
 pub trait BufReadExt {
-    fn read_variant(&mut self) -> IoResult<Variant>;
+    fn read_variant(&mut self) -> DeserResult<Variant>;
 }
 
 impl<T: Read> ReadExt for T {
-    fn read_variant(&mut self) -> IoResult<Variant> {
+    fn read_variant(&mut self) -> DeserResult<Variant> {
         let iter = self.bytes();
         let mut result = 0u64;
         for (i, rbyte) in iter.take(10).enumerate() {
@@ -40,7 +41,7 @@ impl<T: Read> ReadExt for T {
 }
 
 impl<T: BufRead> BufReadExt for T {
-    fn read_variant(&mut self) -> IoResult<Variant> {
+    fn read_variant(&mut self) -> DeserResult<Variant> {
         let inner_buf = self.fill_buf()?;
 
         let (four_bytes_array, _) = inner_buf.as_chunks::<4>();

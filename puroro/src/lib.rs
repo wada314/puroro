@@ -17,3 +17,14 @@
 
 pub mod internal;
 pub mod string;
+
+use ::thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum DeserError {
+    #[error("io error")]
+    IoError(#[from] ::std::io::Error),
+    #[error("Deserializing invalid variant (too long).")]
+    InvalidVariant,
+}
+pub type DeserResult<T> = ::std::result::Result<T, DeserError>;
