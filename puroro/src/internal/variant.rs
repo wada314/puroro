@@ -26,7 +26,16 @@ pub trait BufReadExt {
 
 impl<T: Read> ReadExt for T {
     fn read_variant(&mut self) -> IoResult<Variant> {
-        todo!()
+        let iter = self.bytes();
+        let mut result = 0u64;
+        for (i, rbyte) in iter.take(10).enumerate() {
+            let byte = rbyte?;
+            result |= ((byte & 0x7F) as u64) << (i*7);
+            if (byte & 080) == 0 {
+                break;
+            }
+        }
+        Ok(Variant(result.to_le_bytes()))
     }
 }
 
@@ -34,8 +43,6 @@ impl<T: BufRead> BufReadExt for T {
     fn read_variant(&mut self) -> IoResult<Variant> {
         let inner_buf = self.fill_buf()?;
 
-        // Speculative load 4 bytes.
-        // Assuming the most usecases of the variant are <= 4 bytes.
         let (four_bytes_array, _) = inner_buf.as_chunks::<4>();
         let Some(four_bytes) = four_bytes_array.first() else {
             return <Self as ReadExt>::read_variant(self);
