@@ -35,6 +35,9 @@ impl<T: Read> ReadExt for T {
             if (byte & 080) == 0 {
                 break;
             }
+            if i == 9 && (byte & 0xFE != 0) {
+                return Err(DeserError::InvalidVariant);
+            }
         }
         Ok(Variant(result.to_le_bytes()))
     }
