@@ -96,6 +96,7 @@ impl<T: Write> WriteExt for T {
                 byte_len = i + 1;
                 break;
             }
+            buffer[i] |= 0x80;
             v >>= 7;
         }
         let out_slice = &buffer[0..byte_len];
@@ -115,7 +116,7 @@ mod test {
     }
 
     #[test]
-    fn test_encode_variant() {
+    fn test_encode_variant() -> SerResult<()> {
         fn test_case(value: u64, expected: &[u8]) -> SerResult<()> {
             let mut buf = Vec::<u8>::new();
             buf.write_variant(value.into())?;
@@ -123,7 +124,17 @@ mod test {
             Ok(())
         }
 
-        test_case(0, &[0]).unwrap();
-        test_case(1, &[1]).unwrap();
+        test_case(0, &[0])?;
+        test_case(1, &[1])?;
+        test_case(127, &[0x7f])?;
+        test_case(128, &[0x80, 0x01])?;
+        test_case(0x3FFF, &[0xFF, 0x7F])?;
+        test_case(0x4000, &[0x80, 0x80, 0x01])?;
+
+        test_case(0x7FFF_FFFF_FFFF_FFFF, &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F])?;
+        test_case(0x8000_0000_0000_0000, &[0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x01])?;
+        test_case(0xFFFF_FFFF_FFFF_FFFF, &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01])?;
+
+        Ok(())
     }
 }
