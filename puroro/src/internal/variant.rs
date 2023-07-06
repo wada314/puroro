@@ -73,7 +73,7 @@ impl<T: BufRead> BufReadExt for T {
             // [11.1100...........00]
             & u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
         
-        let load_bytes_num_index = (((a & 0x00_00_00_80) >> 15) | ((a & 0x00_00_80_00) >> 31) | ((a & 0x00_80_00_00) >> 47)) as usize;
+        let load_bytes_num_index = (((a & 0x00_00_00_80) >> 7) | ((a & 0x00_00_80_00) >> 15) | ((a & 0x00_80_00_00) >> 23)) as usize;
         let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
         self.consume(load_bytes_num);
