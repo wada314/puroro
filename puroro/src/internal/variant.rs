@@ -103,3 +103,27 @@ impl<T: Write> WriteExt for T {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{ReadExt, BufReadExt, WriteExt, Variant, SerResult, DeserResult};
+
+    impl From<u64> for Variant {
+        fn from(value: u64) -> Self {
+            Variant(u64::to_le_bytes(value))
+        }
+    }
+
+    #[test]
+    fn test_encode_variant() {
+        fn test_case(value: u64, expected: &[u8]) -> SerResult<()> {
+            let mut buf = Vec::<u8>::new();
+            buf.write_variant(value.into())?;
+            assert_eq!(expected, &buf, "Failed for value {}", value);
+            Ok(())
+        }
+
+        test_case(0, &[0]).unwrap();
+        test_case(1, &[1]).unwrap();
+    }
+}
