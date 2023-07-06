@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::io::{BufRead, Read, Write};
-use crate::{DeserResult, DeserError, SerResult};
+use crate::{DeserError, DeserResult, SerResult};
+use std::io::{BufRead, Read, Write};
 
 pub struct Variant([u8; 8]);
 
@@ -35,8 +35,8 @@ impl<T: Read> ReadExt for T {
         let mut result = 0u64;
         for (i, rbyte) in iter.take(10).enumerate() {
             let byte = rbyte?;
-            result |= ((byte & 0x7F) as u64) << (i*7);
-            if (byte & 080) == 0 {
+            result |= ((byte & 0x7F) as u64) << (i * 7);
+            if (byte & 0x80) == 0 {
                 break;
             }
             if i == 9 && (byte & 0xFE != 0) {
@@ -67,17 +67,21 @@ impl<T: BufRead> BufReadExt for T {
             | ((a & 0x00_00_7F_00) >> 1)
             | ((a & 0x00_7F_00_00) >> 2)
             | ((a & 0x7F_00_00_00) >> 3);
-        let mask = 
+        let mask = {
             // Assuming 7 bits each for a, b, c, d,
             // [a...ab...bc...cd...d]
             // [11...........1100.00]
-            u32::wrapping_neg(a & 0x00_00_00_80)
+            let mask1 = u32::wrapping_neg(a & 0x00_00_00_80);
             // [11......1100......00]
-            & u32::wrapping_neg((a & 0x00_00_80_00) >> 1)
+            let mask2 = u32::wrapping_neg((a & 0x00_00_80_00) >> 1);
             // [11.1100...........00]
-            & u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
-        
-        let load_bytes_num_index = (((a & 0x00_00_00_80) >> 7) | ((a & 0x00_00_80_00) >> 15) | ((a & 0x00_80_00_00) >> 23)) as usize;
+            let mask3 = u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
+            mask1 & mask2 & mask3
+        };
+
+        let load_bytes_num_index = (((a & 0x00_00_00_80) >> 7)
+            | ((a & 0x00_00_80_00) >> 15)
+            | ((a & 0x00_80_00_00) >> 23)) as usize;
         let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
         self.consume(load_bytes_num);
@@ -107,7 +111,7 @@ impl<T: Write> WriteExt for T {
 
 #[cfg(test)]
 mod test {
-    use super::{ReadExt, BufReadExt, WriteExt, Variant, SerResult, DeserResult};
+    use super::{BufReadExt, DeserResult, ReadExt, SerResult, Variant, WriteExt};
 
     impl From<u64> for Variant {
         fn from(value: u64) -> Self {
@@ -115,25 +119,56 @@ mod test {
         }
     }
 
+    impl From<Variant> for u64 {
+        fn from(value: Variant) -> Self {
+            u64::from_le_bytes(value.0)
+        }
+    }
+
+    const BASIC_TEST_CASES: &[(u64, &[u8])] = &[
+        (0, &[0]),
+        (1, &[1]),
+        (127, &[0x7f]),
+        (128, &[0x80, 0x01]),
+        (0x3FFF, &[0xFF, 0x7F]),
+        (0x4000, &[0x80, 0x80, 0x01]),
+        (
+            0x7FFF_FFFF_FFFF_FFFF,
+            &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F],
+        ),
+        (
+            0x8000_0000_0000_0000,
+            &[0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x01],
+        ),
+        (
+            0xFFFF_FFFF_FFFF_FFFF,
+            &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01],
+        ),
+    ];
+
     #[test]
-    fn test_encode_variant() -> SerResult<()> {
-        fn test_case(value: u64, expected: &[u8]) -> SerResult<()> {
+    fn test_write_variant() -> SerResult<()> {
+        for &(value, expected) in BASIC_TEST_CASES {
             let mut buf = Vec::<u8>::new();
             buf.write_variant(value.into())?;
-            assert_eq!(expected, &buf, "Failed for value {}", value);
-            Ok(())
+            assert_eq!(expected, &buf, "Failed for value={}.", value);
         }
 
-        test_case(0, &[0])?;
-        test_case(1, &[1])?;
-        test_case(127, &[0x7f])?;
-        test_case(128, &[0x80, 0x01])?;
-        test_case(0x3FFF, &[0xFF, 0x7F])?;
-        test_case(0x4000, &[0x80, 0x80, 0x01])?;
+        Ok(())
+    }
 
-        test_case(0x7FFF_FFFF_FFFF_FFFF, &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F])?;
-        test_case(0x8000_0000_0000_0000, &[0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x01])?;
-        test_case(0xFFFF_FFFF_FFFF_FFFF, &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01])?;
+    #[test]
+    fn test_read_variant() -> DeserResult<()> {
+        for &(expected, mut input) in BASIC_TEST_CASES {
+            let var = <&[u8] as ReadExt>::read_variant(&mut input)?;
+            assert_eq!(
+                0,
+                input.len(),
+                "The input buffer is not read until the end. value={}.",
+                expected
+            );
+            assert_eq!(expected, var.into());
+        }
 
         Ok(())
     }
