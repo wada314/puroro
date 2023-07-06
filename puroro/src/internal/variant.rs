@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::io::{BufRead, Read};
-use crate::{DeserResult, DeserError};
+use ::std::io::{BufRead, Read, Write};
+use crate::{DeserResult, DeserError, SerResult};
 
 pub struct Variant([u8; 8]);
 
@@ -23,6 +23,10 @@ trait ReadExt {
 
 pub trait BufReadExt {
     fn read_variant(&mut self) -> DeserResult<Variant>;
+}
+
+trait WriteExt {
+    fn write_variant(&mut self, variant: Variant) -> SerResult<()>;
 }
 
 impl<T: Read> ReadExt for T {
@@ -78,5 +82,24 @@ impl<T: BufRead> BufReadExt for T {
 
         self.consume(load_bytes_num);
         Ok(Variant(((connected_7bits_x4 & mask) as u64).to_le_bytes()))
+    }
+}
+
+impl<T: Write> WriteExt for T {
+    fn write_variant(&mut self, variant: Variant) -> SerResult<()> {
+        let mut v = u64::from_le_bytes(variant.0);
+        let mut buffer = <[u8; 10]>::default();
+        let mut byte_len = 0;
+        for i in 0..10 {
+            buffer[i] = (v & 0x7F) as u8;
+            if (v & !0x7F) == 0 {
+                byte_len = i + 1;
+                break;
+            }
+            v >>= 7;
+        }
+        let out_slice = &buffer[0..byte_len];
+        self.write_all(out_slice)?;
+        Ok(())
     }
 }

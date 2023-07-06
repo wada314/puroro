@@ -28,3 +28,10 @@ pub enum DeserError {
     InvalidVariant,
 }
 pub type DeserResult<T> = ::std::result::Result<T, DeserError>;
+
+#[derive(Error, Debug)]
+pub enum SerError {
+    #[error("io error")]
+    IoError(#[from] ::std::io::Error),
+}
+pub type SerResult<T> = ::std::result::Result<T, SerError>;

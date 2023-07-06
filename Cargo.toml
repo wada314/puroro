@@ -5,3 +5,4 @@ members = [
 default-members = [
     "puroro",
 ]
+resolver = "2"
