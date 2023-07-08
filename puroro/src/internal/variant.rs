@@ -19,12 +19,14 @@ use std::io::{BufRead, Read, Write};
 pub struct Variant([u8; 8]);
 
 impl From<u64> for Variant {
+    #[inline]
     fn from(value: u64) -> Self {
         Variant(u64::to_le_bytes(value))
     }
 }
 
 impl From<Variant> for u64 {
+    #[inline]
     fn from(value: Variant) -> Self {
         u64::from_le_bytes(value.0)
     }
@@ -43,6 +45,7 @@ pub trait WriteExt {
 }
 
 impl<T: Read> ReadExt for T {
+    #[inline]
     fn read_variant(&mut self) -> DeserResult<Variant> {
         let iter = self.bytes();
         let mut result = 0u64;
@@ -52,7 +55,7 @@ impl<T: Read> ReadExt for T {
             if (byte & 0x80) == 0 {
                 break;
             }
-            if i == 9 && (byte & 0xFE != 0) {
+            if i == 9 && ((byte & 0xFE) != 0) {
                 return Err(DeserError::InvalidVariant);
             }
         }
@@ -61,6 +64,7 @@ impl<T: Read> ReadExt for T {
 }
 
 impl<T: BufRead> BufReadExt for T {
+    #[inline]
     fn read_variant_assume_4(&mut self) -> DeserResult<Variant> {
         let inner_buf = self.fill_buf()?;
 
@@ -98,7 +102,7 @@ impl<T: BufRead> BufReadExt for T {
         let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
         self.consume(load_bytes_num);
-        Ok(Variant(((connected_7bits_x4 & mask) as u64).to_le_bytes()))
+        Ok(((connected_7bits_x4 & mask) as u64).into())
     }
 }
 
