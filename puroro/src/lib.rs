@@ -14,6 +14,7 @@
 
 #![feature(allocator_api)]
 #![feature(slice_as_chunks)]
+#![feature(assert_matches)]
 
 pub mod internal;
 pub mod string;

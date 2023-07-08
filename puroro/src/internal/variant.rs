@@ -15,6 +15,7 @@
 use crate::{DeserError, DeserResult, SerResult};
 use std::io::{BufRead, Read, Write};
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct Variant([u8; 8]);
 
 trait ReadExt {
@@ -112,6 +113,8 @@ impl<T: Write> WriteExt for T {
 #[cfg(test)]
 mod test {
     use super::{BufReadExt, DeserResult, ReadExt, SerResult, Variant, WriteExt};
+    use crate::DeserError;
+    use ::std::assert_matches::assert_matches;
 
     impl From<u64> for Variant {
         fn from(value: u64) -> Self {
@@ -170,6 +173,16 @@ mod test {
             assert_eq!(expected, var.into());
         }
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_read_variant_too_long() -> DeserResult<()> {
+        let mut input: &[u8] = &[0x80u8; 10];
+        assert_matches!(
+            <&[u8] as ReadExt>::read_variant(&mut input),
+            Err(DeserError::InvalidVariant)
+        );
         Ok(())
     }
 }
