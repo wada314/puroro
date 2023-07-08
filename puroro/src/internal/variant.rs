@@ -23,7 +23,7 @@ trait ReadExt {
 }
 
 pub trait BufReadExt {
-    fn read_variant(&mut self) -> DeserResult<Variant>;
+    fn read_variant_assume_4(&mut self) -> DeserResult<Variant>;
 }
 
 trait WriteExt {
@@ -49,7 +49,7 @@ impl<T: Read> ReadExt for T {
 }
 
 impl<T: BufRead> BufReadExt for T {
-    fn read_variant(&mut self) -> DeserResult<Variant> {
+    fn read_variant_assume_4(&mut self) -> DeserResult<Variant> {
         let inner_buf = self.fill_buf()?;
 
         let (four_bytes_array, _) = inner_buf.as_chunks::<4>();
@@ -184,5 +184,51 @@ mod test {
             Err(DeserError::InvalidVariant)
         );
         Ok(())
+    }
+
+    #[test]
+    fn test_buf_read_variant_4() -> DeserResult<()> {
+        for &(expected, mut input) in BASIC_TEST_CASES {
+            let var = <&[u8] as BufReadExt>::read_variant_assume_4(&mut input)?;
+            assert_eq!(
+                0,
+                input.len(),
+                "The input buffer is not read until the end. value={}.",
+                expected
+            );
+            assert_eq!(expected, var.into());
+        }
+
+        Ok(())
+    }
+}
+
+mod bench {
+    use super::{BufReadExt, DeserResult, ReadExt, SerResult, Variant, WriteExt};
+    use crate::DeserError;
+    use ::rand::prelude::*;
+    use ::rand_pcg::Pcg32;
+    use ::std::cell::LazyCell;
+    use ::std::iter;
+
+    static TEST_CASES_RANDOM_1000: LazyCell<Box<[u8]>> = LazyCell::new(|| {
+        let mut rand = Pcg32::seed_from_u64(123456u64);
+        let mut output = Vec::with_capacity(10 * 1000);
+        for item_u64 in iter::repeat_with(|| rand.gen()) {
+            let item_var = Variant(u64::to_le_bytes(item_u64));
+            WriteExt::write_variant(&mut output, item_var).unwrap();
+        }
+        output.into_boxed_slice()
+    });
+
+    #[bench]
+    fn bench_read_variant() -> DeserResult<Box<&[u64]>> {
+        let mut output = Box::new_uninit_slice(1000);
+        let mut input: &[u8] = &TEST_CASES_RANDOM_1000;
+        for i in 0..1000 {
+            let var = <&[u8] as ReadExt>::read_variant(&mut input)?;
+            output[i] = u64::from_le_bytes(var.0);
+        }
+        Ok(output.into_boxed_slice())
     }
 }
