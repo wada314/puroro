@@ -11,9 +11,11 @@ readme = "../readme.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
+bench = false
 
 [[bench]]
-name = "read-variant"
+name = "variant"
+harness = false
 
 [dependencies]
 thiserror = "1.0"
@@ -21,6 +23,7 @@ thiserror = "1.0"
 [dev-dependencies]
 rand = "0.8.3"
 rand_pcg = "0.3.1"
+criterion = "0.3"
 
 [features]
 default = []

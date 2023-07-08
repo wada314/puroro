@@ -15,10 +15,22 @@
 use crate::{DeserError, DeserResult, SerResult};
 use std::io::{BufRead, Read, Write};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
 
-trait ReadExt {
+impl From<u64> for Variant {
+    fn from(value: u64) -> Self {
+        Variant(u64::to_le_bytes(value))
+    }
+}
+
+impl From<Variant> for u64 {
+    fn from(value: Variant) -> Self {
+        u64::from_le_bytes(value.0)
+    }
+}
+
+pub trait ReadExt {
     fn read_variant(&mut self) -> DeserResult<Variant>;
 }
 
@@ -26,7 +38,7 @@ pub trait BufReadExt {
     fn read_variant_assume_4(&mut self) -> DeserResult<Variant>;
 }
 
-trait WriteExt {
+pub trait WriteExt {
     fn write_variant(&mut self, variant: Variant) -> SerResult<()>;
 }
 
@@ -112,21 +124,9 @@ impl<T: Write> WriteExt for T {
 
 #[cfg(test)]
 mod test {
-    use super::{BufReadExt, DeserResult, ReadExt, SerResult, Variant, WriteExt};
+    use super::{BufReadExt, DeserResult, ReadExt, SerResult, WriteExt};
     use crate::DeserError;
     use ::std::assert_matches::assert_matches;
-
-    impl From<u64> for Variant {
-        fn from(value: u64) -> Self {
-            Variant(u64::to_le_bytes(value))
-        }
-    }
-
-    impl From<Variant> for u64 {
-        fn from(value: Variant) -> Self {
-            u64::from_le_bytes(value.0)
-        }
-    }
 
     const BASIC_TEST_CASES: &[(u64, &[u8])] = &[
         (0, &[0]),
@@ -200,35 +200,5 @@ mod test {
         }
 
         Ok(())
-    }
-}
-
-mod bench {
-    use super::{BufReadExt, DeserResult, ReadExt, SerResult, Variant, WriteExt};
-    use crate::DeserError;
-    use ::rand::prelude::*;
-    use ::rand_pcg::Pcg32;
-    use ::std::cell::LazyCell;
-    use ::std::iter;
-
-    static TEST_CASES_RANDOM_1000: LazyCell<Box<[u8]>> = LazyCell::new(|| {
-        let mut rand = Pcg32::seed_from_u64(123456u64);
-        let mut output = Vec::with_capacity(10 * 1000);
-        for item_u64 in iter::repeat_with(|| rand.gen()) {
-            let item_var = Variant(u64::to_le_bytes(item_u64));
-            WriteExt::write_variant(&mut output, item_var).unwrap();
-        }
-        output.into_boxed_slice()
-    });
-
-    #[bench]
-    fn bench_read_variant() -> DeserResult<Box<&[u64]>> {
-        let mut output = Box::new_uninit_slice(1000);
-        let mut input: &[u8] = &TEST_CASES_RANDOM_1000;
-        for i in 0..1000 {
-            let var = <&[u8] as ReadExt>::read_variant(&mut input)?;
-            output[i] = u64::from_le_bytes(var.0);
-        }
-        Ok(output.into_boxed_slice())
     }
 }
