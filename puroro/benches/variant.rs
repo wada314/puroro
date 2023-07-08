@@ -35,16 +35,26 @@ fn read_variants<const SIZE: usize>(mut input: &[u8], output: &mut [Variant; SIZ
     }
 }
 
+#[inline]
+fn fib(v: usize) -> usize {
+    match v {
+        0 => 0,
+        1 => 1,
+        n => fib(n - 1) + fib(n - 2),
+    }
+}
+
 fn bench_read_variants(criterion: &mut Criterion) {
-    let mut output = Box::new([Variant::default(); 10]);
-    let input: Box<[u8]> = test_cases_random::<10>();
+    let mut output = Box::new([Variant::default(); 100]);
+    let input: Box<[u8]> = test_cases_random::<100>();
     let input2 = [0x01];
-    criterion.bench_function("read_variant_random_10", |b| {
+    criterion.bench_function("read_variant_random 10", |b| {
         b.iter(|| {
+            fib(black_box(20))
             // read_variants(black_box(input.as_ref()), output.as_mut());
             // let mut input_slice: &[u8] = black_box(&input2);
             // <&[u8] as ReadExt>::read_variant(&mut input_slice).unwrap();
-            black_box(1) + black_box(2)
+            // black_box(1) + black_box(2)
         })
     });
 }
