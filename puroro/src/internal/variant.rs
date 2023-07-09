@@ -38,6 +38,7 @@ pub trait ReadExt {
 
 pub trait BufReadExt {
     fn read_variant_assume_4(&mut self) -> DeserResult<Variant>;
+    fn read_variant_assume_2(&mut self) -> DeserResult<Variant>;
 }
 
 pub trait WriteExt {
@@ -73,27 +74,29 @@ impl<T: BufRead> BufReadExt for T {
             return <Self as ReadExt>::read_variant(self);
         };
         let a = u32::from_le_bytes(*four_bytes);
-        if (a & 0x80_80_80_80) == 0x80_80_80_80 {
+        if (a & 0b_10000000_10000000_10000000_10000000) == 0b_10000000_10000000_10000000_10000000 {
             // The variant is longer than 4 bytes. Fallback to naive implementation.
             return <Self as ReadExt>::read_variant(self);
         }
 
         // For optimization, no early-return or branch after here!
 
-        let connected_7bits_x4 = (a & 0x00_00_00_7F)
-            | ((a & 0x00_00_7F_00) >> 1)
-            | ((a & 0x00_7F_00_00) >> 2)
-            | ((a & 0x7F_00_00_00) >> 3);
+        let connected_7bits_x4 = (a & 0b_00000000_00000000_00000000_01111111)
+            | ((a & 0b_00000000_00000000_01111111_00000000) >> 1)
+            | ((a & 0b_00000000_01111111_00000000_00000000) >> 2)
+            | ((a & 0b_01111111_00000000_00000000_00000000) >> 3);
         let mask = {
             // Assuming 7 bits each for a, b, c, d,
-            // [a...ab...bc...cd...d]
-            // [11...........1100.00]
-            let mask1 = u32::wrapping_neg(a & 0x00_00_00_80);
-            // [11......1100......00]
-            let mask2 = u32::wrapping_neg((a & 0x00_00_80_00) >> 1);
-            // [11.1100...........00]
-            let mask3 = u32::wrapping_neg((a & 0x00_80_00_00) >> 2);
-            mask1 & mask2 & mask3
+            // [a....ab....bc....cd....d] <= 28 bits
+            // [11....................11]
+            let mask1 = 0b_0000_1111111_1111111_1111111_1111111;
+            // [00..............0011..11]
+            let mask2 = !u32::wrapping_neg((!a & 0b_00000000_00000000_00000000_10000000) >> 0);
+            // [00.......0011.........11]
+            let mask3 = !u32::wrapping_neg((!a & 0b_00000000_00000000_10000000_00000000) >> 1);
+            // [00..0011..............11]
+            let mask4 = !u32::wrapping_neg((!a & 0b_00000000_10000000_00000000_00000000) >> 2);
+            mask1 & mask2 & mask3 & mask4
         };
 
         let load_bytes_num_index = (((a & 0x00_00_00_80) >> 7)
@@ -103,6 +106,31 @@ impl<T: BufRead> BufReadExt for T {
 
         self.consume(load_bytes_num);
         Ok(((connected_7bits_x4 & mask) as u64).into())
+    }
+
+    #[inline]
+    fn read_variant_assume_2(&mut self) -> DeserResult<Variant> {
+        let inner_buf = self.fill_buf()?;
+
+        let (two_bytes_array, _) = inner_buf.as_chunks::<2>();
+        let Some(two_bytes) = two_bytes_array.first() else {
+            return <Self as ReadExt>::read_variant(self);
+        };
+        let a = u16::from_le_bytes(*two_bytes);
+        if (a & 0x80_80) == 0x80_80 {
+            // The variant is longer than 2 bytes. Fallback to naive implementation.
+            return <Self as ReadExt>::read_variant(self);
+        }
+
+        // For optimization, no early-return or branch after here!
+
+        let connected_7bits_x2 = (a & 0x00_7F) | ((a & 0x7F_00) >> 1);
+        let mask = u16::wrapping_neg(a & 0x00_80) | 0b_00_1111111_1111111;
+
+        let load_bytes_num = ((a & 0x00_80) >> 7) as usize + 1;
+
+        self.consume(load_bytes_num);
+        Ok(((connected_7bits_x2 & mask) as u64).into())
     }
 }
 
@@ -194,6 +222,22 @@ mod test {
     fn test_buf_read_variant_4() -> DeserResult<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
             let var = <&[u8] as BufReadExt>::read_variant_assume_4(&mut input)?;
+            assert_eq!(
+                0,
+                input.len(),
+                "The input buffer is not read until the end. value={}.",
+                expected
+            );
+            assert_eq!(expected, var.into());
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_buf_read_variant_2() -> DeserResult<()> {
+        for &(expected, mut input) in BASIC_TEST_CASES {
+            let var = <&[u8] as BufReadExt>::read_variant_assume_2(&mut input)?;
             assert_eq!(
                 0,
                 input.len(),
