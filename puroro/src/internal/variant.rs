@@ -117,15 +117,15 @@ impl<T: BufRead> BufReadExt for T {
             return <Self as ReadExt>::read_variant(self);
         };
         let a = u16::from_le_bytes(*two_bytes);
-        if (a & 0x80_80) == 0x80_80 {
+        if (a & 0b_10000000_10000000) == 0b_10000000_10000000 {
             // The variant is longer than 2 bytes. Fallback to naive implementation.
             return <Self as ReadExt>::read_variant(self);
         }
 
         // For optimization, no early-return or branch after here!
 
-        let connected_7bits_x2 = (a & 0x00_7F) | ((a & 0x7F_00) >> 1);
-        let mask = u16::wrapping_neg(a & 0x00_80) | 0b_00_1111111_1111111;
+        let connected_7bits_x2 = (a & 0b_00000000_01111111) | ((a & 0b_01111111_00000000) >> 1);
+        let mask = !u16::wrapping_neg(!a & 0b_00000000_10000000) & 0b_00_1111111_1111111;
 
         let load_bytes_num = ((a & 0x00_80) >> 7) as usize + 1;
 
@@ -165,8 +165,11 @@ mod test {
         (1, &[1]),
         (127, &[0x7f]),
         (128, &[0x80, 0x01]),
+        (1_000_000, &[0xc0, 0x84, 0x3d]),
         (0x3FFF, &[0xFF, 0x7F]),
         (0x4000, &[0x80, 0x80, 0x01]),
+        (100_000_000, &[0x80, 0xc2, 0xd7, 0x2f]),
+        (1_000_000_000, &[0x80, 0x94, 0xeb, 0xdc, 0x03]),
         (
             0x7FFF_FFFF_FFFF_FFFF,
             &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F],
