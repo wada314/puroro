@@ -100,8 +100,8 @@ impl<T: BufRead> BufReadExt for T {
         };
 
         let load_bytes_num_index = (((a & 0x00_00_00_80) >> 7)
-            | ((a & 0x00_00_80_00) >> 15)
-            | ((a & 0x00_80_00_00) >> 23)) as usize;
+            | ((a & 0x00_00_80_00) >> 14)
+            | ((a & 0x00_80_00_00) >> 21)) as usize;
         let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
         self.consume(load_bytes_num);
