@@ -68,6 +68,8 @@ fn bench_read_variants(criterion: &mut Criterion) {
     let input_rand: &[u8] = &input_rand_box;
     let input_28bits_box = test_cases_exponential_dist::<SIZE>(28, 99.0);
     let input_28bits: &[u8] = &input_28bits_box;
+    let input_14bits_box = test_cases_exponential_dist::<SIZE>(14, 99.0);
+    let input_14bits: &[u8] = &input_14bits_box;
 
     let mut group = criterion.benchmark_group("read random variants");
     group.bench_function("default read", |b| {
@@ -90,6 +92,18 @@ fn bench_read_variants(criterion: &mut Criterion) {
     });
     group.bench_function("assume 2", |b| {
         b.iter(|| read_variants_assume_2::<SIZE>(black_box(input_28bits)))
+    });
+    group.finish();
+
+    let mut group = criterion.benchmark_group("read 99% <2^14");
+    group.bench_function("default read", |b| {
+        b.iter(|| read_variants::<SIZE>(black_box(input_14bits)))
+    });
+    group.bench_function("assume 4", |b| {
+        b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_14bits)))
+    });
+    group.bench_function("assume 2", |b| {
+        b.iter(|| read_variants_assume_2::<SIZE>(black_box(input_14bits)))
     });
     group.finish();
 }
