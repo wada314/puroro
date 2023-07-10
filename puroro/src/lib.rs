@@ -36,3 +36,26 @@ pub enum SerError {
     IoError(#[from] ::std::io::Error),
 }
 pub type SerResult<T> = ::std::result::Result<T, SerError>;
+
+struct Foo<T1, T2> {
+    item1: T1,
+    item2: T2,
+}
+impl<T1: Default, T2: Default> Default for Foo<T1, T2> {
+    fn default() -> Self {
+        Self {
+            item1: Default::default(),
+            item2: Default::default(),
+        }
+    }
+}
+fn foo(foo: Foo<usize, i32>) {
+    unimplemented!()
+}
+fn hoge() {
+    let foovar = Foo {
+        item1: 0,
+        ..Default::default()
+    };
+    foo(foovar);
+}
