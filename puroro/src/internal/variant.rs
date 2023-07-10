@@ -37,6 +37,7 @@ pub trait ReadExt {
 }
 
 pub trait BufReadExt {
+    fn read_variant_peek_10(&mut self) -> DeserResult<Variant>;
     fn read_variant_assume_4(&mut self) -> DeserResult<Variant>;
     fn read_variant_assume_2(&mut self) -> DeserResult<Variant>;
 }
@@ -65,6 +66,30 @@ impl<T: Read> ReadExt for T {
 }
 
 impl<T: BufRead> BufReadExt for T {
+    #[inline]
+    fn read_variant_peek_10(&mut self) -> DeserResult<Variant> {
+        let inner_buf = self.fill_buf()?;
+        let (ten_bytes_buf, _) = inner_buf.as_chunks::<10>();
+        let Some(ten_bytes) = ten_bytes_buf.first() else {
+            return <Self as ReadExt>::read_variant(self);
+        };
+
+        let mut result = 0u64;
+        for i in 0usize..10 {
+            let byte = ten_bytes[i];
+            result |= ((byte & 0b_01111111) as u64) << (i * 7);
+            if (byte & 0b_10000000) == 0 {
+                self.consume(i + 1);
+                break;
+            }
+            if i == 9 && ((byte & 0b_11111110) != 0) {
+                return Err(DeserError::InvalidVariant);
+            }
+        }
+
+        Ok(result.into())
+    }
+
     #[inline]
     fn read_variant_assume_4(&mut self) -> DeserResult<Variant> {
         let inner_buf = self.fill_buf()?;

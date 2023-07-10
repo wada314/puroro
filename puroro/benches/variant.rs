@@ -54,6 +54,10 @@ fn read_variants<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
     array::from_fn(|_| <&[u8] as ReadExt>::read_variant(&mut input).unwrap())
 }
 
+fn read_variants_peek_10<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
+    array::from_fn(|_| <&[u8] as BufReadExt>::read_variant_peek_10(&mut input).unwrap())
+}
+
 fn read_variants_assume_4<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
     array::from_fn(|_| <&[u8] as BufReadExt>::read_variant_assume_4(&mut input).unwrap())
 }
@@ -75,6 +79,9 @@ fn bench_read_variants(criterion: &mut Criterion) {
     group.bench_function("default read", |b| {
         b.iter(|| read_variants::<SIZE>(black_box(input_rand)))
     });
+    group.bench_function("peek 10", |b| {
+        b.iter(|| read_variants_peek_10::<SIZE>(black_box(input_rand)))
+    });
     group.bench_function("assume 4", |b| {
         b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_rand)))
     });
@@ -87,6 +94,9 @@ fn bench_read_variants(criterion: &mut Criterion) {
     group.bench_function("default read", |b| {
         b.iter(|| read_variants::<SIZE>(black_box(input_28bits)))
     });
+    group.bench_function("peek 10", |b| {
+        b.iter(|| read_variants_peek_10::<SIZE>(black_box(input_28bits)))
+    });
     group.bench_function("assume 4", |b| {
         b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_28bits)))
     });
@@ -98,6 +108,9 @@ fn bench_read_variants(criterion: &mut Criterion) {
     let mut group = criterion.benchmark_group("read 99% <2^14");
     group.bench_function("default read", |b| {
         b.iter(|| read_variants::<SIZE>(black_box(input_14bits)))
+    });
+    group.bench_function("peek 10", |b| {
+        b.iter(|| read_variants_peek_10::<SIZE>(black_box(input_14bits)))
     });
     group.bench_function("assume 4", |b| {
         b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_14bits)))
