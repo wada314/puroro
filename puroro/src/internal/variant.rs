@@ -249,6 +249,22 @@ mod test {
     }
 
     #[test]
+    fn test_buf_read_peek_10() -> DeserResult<()> {
+        for &(expected, mut input) in BASIC_TEST_CASES {
+            let var = <&[u8] as BufReadExt>::read_variant_peek_10(&mut input)?;
+            assert_eq!(
+                0,
+                input.len(),
+                "The input buffer is not read until the end. value={}.",
+                expected
+            );
+            assert_eq!(expected, var.into());
+        }
+
+        Ok(())
+    }
+
+    #[test]
     fn test_buf_read_variant_4() -> DeserResult<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
             let var = <&[u8] as BufReadExt>::read_variant_assume_4(&mut input)?;
