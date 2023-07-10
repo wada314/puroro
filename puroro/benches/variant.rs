@@ -68,57 +68,29 @@ fn read_variants_assume_2<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE
 
 fn bench_read_variants(criterion: &mut Criterion) {
     const SIZE: usize = 1000;
-    let input_rand_box = test_cases_random::<SIZE>();
-    let input_rand: &[u8] = &input_rand_box;
-    let input_28bits_box = test_cases_exponential_dist::<SIZE>(28, 99.0);
-    let input_28bits: &[u8] = &input_28bits_box;
-    let input_14bits_box = test_cases_exponential_dist::<SIZE>(14, 99.0);
-    let input_14bits: &[u8] = &input_14bits_box;
+    let input_rand = test_cases_random::<SIZE>();
+    let input_28bits = test_cases_exponential_dist::<SIZE>(28, 99.0);
+    let input_14bits = test_cases_exponential_dist::<SIZE>(14, 99.0);
 
-    let mut group = criterion.benchmark_group("read random variants");
-    group.bench_function("default read", |b| {
-        b.iter(|| read_variants::<SIZE>(black_box(input_rand)))
-    });
-    group.bench_function("peek 10", |b| {
-        b.iter(|| read_variants_peek_10::<SIZE>(black_box(input_rand)))
-    });
-    group.bench_function("assume 4", |b| {
-        b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_rand)))
-    });
-    group.bench_function("assume 2", |b| {
-        b.iter(|| read_variants_assume_2::<SIZE>(black_box(input_rand)))
-    });
-    group.finish();
+    let target_functions: &[(&str, fn(&[u8]) -> _)] = &[
+        ("read Bytes", read_variants::<SIZE>),
+        ("peek 10", read_variants_peek_10::<SIZE>),
+        ("assume 4", read_variants_assume_4::<SIZE>),
+        ("assume 2", read_variants_assume_2::<SIZE>),
+    ];
+    let input_bytes: &[(&str, &[u8])] = &[
+        ("random variants", &input_rand),
+        ("99% < 2^28", &input_28bits),
+        ("99% < 2^14", &input_14bits),
+    ];
 
-    let mut group = criterion.benchmark_group("read 99% <2^28");
-    group.bench_function("default read", |b| {
-        b.iter(|| read_variants::<SIZE>(black_box(input_28bits)))
-    });
-    group.bench_function("peek 10", |b| {
-        b.iter(|| read_variants_peek_10::<SIZE>(black_box(input_28bits)))
-    });
-    group.bench_function("assume 4", |b| {
-        b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_28bits)))
-    });
-    group.bench_function("assume 2", |b| {
-        b.iter(|| read_variants_assume_2::<SIZE>(black_box(input_28bits)))
-    });
-    group.finish();
-
-    let mut group = criterion.benchmark_group("read 99% <2^14");
-    group.bench_function("default read", |b| {
-        b.iter(|| read_variants::<SIZE>(black_box(input_14bits)))
-    });
-    group.bench_function("peek 10", |b| {
-        b.iter(|| read_variants_peek_10::<SIZE>(black_box(input_14bits)))
-    });
-    group.bench_function("assume 4", |b| {
-        b.iter(|| read_variants_assume_4::<SIZE>(black_box(input_14bits)))
-    });
-    group.bench_function("assume 2", |b| {
-        b.iter(|| read_variants_assume_2::<SIZE>(black_box(input_14bits)))
-    });
-    group.finish();
+    for &(input_name, input) in input_bytes {
+        let mut group = criterion.benchmark_group(input_name);
+        for &(target_name, target) in target_functions {
+            group.bench_function(target_name, |b| b.iter(|| target(black_box(input))));
+        }
+        group.finish();
+    }
 }
 
 criterion_group!(benches, bench_read_variants);
