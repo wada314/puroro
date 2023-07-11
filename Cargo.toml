@@ -1,8 +1,10 @@
 [workspace]
 members = [
     "puroro",
+    "puroro-derive",
 ]
 default-members = [
     "puroro",
+    "puroro-derive",
 ]
 resolver = "2"
