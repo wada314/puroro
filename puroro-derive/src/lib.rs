@@ -13,12 +13,17 @@
 // limitations under the License.
 
 use ::proc_macro::TokenStream;
-use ::quote::quote;
+use ::quote::{quote, quote_spanned};
 use ::syn::{parse_macro_input, DeriveInput};
 
 #[proc_macro_derive(Message)]
 pub fn derive_puroro_message(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
+    let ::syn::Data::Struct(data_struct) = &input.data else {
+        return quote! {
+            compile_error!("#[derive(Message)] must be attached to struct");
+        }.into()
+    };
     quote! {
         #input
     }
