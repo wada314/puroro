@@ -16,6 +16,7 @@ bench = false
 [[bench]]
 name = "variant"
 harness = false
+
 [dependencies]
 thiserror = "1.0"
 

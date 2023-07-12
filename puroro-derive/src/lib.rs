@@ -13,8 +13,14 @@
 // limitations under the License.
 
 use ::proc_macro::TokenStream;
+use ::quote::quote;
+use ::syn::{parse_macro_input, DeriveInput};
 
 #[proc_macro_derive(Message)]
 pub fn derive_puroro_message(input: TokenStream) -> TokenStream {
-    todo!()
+    let input = parse_macro_input!(input as DeriveInput);
+    quote! {
+        #input
+    }
+    .into()
 }
