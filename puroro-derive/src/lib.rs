@@ -24,8 +24,5 @@ pub fn derive_puroro_message(input: TokenStream) -> TokenStream {
             compile_error!("#[derive(Message)] must be attached to struct");
         }.into()
     };
-    quote! {
-        #input
-    }
-    .into()
+    quote! {}.into()
 }

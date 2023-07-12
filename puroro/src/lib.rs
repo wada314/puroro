@@ -19,6 +19,12 @@
 pub mod internal;
 pub mod string;
 
+pub use ::puroro_derive::*;
+pub trait Message {}
+
+#[derive(Message)]
+struct Hoge;
+
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
