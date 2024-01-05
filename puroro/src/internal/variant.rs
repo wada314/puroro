@@ -12,11 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{DeserError, DeserResult, SerResult};
+use crate::{ErrorKind, Result};
 use std::io::{BufRead, Read, Write};
 
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
+
+impl Variant {
+    pub fn as_uint64(&self) -> u64 {
+        self.clone().into()
+    }
+    pub fn as_int64(&self) -> i64 {
+        i64::from_le_bytes(self.0)
+    }
+    pub fn try_as_int32(&self) -> Result<i32> {
+        Ok(self
+            .as_int64()
+            .try_into()
+            .map_err(|_| ErrorKind::VariantValueTooLarge)?)
+    }
+}
 
 impl From<u64> for Variant {
     #[inline]
@@ -33,22 +48,22 @@ impl From<Variant> for u64 {
 }
 
 pub trait ReadExtVariant {
-    fn read_variant(&mut self) -> DeserResult<Variant>;
+    fn read_variant(&mut self) -> Result<Variant>;
 }
 
 pub trait BufReadExtVariant {
-    fn read_variant_peek_10(&mut self) -> DeserResult<Variant>;
-    fn read_variant_assume_4(&mut self) -> DeserResult<Variant>;
-    fn read_variant_assume_2(&mut self) -> DeserResult<Variant>;
+    fn read_variant_peek_10(&mut self) -> Result<Variant>;
+    fn read_variant_assume_4(&mut self) -> Result<Variant>;
+    fn read_variant_assume_2(&mut self) -> Result<Variant>;
 }
 
 pub trait WriteExtVariant {
-    fn write_variant(&mut self, variant: Variant) -> SerResult<()>;
+    fn write_variant(&mut self, variant: Variant) -> Result<()>;
 }
 
 impl<T: Read> ReadExtVariant for T {
     #[inline]
-    fn read_variant(&mut self) -> DeserResult<Variant> {
+    fn read_variant(&mut self) -> Result<Variant> {
         let iter = self.bytes();
         let mut result = 0u64;
         for (i, rbyte) in iter.take(10).enumerate() {
@@ -58,7 +73,7 @@ impl<T: Read> ReadExtVariant for T {
                 break;
             }
             if i == 9 && ((byte & 0xFE) != 0) {
-                return Err(DeserError::InvalidVariant);
+                return Err(ErrorKind::TooLongEncodedVariant);
             }
         }
         Ok(Variant(result.to_le_bytes()))
@@ -67,7 +82,7 @@ impl<T: Read> ReadExtVariant for T {
 
 impl<T: BufRead> BufReadExtVariant for T {
     #[inline]
-    fn read_variant_peek_10(&mut self) -> DeserResult<Variant> {
+    fn read_variant_peek_10(&mut self) -> Result<Variant> {
         let inner_buf = self.fill_buf()?;
         let (ten_bytes_buf, _) = inner_buf.as_chunks::<10>();
         let Some(ten_bytes) = ten_bytes_buf.first() else {
@@ -83,7 +98,7 @@ impl<T: BufRead> BufReadExtVariant for T {
                 break;
             }
             if i == 9 && ((byte & 0b_11111110) != 0) {
-                return Err(DeserError::InvalidVariant);
+                return Err(ErrorKind::TooLongEncodedVariant);
             }
         }
 
@@ -91,7 +106,7 @@ impl<T: BufRead> BufReadExtVariant for T {
     }
 
     #[inline]
-    fn read_variant_assume_4(&mut self) -> DeserResult<Variant> {
+    fn read_variant_assume_4(&mut self) -> Result<Variant> {
         let inner_buf = self.fill_buf()?;
 
         let (four_bytes_array, _) = inner_buf.as_chunks::<4>();
@@ -134,7 +149,7 @@ impl<T: BufRead> BufReadExtVariant for T {
     }
 
     #[inline]
-    fn read_variant_assume_2(&mut self) -> DeserResult<Variant> {
+    fn read_variant_assume_2(&mut self) -> Result<Variant> {
         let inner_buf = self.fill_buf()?;
 
         let (two_bytes_array, _) = inner_buf.as_chunks::<2>();
@@ -160,7 +175,7 @@ impl<T: BufRead> BufReadExtVariant for T {
 }
 
 impl<T: Write> WriteExtVariant for T {
-    fn write_variant(&mut self, variant: Variant) -> SerResult<()> {
+    fn write_variant(&mut self, variant: Variant) -> Result<()> {
         let mut v = u64::from_le_bytes(variant.0);
         let mut buffer = <[u8; 10]>::default();
         let mut byte_len = 0;
@@ -181,8 +196,8 @@ impl<T: Write> WriteExtVariant for T {
 
 #[cfg(test)]
 mod test {
-    use super::{BufReadExtVariant, DeserResult, ReadExtVariant, SerResult, WriteExtVariant};
-    use crate::DeserError;
+    use super::{BufReadExtVariant, ReadExtVariant, WriteExtVariant};
+    use crate::{ErrorKind, Result};
     use ::std::assert_matches::assert_matches;
 
     const BASIC_TEST_CASES: &[(u64, &[u8])] = &[
@@ -212,7 +227,7 @@ mod test {
     ];
 
     #[test]
-    fn test_write_variant() -> SerResult<()> {
+    fn test_write_variant() -> Result<()> {
         for &(value, expected) in BASIC_TEST_CASES {
             let mut buf = Vec::<u8>::new();
             buf.write_variant(value.into())?;
@@ -223,7 +238,7 @@ mod test {
     }
 
     #[test]
-    fn test_read_variant() -> DeserResult<()> {
+    fn test_read_variant() -> Result<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
             let var = <&[u8] as ReadExtVariant>::read_variant(&mut input)?;
             assert_eq!(
@@ -239,17 +254,17 @@ mod test {
     }
 
     #[test]
-    fn test_read_variant_too_long() -> DeserResult<()> {
+    fn test_read_variant_too_long() -> Result<()> {
         let mut input: &[u8] = &[0x80u8; 10];
         assert_matches!(
             <&[u8] as ReadExtVariant>::read_variant(&mut input),
-            Err(DeserError::InvalidVariant)
+            Err(ErrorKind::TooLongEncodedVariant)
         );
         Ok(())
     }
 
     #[test]
-    fn test_buf_read_peek_10() -> DeserResult<()> {
+    fn test_buf_read_peek_10() -> Result<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
             let var = <&[u8] as BufReadExtVariant>::read_variant_peek_10(&mut input)?;
             assert_eq!(
@@ -265,7 +280,7 @@ mod test {
     }
 
     #[test]
-    fn test_buf_read_variant_4() -> DeserResult<()> {
+    fn test_buf_read_variant_4() -> Result<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
             let var = <&[u8] as BufReadExtVariant>::read_variant_assume_4(&mut input)?;
             assert_eq!(
@@ -281,7 +296,7 @@ mod test {
     }
 
     #[test]
-    fn test_buf_read_variant_2() -> DeserResult<()> {
+    fn test_buf_read_variant_2() -> Result<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
             let var = <&[u8] as BufReadExtVariant>::read_variant_assume_2(&mut input)?;
             assert_eq!(

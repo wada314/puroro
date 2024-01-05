@@ -21,17 +21,12 @@ pub mod internal;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum DeserError {
+pub enum ErrorKind {
     #[error("io error")]
     IoError(#[from] ::std::io::Error),
     #[error("Deserializing invalid variant (too long).")]
-    InvalidVariant,
+    TooLongEncodedVariant,
+    #[error("The decoded variant value is not convertible to .proto specified int type")]
+    VariantValueTooLarge,
 }
-pub type DeserResult<T> = ::std::result::Result<T, DeserError>;
-
-#[derive(Error, Debug)]
-pub enum SerError {
-    #[error("io error")]
-    IoError(#[from] ::std::io::Error),
-}
-pub type SerResult<T> = ::std::result::Result<T, SerError>;
+pub type Result<T> = ::std::result::Result<T, ErrorKind>;
