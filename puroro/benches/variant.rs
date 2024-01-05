@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ::criterion::{black_box, criterion_group, criterion_main, Criterion};
-use ::puroro::internal::variant::{BufReadExt, ReadExt, Variant, WriteExt};
+use ::puroro::internal::variant::{BufReadExtVariant, ReadExtVariant, Variant, WriteExtVariant};
 use ::rand::prelude::*;
 use ::rand_distr::Exp;
 use ::rand_pcg::Pcg32;
@@ -25,9 +25,8 @@ fn test_cases_random<const SIZE: usize>() -> Box<[u8]> {
     let mut output = Vec::with_capacity(10 * SIZE);
     for item_u64 in iter::repeat_with(|| rand.gen::<u64>()).take(SIZE) {
         let item_var = Variant::from(item_u64);
-        WriteExt::write_variant(&mut output, item_var).unwrap();
+        WriteExtVariant::write_variant(&mut output, item_var).unwrap();
     }
-    dbg!(output.len());
     output.into_boxed_slice()
 }
 
@@ -44,26 +43,25 @@ fn test_cases_exponential_dist<const SIZE: usize>(
             .unwrap();
     for item_f64 in iter::repeat_with(|| exp_distr.sample(&mut rand)).take(SIZE) {
         let item_var = Variant::from(item_f64 as u64);
-        WriteExt::write_variant(&mut output, item_var).unwrap();
+        WriteExtVariant::write_variant(&mut output, item_var).unwrap();
     }
-    dbg!(output.len());
     output.into_boxed_slice()
 }
 
 fn read_variants<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
-    array::from_fn(|_| <&[u8] as ReadExt>::read_variant(&mut input).unwrap())
+    array::from_fn(|_| <&[u8] as ReadExtVariant>::read_variant(&mut input).unwrap())
 }
 
 fn read_variants_peek_10<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
-    array::from_fn(|_| <&[u8] as BufReadExt>::read_variant_peek_10(&mut input).unwrap())
+    array::from_fn(|_| <&[u8] as BufReadExtVariant>::read_variant_peek_10(&mut input).unwrap())
 }
 
 fn read_variants_assume_4<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
-    array::from_fn(|_| <&[u8] as BufReadExt>::read_variant_assume_4(&mut input).unwrap())
+    array::from_fn(|_| <&[u8] as BufReadExtVariant>::read_variant_assume_4(&mut input).unwrap())
 }
 
 fn read_variants_assume_2<const SIZE: usize>(mut input: &[u8]) -> [Variant; SIZE] {
-    array::from_fn(|_| <&[u8] as BufReadExt>::read_variant_assume_2(&mut input).unwrap())
+    array::from_fn(|_| <&[u8] as BufReadExtVariant>::read_variant_assume_2(&mut input).unwrap())
 }
 
 fn bench_read_variants(criterion: &mut Criterion) {

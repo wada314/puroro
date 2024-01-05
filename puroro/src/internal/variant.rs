@@ -32,21 +32,21 @@ impl From<Variant> for u64 {
     }
 }
 
-pub trait ReadExt {
+pub trait ReadExtVariant {
     fn read_variant(&mut self) -> DeserResult<Variant>;
 }
 
-pub trait BufReadExt {
+pub trait BufReadExtVariant {
     fn read_variant_peek_10(&mut self) -> DeserResult<Variant>;
     fn read_variant_assume_4(&mut self) -> DeserResult<Variant>;
     fn read_variant_assume_2(&mut self) -> DeserResult<Variant>;
 }
 
-pub trait WriteExt {
+pub trait WriteExtVariant {
     fn write_variant(&mut self, variant: Variant) -> SerResult<()>;
 }
 
-impl<T: Read> ReadExt for T {
+impl<T: Read> ReadExtVariant for T {
     #[inline]
     fn read_variant(&mut self) -> DeserResult<Variant> {
         let iter = self.bytes();
@@ -65,13 +65,13 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-impl<T: BufRead> BufReadExt for T {
+impl<T: BufRead> BufReadExtVariant for T {
     #[inline]
     fn read_variant_peek_10(&mut self) -> DeserResult<Variant> {
         let inner_buf = self.fill_buf()?;
         let (ten_bytes_buf, _) = inner_buf.as_chunks::<10>();
         let Some(ten_bytes) = ten_bytes_buf.first() else {
-            return <Self as ReadExt>::read_variant(self);
+            return <Self as ReadExtVariant>::read_variant(self);
         };
 
         let mut result = 0u64;
@@ -96,12 +96,12 @@ impl<T: BufRead> BufReadExt for T {
 
         let (four_bytes_array, _) = inner_buf.as_chunks::<4>();
         let Some(four_bytes) = four_bytes_array.first() else {
-            return <Self as ReadExt>::read_variant(self);
+            return <Self as ReadExtVariant>::read_variant(self);
         };
         let a = u32::from_le_bytes(*four_bytes);
         if (a & 0b_10000000_10000000_10000000_10000000) == 0b_10000000_10000000_10000000_10000000 {
             // The variant is longer than 4 bytes. Fallback to naive implementation.
-            return <Self as ReadExt>::read_variant(self);
+            return <Self as ReadExtVariant>::read_variant(self);
         }
 
         // For optimization, no early-return or branch after here!
@@ -139,12 +139,12 @@ impl<T: BufRead> BufReadExt for T {
 
         let (two_bytes_array, _) = inner_buf.as_chunks::<2>();
         let Some(two_bytes) = two_bytes_array.first() else {
-            return <Self as ReadExt>::read_variant(self);
+            return <Self as ReadExtVariant>::read_variant(self);
         };
         let a = u16::from_le_bytes(*two_bytes);
         if (a & 0b_10000000_10000000) == 0b_10000000_10000000 {
             // The variant is longer than 2 bytes. Fallback to naive implementation.
-            return <Self as ReadExt>::read_variant(self);
+            return <Self as ReadExtVariant>::read_variant(self);
         }
 
         // For optimization, no early-return or branch after here!
@@ -159,7 +159,7 @@ impl<T: BufRead> BufReadExt for T {
     }
 }
 
-impl<T: Write> WriteExt for T {
+impl<T: Write> WriteExtVariant for T {
     fn write_variant(&mut self, variant: Variant) -> SerResult<()> {
         let mut v = u64::from_le_bytes(variant.0);
         let mut buffer = <[u8; 10]>::default();
@@ -181,7 +181,7 @@ impl<T: Write> WriteExt for T {
 
 #[cfg(test)]
 mod test {
-    use super::{BufReadExt, DeserResult, ReadExt, SerResult, WriteExt};
+    use super::{BufReadExtVariant, DeserResult, ReadExtVariant, SerResult, WriteExtVariant};
     use crate::DeserError;
     use ::std::assert_matches::assert_matches;
 
@@ -225,7 +225,7 @@ mod test {
     #[test]
     fn test_read_variant() -> DeserResult<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
-            let var = <&[u8] as ReadExt>::read_variant(&mut input)?;
+            let var = <&[u8] as ReadExtVariant>::read_variant(&mut input)?;
             assert_eq!(
                 0,
                 input.len(),
@@ -242,7 +242,7 @@ mod test {
     fn test_read_variant_too_long() -> DeserResult<()> {
         let mut input: &[u8] = &[0x80u8; 10];
         assert_matches!(
-            <&[u8] as ReadExt>::read_variant(&mut input),
+            <&[u8] as ReadExtVariant>::read_variant(&mut input),
             Err(DeserError::InvalidVariant)
         );
         Ok(())
@@ -251,7 +251,7 @@ mod test {
     #[test]
     fn test_buf_read_peek_10() -> DeserResult<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
-            let var = <&[u8] as BufReadExt>::read_variant_peek_10(&mut input)?;
+            let var = <&[u8] as BufReadExtVariant>::read_variant_peek_10(&mut input)?;
             assert_eq!(
                 0,
                 input.len(),
@@ -267,7 +267,7 @@ mod test {
     #[test]
     fn test_buf_read_variant_4() -> DeserResult<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
-            let var = <&[u8] as BufReadExt>::read_variant_assume_4(&mut input)?;
+            let var = <&[u8] as BufReadExtVariant>::read_variant_assume_4(&mut input)?;
             assert_eq!(
                 0,
                 input.len(),
@@ -283,7 +283,7 @@ mod test {
     #[test]
     fn test_buf_read_variant_2() -> DeserResult<()> {
         for &(expected, mut input) in BASIC_TEST_CASES {
-            let var = <&[u8] as BufReadExt>::read_variant_assume_2(&mut input)?;
+            let var = <&[u8] as BufReadExtVariant>::read_variant_assume_2(&mut input)?;
             assert_eq!(
                 0,
                 input.len(),
