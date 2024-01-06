@@ -12,5 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod deser;
-pub mod variant;
+use crate::internal::variant::Variant;
+use crate::{ErrorKind, Result};
+
+pub struct Record<T> {
+    number: i32,
+    payload: Payload<T>,
+}
+pub enum Payload<T> {
+    Variant(Variant),
+    I32([u8; 4]),
+    I64([u8; 8]),
+    Len(T),
+}
+
+pub trait DeserBuilder {
+    type Output;
+    fn build(self) -> Self::Output;
+    fn deser_record<T: AsRef<[u8]>>(&mut self, record: Record<T>);
+}
