@@ -31,6 +31,12 @@ impl Variant {
             .try_into()
             .map_err(|_| ErrorKind::VariantValueTooLarge)?)
     }
+    pub fn try_as_uint32(&self) -> Result<u32> {
+        Ok(self
+            .as_uint64()
+            .try_into()
+            .map_err(|_| ErrorKind::VariantValueTooLarge)?)
+    }
 }
 
 impl From<u64> for Variant {
