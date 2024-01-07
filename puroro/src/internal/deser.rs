@@ -14,6 +14,7 @@
 
 use crate::internal::variant::Variant;
 use crate::{ErrorKind, Result};
+use ::futures::io::AsyncRead;
 
 pub struct Record<T> {
     number: i32,
