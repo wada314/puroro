@@ -27,10 +27,37 @@ pub enum Payload<T> {
     Len(T),
 }
 
+trait ReadExtRecord {
+    type LenPayloadType;
+    fn read_record(&mut self) -> Result<Payload<Self::LenPayloadType>>;
+}
+impl<'a> ReadExtRecord for &'a [u8] {
+    type LenPayloadType = &'a [u8];
+    fn read_record(&mut self) -> Result<Payload<Self::LenPayloadType>> {
+        use crate::internal::variant::ReadExtVariant;
+        let tag = self.read_variant()?.try_as_uint32()?;
+        let wire_type = tag & 0x7;
+        let number = tag >> 3;
+        todo!()
+    }
+}
+
 pub trait DeseringMessage {
-    fn finish(&mut self);
-    fn deser_record(&mut self, record: Record<&[u8]>) -> Option<&mut dyn DeseringMessage>;
+    fn finish(&mut self) -> Result<()>;
+    fn deser_record(&mut self, record: Record<&[u8]>) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 pub trait AsyncDeseringMessage {
-    fn finish(&mut self);
+    fn finish(&mut self) -> Result<()>;
+}
+
+pub fn deser_from_slice(root_msg: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
+    let mut stack = Vec::new();
+    stack.push((root_msg, input));
+    while let Some((msg, mut remain)) = stack.pop() {
+        if remain.is_empty() {
+            msg.finish()?;
+            continue;
+        }
+    }
+    todo!()
 }
