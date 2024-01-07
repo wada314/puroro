@@ -26,8 +26,10 @@ pub enum Payload<T> {
     Len(T),
 }
 
-pub trait DeserBuilder {
-    type Output;
-    fn build(self) -> Self::Output;
-    fn deser_record<T: AsRef<[u8]>>(&mut self, record: Record<T>);
+pub trait DeseringMessage {
+    fn finish(&mut self);
+    fn deser_record(&mut self, record: Record<&[u8]>) -> Option<&mut dyn DeseringMessage>;
+}
+pub trait AsyncDeseringMessage {
+    fn finish(&mut self);
 }

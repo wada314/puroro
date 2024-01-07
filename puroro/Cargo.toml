@@ -18,6 +18,7 @@ name = "variant"
 harness = false
 
 [dependencies]
+futures-io = "0.3.30"
 thiserror = "1.0"
 
 [dev-dependencies]
