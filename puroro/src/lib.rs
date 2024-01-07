@@ -36,3 +36,13 @@ pub trait AsyncDeserMessage {
     type Message: Message;
     async fn wait_deser(self) -> Self::Message;
 }
+
+pub struct DescriptorProto {
+    pub name: String,                      // 1
+    pub fields: Vec<FieldDescriptorProto>, // 2
+}
+
+pub struct FieldDescriptorProto {
+    pub name: String, // 1
+    pub number: i32,  // 3
+}
