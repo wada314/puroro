@@ -17,7 +17,7 @@ use crate::{ErrorKind, Result};
 use ::futures::io::AsyncRead;
 
 pub struct Record<T> {
-    number: i32,
+    number: u32,
     payload: Payload<T>,
 }
 pub enum Payload<T> {
@@ -27,18 +27,58 @@ pub enum Payload<T> {
     Len(T),
 }
 
+enum WireType {
+    Variant = 0,
+    I64 = 1,
+    Len = 2,
+    I32 = 5,
+}
+impl TryFrom<u32> for WireType {
+    type Error = ErrorKind;
+    fn try_from(value: u32) -> Result<WireType> {
+        Ok(match value {
+            0 => WireType::Variant,
+            1 => WireType::I64,
+            2 => WireType::Len,
+            5 => WireType::I32,
+            _ => Err(ErrorKind::UnknownWireType)?,
+        })
+    }
+}
+
 trait ReadExtRecord {
     type LenPayloadType;
-    fn read_record(&mut self) -> Result<Payload<Self::LenPayloadType>>;
+    fn read_record(&mut self) -> Result<Record<Self::LenPayloadType>>;
 }
 impl<'a> ReadExtRecord for &'a [u8] {
     type LenPayloadType = &'a [u8];
-    fn read_record(&mut self) -> Result<Payload<Self::LenPayloadType>> {
+    fn read_record(&mut self) -> Result<Record<Self::LenPayloadType>> {
         use crate::internal::variant::ReadExtVariant;
         let tag = self.read_variant()?.try_as_uint32()?;
-        let wire_type = tag & 0x7;
+        let wire_type: WireType = (tag & 0x7).try_into()?;
         let number = tag >> 3;
-        todo!()
+        let payload = match wire_type {
+            WireType::Variant => Payload::Variant(self.read_variant()?),
+            WireType::I32 => {
+                let Some((chunk, remain)) = self.split_first_chunk::<4>() else {
+                    Err(ErrorKind::DeserUnexpectedEof)?
+                };
+                *self = remain;
+                Payload::I32(chunk.clone())
+            }
+            WireType::I64 => {
+                let Some((chunk, remain)) = self.split_first_chunk::<8>() else {
+                    Err(ErrorKind::DeserUnexpectedEof)?
+                };
+                *self = remain;
+                Payload::I64(chunk.clone())
+            }
+            WireType::Len => {
+                let length = self.read_variant()?.try_as_int32()?;
+                let Some((chunk, remain)) = self.split_at(length)
+            },
+        };
+        Ok(Record { number, payload })
     }
 }
 

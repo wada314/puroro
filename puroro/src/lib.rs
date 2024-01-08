@@ -15,6 +15,7 @@
 #![feature(allocator_api)]
 #![feature(slice_as_chunks)]
 #![feature(assert_matches)]
+#![feature(slice_first_last_chunk)]
 
 pub mod internal;
 
@@ -28,6 +29,10 @@ pub enum ErrorKind {
     TooLongEncodedVariant,
     #[error("The decoded variant value is not convertible to .proto specified int type")]
     VariantValueTooLarge,
+    #[error("unknown wire type")]
+    UnknownWireType,
+    #[error("Unexpected EOF detected while deserializing")]
+    DeserUnexpectedEof,
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
