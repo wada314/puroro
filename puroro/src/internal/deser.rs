@@ -88,13 +88,16 @@ impl<'a> ReadExtRecord for &'a [u8] {
 
 pub trait DeseringMessage {
     fn finish(&mut self) -> Result<()>;
-    fn deser_record(&mut self, record: Record<&[u8]>) -> Result<Option<&mut dyn DeseringMessage>>;
+    fn deser_record<'a, 'b>(
+        &'a mut self,
+        record: Record<&'b [u8]>,
+    ) -> Result<Option<(&'a mut dyn DeseringMessage, &'b [u8])>>;
 }
 pub trait AsyncDeseringMessage {
     fn finish(&mut self) -> Result<()>;
 }
 
-pub fn deser_from_slice(root_msg: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
+pub fn deser_from_slice(root_msg: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
     let mut stack = Vec::new();
     stack.push((root_msg, input));
     while let Some((msg, mut remain)) = stack.pop() {
@@ -102,6 +105,11 @@ pub fn deser_from_slice(root_msg: &mut dyn DeseringMessage, input: &[u8]) -> Res
             msg.finish()?;
             continue;
         }
+        let record = remain.read_record()?;
+        if let Some((child_message, child_record)) = msg.deser_record(record)? {
+            stack.push((child_message, child_record));
+        };
+        stack.push((msg, remain));
     }
     todo!()
 }
