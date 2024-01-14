@@ -74,9 +74,13 @@ impl<'a> ReadExtRecord for &'a [u8] {
                 Payload::I64(chunk.clone())
             }
             WireType::Len => {
-                let length = self.read_variant()?.try_as_int32()?;
-                let Some((chunk, remain)) = self.split_at(length)
-            },
+                let length: usize = self.read_variant()?.try_as_int32()?.try_into()?;
+                let Some((chunk, remain)) = self.try_split_at(length) else {
+                    Err(ErrorKind::DeserUnexpectedEof)?
+                };
+                *self = remain;
+                Payload::Len(chunk)
+            }
         };
         Ok(Record { number, payload })
     }
@@ -100,4 +104,17 @@ pub fn deser_from_slice(root_msg: &mut dyn DeseringMessage, input: &[u8]) -> Res
         }
     }
     todo!()
+}
+
+trait SliceExt<T> {
+    fn try_split_at(&self, at: usize) -> Option<(&[T], &[T])>;
+}
+impl<T> SliceExt<T> for [T] {
+    fn try_split_at(&self, at: usize) -> Option<(&[T], &[T])> {
+        if at <= self.len() {
+            Some(self.split_at(at))
+        } else {
+            None
+        }
+    }
 }

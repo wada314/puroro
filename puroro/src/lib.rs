@@ -25,6 +25,8 @@ use ::thiserror::Error;
 pub enum ErrorKind {
     #[error("io error")]
     IoError(#[from] ::std::io::Error),
+    #[error("try from int error")]
+    TryFromIntError(#[from] ::std::num::TryFromIntError),
     #[error("Deserializing invalid variant (too long).")]
     TooLongEncodedVariant,
     #[error("The decoded variant value is not convertible to .proto specified int type")]
