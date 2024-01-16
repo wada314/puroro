@@ -86,32 +86,21 @@ impl<'a> ReadExtRecord for &'a [u8] {
     }
 }
 
-pub trait DeseringMessage {
-    fn finish(&mut self) -> Result<()>;
-    fn deser_record<'a, 'b>(
-        &'a mut self,
-        record: Record<&'b [u8]>,
-    ) -> Result<Option<(&'a mut dyn DeseringMessage, &'b [u8])>>;
-}
-pub trait AsyncDeseringMessage {
-    fn finish(&mut self) -> Result<()>;
+pub trait DeseringMessageCursor<'a> {
+    fn try_into_parent(self) -> Result<Box<dyn DeseringMessageCursor<'a>>>;
+    fn try_parse_record(self: Box<Self>) -> Result<Box<dyn DeseringMessageCursor<'a>>>;
 }
 
-pub fn deser_from_slice(root_msg: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
-    let mut stack = Vec::new();
-    stack.push((root_msg, input));
-    while let Some((msg, mut remain)) = stack.pop() {
-        if remain.is_empty() {
-            msg.finish()?;
-            continue;
-        }
-        let record = remain.read_record()?;
-        if let Some((child_message, child_record)) = msg.deser_record(record)? {
-            stack.push((child_message, child_record));
-        };
-        stack.push((msg, remain));
+pub struct RootMessageCursor<'a, M>(&'a mut M);
+
+impl<'a, M> DeseringMessageCursor<'a> for RootMessageCursor<'a, M> {
+    fn try_into_parent(self) -> Result<Box<dyn DeseringMessageCursor<'a>>> {
+        Err(ErrorKind::DeserError)?
     }
-    todo!()
+
+    fn try_parse_record(self: Box<Self>) -> Result<Box<dyn DeseringMessageCursor<'a>>> {
+        todo!()
+    }
 }
 
 trait SliceExt<T> {

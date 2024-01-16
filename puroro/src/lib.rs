@@ -29,6 +29,8 @@ pub enum ErrorKind {
     TryFromIntError(#[from] ::std::num::TryFromIntError),
     #[error("Deserializing invalid variant (too long).")]
     TooLongEncodedVariant,
+    #[error("Generic deserializing error.")]
+    DeserError,
     #[error("The decoded variant value is not convertible to .proto specified int type")]
     VariantValueTooLarge,
     #[error("unknown wire type")]
