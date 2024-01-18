@@ -86,21 +86,8 @@ impl<'a> ReadExtRecord for &'a [u8] {
     }
 }
 
-pub trait DeseringMessageCursor<'a> {
-    fn try_into_parent(self) -> Result<Box<dyn DeseringMessageCursor<'a>>>;
-    fn try_parse_record(self: Box<Self>) -> Result<Box<dyn DeseringMessageCursor<'a>>>;
-}
-
-pub struct RootMessageCursor<'a, M>(&'a mut M);
-
-impl<'a, M> DeseringMessageCursor<'a> for RootMessageCursor<'a, M> {
-    fn try_into_parent(self) -> Result<Box<dyn DeseringMessageCursor<'a>>> {
-        Err(ErrorKind::DeserError)?
-    }
-
-    fn try_parse_record(self: Box<Self>) -> Result<Box<dyn DeseringMessageCursor<'a>>> {
-        todo!()
-    }
+pub trait DeseringMessage {
+    fn try_parse_record(&mut self) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
 trait SliceExt<T> {
