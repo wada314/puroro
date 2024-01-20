@@ -87,7 +87,39 @@ impl<'a> ReadExtRecord for &'a [u8] {
 }
 
 pub trait DeseringMessage {
-    fn try_parse_record(&mut self) -> Result<Option<&mut dyn DeseringMessage>>;
+    fn try_parse_record<'a: 'b, 'b>(
+        &'a mut self,
+        record: Record<&[u8]>,
+    ) -> Result<Option<&'b mut dyn DeseringMessage>>;
+}
+
+struct Stack<'a, T: ?Sized> {
+    vec: Vec<&'a mut T>,
+}
+impl<'a, T> Stack<'a, T> {
+    fn pop(&mut self) -> Result<()> {
+        self.vec.pop().ok_or(ErrorKind::DeserError)?;
+        Ok(())
+    }
+    fn check_last_and_maybe_push(
+        &mut self,
+        f: impl FnOnce(&mut T) -> Result<Option<&mut T>>,
+    ) -> Result<()> {
+        use ::std::mem::transmute;
+        let last = unsafe {
+            &mut **transmute::<_, &*mut T>(self.vec.last().ok_or(ErrorKind::DeserError)?)
+        };
+        if let Some(child) = (f)(last)? {
+            self.vec.push(child);
+        }
+
+        Ok(())
+    }
+}
+
+fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
+    todo!();
+    Ok(())
 }
 
 trait SliceExt<T> {
