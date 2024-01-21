@@ -128,10 +128,10 @@ impl<T> Stack<T> {
 }
 
 pub trait DeseringMessage {
-    fn try_parse_slice_record<'a, 'b>(
-        &'a mut self,
-        record: Record<&'b [u8]>,
-    ) -> Result<Option<(&'a mut dyn DeseringMessage, &'b [u8])>>;
+    fn try_parse_slice_record<'slice>(
+        &mut self,
+        record: Record<&'slice [u8]>,
+    ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>>;
 }
 
 fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
