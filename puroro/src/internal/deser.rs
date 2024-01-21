@@ -140,7 +140,7 @@ fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> 
     while !stack.is_empty() {
         let record = slice.read_record()?;
         if stack.check_last_and_maybe_push(move |msg| msg.try_parse_record(record))? {
-            todo!()
+            todo!();
         }
     }
     Ok(())
