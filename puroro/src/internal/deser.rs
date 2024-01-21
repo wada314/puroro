@@ -172,11 +172,36 @@ impl<T> SliceExt<T> for [T] {
 mod test {
     use super::*;
 
+    #[derive(Default)]
     struct SampleMessage {
         variants: Vec<(u32, Variant)>,
         i32s: Vec<(u32, u32)>,
         i64s: Vec<(u32, u64)>,
-        bytes: Vec<(u32, Vec<u8>)>,
-        children: Vec<Box<SampleMessage>>,
+        strings: Vec<(u32, String)>,
+        children: Vec<(u32, Box<SampleMessage>)>,
+    }
+
+    impl DeseringMessage for SampleMessage {
+        fn try_parse_slice_record<'slice>(
+            &mut self,
+            record: Record<&'slice [u8]>,
+        ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>> {
+            let n = record.number;
+            match record.payload {
+                Payload::Variant(v) => self.variants.push((n, v)),
+                Payload::I32(b4) => self.i32s.push((n, u32::from_le_bytes(b4))),
+                Payload::I64(b8) => self.i64s.push((n, u64::from_le_bytes(b8))),
+                Payload::Len(slice) => {
+                    if n % 2 == 0 {
+                        self.strings
+                            .push((n, String::from_utf8_lossy(slice).into_owned()))
+                    } else {
+                        self.children.push((n, Box::new(Default::default())));
+                        return Ok(Some((self.children.last_mut().unwrap().1.as_mut(), slice)));
+                    }
+                }
+            }
+            Ok(None)
+        }
     }
 }
