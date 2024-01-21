@@ -86,22 +86,15 @@ impl<'a> ReadExtRecord for &'a [u8] {
     }
 }
 
-pub trait DeseringMessage {
-    fn try_parse_record(
-        &mut self,
-        record: Record<&[u8]>,
-    ) -> Result<Option<&mut dyn DeseringMessage>>;
-}
-
 #[derive(Default)]
-struct Stack<'a, T: ?Sized> {
-    vec: Vec<&'a mut T>,
+struct Stack<T> {
+    vec: Vec<T>,
 }
-impl<'a, T: ?Sized> Stack<'a, T> {
+impl<T> Stack<T> {
     fn new() -> Self {
         Self { vec: Vec::new() }
     }
-    fn push(&mut self, elem: &'a mut T) {
+    fn push(&mut self, elem: T) {
         self.vec.push(elem);
     }
     fn pop(&mut self) -> Result<()> {
@@ -114,10 +107,10 @@ impl<'a, T: ?Sized> Stack<'a, T> {
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    fn check_last_and_maybe_push(
-        &mut self,
-        f: impl FnOnce(&mut T) -> Result<Option<&mut T>>,
-    ) -> Result<bool> {
+    fn check_last_mut_and_maybe_push<'a>(
+        &'a mut self,
+        f: impl FnOnce(&'a mut T) -> Result<Option<T>>,
+    ) -> Result<()> {
         use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
         // without grabbing the mut borrow of the stack itself.
@@ -126,21 +119,34 @@ impl<'a, T: ?Sized> Stack<'a, T> {
         };
         if let Some(child) = (f)(last)? {
             self.vec.push(child);
-            Ok(true)
-        } else {
-            Ok(false)
         }
+        Ok(())
     }
+}
+
+pub trait DeseringMessage {
+    fn try_parse_slice_record<'a, 'b>(
+        &'a mut self,
+        record: Record<&'b [u8]>,
+    ) -> Result<Option<(&'a mut dyn DeseringMessage, &'b [u8])>>;
 }
 
 fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
     let mut stack = Stack::new();
-    let mut slice = input;
-    stack.push(root);
+    stack.push((root, input));
     while !stack.is_empty() {
-        let record = slice.read_record()?;
-        if stack.check_last_and_maybe_push(move |msg| msg.try_parse_record(record))? {
-            todo!();
+        let mut input_is_empty = false;
+        stack.check_last_mut_and_maybe_push(|(msg, input)| {
+            if input.is_empty() {
+                input_is_empty = true;
+                Ok(None)
+            } else {
+                let record = input.read_record()?;
+                Ok(msg.try_parse_slice_record(record)?)
+            }
+        })?;
+        if input_is_empty {
+            stack.pop();
         }
     }
     Ok(())
