@@ -167,3 +167,16 @@ impl<T> SliceExt<T> for [T] {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    struct SampleMessage {
+        variants: Vec<(u32, Variant)>,
+        i32s: Vec<(u32, u32)>,
+        i64s: Vec<(u32, u64)>,
+        bytes: Vec<(u32, Vec<u8>)>,
+        children: Vec<Box<SampleMessage>>,
+    }
+}
