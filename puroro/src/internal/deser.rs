@@ -87,10 +87,10 @@ impl<'a> ReadExtRecord for &'a [u8] {
 }
 
 pub trait DeseringMessage {
-    fn try_parse_record<'a: 'b, 'b>(
-        &'a mut self,
+    fn try_parse_record(
+        &mut self,
         record: Record<&[u8]>,
-    ) -> Result<Option<&'b mut dyn DeseringMessage>>;
+    ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
 #[derive(Default)]
@@ -114,9 +114,9 @@ impl<'a, T: ?Sized> Stack<'a, T> {
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    fn check_last_and_maybe_push<'b: 'c, 'c>(
+    fn check_last_and_maybe_push(
         &mut self,
-        f: impl FnOnce(&'b mut T) -> Result<Option<&'c mut T>>,
+        f: impl FnOnce(&mut T) -> Result<Option<&mut T>>,
     ) -> Result<bool> {
         use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
