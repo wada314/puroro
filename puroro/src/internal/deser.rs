@@ -107,9 +107,9 @@ impl<T> Stack<T> {
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    fn check_last_mut_and_maybe_push<'a>(
-        &'a mut self,
-        f: impl FnOnce(&'a mut T) -> Result<Option<T>>,
+    fn check_last_mut_and_maybe_push(
+        &mut self,
+        f: impl FnOnce(&mut T) -> Result<Option<T>>,
     ) -> Result<()> {
         use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
