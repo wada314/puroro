@@ -97,7 +97,7 @@ pub trait DeseringMessage {
 struct Stack<'a, T: ?Sized> {
     vec: Vec<&'a mut T>,
 }
-impl<'a, T> Stack<'a, T> {
+impl<'a, T: ?Sized> Stack<'a, T> {
     fn new() -> Self {
         Self { vec: Vec::new() }
     }
@@ -128,6 +128,7 @@ impl<'a, T> Stack<'a, T> {
 
 fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
     let mut stack = Stack::new();
+    stack.push(root);
     Ok(())
 }
 
