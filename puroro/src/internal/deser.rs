@@ -107,10 +107,13 @@ impl<T> Stack<T> {
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    fn check_last_mut_and_maybe_push(
+    fn check_last_mut_and_maybe_push<'a>(
         &mut self,
-        f: impl FnOnce(&mut T) -> Result<Option<T>>,
-    ) -> Result<()> {
+        f: impl FnOnce(&'a mut T) -> Result<Option<T>>,
+    ) -> Result<()>
+    where
+        T: 'a,
+    {
         use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
         // without grabbing the mut borrow of the stack itself.
@@ -131,7 +134,7 @@ pub trait DeseringMessage {
     ) -> Result<Option<(&'a mut dyn DeseringMessage, &'b [u8])>>;
 }
 
-fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
+fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
     let mut stack = Stack::new();
     stack.push((root, input));
     while !stack.is_empty() {
