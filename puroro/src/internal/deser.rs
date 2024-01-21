@@ -108,10 +108,16 @@ impl<'a, T: ?Sized> Stack<'a, T> {
         self.vec.pop().ok_or(ErrorKind::DeserError)?;
         Ok(())
     }
-    fn check_last_and_maybe_push(
+    fn len(&self) -> usize {
+        self.vec.len()
+    }
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    fn check_last_and_maybe_push<'b: 'c, 'c>(
         &mut self,
-        f: impl FnOnce(&mut T) -> Result<Option<&mut T>>,
-    ) -> Result<()> {
+        f: impl FnOnce(&'b mut T) -> Result<Option<&'c mut T>>,
+    ) -> Result<bool> {
         use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
         // without grabbing the mut borrow of the stack itself.
@@ -120,15 +126,23 @@ impl<'a, T: ?Sized> Stack<'a, T> {
         };
         if let Some(child) = (f)(last)? {
             self.vec.push(child);
+            Ok(true)
+        } else {
+            Ok(false)
         }
-
-        Ok(())
     }
 }
 
 fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
     let mut stack = Stack::new();
+    let mut slice = input;
     stack.push(root);
+    while !stack.is_empty() {
+        let record = slice.read_record()?;
+        if stack.check_last_and_maybe_push(move |msg| msg.try_parse_record(record))? {
+            todo!()
+        }
+    }
     Ok(())
 }
 
