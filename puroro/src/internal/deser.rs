@@ -93,10 +93,17 @@ pub trait DeseringMessage {
     ) -> Result<Option<&'b mut dyn DeseringMessage>>;
 }
 
+#[derive(Default)]
 struct Stack<'a, T: ?Sized> {
     vec: Vec<&'a mut T>,
 }
 impl<'a, T> Stack<'a, T> {
+    fn new() -> Self {
+        Self { vec: Vec::new() }
+    }
+    fn push(&mut self, elem: &'a mut T) {
+        self.vec.push(elem);
+    }
     fn pop(&mut self) -> Result<()> {
         self.vec.pop().ok_or(ErrorKind::DeserError)?;
         Ok(())
@@ -106,6 +113,8 @@ impl<'a, T> Stack<'a, T> {
         f: impl FnOnce(&mut T) -> Result<Option<&mut T>>,
     ) -> Result<()> {
         use ::std::mem::transmute;
+        // Grabbing the mut borrow of the last element in the stack,
+        // without grabbing the mut borrow of the stack itself.
         let last = unsafe {
             &mut **transmute::<_, &*mut T>(self.vec.last().ok_or(ErrorKind::DeserError)?)
         };
@@ -118,7 +127,7 @@ impl<'a, T> Stack<'a, T> {
 }
 
 fn deser_from_slice(root: &mut dyn DeseringMessage, input: &[u8]) -> Result<()> {
-    todo!();
+    let mut stack = Stack::new();
     Ok(())
 }
 
