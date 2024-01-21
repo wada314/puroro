@@ -97,7 +97,7 @@ impl<T> Stack<T> {
     fn push(&mut self, elem: T) {
         self.vec.push(elem);
     }
-    fn pop(&mut self) -> Result<()> {
+    fn try_pop(&mut self) -> Result<()> {
         self.vec.pop().ok_or(ErrorKind::DeserError)?;
         Ok(())
     }
@@ -149,7 +149,7 @@ fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> R
             }
         })?;
         if input_is_empty {
-            stack.pop();
+            stack.try_pop()?;
         }
     }
     Ok(())
