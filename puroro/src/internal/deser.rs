@@ -49,11 +49,11 @@ impl TryFrom<u32> for WireType {
     }
 }
 
-trait ReadExtRecord {
+trait SliceExtReadRecord {
     type LenPayloadType;
     fn read_record(&mut self) -> Result<Record<Self::LenPayloadType>>;
 }
-impl<'a> ReadExtRecord for &'a [u8] {
+impl<'a> SliceExtReadRecord for &'a [u8] {
     type LenPayloadType = &'a [u8];
     fn read_record(&mut self) -> Result<Record<Self::LenPayloadType>> {
         use crate::internal::variant::ReadExtVariant;
