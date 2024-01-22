@@ -117,7 +117,6 @@ impl<T> Stack<T> {
     where
         T: 'a,
     {
-        use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
         // without grabbing the mut borrow of the stack itself.
         let last = unsafe { &mut *(self as *mut Self) }
@@ -138,7 +137,7 @@ pub trait DeseringMessage {
     ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>>;
 }
 
-fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
+pub fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
     let mut stack = Stack::new();
     stack.push((root, input));
     while !stack.is_empty() {
