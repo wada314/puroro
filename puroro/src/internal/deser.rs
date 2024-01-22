@@ -208,10 +208,15 @@ mod test {
         }
     }
 
+    const INPUT_FIELD_1_VARIANT_1: &[u8] = &[(1 << 3) | WireType::Variant as u8, 0x01];
+    const INPUT_FIELD_2_VARIANT_3: &[u8] = &[(2 << 3) | WireType::Variant as u8, 0x03];
+    const INPUT_FIELD_3_I32_1: &[u8] = &[(3 << 3) | WireType::I32 as u8, 1, 0, 0, 0];
+    const INPUT_FIELD_4_I32_3: &[u8] = &[(4 << 3) | WireType::I32 as u8, 3, 0, 0, 0];
+    const INPUT_FIELD_5_I64_1: &[u8] = &[(5 << 3) | WireType::I64 as u8, 1, 0, 0, 0, 0, 0, 0, 0];
+    const INPUT_FIELD_6_I64_3: &[u8] = &[(6 << 3) | WireType::I64 as u8, 3, 0, 0, 0, 0, 0, 0, 0];
+
     #[test]
-    fn test_deser_variant_field() {
-        const INPUT_FIELD_1_VARIANT_1: &[u8] = &[0x08, 0x01];
-        const INPUT_FIELD_2_VARIANT_3: &[u8] = &[0x10, 0x03];
+    fn test_deser_variant_fields() {
         let input = [INPUT_FIELD_1_VARIANT_1, INPUT_FIELD_2_VARIANT_3]
             .into_iter()
             .flatten()
@@ -224,11 +229,44 @@ mod test {
         assert_eq!(0, msg1.i64s.len());
         assert_eq!(0, msg1.strings.len());
         assert_eq!(0, msg1.children.len());
-        let var1 = msg1.variants[0];
-        assert_eq!(1, var1.0);
-        assert_eq!(1, var1.1.as_uint64());
-        let var2 = msg1.variants[1];
-        assert_eq!(2, var2.0);
-        assert_eq!(3, var2.1.as_uint64());
+        let var_1 = msg1.variants[0];
+        assert_eq!(1, var_1.0);
+        assert_eq!(1, var_1.1.as_uint64());
+        let var_2 = msg1.variants[1];
+        assert_eq!(2, var_2.0);
+        assert_eq!(3, var_2.1.as_uint64());
+    }
+
+    #[test]
+    fn test_deser_fixed_fields() {
+        let input = [
+            INPUT_FIELD_3_I32_1,
+            INPUT_FIELD_4_I32_3,
+            INPUT_FIELD_5_I64_1,
+            INPUT_FIELD_6_I64_3,
+        ]
+        .into_iter()
+        .flatten()
+        .copied()
+        .collect::<Vec<_>>();
+        let mut msg1 = SampleMessage::default();
+        deser_from_slice(&mut msg1, &input).unwrap();
+        assert_eq!(0, msg1.variants.len());
+        assert_eq!(2, msg1.i32s.len());
+        assert_eq!(2, msg1.i64s.len());
+        assert_eq!(0, msg1.strings.len());
+        assert_eq!(0, msg1.children.len());
+        let i32_1 = msg1.i32s[0];
+        assert_eq!(3, i32_1.0);
+        assert_eq!(1, i32_1.1);
+        let i32_2 = msg1.i32s[1];
+        assert_eq!(4, i32_2.0);
+        assert_eq!(3, i32_2.1);
+        let i64_1 = msg1.i64s[0];
+        assert_eq!(5, i64_1.0);
+        assert_eq!(1, i64_1.1);
+        let i64_2 = msg1.i64s[1];
+        assert_eq!(6, i64_2.0);
+        assert_eq!(3, i64_2.1);
     }
 }
