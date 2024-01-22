@@ -212,15 +212,24 @@ mod test {
     #[test]
     fn test_deser_variant_field() {
         const INPUT_FIELD_1_VARIANT_1: &[u8] = &[0x08, 0x01];
+        const INPUT_FIELD_2_VARIANT_3: &[u8] = &[0x10, 0x03];
+        let input = [INPUT_FIELD_1_VARIANT_1, INPUT_FIELD_2_VARIANT_3]
+            .into_iter()
+            .flatten()
+            .copied()
+            .collect::<Vec<_>>();
         let mut msg1 = SampleMessage::default();
-        deser_from_slice(&mut msg1, INPUT_FIELD_1_VARIANT_1).unwrap();
-        assert_eq!(1, msg1.variants.len());
+        deser_from_slice(&mut msg1, &input).unwrap();
+        assert_eq!(2, msg1.variants.len());
         assert_eq!(0, msg1.i32s.len());
         assert_eq!(0, msg1.i64s.len());
         assert_eq!(0, msg1.strings.len());
         assert_eq!(0, msg1.children.len());
-        let var1 = msg1.variants.pop().unwrap();
+        let var1 = msg1.variants[0];
         assert_eq!(1, var1.0);
         assert_eq!(1, var1.1.as_uint64());
+        let var2 = msg1.variants[1];
+        assert_eq!(2, var2.0);
+        assert_eq!(3, var2.1.as_uint64());
     }
 }
