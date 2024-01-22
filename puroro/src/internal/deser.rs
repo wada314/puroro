@@ -16,10 +16,12 @@ use crate::internal::variant::Variant;
 use crate::{ErrorKind, Result};
 use ::futures::io::AsyncRead;
 
+#[derive(Debug)]
 pub struct Record<T> {
     number: u32,
     payload: Payload<T>,
 }
+#[derive(Debug)]
 pub enum Payload<T> {
     Variant(Variant),
     I32([u8; 4]),
@@ -27,6 +29,7 @@ pub enum Payload<T> {
     Len(T),
 }
 
+#[derive(Debug)]
 enum WireType {
     Variant = 0,
     I64 = 1,
@@ -117,9 +120,10 @@ impl<T> Stack<T> {
         use ::std::mem::transmute;
         // Grabbing the mut borrow of the last element in the stack,
         // without grabbing the mut borrow of the stack itself.
-        let last = unsafe {
-            &mut **transmute::<_, &*mut T>(self.vec.last().ok_or(ErrorKind::DeserError)?)
-        };
+        let last = unsafe { &mut *(self as *mut Self) }
+            .vec
+            .last_mut()
+            .ok_or(ErrorKind::DeserError)?;
         if let Some(child) = (f)(last)? {
             self.vec.push(child);
         }
@@ -203,5 +207,20 @@ mod test {
             }
             Ok(None)
         }
+    }
+
+    #[test]
+    fn test_deser_variant_field() {
+        const INPUT_FIELD_1_VARIANT_1: &[u8] = &[0x08, 0x01];
+        let mut msg1 = SampleMessage::default();
+        deser_from_slice(&mut msg1, INPUT_FIELD_1_VARIANT_1).unwrap();
+        assert_eq!(1, msg1.variants.len());
+        assert_eq!(0, msg1.i32s.len());
+        assert_eq!(0, msg1.i64s.len());
+        assert_eq!(0, msg1.strings.len());
+        assert_eq!(0, msg1.children.len());
+        let var1 = msg1.variants.pop().unwrap();
+        assert_eq!(1, var1.0);
+        assert_eq!(1, var1.1.as_uint64());
     }
 }
