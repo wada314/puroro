@@ -155,14 +155,15 @@ mod test {
     const INPUT_FIELD_8_STRING_FOO: &[u8] = &[(8 << 3) | WireType::Len as u8, 3, b'f', b'o', b'o'];
     const INPUT_FIELD_10_STRING_YO: &[u8] = &[(10 << 3) | WireType::Len as u8, 2, b'y', b'o'];
 
-    fn gen_submessage_bytes(num: u32, submessage_bytes: &[u8]) -> Vec<u8> {
+    fn gen_submessage_bytes(num: u32, submessage_bytes: impl AsRef<[u8]>) -> Vec<u8> {
         let mut result = Vec::new();
         result
             .write_variant(Variant::from(((num as u64) << 3) | WireType::Len as u64))
             .unwrap();
         result
-            .write_variant(Variant::try_from(submessage_bytes.len()).unwrap())
+            .write_variant(Variant::try_from(submessage_bytes.as_ref().len()).unwrap())
             .unwrap();
+        result.extend_from_slice(submessage_bytes.as_ref());
         result
     }
 
@@ -174,7 +175,9 @@ mod test {
             .copied()
             .collect::<Vec<_>>();
         let mut msg1 = SampleMessage::default();
+
         deser_from_slice(&mut msg1, &input).unwrap();
+
         assert_eq!(2, msg1.variants.len());
         assert_eq!(0, msg1.i32s.len());
         assert_eq!(0, msg1.i64s.len());
@@ -201,7 +204,9 @@ mod test {
         .copied()
         .collect::<Vec<_>>();
         let mut msg1 = SampleMessage::default();
+
         deser_from_slice(&mut msg1, &input).unwrap();
+
         assert_eq!(0, msg1.variants.len());
         assert_eq!(2, msg1.i32s.len());
         assert_eq!(2, msg1.i64s.len());
@@ -229,7 +234,9 @@ mod test {
             .copied()
             .collect::<Vec<_>>();
         let mut msg1 = SampleMessage::default();
+
         deser_from_slice(&mut msg1, &input).unwrap();
+
         assert_eq!(0, msg1.variants.len());
         assert_eq!(0, msg1.i32s.len());
         assert_eq!(0, msg1.i64s.len());
@@ -241,5 +248,27 @@ mod test {
         let string_2 = &msg1.strings[1];
         assert_eq!(10, string_2.num);
         assert_eq!("yo", &string_2.val);
+    }
+
+    fn test_deser_submsg_fields() {
+        let subsubmsg1_bytes = INPUT_FIELD_1_VARIANT_1;
+        let submsg1_bytes = [
+            INPUT_FIELD_2_VARIANT_3.to_vec(),
+            gen_submessage_bytes(3, subsubmsg1_bytes),
+        ]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+        let msg1_bytes = [
+            INPUT_FIELD_3_I32_1.to_vec(),
+            submsg1_bytes,
+            gen_submessage_bytes(5, INPUT_FIELD_4_I32_3),
+        ]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+        let mut msg1 = SampleMessage::default();
+
+        deser_from_slice(&mut msg1, &msg1_bytes).unwrap()
     }
 }
