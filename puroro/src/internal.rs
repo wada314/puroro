@@ -14,3 +14,25 @@
 
 pub mod deser;
 pub mod variant;
+
+use crate::{ErrorKind, Result};
+
+#[derive(Debug)]
+enum WireType {
+    Variant = 0,
+    I64 = 1,
+    Len = 2,
+    I32 = 5,
+}
+impl TryFrom<u32> for WireType {
+    type Error = ErrorKind;
+    fn try_from(value: u32) -> Result<WireType> {
+        Ok(match value {
+            0 => WireType::Variant,
+            1 => WireType::I64,
+            2 => WireType::Len,
+            5 => WireType::I32,
+            _ => Err(ErrorKind::UnknownWireType)?,
+        })
+    }
+}

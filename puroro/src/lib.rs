@@ -41,10 +41,6 @@ pub enum ErrorKind {
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub trait Message {}
-pub trait AsyncDeserMessage {
-    type Message: Message;
-    async fn wait_deser(self) -> Self::Message;
-}
 
 #[derive(Default, Clone)]
 pub struct DescriptorProto {
