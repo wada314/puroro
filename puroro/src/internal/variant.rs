@@ -13,7 +13,8 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
-use std::io::{BufRead, Read, Write};
+use ::std::io::{BufRead, Read, Write};
+use ::std::num::TryFromIntError;
 
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
@@ -50,6 +51,14 @@ impl From<Variant> for u64 {
     #[inline]
     fn from(value: Variant) -> Self {
         u64::from_le_bytes(value.0)
+    }
+}
+
+impl TryFrom<usize> for Variant {
+    type Error = TryFromIntError;
+    #[inline]
+    fn try_from(value: usize) -> ::std::result::Result<Self, Self::Error> {
+        Ok(<u64>::into(value.try_into()?))
     }
 }
 

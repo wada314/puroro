@@ -90,7 +90,7 @@ pub fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) 
 mod test {
     use super::*;
     use crate::internal::deser::record::{Payload, Record};
-    use crate::internal::variant::Variant;
+    use crate::internal::variant::{Variant, WriteExtVariant};
     use crate::internal::WireType;
 
     #[derive(Default, Debug, PartialEq)]
@@ -154,6 +154,17 @@ mod test {
     const INPUT_FIELD_6_I64_3: &[u8] = &[(6 << 3) | WireType::I64 as u8, 3, 0, 0, 0, 0, 0, 0, 0];
     const INPUT_FIELD_8_STRING_FOO: &[u8] = &[(8 << 3) | WireType::Len as u8, 3, b'f', b'o', b'o'];
     const INPUT_FIELD_10_STRING_YO: &[u8] = &[(10 << 3) | WireType::Len as u8, 2, b'y', b'o'];
+
+    fn gen_submessage_bytes(num: u32, submessage_bytes: &[u8]) -> Vec<u8> {
+        let mut result = Vec::new();
+        result
+            .write_variant(Variant::from(((num as u64) << 3) | WireType::Len as u64))
+            .unwrap();
+        result
+            .write_variant(Variant::try_from(submessage_bytes.len()).unwrap())
+            .unwrap();
+        result
+    }
 
     #[test]
     fn test_deser_variant_fields() {
