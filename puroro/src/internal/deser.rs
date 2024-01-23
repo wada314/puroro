@@ -153,6 +153,7 @@ mod test {
     const INPUT_FIELD_5_I64_1: &[u8] = &[(5 << 3) | WireType::I64 as u8, 1, 0, 0, 0, 0, 0, 0, 0];
     const INPUT_FIELD_6_I64_3: &[u8] = &[(6 << 3) | WireType::I64 as u8, 3, 0, 0, 0, 0, 0, 0, 0];
     const INPUT_FIELD_8_STRING_FOO: &[u8] = &[(8 << 3) | WireType::Len as u8, 3, b'f', b'o', b'o'];
+    const INPUT_FIELD_10_STRING_YO: &[u8] = &[(10 << 3) | WireType::Len as u8, 2, b'y', b'o'];
 
     #[test]
     fn test_deser_variant_fields() {
@@ -211,15 +212,23 @@ mod test {
 
     #[test]
     fn test_deser_string_fields() {
-        let input = INPUT_FIELD_8_STRING_FOO;
+        let input = [INPUT_FIELD_8_STRING_FOO, INPUT_FIELD_10_STRING_YO]
+            .into_iter()
+            .flatten()
+            .copied()
+            .collect::<Vec<_>>();
         let mut msg1 = SampleMessage::default();
         deser_from_slice(&mut msg1, &input).unwrap();
         assert_eq!(0, msg1.variants.len());
         assert_eq!(0, msg1.i32s.len());
         assert_eq!(0, msg1.i64s.len());
-        assert_eq!(1, msg1.strings.len());
+        assert_eq!(2, msg1.strings.len());
         assert_eq!(0, msg1.children.len());
         let string_1 = &msg1.strings[0];
         assert_eq!(8, string_1.num);
+        assert_eq!("foo", &string_1.val);
+        let string_2 = &msg1.strings[1];
+        assert_eq!(10, string_2.num);
+        assert_eq!("yo", &string_2.val);
     }
 }
