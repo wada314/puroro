@@ -1,10 +1,10 @@
 // Copyright 2021 Google LLC
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.num (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.num
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -93,13 +93,19 @@ mod test {
     use crate::internal::variant::Variant;
     use crate::internal::WireType;
 
-    #[derive(Default)]
+    #[derive(Default, Debug, PartialEq)]
+    struct Field<T> {
+        num: u32,
+        val: T,
+    }
+
+    #[derive(Default, Debug, PartialEq)]
     struct SampleMessage {
-        variants: Vec<(u32, Variant)>,
-        i32s: Vec<(u32, u32)>,
-        i64s: Vec<(u32, u64)>,
-        strings: Vec<(u32, String)>,
-        children: Vec<(u32, Box<SampleMessage>)>,
+        variants: Vec<Field<Variant>>,
+        i32s: Vec<Field<u32>>,
+        i64s: Vec<Field<u64>>,
+        strings: Vec<Field<String>>,
+        children: Vec<Field<Box<SampleMessage>>>,
     }
 
     impl DeseringMessage for SampleMessage {
@@ -107,18 +113,32 @@ mod test {
             &mut self,
             record: Record<&'slice [u8]>,
         ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>> {
-            let n = record.number;
+            let num = record.number;
             match record.payload {
-                Payload::Variant(v) => self.variants.push((n, v)),
-                Payload::I32(b4) => self.i32s.push((n, u32::from_le_bytes(b4))),
-                Payload::I64(b8) => self.i64s.push((n, u64::from_le_bytes(b8))),
+                Payload::Variant(val) => self.variants.push(Field { num, val }),
+                Payload::I32(b4) => self.i32s.push(Field {
+                    num,
+                    val: u32::from_le_bytes(b4),
+                }),
+                Payload::I64(b8) => self.i64s.push(Field {
+                    num,
+                    val: u64::from_le_bytes(b8),
+                }),
                 Payload::Len(slice) => {
-                    if n % 2 == 0 {
-                        self.strings
-                            .push((n, String::from_utf8_lossy(slice).into_owned()))
+                    if num % 2 == 0 {
+                        self.strings.push(Field {
+                            num,
+                            val: String::from_utf8_lossy(slice).into_owned(),
+                        })
                     } else {
-                        self.children.push((n, Box::new(Default::default())));
-                        return Ok(Some((self.children.last_mut().unwrap().1.as_mut(), slice)));
+                        self.children.push(Field {
+                            num,
+                            val: Box::new(Default::default()),
+                        });
+                        return Ok(Some((
+                            self.children.last_mut().unwrap().val.as_mut(),
+                            slice,
+                        )));
                     }
                 }
             }
@@ -132,6 +152,7 @@ mod test {
     const INPUT_FIELD_4_I32_3: &[u8] = &[(4 << 3) | WireType::I32 as u8, 3, 0, 0, 0];
     const INPUT_FIELD_5_I64_1: &[u8] = &[(5 << 3) | WireType::I64 as u8, 1, 0, 0, 0, 0, 0, 0, 0];
     const INPUT_FIELD_6_I64_3: &[u8] = &[(6 << 3) | WireType::I64 as u8, 3, 0, 0, 0, 0, 0, 0, 0];
+    const INPUT_FIELD_8_STRING_FOO: &[u8] = &[(8 << 3) | WireType::Len as u8, 3, b'f', b'o', b'o'];
 
     #[test]
     fn test_deser_variant_fields() {
@@ -147,12 +168,12 @@ mod test {
         assert_eq!(0, msg1.i64s.len());
         assert_eq!(0, msg1.strings.len());
         assert_eq!(0, msg1.children.len());
-        let var_1 = msg1.variants[0];
-        assert_eq!(1, var_1.0);
-        assert_eq!(1, var_1.1.as_uint64());
-        let var_2 = msg1.variants[1];
-        assert_eq!(2, var_2.0);
-        assert_eq!(3, var_2.1.as_uint64());
+        let var_1 = &msg1.variants[0];
+        assert_eq!(1, var_1.num);
+        assert_eq!(1, var_1.val.as_uint64());
+        let var_2 = &msg1.variants[1];
+        assert_eq!(2, var_2.num);
+        assert_eq!(3, var_2.val.as_uint64());
     }
 
     #[test]
@@ -174,17 +195,31 @@ mod test {
         assert_eq!(2, msg1.i64s.len());
         assert_eq!(0, msg1.strings.len());
         assert_eq!(0, msg1.children.len());
-        let i32_1 = msg1.i32s[0];
-        assert_eq!(3, i32_1.0);
-        assert_eq!(1, i32_1.1);
-        let i32_2 = msg1.i32s[1];
-        assert_eq!(4, i32_2.0);
-        assert_eq!(3, i32_2.1);
-        let i64_1 = msg1.i64s[0];
-        assert_eq!(5, i64_1.0);
-        assert_eq!(1, i64_1.1);
-        let i64_2 = msg1.i64s[1];
-        assert_eq!(6, i64_2.0);
-        assert_eq!(3, i64_2.1);
+        let i32_1 = &msg1.i32s[0];
+        assert_eq!(3, i32_1.num);
+        assert_eq!(1, i32_1.val);
+        let i32_2 = &msg1.i32s[1];
+        assert_eq!(4, i32_2.num);
+        assert_eq!(3, i32_2.val);
+        let i64_1 = &msg1.i64s[0];
+        assert_eq!(5, i64_1.num);
+        assert_eq!(1, i64_1.val);
+        let i64_2 = &msg1.i64s[1];
+        assert_eq!(6, i64_2.num);
+        assert_eq!(3, i64_2.val);
+    }
+
+    #[test]
+    fn test_deser_string_fields() {
+        let input = INPUT_FIELD_8_STRING_FOO;
+        let mut msg1 = SampleMessage::default();
+        deser_from_slice(&mut msg1, &input).unwrap();
+        assert_eq!(0, msg1.variants.len());
+        assert_eq!(0, msg1.i32s.len());
+        assert_eq!(0, msg1.i64s.len());
+        assert_eq!(1, msg1.strings.len());
+        assert_eq!(0, msg1.children.len());
+        let string_1 = &msg1.strings[0];
+        assert_eq!(8, string_1.num);
     }
 }
