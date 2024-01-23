@@ -30,12 +30,10 @@ pub enum Payload<T> {
 }
 
 pub trait SliceExtReadRecord {
-    type LenPayloadType;
-    fn read_record(&mut self) -> Result<Record<Self::LenPayloadType>>;
+    fn read_record(&mut self) -> Result<Record<&[u8]>>;
 }
-impl<'a> SliceExtReadRecord for &'a [u8] {
-    type LenPayloadType = &'a [u8];
-    fn read_record(&mut self) -> Result<Record<Self::LenPayloadType>> {
+impl SliceExtReadRecord for &[u8] {
+    fn read_record(&mut self) -> Result<Record<&[u8]>> {
         use crate::internal::variant::ReadExtVariant;
         let tag = self.read_variant()?.try_as_uint32()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
@@ -69,10 +67,10 @@ impl<'a> SliceExtReadRecord for &'a [u8] {
     }
 }
 
-trait SliceExt<T> {
+trait SliceExtTrySplitAt<T> {
     fn try_split_at(&self, at: usize) -> Option<(&[T], &[T])>;
 }
-impl<T> SliceExt<T> for [T] {
+impl<T> SliceExtTrySplitAt<T> for [T] {
     fn try_split_at(&self, at: usize) -> Option<(&[T], &[T])> {
         if at <= self.len() {
             Some(self.split_at(at))
