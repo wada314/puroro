@@ -262,7 +262,7 @@ mod test {
         .collect::<Vec<_>>();
         let msg1_bytes = [
             INPUT_FIELD_3_I32_1.to_vec(),
-            submsg1_bytes,
+            gen_submessage_bytes(7, &submsg1_bytes),
             gen_submessage_bytes(5, INPUT_FIELD_4_I32_3),
         ]
         .into_iter()
@@ -278,7 +278,7 @@ mod test {
         assert_eq!(0, msg1.strings.len());
         assert_eq!(2, msg1.children.len());
 
-        assert_eq!(3, msg1.children[0].num);
+        assert_eq!(7, msg1.children[0].num);
         let submsg1 = msg1.children[0].val.as_ref();
         assert_eq!(5, msg1.children[1].num);
         let submsg2 = msg1.children[1].val.as_ref();
@@ -296,7 +296,7 @@ mod test {
         assert_eq!(0, submsg2.i64s.len());
         assert_eq!(0, submsg2.strings.len());
         assert_eq!(0, submsg2.children.len());
-        assert_eq!(5, submsg2.i32s[0].num);
+        assert_eq!(4, submsg2.i32s[0].num);
         assert_eq!(3, submsg2.i32s[0].val);
 
         assert_eq!(3, submsg1.children[0].num);
