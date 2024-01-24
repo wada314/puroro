@@ -178,17 +178,17 @@ mod test {
 
         deser_from_slice(&mut msg1, &input).unwrap();
 
-        assert_eq!(2, msg1.variants.len());
-        assert_eq!(0, msg1.i32s.len());
-        assert_eq!(0, msg1.i64s.len());
-        assert_eq!(0, msg1.strings.len());
-        assert_eq!(0, msg1.children.len());
-        let var_1 = &msg1.variants[0];
-        assert_eq!(1, var_1.num);
-        assert_eq!(1, var_1.val.as_uint64());
-        let var_2 = &msg1.variants[1];
-        assert_eq!(2, var_2.num);
-        assert_eq!(3, var_2.val.as_uint64());
+        let mut expected_msg1 = SampleMessage::default();
+        expected_msg1.variants.push(Field {
+            num: 1,
+            val: 1.into(),
+        });
+        expected_msg1.variants.push(Field {
+            num: 2,
+            val: 3.into(),
+        });
+
+        assert_eq!(expected_msg1, msg1);
     }
 
     #[test]
