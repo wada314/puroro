@@ -250,7 +250,8 @@ mod test {
         assert_eq!("yo", &string_2.val);
     }
 
-    fn test_deser_submsg_fields() {
+    #[test]
+    fn test_deser_complex_fields() {
         let subsubmsg1_bytes = INPUT_FIELD_1_VARIANT_1;
         let submsg1_bytes = [
             INPUT_FIELD_2_VARIANT_3.to_vec(),
@@ -269,6 +270,44 @@ mod test {
         .collect::<Vec<_>>();
         let mut msg1 = SampleMessage::default();
 
-        deser_from_slice(&mut msg1, &msg1_bytes).unwrap()
+        deser_from_slice(&mut msg1, &msg1_bytes).unwrap();
+
+        assert_eq!(0, msg1.variants.len());
+        assert_eq!(1, msg1.i32s.len());
+        assert_eq!(0, msg1.i64s.len());
+        assert_eq!(0, msg1.strings.len());
+        assert_eq!(2, msg1.children.len());
+
+        assert_eq!(3, msg1.children[0].num);
+        let submsg1 = msg1.children[0].val.as_ref();
+        assert_eq!(5, msg1.children[1].num);
+        let submsg2 = msg1.children[1].val.as_ref();
+
+        assert_eq!(1, submsg1.variants.len());
+        assert_eq!(0, submsg1.i32s.len());
+        assert_eq!(0, submsg1.i64s.len());
+        assert_eq!(0, submsg1.strings.len());
+        assert_eq!(1, submsg1.children.len());
+        assert_eq!(2, submsg1.variants[0].num);
+        assert_eq!(3, submsg1.variants[0].val.as_uint64());
+
+        assert_eq!(0, submsg2.variants.len());
+        assert_eq!(1, submsg2.i32s.len());
+        assert_eq!(0, submsg2.i64s.len());
+        assert_eq!(0, submsg2.strings.len());
+        assert_eq!(0, submsg2.children.len());
+        assert_eq!(5, submsg2.i32s[0].num);
+        assert_eq!(3, submsg2.i32s[0].val);
+
+        assert_eq!(3, submsg1.children[0].num);
+        let subsubmsg1 = submsg1.children[0].val.as_ref();
+
+        assert_eq!(1, subsubmsg1.variants.len());
+        assert_eq!(0, subsubmsg1.i32s.len());
+        assert_eq!(0, subsubmsg1.i64s.len());
+        assert_eq!(0, subsubmsg1.strings.len());
+        assert_eq!(0, subsubmsg1.children.len());
+        assert_eq!(1, subsubmsg1.variants[0].num);
+        assert_eq!(1, subsubmsg1.variants[0].val.as_uint64());
     }
 }
