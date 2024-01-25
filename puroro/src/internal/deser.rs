@@ -207,23 +207,13 @@ mod test {
 
         deser_from_slice(&mut msg1, &input).unwrap();
 
-        assert_eq!(0, msg1.variants.len());
-        assert_eq!(2, msg1.i32s.len());
-        assert_eq!(2, msg1.i64s.len());
-        assert_eq!(0, msg1.strings.len());
-        assert_eq!(0, msg1.children.len());
-        let i32_1 = &msg1.i32s[0];
-        assert_eq!(3, i32_1.num);
-        assert_eq!(1, i32_1.val);
-        let i32_2 = &msg1.i32s[1];
-        assert_eq!(4, i32_2.num);
-        assert_eq!(3, i32_2.val);
-        let i64_1 = &msg1.i64s[0];
-        assert_eq!(5, i64_1.num);
-        assert_eq!(1, i64_1.val);
-        let i64_2 = &msg1.i64s[1];
-        assert_eq!(6, i64_2.num);
-        assert_eq!(3, i64_2.val);
+        let mut expected_msg1 = SampleMessage::default();
+        expected_msg1.i32s.push(Field { num: 3, val: 1 });
+        expected_msg1.i32s.push(Field { num: 4, val: 3 });
+        expected_msg1.i64s.push(Field { num: 5, val: 1 });
+        expected_msg1.i64s.push(Field { num: 6, val: 3 });
+
+        assert_eq!(expected_msg1, msg1);
     }
 
     #[test]
@@ -237,17 +227,16 @@ mod test {
 
         deser_from_slice(&mut msg1, &input).unwrap();
 
-        assert_eq!(0, msg1.variants.len());
-        assert_eq!(0, msg1.i32s.len());
-        assert_eq!(0, msg1.i64s.len());
-        assert_eq!(2, msg1.strings.len());
-        assert_eq!(0, msg1.children.len());
-        let string_1 = &msg1.strings[0];
-        assert_eq!(8, string_1.num);
-        assert_eq!("foo", &string_1.val);
-        let string_2 = &msg1.strings[1];
-        assert_eq!(10, string_2.num);
-        assert_eq!("yo", &string_2.val);
+        let mut expected_msg1 = SampleMessage::default();
+        expected_msg1.strings.push(Field {
+            num: 8,
+            val: "foo".to_string(),
+        });
+        expected_msg1.strings.push(Field {
+            num: 10,
+            val: "yo".to_string(),
+        });
+        assert_eq!(expected_msg1, msg1);
     }
 
     #[test]
@@ -272,42 +261,35 @@ mod test {
 
         deser_from_slice(&mut msg1, &msg1_bytes).unwrap();
 
-        assert_eq!(0, msg1.variants.len());
-        assert_eq!(1, msg1.i32s.len());
-        assert_eq!(0, msg1.i64s.len());
-        assert_eq!(0, msg1.strings.len());
-        assert_eq!(2, msg1.children.len());
-
-        assert_eq!(7, msg1.children[0].num);
-        let submsg1 = msg1.children[0].val.as_ref();
-        assert_eq!(5, msg1.children[1].num);
-        let submsg2 = msg1.children[1].val.as_ref();
-
-        assert_eq!(1, submsg1.variants.len());
-        assert_eq!(0, submsg1.i32s.len());
-        assert_eq!(0, submsg1.i64s.len());
-        assert_eq!(0, submsg1.strings.len());
-        assert_eq!(1, submsg1.children.len());
-        assert_eq!(2, submsg1.variants[0].num);
-        assert_eq!(3, submsg1.variants[0].val.as_uint64());
-
-        assert_eq!(0, submsg2.variants.len());
-        assert_eq!(1, submsg2.i32s.len());
-        assert_eq!(0, submsg2.i64s.len());
-        assert_eq!(0, submsg2.strings.len());
-        assert_eq!(0, submsg2.children.len());
-        assert_eq!(4, submsg2.i32s[0].num);
-        assert_eq!(3, submsg2.i32s[0].val);
-
-        assert_eq!(3, submsg1.children[0].num);
-        let subsubmsg1 = submsg1.children[0].val.as_ref();
-
-        assert_eq!(1, subsubmsg1.variants.len());
-        assert_eq!(0, subsubmsg1.i32s.len());
-        assert_eq!(0, subsubmsg1.i64s.len());
-        assert_eq!(0, subsubmsg1.strings.len());
-        assert_eq!(0, subsubmsg1.children.len());
-        assert_eq!(1, subsubmsg1.variants[0].num);
-        assert_eq!(1, subsubmsg1.variants[0].val.as_uint64());
+        let mut expected_msg1 = SampleMessage::default();
+        expected_msg1.i32s.push(Field { num: 3, val: 1 });
+        expected_msg1.children.push(Field {
+            num: 7,
+            val: Box::new(SampleMessage::default()),
+        });
+        expected_msg1.children.push(Field {
+            num: 5,
+            val: Box::new(SampleMessage::default()),
+        });
+        expected_msg1.children[0].val.variants.push(Field {
+            num: 2,
+            val: 3.into(),
+        });
+        expected_msg1.children[0].val.children.push(Field {
+            num: 3,
+            val: Box::new(SampleMessage::default()),
+        });
+        expected_msg1.children[0].val.children[0]
+            .val
+            .variants
+            .push(Field {
+                num: 1,
+                val: 1.into(),
+            });
+        expected_msg1.children[1]
+            .val
+            .i32s
+            .push(Field { num: 4, val: 3 });
+        assert_eq!(expected_msg1, msg1);
     }
 }
