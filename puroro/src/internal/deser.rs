@@ -15,6 +15,7 @@
 pub mod record;
 
 use self::record::{Record, SliceExtReadRecord};
+use crate::internal::freezing_mut::{FreezeStatus, FrozenMut, UnfrozenMut};
 use crate::{ErrorKind, Result};
 
 #[derive(Default)]

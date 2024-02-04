@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod deser;
+pub(crate) mod freezing_mut;
 pub mod variant;
 
 use crate::{ErrorKind, Result};
