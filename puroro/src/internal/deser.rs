@@ -60,32 +60,60 @@ impl<T> Stack<T> {
 }
 
 pub trait DeseringMessage {
-    fn try_parse_slice_record<'slice>(
+    // fn try_parse_slice_record<'slice>(
+    //     &mut self,
+    //     record: Record<&'slice [u8]>,
+    // ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>>;
+    fn parse_slice_record_or_alloc_child(
         &mut self,
-        record: Record<&'slice [u8]>,
-    ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>>;
+        record: &Record<&[u8]>,
+    ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
-pub fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
-    let mut stack = Stack::new();
-    stack.push((root, input));
-    while !stack.is_empty() {
-        let mut input_is_empty = false;
-        stack.check_last_mut_and_maybe_push(|(msg, input)| {
-            if input.is_empty() {
-                input_is_empty = true;
-                Ok(None)
-            } else {
-                let record = input.read_record()?;
-                Ok(msg.try_parse_slice_record(record)?)
+pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
+    let mut msg = UnfrozenMut::new(root);
+    let mut stack = Vec::new();
+    while !(input.is_empty() && stack.is_empty()) {
+        if !input.is_empty() {
+            let record = input.read_record()?;
+            match msg.try_work(|msg| msg.parse_slice_record_or_alloc_child(&record))? {
+                FreezeStatus::Unfrozen(same) => {
+                    msg = same;
+                }
+                FreezeStatus::Frozen(prev, new_msg) => {
+                    stack.push((input, prev));
+                    msg = new_msg;
+                }
             }
-        })?;
-        if input_is_empty {
-            stack.try_pop()?;
+        } else {
+            let (prev_input, prev_msg) = stack.pop().unwrap();
+            input = prev_input;
+            msg = prev_msg.unfreeze(msg);
         }
     }
     Ok(())
 }
+
+// pub fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
+//     let mut stack = Stack::new();
+//     stack.push((root, input));
+//     while !stack.is_empty() {
+//         let mut input_is_empty = false;
+//         stack.check_last_mut_and_maybe_push(|(msg, input)| {
+//             if input.is_empty() {
+//                 input_is_empty = true;
+//                 Ok(None)
+//             } else {
+//                 let record = input.read_record()?;
+//                 Ok(msg.try_parse_slice_record(record)?)
+//             }
+//         })?;
+//         if input_is_empty {
+//             stack.try_pop()?;
+//         }
+//     }
+//     Ok(())
+// }
 
 #[cfg(test)]
 mod test {
@@ -110,10 +138,10 @@ mod test {
     }
 
     impl DeseringMessage for SampleMessage {
-        fn try_parse_slice_record<'slice>(
+        fn parse_slice_record_or_alloc_child(
             &mut self,
-            record: Record<&'slice [u8]>,
-        ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>> {
+            record: &Record<&[u8]>,
+        ) -> Result<Option<&mut dyn DeseringMessage>> {
             let num = record.number;
             match record.payload {
                 Payload::Variant(val) => self.variants.push(Field { num, val }),
@@ -136,15 +164,48 @@ mod test {
                             num,
                             val: Box::new(Default::default()),
                         });
-                        return Ok(Some((
-                            self.children.last_mut().unwrap().val.as_mut(),
-                            slice,
-                        )));
+                        return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
                     }
                 }
             }
             Ok(None)
         }
+
+        // fn try_parse_slice_record<'slice>(
+        //     &mut self,
+        //     record: Record<&'slice [u8]>,
+        // ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>> {
+        //     let num = record.number;
+        //     match record.payload {
+        //         Payload::Variant(val) => self.variants.push(Field { num, val }),
+        //         Payload::I32(b4) => self.i32s.push(Field {
+        //             num,
+        //             val: u32::from_le_bytes(b4),
+        //         }),
+        //         Payload::I64(b8) => self.i64s.push(Field {
+        //             num,
+        //             val: u64::from_le_bytes(b8),
+        //         }),
+        //         Payload::Len(slice) => {
+        //             if num % 2 == 0 {
+        //                 self.strings.push(Field {
+        //                     num,
+        //                     val: String::from_utf8_lossy(slice).into_owned(),
+        //                 })
+        //             } else {
+        //                 self.children.push(Field {
+        //                     num,
+        //                     val: Box::new(Default::default()),
+        //                 });
+        //                 return Ok(Some((
+        //                     self.children.last_mut().unwrap().val.as_mut(),
+        //                     slice,
+        //                 )));
+        //             }
+        //         }
+        //     }
+        //     Ok(None)
+        // }
     }
 
     const INPUT_FIELD_1_VARIANT_1: &[u8] = &[(1 << 3) | WireType::Variant as u8, 0x01];

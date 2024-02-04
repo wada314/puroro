@@ -15,6 +15,7 @@
 use ::std::marker::PhantomData;
 use ::std::mem::transmute;
 use ::std::ops::{Deref, DerefMut};
+use ::std::result::Result;
 
 #[derive(PartialEq, Eq)]
 pub(crate) struct UnfrozenMut<'a, T: ?Sized> {
@@ -43,16 +44,22 @@ impl<'a, T: 'a + ?Sized> UnfrozenMut<'a, T> {
         self,
         f: F,
     ) -> FreezeStatus<'a, T> {
-        if let Some(child) = (f)(unsafe { transmute(self.ptr) }) {
+        self.try_work::<(), _>(move |ptr| Ok((f)(ptr))).unwrap()
+    }
+    pub(crate) fn try_work<E, F: FnOnce(&'a mut T) -> Result<Option<&'a mut T>, E>>(
+        self,
+        f: F,
+    ) -> Result<FreezeStatus<'a, T>, E> {
+        if let Some(child) = (f)(unsafe { transmute(self.ptr) })? {
             let frozen_self = FrozenMut {
                 ptr: self.ptr,
                 child,
                 phantom: PhantomData,
             };
             let child_chain = UnfrozenMut::new(child);
-            FreezeStatus::Frozen(frozen_self, child_chain)
+            Ok(FreezeStatus::Frozen(frozen_self, child_chain))
         } else {
-            FreezeStatus::Unfrozen(self)
+            Ok(FreezeStatus::Unfrozen(self))
         }
     }
 }
