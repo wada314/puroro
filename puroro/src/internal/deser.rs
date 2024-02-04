@@ -83,6 +83,7 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
                 FreezeStatus::Frozen(prev, new_msg) => {
                     stack.push((input, prev));
                     msg = new_msg;
+                    input = todo!();
                 }
             }
         } else {
