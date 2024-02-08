@@ -29,11 +29,11 @@ pub enum Payload<T> {
     Len(T),
 }
 
-pub trait SliceExtReadRecord {
-    fn read_record(&mut self) -> Result<Record<&[u8]>>;
+pub trait SliceExtReadRecord<'a> {
+    fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>>;
 }
-impl SliceExtReadRecord for &[u8] {
-    fn read_record(&mut self) -> Result<Record<&[u8]>> {
+impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
+    fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>> {
         use crate::internal::variant::ReadExtVariant;
         let tag = self.read_variant()?.try_as_uint32()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;

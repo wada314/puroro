@@ -14,14 +14,19 @@
 
 pub mod record;
 
-use self::record::{Record, SliceExtReadRecord};
+use self::record::{Payload, Record, SliceExtReadRecord};
 use crate::internal::freezing_mut::{FreezeStatus, FrozenMut, UnfrozenMut};
+use crate::internal::variant::Variant;
 use crate::{ErrorKind, Result};
 
 pub trait DeseringMessage {
-    fn parse_slice_record_or_alloc_child(
+    fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()>;
+    fn parse_i32(&mut self, num: u32, val: [u8; 4]) -> Result<()>;
+    fn parse_i64(&mut self, num: u32, val: [u8; 8]) -> Result<()>;
+    fn parse_len_slice_or_alloc_child(
         &mut self,
-        record: &Record<&[u8]>,
+        num: u32,
+        slice: &[u8],
     ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
@@ -31,14 +36,23 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     while !(input.is_empty() && stack.is_empty()) {
         if !input.is_empty() {
             let record = input.read_record()?;
-            match msg.try_work(|msg| msg.parse_slice_record_or_alloc_child(&record))? {
-                FreezeStatus::Unfrozen(same) => {
-                    msg = same;
-                }
-                FreezeStatus::Frozen(prev, new_msg) => {
-                    stack.push((input, prev));
-                    msg = new_msg;
-                    input = todo!();
+            match record.payload {
+                Payload::Variant(val) => msg.parse_variant(record.number, val)?,
+                Payload::I32(val) => msg.parse_i32(record.number, val)?,
+                Payload::I64(val) => msg.parse_i64(record.number, val)?,
+                Payload::Len(input_subpart) => {
+                    match msg.try_work(|msg| {
+                        msg.parse_len_slice_or_alloc_child(record.number, input_subpart)
+                    })? {
+                        FreezeStatus::Unfrozen(new_msg) => {
+                            msg = new_msg;
+                        }
+                        FreezeStatus::Frozen(frozen_msg, new_msg) => {
+                            stack.push((input, frozen_msg));
+                            input = input_subpart;
+                            msg = new_msg;
+                        }
+                    }
                 }
             }
         } else {
@@ -73,35 +87,43 @@ mod test {
     }
 
     impl DeseringMessage for SampleMessage {
-        fn parse_slice_record_or_alloc_child(
+        fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()> {
+            self.variants.push(Field { num, val: var });
+            Ok(())
+        }
+
+        fn parse_i32(&mut self, num: u32, val: [u8; 4]) -> Result<()> {
+            self.i32s.push(Field {
+                num,
+                val: u32::from_le_bytes(val),
+            });
+            Ok(())
+        }
+
+        fn parse_i64(&mut self, num: u32, val: [u8; 8]) -> Result<()> {
+            self.i64s.push(Field {
+                num,
+                val: u64::from_le_bytes(val),
+            });
+            Ok(())
+        }
+
+        fn parse_len_slice_or_alloc_child(
             &mut self,
-            record: &Record<&[u8]>,
+            num: u32,
+            slice: &[u8],
         ) -> Result<Option<&mut dyn DeseringMessage>> {
-            let num = record.number;
-            match record.payload {
-                Payload::Variant(val) => self.variants.push(Field { num, val }),
-                Payload::I32(b4) => self.i32s.push(Field {
+            if num % 2 == 0 {
+                self.strings.push(Field {
                     num,
-                    val: u32::from_le_bytes(b4),
-                }),
-                Payload::I64(b8) => self.i64s.push(Field {
+                    val: String::from_utf8_lossy(slice).into_owned(),
+                })
+            } else {
+                self.children.push(Field {
                     num,
-                    val: u64::from_le_bytes(b8),
-                }),
-                Payload::Len(slice) => {
-                    if num % 2 == 0 {
-                        self.strings.push(Field {
-                            num,
-                            val: String::from_utf8_lossy(slice).into_owned(),
-                        })
-                    } else {
-                        self.children.push(Field {
-                            num,
-                            val: Box::new(Default::default()),
-                        });
-                        return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
-                    }
-                }
+                    val: Box::new(Default::default()),
+                });
+                return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
             }
             Ok(None)
         }
