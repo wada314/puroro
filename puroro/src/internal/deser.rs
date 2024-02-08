@@ -18,52 +18,7 @@ use self::record::{Record, SliceExtReadRecord};
 use crate::internal::freezing_mut::{FreezeStatus, FrozenMut, UnfrozenMut};
 use crate::{ErrorKind, Result};
 
-#[derive(Default)]
-struct Stack<T> {
-    vec: Vec<T>,
-}
-impl<T> Stack<T> {
-    fn new() -> Self {
-        Self { vec: Vec::new() }
-    }
-    fn push(&mut self, elem: T) {
-        self.vec.push(elem);
-    }
-    fn try_pop(&mut self) -> Result<()> {
-        self.vec.pop().ok_or(ErrorKind::DeserError)?;
-        Ok(())
-    }
-    fn len(&self) -> usize {
-        self.vec.len()
-    }
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-    fn check_last_mut_and_maybe_push<'a>(
-        &mut self,
-        f: impl FnOnce(&'a mut T) -> Result<Option<T>>,
-    ) -> Result<()>
-    where
-        T: 'a,
-    {
-        // Grabbing the mut borrow of the last element in the stack,
-        // without grabbing the mut borrow of the stack itself.
-        let last = unsafe { &mut *(self as *mut Self) }
-            .vec
-            .last_mut()
-            .ok_or(ErrorKind::DeserError)?;
-        if let Some(child) = (f)(last)? {
-            self.vec.push(child);
-        }
-        Ok(())
-    }
-}
-
 pub trait DeseringMessage {
-    // fn try_parse_slice_record<'slice>(
-    //     &mut self,
-    //     record: Record<&'slice [u8]>,
-    // ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>>;
     fn parse_slice_record_or_alloc_child(
         &mut self,
         record: &Record<&[u8]>,
@@ -94,27 +49,6 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     }
     Ok(())
 }
-
-// pub fn deser_from_slice<'a>(root: &'a mut dyn DeseringMessage, input: &'a [u8]) -> Result<()> {
-//     let mut stack = Stack::new();
-//     stack.push((root, input));
-//     while !stack.is_empty() {
-//         let mut input_is_empty = false;
-//         stack.check_last_mut_and_maybe_push(|(msg, input)| {
-//             if input.is_empty() {
-//                 input_is_empty = true;
-//                 Ok(None)
-//             } else {
-//                 let record = input.read_record()?;
-//                 Ok(msg.try_parse_slice_record(record)?)
-//             }
-//         })?;
-//         if input_is_empty {
-//             stack.try_pop()?;
-//         }
-//     }
-//     Ok(())
-// }
 
 #[cfg(test)]
 mod test {
@@ -171,42 +105,6 @@ mod test {
             }
             Ok(None)
         }
-
-        // fn try_parse_slice_record<'slice>(
-        //     &mut self,
-        //     record: Record<&'slice [u8]>,
-        // ) -> Result<Option<(&mut dyn DeseringMessage, &'slice [u8])>> {
-        //     let num = record.number;
-        //     match record.payload {
-        //         Payload::Variant(val) => self.variants.push(Field { num, val }),
-        //         Payload::I32(b4) => self.i32s.push(Field {
-        //             num,
-        //             val: u32::from_le_bytes(b4),
-        //         }),
-        //         Payload::I64(b8) => self.i64s.push(Field {
-        //             num,
-        //             val: u64::from_le_bytes(b8),
-        //         }),
-        //         Payload::Len(slice) => {
-        //             if num % 2 == 0 {
-        //                 self.strings.push(Field {
-        //                     num,
-        //                     val: String::from_utf8_lossy(slice).into_owned(),
-        //                 })
-        //             } else {
-        //                 self.children.push(Field {
-        //                     num,
-        //                     val: Box::new(Default::default()),
-        //                 });
-        //                 return Ok(Some((
-        //                     self.children.last_mut().unwrap().val.as_mut(),
-        //                     slice,
-        //                 )));
-        //             }
-        //         }
-        //     }
-        //     Ok(None)
-        // }
     }
 
     const INPUT_FIELD_1_VARIANT_1: &[u8] = &[(1 << 3) | WireType::Variant as u8, 0x01];
