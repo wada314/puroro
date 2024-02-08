@@ -18,6 +18,7 @@ use self::record::{Payload, Record, SliceExtReadRecord};
 use crate::internal::freezing_mut::{FreezeStatus, FrozenMut, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::{ErrorKind, Result};
+use ::std::io::Read;
 
 pub trait DeseringMessage {
     fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()>;
@@ -27,6 +28,11 @@ pub trait DeseringMessage {
         &mut self,
         num: u32,
         slice: &[u8],
+    ) -> Result<Option<&mut dyn DeseringMessage>>;
+    fn parse_len_read_or_alloc_child(
+        &mut self,
+        num: u32,
+        read: &mut dyn Read,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
