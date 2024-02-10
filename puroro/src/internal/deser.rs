@@ -71,7 +71,7 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     Ok(())
 }
 
-pub fn deser_from_read(
+pub fn deser_from_bound_read(
     root: &mut dyn DeseringMessage,
     mut bound_read: Take<impl Read>,
 ) -> Result<()> {
@@ -237,25 +237,8 @@ mod test {
         (vec, expected)
     });
 
-    #[test]
-    fn test_slice_deser_variant_fields() {
-        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
-        let mut msg = SampleMessage::default();
-        deser_from_slice(&mut msg, input).unwrap();
-        assert_eq!(expected, &msg);
-    }
-
-    #[test]
-    fn test_read_deser_variant_fields() {
-        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
-        let mut msg = SampleMessage::default();
-        deser_from_read(&mut msg, <&[u8] as Read>::take(input, input.len() as u64)).unwrap();
-        assert_eq!(expected, &msg);
-    }
-
-    #[test]
-    fn test_deser_fixed_fields() {
-        let input = [
+    static TEST_CASE_FIXED_FIELDS: LazyLock<(Vec<u8>, SampleMessage)> = LazyLock::new(|| {
+        let vec = [
             INPUT_FIELD_3_I32_1,
             INPUT_FIELD_4_I32_3,
             INPUT_FIELD_5_I64_1,
@@ -265,44 +248,33 @@ mod test {
         .flatten()
         .copied()
         .collect::<Vec<_>>();
-        let mut msg1 = SampleMessage::default();
+        let mut expected = SampleMessage::default();
+        expected.i32s.push(Field { num: 3, val: 1 });
+        expected.i32s.push(Field { num: 4, val: 3 });
+        expected.i64s.push(Field { num: 5, val: 1 });
+        expected.i64s.push(Field { num: 6, val: 3 });
+        (vec, expected)
+    });
 
-        deser_from_slice(&mut msg1, &input).unwrap();
-
-        let mut expected_msg1 = SampleMessage::default();
-        expected_msg1.i32s.push(Field { num: 3, val: 1 });
-        expected_msg1.i32s.push(Field { num: 4, val: 3 });
-        expected_msg1.i64s.push(Field { num: 5, val: 1 });
-        expected_msg1.i64s.push(Field { num: 6, val: 3 });
-
-        assert_eq!(expected_msg1, msg1);
-    }
-
-    #[test]
-    fn test_deser_string_fields() {
-        let input = [INPUT_FIELD_8_STRING_FOO, INPUT_FIELD_10_STRING_YO]
+    static TEST_CASE_STRING_FIELDS: LazyLock<(Vec<u8>, SampleMessage)> = LazyLock::new(|| {
+        let vec = [INPUT_FIELD_8_STRING_FOO, INPUT_FIELD_10_STRING_YO]
             .into_iter()
             .flatten()
             .copied()
             .collect::<Vec<_>>();
-        let mut msg1 = SampleMessage::default();
-
-        deser_from_slice(&mut msg1, &input).unwrap();
-
-        let mut expected_msg1 = SampleMessage::default();
-        expected_msg1.strings.push(Field {
+        let mut expected = SampleMessage::default();
+        expected.strings.push(Field {
             num: 8,
             val: "foo".to_string(),
         });
-        expected_msg1.strings.push(Field {
+        expected.strings.push(Field {
             num: 10,
             val: "yo".to_string(),
         });
-        assert_eq!(expected_msg1, msg1);
-    }
+        (vec, expected)
+    });
 
-    #[test]
-    fn test_deser_complex_fields() {
+    static TEST_CASE_COMPLEX_FIELDS: LazyLock<(Vec<u8>, SampleMessage)> = LazyLock::new(|| {
         let subsubmsg1_bytes = INPUT_FIELD_1_VARIANT_1;
         let submsg1_bytes = [
             INPUT_FIELD_2_VARIANT_3.to_vec(),
@@ -319,39 +291,72 @@ mod test {
         .into_iter()
         .flatten()
         .collect::<Vec<_>>();
-        let mut msg1 = SampleMessage::default();
-
-        deser_from_slice(&mut msg1, &msg1_bytes).unwrap();
-
-        let mut expected_msg1 = SampleMessage::default();
-        expected_msg1.i32s.push(Field { num: 3, val: 1 });
-        expected_msg1.children.push(Field {
+        let mut expected = SampleMessage::default();
+        expected.i32s.push(Field { num: 3, val: 1 });
+        expected.children.push(Field {
             num: 7,
             val: Box::new(SampleMessage::default()),
         });
-        expected_msg1.children.push(Field {
+        expected.children.push(Field {
             num: 5,
             val: Box::new(SampleMessage::default()),
         });
-        expected_msg1.children[0].val.variants.push(Field {
+        expected.children[0].val.variants.push(Field {
             num: 2,
             val: 3.into(),
         });
-        expected_msg1.children[0].val.children.push(Field {
+        expected.children[0].val.children.push(Field {
             num: 3,
             val: Box::new(SampleMessage::default()),
         });
-        expected_msg1.children[0].val.children[0]
+        expected.children[0].val.children[0]
             .val
             .variants
             .push(Field {
                 num: 1,
                 val: 1.into(),
             });
-        expected_msg1.children[1]
-            .val
-            .i32s
-            .push(Field { num: 4, val: 3 });
-        assert_eq!(expected_msg1, msg1);
+        expected.children[1].val.i32s.push(Field { num: 4, val: 3 });
+        (msg1_bytes, expected)
+    });
+
+    #[test]
+    fn test_slice_deser_variant_fields() {
+        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_slice(&mut msg, input).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_read_deser_variant_fields() {
+        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_bound_read(&mut msg, <&[u8] as Read>::take(input, input.len() as u64)).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_slice_deser_fixed_fields() {
+        let (input, expected) = &*TEST_CASE_FIXED_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_slice(&mut msg, &input).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_slice_deser_string_fields() {
+        let (input, expected) = &*TEST_CASE_STRING_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_slice(&mut msg, &input).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_slice_deser_complex_fields() {
+        let (input, expected) = &*TEST_CASE_COMPLEX_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_slice(&mut msg, &input).unwrap();
+        assert_eq!(expected, &msg);
     }
 }
