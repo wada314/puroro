@@ -33,6 +33,7 @@ pub(crate) enum FreezeStatus<'a, T: ?Sized> {
     Frozen(FrozenMut<'a, T>, UnfrozenMut<'a, T>),
 }
 
+#[allow(unused)]
 impl<'a, T: 'a + ?Sized> UnfrozenMut<'a, T> {
     pub(crate) fn new(val: &'a mut T) -> Self {
         Self {

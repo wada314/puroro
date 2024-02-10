@@ -14,11 +14,11 @@
 
 pub mod record;
 
-use self::record::{Payload, Record, SliceExtReadRecord};
-use crate::internal::freezing_mut::{FreezeStatus, FrozenMut, UnfrozenMut};
+use self::record::{Payload, SliceExtReadRecord};
+use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
-use crate::{ErrorKind, Result};
-use ::std::io::Read;
+use crate::Result;
+use ::std::io::{Read, Take};
 
 pub trait DeseringMessage {
     fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()>;
@@ -32,7 +32,7 @@ pub trait DeseringMessage {
     fn parse_len_read_or_alloc_child(
         &mut self,
         num: u32,
-        read: &mut dyn Read,
+        take: &mut Take<&mut dyn Read>,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
@@ -73,7 +73,6 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::internal::deser::record::{Payload, Record};
     use crate::internal::variant::{Variant, WriteExtVariant};
     use crate::internal::WireType;
 
@@ -127,7 +126,27 @@ mod test {
             } else {
                 self.children.push(Field {
                     num,
-                    val: Box::new(Default::default()),
+                    val: Box::new(SampleMessage::default()),
+                });
+                return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
+            }
+            Ok(None)
+        }
+
+        fn parse_len_read_or_alloc_child(
+            &mut self,
+            num: u32,
+            take: &mut Take<&mut dyn Read>,
+        ) -> Result<Option<&mut dyn DeseringMessage>> {
+            if num % 2 == 0 {
+                let mut val = String::with_capacity(take.limit() as usize);
+                take.read_to_string(&mut val)?;
+                debug_assert_eq!(0, take.limit());
+                self.strings.push(Field { num, val });
+            } else {
+                self.children.push(Field {
+                    num,
+                    val: Box::new(SampleMessage::default()),
                 });
                 return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
             }
