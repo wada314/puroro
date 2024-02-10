@@ -14,7 +14,7 @@
 
 pub mod record;
 
-use self::record::{Payload, SliceExtReadRecord};
+use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::Result;
@@ -37,6 +37,7 @@ pub trait DeseringMessage {
 }
 
 pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
+    use self::record::SliceExtReadRecord;
     let mut msg = UnfrozenMut::new(root);
     let mut stack = Vec::new();
     while !(input.is_empty() && stack.is_empty()) {
@@ -70,9 +71,37 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     Ok(())
 }
 
-pub fn deser_from_read(root: &mut dyn DeseringMessage, input: &mut dyn Read) -> Result<()> {
+pub fn deser_from_read(root: &mut dyn DeseringMessage, bound_input: Take<impl Read>) -> Result<()> {
+    use self::record::ReadExtReadRecord;
     let mut msg = UnfrozenMut::new(root);
     let mut stack = Vec::new();
+    loop {
+        let Some(record) = bound_input.read_record_or_eof()? else {
+            todo!()
+        };
+        match record.payload {
+            Payload::Variant(val) => msg.parse_variant(record.number, val)?,
+            Payload::I32(val) => msg.parse_i32(record.number, val)?,
+            Payload::I64(val) => msg.parse_i64(record.number, val)?,
+            Payload::Len(input_subpart) => {
+                match msg.try_work(|msg| {
+                    msg.parse_len_read_or_alloc_child(record.number, input_subpart)
+                })? {
+                    FreezeStatus::Unfrozen(new_msg) => {
+                        msg = new_msg;
+                    }
+                    FreezeStatus::Frozen(frozen_msg, new_msg) => {
+                        todo!();
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+fn shrink_take_take<R: Read>(take: Take<&mut Take<R>>) -> (Take<R>, u64) {
+    todo!()
 }
 
 #[cfg(test)]

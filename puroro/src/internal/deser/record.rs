@@ -70,12 +70,15 @@ impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
 }
 
 pub trait ReadExtReadRecord: Sized {
-    fn read_record(&mut self) -> Result<Record<Take<&mut Self>>>;
+    fn read_record_or_eof(&mut self) -> Result<Option<Record<Take<&mut Self>>>>;
 }
 impl<T: Read> ReadExtReadRecord for T {
-    fn read_record(&mut self) -> Result<Record<Take<&mut Self>>> {
+    fn read_record_or_eof(&mut self) -> Result<Option<Record<Take<&mut Self>>>> {
         use crate::internal::variant::ReadExtVariant;
-        let tag = self.read_variant()?.try_as_uint32()?;
+        let Some(tag_var) = self.read_variant_or_eof()? else {
+            return Ok(None);
+        };
+        let tag = tag_var.try_as_uint32()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         let number = tag >> 3;
         let payload = match wire_type {
@@ -95,7 +98,7 @@ impl<T: Read> ReadExtReadRecord for T {
                 Payload::Len(self.take(length))
             }
         };
-        Ok(Record { number, payload })
+        Ok(Some(Record { number, payload }))
     }
 }
 

@@ -117,7 +117,7 @@ impl<T: Read> ReadExtVariant for T {
                 return Err(ErrorKind::TooLongEncodedVariant);
             }
         }
-        Ok(Variant(result.to_le_bytes()))
+        Ok(Some(Variant(result.to_le_bytes())))
     }
 }
 
