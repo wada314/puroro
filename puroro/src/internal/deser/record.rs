@@ -15,6 +15,8 @@
 use crate::internal::variant::Variant;
 use crate::internal::WireType;
 use crate::{ErrorKind, Result};
+use ::std::io::{Read, Take};
+use std::default;
 
 #[derive(Debug)]
 pub struct Record<T> {
@@ -61,6 +63,36 @@ impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
                 };
                 *self = remain;
                 Payload::Len(chunk)
+            }
+        };
+        Ok(Record { number, payload })
+    }
+}
+
+pub trait ReadExtReadRecord: Sized {
+    fn read_record(&mut self) -> Result<Record<Take<&mut Self>>>;
+}
+impl<T: Read> ReadExtReadRecord for T {
+    fn read_record(&mut self) -> Result<Record<Take<&mut Self>>> {
+        use crate::internal::variant::ReadExtVariant;
+        let tag = self.read_variant()?.try_as_uint32()?;
+        let wire_type: WireType = (tag & 0x7).try_into()?;
+        let number = tag >> 3;
+        let payload = match wire_type {
+            WireType::Variant => Payload::Variant(self.read_variant()?),
+            WireType::I32 => {
+                let mut buf = <[u8; 4]>::default();
+                self.read_exact(&mut buf)?;
+                Payload::I32(buf)
+            }
+            WireType::I64 => {
+                let mut buf = <[u8; 8]>::default();
+                self.read_exact(&mut buf)?;
+                Payload::I64(buf)
+            }
+            WireType::Len => {
+                let length: u64 = self.read_variant()?.try_as_int32()?.try_into()?;
+                Payload::Len(self.take(length))
             }
         };
         Ok(Record { number, payload })
