@@ -64,6 +64,7 @@ impl TryFrom<usize> for Variant {
 
 pub trait ReadExtVariant {
     fn read_variant(&mut self) -> Result<Variant>;
+    fn read_variant_or_eof(&mut self) -> Result<Option<Variant>>;
 }
 
 pub trait BufReadExtVariant {
@@ -83,6 +84,31 @@ impl<T: Read> ReadExtVariant for T {
         let mut result = 0u64;
         for (i, rbyte) in iter.take(10).enumerate() {
             let byte = rbyte?;
+            result |= ((byte & 0x7F) as u64) << (i * 7);
+            if (byte & 0x80) == 0 {
+                break;
+            }
+            if i == 9 && ((byte & 0xFE) != 0) {
+                return Err(ErrorKind::TooLongEncodedVariant);
+            }
+        }
+        Ok(Variant(result.to_le_bytes()))
+    }
+    #[inline]
+    fn read_variant_or_eof(&mut self) -> Result<Option<Variant>> {
+        let iter = self.bytes();
+        let mut result = 0u64;
+        for (i, rbyte) in iter.take(10).enumerate() {
+            let byte = match rbyte {
+                Ok(byte) => byte,
+                Err(e) => {
+                    if i == 0 {
+                        return Ok(None);
+                    } else {
+                        return Err(e.into());
+                    }
+                }
+            };
             result |= ((byte & 0x7F) as u64) << (i * 7);
             if (byte & 0x80) == 0 {
                 break;

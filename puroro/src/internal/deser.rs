@@ -70,6 +70,11 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     Ok(())
 }
 
+pub fn deser_from_read(root: &mut dyn DeseringMessage, input: &mut dyn Read) -> Result<()> {
+    let mut msg = UnfrozenMut::new(root);
+    let mut stack = Vec::new();
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
