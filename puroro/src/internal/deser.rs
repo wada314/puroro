@@ -71,37 +71,46 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     Ok(())
 }
 
-pub fn deser_from_read(root: &mut dyn DeseringMessage, bound_input: Take<impl Read>) -> Result<()> {
+pub fn deser_from_read(
+    root: &mut dyn DeseringMessage,
+    mut bound_read: Take<impl Read>,
+) -> Result<()> {
     use self::record::ReadExtReadRecord;
     let mut msg = UnfrozenMut::new(root);
     let mut stack = Vec::new();
     loop {
-        let Some(record) = bound_input.read_record_or_eof()? else {
-            todo!()
-        };
-        match record.payload {
-            Payload::Variant(val) => msg.parse_variant(record.number, val)?,
-            Payload::I32(val) => msg.parse_i32(record.number, val)?,
-            Payload::I64(val) => msg.parse_i64(record.number, val)?,
-            Payload::Len(input_subpart) => {
-                match msg.try_work(|msg| {
-                    msg.parse_len_read_or_alloc_child(record.number, input_subpart)
-                })? {
-                    FreezeStatus::Unfrozen(new_msg) => {
-                        msg = new_msg;
-                    }
-                    FreezeStatus::Frozen(frozen_msg, new_msg) => {
-                        todo!();
+        if let Some(record) = bound_read.read_record_or_eof()? {
+            match record.payload {
+                Payload::Variant(val) => msg.parse_variant(record.number, val)?,
+                Payload::I32(val) => msg.parse_i32(record.number, val)?,
+                Payload::I64(val) => msg.parse_i64(record.number, val)?,
+                Payload::Len(mut child_read) => {
+                    match msg.try_work(|msg| {
+                        msg.parse_len_read_or_alloc_child(record.number, &mut child_read)
+                    })? {
+                        FreezeStatus::Unfrozen(new_msg) => {
+                            msg = new_msg;
+                        }
+                        FreezeStatus::Frozen(frozen_msg, new_msg) => {
+                            let child_read_remaining = child_read.limit();
+                            let parent_read_remaining = bound_read.limit() - child_read_remaining;
+                            bound_read.set_limit(child_read_remaining);
+                            stack.push((parent_read_remaining, frozen_msg));
+                            msg = new_msg;
+                        }
                     }
                 }
+            }
+        } else {
+            if let Some((parent_read_remaining, prev_msg)) = stack.pop() {
+                bound_read.set_limit(parent_read_remaining);
+                msg = prev_msg.unfreeze(msg);
+            } else {
+                break;
             }
         }
     }
     Ok(())
-}
-
-fn shrink_take_take<R: Read>(take: Take<&mut Take<R>>) -> (Take<R>, u64) {
-    todo!()
 }
 
 #[cfg(test)]
