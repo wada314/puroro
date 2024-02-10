@@ -16,6 +16,7 @@
 #![feature(slice_as_chunks)]
 #![feature(assert_matches)]
 #![feature(slice_first_last_chunk)]
+#![feature(lazy_cell)]
 
 pub mod internal;
 

@@ -96,19 +96,13 @@ impl<T: Read> ReadExtVariant for T {
     }
     #[inline]
     fn read_variant_or_eof(&mut self) -> Result<Option<Variant>> {
-        let iter = self.bytes();
+        let mut iter = self.bytes().peekable();
+        if iter.peek().is_none() {
+            return Ok(None);
+        }
         let mut result = 0u64;
         for (i, rbyte) in iter.take(10).enumerate() {
-            let byte = match rbyte {
-                Ok(byte) => byte,
-                Err(e) => {
-                    if i == 0 {
-                        return Ok(None);
-                    } else {
-                        return Err(e.into());
-                    }
-                }
-            };
+            let byte = rbyte?;
             result |= ((byte & 0x7F) as u64) << (i * 7);
             if (byte & 0x80) == 0 {
                 break;

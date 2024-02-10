@@ -118,6 +118,7 @@ mod test {
     use super::*;
     use crate::internal::variant::{Variant, WriteExtVariant};
     use crate::internal::WireType;
+    use ::std::sync::LazyLock;
 
     #[derive(Default, Debug, PartialEq)]
     struct Field<T> {
@@ -218,28 +219,38 @@ mod test {
         result
     }
 
-    #[test]
-    fn test_deser_variant_fields() {
-        let input = [INPUT_FIELD_1_VARIANT_1, INPUT_FIELD_2_VARIANT_3]
+    static TEST_CASE_VARIANT_FIELDS: LazyLock<(Vec<u8>, SampleMessage)> = LazyLock::new(|| {
+        let vec = [INPUT_FIELD_1_VARIANT_1, INPUT_FIELD_2_VARIANT_3]
             .into_iter()
             .flatten()
             .copied()
             .collect::<Vec<_>>();
-        let mut msg1 = SampleMessage::default();
-
-        deser_from_slice(&mut msg1, &input).unwrap();
-
-        let mut expected_msg1 = SampleMessage::default();
-        expected_msg1.variants.push(Field {
+        let mut expected = SampleMessage::default();
+        expected.variants.push(Field {
             num: 1,
             val: 1.into(),
         });
-        expected_msg1.variants.push(Field {
+        expected.variants.push(Field {
             num: 2,
             val: 3.into(),
         });
+        (vec, expected)
+    });
 
-        assert_eq!(expected_msg1, msg1);
+    #[test]
+    fn test_slice_deser_variant_fields() {
+        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_slice(&mut msg, input).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_read_deser_variant_fields() {
+        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_read(&mut msg, <&[u8] as Read>::take(input, input.len() as u64)).unwrap();
+        assert_eq!(expected, &msg);
     }
 
     #[test]
