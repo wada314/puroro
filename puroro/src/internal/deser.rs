@@ -71,7 +71,7 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     Ok(())
 }
 
-pub fn deser_from_read(
+pub fn deser_from_bound_read(
     root: &mut dyn DeseringMessage,
     mut bound_read: Take<impl Read>,
 ) -> Result<()> {
@@ -249,7 +249,7 @@ mod test {
     fn test_read_deser_variant_fields() {
         let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
         let mut msg = SampleMessage::default();
-        deser_from_read(&mut msg, <&[u8] as Read>::take(input, input.len() as u64)).unwrap();
+        deser_from_bound_read(&mut msg, <&[u8] as Read>::take(input, input.len() as u64)).unwrap();
         assert_eq!(expected, &msg);
     }
 
