@@ -348,14 +348,6 @@ mod test {
     }
 
     #[test]
-    fn test_read_deser_variant_fields() {
-        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
-        let mut msg = SampleMessage::default();
-        deser_from_bound_read(&mut msg, <&[u8] as Read>::take(input, input.len() as u64)).unwrap();
-        assert_eq!(expected, &msg);
-    }
-
-    #[test]
     fn test_slice_deser_fixed_fields() {
         let (input, expected) = &*TEST_CASE_FIXED_FIELDS;
         let mut msg = SampleMessage::default();
@@ -376,6 +368,38 @@ mod test {
         let (input, expected) = &*TEST_CASE_COMPLEX_FIELDS;
         let mut msg = SampleMessage::default();
         deser_from_slice(&mut msg, &input).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_read_deser_variant_fields() {
+        let (input, expected) = &*TEST_CASE_VARIANT_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_read(&mut msg, input.as_slice()).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_read_deser_fixed_fields() {
+        let (input, expected) = &*TEST_CASE_FIXED_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_read(&mut msg, input.as_slice()).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_read_deser_string_fields() {
+        let (input, expected) = &*TEST_CASE_STRING_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_read(&mut msg, input.as_slice()).unwrap();
+        assert_eq!(expected, &msg);
+    }
+
+    #[test]
+    fn test_read_deser_complex_fields() {
+        let (input, expected) = &*TEST_CASE_COMPLEX_FIELDS;
+        let mut msg = SampleMessage::default();
+        deser_from_read(&mut msg, input.as_slice()).unwrap();
         assert_eq!(expected, &msg);
     }
 }
