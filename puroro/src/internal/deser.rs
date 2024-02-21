@@ -113,6 +113,25 @@ pub fn deser_from_bound_read(
     Ok(())
 }
 
+pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> Result<()> {
+    use self::record::ReadExtReadRecord;
+    while let Some(record) = read.read_record_or_eof()? {
+        match record.payload {
+            Payload::Variant(val) => root.parse_variant(record.number, val)?,
+            Payload::I32(val) => root.parse_i32(record.number, val)?,
+            Payload::I64(val) => root.parse_i64(record.number, val)?,
+            Payload::Len(mut child_read) => {
+                if let Some(child) =
+                    root.parse_len_read_or_alloc_child(record.number, &mut child_read)?
+                {
+                    deser_from_bound_read(child, child_read)?;
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
