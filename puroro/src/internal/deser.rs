@@ -14,7 +14,7 @@
 
 pub mod record;
 
-use self::record::Payload;
+use self::record::{Payload, Record};
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::Result;
@@ -101,13 +101,12 @@ pub fn deser_from_bound_read(
                     }
                 }
             }
+        } else if let Some((parent_read_remaining, prev_msg)) = stack.pop() {
+            bound_read.set_limit(parent_read_remaining);
+            msg = prev_msg.unfreeze(msg);
         } else {
-            if let Some((parent_read_remaining, prev_msg)) = stack.pop() {
-                bound_read.set_limit(parent_read_remaining);
-                msg = prev_msg.unfreeze(msg);
-            } else {
-                break;
-            }
+            // No more records and no more stack, we're done for the given `Read` instance.
+            break;
         }
     }
     Ok(())
