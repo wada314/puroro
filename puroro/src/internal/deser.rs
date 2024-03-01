@@ -40,8 +40,9 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
     use self::record::SliceExtReadRecord;
     let mut msg = UnfrozenMut::new(root);
     let mut stack = Vec::new();
-    while !(input.is_empty() && stack.is_empty()) {
+    loop {
         if !input.is_empty() {
+            // Still have records to process.
             let record = input.read_record()?;
             match record.payload {
                 Payload::Variant(val) => msg.parse_variant(record.number, val)?,
@@ -63,7 +64,11 @@ pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Res
                 }
             }
         } else {
-            let (prev_input, prev_msg) = stack.pop().unwrap();
+            // Finished the current level of messages, pop the stack to go back to the parent.
+            let Some((prev_input, prev_msg)) = stack.pop() else {
+                // No more records and no more stack, we're done for the given slice.
+                break;
+            };
             input = prev_input;
             msg = prev_msg.unfreeze(msg);
         }
@@ -80,6 +85,7 @@ pub fn deser_from_bound_read(
     let mut stack = Vec::new();
     loop {
         if let Some(record) = bound_read.read_record_or_eof()? {
+            // Still have records to process.
             match record.payload {
                 Payload::Variant(val) => msg.parse_variant(record.number, val)?,
                 Payload::I32(val) => msg.parse_i32(record.number, val)?,
@@ -101,12 +107,14 @@ pub fn deser_from_bound_read(
                     }
                 }
             }
-        } else if let Some((parent_read_remaining, prev_msg)) = stack.pop() {
+        } else {
+            // Finished the current level of messages, pop the stack to go back to the parent.
+            let Some((parent_read_remaining, prev_msg)) = stack.pop() else {
+                // No more records and no more stack, we're done for the given `Read` instance.
+                break;
+            };
             bound_read.set_limit(parent_read_remaining);
             msg = prev_msg.unfreeze(msg);
-        } else {
-            // No more records and no more stack, we're done for the given `Read` instance.
-            break;
         }
     }
     Ok(())
