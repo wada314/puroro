@@ -14,11 +14,14 @@
 
 pub mod record;
 
-use self::record::{Payload, Record};
+use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::Result;
+use ::futures::io::{AsyncRead, Take as AsyncTake};
 use ::std::io::{Read, Take};
+use ::std::pin::Pin;
+use ::std::task::Context;
 
 pub trait DeseringMessage {
     fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()>;
@@ -32,7 +35,13 @@ pub trait DeseringMessage {
     fn parse_len_read_or_alloc_child(
         &mut self,
         num: u32,
-        take: &mut Take<&mut dyn Read>,
+        read: &mut Take<&mut dyn Read>,
+    ) -> Result<Option<&mut dyn DeseringMessage>>;
+    fn poll_parse_len_async_read_or_alloc_child(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        num: u32,
+        read: &mut AsyncTake<Pin<&mut dyn AsyncRead>>,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
@@ -206,12 +215,12 @@ mod test {
         fn parse_len_read_or_alloc_child(
             &mut self,
             num: u32,
-            take: &mut Take<&mut dyn Read>,
+            read: &mut Take<&mut dyn Read>,
         ) -> Result<Option<&mut dyn DeseringMessage>> {
             if num % 2 == 0 {
-                let mut val = String::with_capacity(take.limit() as usize);
-                take.read_to_string(&mut val)?;
-                debug_assert_eq!(0, take.limit());
+                let mut val = String::with_capacity(read.limit() as usize);
+                read.read_to_string(&mut val)?;
+                debug_assert_eq!(0, read.limit());
                 self.strings.push(Field { num, val });
             } else {
                 self.children.push(Field {
@@ -221,6 +230,18 @@ mod test {
                 return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
             }
             Ok(None)
+        }
+
+        fn poll_parse_len_async_read_or_alloc_child(
+            self: Pin<&mut Self>,
+            cx: &mut Context<'_>,
+            num: u32,
+            read: &mut AsyncTake<Pin<&mut (dyn AsyncRead)>>,
+        ) -> Result<Option<&mut dyn DeseringMessage>> {
+            if num % 2 == 0 {
+                let mut val = String::with_capacity(read.limit() as usize);
+            }
+            unimplemented!()
         }
     }
 
