@@ -19,6 +19,7 @@ use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::Result;
 use ::futures::io::{AsyncRead, Take as AsyncTake};
+use ::futures::task::Poll;
 use ::std::io::{Read, Take};
 use ::std::pin::Pin;
 use ::std::task::Context;
@@ -42,7 +43,7 @@ pub trait DeseringMessage {
         cx: &mut Context<'_>,
         num: u32,
         read: &mut AsyncTake<Pin<&mut dyn AsyncRead>>,
-    ) -> Result<Option<&mut dyn DeseringMessage>>;
+    ) -> Poll<Result<Option<&mut dyn DeseringMessage>>>;
 }
 
 pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
@@ -153,6 +154,8 @@ mod test {
     use super::*;
     use crate::internal::variant::{Variant, WriteExtVariant};
     use crate::internal::WireType;
+    use ::futures::io::AsyncReadExt;
+    use ::std::future::Future;
     use ::std::sync::LazyLock;
 
     #[derive(Default, Debug, PartialEq)]
@@ -237,9 +240,13 @@ mod test {
             cx: &mut Context<'_>,
             num: u32,
             read: &mut AsyncTake<Pin<&mut (dyn AsyncRead)>>,
-        ) -> Result<Option<&mut dyn DeseringMessage>> {
+        ) -> Poll<Result<Option<&mut dyn DeseringMessage>>> {
             if num % 2 == 0 {
-                let mut val = String::with_capacity(read.limit() as usize);
+                let string_future = Some(async {
+                    let mut val = String::with_capacity(read.limit() as usize);
+                    read.read_to_string(&mut val).await?;
+                    Result::<_>::Ok(Option::<&mut dyn DeseringMessage>::None)
+                });
             }
             unimplemented!()
         }
