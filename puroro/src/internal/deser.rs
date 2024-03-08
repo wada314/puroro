@@ -243,6 +243,7 @@ mod test {
                 let string_future = Some(async {
                     let mut val = String::with_capacity(read.limit() as usize);
                     read.read_to_string(&mut val).await?;
+
                     Result::<_>::Ok(Option::<&mut dyn DeseringMessage>::None)
                 });
             }
