@@ -15,7 +15,6 @@
 use ::std::marker::PhantomData;
 use ::std::mem::transmute;
 use ::std::ops::{Deref, DerefMut};
-use ::std::result::Result;
 
 #[derive(PartialEq, Eq)]
 pub(crate) struct UnfrozenMut<'a, T: ?Sized> {

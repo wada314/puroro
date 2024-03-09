@@ -152,7 +152,7 @@ pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> R
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::internal::variant::{Variant, WriteExtVariant};
+    use crate::internal::variant::WriteExtVariant;
     use crate::internal::WireType;
     use ::futures::io::AsyncReadExt;
 
