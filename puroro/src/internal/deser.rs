@@ -38,12 +38,6 @@ pub trait DeseringMessage {
         num: u32,
         read: &mut Take<&mut dyn Read>,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
-    fn poll_parse_len_async_read_or_alloc_child(
-        self: Pin<&mut Self>,
-        cx: &mut Context<'_>,
-        num: u32,
-        read: &mut AsyncTake<Pin<&mut dyn AsyncRead>>,
-    ) -> Poll<Result<Option<&mut dyn DeseringMessage>>>;
 }
 
 pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
@@ -155,6 +149,7 @@ mod test {
     use crate::internal::variant::WriteExtVariant;
     use crate::internal::WireType;
     use ::futures::io::AsyncReadExt;
+    use ::std::future::Future;
 
     #[derive(Default, Debug, PartialEq)]
     struct Field<T> {
@@ -232,7 +227,9 @@ mod test {
             }
             Ok(None)
         }
+    }
 
+    impl SampleMessage {
         fn poll_parse_len_async_read_or_alloc_child(
             self: Pin<&mut Self>,
             cx: &mut Context<'_>,
@@ -247,7 +244,25 @@ mod test {
                     Result::<_>::Ok(Option::<&mut dyn DeseringMessage>::None)
                 });
             }
-            unimplemented!()
+            todo!()
+        }
+
+        fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
+            &'this mut self,
+            num: u32,
+            read: &'r mut AsyncTake<impl AsyncRead + Unpin>,
+        ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>> {
+            let boxed = Box::new(async move {
+                if num % 2 == 0 {
+                    let mut val = String::with_capacity(read.limit() as usize);
+                    read.read_to_string(&mut val).await?;
+                    self.strings.push(Field { num, val });
+                    Result::<_>::Ok(None)
+                } else {
+                    todo!()
+                }
+            });
+            boxed
         }
     }
 
