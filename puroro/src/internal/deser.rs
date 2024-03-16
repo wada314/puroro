@@ -18,7 +18,7 @@ use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::Result;
-use ::futures::io::{AsyncRead, Take as AsyncTake};
+use ::futures::io::{AsyncRead, AsyncWrite, Take as AsyncTake};
 use ::std::alloc::Allocator;
 use ::std::future::Future;
 use ::std::io::{Read, Take};
@@ -46,6 +46,17 @@ pub trait AsyncDeseringMessage<A: Allocator>: DeseringMessage {
         read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
         alloc: A,
     ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>;
+}
+
+pub trait TheReadableMessage {}
+pub trait TheAppendableMessage: TheReadableMessage {}
+pub trait TheMutableMessage: TheAppendableMessage {}
+pub trait TheAsyncReadableMessage: TheReadableMessage {}
+pub trait TheAsyncDeserializableMessage: TheReadableMessage {
+    fn async_deser(&mut self, read: impl AsyncRead) -> impl '_ + TheAsyncReadableMessage;
+}
+pub trait TheAsyncSerializableMessage {
+    fn async_ser(&self, write: impl AsyncWrite) -> impl '_ + TheAppendableMessage;
 }
 
 pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
