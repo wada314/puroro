@@ -19,10 +19,9 @@ use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::variant::Variant;
 use crate::Result;
 use ::futures::io::{AsyncRead, Take as AsyncTake};
-use ::futures::task::Poll;
+use ::std::alloc::Allocator;
+use ::std::future::Future;
 use ::std::io::{Read, Take};
-use ::std::pin::Pin;
-use ::std::task::Context;
 
 pub trait DeseringMessage {
     fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()>;
@@ -38,6 +37,15 @@ pub trait DeseringMessage {
         num: u32,
         read: &mut Take<&mut dyn Read>,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
+}
+
+pub trait AsyncDeseringMessage<A: Allocator> {
+    fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
+        &'this mut self,
+        num: u32,
+        read: &'r mut AsyncTake<impl AsyncRead + Unpin>,
+        alloc: A,
+    ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>;
 }
 
 pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
@@ -149,7 +157,6 @@ mod test {
     use crate::internal::variant::WriteExtVariant;
     use crate::internal::WireType;
     use ::futures::io::AsyncReadExt;
-    use ::std::future::Future;
 
     #[derive(Default, Debug, PartialEq)]
     struct Field<T> {
@@ -229,28 +236,32 @@ mod test {
         }
     }
 
-    impl SampleMessage {
+    impl<A: Allocator> AsyncDeseringMessage<A> for SampleMessage {
         fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
             &'this mut self,
             num: u32,
             read: &'r mut AsyncTake<impl AsyncRead + Unpin>,
-        ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>> {
-            let boxed = Box::new(async move {
-                if num % 2 == 0 {
-                    let mut val = String::with_capacity(read.limit() as usize);
-                    read.read_to_string(&mut val).await?;
-                    self.strings.push(Field { num, val });
-                    Result::<_>::Ok(None)
-                } else {
-                    self.children.push(Field {
-                        num,
-                        val: Box::new(SampleMessage::default()),
-                    });
-                    Result::<_>::Ok(Some(
-                        self.children.last_mut().unwrap().val.as_mut() as &mut dyn DeseringMessage
-                    ))
-                }
-            });
+            alloc: A,
+        ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>
+        {
+            let boxed = Box::new_in(
+                async move {
+                    if num % 2 == 0 {
+                        let mut val = String::with_capacity(read.limit() as usize);
+                        read.read_to_string(&mut val).await?;
+                        self.strings.push(Field { num, val });
+                        Result::<_>::Ok(None)
+                    } else {
+                        self.children.push(Field {
+                            num,
+                            val: Box::new(SampleMessage::default()),
+                        });
+                        Result::<_>::Ok(Some(self.children.last_mut().unwrap().val.as_mut()
+                            as &mut dyn DeseringMessage))
+                    }
+                },
+                alloc,
+            );
             boxed
         }
     }
