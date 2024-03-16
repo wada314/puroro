@@ -43,7 +43,7 @@ pub trait AsyncDeseringMessage<A: Allocator>: DeseringMessage {
     fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
         &'this mut self,
         num: u32,
-        read: &'r mut AsyncTake<impl AsyncRead + Unpin>,
+        read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
         alloc: A,
     ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>;
 }
@@ -151,6 +151,14 @@ pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> R
     Ok(())
 }
 
+pub async fn deser_from_async_bound_read<A: Allocator>(
+    root: &mut dyn AsyncDeseringMessage<A>,
+    mut bound_read: AsyncTake<&mut (dyn AsyncRead + Unpin)>,
+    alloc: A,
+) -> Result<()> {
+    todo!()
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -240,7 +248,7 @@ mod test {
         fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
             &'this mut self,
             num: u32,
-            read: &'r mut AsyncTake<impl AsyncRead + Unpin>,
+            mut read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
             alloc: A,
         ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>
         {
