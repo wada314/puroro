@@ -39,7 +39,7 @@ pub trait DeseringMessage {
     ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
 
-pub trait AsyncDeseringMessage<A: Allocator> {
+pub trait AsyncDeseringMessage<A: Allocator>: DeseringMessage {
     fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
         &'this mut self,
         num: u32,
