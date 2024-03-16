@@ -230,23 +230,6 @@ mod test {
     }
 
     impl SampleMessage {
-        fn poll_parse_len_async_read_or_alloc_child(
-            self: Pin<&mut Self>,
-            cx: &mut Context<'_>,
-            num: u32,
-            read: &mut AsyncTake<Pin<&mut (dyn AsyncRead)>>,
-        ) -> Poll<Result<Option<&mut dyn DeseringMessage>>> {
-            if num % 2 == 0 {
-                let string_future = Some(async {
-                    let mut val = String::with_capacity(read.limit() as usize);
-                    read.read_to_string(&mut val).await?;
-
-                    Result::<_>::Ok(Option::<&mut dyn DeseringMessage>::None)
-                });
-            }
-            todo!()
-        }
-
         fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
             &'this mut self,
             num: u32,
@@ -259,7 +242,13 @@ mod test {
                     self.strings.push(Field { num, val });
                     Result::<_>::Ok(None)
                 } else {
-                    todo!()
+                    self.children.push(Field {
+                        num,
+                        val: Box::new(SampleMessage::default()),
+                    });
+                    Result::<_>::Ok(Some(
+                        self.children.last_mut().unwrap().val.as_mut() as &mut dyn DeseringMessage
+                    ))
                 }
             });
             boxed
