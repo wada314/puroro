@@ -405,16 +405,19 @@ pub struct FieldDescriptorCache {
 }
 
 impl<'a> FieldDescriptorWithContext<'a> {
-    fn name(&self) -> &str {
-        &self.body.name
+    fn name(&self) -> Result<&str> {
+        Ok(&self.body.name)
     }
-    fn full_name(&self) -> &str {
-        self.cache.full_name.get_or_init(|| {
-            let mut full_name = self.message.full_name().to_string();
-            full_name.push('.');
-            full_name.push_str(&self.body.name);
-            full_name
-        })
+    fn full_name(&self) -> Result<&str> {
+        self.cache
+            .full_name
+            .get_or_try_init(|| {
+                let mut full_name = self.message.full_name()?.to_string();
+                full_name.push('.');
+                full_name.push_str(&self.body.name);
+                Ok(full_name)
+            })
+            .map(|s| s.as_str())
     }
 }
 
