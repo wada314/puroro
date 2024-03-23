@@ -180,12 +180,7 @@ impl<'a> FileDescriptorWithContext<'a> {
                     file: self,
                     maybe_nested: None,
                     body: m,
-                    full_name: Default::default(),
-                    fields: Default::default(),
-                    oneofs: Default::default(),
-                    real_oneofs: Default::default(),
-                    nested_types: Default::default(),
-                    enum_types: Default::default(),
+                    cache: Default::default(),
                 })
                 .collect()
         })
@@ -199,6 +194,7 @@ impl<'a> FileDescriptorWithContext<'a> {
                     file: self.body,
                     maybe_nested: None,
                     body: e,
+                    cache: Default::default(),
                 })
                 .collect()
         })
@@ -249,6 +245,7 @@ impl<'a> DescriptorWithContext<'a> {
                 .map(|f| FieldDescriptorWithContext {
                     message: self,
                     body: f,
+                    cache: Default::default(),
                 })
                 .collect()
         })
@@ -261,6 +258,7 @@ impl<'a> DescriptorWithContext<'a> {
                 .map(|o| OneofDescriptorWithContext {
                     message: self,
                     body: o,
+                    cache: Default::default(),
                 })
                 .collect()
         })
@@ -273,6 +271,7 @@ impl<'a> DescriptorWithContext<'a> {
                 .map(|o| OneofDescriptorWithContext {
                     message: self,
                     body: o,
+                    cache: Default::default(),
                 })
                 .collect()
         })
