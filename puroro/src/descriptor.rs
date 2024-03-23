@@ -14,9 +14,28 @@
 
 use ::std::borrow::Cow;
 
-pub trait FileDescriptor {}
+pub trait FileDescriptor {
+    fn name(&self) -> &str;
+    fn package(&self) -> &str;
+    fn dependencies(&self) -> &[&dyn FileDescriptor];
+    fn public_dependencies(&self) -> &[&dyn FileDescriptor];
+    fn weak_dependencies(&self) -> &[&dyn FileDescriptor];
+    fn message_types(&self) -> &[&dyn Descriptor];
+    fn enum_types(&self) -> &[&dyn EnumDescriptor];
+}
 
-pub trait Descriptor {}
+pub trait Descriptor {
+    fn name(&self) -> &str;
+    fn full_name(&self) -> &str;
+    fn index(&self) -> usize;
+    fn file(&self) -> &dyn FileDescriptor;
+    fn containing_type(&self) -> Option<&dyn Descriptor>;
+    fn fields(&self) -> &[&dyn FieldDescriptor];
+    fn oneof_decls(&self) -> &[&dyn OneofDescriptor];
+    fn real_oneof_decls(&self) -> &[&dyn OneofDescriptor];
+    fn nested_types(&self) -> &[&dyn Descriptor];
+    fn enum_types(&self) -> &[&dyn EnumDescriptor];
+}
 
 pub trait FieldDescriptor {
     fn name(&self) -> &str;
@@ -27,9 +46,9 @@ pub trait FieldDescriptor {
     fn type_(&self) -> self::field_descriptor::Type;
     fn type_name(&self) -> &str;
     fn label(&self) -> self::field_descriptor::Label;
-    fn index(&self) -> i32;
+    fn index(&self) -> usize;
     fn containing_type(&self) -> &dyn Descriptor;
-    fn index_in_oneof(&self) -> i32;
+    fn index_in_oneof(&self) -> usize;
     fn containing_oneof(&self) -> Option<&dyn OneofDescriptor>;
     fn real_containing_oneof(&self) -> Option<&dyn OneofDescriptor>;
     fn message_type(&self) -> Option<&dyn Descriptor>;
@@ -54,6 +73,7 @@ pub trait FieldDescriptor {
     fn has_optional_keyword(&self) -> bool;
     fn has_presense(&self) -> bool;
 }
+
 pub mod field_descriptor {
     #[derive(Clone, Copy, Debug, Eq, PartialEq)]
     pub enum Type {
@@ -87,7 +107,7 @@ pub mod field_descriptor {
 pub trait EnumDescriptor {
     fn name(&self) -> &str;
     fn full_name(&self) -> &str;
-    fn index(&self) -> i32;
+    fn index(&self) -> usize;
     fn file(&self) -> &dyn FileDescriptor;
     fn values(&self) -> &[&dyn EnumValueDescriptor];
     fn containing_type(&self) -> &dyn Descriptor;
@@ -96,7 +116,7 @@ pub trait EnumDescriptor {
 pub trait EnumValueDescriptor {
     fn name(&self) -> &str;
     fn full_name(&self) -> &str;
-    fn index(&self) -> i32;
+    fn index(&self) -> usize;
     fn number(&self) -> i32;
     fn file(&self) -> &dyn FileDescriptor;
     fn type_(&self) -> &dyn EnumDescriptor;
@@ -105,47 +125,49 @@ pub trait EnumValueDescriptor {
 pub trait OneofDescriptor {
     fn name(&self) -> &str;
     fn full_name(&self) -> &str;
-    fn index(&self) -> i32;
+    fn index(&self) -> usize;
     fn is_synthetic(&self) -> bool;
     fn file(&self) -> &dyn FileDescriptor;
     fn containing_type(&self) -> &dyn Descriptor;
     fn fields(&self) -> &[&dyn FieldDescriptor];
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FieldDescriptorImpl<'a> {
-    name: Cow<'a, str>,
-    number: i32,
-    label: field_descriptor::Label,
-}
-impl FieldDescriptor for FieldDescriptorImpl<'_> {
-    fn name(&self) -> &str {
-        &self.name
-    }
-    fn full_name(&self) -> &str {
-        todo!()
-    }
-    fn number(&self) -> i32 {
-        self.number
-    }
-    fn label(&self) -> field_descriptor::Label {
-        self.label
-    }
+pub struct FileDescriptorStruct {
+    name: Cow<'static, str>,
+    package: Cow<'static, str>,
+    message_types: Vec<DescriptorStruct>,
+    enum_types: Vec<EnumDescriptorStruct>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct EnumDescriptorImpl<'a> {
-    name: Cow<'a, str>,
-    value: i32,
+pub struct DescriptorStruct {
+    name: Cow<'static, str>,
+    full_name: Cow<'static, str>,
+    fields: Vec<FieldDescriptorStruct>,
+    oneof_decls: Vec<OneofDescriptorStruct>,
+    nested_types: Vec<DescriptorStruct>,
+    enum_types: Vec<EnumDescriptorStruct>,
 }
-impl EnumDescriptor for EnumDescriptorImpl<'_> {
-    fn name(&self) -> &str {
-        &self.name
-    }
-    fn full_name(&self) -> &str {
-        todo!()
-    }
-    fn value(&self) -> i32 {
-        self.value
-    }
+
+pub struct FieldDescriptorStruct {
+    name: Cow<'static, str>,
+    number: i32,
+    type_: self::field_descriptor::Type,
+    type_name: Cow<'static, str>,
+    label: self::field_descriptor::Label,
+}
+
+pub struct EnumDescriptorStruct {
+    name: Cow<'static, str>,
+    values: Vec<EnumValueDescriptorStruct>,
+}
+
+pub struct EnumValueDescriptorStruct {
+    name: Cow<'static, str>,
+    number: i32,
+}
+
+pub struct OneofDescriptorStruct {
+    name: Cow<'static, str>,
+    fields: Vec<FieldDescriptorStruct>,
+    is_synthetic: bool,
 }
