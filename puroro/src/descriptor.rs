@@ -168,6 +168,6 @@ pub struct EnumValueDescriptorStruct {
 
 pub struct OneofDescriptorStruct {
     name: Cow<'static, str>,
-    fields: Vec<FieldDescriptorStruct>,
+    field_indices: Vec<usize>,
     is_synthetic: bool,
 }
