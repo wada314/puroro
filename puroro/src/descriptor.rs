@@ -16,8 +16,9 @@ use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
 use std::sync::Once;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Edition {
+    #[default]
     Unknown,
     Proto2,
     Proto3,
@@ -26,12 +27,13 @@ pub enum Edition {
 }
 
 pub mod field_descriptor {
-    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
     pub enum Type {
         DOUBLE,
         FLOAT,
         INT64,
         UINT64,
+        #[default]
         INT32,
         FIXED64,
         FIXED32,
@@ -47,8 +49,9 @@ pub mod field_descriptor {
         SINT32,
         SINT64,
     }
-    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
     pub enum Label {
+        #[default]
         OPTIONAL,
         REQUIRED,
         REPEATED,
@@ -58,7 +61,7 @@ pub mod field_descriptor {
 /// Structs for the each descriptor types.
 /// These structs are strictly read-only and only knows about its children, not parent.
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FileDescriptor {
     pub name: Cow<'static, str>,
     pub package: Cow<'static, str>,
@@ -69,7 +72,7 @@ pub struct FileDescriptor {
     pub edition: Edition,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Descriptor {
     pub name: Cow<'static, str>,
     pub full_name: Cow<'static, str>,
@@ -79,7 +82,7 @@ pub struct Descriptor {
     pub enum_types: Cow<'static, [EnumDescriptor]>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FieldDescriptor {
     pub name: Cow<'static, str>,
     pub number: i32,
@@ -88,19 +91,19 @@ pub struct FieldDescriptor {
     pub label: self::field_descriptor::Label,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EnumDescriptor {
     pub name: Cow<'static, str>,
     pub values: Cow<'static, [EnumValueDescriptor]>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EnumValueDescriptor {
     pub name: Cow<'static, str>,
     pub number: i32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct OneofDescriptor {
     pub name: Cow<'static, str>,
     pub field_indices: Cow<'static, [usize]>,
