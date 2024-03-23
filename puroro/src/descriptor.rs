@@ -15,72 +15,13 @@
 use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
 
-/// Public traits for the descriptor types.
-
-pub trait FileDescriptor {
-    fn name(&self) -> &str;
-    fn package(&self) -> &str;
-    fn dependencies(&self) -> impl IntoIterator<Item = &impl FileDescriptor>;
-    fn message_types(&self) -> impl IntoIterator<Item = &impl Descriptor>;
-    fn enum_types(&self) -> impl IntoIterator<Item = &impl EnumDescriptor>;
-}
-
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Edition {
     Unknown,
     Proto2,
     Proto3,
     Edition2023,
     Edition2024,
-}
-
-pub trait Descriptor {
-    fn name(&self) -> &str;
-    fn full_name(&self) -> &str;
-    fn index(&self) -> usize;
-    fn file(&self) -> &impl FileDescriptor;
-    fn containing_type(&self) -> Option<&impl Descriptor>;
-    fn fields(&self) -> impl IntoIterator<Item = &impl FieldDescriptor>;
-    fn oneof_decls(&self) -> impl IntoIterator<Item = &impl OneofDescriptor>;
-    fn real_oneof_decls(&self) -> impl IntoIterator<Item = &impl OneofDescriptor>;
-    fn nested_types(&self) -> impl IntoIterator<Item = &impl Descriptor>;
-    fn enum_types(&self) -> impl IntoIterator<Item = &impl EnumDescriptor>;
-}
-
-pub trait FieldDescriptor {
-    fn name(&self) -> &str;
-    fn full_name(&self) -> &str;
-    fn file(&self) -> &impl FileDescriptor;
-    fn is_extension(&self) -> bool;
-    fn number(&self) -> i32;
-    fn type_(&self) -> self::field_descriptor::Type;
-    fn type_name(&self) -> &str;
-    fn label(&self) -> self::field_descriptor::Label;
-    fn index(&self) -> usize;
-    fn containing_type(&self) -> &impl Descriptor;
-    fn index_in_oneof(&self) -> usize;
-    fn containing_oneof(&self) -> Option<&impl OneofDescriptor>;
-    fn real_containing_oneof(&self) -> Option<&impl OneofDescriptor>;
-    fn message_type(&self) -> Option<&impl Descriptor>;
-    fn enum_type(&self) -> Option<&impl EnumDescriptor>;
-
-    fn is_required(&self) -> bool {
-        self.label() == self::field_descriptor::Label::REQUIRED
-    }
-    fn is_optional(&self) -> bool {
-        self.label() == self::field_descriptor::Label::OPTIONAL
-    }
-    fn is_repeated(&self) -> bool {
-        self.label() == self::field_descriptor::Label::REPEATED
-    }
-    fn is_packable(&self) -> bool {
-        self.is_repeated() && todo!()
-    }
-    fn is_packed(&self) -> bool {
-        todo!()
-    }
-    fn is_map(&self) -> bool;
-    fn has_optional_keyword(&self) -> bool;
-    fn has_presense(&self) -> bool;
 }
 
 pub mod field_descriptor {
@@ -113,57 +54,31 @@ pub mod field_descriptor {
     }
 }
 
-pub trait EnumDescriptor {
-    fn name(&self) -> &str;
-    fn full_name(&self) -> &str;
-    fn index(&self) -> usize;
-    fn file(&self) -> &impl FileDescriptor;
-    fn values(&self) -> impl IntoIterator<Item = &impl EnumValueDescriptor>;
-    fn containing_type(&self) -> &impl Descriptor;
-}
-
-pub trait EnumValueDescriptor {
-    fn name(&self) -> &str;
-    fn full_name(&self) -> &str;
-    fn index(&self) -> usize;
-    fn number(&self) -> i32;
-    fn file(&self) -> &impl FileDescriptor;
-    fn type_(&self) -> &impl EnumDescriptor;
-}
-
-pub trait OneofDescriptor {
-    fn name(&self) -> &str;
-    fn full_name(&self) -> &str;
-    fn index(&self) -> usize;
-    fn is_synthetic(&self) -> bool;
-    fn file(&self) -> &impl FileDescriptor;
-    fn containing_type(&self) -> &impl Descriptor;
-    fn fields(&self) -> impl IntoIterator<Item = &impl FieldDescriptor>;
-}
-
 /// Structs for the each descriptor types.
 /// These structs are strictly read-only and only knows about its children, not parent.
-/// These structs does not directly impl the traits above.
 
+#[derive(Debug, Clone)]
 pub struct FileDescriptorStruct {
     pub name: Cow<'static, str>,
     pub package: Cow<'static, str>,
-    pub dependency_indices: Vec<usize>,
-    pub message_types: Vec<DescriptorStruct>,
-    pub enum_types: Vec<EnumDescriptorStruct>,
+    pub dependency_indices: Cow<'static, [usize]>,
+    pub message_types: Cow<'static, [DescriptorStruct]>,
+    pub enum_types: Cow<'static, [EnumDescriptorStruct]>,
     pub syntax: Cow<'static, str>,
     pub edition: Edition,
 }
 
+#[derive(Debug, Clone)]
 pub struct DescriptorStruct {
     pub name: Cow<'static, str>,
     pub full_name: Cow<'static, str>,
-    pub fields: Vec<FieldDescriptorStruct>,
-    pub oneof_decls: Vec<OneofDescriptorStruct>,
-    pub nested_types: Vec<DescriptorStruct>,
-    pub enum_types: Vec<EnumDescriptorStruct>,
+    pub fields: Cow<'static, [FieldDescriptorStruct]>,
+    pub oneof_decls: Cow<'static, [OneofDescriptorStruct]>,
+    pub nested_types: Cow<'static, [DescriptorStruct]>,
+    pub enum_types: Cow<'static, [EnumDescriptorStruct]>,
 }
 
+#[derive(Debug, Clone)]
 pub struct FieldDescriptorStruct {
     pub name: Cow<'static, str>,
     pub number: i32,
@@ -172,25 +87,26 @@ pub struct FieldDescriptorStruct {
     pub label: self::field_descriptor::Label,
 }
 
+#[derive(Debug, Clone)]
 pub struct EnumDescriptorStruct {
     pub name: Cow<'static, str>,
-    pub values: Vec<EnumValueDescriptorStruct>,
+    pub values: Cow<'static, [EnumValueDescriptorStruct]>,
 }
 
+#[derive(Debug, Clone)]
 pub struct EnumValueDescriptorStruct {
     pub name: Cow<'static, str>,
     pub number: i32,
 }
 
+#[derive(Debug, Clone)]
 pub struct OneofDescriptorStruct {
     pub name: Cow<'static, str>,
-    pub field_indices: Vec<usize>,
+    pub field_indices: Cow<'static, [usize]>,
 }
 
 /// The struct types with the "context".
 /// The context here means the path from the root of the descriptor tree to the current node.
-/// These contexted structs implements the descriptor traits above,
-/// and they can be converted from the raw struct types above.
 
 pub struct Context {
     files: Vec<FileDescriptorStruct>,
@@ -219,7 +135,7 @@ impl Context {
     fn file_from_index(&self, index: usize) -> FileDescriptorWithContext {
         FileDescriptorWithContext {
             root: self,
-            file: &self.files[index],
+            body: &self.files[index],
             dependencies: Default::default(),
         }
     }
@@ -227,67 +143,64 @@ impl Context {
 
 pub struct FileDescriptorWithContext<'a> {
     root: &'a Context,
-    file: &'a FileDescriptorStruct,
+    body: &'a FileDescriptorStruct,
     dependencies: OnceCell<Vec<FileDescriptorWithContext<'a>>>,
+    messages: OnceCell<Vec<DescriptorWithContext<'a>>>,
+    enums: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
 }
 
-impl FileDescriptor for FileDescriptorWithContext<'_> {
+impl<'a> FileDescriptorWithContext<'a> {
     fn name(&self) -> &str {
-        &self.file.name
+        &self.body.name
     }
     fn package(&self) -> &str {
-        &self.file.package
+        &self.body.package
     }
-    fn dependencies(&self) -> impl IntoIterator<Item = &impl FileDescriptor> {
+    fn dependencies(&'a self) -> impl 'a + IntoIterator<Item = &FileDescriptorWithContext> {
         self.dependencies.get_or_init(|| {
-            self.file
+            self.body
                 .dependency_indices
                 .iter()
                 .map(|&i| self.root.file_from_index(i))
                 .collect()
         })
     }
-    fn message_types(&self) -> impl IntoIterator<Item = &impl Descriptor> {
-        todo!()
+    fn messages(&'a self) -> impl 'a + IntoIterator<Item = &DescriptorWithContext<'a>> {
+        self.messages.get_or_init(|| {
+            self.body
+                .message_types
+                .iter()
+                .map(|m| DescriptorWithContext {
+                    file: self,
+                    maybe_nested: None,
+                    body: m,
+                })
+                .collect()
+        })
     }
-
-    fn enum_types(&self) -> impl IntoIterator<Item = &impl EnumDescriptor> {
-        todo!()
+    fn enums(&'a self) -> impl 'a + IntoIterator<Item = &EnumDescriptorWithContext<'a>> {
+        self.enums.get_or_init(|| {
+            self.body
+                .enum_types
+                .iter()
+                .map(|e| EnumDescriptorWithContext {
+                    root: self.root,
+                    file: self.body,
+                    descriptor: e,
+                })
+                .collect()
+        })
     }
 }
 
 pub struct DescriptorWithContext<'a> {
+    file: &'a FileDescriptorWithContext<'a>,
+    maybe_nested: Option<&'a DescriptorWithContext<'a>>,
+    body: &'a DescriptorStruct,
+}
+
+pub struct EnumDescriptorWithContext<'a> {
     root: &'a Context,
     file: &'a FileDescriptorStruct,
-    descriptor: &'a DescriptorStruct,
-}
-impl Descriptor for DescriptorWithContext<'_> {
-    fn name(&self) -> &str {
-        &self.descriptor.name
-    }
-    fn full_name(&self) -> &str {
-        todo!()
-    }
-    fn index(&self) -> usize {
-        todo!()
-    }
-    fn file(&self) -> &impl FileDescriptor {}
-    fn containing_type(&self) -> Option<&impl Descriptor> {
-        todo!()
-    }
-    fn fields(&self) -> impl IntoIterator<Item = &impl FieldDescriptor> {
-        todo!()
-    }
-    fn oneof_decls(&self) -> impl IntoIterator<Item = &impl OneofDescriptor> {
-        todo!()
-    }
-    fn real_oneof_decls(&self) -> impl IntoIterator<Item = &impl OneofDescriptor> {
-        todo!()
-    }
-    fn nested_types(&self) -> impl IntoIterator<Item = &impl Descriptor> {
-        todo!()
-    }
-    fn enum_types(&self) -> impl IntoIterator<Item = &impl EnumDescriptor> {
-        todo!()
-    }
+    descriptor: &'a EnumDescriptorStruct,
 }
