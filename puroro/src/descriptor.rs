@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::Result;
 use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
-use std::sync::Once;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Edition {
@@ -133,15 +133,15 @@ impl<const N: usize> From<[FileDescriptor; N]> for Context {
     }
 }
 impl Context {
-    fn files(&self) -> impl IntoIterator<Item = FileDescriptorWithContext> {
+    fn files(&self) -> impl IntoIterator<Item = Result<FileDescriptorWithContext>> {
         (0..(self.files.len())).map(move |i| self.file_from_index(i))
     }
-    fn file_from_index(&self, index: usize) -> FileDescriptorWithContext {
-        FileDescriptorWithContext {
+    fn file_from_index(&self, index: usize) -> Result<FileDescriptorWithContext> {
+        Ok(FileDescriptorWithContext {
             root: self,
             body: &self.files[index],
             cache: Default::default(),
-        }
+        })
     }
 }
 
@@ -159,14 +159,14 @@ pub struct FileDescriptorCache<'a> {
 }
 
 impl<'a> FileDescriptorWithContext<'a> {
-    fn name(&self) -> &str {
-        &self.body.name
+    fn name(&self) -> Result<&str> {
+        Ok(&self.body.name)
     }
-    fn package(&self) -> &str {
-        &self.body.package
+    fn package(&self) -> Result<&str> {
+        Ok(&self.body.package)
     }
-    fn dependencies(&'a self) -> impl 'a + IntoIterator<Item = &FileDescriptorWithContext> {
-        self.cache.dependencies.get_or_init(|| {
+    fn dependencies(&'a self) -> Result<impl 'a + IntoIterator<Item = &FileDescriptorWithContext>> {
+        self.cache.dependencies.get_or_try_init(|| {
             self.body
                 .dependency_indices
                 .iter()
@@ -174,30 +174,34 @@ impl<'a> FileDescriptorWithContext<'a> {
                 .collect()
         })
     }
-    fn messages(&'a self) -> impl 'a + IntoIterator<Item = &DescriptorWithContext<'a>> {
-        self.cache.messages.get_or_init(|| {
+    fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+        self.cache.messages.get_or_try_init(|| {
             self.body
                 .message_types
                 .iter()
-                .map(|m| DescriptorWithContext {
-                    file: self,
-                    maybe_nested: None,
-                    body: m,
-                    cache: Default::default(),
+                .map(|m| {
+                    Ok(DescriptorWithContext {
+                        file: self,
+                        maybe_containing: None,
+                        body: m,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
     }
-    fn enums(&'a self) -> impl 'a + IntoIterator<Item = &EnumDescriptorWithContext<'a>> {
-        self.cache.enums.get_or_init(|| {
+    fn enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+        self.cache.enums.get_or_try_init(|| {
             self.body
                 .enum_types
                 .iter()
-                .map(|e| EnumDescriptorWithContext {
-                    file: self.body,
-                    maybe_nested: None,
-                    body: e,
-                    cache: Default::default(),
+                .map(|e| {
+                    Ok(EnumDescriptorWithContext {
+                        file: self,
+                        maybe_containing: None,
+                        body: e,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
@@ -206,7 +210,7 @@ impl<'a> FileDescriptorWithContext<'a> {
 
 pub struct DescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
-    maybe_nested: Option<&'a DescriptorWithContext<'a>>,
+    maybe_containing: Option<&'a DescriptorWithContext<'a>>,
     body: &'a Descriptor,
     cache: DescriptorCache<'a>,
 }
@@ -222,87 +226,102 @@ pub struct DescriptorCache<'a> {
 }
 
 impl<'a> DescriptorWithContext<'a> {
-    fn name(&self) -> &str {
-        &self.body.name
+    fn name(&self) -> Result<&str> {
+        Ok(&self.body.name)
     }
-    fn full_name(&self) -> &str {
-        self.cache.full_name.get_or_init(|| {
-            let mut full_name = if let Some(nested) = self.maybe_nested {
-                nested.full_name().to_string()
-            } else {
-                self.file.package().to_string()
-            };
-            full_name.push('.');
-            full_name.push_str(&self.body.name);
-            full_name
-        })
+    fn full_name(&self) -> Result<&str> {
+        self.cache
+            .full_name
+            .get_or_try_init(|| {
+                let mut full_name = if let Some(nested) = self.maybe_containing {
+                    nested.full_name()?.to_string()
+                } else {
+                    self.file.package()?.to_string()
+                };
+                if !full_name.is_empty() {
+                    full_name.push('.');
+                }
+                full_name.push_str(&self.body.name);
+                Ok(full_name)
+            })
+            .map(|s| s.as_str())
     }
-    fn file(&self) -> &FileDescriptorWithContext<'a> {
-        self.file
+    fn file(&'a self) -> Result<&FileDescriptorWithContext> {
+        Ok(self.file)
     }
-    fn fields(&'a self) -> impl 'a + IntoIterator<Item = &FieldDescriptorWithContext<'a>> {
-        self.cache.fields.get_or_init(|| {
+    fn fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+        self.cache.fields.get_or_try_init(|| {
             self.body
                 .fields
                 .iter()
-                .map(|f| FieldDescriptorWithContext {
-                    message: self,
-                    body: f,
-                    cache: Default::default(),
+                .map(|f| {
+                    Ok(FieldDescriptorWithContext {
+                        message: self,
+                        body: f,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
     }
-    fn oneofs(&'a self) -> impl 'a + IntoIterator<Item = &OneofDescriptorWithContext<'a>> {
-        self.cache.oneofs.get_or_init(|| {
+    fn oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+        self.cache.oneofs.get_or_try_init(|| {
             self.body
                 .oneof_decls
                 .iter()
-                .map(|o| OneofDescriptorWithContext {
-                    message: self,
-                    body: o,
-                    cache: Default::default(),
+                .map(|o| {
+                    Ok(OneofDescriptorWithContext {
+                        message: self,
+                        body: o,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
     }
-    fn real_oneofs(&'a self) -> impl 'a + IntoIterator<Item = &OneofDescriptorWithContext<'a>> {
-        self.cache.real_oneofs.get_or_init(|| {
+    fn real_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+        self.cache.real_oneofs.get_or_try_init(|| {
             self.body
                 .oneof_decls
                 .iter()
-                .map(|o| OneofDescriptorWithContext {
-                    message: self,
-                    body: o,
-                    cache: Default::default(),
+                .map(|o| {
+                    Ok(OneofDescriptorWithContext {
+                        message: self,
+                        body: o,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
     }
-    fn nested_types(&'a self) -> impl 'a + IntoIterator<Item = &DescriptorWithContext<'a>> {
-        self.cache.nested_types.get_or_init(|| {
+    fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+        self.cache.nested_types.get_or_try_init(|| {
             self.body
                 .nested_types
                 .iter()
-                .map(|m| DescriptorWithContext {
-                    file: self.file,
-                    maybe_nested: Some(self),
-                    body: m,
-                    cache: Default::default(),
+                .map(|m| {
+                    Ok(DescriptorWithContext {
+                        file: self.file,
+                        maybe_containing: Some(self),
+                        body: m,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
     }
-    fn enum_types(&'a self) -> impl 'a + IntoIterator<Item = &EnumDescriptorWithContext<'a>> {
-        self.cache.enum_types.get_or_init(|| {
+    fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+        self.cache.enum_types.get_or_try_init(|| {
             self.body
                 .enum_types
                 .iter()
-                .map(|e| EnumDescriptorWithContext {
-                    file: self.file.body,
-                    maybe_nested: Some(self),
-                    body: e,
-                    cache: Default::default(),
+                .map(|e| {
+                    Ok(EnumDescriptorWithContext {
+                        file: self.file,
+                        maybe_containing: Some(self),
+                        body: e,
+                        cache: Default::default(),
+                    })
                 })
                 .collect()
         })
@@ -310,15 +329,57 @@ impl<'a> DescriptorWithContext<'a> {
 }
 
 pub struct EnumDescriptorWithContext<'a> {
-    file: &'a FileDescriptor,
-    maybe_nested: Option<&'a DescriptorWithContext<'a>>,
+    file: &'a FileDescriptorWithContext<'a>,
+    maybe_containing: Option<&'a DescriptorWithContext<'a>>,
     body: &'a EnumDescriptor,
     cache: EnumDescriptorCache<'a>,
 }
 
 #[derive(Default)]
 pub struct EnumDescriptorCache<'a> {
+    full_name: OnceCell<String>,
     values: OnceCell<Vec<EnumValuesDescriptorWithContext<'a>>>,
+}
+
+impl<'a> EnumDescriptorWithContext<'a> {
+    fn name(&self) -> Result<&str> {
+        Ok(self.body.name.as_ref())
+    }
+    fn full_name(&self) -> Result<&str> {
+        self.cache
+            .full_name
+            .get_or_try_init(|| {
+                let mut full_name = if let Some(nested) = self.maybe_containing {
+                    nested.full_name()?.to_string()
+                } else {
+                    self.file.package()?.to_string()
+                };
+                if !full_name.is_empty() {
+                    full_name.push('.');
+                }
+                full_name.push_str(&self.body.name);
+                Ok(full_name)
+            })
+            .map(|s| s.as_str())
+    }
+    fn file(&'a self) -> Result<&FileDescriptorWithContext> {
+        Ok(self.file)
+    }
+    fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValuesDescriptorWithContext>> {
+        self.cache.values.get_or_try_init(|| {
+            self.body
+                .values
+                .iter()
+                .map(|v| {
+                    Ok(EnumValuesDescriptorWithContext {
+                        enum_: self,
+                        body: v,
+                        cache: Default::default(),
+                    })
+                })
+                .collect()
+        })
+    }
 }
 
 pub struct EnumValuesDescriptorWithContext<'a> {
@@ -341,6 +402,20 @@ pub struct FieldDescriptorWithContext<'a> {
 pub struct FieldDescriptorCache {
     full_name: OnceCell<String>,
     type_: OnceCell<()>,
+}
+
+impl<'a> FieldDescriptorWithContext<'a> {
+    fn name(&self) -> &str {
+        &self.body.name
+    }
+    fn full_name(&self) -> &str {
+        self.cache.full_name.get_or_init(|| {
+            let mut full_name = self.message.full_name().to_string();
+            full_name.push('.');
+            full_name.push_str(&self.body.name);
+            full_name
+        })
+    }
 }
 
 pub struct OneofDescriptorWithContext<'a> {

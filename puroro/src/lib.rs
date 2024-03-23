@@ -16,10 +16,11 @@
 #![feature(slice_as_chunks)]
 #![feature(assert_matches)]
 #![feature(lazy_cell)]
+#![feature(once_cell_try)]
 
+pub mod descriptor;
 pub mod internal;
 pub mod message;
-pub mod descriptor;
 
 use ::thiserror::Error;
 
@@ -39,6 +40,8 @@ pub enum ErrorKind {
     UnknownWireType,
     #[error("Unexpected EOF detected while deserializing")]
     DeserUnexpectedEof,
+    #[error("Error while constructing a descriptor tree structure. %s")]
+    DescriptorStructureError(String),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
