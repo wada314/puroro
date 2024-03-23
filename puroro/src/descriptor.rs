@@ -14,6 +14,7 @@
 
 use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
+use std::sync::Once;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Edition {
@@ -58,28 +59,28 @@ pub mod field_descriptor {
 /// These structs are strictly read-only and only knows about its children, not parent.
 
 #[derive(Debug, Clone)]
-pub struct FileDescriptorStruct {
+pub struct FileDescriptor {
     pub name: Cow<'static, str>,
     pub package: Cow<'static, str>,
     pub dependency_indices: Cow<'static, [usize]>,
-    pub message_types: Cow<'static, [DescriptorStruct]>,
-    pub enum_types: Cow<'static, [EnumDescriptorStruct]>,
+    pub message_types: Cow<'static, [Descriptor]>,
+    pub enum_types: Cow<'static, [EnumDescriptor]>,
     pub syntax: Cow<'static, str>,
     pub edition: Edition,
 }
 
 #[derive(Debug, Clone)]
-pub struct DescriptorStruct {
+pub struct Descriptor {
     pub name: Cow<'static, str>,
     pub full_name: Cow<'static, str>,
-    pub fields: Cow<'static, [FieldDescriptorStruct]>,
-    pub oneof_decls: Cow<'static, [OneofDescriptorStruct]>,
-    pub nested_types: Cow<'static, [DescriptorStruct]>,
-    pub enum_types: Cow<'static, [EnumDescriptorStruct]>,
+    pub fields: Cow<'static, [FieldDescriptor]>,
+    pub oneof_decls: Cow<'static, [OneofDescriptor]>,
+    pub nested_types: Cow<'static, [Descriptor]>,
+    pub enum_types: Cow<'static, [EnumDescriptor]>,
 }
 
 #[derive(Debug, Clone)]
-pub struct FieldDescriptorStruct {
+pub struct FieldDescriptor {
     pub name: Cow<'static, str>,
     pub number: i32,
     pub type_: self::field_descriptor::Type,
@@ -88,19 +89,19 @@ pub struct FieldDescriptorStruct {
 }
 
 #[derive(Debug, Clone)]
-pub struct EnumDescriptorStruct {
+pub struct EnumDescriptor {
     pub name: Cow<'static, str>,
-    pub values: Cow<'static, [EnumValueDescriptorStruct]>,
+    pub values: Cow<'static, [EnumValueDescriptor]>,
 }
 
 #[derive(Debug, Clone)]
-pub struct EnumValueDescriptorStruct {
+pub struct EnumValueDescriptor {
     pub name: Cow<'static, str>,
     pub number: i32,
 }
 
 #[derive(Debug, Clone)]
-pub struct OneofDescriptorStruct {
+pub struct OneofDescriptor {
     pub name: Cow<'static, str>,
     pub field_indices: Cow<'static, [usize]>,
 }
@@ -109,20 +110,20 @@ pub struct OneofDescriptorStruct {
 /// The context here means the path from the root of the descriptor tree to the current node.
 
 pub struct Context {
-    files: Vec<FileDescriptorStruct>,
+    files: Vec<FileDescriptor>,
 }
-impl From<FileDescriptorStruct> for Context {
-    fn from(f: FileDescriptorStruct) -> Self {
+impl From<FileDescriptor> for Context {
+    fn from(f: FileDescriptor) -> Self {
         Self { files: vec![f] }
     }
 }
-impl From<Vec<FileDescriptorStruct>> for Context {
-    fn from(files: Vec<FileDescriptorStruct>) -> Self {
+impl From<Vec<FileDescriptor>> for Context {
+    fn from(files: Vec<FileDescriptor>) -> Self {
         Self { files }
     }
 }
-impl<const N: usize> From<[FileDescriptorStruct; N]> for Context {
-    fn from(files: [FileDescriptorStruct; N]) -> Self {
+impl<const N: usize> From<[FileDescriptor; N]> for Context {
+    fn from(files: [FileDescriptor; N]) -> Self {
         Self {
             files: files.into(),
         }
@@ -136,14 +137,19 @@ impl Context {
         FileDescriptorWithContext {
             root: self,
             body: &self.files[index],
-            dependencies: Default::default(),
+            cache: Default::default(),
         }
     }
 }
 
 pub struct FileDescriptorWithContext<'a> {
     root: &'a Context,
-    body: &'a FileDescriptorStruct,
+    body: &'a FileDescriptor,
+    cache: FileDescriptorCache<'a>,
+}
+
+#[derive(Default)]
+pub struct FileDescriptorCache<'a> {
     dependencies: OnceCell<Vec<FileDescriptorWithContext<'a>>>,
     messages: OnceCell<Vec<DescriptorWithContext<'a>>>,
     enums: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
@@ -157,7 +163,7 @@ impl<'a> FileDescriptorWithContext<'a> {
         &self.body.package
     }
     fn dependencies(&'a self) -> impl 'a + IntoIterator<Item = &FileDescriptorWithContext> {
-        self.dependencies.get_or_init(|| {
+        self.cache.dependencies.get_or_init(|| {
             self.body
                 .dependency_indices
                 .iter()
@@ -166,7 +172,7 @@ impl<'a> FileDescriptorWithContext<'a> {
         })
     }
     fn messages(&'a self) -> impl 'a + IntoIterator<Item = &DescriptorWithContext<'a>> {
-        self.messages.get_or_init(|| {
+        self.cache.messages.get_or_init(|| {
             self.body
                 .message_types
                 .iter()
@@ -174,19 +180,25 @@ impl<'a> FileDescriptorWithContext<'a> {
                     file: self,
                     maybe_nested: None,
                     body: m,
+                    full_name: Default::default(),
+                    fields: Default::default(),
+                    oneofs: Default::default(),
+                    real_oneofs: Default::default(),
+                    nested_types: Default::default(),
+                    enum_types: Default::default(),
                 })
                 .collect()
         })
     }
     fn enums(&'a self) -> impl 'a + IntoIterator<Item = &EnumDescriptorWithContext<'a>> {
-        self.enums.get_or_init(|| {
+        self.cache.enums.get_or_init(|| {
             self.body
                 .enum_types
                 .iter()
                 .map(|e| EnumDescriptorWithContext {
-                    root: self.root,
                     file: self.body,
-                    descriptor: e,
+                    maybe_nested: None,
+                    body: e,
                 })
                 .collect()
         })
@@ -196,11 +208,144 @@ impl<'a> FileDescriptorWithContext<'a> {
 pub struct DescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
     maybe_nested: Option<&'a DescriptorWithContext<'a>>,
-    body: &'a DescriptorStruct,
+    body: &'a Descriptor,
+    cache: DescriptorCache<'a>,
+}
+
+#[derive(Default)]
+pub struct DescriptorCache<'a> {
+    full_name: OnceCell<String>,
+    fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
+    oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
+    real_oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
+    nested_types: OnceCell<Vec<DescriptorWithContext<'a>>>,
+    enum_types: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
+}
+
+impl<'a> DescriptorWithContext<'a> {
+    fn name(&self) -> &str {
+        &self.body.name
+    }
+    fn full_name(&self) -> &str {
+        self.cache.full_name.get_or_init(|| {
+            let mut full_name = if let Some(nested) = self.maybe_nested {
+                nested.full_name().to_string()
+            } else {
+                self.file.package().to_string()
+            };
+            full_name.push('.');
+            full_name.push_str(&self.body.name);
+            full_name
+        })
+    }
+    fn file(&self) -> &FileDescriptorWithContext<'a> {
+        self.file
+    }
+    fn fields(&'a self) -> impl 'a + IntoIterator<Item = &FieldDescriptorWithContext<'a>> {
+        self.cache.fields.get_or_init(|| {
+            self.body
+                .fields
+                .iter()
+                .map(|f| FieldDescriptorWithContext {
+                    message: self,
+                    body: f,
+                })
+                .collect()
+        })
+    }
+    fn oneofs(&'a self) -> impl 'a + IntoIterator<Item = &OneofDescriptorWithContext<'a>> {
+        self.cache.oneofs.get_or_init(|| {
+            self.body
+                .oneof_decls
+                .iter()
+                .map(|o| OneofDescriptorWithContext {
+                    message: self,
+                    body: o,
+                })
+                .collect()
+        })
+    }
+    fn real_oneofs(&'a self) -> impl 'a + IntoIterator<Item = &OneofDescriptorWithContext<'a>> {
+        self.cache.real_oneofs.get_or_init(|| {
+            self.body
+                .oneof_decls
+                .iter()
+                .map(|o| OneofDescriptorWithContext {
+                    message: self,
+                    body: o,
+                })
+                .collect()
+        })
+    }
+    fn nested_types(&'a self) -> impl 'a + IntoIterator<Item = &DescriptorWithContext<'a>> {
+        self.cache.nested_types.get_or_init(|| {
+            self.body
+                .nested_types
+                .iter()
+                .map(|m| DescriptorWithContext {
+                    file: self.file,
+                    maybe_nested: Some(self),
+                    body: m,
+                    cache: Default::default(),
+                })
+                .collect()
+        })
+    }
+    fn enum_types(&'a self) -> impl 'a + IntoIterator<Item = &EnumDescriptorWithContext<'a>> {
+        self.cache.enum_types.get_or_init(|| {
+            self.body
+                .enum_types
+                .iter()
+                .map(|e| EnumDescriptorWithContext {
+                    file: self.file.body,
+                    maybe_nested: Some(self),
+                    body: e,
+                    cache: Default::default(),
+                })
+                .collect()
+        })
+    }
 }
 
 pub struct EnumDescriptorWithContext<'a> {
-    root: &'a Context,
-    file: &'a FileDescriptorStruct,
-    descriptor: &'a EnumDescriptorStruct,
+    file: &'a FileDescriptor,
+    maybe_nested: Option<&'a DescriptorWithContext<'a>>,
+    body: &'a EnumDescriptor,
+    cache: EnumDescriptorCache<'a>,
 }
+
+#[derive(Default)]
+pub struct EnumDescriptorCache<'a> {
+    values: OnceCell<Vec<EnumValuesDescriptorWithContext<'a>>>,
+}
+
+pub struct EnumValuesDescriptorWithContext<'a> {
+    enum_: &'a EnumDescriptorWithContext<'a>,
+    body: &'a EnumValueDescriptor,
+    cache: EnumValuesDescriptorCache,
+}
+#[derive(Default)]
+pub struct EnumValuesDescriptorCache {
+    full_name: OnceCell<String>,
+}
+
+pub struct FieldDescriptorWithContext<'a> {
+    message: &'a DescriptorWithContext<'a>,
+    body: &'a FieldDescriptor,
+    cache: FieldDescriptorCache,
+}
+
+#[derive(Default)]
+pub struct FieldDescriptorCache {
+    full_name: OnceCell<String>,
+    type_: OnceCell<()>,
+}
+
+pub struct OneofDescriptorWithContext<'a> {
+    message: &'a DescriptorWithContext<'a>,
+    body: &'a OneofDescriptor,
+    cache: OneofDescriptorCache,
+}
+
+#[derive(Default)]
+pub struct OneofDescriptorCache {}
