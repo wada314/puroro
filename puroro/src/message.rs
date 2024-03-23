@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use ::futures::io::{AsyncRead, AsyncWrite};
-use ::std::alloc::{Allocator, GlobalAlloc};
 use ::std::borrow::Cow;
 
 pub trait MessageLite {}
@@ -66,6 +65,11 @@ pub mod field_descriptor {
     }
 }
 
+pub trait EnumDescriptor {
+    fn name(&self) -> &str;
+    fn value(&self) -> i32;
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldDescriptorImpl<'a> {
     name: Cow<'a, str>,
@@ -82,4 +86,10 @@ impl FieldDescriptor for FieldDescriptorImpl<'_> {
     fn label(&self) -> field_descriptor::Label {
         self.label
     }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EnumDescriptorImpl<'a> {
+    name: Cow<'a, str>,
+    value: i32,
 }
