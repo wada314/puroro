@@ -16,8 +16,8 @@ use ::futures::io::{AsyncRead, AsyncWrite};
 
 pub trait MessageLite {}
 pub trait Message: MessageLite {}
-pub trait ReadableMessage: Message {}
-pub trait AppendableMessage: Message {}
+pub trait ReadableMessage: MessageLite {}
+pub trait AppendableMessage: MessageLite {}
 pub trait MutableMessage: AppendableMessage {}
 pub trait AsyncReadableMessage: ReadableMessage {}
 pub trait AsyncDeserializableMessage: ReadableMessage {
@@ -25,4 +25,10 @@ pub trait AsyncDeserializableMessage: ReadableMessage {
 }
 pub trait AsyncSerializableMessage {
     fn async_ser(&self, write: impl AsyncWrite) -> impl '_ + AppendableMessage;
+}
+
+pub trait Field {}
+
+pub struct FieldDescriptor {
+    
 }
