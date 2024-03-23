@@ -14,14 +14,15 @@
 
 use ::futures::io::{AsyncRead, AsyncWrite};
 
-pub trait TheMessage {}
-pub trait TheReadableMessage: TheMessage {}
-pub trait TheAppendableMessage: TheMessage {}
-pub trait TheMutableMessage: TheAppendableMessage {}
-pub trait TheAsyncReadableMessage: TheReadableMessage {}
-pub trait TheAsyncDeserializableMessage: TheReadableMessage {
-    fn async_deser(&mut self, read: impl AsyncRead) -> impl '_ + TheAsyncReadableMessage;
+pub trait MessageLite {}
+pub trait Message: MessageLite {}
+pub trait ReadableMessage: Message {}
+pub trait AppendableMessage: Message {}
+pub trait MutableMessage: AppendableMessage {}
+pub trait AsyncReadableMessage: ReadableMessage {}
+pub trait AsyncDeserializableMessage: ReadableMessage {
+    fn async_deser(&mut self, read: impl AsyncRead) -> impl '_ + AsyncReadableMessage;
 }
-pub trait TheAsyncSerializableMessage {
-    fn async_ser(&self, write: impl AsyncWrite) -> impl '_ + TheAppendableMessage;
+pub trait AsyncSerializableMessage {
+    fn async_ser(&self, write: impl AsyncWrite) -> impl '_ + AppendableMessage;
 }
