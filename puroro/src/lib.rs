@@ -18,6 +18,7 @@
 #![feature(lazy_cell)]
 
 pub mod internal;
+pub mod message;
 
 use ::thiserror::Error;
 
