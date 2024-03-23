@@ -48,8 +48,9 @@ pub trait AsyncDeseringMessage<A: Allocator>: DeseringMessage {
     ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>;
 }
 
-pub trait TheReadableMessage {}
-pub trait TheAppendableMessage: TheReadableMessage {}
+pub trait TheMessage {}
+pub trait TheReadableMessage: TheMessage {}
+pub trait TheAppendableMessage: TheMessage {}
 pub trait TheMutableMessage: TheAppendableMessage {}
 pub trait TheAsyncReadableMessage: TheReadableMessage {}
 pub trait TheAsyncDeserializableMessage: TheReadableMessage {
