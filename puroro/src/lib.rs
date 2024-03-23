@@ -19,6 +19,7 @@
 
 pub mod internal;
 pub mod message;
+pub mod descriptor;
 
 use ::thiserror::Error;
 
