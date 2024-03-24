@@ -26,36 +26,35 @@ pub enum Edition {
     Edition2024,
 }
 
-pub mod field_descriptor {
-    #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
-    pub enum Type {
-        DOUBLE,
-        FLOAT,
-        INT64,
-        UINT64,
-        #[default]
-        INT32,
-        FIXED64,
-        FIXED32,
-        BOOL,
-        STRING,
-        GROUP,
-        MESSAGE,
-        BYTES,
-        UINT32,
-        ENUM,
-        SFIXED32,
-        SFIXED64,
-        SINT32,
-        SINT64,
-    }
-    #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
-    pub enum Label {
-        #[default]
-        OPTIONAL,
-        REQUIRED,
-        REPEATED,
-    }
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
+pub enum FieldType {
+    DOUBLE,
+    FLOAT,
+    INT64,
+    UINT64,
+    #[default]
+    INT32,
+    FIXED64,
+    FIXED32,
+    BOOL,
+    STRING,
+    GROUP,
+    MESSAGE,
+    BYTES,
+    UINT32,
+    ENUM,
+    SFIXED32,
+    SFIXED64,
+    SINT32,
+    SINT64,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
+pub enum FieldLabel {
+    #[default]
+    OPTIONAL,
+    REQUIRED,
+    REPEATED,
 }
 
 /// Structs for the each descriptor types.
@@ -86,9 +85,9 @@ pub struct Descriptor {
 pub struct FieldDescriptor {
     pub name: Cow<'static, str>,
     pub number: i32,
-    pub type_: self::field_descriptor::Type,
+    pub type_: FieldType,
     pub type_name: Cow<'static, str>,
-    pub label: self::field_descriptor::Label,
+    pub label: FieldLabel,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -338,7 +337,7 @@ pub struct EnumDescriptorWithContext<'a> {
 #[derive(Default)]
 pub struct EnumDescriptorCache<'a> {
     full_name: OnceCell<String>,
-    values: OnceCell<Vec<EnumValuesDescriptorWithContext<'a>>>,
+    values: OnceCell<Vec<EnumValueDescriptorWithContext<'a>>>,
 }
 
 impl<'a> EnumDescriptorWithContext<'a> {
@@ -365,13 +364,13 @@ impl<'a> EnumDescriptorWithContext<'a> {
     fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
     }
-    fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValuesDescriptorWithContext>> {
+    fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptorWithContext>> {
         self.cache.values.get_or_try_init(|| {
             self.body
                 .values
                 .iter()
                 .map(|v| {
-                    Ok(EnumValuesDescriptorWithContext {
+                    Ok(EnumValueDescriptorWithContext {
                         enum_: self,
                         body: v,
                         cache: Default::default(),
@@ -382,14 +381,37 @@ impl<'a> EnumDescriptorWithContext<'a> {
     }
 }
 
-pub struct EnumValuesDescriptorWithContext<'a> {
+pub struct EnumValueDescriptorWithContext<'a> {
     enum_: &'a EnumDescriptorWithContext<'a>,
     body: &'a EnumValueDescriptor,
-    cache: EnumValuesDescriptorCache,
+    cache: EnumValueDescriptorCache,
 }
 #[derive(Default)]
-pub struct EnumValuesDescriptorCache {
+pub struct EnumValueDescriptorCache {
     full_name: OnceCell<String>,
+}
+impl<'a> EnumValueDescriptorWithContext<'a> {
+    fn name(&self) -> Result<&str> {
+        Ok(self.body.name.as_ref())
+    }
+    fn full_name(&self) -> Result<&str> {
+        self.cache
+            .full_name
+            .get_or_try_init(|| {
+                // This full_name is a sibling of EnumDescriptor, not a child.
+                let mut full_name = if let Some(m) = self.enum_.maybe_containing {
+                    m.full_name()?.to_string()
+                } else {
+                    self.enum_.file.package()?.to_string()
+                };
+                if !full_name.is_empty() {
+                    full_name.push('.');
+                }
+                full_name.push_str(&self.body.name);
+                Ok(full_name)
+            })
+            .map(|s| s.as_str())
+    }
 }
 
 pub struct FieldDescriptorWithContext<'a> {
