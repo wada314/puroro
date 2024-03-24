@@ -27,7 +27,7 @@ pub enum Edition {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
-pub enum FieldType {
+enum FieldTypeTemplate<E, M> {
     DOUBLE,
     FLOAT,
     INT64,
@@ -39,15 +39,18 @@ pub enum FieldType {
     BOOL,
     STRING,
     GROUP,
-    MESSAGE,
+    MESSAGE(M),
     BYTES,
     UINT32,
-    ENUM,
+    ENUM(E),
     SFIXED32,
     SFIXED64,
     SINT32,
     SINT64,
 }
+pub type FieldType = FieldTypeTemplate<(), ()>;
+pub type FieldTypeWithConcreteType<'a> =
+    FieldTypeTemplate<&'a EnumDescriptorWithContext<'a>, &'a DescriptorWithContext<'a>>;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldLabel {
