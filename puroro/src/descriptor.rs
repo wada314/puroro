@@ -27,7 +27,7 @@ pub enum Edition {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
-enum FieldTypeTemplate<E, M> {
+pub enum FieldTypeTemplate<E, M> {
     DOUBLE,
     FLOAT,
     INT64,
