@@ -63,7 +63,7 @@ pub enum FieldLabel {
 /// Structs for the each descriptor types.
 /// These structs are strictly read-only and only knows about its children, not parent.
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FileDescriptor {
     pub name: String,
     pub package: String,
@@ -74,7 +74,7 @@ pub struct FileDescriptor {
     pub edition: Edition,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Descriptor {
     pub name: String,
     pub full_name: String,
@@ -84,7 +84,7 @@ pub struct Descriptor {
     pub enum_types: Vec<EnumDescriptor>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FieldDescriptor {
     pub name: String,
     pub number: i32,
@@ -93,19 +93,19 @@ pub struct FieldDescriptor {
     pub label: FieldLabel,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EnumDescriptor {
     pub name: String,
     pub values: Vec<EnumValueDescriptor>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EnumValueDescriptor {
     pub name: String,
     pub number: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OneofDescriptor {
     pub name: String,
     pub field_indices: Vec<usize>,
