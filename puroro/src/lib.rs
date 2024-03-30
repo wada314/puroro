@@ -44,6 +44,8 @@ pub enum ErrorKind {
     DeserUnexpectedEof,
     #[error("Error while constructing a descriptor tree structure. %s")]
     DescriptorStructureError(String),
+    #[error("Error when matching the GenericMessage type's field type.")]
+    GenericMessageFieldTypeError,
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 

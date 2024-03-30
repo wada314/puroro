@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::descriptor::FieldDescriptor;
 use crate::internal::variant::Variant;
-use crate::message::MessageLite;
 use crate::string::String;
 use ::std::alloc::Allocator;
+
+use crate::{ErrorKind, Result};
 
 pub struct GenericMessage<A: Allocator> {
     fields: Vec<Field<A>>,
@@ -25,6 +27,13 @@ pub struct Field<A: Allocator> {
     number: i32,
     name: String<A>,
     records: Vec<WireTypeAndPayload<A>, A>,
+}
+
+trait FieldBody<A: Allocator> {
+    fn as_i32(&self) -> Result<i32>;
+    fn as_opt_i32(&self) -> Result<Option<i32>>;
+    fn as_repeated_i32(&self) -> Result<impl IntoIterator<Item = i32>>;
+    // fn set_descriptor(&mut self, descriptor: &FieldDescriptor) -> Result<()>;
 }
 
 enum WireTypeAndPayload<A: Allocator> {
