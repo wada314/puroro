@@ -14,38 +14,36 @@
 
 use crate::descriptor::FieldDescriptor;
 use crate::internal::variant::Variant;
-use crate::string::String;
-use ::std::alloc::Allocator;
 
 use crate::{ErrorKind, Result};
 
-pub struct GenericMessage<A: Allocator> {
-    fields: Vec<Field<A>>,
+pub struct GenericMessage {
+    fields: Vec<Field>,
 }
 
-impl<A: Allocator> GenericMessage<A> {
+impl GenericMessage {
     fn set_field_descriptor(&mut self, descriptor: &FieldDescriptor) -> Result<()> {
         todo!()
     }
 }
 
-pub struct Field<A: Allocator> {
+pub struct Field {
     number: i32,
-    name: String<A>,
-    records: Vec<WireTypeAndPayload<A>, A>,
+    name: String,
+    records: Vec<WireTypeAndPayload>,
 }
 
-trait FieldBody<A: Allocator> {
+trait FieldBody {
     fn as_i32(&self) -> Result<i32>;
     fn as_opt_i32(&self) -> Result<Option<i32>>;
     fn as_repeated_i32(&self) -> Result<impl IntoIterator<Item = i32>>;
 }
 
-enum WireTypeAndPayload<A: Allocator> {
+enum WireTypeAndPayload {
     Varint(Variant),
     Fixed64([u8; 8]),
     Fixed32([u8; 4]),
-    LengthDelimited(Vec<u8, A>),
+    LengthDelimited(Vec<u8>),
     // StartGroup,
     // EndGroup,
 }
