@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::message::MessageLite;
+use crate::string::String;
 use ::std::alloc::Allocator;
 
 pub struct GenericMessage<A: Allocator> {
@@ -21,5 +22,5 @@ pub struct GenericMessage<A: Allocator> {
 
 pub struct Field<A: Allocator> {
     number: i32,
-    name: Vec<u8, A>,
+    name: String<A>,
 }

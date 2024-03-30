@@ -22,6 +22,7 @@ pub mod descriptor;
 pub mod generic_message;
 pub mod internal;
 pub mod message;
+pub mod string;
 
 use ::thiserror::Error;
 
