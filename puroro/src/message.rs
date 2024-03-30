@@ -14,7 +14,9 @@
 
 use ::futures::io::{AsyncRead, AsyncWrite};
 
+/// Protobuf message, which can be serialized, deserialized, and field accessible.
 pub trait MessageLite {}
+/// [`MessageLite`] + descriptors and reflections.
 pub trait Message: MessageLite {}
 pub trait ReadableMessage: MessageLite {}
 pub trait AppendableMessage: MessageLite {}
