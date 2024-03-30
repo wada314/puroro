@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::string::String;
 use crate::Result;
-use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
 
@@ -66,51 +64,51 @@ pub enum FieldLabel {
 /// These structs are strictly read-only and only knows about its children, not parent.
 
 #[derive(Debug)]
-pub struct FileDescriptor<A: Allocator = Global> {
-    pub name: String<A>,
-    pub package: String<A>,
-    pub dependency_indices: Vec<usize, A>,
-    pub message_types: Vec<Descriptor, A>,
-    pub enum_types: Vec<EnumDescriptor, A>,
-    pub syntax: String<A>,
+pub struct FileDescriptor {
+    pub name: String,
+    pub package: String,
+    pub dependency_indices: Vec<usize>,
+    pub message_types: Vec<Descriptor>,
+    pub enum_types: Vec<EnumDescriptor>,
+    pub syntax: String,
     pub edition: Edition,
 }
 
 #[derive(Debug)]
-pub struct Descriptor<A: Allocator = Global> {
-    pub name: String<A>,
-    pub full_name: String<A>,
-    pub fields: Vec<FieldDescriptor, A>,
-    pub oneof_decls: Vec<OneofDescriptor, A>,
-    pub nested_types: Vec<Descriptor, A>,
-    pub enum_types: Vec<EnumDescriptor, A>,
+pub struct Descriptor {
+    pub name: String,
+    pub full_name: String,
+    pub fields: Vec<FieldDescriptor>,
+    pub oneof_decls: Vec<OneofDescriptor>,
+    pub nested_types: Vec<Descriptor>,
+    pub enum_types: Vec<EnumDescriptor>,
 }
 
 #[derive(Debug)]
-pub struct FieldDescriptor<A: Allocator = Global> {
-    pub name: String<A>,
+pub struct FieldDescriptor {
+    pub name: String,
     pub number: i32,
     pub type_: FieldType,
-    pub type_name: String<A>,
+    pub type_name: String,
     pub label: FieldLabel,
 }
 
 #[derive(Debug)]
-pub struct EnumDescriptor<A: Allocator = Global> {
-    pub name: String<A>,
-    pub values: Vec<EnumValueDescriptor, A>,
+pub struct EnumDescriptor {
+    pub name: String,
+    pub values: Vec<EnumValueDescriptor>,
 }
 
 #[derive(Debug)]
-pub struct EnumValueDescriptor<A: Allocator = Global> {
-    pub name: String<A>,
+pub struct EnumValueDescriptor {
+    pub name: String,
     pub number: i32,
 }
 
 #[derive(Debug)]
-pub struct OneofDescriptor<A: Allocator = Global> {
-    pub name: String<A>,
-    pub field_indices: Vec<usize, A>,
+pub struct OneofDescriptor {
+    pub name: String,
+    pub field_indices: Vec<usize>,
 }
 
 /// The struct types with the "context".
