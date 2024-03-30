@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::variant::Variant;
 use crate::message::MessageLite;
 use crate::string::String;
 use ::std::alloc::Allocator;
@@ -23,4 +24,14 @@ pub struct GenericMessage<A: Allocator> {
 pub struct Field<A: Allocator> {
     number: i32,
     name: String<A>,
+    records: Vec<WireTypeAndPayload<A>, A>,
+}
+
+enum WireTypeAndPayload<A: Allocator> {
+    Varint(Variant),
+    Fixed64([u8; 8]),
+    Fixed32([u8; 4]),
+    LengthDelimited(Vec<u8, A>),
+    // StartGroup,
+    // EndGroup,
 }
