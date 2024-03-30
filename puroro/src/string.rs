@@ -16,6 +16,7 @@
 
 use ::std::alloc::{Allocator, Global};
 use ::std::borrow::{Borrow, BorrowMut};
+use ::std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use ::std::ops::{Deref, DerefMut};
 
 #[derive(PartialEq, PartialOrd, Eq, Ord)]
@@ -70,5 +71,28 @@ impl<A: Allocator> DerefMut for String<A> {
 impl Default for String {
     fn default() -> Self {
         Self::new()
+    }
+}
+impl<A: Allocator> Display for String<A> {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        Display::fmt(self.as_ref(), f)
+    }
+}
+impl<A: Allocator> Debug for String<A> {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        Debug::fmt(self.as_ref(), f)
+    }
+}
+
+impl From<::std::string::String> for String<Global> {
+    fn from(s: ::std::string::String) -> Self {
+        Self {
+            vec: s.into_bytes(),
+        }
+    }
+}
+impl From<String<Global>> for ::std::string::String {
+    fn from(s: String<Global>) -> Self {
+        unsafe { ::std::string::String::from_utf8_unchecked(s.vec) }
     }
 }

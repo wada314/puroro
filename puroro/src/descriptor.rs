@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::string::String;
 use crate::Result;
+use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
 
@@ -63,52 +65,52 @@ pub enum FieldLabel {
 /// Structs for the each descriptor types.
 /// These structs are strictly read-only and only knows about its children, not parent.
 
-#[derive(Debug, Clone, Default)]
-pub struct FileDescriptor {
-    pub name: Cow<'static, str>,
-    pub package: Cow<'static, str>,
-    pub dependency_indices: Cow<'static, [usize]>,
-    pub message_types: Cow<'static, [Descriptor]>,
-    pub enum_types: Cow<'static, [EnumDescriptor]>,
-    pub syntax: Cow<'static, str>,
+#[derive(Debug)]
+pub struct FileDescriptor<A: Allocator = Global> {
+    pub name: String<A>,
+    pub package: String<A>,
+    pub dependency_indices: Vec<usize, A>,
+    pub message_types: Vec<Descriptor, A>,
+    pub enum_types: Vec<EnumDescriptor, A>,
+    pub syntax: String<A>,
     pub edition: Edition,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct Descriptor {
-    pub name: Cow<'static, str>,
-    pub full_name: Cow<'static, str>,
-    pub fields: Cow<'static, [FieldDescriptor]>,
-    pub oneof_decls: Cow<'static, [OneofDescriptor]>,
-    pub nested_types: Cow<'static, [Descriptor]>,
-    pub enum_types: Cow<'static, [EnumDescriptor]>,
+#[derive(Debug)]
+pub struct Descriptor<A: Allocator = Global> {
+    pub name: String<A>,
+    pub full_name: String<A>,
+    pub fields: Vec<FieldDescriptor, A>,
+    pub oneof_decls: Vec<OneofDescriptor, A>,
+    pub nested_types: Vec<Descriptor, A>,
+    pub enum_types: Vec<EnumDescriptor, A>,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct FieldDescriptor {
-    pub name: Cow<'static, str>,
+#[derive(Debug)]
+pub struct FieldDescriptor<A: Allocator = Global> {
+    pub name: String<A>,
     pub number: i32,
     pub type_: FieldType,
-    pub type_name: Cow<'static, str>,
+    pub type_name: String<A>,
     pub label: FieldLabel,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct EnumDescriptor {
-    pub name: Cow<'static, str>,
-    pub values: Cow<'static, [EnumValueDescriptor]>,
+#[derive(Debug)]
+pub struct EnumDescriptor<A: Allocator = Global> {
+    pub name: String<A>,
+    pub values: Vec<EnumValueDescriptor, A>,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct EnumValueDescriptor {
-    pub name: Cow<'static, str>,
+#[derive(Debug)]
+pub struct EnumValueDescriptor<A: Allocator = Global> {
+    pub name: String<A>,
     pub number: i32,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct OneofDescriptor {
-    pub name: Cow<'static, str>,
-    pub field_indices: Cow<'static, [usize]>,
+#[derive(Debug)]
+pub struct OneofDescriptor<A: Allocator = Global> {
+    pub name: String<A>,
+    pub field_indices: Vec<usize, A>,
 }
 
 /// The struct types with the "context".
@@ -246,7 +248,7 @@ impl<'a> DescriptorWithContext<'a> {
                 full_name.push_str(&self.body.name);
                 Ok(full_name)
             })
-            .map(|s| s.as_str())
+            .map(|s| s.as_ref())
     }
     fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
@@ -362,7 +364,7 @@ impl<'a> EnumDescriptorWithContext<'a> {
                 full_name.push_str(&self.body.name);
                 Ok(full_name)
             })
-            .map(|s| s.as_str())
+            .map(|s| s.as_ref())
     }
     fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
@@ -413,7 +415,7 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
                 full_name.push_str(&self.body.name);
                 Ok(full_name)
             })
-            .map(|s| s.as_str())
+            .map(|s| s.as_ref())
     }
 }
 
@@ -442,7 +444,7 @@ impl<'a> FieldDescriptorWithContext<'a> {
                 full_name.push_str(&self.body.name);
                 Ok(full_name)
             })
-            .map(|s| s.as_str())
+            .map(|s| s.as_ref())
     }
 }
 

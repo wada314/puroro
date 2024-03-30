@@ -23,6 +23,12 @@ pub struct GenericMessage<A: Allocator> {
     fields: Vec<Field<A>>,
 }
 
+impl<A: Allocator> GenericMessage<A> {
+    fn set_field_descriptor(&mut self, descriptor: &FieldDescriptor) -> Result<()> {
+        todo!()
+    }
+}
+
 pub struct Field<A: Allocator> {
     number: i32,
     name: String<A>,
@@ -33,7 +39,6 @@ trait FieldBody<A: Allocator> {
     fn as_i32(&self) -> Result<i32>;
     fn as_opt_i32(&self) -> Result<Option<i32>>;
     fn as_repeated_i32(&self) -> Result<impl IntoIterator<Item = i32>>;
-    // fn set_descriptor(&mut self, descriptor: &FieldDescriptor) -> Result<()>;
 }
 
 enum WireTypeAndPayload<A: Allocator> {
