@@ -19,6 +19,7 @@
 #![feature(once_cell_try)]
 
 pub mod descriptor;
+pub mod editions;
 pub mod generic_message;
 pub mod internal;
 pub mod message;
