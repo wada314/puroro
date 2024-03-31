@@ -47,21 +47,25 @@ impl Field {
     }
 
     pub fn as_scalar_int32(&self, allow_packed: bool) -> Result<Option<i32>> {
-        let mut records_iter = self.records.iter();
-        Ok(records_iter.try_fold(None, |last, record| match record {
-            WireTypeAndPayload::Variant(variant) => Ok(Some(variant.try_as_int32()?)),
-            WireTypeAndPayload::LengthDelimited(ld) => {
-                if allow_packed {
-                    let last_value_opt = ld.into_variant_iter().try_fold(last, |_, variant| {
-                        Result::Ok(Some(variant?.try_as_int32()?))
-                    })?;
-                    Ok(last_value_opt)
-                } else {
-                    Err(ErrorKind::GenericMessageFieldTypeError)
+        Ok(self
+            .records
+            .iter()
+            .try_fold(None, |last_val_opt, record| match record {
+                WireTypeAndPayload::Variant(variant) => Ok(Some(variant.try_as_int32()?)),
+                WireTypeAndPayload::LengthDelimited(ld) => {
+                    if allow_packed {
+                        let last_value_opt = ld
+                            .into_variant_iter()
+                            .try_fold(last_val_opt, |_, variant| {
+                                Result::Ok(Some(variant?.try_as_int32()?))
+                            })?;
+                        Ok(last_value_opt)
+                    } else {
+                        Err(ErrorKind::GenericMessageFieldTypeError)
+                    }
                 }
-            }
-            _ => Err(ErrorKind::GenericMessageFieldTypeError),
-        })?)
+                _ => Err(ErrorKind::GenericMessageFieldTypeError),
+            })?)
     }
 }
 
