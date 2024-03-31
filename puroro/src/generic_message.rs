@@ -46,19 +46,17 @@ impl Field {
         &self.name
     }
 
-    pub fn as_scalar_int32(&self, allow_packed: bool) -> Result<Option<i32>> {
+    pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
         Ok(self
             .records
             .iter()
-            .try_fold(None, |last_val_opt, record| match record {
-                WireTypeAndPayload::Variant(variant) => Ok(Some(variant.try_as_int32()?)),
+            .try_fold(None, |last_var_opt, record| match record {
+                WireTypeAndPayload::Variant(variant) => Ok(Some(variant)),
                 WireTypeAndPayload::LengthDelimited(ld) => {
                     if allow_packed {
                         let last_value_opt = ld
                             .into_variant_iter()
-                            .try_fold(last_val_opt, |_, variant| {
-                                Result::Ok(Some(variant?.try_as_int32()?))
-                            })?;
+                            .try_fold(last_var_opt, |_, variant| Result::Ok(Some(variant?)))?;
                         Ok(last_value_opt)
                     } else {
                         Err(ErrorKind::GenericMessageFieldTypeError)
