@@ -69,14 +69,14 @@ impl Field {
             })
     }
 
-    pub fn as_scalar_string(&self) -> Result<Option<String>> {
+    pub fn as_scalar_string(&self) -> Result<Option<&str>> {
         self.as_repeated_string().into_iter().try_last()
     }
 
-    pub fn as_repeated_string(&self) -> impl '_ + IntoIterator<Item = Result<String>> {
+    pub fn as_repeated_string(&self) -> impl '_ + IntoIterator<Item = Result<&str>> {
         self.records.iter().map(|record| match record {
             WireTypeAndPayload::LengthDelimited(ld) => {
-                String::from_utf8(ld.clone()).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
+                ::std::str::from_utf8(&ld).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
             }
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
