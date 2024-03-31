@@ -47,18 +47,9 @@ impl Field {
     }
 
     pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
-        Ok(self.records.iter().try_fold(None, |last_var_opt, record| {
-            match (allow_packed, record) {
-                (_, WireTypeAndPayload::Variant(variant)) => Ok(Some(variant.clone())),
-                (true, WireTypeAndPayload::LengthDelimited(ld)) => {
-                    let last_value_opt = ld
-                        .into_variant_iter()
-                        .try_fold(last_var_opt, |_, variant| Result::Ok(Some(variant?)))?;
-                    Ok(last_value_opt)
-                }
-                _ => Err(ErrorKind::GenericMessageFieldTypeError),
-            }
-        })?)
+        self.as_repeated_variant(allow_packed)
+            .into_iter()
+            .try_last()
     }
 
     pub fn as_repeated_variant(
@@ -78,6 +69,16 @@ impl Field {
             })
     }
 }
+
+trait IteratorExt: Iterator {
+    fn try_last<T, E>(mut self) -> ::std::result::Result<Option<T>, E>
+    where
+        Self: Sized + Iterator<Item = ::std::result::Result<T, E>>,
+    {
+        self.try_fold(None, |_, x| x.map(Some))
+    }
+}
+impl<T> IteratorExt for T where T: Iterator {}
 
 enum WireTypeAndPayload {
     Variant(Variant),
