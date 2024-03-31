@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::variant::{ReadExtVariant, Variant};
+use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 
@@ -47,23 +47,35 @@ impl Field {
     }
 
     pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
-        Ok(self
-            .records
-            .iter()
-            .try_fold(None, |last_var_opt, record| match record {
-                WireTypeAndPayload::Variant(variant) => Ok(Some(variant)),
-                WireTypeAndPayload::LengthDelimited(ld) => {
-                    if allow_packed {
-                        let last_value_opt = ld
-                            .into_variant_iter()
-                            .try_fold(last_var_opt, |_, variant| Result::Ok(Some(variant?)))?;
-                        Ok(last_value_opt)
-                    } else {
-                        Err(ErrorKind::GenericMessageFieldTypeError)
-                    }
+        Ok(self.records.iter().try_fold(None, |last_var_opt, record| {
+            match (allow_packed, record) {
+                (_, WireTypeAndPayload::Variant(variant)) => Ok(Some(variant.clone())),
+                (true, WireTypeAndPayload::LengthDelimited(ld)) => {
+                    let last_value_opt = ld
+                        .into_variant_iter()
+                        .try_fold(last_var_opt, |_, variant| Result::Ok(Some(variant?)))?;
+                    Ok(last_value_opt)
                 }
                 _ => Err(ErrorKind::GenericMessageFieldTypeError),
-            })?)
+            }
+        })?)
+    }
+
+    pub fn as_repeated_variant(
+        &self,
+        allow_packed: bool,
+    ) -> impl '_ + IntoIterator<Item = Result<Variant>> {
+        self.records
+            .iter()
+            .flat_map(move |record| match (allow_packed, record) {
+                (_, WireTypeAndPayload::Variant(variant)) => {
+                    Either::Left(Some(Ok(variant.clone())).into_iter())
+                }
+                (true, WireTypeAndPayload::LengthDelimited(ld)) => {
+                    Either::Right(ld.into_variant_iter())
+                }
+                _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
+            })
     }
 }
 

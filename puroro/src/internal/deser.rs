@@ -16,7 +16,7 @@ pub mod record;
 
 use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
-use crate::internal::variant::Variant;
+use crate::variant::Variant;
 use crate::Result;
 use ::futures::io::{AsyncRead, AsyncWrite, Take as AsyncTake};
 use ::std::alloc::Allocator;
@@ -162,8 +162,8 @@ pub async fn deser_from_async_bound_read<A: Allocator>(
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::internal::variant::WriteExtVariant;
     use crate::internal::WireType;
+    use crate::variant::WriteExtVariant;
     use ::futures::io::AsyncReadExt;
 
     #[derive(Default, Debug, PartialEq)]

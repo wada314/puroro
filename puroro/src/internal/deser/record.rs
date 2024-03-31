@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::variant::Variant;
 use crate::internal::WireType;
+use crate::variant::Variant;
 use crate::{ErrorKind, Result};
 use ::std::io::{Read, Take};
 
@@ -35,7 +35,7 @@ pub trait SliceExtReadRecord<'a> {
 }
 impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>> {
-        use crate::internal::variant::ReadExtVariant;
+        use crate::variant::ReadExtVariant;
         let tag = self.read_variant()?.try_as_uint32()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         let number = tag >> 3;
@@ -73,7 +73,7 @@ pub trait ReadExtReadRecord: Sized {
 }
 impl<T: Read> ReadExtReadRecord for T {
     fn read_record_or_eof(&mut self) -> Result<Option<Record<Take<&mut dyn Read>>>> {
-        use crate::internal::variant::ReadExtVariant;
+        use crate::variant::ReadExtVariant;
         let Some(tag_var) = self.read_variant_or_eof()? else {
             return Ok(None);
         };

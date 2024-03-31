@@ -24,6 +24,7 @@ pub mod generic_message;
 pub mod internal;
 pub mod message;
 pub mod string;
+pub mod variant;
 
 use ::thiserror::Error;
 
