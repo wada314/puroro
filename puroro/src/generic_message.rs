@@ -68,6 +68,19 @@ impl Field {
                 _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
             })
     }
+
+    pub fn as_scalar_string(&self) -> Result<Option<String>> {
+        self.as_repeated_string().into_iter().try_last()
+    }
+
+    pub fn as_repeated_string(&self) -> impl '_ + IntoIterator<Item = Result<String>> {
+        self.records.iter().map(|record| match record {
+            WireTypeAndPayload::LengthDelimited(ld) => {
+                String::from_utf8(ld.clone()).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
+            }
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
 }
 
 trait IteratorExt: Iterator {
