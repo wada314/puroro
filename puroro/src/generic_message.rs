@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::descriptor::FieldDescriptor;
-use crate::internal::variant::Variant;
-
+use crate::internal::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
+use ::itertools::Either;
 
-pub struct GenericMessage {
+pub struct UntypedMessage {
     fields: Vec<Field>,
 }
 
-impl GenericMessage {
-    fn set_field_descriptor(&mut self, descriptor: &FieldDescriptor) -> Result<()> {
-        todo!()
+impl UntypedMessage {
+    pub fn fields(&self) -> impl Iterator<Item = &Field> {
+        self.fields.iter()
+    }
+    pub fn field_with_name(&self, name: &str) -> Option<&Field> {
+        self.fields.iter().find(|f| f.name == name)
+    }
+    pub fn field_with_number(&self, number: i32) -> Option<&Field> {
+        self.fields.iter().find(|f| f.number == number)
     }
 }
 
@@ -33,14 +38,35 @@ pub struct Field {
     records: Vec<WireTypeAndPayload>,
 }
 
-trait FieldBody {
-    fn as_i32(&self) -> Result<i32>;
-    fn as_opt_i32(&self) -> Result<Option<i32>>;
-    fn as_repeated_i32(&self) -> Result<impl IntoIterator<Item = i32>>;
+impl Field {
+    pub fn number(&self) -> i32 {
+        self.number
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn as_scalar_int32(&self, allow_packed: bool) -> Result<Option<i32>> {
+        let mut records_iter = self.records.iter();
+        Ok(records_iter.try_fold(None, |last, record| match record {
+            WireTypeAndPayload::Variant(variant) => Ok(Some(variant.try_as_int32()?)),
+            WireTypeAndPayload::LengthDelimited(ld) => {
+                if allow_packed {
+                    let last_value_opt = ld.into_variant_iter().try_fold(last, |_, variant| {
+                        Result::Ok(Some(variant?.try_as_int32()?))
+                    })?;
+                    Ok(last_value_opt)
+                } else {
+                    Err(ErrorKind::GenericMessageFieldTypeError)
+                }
+            }
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })?)
+    }
 }
 
 enum WireTypeAndPayload {
-    Varint(Variant),
+    Variant(Variant),
     Fixed64([u8; 8]),
     Fixed32([u8; 4]),
     LengthDelimited(Vec<u8>),

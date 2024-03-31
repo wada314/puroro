@@ -65,6 +65,7 @@ impl TryFrom<usize> for Variant {
 pub trait ReadExtVariant {
     fn read_variant(&mut self) -> Result<Variant>;
     fn read_variant_or_eof(&mut self) -> Result<Option<Variant>>;
+    fn into_variant_iter(self) -> impl Iterator<Item = Result<Variant>>;
 }
 
 pub trait BufReadExtVariant {
@@ -112,6 +113,18 @@ impl<T: Read> ReadExtVariant for T {
             }
         }
         Ok(Some(Variant(result.to_le_bytes())))
+    }
+    fn into_variant_iter(self) -> impl Iterator<Item = Result<Variant>> {
+        struct Iter<T> {
+            reader: T,
+        }
+        impl<T: Read> Iterator for Iter<T> {
+            type Item = Result<Variant>;
+            fn next(&mut self) -> Option<Self::Item> {
+                self.reader.read_variant_or_eof().transpose()
+            }
+        }
+        Iter { reader: self }
     }
 }
 
