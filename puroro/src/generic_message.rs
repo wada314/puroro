@@ -15,12 +15,13 @@
 use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
+use ::std::borrow::Cow;
 
-pub struct UntypedMessage {
-    fields: Vec<Field>,
+pub struct UntypedMessage<'a> {
+    fields: Vec<Field<'a>>,
 }
 
-impl UntypedMessage {
+impl UntypedMessage<'_> {
     pub fn fields(&self) -> impl Iterator<Item = &Field> {
         self.fields.iter()
     }
@@ -32,13 +33,13 @@ impl UntypedMessage {
     }
 }
 
-pub struct Field {
+pub struct Field<'a> {
     number: i32,
     name: String,
-    records: Vec<WireTypeAndPayload>,
+    records: Vec<WireTypeAndPayload<'a>>,
 }
 
-impl Field {
+impl Field<'_> {
     pub fn number(&self) -> i32 {
         self.number
     }
@@ -93,11 +94,11 @@ trait IteratorExt: Iterator {
 }
 impl<T> IteratorExt for T where T: Iterator {}
 
-enum WireTypeAndPayload {
+enum WireTypeAndPayload<'a> {
     Variant(Variant),
     Fixed64([u8; 8]),
     Fixed32([u8; 4]),
-    LengthDelimited(Vec<u8>),
+    LengthDelimited(Cow<'a, [u8]>),
     // StartGroup,
     // EndGroup,
 }
