@@ -17,6 +17,7 @@ use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
 
+#[derive(Clone, Debug, Default)]
 pub struct UntypedMessage<'a> {
     fields: Vec<Field<'a>>,
 }
@@ -33,6 +34,7 @@ impl UntypedMessage<'_> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Field<'a> {
     number: i32,
     name: String,
@@ -98,6 +100,7 @@ trait IteratorExt: Iterator {
 }
 impl<T> IteratorExt for T where T: Iterator {}
 
+#[derive(Debug, Clone)]
 enum WireTypeAndPayload<'a> {
     Variant(Variant),
     Fixed64([u8; 8]),
