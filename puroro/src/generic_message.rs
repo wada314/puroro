@@ -82,6 +82,10 @@ impl Field<'_> {
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
+
+    pub fn as_scalar_message(&self) -> Result<Option<UntypedMessage<'_>>> {
+        todo!()
+    }
 }
 
 trait IteratorExt: Iterator {
