@@ -34,10 +34,10 @@ impl<'a> UntypedMessage<'a> {
     pub fn payloads_for_field(&self, number: i32) -> Option<&[WireTypeAndPayload]> {
         self.fields.get(&number).map(|v| v.as_slice())
     }
-    pub fn payloads_for_field_mut(
-        &'a mut self,
+    pub fn payloads_for_field_mut<'this>(
+        &'this mut self,
         number: i32,
-    ) -> &'a mut Vec<WireTypeAndPayload<'a>> {
+    ) -> &'this mut Vec<WireTypeAndPayload<'a>> {
         self.fields.entry(number).or_default()
     }
 }
