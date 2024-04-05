@@ -24,6 +24,22 @@ pub struct UntypedMessage<'a> {
     fields: HashMap<i32, Vec<WireTypeAndPayload<'a>>>,
 }
 
+#[derive(Debug, Clone)]
+pub enum WireTypeAndPayload<'a> {
+    Variant(Variant),
+    Fixed64([u8; 8]),
+    Fixed32([u8; 4]),
+    Len(Cow<'a, [u8]>),
+    // StartGroup,
+    // EndGroup,
+}
+
+#[derive(Debug, Clone)]
+pub struct Field<'a> {
+    number: i32,
+    wire_and_payloads: &'a [WireTypeAndPayload<'a>],
+}
+
 impl<'a> UntypedMessage<'a> {
     pub fn fields(&self) -> impl Iterator<Item = Field> {
         self.fields.iter().map(|(number, wire_and_payloads)| Field {
@@ -40,12 +56,6 @@ impl<'a> UntypedMessage<'a> {
     ) -> &'this mut Vec<WireTypeAndPayload<'a>> {
         self.fields.entry(number).or_default()
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct Field<'a> {
-    number: i32,
-    wire_and_payloads: &'a [WireTypeAndPayload<'a>],
 }
 
 impl Field<'_> {
@@ -121,29 +131,6 @@ impl Field<'_> {
     }
 }
 
-trait IteratorExt: Iterator {
-    /// Returns the last element if the all elements are Ok.
-    /// If any of the elements are Err, returns the first Err.
-    /// If no element is found, returns None.
-    fn try_last<T, E>(mut self) -> ::std::result::Result<Option<T>, E>
-    where
-        Self: Sized + Iterator<Item = ::std::result::Result<T, E>>,
-    {
-        self.try_fold(None, |_, x| x.map(Some))
-    }
-}
-impl<T> IteratorExt for T where T: Iterator {}
-
-#[derive(Debug, Clone)]
-pub enum WireTypeAndPayload<'a> {
-    Variant(Variant),
-    Fixed64([u8; 8]),
-    Fixed32([u8; 4]),
-    Len(Cow<'a, [u8]>),
-    // StartGroup,
-    // EndGroup,
-}
-
 impl<'a, T> From<Record<T>> for WireTypeAndPayload<'a>
 where
     T: 'a,
@@ -158,3 +145,16 @@ where
         }
     }
 }
+
+trait IteratorExt: Iterator {
+    /// Returns the last element if the all elements are Ok.
+    /// If any of the elements are Err, returns the first Err.
+    /// If no element is found, returns None.
+    fn try_last<T, E>(mut self) -> ::std::result::Result<Option<T>, E>
+    where
+        Self: Sized + Iterator<Item = ::std::result::Result<T, E>>,
+    {
+        self.try_fold(None, |_, x| x.map(Some))
+    }
+}
+impl<T> IteratorExt for T where T: Iterator {}
