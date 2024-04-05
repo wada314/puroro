@@ -17,25 +17,35 @@ use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
+use ::std::collections::HashMap;
 
 #[derive(Clone, Debug, Default)]
 pub struct UntypedMessage<'a> {
-    fields: Vec<Field<'a>>,
+    fields: HashMap<i32, Vec<WireTypeAndPayload<'a>>>,
 }
 
-impl UntypedMessage<'_> {
-    pub fn fields(&self) -> impl Iterator<Item = &Field> {
-        self.fields.iter()
+impl<'a> UntypedMessage<'a> {
+    pub fn fields(&self) -> impl Iterator<Item = Field> {
+        self.fields.iter().map(|(number, wire_and_payloads)| Field {
+            number: *number,
+            wire_and_payloads,
+        })
     }
-    pub fn field_with_number(&self, number: i32) -> Option<&Field> {
-        self.fields.iter().find(|f| f.number == number)
+    pub fn payloads_for_field(&self, number: i32) -> Option<&[WireTypeAndPayload]> {
+        self.fields.get(&number).map(|v| v.as_slice())
+    }
+    pub fn payloads_for_field_mut(
+        &'a mut self,
+        number: i32,
+    ) -> &'a mut Vec<WireTypeAndPayload<'a>> {
+        self.fields.entry(number).or_default()
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct Field<'a> {
     number: i32,
-    wire_and_payloads: Vec<WireTypeAndPayload<'a>>,
+    wire_and_payloads: &'a [WireTypeAndPayload<'a>],
 }
 
 impl Field<'_> {
@@ -79,11 +89,17 @@ impl Field<'_> {
 
     pub fn as_scalar_message(&self) -> Result<Option<UntypedMessage<'_>>> {
         let mut message_opt = None;
-        for wire_and_payload in &self.wire_and_payloads {
+        for wire_and_payload in self.wire_and_payloads {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            todo!()
+            for try_record in buf.as_ref().into_records() {
+                let record = try_record?;
+                message_opt
+                    .get_or_insert_default()
+                    .payloads_for_field_mut(record.number.clone())
+                    .push(record.into());
+            }
         }
         Ok(message_opt)
     }
@@ -110,4 +126,19 @@ enum WireTypeAndPayload<'a> {
     Len(Cow<'a, [u8]>),
     // StartGroup,
     // EndGroup,
+}
+
+impl<'a, T> From<Record<T>> for WireTypeAndPayload<'a>
+where
+    T: 'a,
+    Cow<'a, [u8]>: From<T>,
+{
+    fn from(record: Record<T>) -> Self {
+        match record.payload {
+            Payload::Variant(variant) => WireTypeAndPayload::Variant(variant),
+            Payload::I64(buf) => WireTypeAndPayload::Fixed64(buf),
+            Payload::I32(buf) => WireTypeAndPayload::Fixed32(buf),
+            Payload::Len(buf) => WireTypeAndPayload::Len(buf.into()),
+        }
+    }
 }

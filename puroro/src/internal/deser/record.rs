@@ -33,6 +33,10 @@ pub enum Payload<T> {
 pub trait SliceExtReadRecord<'a> {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>>;
     fn read_record_or_eof<'b>(&'b mut self) -> Result<Option<Record<&'a [u8]>>>;
+
+    fn into_records<'b>(&'b mut self) -> impl '_ + Iterator<Item = Result<Record<&'a [u8]>>> {
+        ::std::iter::from_fn(|| self.read_record_or_eof().transpose())
+    }
 }
 impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>> {
