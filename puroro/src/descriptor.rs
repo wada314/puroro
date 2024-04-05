@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use crate::Result;
-use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

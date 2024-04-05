@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::deser::record::{Payload, Record, SliceExtReadRecord};
 use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
@@ -34,7 +35,7 @@ impl UntypedMessage<'_> {
 #[derive(Debug, Clone)]
 pub struct Field<'a> {
     number: i32,
-    records: Vec<WireTypeAndPayload<'a>>,
+    wire_and_payloads: Vec<WireTypeAndPayload<'a>>,
 }
 
 impl Field<'_> {
@@ -52,15 +53,13 @@ impl Field<'_> {
         &self,
         allow_packed: bool,
     ) -> impl '_ + IntoIterator<Item = Result<Variant>> {
-        self.records
+        self.wire_and_payloads
             .iter()
             .flat_map(move |record| match (allow_packed, record) {
                 (_, WireTypeAndPayload::Variant(variant)) => {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
-                (true, WireTypeAndPayload::LengthDelimited(ld)) => {
-                    Either::Right(ld.into_variant_iter())
-                }
+                (true, WireTypeAndPayload::Len(ld)) => Either::Right(ld.into_variant_iter()),
                 _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
             })
     }
@@ -70,8 +69,8 @@ impl Field<'_> {
     }
 
     pub fn as_repeated_string(&self) -> impl '_ + IntoIterator<Item = Result<&str>> {
-        self.records.iter().map(|record| match record {
-            WireTypeAndPayload::LengthDelimited(ld) => {
+        self.wire_and_payloads.iter().map(|record| match record {
+            WireTypeAndPayload::Len(ld) => {
                 ::std::str::from_utf8(&ld).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
             }
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
@@ -79,11 +78,21 @@ impl Field<'_> {
     }
 
     pub fn as_scalar_message(&self) -> Result<Option<UntypedMessage<'_>>> {
-        todo!()
+        let mut message_opt = None;
+        for wire_and_payload in &self.wire_and_payloads {
+            let WireTypeAndPayload::Len(buf) = wire_and_payload else {
+                Err(ErrorKind::GenericMessageFieldTypeError)?
+            };
+            todo!()
+        }
+        Ok(message_opt)
     }
 }
 
 trait IteratorExt: Iterator {
+    /// Returns the last element if the all elements are Ok.
+    /// If any of the elements are Err, returns the first Err.
+    /// If no element is found, returns None.
     fn try_last<T, E>(mut self) -> ::std::result::Result<Option<T>, E>
     where
         Self: Sized + Iterator<Item = ::std::result::Result<T, E>>,
@@ -98,7 +107,7 @@ enum WireTypeAndPayload<'a> {
     Variant(Variant),
     Fixed64([u8; 8]),
     Fixed32([u8; 4]),
-    LengthDelimited(Cow<'a, [u8]>),
+    Len(Cow<'a, [u8]>),
     // StartGroup,
     // EndGroup,
 }

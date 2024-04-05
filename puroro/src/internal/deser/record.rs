@@ -19,7 +19,7 @@ use ::std::io::{Read, Take};
 
 #[derive(Debug)]
 pub struct Record<T> {
-    pub number: u32,
+    pub number: i32,
     pub payload: Payload<T>,
 }
 #[derive(Debug)]
@@ -32,13 +32,15 @@ pub enum Payload<T> {
 
 pub trait SliceExtReadRecord<'a> {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>>;
+    fn read_record_or_eof<'b>(&'b mut self) -> Result<Option<Record<&'a [u8]>>>;
 }
 impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>> {
         use crate::variant::ReadExtVariant;
         let tag = self.read_variant()?.try_as_uint32()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
-        let number = tag >> 3;
+        // safe because the `tag >> 3` is less than 29 bits
+        let number: i32 = (tag >> 3).try_into().unwrap();
         let payload = match wire_type {
             WireType::Variant => Payload::Variant(self.read_variant()?),
             WireType::I32 => {
@@ -66,6 +68,14 @@ impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
         };
         Ok(Record { number, payload })
     }
+
+    fn read_record_or_eof<'b>(&'b mut self) -> Result<Option<Record<&'a [u8]>>> {
+        if self.is_empty() {
+            Ok(None)
+        } else {
+            self.read_record().map(Some)
+        }
+    }
 }
 
 pub trait ReadExtReadRecord: Sized {
@@ -79,7 +89,8 @@ impl<T: Read> ReadExtReadRecord for T {
         };
         let tag = tag_var.try_as_uint32()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
-        let number = tag >> 3;
+        // safe because the `tag >> 3` is less than 29 bits
+        let number: i32 = (tag >> 3).try_into().unwrap();
         let payload = match wire_type {
             WireType::Variant => Payload::Variant(self.read_variant()?),
             WireType::I32 => {
