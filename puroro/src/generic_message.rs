@@ -119,7 +119,7 @@ trait IteratorExt: Iterator {
 impl<T> IteratorExt for T where T: Iterator {}
 
 #[derive(Debug, Clone)]
-enum WireTypeAndPayload<'a> {
+pub enum WireTypeAndPayload<'a> {
     Variant(Variant),
     Fixed64([u8; 8]),
     Fixed32([u8; 4]),
