@@ -26,9 +26,6 @@ impl UntypedMessage<'_> {
     pub fn fields(&self) -> impl Iterator<Item = &Field> {
         self.fields.iter()
     }
-    pub fn field_with_name(&self, name: &str) -> Option<&Field> {
-        self.fields.iter().find(|f| f.name == name)
-    }
     pub fn field_with_number(&self, number: i32) -> Option<&Field> {
         self.fields.iter().find(|f| f.number == number)
     }
@@ -37,16 +34,12 @@ impl UntypedMessage<'_> {
 #[derive(Debug, Clone)]
 pub struct Field<'a> {
     number: i32,
-    name: String,
     records: Vec<WireTypeAndPayload<'a>>,
 }
 
 impl Field<'_> {
     pub fn number(&self) -> i32 {
         self.number
-    }
-    pub fn name(&self) -> &str {
-        &self.name
     }
 
     pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
