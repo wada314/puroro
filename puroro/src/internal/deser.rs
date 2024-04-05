@@ -24,17 +24,17 @@ use ::std::future::Future;
 use ::std::io::{Read, Take};
 
 pub trait DeseringMessage {
-    fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()>;
-    fn parse_i32(&mut self, num: u32, val: [u8; 4]) -> Result<()>;
-    fn parse_i64(&mut self, num: u32, val: [u8; 8]) -> Result<()>;
+    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
+    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
+    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
     fn parse_len_slice_or_alloc_child(
         &mut self,
-        num: u32,
+        num: i32,
         slice: &[u8],
     ) -> Result<Option<&mut dyn DeseringMessage>>;
     fn parse_len_read_or_alloc_child(
         &mut self,
-        num: u32,
+        num: i32,
         read: &mut Take<&mut dyn Read>,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
 }
@@ -42,7 +42,7 @@ pub trait DeseringMessage {
 pub trait AsyncDeseringMessage<A: Allocator>: DeseringMessage {
     fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
         &'this mut self,
-        num: u32,
+        num: i32,
         read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
         alloc: A,
     ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>;
@@ -168,7 +168,7 @@ mod test {
 
     #[derive(Default, Debug, PartialEq)]
     struct Field<T> {
-        num: u32,
+        num: i32,
         val: T,
     }
 
@@ -182,12 +182,12 @@ mod test {
     }
 
     impl DeseringMessage for SampleMessage {
-        fn parse_variant(&mut self, num: u32, var: Variant) -> Result<()> {
+        fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
             self.variants.push(Field { num, val: var });
             Ok(())
         }
 
-        fn parse_i32(&mut self, num: u32, val: [u8; 4]) -> Result<()> {
+        fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
             self.i32s.push(Field {
                 num,
                 val: u32::from_le_bytes(val),
@@ -195,7 +195,7 @@ mod test {
             Ok(())
         }
 
-        fn parse_i64(&mut self, num: u32, val: [u8; 8]) -> Result<()> {
+        fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
             self.i64s.push(Field {
                 num,
                 val: u64::from_le_bytes(val),
@@ -205,7 +205,7 @@ mod test {
 
         fn parse_len_slice_or_alloc_child(
             &mut self,
-            num: u32,
+            num: i32,
             slice: &[u8],
         ) -> Result<Option<&mut dyn DeseringMessage>> {
             if num % 2 == 0 {
@@ -225,7 +225,7 @@ mod test {
 
         fn parse_len_read_or_alloc_child(
             &mut self,
-            num: u32,
+            num: i32,
             read: &mut Take<&mut dyn Read>,
         ) -> Result<Option<&mut dyn DeseringMessage>> {
             if num % 2 == 0 {
@@ -247,7 +247,7 @@ mod test {
     impl<A: Allocator> AsyncDeseringMessage<A> for SampleMessage {
         fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
             &'this mut self,
-            num: u32,
+            num: i32,
             mut read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
             alloc: A,
         ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>
@@ -283,7 +283,7 @@ mod test {
     const INPUT_FIELD_8_STRING_FOO: &[u8] = &[(8 << 3) | WireType::Len as u8, 3, b'f', b'o', b'o'];
     const INPUT_FIELD_10_STRING_YO: &[u8] = &[(10 << 3) | WireType::Len as u8, 2, b'y', b'o'];
 
-    fn gen_submessage_bytes(num: u32, submessage_bytes: impl AsRef<[u8]>) -> Vec<u8> {
+    fn gen_submessage_bytes(num: i32, submessage_bytes: impl AsRef<[u8]>) -> Vec<u8> {
         let mut result = Vec::new();
         result
             .write_variant(Variant::from(((num as u64) << 3) | WireType::Len as u64))

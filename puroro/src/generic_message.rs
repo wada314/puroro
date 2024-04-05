@@ -88,7 +88,7 @@ impl Field<'_> {
     }
 
     pub fn as_scalar_message(&self) -> Result<Option<UntypedMessage<'_>>> {
-        let mut message_opt = None;
+        let mut message_opt: Option<UntypedMessage> = None;
         for wire_and_payload in self.wire_and_payloads {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
@@ -96,7 +96,7 @@ impl Field<'_> {
             for try_record in buf.as_ref().into_records() {
                 let record = try_record?;
                 message_opt
-                    .get_or_insert_default()
+                    .get_or_insert_with(UntypedMessage::default)
                     .payloads_for_field_mut(record.number.clone())
                     .push(record.into());
             }
