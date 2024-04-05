@@ -103,6 +103,22 @@ impl Field<'_> {
         }
         Ok(message_opt)
     }
+
+    pub fn as_repeated_message(&self) -> impl '_ + IntoIterator<Item = Result<UntypedMessage<'_>>> {
+        self.wire_and_payloads.iter().map(|wire_and_payload| {
+            let WireTypeAndPayload::Len(buf) = wire_and_payload else {
+                Err(ErrorKind::GenericMessageFieldTypeError)?
+            };
+            let mut message = UntypedMessage::default();
+            for try_record in buf.as_ref().into_records() {
+                let record = try_record?;
+                message
+                    .payloads_for_field_mut(record.number.clone())
+                    .push(record.into());
+            }
+            Ok(message)
+        })
+    }
 }
 
 trait IteratorExt: Iterator {
