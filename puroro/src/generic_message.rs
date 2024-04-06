@@ -41,6 +41,21 @@ pub struct Field<'a> {
 }
 
 impl<'a> UntypedMessage<'a> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn from_buffer(mut buf: &'a [u8]) -> Self {
+        let mut message = UntypedMessage::default();
+        for try_record in buf.into_records() {
+            let record = try_record.unwrap();
+            message
+                .payloads_for_field_mut(record.number.clone())
+                .push(record.into());
+        }
+        message
+    }
+
     pub fn fields(&self) -> impl Iterator<Item = Field> {
         self.fields.iter().map(|(number, wire_and_payloads)| Field {
             number: *number,
