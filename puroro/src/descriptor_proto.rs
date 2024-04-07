@@ -17,7 +17,14 @@ use crate::Result;
 
 pub struct EnumValueDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> EnumValueDescriptorProto<'a> {
-    pub fn name(&'a self) -> Result<Option<&'a str>> {
+    pub fn name(&self) -> Result<Option<&'a str>> {
         self.0.field(1).as_scalar_string()
+    }
+    pub fn number(&self) -> Result<Option<i32>> {
+        self.0
+            .field(2)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_int32())
+            .transpose()
     }
 }
