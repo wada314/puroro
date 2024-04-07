@@ -20,7 +20,7 @@
 
 pub mod descriptor;
 pub mod editions;
-pub mod generic_message;
+pub mod untyped_message;
 pub mod internal;
 pub mod message;
 pub mod string;
