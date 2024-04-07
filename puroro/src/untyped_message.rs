@@ -103,9 +103,9 @@ impl<'a> Field<'a> {
     }
 
     pub fn as_repeated_variant(
-        &'a self,
+        &'_ self,
         allow_packed: bool,
-    ) -> impl 'a + IntoIterator<Item = Result<Variant>> {
+    ) -> impl '_ + 'a + IntoIterator<Item = Result<Variant>> {
         self.wire_and_payloads
             .iter()
             .flat_map(move |record| match (allow_packed, record) {
@@ -117,11 +117,11 @@ impl<'a> Field<'a> {
             })
     }
 
-    pub fn as_scalar_string(&'a self) -> Result<Option<&'a str>> {
+    pub fn as_scalar_string(&self) -> Result<Option<&'a str>> {
         self.as_repeated_string().into_iter().try_last()
     }
 
-    pub fn as_repeated_string(&'a self) -> impl 'a + IntoIterator<Item = Result<&'a str>> {
+    pub fn as_repeated_string(&self) -> impl '_ + 'a + IntoIterator<Item = Result<&'a str>> {
         self.wire_and_payloads.iter().map(|record| match record {
             WireTypeAndPayload::Len(ld) => {
                 ::std::str::from_utf8(&ld).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
@@ -130,7 +130,7 @@ impl<'a> Field<'a> {
         })
     }
 
-    pub fn as_scalar_message(&'a self) -> Result<Option<UntypedMessage<'a>>> {
+    pub fn as_scalar_message(&self) -> Result<Option<UntypedMessage<'a>>> {
         let mut message_opt: Option<UntypedMessage> = None;
         for wire_and_payload in self.wire_and_payloads {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
@@ -144,8 +144,8 @@ impl<'a> Field<'a> {
     }
 
     pub fn as_repeated_message(
-        &'a self,
-    ) -> impl 'a + IntoIterator<Item = Result<UntypedMessage<'a>>> {
+        &self,
+    ) -> impl '_ + 'a + IntoIterator<Item = Result<UntypedMessage<'a>>> {
         self.wire_and_payloads.iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
