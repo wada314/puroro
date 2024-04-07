@@ -19,11 +19,12 @@
 #![feature(once_cell_try)]
 
 pub mod descriptor;
+pub mod descriptor_proto;
 pub mod editions;
-pub mod untyped_message;
 pub mod internal;
 pub mod message;
 pub mod string;
+pub mod untyped_message;
 pub mod variant;
 
 use ::thiserror::Error;
