@@ -45,15 +45,19 @@ impl<'a> UntypedMessage<'a> {
         Self::default()
     }
 
-    pub fn from_buffer(mut buf: &'a [u8]) -> Self {
+    pub fn from_buffer(buf: &'a [u8]) -> Result<Self> {
         let mut message = UntypedMessage::default();
+        message.merge_from_buffer(buf)?;
+        Ok(message)
+    }
+
+    pub fn merge_from_buffer(&mut self, mut buf: &'a [u8]) -> Result<()> {
         for try_record in buf.into_records() {
-            let record = try_record.unwrap();
-            message
-                .payloads_for_field_mut(record.number.clone())
+            let record = try_record?;
+            self.payloads_for_field_mut(record.number.clone())
                 .push(record.into());
         }
-        message
+        Ok(())
     }
 
     pub fn fields(&self) -> impl Iterator<Item = Field> {
@@ -118,13 +122,9 @@ impl Field<'_> {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            for try_record in buf.as_ref().into_records() {
-                let record = try_record?;
-                message_opt
-                    .get_or_insert_with(UntypedMessage::default)
-                    .payloads_for_field_mut(record.number.clone())
-                    .push(record.into());
-            }
+            message_opt
+                .get_or_insert_with(UntypedMessage::default)
+                .merge_from_buffer(buf)?;
         }
         Ok(message_opt)
     }
@@ -134,14 +134,7 @@ impl Field<'_> {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            let mut message = UntypedMessage::default();
-            for try_record in buf.as_ref().into_records() {
-                let record = try_record?;
-                message
-                    .payloads_for_field_mut(record.number.clone())
-                    .push(record.into());
-            }
-            Ok(message)
+            UntypedMessage::from_buffer(buf)
         })
     }
 }
