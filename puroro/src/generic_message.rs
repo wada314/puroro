@@ -60,12 +60,20 @@ impl<'a> UntypedMessage<'a> {
         Ok(())
     }
 
+    pub fn field(&self, num: i32) -> Result<Option<Field<'_>>> {
+        Ok(self.fields.get(&num).map(|wire_and_payloads| Field {
+            number: num,
+            wire_and_payloads,
+        }))
+    }
+
     pub fn fields(&self) -> impl Iterator<Item = Field> {
         self.fields.iter().map(|(number, wire_and_payloads)| Field {
             number: *number,
             wire_and_payloads,
         })
     }
+
     pub fn payloads_for_field(&self, number: i32) -> Option<&[WireTypeAndPayload]> {
         self.fields.get(&number).map(|v| v.as_slice())
     }
