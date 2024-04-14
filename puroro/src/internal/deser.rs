@@ -18,7 +18,7 @@ use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::variant::Variant;
 use crate::Result;
-use ::futures::io::{AsyncRead, AsyncWrite, Take as AsyncTake};
+use ::futures::io::{AsyncRead, Take as AsyncTake};
 use ::std::alloc::Allocator;
 use ::std::future::Future;
 use ::std::io::{Read, Take};
@@ -149,14 +149,6 @@ pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> R
         }
     }
     Ok(())
-}
-
-pub async fn deser_from_async_bound_read<A: Allocator>(
-    root: &mut dyn AsyncDeseringMessage<A>,
-    mut bound_read: AsyncTake<&mut (dyn AsyncRead + Unpin)>,
-    alloc: A,
-) -> Result<()> {
-    todo!()
 }
 
 #[cfg(test)]
