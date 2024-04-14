@@ -12,8 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use itertools::Itertools;
+
 use crate::untyped_message::UntypedMessage;
 use crate::Result;
+
+pub struct EnumDescriptorProto<'a>(UntypedMessage<'a>);
+impl<'a> EnumDescriptorProto<'a> {
+    pub fn name(&self) -> Result<Option<&str>> {
+        self.0.field(1).as_scalar_string()
+    }
+    pub fn value(&self) -> impl IntoIterator<Item = Result<EnumValueDescriptorProto<'a>>> {
+        self.0
+            .field(2)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(EnumValueDescriptorProto)
+    }
+}
 
 pub struct EnumValueDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> EnumValueDescriptorProto<'a> {
