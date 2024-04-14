@@ -60,7 +60,7 @@ impl<'a> UntypedMessage<'a> {
         Ok(())
     }
 
-    pub fn field(&'a self, number: i32) -> Field<'a> {
+    pub fn field(&self, number: i32) -> Field {
         self.fields.get(&number).map_or_else(
             || Field {
                 number,
@@ -73,7 +73,7 @@ impl<'a> UntypedMessage<'a> {
         )
     }
 
-    pub fn fields(&'a self) -> impl '_ + Iterator<Item = Field<'a>> {
+    pub fn fields(&self) -> impl '_ + Iterator<Item = Field> {
         self.fields.iter().map(|(number, wire_and_payloads)| Field {
             number: *number,
             wire_and_payloads,
