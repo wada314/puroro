@@ -38,6 +38,13 @@ impl Variant {
             .try_into()
             .map_err(|_| ErrorKind::VariantValueTooLarge)?)
     }
+    pub fn try_as_bool(&self) -> Result<bool> {
+        Ok(match self.as_uint64() {
+            0 => false,
+            1 => true,
+            _ => Err(ErrorKind::VariantValueTooLarge)?,
+        })
+    }
 }
 
 impl From<u64> for Variant {

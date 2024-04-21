@@ -43,11 +43,33 @@ impl<'a> FieldDescriptorProto<'a> {
             .map(|v| v.try_as_int32()?.try_into())
             .transpose()
     }
-    // pub fn type_name(&self) -> Result<Option<&'a str>>
-    // pub fn extendee(&self) -> Result<Option<&'a str>>
-    // pub fn default_value(&self) -> Result<Option<&'a str>>
-    // pub fn oneof_index(&self) -> Result<Option<i32>>
-    // pub fn json_name(&self) -> Result<Option<&'a str>>
+    pub fn type_name(&self) -> Result<Option<&str>> {
+        self.0.field(6).as_scalar_string()
+    }
+    pub fn extendee(&self) -> Result<Option<&str>> {
+        self.0.field(2).as_scalar_string()
+    }
+    pub fn default_value(&self) -> Result<Option<&str>> {
+        self.0.field(7).as_scalar_string()
+    }
+    pub fn oneof_index(&self) -> Result<Option<i32>> {
+        self.0
+            .field(9)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_int32())
+            .transpose()
+    }
+    pub fn json_name(&self) -> Result<Option<&str>> {
+        self.0.field(10).as_scalar_string()
+    }
+    // pub fn options(&self) -> Result<Option<FieldOptions>>
+    pub fn proto3_optional(&self) -> Result<Option<bool>> {
+        self.0
+            .field(17)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_bool())
+            .transpose()
+    }
 }
 
 pub mod field_descriptor_proto {
