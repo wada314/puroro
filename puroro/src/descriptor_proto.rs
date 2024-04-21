@@ -15,7 +15,117 @@
 use itertools::Itertools;
 
 use crate::untyped_message::UntypedMessage;
-use crate::Result;
+use crate::{ErrorKind, Result};
+
+pub struct FieldDescriptorProto<'a>(UntypedMessage<'a>);
+impl<'a> FieldDescriptorProto<'a> {
+    pub fn name(&self) -> Result<Option<&str>> {
+        self.0.field(1).as_scalar_string()
+    }
+    pub fn number(&self) -> Result<Option<i32>> {
+        self.0
+            .field(3)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_int32())
+            .transpose()
+    }
+    pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
+        self.0
+            .field(4)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_int32()?.try_into())
+            .transpose()
+    }
+    pub fn type_(&self) -> Result<Option<field_descriptor_proto::Type>> {
+        self.0
+            .field(5)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_int32()?.try_into())
+            .transpose()
+    }
+    // pub fn type_name(&self) -> Result<Option<&'a str>>
+    // pub fn extendee(&self) -> Result<Option<&'a str>>
+    // pub fn default_value(&self) -> Result<Option<&'a str>>
+    // pub fn oneof_index(&self) -> Result<Option<i32>>
+    // pub fn json_name(&self) -> Result<Option<&'a str>>
+}
+
+pub mod field_descriptor_proto {
+    use super::*;
+    pub enum Type {
+        TypeDouble = 1,
+        TypeFloat = 2,
+        TypeInt64 = 3,
+        TypeUInt64 = 4,
+        TypeInt32 = 5,
+        TypeFixed64 = 6,
+        TypeFixed32 = 7,
+        TypeBool = 8,
+        TypeString = 9,
+        TypeGroup = 10,
+        TypeMessage = 11,
+        TypeBytes = 12,
+        TypeUInt32 = 13,
+        TypeEnum = 14,
+        TypeSFixed32 = 15,
+        TypeSFixed64 = 16,
+        TypeSInt32 = 17,
+        TypeSInt64 = 18,
+    }
+
+    pub enum Label {
+        LabelOptional = 1,
+        LabelRepeated = 2,
+        LabelRequired = 3,
+    }
+
+    impl TryFrom<i32> for Type {
+        type Error = ErrorKind;
+        fn try_from(value: i32) -> Result<Self> {
+            match value {
+                1 => Ok(Self::TypeDouble),
+                2 => Ok(Self::TypeFloat),
+                3 => Ok(Self::TypeInt64),
+                4 => Ok(Self::TypeUInt64),
+                5 => Ok(Self::TypeInt32),
+                6 => Ok(Self::TypeFixed64),
+                7 => Ok(Self::TypeFixed32),
+                8 => Ok(Self::TypeBool),
+                9 => Ok(Self::TypeString),
+                10 => Ok(Self::TypeGroup),
+                11 => Ok(Self::TypeMessage),
+                12 => Ok(Self::TypeBytes),
+                13 => Ok(Self::TypeUInt32),
+                14 => Ok(Self::TypeEnum),
+                15 => Ok(Self::TypeSFixed32),
+                16 => Ok(Self::TypeSFixed64),
+                17 => Ok(Self::TypeSInt32),
+                18 => Ok(Self::TypeSInt64),
+                _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+            }
+        }
+    }
+
+    impl TryFrom<i32> for Label {
+        type Error = ErrorKind;
+        fn try_from(value: i32) -> Result<Self> {
+            match value {
+                1 => Ok(Self::LabelOptional),
+                2 => Ok(Self::LabelRepeated),
+                3 => Ok(Self::LabelRequired),
+                _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+            }
+        }
+    }
+}
+
+pub struct OneofDescriptorProto<'a>(UntypedMessage<'a>);
+impl<'a> OneofDescriptorProto<'a> {
+    pub fn name(&self) -> Result<Option<&str>> {
+        self.0.field(1).as_scalar_string()
+    }
+    // pub fn options(&self) -> Result<Option<OneofOptions>>
+}
 
 pub struct EnumDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> EnumDescriptorProto<'a> {

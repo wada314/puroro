@@ -49,6 +49,8 @@ pub enum ErrorKind {
     DescriptorStructureError(String),
     #[error("Error when matching the GenericMessage type's field type.")]
     GenericMessageFieldTypeError,
+    #[error("Error when converting an int32 to an (closed) enum value.")]
+    TryFromIntIntoEnumError(i32),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
