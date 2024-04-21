@@ -29,6 +29,9 @@ impl<'a> EnumDescriptorProto<'a> {
             .into_iter()
             .map_ok(EnumValueDescriptorProto)
     }
+    // pub fn options(&self) -> Result<Option<EnumOptions>>
+    // pub fn reserved_range(&self) -> impl IntoIterator<Item = Result<ReservedRange>>
+    // pub fn reserved_name(&self) -> impl IntoIterator<Item = Result<&'a str>>
 }
 
 pub struct EnumValueDescriptorProto<'a>(UntypedMessage<'a>);
