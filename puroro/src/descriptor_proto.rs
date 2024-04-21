@@ -22,7 +22,7 @@ impl<'a> EnumDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
     }
-    pub fn value(&self) -> impl IntoIterator<Item = Result<EnumValueDescriptorProto<'a>>> {
+    pub fn value(&self) -> impl IntoIterator<Item = Result<EnumValueDescriptorProto>> {
         self.0
             .field(2)
             .as_repeated_message()
