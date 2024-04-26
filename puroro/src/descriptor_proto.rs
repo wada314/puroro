@@ -17,6 +17,52 @@ use itertools::Itertools;
 use crate::untyped_message::UntypedMessage;
 use crate::{ErrorKind, Result};
 
+pub struct DescriptorProto<'a>(UntypedMessage<'a>);
+impl<'a> DescriptorProto<'a> {
+    pub fn name(&self) -> Result<Option<&str>> {
+        self.0.field(1).as_scalar_string()
+    }
+    pub fn field(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>> {
+        self.0
+            .field(2)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(FieldDescriptorProto)
+    }
+    pub fn extension(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>> {
+        self.0
+            .field(6)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(FieldDescriptorProto)
+    }
+    pub fn nested_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
+        self.0
+            .field(3)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(DescriptorProto)
+    }
+    // pub fn extension_range(&self) -> impl IntoIterator<Item = Result<descriptor_proto::ExtensionRangeProto>>
+    pub fn enum_type(&self) -> impl IntoIterator<Item = Result<EnumDescriptorProto>> {
+        self.0
+            .field(4)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(EnumDescriptorProto)
+    }
+    pub fn oneof_decl(&self) -> impl IntoIterator<Item = Result<OneofDescriptorProto>> {
+        self.0
+            .field(8)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(OneofDescriptorProto)
+    }
+    // pub fn options(&self) -> Result<Option<MessageOptions>>
+    // pub fn reserved_range(&self) -> impl IntoIterator<Item = Result<descriptor_proto::ReservedRangeProto>>
+    // pub fn reserved_name(&self) -> impl IntoIterator<Item = Result<&'a str>>
+}
+
 pub struct FieldDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> FieldDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
