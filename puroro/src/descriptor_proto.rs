@@ -17,6 +17,17 @@ use itertools::Itertools;
 use crate::untyped_message::UntypedMessage;
 use crate::{ErrorKind, Result};
 
+pub struct FileDescriptorSetProto<'a>(UntypedMessage<'a>);
+impl<'a> FileDescriptorSetProto<'a> {
+    pub fn file(&self) -> impl IntoIterator<Item = Result<FileDescriptorProto>> {
+        self.0
+            .field(1)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(FileDescriptorProto)
+    }
+}
+
 pub enum Edition {
     EditionUnknown = 0,
     EditionProto2 = 998,
