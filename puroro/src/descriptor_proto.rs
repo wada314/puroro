@@ -17,6 +17,67 @@ use itertools::Itertools;
 use crate::untyped_message::UntypedMessage;
 use crate::{ErrorKind, Result};
 
+pub enum Edition {
+    EditionUnknown = 0,
+    EditionProto2 = 998,
+    EditionProto3 = 999,
+    Edition2023 = 1000,
+    Edition2024 = 1001,
+    Edition1TestOnly = 1,
+    Edition2TestOnly = 2,
+    Edition99997TestOnly = 99997,
+    Edition99998TestOnly = 99998,
+    Edition99999TestOnly = 99999,
+}
+
+pub struct FileDescriptorProto<'a>(UntypedMessage<'a>);
+impl<'a> FileDescriptorProto<'a> {
+    pub fn name(&self) -> Result<Option<&str>> {
+        self.0.field(1).as_scalar_string()
+    }
+    pub fn package(&self) -> Result<Option<&str>> {
+        self.0.field(2).as_scalar_string()
+    }
+    pub fn dependency(&self) -> impl IntoIterator<Item = Result<&str>> {
+        self.0.field(3).as_repeated_string()
+    }
+    pub fn public_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
+        self.0
+            .field(10)
+            .as_repeated_variant(false)
+            .into_iter()
+            .map_ok(|v| v.try_as_int32())
+            .map(Result::flatten)
+    }
+    pub fn weak_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
+        self.0
+            .field(11)
+            .as_repeated_variant(false)
+            .into_iter()
+            .map_ok(|v| v.try_as_int32())
+            .map(Result::flatten)
+    }
+    pub fn message_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
+        self.0
+            .field(4)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(DescriptorProto)
+    }
+    pub fn enum_type(&self) -> impl IntoIterator<Item = Result<EnumDescriptorProto>> {
+        self.0
+            .field(5)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(EnumDescriptorProto)
+    }
+    // pub fn service(&self) -> impl IntoIterator<Item = Result<ServiceDescriptorProto>>
+    // pub fn extension(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>>
+    // pub fn options(&self) -> Result<Option<FileOptions>>
+    // pub fn source_code_info(&self) -> Result<Option<SourceCodeInfo>>
+    // pub fn syntax(&self) -> Result<Option<&'a str>>
+}
+
 pub struct DescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> DescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
