@@ -29,6 +29,24 @@ pub enum Edition {
     Edition99998TestOnly = 99998,
     Edition99999TestOnly = 99999,
 }
+impl TryFrom<i32> for Edition {
+    type Error = ErrorKind;
+    fn try_from(value: i32) -> Result<Self> {
+        match value {
+            0 => Ok(Self::EditionUnknown),
+            998 => Ok(Self::EditionProto2),
+            999 => Ok(Self::EditionProto3),
+            1000 => Ok(Self::Edition2023),
+            1001 => Ok(Self::Edition2024),
+            1 => Ok(Self::Edition1TestOnly),
+            2 => Ok(Self::Edition2TestOnly),
+            99997 => Ok(Self::Edition99997TestOnly),
+            99998 => Ok(Self::Edition99998TestOnly),
+            99999 => Ok(Self::Edition99999TestOnly),
+            _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+        }
+    }
+}
 
 pub struct FileDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> FileDescriptorProto<'a> {
@@ -46,16 +64,14 @@ impl<'a> FileDescriptorProto<'a> {
             .field(10)
             .as_repeated_variant(false)
             .into_iter()
-            .map_ok(|v| v.try_as_int32())
-            .map(Result::flatten)
+            .map(|v| v?.try_as_int32())
     }
     pub fn weak_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
         self.0
             .field(11)
             .as_repeated_variant(false)
             .into_iter()
-            .map_ok(|v| v.try_as_int32())
-            .map(Result::flatten)
+            .map(|v| v?.try_as_int32())
     }
     pub fn message_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
         self.0
@@ -73,9 +89,18 @@ impl<'a> FileDescriptorProto<'a> {
     }
     // pub fn service(&self) -> impl IntoIterator<Item = Result<ServiceDescriptorProto>>
     // pub fn extension(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>>
-    // pub fn options(&self) -> Result<Option<FileOptions>>
-    // pub fn source_code_info(&self) -> Result<Option<SourceCodeInfo>>
-    // pub fn syntax(&self) -> Result<Option<&'a str>>
+    // pub fn options(&self) -> Result<Option<FileOptionsProto>>
+    // pub fn source_code_info(&self) -> Result<Option<SourceCodeInfoProto>>
+    pub fn syntax(&self) -> Result<Option<&str>> {
+        self.0.field(12).as_scalar_string()
+    }
+    pub fn edition(&self) -> Result<Option<Edition>> {
+        self.0
+            .field(14)
+            .as_scalar_variant(true)?
+            .map(|v| v.try_as_int32()?.try_into())
+            .transpose()
+    }
 }
 
 pub struct DescriptorProto<'a>(UntypedMessage<'a>);

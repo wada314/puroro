@@ -17,7 +17,6 @@
 #![feature(assert_matches)]
 #![feature(lazy_cell)]
 #![feature(once_cell_try)]
-#![feature(result_flattening)]
 
 pub mod descriptor;
 pub mod descriptor_proto;
