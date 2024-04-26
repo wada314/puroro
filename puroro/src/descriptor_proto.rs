@@ -18,6 +18,19 @@ use crate::untyped_message::UntypedMessage;
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
+impl UntypedMessage<'_> {
+    fn repeated_message_field<'a, T: 'a, F: 'a + Fn(UntypedMessage<'a>) -> T>(
+        &'a self,
+        number: i32,
+        constructor: F,
+    ) -> impl 'a + Iterator<Item = Result<T>> {
+        self.field(number)
+            .as_repeated_message()
+            .into_iter()
+            .map_ok(constructor)
+    }
+}
+
 #[derive(DDeref, DFrom)]
 pub struct FileDescriptorSetProto<'a>(UntypedMessage<'a>);
 impl<'a> FileDescriptorSetProto<'a> {
