@@ -19,7 +19,7 @@ use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
 impl UntypedMessage<'_> {
-    fn repeated_message_field<'a, T: 'a, F: 'a + Fn(UntypedMessage<'a>) -> T>(
+    fn repeated_message_field<'a, T, F: 'a + Fn(UntypedMessage<'a>) -> T>(
         &'a self,
         number: i32,
         constructor: F,
@@ -35,11 +35,7 @@ impl UntypedMessage<'_> {
 pub struct FileDescriptorSetProto<'a>(UntypedMessage<'a>);
 impl<'a> FileDescriptorSetProto<'a> {
     pub fn file(&self) -> impl IntoIterator<Item = Result<FileDescriptorProto>> {
-        self.0
-            .field(1)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(FileDescriptorProto)
+        self.0.repeated_message_field(1, FileDescriptorProto)
     }
 }
 
@@ -101,18 +97,10 @@ impl<'a> FileDescriptorProto<'a> {
             .map(|v| v?.try_as_int32())
     }
     pub fn message_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
-        self.0
-            .field(4)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(DescriptorProto)
+        self.0.repeated_message_field(4, DescriptorProto)
     }
     pub fn enum_type(&self) -> impl IntoIterator<Item = Result<EnumDescriptorProto>> {
-        self.0
-            .field(5)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(EnumDescriptorProto)
+        self.0.repeated_message_field(5, EnumDescriptorProto)
     }
     // pub fn service(&self) -> impl IntoIterator<Item = Result<ServiceDescriptorProto>>
     // pub fn extension(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>>
@@ -137,40 +125,20 @@ impl<'a> DescriptorProto<'a> {
         self.0.field(1).as_scalar_string()
     }
     pub fn field(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>> {
-        self.0
-            .field(2)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(FieldDescriptorProto)
+        self.0.repeated_message_field(2, FieldDescriptorProto)
     }
     pub fn extension(&self) -> impl IntoIterator<Item = Result<FieldDescriptorProto>> {
-        self.0
-            .field(6)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(FieldDescriptorProto)
+        self.0.repeated_message_field(6, FieldDescriptorProto)
     }
     pub fn nested_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
-        self.0
-            .field(3)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(DescriptorProto)
+        self.0.repeated_message_field(3, DescriptorProto)
     }
     // pub fn extension_range(&self) -> impl IntoIterator<Item = Result<descriptor_proto::ExtensionRangeProto>>
     pub fn enum_type(&self) -> impl IntoIterator<Item = Result<EnumDescriptorProto>> {
-        self.0
-            .field(4)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(EnumDescriptorProto)
+        self.0.repeated_message_field(4, EnumDescriptorProto)
     }
     pub fn oneof_decl(&self) -> impl IntoIterator<Item = Result<OneofDescriptorProto>> {
-        self.0
-            .field(8)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(OneofDescriptorProto)
+        self.0.repeated_message_field(8, OneofDescriptorProto)
     }
     // pub fn options(&self) -> Result<Option<MessageOptions>>
     // pub fn reserved_range(&self) -> impl IntoIterator<Item = Result<descriptor_proto::ReservedRangeProto>>
@@ -318,11 +286,7 @@ impl<'a> EnumDescriptorProto<'a> {
         self.0.field(1).as_scalar_string()
     }
     pub fn value(&self) -> impl IntoIterator<Item = Result<EnumValueDescriptorProto>> {
-        self.0
-            .field(2)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(EnumValueDescriptorProto)
+        self.0.repeated_message_field(2, EnumValueDescriptorProto)
     }
     // pub fn options(&self) -> Result<Option<EnumOptions>>
     // pub fn reserved_range(&self) -> impl IntoIterator<Item = Result<ReservedRange>>
