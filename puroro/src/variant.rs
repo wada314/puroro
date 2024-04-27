@@ -19,33 +19,7 @@ use ::std::num::TryFromIntError;
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
 
-impl Variant {
-    pub fn as_uint64(&self) -> u64 {
-        self.clone().into()
-    }
-    pub fn as_int64(&self) -> i64 {
-        i64::from_le_bytes(self.0)
-    }
-    pub fn try_as_int32(&self) -> Result<i32> {
-        Ok(self
-            .as_int64()
-            .try_into()
-            .map_err(|_| ErrorKind::VariantValueTooLarge)?)
-    }
-    pub fn try_as_uint32(&self) -> Result<u32> {
-        Ok(self
-            .as_uint64()
-            .try_into()
-            .map_err(|_| ErrorKind::VariantValueTooLarge)?)
-    }
-    pub fn try_as_bool(&self) -> Result<bool> {
-        Ok(match self.as_uint64() {
-            0 => false,
-            1 => true,
-            _ => Err(ErrorKind::VariantValueTooLarge)?,
-        })
-    }
-}
+// From integers to Variant
 
 impl From<u64> for Variant {
     #[inline]
@@ -53,14 +27,30 @@ impl From<u64> for Variant {
         Variant(u64::to_le_bytes(value))
     }
 }
-
-impl From<Variant> for u64 {
+impl From<i64> for Variant {
     #[inline]
-    fn from(value: Variant) -> Self {
-        u64::from_le_bytes(value.0)
+    fn from(value: i64) -> Self {
+        Variant(i64::to_le_bytes(value))
     }
 }
-
+impl From<u32> for Variant {
+    #[inline]
+    fn from(value: u32) -> Self {
+        (value as u64).into()
+    }
+}
+impl From<i32> for Variant {
+    #[inline]
+    fn from(value: i32) -> Self {
+        (value as i64).into()
+    }
+}
+impl From<bool> for Variant {
+    #[inline]
+    fn from(value: bool) -> Self {
+        (value as u64).into()
+    }
+}
 impl TryFrom<usize> for Variant {
     type Error = TryFromIntError;
     #[inline]
@@ -68,6 +58,55 @@ impl TryFrom<usize> for Variant {
         Ok(<u64>::into(value.try_into()?))
     }
 }
+
+// From Variant to integers
+
+impl From<Variant> for u64 {
+    #[inline]
+    fn from(value: Variant) -> Self {
+        u64::from_le_bytes(value.0)
+    }
+}
+impl From<Variant> for i64 {
+    #[inline]
+    fn from(value: Variant) -> Self {
+        i64::from_le_bytes(value.0)
+    }
+}
+impl TryFrom<Variant> for u32 {
+    type Error = ErrorKind;
+    #[inline]
+    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
+        Ok(u32::try_from(u64::from(value))?)
+    }
+}
+impl TryFrom<Variant> for i32 {
+    type Error = ErrorKind;
+    #[inline]
+    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
+        Ok(i32::try_from(i64::from(value))?)
+    }
+}
+impl TryFrom<Variant> for bool {
+    type Error = ErrorKind;
+    #[inline]
+    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
+        match u64::from(value) {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(ErrorKind::IntegerToBoolError),
+        }
+    }
+}
+impl TryFrom<Variant> for usize {
+    type Error = ErrorKind;
+    #[inline]
+    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
+        Ok(usize::try_from(u64::from(value))?)
+    }
+}
+
+// Variant readers
 
 pub trait ReadExtVariant {
     fn read_variant(&mut self) -> Result<Variant>;

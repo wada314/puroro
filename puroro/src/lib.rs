@@ -33,8 +33,10 @@ use ::thiserror::Error;
 pub enum ErrorKind {
     #[error("io error")]
     IoError(#[from] ::std::io::Error),
-    #[error("try from int error")]
-    TryFromIntError(#[from] ::std::num::TryFromIntError),
+    #[error("std::num::TryFromIntError")]
+    StdTryFromIntError(#[from] ::std::num::TryFromIntError),
+    #[error("integer to boolean conversion error")]
+    IntegerToBoolError,
     #[error("Deserializing invalid variant (too long).")]
     TooLongEncodedVariant,
     #[error("Generic deserializing error.")]

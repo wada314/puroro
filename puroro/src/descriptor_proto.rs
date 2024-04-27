@@ -15,10 +15,20 @@
 use itertools::Itertools;
 
 use crate::untyped_message::UntypedMessage;
+use crate::variant::Variant;
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
 impl UntypedMessage<'_> {
+    fn repeated_variant_field<'a, T>(&'a self, number: i32) -> impl 'a + Iterator<Item = Result<T>>
+    where
+        Variant: TryInto<T, Error = ErrorKind>,
+    {
+        self.field(number)
+            .as_repeated_variant(false)
+            .into_iter()
+            .map(|var| var?.try_into())
+    }
     fn repeated_message_field<'a, T, F: 'a + Fn(UntypedMessage<'a>) -> T>(
         &'a self,
         number: i32,
@@ -87,14 +97,14 @@ impl<'a> FileDescriptorProto<'a> {
             .field(10)
             .as_repeated_variant(false)
             .into_iter()
-            .map(|v| v?.try_as_int32())
+            .map(|v| v?.try_into())
     }
     pub fn weak_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
         self.0
             .field(11)
             .as_repeated_variant(false)
             .into_iter()
-            .map(|v| v?.try_as_int32())
+            .map(|v| v?.try_into())
     }
     pub fn message_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
         self.0.repeated_message_field(4, DescriptorProto)
@@ -113,7 +123,7 @@ impl<'a> FileDescriptorProto<'a> {
         self.0
             .field(14)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_int32()?.try_into())
+            .map(|v| TryInto::<i32>::try_into(v)?.try_into())
             .transpose()
     }
 }
@@ -155,21 +165,21 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0
             .field(3)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_int32())
+            .map(|v| v.try_into())
             .transpose()
     }
     pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
         self.0
             .field(4)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_int32()?.try_into())
+            .map(|v| TryInto::<i32>::try_into(v)?.try_into())
             .transpose()
     }
     pub fn type_(&self) -> Result<Option<field_descriptor_proto::Type>> {
         self.0
             .field(5)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_int32()?.try_into())
+            .map(|v| TryInto::<i32>::try_into(v)?.try_into())
             .transpose()
     }
     pub fn type_name(&self) -> Result<Option<&str>> {
@@ -185,7 +195,7 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0
             .field(9)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_int32())
+            .map(|v| v.try_into())
             .transpose()
     }
     pub fn json_name(&self) -> Result<Option<&str>> {
@@ -196,7 +206,7 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0
             .field(17)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_bool())
+            .map(|v| v.try_into())
             .transpose()
     }
 }
@@ -303,7 +313,7 @@ impl<'a> EnumValueDescriptorProto<'a> {
         self.0
             .field(2)
             .as_scalar_variant(true)?
-            .map(|v| v.try_as_int32())
+            .map(|v| v.try_into())
             .transpose()
     }
 }
