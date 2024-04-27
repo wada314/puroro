@@ -20,6 +20,15 @@ use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
 impl UntypedMessage<'_> {
+    fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T>>
+    where
+        Variant: TryInto<T, Error = ErrorKind>,
+    {
+        self.field(number)
+            .as_scalar_variant(false)?
+            .map(|v| v.try_into())
+            .transpose()
+    }
     fn repeated_variant_field<'a, T>(&'a self, number: i32) -> impl 'a + Iterator<Item = Result<T>>
     where
         Variant: TryInto<T, Error = ErrorKind>,
@@ -154,11 +163,7 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0.field(1).as_scalar_string()
     }
     pub fn number(&self) -> Result<Option<i32>> {
-        self.0
-            .field(3)
-            .as_scalar_variant(true)?
-            .map(|v| v.try_into())
-            .transpose()
+        self.0.scalar_variant_field(3)
     }
     pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
         self.0
@@ -184,22 +189,14 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0.field(7).as_scalar_string()
     }
     pub fn oneof_index(&self) -> Result<Option<i32>> {
-        self.0
-            .field(9)
-            .as_scalar_variant(true)?
-            .map(|v| v.try_into())
-            .transpose()
+        self.0.scalar_variant_field(9)
     }
     pub fn json_name(&self) -> Result<Option<&str>> {
         self.0.field(10).as_scalar_string()
     }
     // pub fn options(&self) -> Result<Option<FieldOptions>>
     pub fn proto3_optional(&self) -> Result<Option<bool>> {
-        self.0
-            .field(17)
-            .as_scalar_variant(true)?
-            .map(|v| v.try_into())
-            .transpose()
+        self.0.scalar_variant_field(17)
     }
 }
 
@@ -302,10 +299,6 @@ impl<'a> EnumValueDescriptorProto<'a> {
         self.0.field(1).as_scalar_string()
     }
     pub fn number(&self) -> Result<Option<i32>> {
-        self.0
-            .field(2)
-            .as_scalar_variant(true)?
-            .map(|v| v.try_into())
-            .transpose()
+        self.0.scalar_variant_field(2)
     }
 }
