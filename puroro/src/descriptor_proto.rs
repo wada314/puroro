@@ -38,6 +38,14 @@ impl UntypedMessage<'_> {
             .into_iter()
             .map(|var| var?.try_into())
     }
+    fn scalar_enum2_field<T>(&self, number: i32) -> Result<Option<T>>
+    where
+        T: TryFrom<i32, Error = ErrorKind>,
+    {
+        self.scalar_variant_field::<i32>(number)?
+            .map(|i| i.try_into())
+            .transpose()
+    }
     fn repeated_message_field<'a, T, F: 'a + Fn(UntypedMessage<'a>) -> T>(
         &'a self,
         number: i32,
@@ -121,11 +129,7 @@ impl<'a> FileDescriptorProto<'a> {
         self.0.field(12).as_scalar_string()
     }
     pub fn edition(&self) -> Result<Option<Edition>> {
-        self.0
-            .field(14)
-            .as_scalar_variant(true)?
-            .map(|v| TryInto::<i32>::try_into(v)?.try_into())
-            .transpose()
+        self.0.scalar_enum2_field(14)
     }
 }
 
@@ -166,18 +170,10 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0.scalar_variant_field(3)
     }
     pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
-        self.0
-            .field(4)
-            .as_scalar_variant(true)?
-            .map(|v| TryInto::<i32>::try_into(v)?.try_into())
-            .transpose()
+        self.0.scalar_enum2_field(4)
     }
     pub fn type_(&self) -> Result<Option<field_descriptor_proto::Type>> {
-        self.0
-            .field(5)
-            .as_scalar_variant(true)?
-            .map(|v| TryInto::<i32>::try_into(v)?.try_into())
-            .transpose()
+        self.0.scalar_enum2_field(5)
     }
     pub fn type_name(&self) -> Result<Option<&str>> {
         self.0.field(6).as_scalar_string()
