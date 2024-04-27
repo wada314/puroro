@@ -41,7 +41,7 @@ pub trait SliceExtReadRecord<'a> {
 impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>> {
         use crate::variant::ReadExtVariant;
-        let tag = self.read_variant()?.try_as_uint32()?;
+        let tag: u32 = self.read_variant()?.try_into()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         // safe because the `tag >> 3` is less than 29 bits
         let number: i32 = (tag >> 3).try_into().unwrap();
@@ -62,7 +62,7 @@ impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
                 Payload::I64(chunk.clone())
             }
             WireType::Len => {
-                let length: usize = self.read_variant()?.try_as_int32()?.try_into()?;
+                let length: usize = self.read_variant()?.try_into()?;
                 let Some((chunk, remain)) = self.try_split_at(length) else {
                     Err(ErrorKind::DeserUnexpectedEof)?
                 };
@@ -91,7 +91,7 @@ impl<T: Read> ReadExtReadRecord for T {
         let Some(tag_var) = self.read_variant_or_eof()? else {
             return Ok(None);
         };
-        let tag = tag_var.try_as_uint32()?;
+        let tag: u32 = tag_var.try_into()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         // safe because the `tag >> 3` is less than 29 bits
         let number: i32 = (tag >> 3).try_into().unwrap();
@@ -108,7 +108,7 @@ impl<T: Read> ReadExtReadRecord for T {
                 Payload::I64(buf)
             }
             WireType::Len => {
-                let length: u64 = self.read_variant()?.try_as_int32()?.try_into()?;
+                let length: u64 = self.read_variant()?.into();
                 Payload::Len((self as &mut dyn Read).take(length))
             }
         };

@@ -383,7 +383,7 @@ mod test {
                 "The input buffer is not read until the end. value={}.",
                 expected
             );
-            assert_eq!(expected, var.as_uint64());
+            assert_eq!(expected, var.into());
         }
 
         Ok(())
@@ -399,7 +399,7 @@ mod test {
                 "The input buffer is not read until the end. value={}.",
                 expected
             );
-            assert_eq!(expected, var.as_uint64());
+            assert_eq!(expected, var.into());
         }
 
         Ok(())
