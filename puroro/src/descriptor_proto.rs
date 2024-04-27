@@ -93,18 +93,10 @@ impl<'a> FileDescriptorProto<'a> {
         self.0.field(3).as_repeated_string()
     }
     pub fn public_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
-        self.0
-            .field(10)
-            .as_repeated_variant(false)
-            .into_iter()
-            .map(|v| v?.try_into())
+        self.0.repeated_variant_field(10)
     }
     pub fn weak_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
-        self.0
-            .field(11)
-            .as_repeated_variant(false)
-            .into_iter()
-            .map(|v| v?.try_into())
+        self.0.repeated_variant_field(11)
     }
     pub fn message_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
         self.0.repeated_message_field(4, DescriptorProto)
