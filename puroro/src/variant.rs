@@ -82,7 +82,7 @@ impl VariantIntegerType for Bool {
     type RustType = bool;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
-        match u64::from(var) {
+        match u64::try_from_variant(var)? {
             0 => Ok(false),
             1 => Ok(true),
             _ => Err(ErrorKind::IntegerToBoolError),
@@ -118,90 +118,26 @@ impl VariantIntegerType for SInt64 {
     }
 }
 
-// From integers to Variant
-
-impl From<u64> for Variant {
-    #[inline]
-    fn from(value: u64) -> Self {
-        Variant(u64::to_le_bytes(value))
-    }
-}
-impl From<i64> for Variant {
-    #[inline]
-    fn from(value: i64) -> Self {
-        Variant(i64::to_le_bytes(value))
-    }
-}
+// To and from unsigned integers are unique (where signed integers are not)
 impl From<u32> for Variant {
-    #[inline]
     fn from(value: u32) -> Self {
         (value as u64).into()
     }
 }
-impl From<i32> for Variant {
-    #[inline]
-    fn from(value: i32) -> Self {
-        (value as i64).into()
+impl From<u64> for Variant {
+    fn from(value: u64) -> Self {
+        Variant(value.to_le_bytes())
     }
 }
-impl From<bool> for Variant {
-    #[inline]
-    fn from(value: bool) -> Self {
-        (value as u64).into()
-    }
-}
-impl TryFrom<usize> for Variant {
-    type Error = TryFromIntError;
-    #[inline]
-    fn try_from(value: usize) -> ::std::result::Result<Self, Self::Error> {
-        Ok(<u64>::into(value.try_into()?))
-    }
-}
-
-// From Variant to integers
-
 impl From<Variant> for u64 {
-    #[inline]
-    fn from(value: Variant) -> Self {
-        u64::from_le_bytes(value.0)
-    }
-}
-impl From<Variant> for i64 {
-    #[inline]
-    fn from(value: Variant) -> Self {
-        i64::from_le_bytes(value.0)
+    fn from(variant: Variant) -> Self {
+        u64::from_le_bytes(variant.0)
     }
 }
 impl TryFrom<Variant> for u32 {
     type Error = ErrorKind;
-    #[inline]
-    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
-        Ok(u32::try_from(u64::from(value))?)
-    }
-}
-impl TryFrom<Variant> for i32 {
-    type Error = ErrorKind;
-    #[inline]
-    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
-        Ok(i32::try_from(i64::from(value))?)
-    }
-}
-impl TryFrom<Variant> for bool {
-    type Error = ErrorKind;
-    #[inline]
-    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
-        match u64::from(value) {
-            0 => Ok(false),
-            1 => Ok(true),
-            _ => Err(ErrorKind::IntegerToBoolError),
-        }
-    }
-}
-impl TryFrom<Variant> for usize {
-    type Error = ErrorKind;
-    #[inline]
-    fn try_from(value: Variant) -> ::std::result::Result<Self, Self::Error> {
-        Ok(usize::try_from(u64::from(value))?)
+    fn try_from(variant: Variant) -> Result<Self> {
+        Ok(Into::<u64>::into(variant).try_into()?)
     }
 }
 
@@ -295,7 +231,7 @@ impl<T: BufRead> BufReadExtVariant for T {
             }
         }
 
-        Ok(result.into())
+        Ok(UInt64::try_into_variant(result)?)
     }
 
     #[inline]
@@ -338,7 +274,9 @@ impl<T: BufRead> BufReadExtVariant for T {
         let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
         self.consume(load_bytes_num);
-        Ok(((connected_7bits_x4 & mask) as u64).into())
+        Ok(UInt64::try_into_variant(
+            (connected_7bits_x4 & mask) as u64,
+        )?)
     }
 
     #[inline]
@@ -363,7 +301,9 @@ impl<T: BufRead> BufReadExtVariant for T {
         let load_bytes_num = ((a & 0x00_80) >> 7) as usize + 1;
 
         self.consume(load_bytes_num);
-        Ok(((connected_7bits_x2 & mask) as u64).into())
+        Ok(UInt64::try_into_variant(
+            (connected_7bits_x2 & mask) as u64,
+        )?)
     }
 }
 
