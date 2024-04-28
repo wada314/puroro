@@ -17,7 +17,7 @@ pub mod record;
 use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::WireType;
-use crate::variant::Variant;
+use crate::variant::{Int32, Variant, VariantIntegerType};
 use crate::Result;
 use ::futures::io::{AsyncRead, Take as AsyncTake};
 use ::std::alloc::Allocator;
@@ -28,14 +28,14 @@ pub trait DeserMessageHandler<LenBody> {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-    fn parse_len_and_check_is_message(&mut self, num: i32, len_body: LenBody) -> Result<bool>;
+    fn parse_len_and_check_is_message(&mut self, num: i32, len_body: &mut LenBody) -> Result<bool>;
 }
 
-trait BufReadExt: Sized {
+trait ReadExt: Sized {
     fn read_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, i32)>>;
 }
 
-impl<T: BufRead> BufReadExt for Take<T> {
+impl<T: Read> ReadExt for T {
     fn read_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, i32)>> {
         use crate::variant::ReadExtVariant;
         let Some(tag_var) = self.read_variant_or_eof()? else {
@@ -43,9 +43,45 @@ impl<T: BufRead> BufReadExt for Take<T> {
         };
         let tag: u32 = tag_var.try_into()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
-        let field_number: i32 = (tag >> 3).try_into()?; // safe because the `tag >> 3` is less than 29 bits
+        // safe because the `tag >> 3` is less than 29 bits
+        let field_number: i32 = (tag >> 3).try_into()?;
         Ok(Some((wire_type, field_number)))
     }
+}
+
+pub fn deser_from_take2<T: BufRead>(
+    mut read: Take<T>,
+    handler: &mut dyn DeserMessageHandler<Take<T>>,
+) -> Result<()> {
+    use crate::variant::BufReadExtVariant;
+    while let Some((wire_type, field_number)) = read.read_wire_type_and_field_number()? {
+        match wire_type {
+            WireType::Variant => {
+                handler.parse_variant(field_number, read.read_variant()?)?;
+            }
+            WireType::I32 => {
+                let mut buf = [0; 4];
+                read.read_exact(&mut buf)?;
+                handler.parse_i32(field_number, buf)?;
+            }
+            WireType::I64 => {
+                let mut buf = [0; 8];
+                read.read_exact(&mut buf)?;
+                handler.parse_i64(field_number, buf)?;
+            }
+            WireType::Len => {
+                let len: usize = Int32::try_from_variant(read.read_variant()?)?.try_into()?;
+                if handler.parse_len_and_check_is_message(field_number, &mut read)? {
+                    // do something
+                    todo!();
+                } else {
+                    // Not a message, skip the bytes.
+                    read.consume(len);
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 pub trait DeseringMessage {
