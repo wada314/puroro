@@ -21,7 +21,14 @@ use crate::Result;
 use ::futures::io::{AsyncRead, Take as AsyncTake};
 use ::std::alloc::Allocator;
 use ::std::future::Future;
-use ::std::io::{Read, Take};
+use ::std::io::{BufRead, Read, Take};
+
+pub trait DeserMessageHandler<LenBody> {
+    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
+    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
+    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
+    fn parse_len_and_check_is_message(&mut self, num: i32, len_body: LenBody) -> Result<bool>;
+}
 
 pub trait DeseringMessage {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
@@ -37,15 +44,6 @@ pub trait DeseringMessage {
         num: i32,
         read: &mut Take<&mut dyn Read>,
     ) -> Result<Option<&mut dyn DeseringMessage>>;
-}
-
-pub trait AsyncDeseringMessage<A: Allocator>: DeseringMessage {
-    fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
-        &'this mut self,
-        num: i32,
-        read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
-        alloc: A,
-    ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>;
 }
 
 pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {

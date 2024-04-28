@@ -18,7 +18,7 @@ use ::std::io::{BufRead, Read, Write};
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
 
-// Int types of proto
+// region: Traits for variant int types of proto
 pub trait VariantIntegerType {
     type RustType;
     fn try_from_variant(var: Variant) -> Result<Self::RustType>;
@@ -117,6 +117,9 @@ impl VariantIntegerType for SInt64 {
     }
 }
 
+// endregion
+
+// region: From unsigned
 // To and from unsigned integers are unique (where signed integers are not)
 impl From<u32> for Variant {
     fn from(value: u32) -> Self {
@@ -140,6 +143,8 @@ impl TryFrom<Variant> for u32 {
     }
 }
 
+// endregion
+
 // Variant readers
 
 pub trait ReadExtVariant {
@@ -148,7 +153,10 @@ pub trait ReadExtVariant {
     fn into_variant_iter(self) -> impl Iterator<Item = Result<Variant>>;
 }
 
-pub trait BufReadExtVariant {
+pub trait BufReadExtVariant: ReadExtVariant {
+    fn read_variant(&mut self) -> Result<Variant> {
+        <Self as ReadExtVariant>::read_variant(self)
+    }
     fn read_variant_peek_10(&mut self) -> Result<Variant>;
     fn read_variant_assume_4(&mut self) -> Result<Variant>;
     fn read_variant_assume_2(&mut self) -> Result<Variant>;

@@ -15,7 +15,7 @@
 use crate::internal::WireType;
 use crate::variant::{Int32, Variant, VariantIntegerType};
 use crate::{ErrorKind, Result};
-use ::std::io::{Read, Take};
+use ::std::io::{BufRead, Read, Take};
 
 #[derive(Debug)]
 pub struct Record<T> {
@@ -28,6 +28,42 @@ pub enum Payload<T> {
     I32([u8; 4]),
     I64([u8; 8]),
     Len(T),
+}
+
+pub trait BufReadExtRecord: Sized {
+    fn read_record(&mut self) -> Result<Option<Record<Self>>>;
+}
+
+impl<T: BufRead> BufReadExtRecord for Take<T> {
+    fn read_record(&mut self) -> Result<Option<Record<Self>>> {
+        use crate::variant::ReadExtVariant;
+        let Some(tag_variant) = self.read_variant_or_eof()? else {
+            return Ok(None);
+        };
+        let tag: u32 = tag_variant.try_into()?;
+        let wire_type: WireType = (tag & 0x7).try_into()?;
+        // safe because the `tag >> 3` is less than 29 bits
+        let number: i32 = (tag >> 3).try_into().unwrap();
+
+        let payload = match wire_type {
+            WireType::Variant => Payload::Variant(self.read_variant()?),
+            WireType::I32 => {
+                let mut buf = [0; 4];
+                self.read_exact(&mut buf)?;
+                Payload::I32(buf)
+            }
+            WireType::I64 => {
+                let mut buf = [0; 8];
+                self.read_exact(&mut buf)?;
+                Payload::I64(buf)
+            }
+            WireType::Len => {
+                let length: usize = Int32::try_from_variant(self.read_variant()?)?.try_into()?;
+                Payload::Len(self.get_mut().take(length as u64))
+            }
+        };
+        Ok(Some(Record { number, payload }))
+    }
 }
 
 pub trait SliceExtReadRecord<'a> {
