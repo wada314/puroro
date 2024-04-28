@@ -50,14 +50,21 @@ impl<R> ScopeRead<R> {
 }
 impl<R: Read> Read for ScopeRead<R> {
     fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize> {
-        if let Some(limit) = self.limits.last() {
-            if buf.len() > *limit {
+        if let Some(limit) = self.limits.last_mut() {
+            let read_len = if buf.len() > *limit {
                 // Buffer is too long. Limit the buffer.
-                return self.read.read(&mut buf[..*limit]);
-            }
+                self.read.read(&mut buf[..*limit])?
+            } else {
+                // Buffer is within the limit.
+                self.read.read(buf)?
+            };
+            // Shrink the current scope's limit size.
+            *limit -= read_len;
+            Ok(read_len)
+        } else {
+            // No limit is set. Identical to the inner read.
+            self.read.read(buf)
         }
-        // Buffer is within the limit.
-        self.read.read(buf)
     }
 }
 impl<R: BufRead> BufRead for ScopeRead<R> {
@@ -301,6 +308,18 @@ mod test {
         // (message, field number of child)
         stack: Vec<(SampleMessage, i32)>,
     }
+    impl SampleMessageHandler {
+        fn new() -> Self {
+            Self {
+                cur: SampleMessage::default(),
+                stack: Vec::new(),
+            }
+        }
+        fn finish(self) -> SampleMessage {
+            assert!(self.stack.is_empty());
+            self.cur
+        }
+    }
     impl<R: BufRead> DeserMessageHandler<R> for SampleMessageHandler {
         fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
             self.cur.variants.push(Field { num, val: var });
@@ -533,66 +552,38 @@ mod test {
     }
 
     #[test]
-    fn test_slice_deser_variant_fields() {
+    fn test_deser_variant_fields() {
         let (input, expected) = test_case_variant_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_slice(&mut msg, &input).unwrap();
+        let mut handler = SampleMessageHandler::new();
+        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        let msg = handler.finish();
         assert_eq!(expected, msg);
     }
 
     #[test]
-    fn test_slice_deser_fixed_fields() {
+    fn test_deser_fixed_fields() {
         let (input, expected) = test_case_fixed_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_slice(&mut msg, &input).unwrap();
+        let mut handler = SampleMessageHandler::new();
+        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        let msg = handler.finish();
         assert_eq!(expected, msg);
     }
 
     #[test]
-    fn test_slice_deser_string_fields() {
+    fn test_deser_string_fields() {
         let (input, expected) = test_case_string_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_slice(&mut msg, &input).unwrap();
+        let mut handler = SampleMessageHandler::new();
+        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        let msg = handler.finish();
         assert_eq!(expected, msg);
     }
 
     #[test]
-    fn test_slice_deser_complex_fields() {
+    fn test_deser_complex_fields() {
         let (input, expected) = test_case_complex_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_slice(&mut msg, &input).unwrap();
-        assert_eq!(expected, msg);
-    }
-
-    #[test]
-    fn test_read_deser_variant_fields() {
-        let (input, expected) = test_case_variant_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_read(&mut msg, input.as_slice()).unwrap();
-        assert_eq!(expected, msg);
-    }
-
-    #[test]
-    fn test_read_deser_fixed_fields() {
-        let (input, expected) = test_case_fixed_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_read(&mut msg, input.as_slice()).unwrap();
-        assert_eq!(expected, msg);
-    }
-
-    #[test]
-    fn test_read_deser_string_fields() {
-        let (input, expected) = test_case_string_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_read(&mut msg, input.as_slice()).unwrap();
-        assert_eq!(expected, msg);
-    }
-
-    #[test]
-    fn test_read_deser_complex_fields() {
-        let (input, expected) = test_case_complex_fields();
-        let mut msg = SampleMessage::default();
-        deser_from_read(&mut msg, input.as_slice()).unwrap();
+        let mut handler = SampleMessageHandler::new();
+        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        let msg = handler.finish();
         assert_eq!(expected, msg);
     }
 }
