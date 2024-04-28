@@ -116,7 +116,7 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-pub fn deser_from_read2<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
+pub fn deser_from_read<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
     read: R,
     handler: &mut H,
 ) -> Result<()> {
@@ -156,125 +156,6 @@ pub fn deser_from_read2<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
                 } else {
                     handler.parse_len(field_number, &mut read)?;
                     read.unscope();
-                }
-            }
-        }
-    }
-    Ok(())
-}
-
-pub trait DeseringMessage {
-    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
-    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
-    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-    fn parse_len_slice_or_alloc_child(
-        &mut self,
-        num: i32,
-        slice: &[u8],
-    ) -> Result<Option<&mut dyn DeseringMessage>>;
-    fn parse_len_read_or_alloc_child(
-        &mut self,
-        num: i32,
-        read: &mut Take<&mut dyn Read>,
-    ) -> Result<Option<&mut dyn DeseringMessage>>;
-}
-
-pub fn deser_from_slice(root: &mut dyn DeseringMessage, mut input: &[u8]) -> Result<()> {
-    use self::record::SliceExtReadRecord;
-    let mut msg = UnfrozenMut::new(root);
-    let mut stack = Vec::new();
-    loop {
-        if !input.is_empty() {
-            // Still have records to process.
-            let record = input.read_record()?;
-            match record.payload {
-                Payload::Variant(val) => msg.parse_variant(record.number, val)?,
-                Payload::I32(val) => msg.parse_i32(record.number, val)?,
-                Payload::I64(val) => msg.parse_i64(record.number, val)?,
-                Payload::Len(input_subpart) => {
-                    match msg.try_work(|msg| {
-                        msg.parse_len_slice_or_alloc_child(record.number, input_subpart)
-                    })? {
-                        FreezeStatus::Unfrozen(new_msg) => {
-                            msg = new_msg;
-                        }
-                        FreezeStatus::Frozen(frozen_msg, new_msg) => {
-                            stack.push((input, frozen_msg));
-                            input = input_subpart;
-                            msg = new_msg;
-                        }
-                    }
-                }
-            }
-        } else {
-            // Finished the current level of messages, pop the stack to go back to the parent.
-            let Some((prev_input, prev_msg)) = stack.pop() else {
-                // No more records and no more stack, we're done for the given slice.
-                break;
-            };
-            input = prev_input;
-            msg = prev_msg.unfreeze(msg);
-        }
-    }
-    Ok(())
-}
-
-pub fn deser_from_bound_read(
-    root: &mut dyn DeseringMessage,
-    mut bound_read: Take<impl Read>,
-) -> Result<()> {
-    use self::record::ReadExtReadRecord;
-    let mut msg = UnfrozenMut::new(root);
-    let mut stack = Vec::new();
-    loop {
-        if let Some(record) = bound_read.read_record_or_eof()? {
-            // Still have records to process.
-            match record.payload {
-                Payload::Variant(val) => msg.parse_variant(record.number, val)?,
-                Payload::I32(val) => msg.parse_i32(record.number, val)?,
-                Payload::I64(val) => msg.parse_i64(record.number, val)?,
-                Payload::Len(mut child_read) => {
-                    match msg.try_work(|msg| {
-                        msg.parse_len_read_or_alloc_child(record.number, &mut child_read)
-                    })? {
-                        FreezeStatus::Unfrozen(new_msg) => {
-                            msg = new_msg;
-                        }
-                        FreezeStatus::Frozen(frozen_msg, new_msg) => {
-                            let child_read_remaining = child_read.limit();
-                            let parent_read_remaining = bound_read.limit() - child_read_remaining;
-                            bound_read.set_limit(child_read_remaining);
-                            stack.push((parent_read_remaining, frozen_msg));
-                            msg = new_msg;
-                        }
-                    }
-                }
-            }
-        } else {
-            // Finished the current level of messages, pop the stack to go back to the parent.
-            let Some((parent_read_remaining, prev_msg)) = stack.pop() else {
-                // No more records and no more stack, we're done for the given `Read` instance.
-                break;
-            };
-            bound_read.set_limit(parent_read_remaining);
-            msg = prev_msg.unfreeze(msg);
-        }
-    }
-    Ok(())
-}
-
-pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> Result<()> {
-    use self::record::ReadExtReadRecord;
-    while let Some(record) = read.read_record_or_eof()? {
-        match record.payload {
-            Payload::Variant(val) => root.parse_variant(record.number, val)?,
-            Payload::I32(val) => root.parse_i32(record.number, val)?,
-            Payload::I64(val) => root.parse_i64(record.number, val)?,
-            Payload::Len(mut child_read) => {
-                if let Some(child) =
-                    root.parse_len_read_or_alloc_child(record.number, &mut child_read)?
-                {
-                    deser_from_bound_read(child, child_read)?;
                 }
             }
         }
@@ -360,69 +241,6 @@ mod test {
                 val: Box::new(child),
             });
             Ok(())
-        }
-    }
-
-    impl DeseringMessage for SampleMessage {
-        fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
-            self.variants.push(Field { num, val: var });
-            Ok(())
-        }
-
-        fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
-            self.i32s.push(Field {
-                num,
-                val: u32::from_le_bytes(val),
-            });
-            Ok(())
-        }
-
-        fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
-            self.i64s.push(Field {
-                num,
-                val: u64::from_le_bytes(val),
-            });
-            Ok(())
-        }
-
-        fn parse_len_slice_or_alloc_child(
-            &mut self,
-            num: i32,
-            slice: &[u8],
-        ) -> Result<Option<&mut dyn DeseringMessage>> {
-            if num % 2 == 0 {
-                self.strings.push(Field {
-                    num,
-                    val: String::from_utf8_lossy(slice).into_owned(),
-                })
-            } else {
-                self.children.push(Field {
-                    num,
-                    val: Box::new(SampleMessage::default()),
-                });
-                return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
-            }
-            Ok(None)
-        }
-
-        fn parse_len_read_or_alloc_child(
-            &mut self,
-            num: i32,
-            read: &mut Take<&mut dyn Read>,
-        ) -> Result<Option<&mut dyn DeseringMessage>> {
-            if num % 2 == 0 {
-                let mut val = String::with_capacity(read.limit() as usize);
-                read.read_to_string(&mut val)?;
-                debug_assert_eq!(0, read.limit());
-                self.strings.push(Field { num, val });
-            } else {
-                self.children.push(Field {
-                    num,
-                    val: Box::new(SampleMessage::default()),
-                });
-                return Ok(Some(self.children.last_mut().unwrap().val.as_mut()));
-            }
-            Ok(None)
         }
     }
 
@@ -555,7 +373,7 @@ mod test {
     fn test_deser_variant_fields() {
         let (input, expected) = test_case_variant_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        deser_from_read(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
@@ -564,7 +382,7 @@ mod test {
     fn test_deser_fixed_fields() {
         let (input, expected) = test_case_fixed_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        deser_from_read(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
@@ -573,7 +391,7 @@ mod test {
     fn test_deser_string_fields() {
         let (input, expected) = test_case_string_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        deser_from_read(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
@@ -582,7 +400,7 @@ mod test {
     fn test_deser_complex_fields() {
         let (input, expected) = test_case_complex_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read2(input.as_slice(), &mut handler).unwrap();
+        deser_from_read(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
