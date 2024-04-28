@@ -252,36 +252,6 @@ mod test {
         }
     }
 
-    impl<A: Allocator> AsyncDeseringMessage<A> for SampleMessage {
-        fn parse_len_async_read_or_alloc_child<'this: 'r, 'r>(
-            &'this mut self,
-            num: i32,
-            mut read: AsyncTake<&'r mut (dyn AsyncRead + Unpin)>,
-            alloc: A,
-        ) -> Box<dyn 'r + Future<Output = Result<Option<&'this mut dyn DeseringMessage>>>, A>
-        {
-            let boxed = Box::new_in(
-                async move {
-                    if num % 2 == 0 {
-                        let mut val = String::with_capacity(read.limit() as usize);
-                        read.read_to_string(&mut val).await?;
-                        self.strings.push(Field { num, val });
-                        Result::<_>::Ok(None)
-                    } else {
-                        self.children.push(Field {
-                            num,
-                            val: Box::new(SampleMessage::default()),
-                        });
-                        Result::<_>::Ok(Some(self.children.last_mut().unwrap().val.as_mut()
-                            as &mut dyn DeseringMessage))
-                    }
-                },
-                alloc,
-            );
-            boxed
-        }
-    }
-
     const INPUT_FIELD_1_VARIANT_1: &[u8] = &[(1 << 3) | WireType::Variant as u8, 0x01];
     const INPUT_FIELD_2_VARIANT_3: &[u8] = &[(2 << 3) | WireType::Variant as u8, 0x03];
     const INPUT_FIELD_3_I32_1: &[u8] = &[(3 << 3) | WireType::I32 as u8, 1, 0, 0, 0];
