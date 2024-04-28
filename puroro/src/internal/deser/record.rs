@@ -15,7 +15,7 @@
 use crate::internal::WireType;
 use crate::variant::{Int32, Variant, VariantIntegerType};
 use crate::{ErrorKind, Result};
-use ::std::io::{BufRead, Read, Take};
+use ::std::io::{Read, Take};
 
 #[derive(Debug)]
 pub struct Record<T> {

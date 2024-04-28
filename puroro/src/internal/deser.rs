@@ -14,12 +14,10 @@
 
 pub mod record;
 
-use self::record::Payload;
-use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::WireType;
 use crate::variant::{Int32, Variant, VariantIntegerType};
 use crate::Result;
-use ::std::io::{BufRead, Read, Take};
+use ::std::io::{BufRead, Read};
 
 pub struct ScopeRead<R> {
     read: R,
