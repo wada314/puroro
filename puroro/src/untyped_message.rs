@@ -100,7 +100,8 @@ impl<'a> Field<'a> {
     pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
         self.as_repeated_variant(allow_packed)
             .into_iter()
-            .try_last()
+            .last()
+            .transpose()
     }
 
     pub fn as_repeated_variant(
@@ -119,7 +120,7 @@ impl<'a> Field<'a> {
     }
 
     pub fn as_scalar_string(&self) -> Result<Option<&'a str>> {
-        self.as_repeated_string().into_iter().try_last()
+        self.as_repeated_string().into_iter().last().transpose()
     }
 
     pub fn as_repeated_string(&self) -> impl 'a + IntoIterator<Item = Result<&'a str>> {
@@ -168,16 +169,3 @@ where
         }
     }
 }
-
-trait IteratorExt: Iterator {
-    /// Returns the last element if the all elements are Ok.
-    /// If any of the elements are Err, returns the first Err.
-    /// If no element is found, returns None.
-    fn try_last<T, E>(mut self) -> ::std::result::Result<Option<T>, E>
-    where
-        Self: Sized + Iterator<Item = ::std::result::Result<T, E>>,
-    {
-        self.try_fold(None, |_, x| x.map(Some))
-    }
-}
-impl<T> IteratorExt for T where T: Iterator {}
