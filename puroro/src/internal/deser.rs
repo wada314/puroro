@@ -83,7 +83,7 @@ impl<R: BufRead> BufRead for ScopeRead<R> {
 
 pub trait DeserMessageHandler<LenBody> {
     type MessageType;
-    fn finish(self) -> Self::MessageType;
+    fn finish(self) -> Result<Self::MessageType>;
 
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
@@ -282,7 +282,7 @@ pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> R
 mod test {
     use super::*;
     use crate::internal::WireType;
-    use crate::variant::*;
+    use crate::{variant::*, ErrorKind};
     use ::futures::io::AsyncReadExt;
 
     #[derive(Default, Debug, PartialEq)]
@@ -298,6 +298,60 @@ mod test {
         i64s: Vec<Field<u64>>,
         strings: Vec<Field<String>>,
         children: Vec<Field<Box<SampleMessage>>>,
+    }
+
+    struct SampleMessageHandler {
+        cur: SampleMessage,
+        // (message, field number of child)
+        stack: Vec<(SampleMessage, i32)>,
+    }
+    impl<R: BufRead> DeserMessageHandler<R> for SampleMessageHandler {
+        type MessageType = SampleMessage;
+        fn finish(self) -> Result<Self::MessageType> {
+            assert!(self.stack.is_empty());
+            Ok(self.cur)
+        }
+        fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
+            self.cur.variants.push(Field { num, val: var });
+            Ok(())
+        }
+        fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
+            self.cur.i32s.push(Field {
+                num,
+                val: u32::from_le_bytes(val),
+            });
+            Ok(())
+        }
+
+        fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
+            self.cur.i64s.push(Field {
+                num,
+                val: u64::from_le_bytes(val),
+            });
+            Ok(())
+        }
+        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<()> {
+            let mut val = String::new();
+            read.read_to_string(&mut val)?;
+            self.cur.strings.push(Field { num, val });
+            Ok(())
+        }
+        fn is_message_field(&self, num: i32) -> bool {
+            num % 2 == 1
+        }
+        fn start_message(&mut self, num: i32) -> Result<()> {
+            self.stack.push((::std::mem::take(&mut self.cur), num));
+            Ok(())
+        }
+        fn end_message(&mut self) -> Result<()> {
+            let (parent, field_num) = self.stack.pop().ok_or(ErrorKind::DeserUnexpectedEof)?;
+            let child = ::std::mem::replace(&mut self.cur, parent);
+            self.cur.children.push(Field {
+                num: field_num,
+                val: Box::new(child),
+            });
+            Ok(())
+        }
     }
 
     impl DeseringMessage for SampleMessage {
