@@ -16,6 +16,7 @@ pub mod record;
 
 use self::record::Payload;
 use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
+use crate::internal::WireType;
 use crate::variant::Variant;
 use crate::Result;
 use ::futures::io::{AsyncRead, Take as AsyncTake};
@@ -28,6 +29,23 @@ pub trait DeserMessageHandler<LenBody> {
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
     fn parse_len_and_check_is_message(&mut self, num: i32, len_body: LenBody) -> Result<bool>;
+}
+
+trait BufReadExt: Sized {
+    fn read_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, i32)>>;
+}
+
+impl<T: BufRead> BufReadExt for Take<T> {
+    fn read_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, i32)>> {
+        use crate::variant::ReadExtVariant;
+        let Some(tag_var) = self.read_variant_or_eof()? else {
+            return Ok(None);
+        };
+        let tag: u32 = tag_var.try_into()?;
+        let wire_type: WireType = (tag & 0x7).try_into()?;
+        let field_number: i32 = (tag >> 3).try_into()?; // safe because the `tag >> 3` is less than 29 bits
+        Ok(Some((wire_type, field_number)))
+    }
 }
 
 pub trait DeseringMessage {
