@@ -45,7 +45,7 @@ impl UntypedMessage<'_> {
     where
         T: TryFrom<i32, Error = ErrorKind>,
     {
-        self.scalar_variant_field::<i32>(number)?
+        self.scalar_variant_field::<Int32>(number)?
             .map(|i| i.try_into())
             .transpose()
     }
