@@ -19,6 +19,7 @@ use crate::variant::{Bool, Int32, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
+/// Some utility impls for `UntypedMessage`.
 impl UntypedMessage<'_> {
     fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T::RustType>>
     where
