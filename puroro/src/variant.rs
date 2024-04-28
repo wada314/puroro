@@ -19,6 +19,66 @@ use ::std::num::TryFromIntError;
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
 
+// Int types of proto
+pub trait VariantIntegerType {
+    type RustType;
+    fn try_from_variant(var: Variant) -> Result<Self::RustType>;
+    fn try_into_variant(x: Self::RustType) -> Result<Variant>;
+}
+
+pub type Int32 = i32;
+pub type Int64 = i64;
+pub type UInt32 = u32;
+pub type UInt64 = u64;
+pub type Bool = bool;
+pub struct SInt32;
+pub struct SInt64;
+
+impl VariantIntegerType for Int32 {
+    type RustType = i32;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        Ok(i64::try_from_variant(var)?.try_into()?)
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        i64::try_into_variant(x.into())
+    }
+}
+impl VariantIntegerType for Int64 {
+    type RustType = i64;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        Ok(i64::from_le_bytes(var.0))
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        Ok(Variant(x.to_le_bytes()))
+    }
+}
+impl VariantIntegerType for UInt32 {
+    type RustType = u32;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        Ok(u64::try_from_variant(var)?.try_into()?)
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        Ok(u64::try_into_variant(x as u64)?)
+    }
+}
+impl VariantIntegerType for UInt64 {
+    type RustType = u64;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        Ok(u64::from_le_bytes(var.0))
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        Ok(Variant(x.to_le_bytes()))
+    }
+}
+
 // From integers to Variant
 
 impl From<u64> for Variant {
