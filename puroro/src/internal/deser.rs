@@ -25,10 +25,21 @@ use ::std::future::Future;
 use ::std::io::{BufRead, Read, Take};
 
 pub trait DeserMessageHandler<LenBody> {
+    type MessageType;
+    fn finish(self) -> Self::MessageType;
+
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-    fn parse_len_and_check_is_message(&mut self, num: i32, len_body: &mut LenBody) -> Result<bool>;
+    fn parse_len<F, H2>(
+        &mut self,
+        num: i32,
+        len_body: &mut LenBody,
+        parse_as_message: F,
+    ) -> Result<()>
+    where
+        F: FnOnce(&mut LenBody, H2) -> Result<H2::MessageType>,
+        H2: DeserMessageHandler<LenBody>;
 }
 
 trait ReadExt: Sized {
@@ -51,7 +62,7 @@ impl<T: Read> ReadExt for T {
 
 pub fn deser_from_take2<T: BufRead>(
     mut read: Take<T>,
-    handler: &mut dyn DeserMessageHandler<Take<T>>,
+    handler: &mut impl DeserMessageHandler<Take<T>>,
 ) -> Result<()> {
     use crate::variant::BufReadExtVariant;
     while let Some((wire_type, field_number)) = read.read_wire_type_and_field_number()? {
@@ -71,13 +82,7 @@ pub fn deser_from_take2<T: BufRead>(
             }
             WireType::Len => {
                 let len: usize = Int32::try_from_variant(read.read_variant()?)?.try_into()?;
-                if handler.parse_len_and_check_is_message(field_number, &mut read)? {
-                    // do something
-                    todo!();
-                } else {
-                    // Not a message, skip the bytes.
-                    read.consume(len);
-                }
+                todo!()
             }
         }
     }
