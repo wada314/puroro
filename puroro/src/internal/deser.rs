@@ -41,6 +41,9 @@ impl<R> ScopeRead<R> {
     pub fn unscope(&mut self) {
         self.limits.pop();
     }
+    pub fn depth(&self) -> usize {
+        self.limits.len()
+    }
     pub fn limit(&self) -> Option<usize> {
         self.limits.last().copied()
     }
@@ -109,12 +112,24 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-pub fn deser_from_scope_read<T: BufRead, H: DeserMessageHandler<ScopeRead<T>>>(
-    mut read: ScopeRead<T>,
+pub fn deser_from_read2<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
+    read: R,
     handler: &mut H,
 ) -> Result<()> {
     use crate::variant::BufReadExtVariant;
-    while let Some((wire_type, field_number)) = read.read_wire_type_and_field_number()? {
+    let mut read = ScopeRead::new(read);
+    loop {
+        let Some((wire_type, field_number)) = read.read_wire_type_and_field_number()? else {
+            if read.depth() == 0 {
+                // No more records and no more stack, we're done for the given `Read` instance.
+                break;
+            } else {
+                // Finished the current level of messages, pop the stack to go back to the parent.
+                read.unscope();
+                handler.end_message()?;
+                continue;
+            }
+        };
         match wire_type {
             WireType::Variant => {
                 handler.parse_variant(field_number, read.read_variant()?)?;
@@ -134,7 +149,6 @@ pub fn deser_from_scope_read<T: BufRead, H: DeserMessageHandler<ScopeRead<T>>>(
                 read.scope(len);
                 if handler.is_message_field(field_number) {
                     handler.start_message(field_number)?;
-                    todo!();
                 } else {
                     handler.parse_len(field_number, &mut read)?;
                     read.unscope();
