@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use itertools::Itertools;
-
 use crate::untyped_message::UntypedMessage;
 use crate::variant::{Bool, Int32, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
+use ::itertools::Itertools;
 
 /// Some utility impls for `UntypedMessage`.
 impl UntypedMessage<'_> {
@@ -63,8 +62,8 @@ impl UntypedMessage<'_> {
 }
 
 #[derive(DDeref, DFrom)]
-pub struct FileDescriptorSetProto<'a>(UntypedMessage<'a>);
-impl<'a> FileDescriptorSetProto<'a> {
+pub struct FileDescriptorSet<'a>(UntypedMessage<'a>);
+impl<'a> FileDescriptorSet<'a> {
     pub fn file(&self) -> impl IntoIterator<Item = Result<FileDescriptorProto>> {
         self.0.repeated_message_field(1, FileDescriptorProto)
     }
