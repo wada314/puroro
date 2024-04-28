@@ -313,7 +313,6 @@ mod test {
             });
             Ok(())
         }
-
         fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
             self.cur.i64s.push(Field {
                 num,
