@@ -24,6 +24,63 @@ use ::std::alloc::Allocator;
 use ::std::future::Future;
 use ::std::io::{BufRead, Read, Take};
 
+pub struct ScopeRead<R> {
+    read: R,
+    limits: Vec<usize>,
+}
+impl<R> ScopeRead<R> {
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            limits: Vec::new(),
+        }
+    }
+    pub fn scope(&mut self, limit: usize) {
+        if let Some(last_mut) = self.limits.last_mut() {
+            *last_mut -= limit;
+        }
+        self.limits.push(limit);
+    }
+    pub fn unscope(&mut self) {
+        self.limits.pop();
+    }
+    pub fn limit(&self) -> Option<usize> {
+        self.limits.last().copied()
+    }
+}
+impl<R: Read> Read for ScopeRead<R> {
+    fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize> {
+        if let Some(limit) = self.limits.last() {
+            if buf.len() > *limit {
+                // Buffer is too long. Limit the buffer.
+                return self.read.read(&mut buf[..*limit]);
+            }
+        }
+        // Buffer is within the limit.
+        self.read.read(buf)
+    }
+}
+impl<R: BufRead> BufRead for ScopeRead<R> {
+    fn fill_buf(&mut self) -> ::std::io::Result<&[u8]> {
+        let buf = self.read.fill_buf()?;
+        if let Some(limit) = self.limits.last() {
+            if buf.len() > *limit {
+                // Buffer is too long. Limit the buffer.
+                return Ok(&buf[..*limit]);
+            }
+        }
+        // Buffer is within the limit.
+        Ok(buf)
+    }
+    fn consume(&mut self, amt: usize) {
+        if let Some(last_mut) = self.limits.last_mut() {
+            assert!(amt <= *last_mut);
+            *last_mut -= amt;
+        }
+        self.read.consume(amt)
+    }
+}
+
 pub trait DeserMessageHandler<LenBody> {
     type MessageType;
     fn finish(self) -> Self::MessageType;
@@ -31,15 +88,10 @@ pub trait DeserMessageHandler<LenBody> {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-    fn parse_len<F, H2>(
-        &mut self,
-        num: i32,
-        len_body: &mut LenBody,
-        parse_as_message: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&mut LenBody, H2) -> Result<H2::MessageType>,
-        H2: DeserMessageHandler<LenBody>;
+    fn parse_len(&mut self, num: i32, val: LenBody) -> Result<()>;
+    fn is_message_field(&self, num: i32) -> bool;
+    fn start_message(&mut self, num: i32) -> Result<()>;
+    fn end_message(&mut self) -> Result<()>;
 }
 
 trait ReadExt: Sized {
@@ -60,9 +112,9 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-pub fn deser_from_take2<T: BufRead>(
-    mut read: Take<T>,
-    handler: &mut impl DeserMessageHandler<Take<T>>,
+pub fn deser_from_scope_read<'a, T: 'a + BufRead, H: DeserMessageHandler<&'a mut ScopeRead<T>>>(
+    mut read: ScopeRead<T>,
+    handler: &mut H,
 ) -> Result<()> {
     use crate::variant::BufReadExtVariant;
     while let Some((wire_type, field_number)) = read.read_wire_type_and_field_number()? {
@@ -82,7 +134,14 @@ pub fn deser_from_take2<T: BufRead>(
             }
             WireType::Len => {
                 let len: usize = Int32::try_from_variant(read.read_variant()?)?.try_into()?;
-                todo!()
+                read.scope(len);
+                if handler.is_message_field(field_number) {
+                    handler.start_message(field_number)?;
+                    todo!();
+                } else {
+                    handler.parse_len(field_number, &mut read)?;
+                    read.unscope();
+                }
             }
         }
     }
