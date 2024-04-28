@@ -14,7 +14,6 @@
 
 use crate::{ErrorKind, Result};
 use ::std::io::{BufRead, Read, Write};
-use ::std::num::TryFromIntError;
 
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
@@ -231,7 +230,7 @@ impl<T: BufRead> BufReadExtVariant for T {
             }
         }
 
-        Ok(UInt64::try_into_variant(result)?)
+        Ok(result.into())
     }
 
     #[inline]
@@ -274,9 +273,7 @@ impl<T: BufRead> BufReadExtVariant for T {
         let load_bytes_num = [1, 2, 1, 3, 1, 2, 1, 4][load_bytes_num_index];
 
         self.consume(load_bytes_num);
-        Ok(UInt64::try_into_variant(
-            (connected_7bits_x4 & mask) as u64,
-        )?)
+        Ok(((connected_7bits_x4 & mask) as u64).into())
     }
 
     #[inline]
@@ -301,9 +298,7 @@ impl<T: BufRead> BufReadExtVariant for T {
         let load_bytes_num = ((a & 0x00_80) >> 7) as usize + 1;
 
         self.consume(load_bytes_num);
-        Ok(UInt64::try_into_variant(
-            (connected_7bits_x2 & mask) as u64,
-        )?)
+        Ok(((connected_7bits_x2 & mask) as u64).into())
     }
 }
 

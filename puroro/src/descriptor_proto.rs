@@ -15,28 +15,31 @@
 use itertools::Itertools;
 
 use crate::untyped_message::UntypedMessage;
-use crate::variant::Variant;
+use crate::variant::{Bool, Int32, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
 impl UntypedMessage<'_> {
-    fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T>>
+    fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T::RustType>>
     where
-        Variant: TryInto<T, Error = ErrorKind>,
+        T: VariantIntegerType,
     {
         self.field(number)
             .as_scalar_variant(false)?
-            .map(|v| v.try_into())
+            .map(|v| T::try_from_variant(v))
             .transpose()
     }
-    fn repeated_variant_field<'a, T>(&'a self, number: i32) -> impl 'a + Iterator<Item = Result<T>>
+    fn repeated_variant_field<'a, T>(
+        &'a self,
+        number: i32,
+    ) -> impl 'a + Iterator<Item = Result<T::RustType>>
     where
-        Variant: TryInto<T, Error = ErrorKind>,
+        T: VariantIntegerType,
     {
         self.field(number)
             .as_repeated_variant(false)
             .into_iter()
-            .map(|var| var?.try_into())
+            .map(|var| T::try_from_variant(var?))
     }
     fn scalar_enum2_field<T>(&self, number: i32) -> Result<Option<T>>
     where
@@ -110,10 +113,10 @@ impl<'a> FileDescriptorProto<'a> {
         self.0.field(3).as_repeated_string()
     }
     pub fn public_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
-        self.0.repeated_variant_field(10)
+        self.0.repeated_variant_field::<Int32>(10)
     }
     pub fn weak_dependency(&self) -> impl '_ + IntoIterator<Item = Result<i32>> {
-        self.0.repeated_variant_field(11)
+        self.0.repeated_variant_field::<Int32>(11)
     }
     pub fn message_type(&self) -> impl IntoIterator<Item = Result<DescriptorProto>> {
         self.0.repeated_message_field(4, DescriptorProto)
@@ -167,7 +170,7 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0.field(1).as_scalar_string()
     }
     pub fn number(&self) -> Result<Option<i32>> {
-        self.0.scalar_variant_field(3)
+        self.0.scalar_variant_field::<Int32>(3)
     }
     pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
         self.0.scalar_enum2_field(4)
@@ -185,14 +188,14 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0.field(7).as_scalar_string()
     }
     pub fn oneof_index(&self) -> Result<Option<i32>> {
-        self.0.scalar_variant_field(9)
+        self.0.scalar_variant_field::<Int32>(9)
     }
     pub fn json_name(&self) -> Result<Option<&str>> {
         self.0.field(10).as_scalar_string()
     }
     // pub fn options(&self) -> Result<Option<FieldOptions>>
     pub fn proto3_optional(&self) -> Result<Option<bool>> {
-        self.0.scalar_variant_field(17)
+        self.0.scalar_variant_field::<Bool>(17)
     }
 }
 
@@ -295,6 +298,6 @@ impl<'a> EnumValueDescriptorProto<'a> {
         self.0.field(1).as_scalar_string()
     }
     pub fn number(&self) -> Result<Option<i32>> {
-        self.0.scalar_variant_field(2)
+        self.0.scalar_variant_field::<Int32>(2)
     }
 }

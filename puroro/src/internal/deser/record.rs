@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::WireType;
-use crate::variant::Variant;
+use crate::variant::{Int32, Variant, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::std::io::{Read, Take};
 
@@ -62,7 +62,7 @@ impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
                 Payload::I64(chunk.clone())
             }
             WireType::Len => {
-                let length: usize = self.read_variant()?.try_into()?;
+                let length: usize = Int32::try_from_variant(self.read_variant()?)?.try_into()?;
                 let Some((chunk, remain)) = self.try_split_at(length) else {
                     Err(ErrorKind::DeserUnexpectedEof)?
                 };
