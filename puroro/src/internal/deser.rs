@@ -155,7 +155,7 @@ pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> R
 mod test {
     use super::*;
     use crate::internal::WireType;
-    use crate::variant::WriteExtVariant;
+    use crate::variant::*;
     use ::futures::io::AsyncReadExt;
 
     #[derive(Default, Debug, PartialEq)]
@@ -281,7 +281,10 @@ mod test {
             .write_variant(Variant::from(((num as u64) << 3) | WireType::Len as u64))
             .unwrap();
         result
-            .write_variant(Variant::try_from(submessage_bytes.as_ref().len()).unwrap())
+            .write_variant(
+                Int32::try_into_variant(submessage_bytes.as_ref().len().try_into().unwrap())
+                    .unwrap(),
+            )
             .unwrap();
         result.extend_from_slice(submessage_bytes.as_ref());
         result
@@ -296,11 +299,11 @@ mod test {
         let mut expected = SampleMessage::default();
         expected.variants.push(Field {
             num: 1,
-            val: 1.into(),
+            val: 1u32.into(),
         });
         expected.variants.push(Field {
             num: 2,
-            val: 3.into(),
+            val: 3u32.into(),
         });
         (vec, expected)
     }
@@ -371,7 +374,7 @@ mod test {
         });
         expected.children[0].val.variants.push(Field {
             num: 2,
-            val: 3.into(),
+            val: 3u32.into(),
         });
         expected.children[0].val.children.push(Field {
             num: 3,
@@ -382,7 +385,7 @@ mod test {
             .variants
             .push(Field {
                 num: 1,
-                val: 1.into(),
+                val: 1u32.into(),
             });
         expected.children[1].val.i32s.push(Field { num: 4, val: 3 });
         (msg1_bytes, expected)
