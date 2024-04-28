@@ -19,6 +19,7 @@ use ::itertools::Either;
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 
+/// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
 pub struct UntypedMessage<'a> {
     fields: HashMap<i32, Vec<WireTypeAndPayload<'a>>>,
