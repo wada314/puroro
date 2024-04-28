@@ -64,7 +64,7 @@ impl VariantIntegerType for UInt32 {
     }
     #[inline]
     fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        Ok(u64::try_into_variant(x as u64)?)
+        u64::try_into_variant(x as u64)
     }
 }
 impl VariantIntegerType for UInt64 {
@@ -76,6 +76,45 @@ impl VariantIntegerType for UInt64 {
     #[inline]
     fn try_into_variant(x: Self::RustType) -> Result<Variant> {
         Ok(Variant(x.to_le_bytes()))
+    }
+}
+impl VariantIntegerType for Bool {
+    type RustType = bool;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        match u64::from(var) {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(ErrorKind::IntegerToBoolError),
+        }
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        u64::try_into_variant(x as u64)
+    }
+}
+impl VariantIntegerType for SInt32 {
+    type RustType = i32;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        Ok(SInt64::try_from_variant(var)?.try_into()?)
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        Ok(SInt64::try_into_variant(x as i64)?)
+    }
+}
+impl VariantIntegerType for SInt64 {
+    type RustType = i64;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        #![allow(unused)]
+        todo!()
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        #![allow(unused)]
+        todo!()
     }
 }
 
