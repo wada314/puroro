@@ -308,7 +308,9 @@ mod test {
     impl<R: BufRead> DeserMessageHandler<R> for SampleMessageHandler {
         type MessageType = SampleMessage;
         fn finish(self) -> Result<Self::MessageType> {
-            assert!(self.stack.is_empty());
+            if !self.stack.is_empty() {
+                Err(ErrorKind::DeserUnexpectedEof)?;
+            }
             Ok(self.cur)
         }
         fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
