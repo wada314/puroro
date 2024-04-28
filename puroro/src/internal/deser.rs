@@ -19,9 +19,6 @@ use crate::internal::freezing_mut::{FreezeStatus, UnfrozenMut};
 use crate::internal::WireType;
 use crate::variant::{Int32, Variant, VariantIntegerType};
 use crate::Result;
-use ::futures::io::{AsyncRead, Take as AsyncTake};
-use ::std::alloc::Allocator;
-use ::std::future::Future;
 use ::std::io::{BufRead, Read, Take};
 
 pub struct ScopeRead<R> {
