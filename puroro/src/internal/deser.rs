@@ -82,9 +82,6 @@ impl<R: BufRead> BufRead for ScopeRead<R> {
 }
 
 pub trait DeserMessageHandler<LenBody> {
-    type MessageType;
-    fn finish(self) -> Result<Self::MessageType>;
-
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
@@ -281,9 +278,7 @@ pub fn deser_from_read(root: &mut dyn DeseringMessage, mut read: impl Read) -> R
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::internal::WireType;
     use crate::{variant::*, ErrorKind};
-    use ::futures::io::AsyncReadExt;
 
     #[derive(Default, Debug, PartialEq)]
     struct Field<T> {
@@ -296,6 +291,7 @@ mod test {
         variants: Vec<Field<Variant>>,
         i32s: Vec<Field<u32>>,
         i64s: Vec<Field<u64>>,
+        // even number fields are strings, odd number fields are submessages
         strings: Vec<Field<String>>,
         children: Vec<Field<Box<SampleMessage>>>,
     }
@@ -306,13 +302,6 @@ mod test {
         stack: Vec<(SampleMessage, i32)>,
     }
     impl<R: BufRead> DeserMessageHandler<R> for SampleMessageHandler {
-        type MessageType = SampleMessage;
-        fn finish(self) -> Result<Self::MessageType> {
-            if !self.stack.is_empty() {
-                Err(ErrorKind::DeserUnexpectedEof)?;
-            }
-            Ok(self.cur)
-        }
         fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
             self.cur.variants.push(Field { num, val: var });
             Ok(())
