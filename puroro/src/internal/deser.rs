@@ -88,7 +88,7 @@ pub trait DeserMessageHandler<LenBody> {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-    fn parse_len(&mut self, num: i32, val: LenBody) -> Result<()>;
+    fn parse_len(&mut self, num: i32, val: &mut LenBody) -> Result<()>;
     fn is_message_field(&self, num: i32) -> bool;
     fn start_message(&mut self, num: i32) -> Result<()>;
     fn end_message(&mut self) -> Result<()>;
@@ -112,7 +112,7 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-pub fn deser_from_scope_read<'a, T: 'a + BufRead, H: DeserMessageHandler<&'a mut ScopeRead<T>>>(
+pub fn deser_from_scope_read<T: BufRead, H: DeserMessageHandler<ScopeRead<T>>>(
     mut read: ScopeRead<T>,
     handler: &mut H,
 ) -> Result<()> {
