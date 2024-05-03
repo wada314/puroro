@@ -47,6 +47,8 @@ pub enum ErrorKind {
     UnknownWireType,
     #[error("Unexpected EOF detected while deserializing")]
     DeserUnexpectedEof,
+    #[error("Error while validating the input descriptor protos. %s")]
+    DescriptorProtoValidationError(String),
     #[error("Error while constructing a descriptor tree structure. %s")]
     DescriptorStructureError(String),
     #[error("Error when matching the GenericMessage type's field type.")]

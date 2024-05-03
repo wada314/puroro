@@ -19,6 +19,7 @@ use crate::descriptor_proto::{
     FileDescriptorProto, FileDescriptorSet, OneofDescriptorProto,
 };
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::std::cell::OnceCell;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -100,11 +101,36 @@ pub struct FieldDescriptor {
     label: FieldLabel,
 }
 
+// region: EnumDescriptor
+
 #[derive(Debug, Clone)]
 pub struct EnumDescriptor {
     name: String,
     values: Vec<EnumValueDescriptor>,
 }
+
+impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptor {
+    type Error = ErrorKind;
+    fn try_from(proto: EnumDescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto
+                .name()?
+                .ok_or_else(|| {
+                    ErrorKind::DescriptorProtoValidationError("No EnumDescriptor name".to_string())
+                })?
+                .to_string(),
+            values: proto
+                .value()
+                .into_iter()
+                .map_ok(EnumValueDescriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+        })
+    }
+}
+
+// endregion:
+
+// region: EnumValueDescriptor
 
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptor {
@@ -112,15 +138,34 @@ pub struct EnumValueDescriptor {
     number: i32,
 }
 
+impl<'a> TryFrom<EnumValueDescriptorProto<'a>> for EnumValueDescriptor {
+    type Error = ErrorKind;
+    fn try_from(proto: EnumValueDescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto
+                .name()?
+                .ok_or_else(|| {
+                    ErrorKind::DescriptorProtoValidationError(
+                        "No EnumValueDescriptor name".to_string(),
+                    )
+                })?
+                .to_string(),
+            number: proto.number()?.ok_or_else(|| {
+                ErrorKind::DescriptorProtoValidationError(
+                    "No EnumValueDescriptor number".to_string(),
+                )
+            })?,
+        })
+    }
+}
+
+// endregion:
+
 #[derive(Debug, Clone)]
 pub struct OneofDescriptor {
     name: String,
     field_indices: Vec<usize>,
 }
-
-// endregion:
-
-// region: TryFrom<descriptor protos> implementations
 
 // endregion:
 
