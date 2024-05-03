@@ -18,7 +18,7 @@ use crate::descriptor_proto::{
     DescriptorProto, EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto,
     FileDescriptorProto, FileDescriptorSet, OneofDescriptorProto,
 };
-use crate::Result;
+use crate::{ErrorKind, Result};
 use ::std::cell::OnceCell;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -64,6 +64,8 @@ pub enum FieldLabel {
     REQUIRED,
     REPEATED,
 }
+
+// region: Descriptor raw structs
 
 /// Structs for the each descriptor types.
 /// These structs are strictly read-only and only knows about its children, not parent.
@@ -115,6 +117,12 @@ pub struct OneofDescriptor {
     name: String,
     field_indices: Vec<usize>,
 }
+
+// endregion:
+
+// region: TryFrom<descriptor protos> implementations
+
+// endregion:
 
 /// The struct types with the "context".
 /// The context here means the path from the root of the descriptor tree to the current node.
