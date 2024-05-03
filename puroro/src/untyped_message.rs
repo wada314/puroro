@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::deser::record::{Payload, Record, SliceExtReadRecord};
-use crate::internal::deser::DeserMessageHandler;
+use crate::internal::deser::record::{Payload, Record};
+use crate::internal::deser::{deser_from_read, DeserMessageHandler};
 use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
@@ -54,12 +54,8 @@ impl<'a> UntypedMessage<'a> {
         Ok(message)
     }
 
-    pub fn merge_from_buffer(&mut self, mut buf: &'a [u8]) -> Result<()> {
-        for try_record in buf.into_records() {
-            let record = try_record?;
-            self.payloads_for_field_mut(record.number.clone())
-                .push(record.into());
-        }
+    pub fn merge_from_buffer(&mut self, buf: &'a [u8]) -> Result<()> {
+        deser_from_read(buf, self)?;
         Ok(())
     }
 
