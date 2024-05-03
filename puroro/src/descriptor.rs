@@ -14,6 +14,10 @@
 
 #![allow(unused)]
 
+use crate::descriptor_proto::{
+    DescriptorProto, EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto,
+    FileDescriptorProto, FileDescriptorSet, OneofDescriptorProto,
+};
 use crate::Result;
 use ::std::cell::OnceCell;
 
@@ -66,50 +70,50 @@ pub enum FieldLabel {
 
 #[derive(Debug, Clone)]
 pub struct FileDescriptor {
-    pub name: String,
-    pub package: String,
-    pub dependency_indices: Vec<usize>,
-    pub message_types: Vec<Descriptor>,
-    pub enum_types: Vec<EnumDescriptor>,
-    pub syntax: String,
-    pub edition: Edition,
+    name: String,
+    package: String,
+    dependency_indices: Vec<usize>,
+    message_types: Vec<Descriptor>,
+    enum_types: Vec<EnumDescriptor>,
+    syntax: String,
+    edition: Edition,
 }
 
 #[derive(Debug, Clone)]
 pub struct Descriptor {
-    pub name: String,
-    pub full_name: String,
-    pub fields: Vec<FieldDescriptor>,
-    pub oneof_decls: Vec<OneofDescriptor>,
-    pub nested_types: Vec<Descriptor>,
-    pub enum_types: Vec<EnumDescriptor>,
+    name: String,
+    full_name: String,
+    fields: Vec<FieldDescriptor>,
+    oneof_decls: Vec<OneofDescriptor>,
+    nested_types: Vec<Descriptor>,
+    enum_types: Vec<EnumDescriptor>,
 }
 
 #[derive(Debug, Clone)]
 pub struct FieldDescriptor {
-    pub name: String,
-    pub number: i32,
-    pub type_: FieldType,
-    pub type_name: String,
-    pub label: FieldLabel,
+    name: String,
+    number: i32,
+    type_: FieldType,
+    type_name: String,
+    label: FieldLabel,
 }
 
 #[derive(Debug, Clone)]
 pub struct EnumDescriptor {
-    pub name: String,
-    pub values: Vec<EnumValueDescriptor>,
+    name: String,
+    values: Vec<EnumValueDescriptor>,
 }
 
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptor {
-    pub name: String,
-    pub number: i32,
+    name: String,
+    number: i32,
 }
 
 #[derive(Debug, Clone)]
 pub struct OneofDescriptor {
-    pub name: String,
-    pub field_indices: Vec<usize>,
+    name: String,
+    field_indices: Vec<usize>,
 }
 
 /// The struct types with the "context".
