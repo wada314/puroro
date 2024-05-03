@@ -57,15 +57,3 @@ pub enum ErrorKind {
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub trait Message {}
-
-#[derive(Default, Clone)]
-pub struct DescriptorProto {
-    pub name: String,                      // 1
-    pub fields: Vec<FieldDescriptorProto>, // 2
-}
-
-#[derive(Default, Clone)]
-pub struct FieldDescriptorProto {
-    pub name: String, // 1
-    pub number: i32,  // 3
-}
