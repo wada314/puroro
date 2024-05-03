@@ -13,11 +13,13 @@
 // limitations under the License.
 
 use crate::internal::deser::record::{Payload, Record, SliceExtReadRecord};
+use crate::internal::deser::DeserMessageHandler;
 use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
+use ::std::io::Read;
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
@@ -167,5 +169,39 @@ where
             Payload::I32(buf) => WireTypeAndPayload::Fixed32(buf),
             Payload::Len(buf) => WireTypeAndPayload::Len(buf.into()),
         }
+    }
+}
+
+impl<'a, R: Read> DeserMessageHandler<R> for UntypedMessage<'a> {
+    fn start_message(&mut self, #[allow(unused)] num: i32) -> Result<()> {
+        unimplemented!()
+    }
+    fn end_message(&mut self) -> Result<()> {
+        unimplemented!()
+    }
+    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
+        self.payloads_for_field_mut(num)
+            .push(WireTypeAndPayload::Variant(var));
+        Ok(())
+    }
+    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
+        self.payloads_for_field_mut(num)
+            .push(WireTypeAndPayload::Fixed32(val));
+        Ok(())
+    }
+    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
+        self.payloads_for_field_mut(num)
+            .push(WireTypeAndPayload::Fixed64(val));
+        Ok(())
+    }
+    fn parse_len(&mut self, num: i32, val: &mut R) -> Result<()> {
+        let mut buf = Vec::new();
+        val.read_to_end(&mut buf)?;
+        self.payloads_for_field_mut(num)
+            .push(WireTypeAndPayload::Len(buf.into()));
+        Ok(())
+    }
+    fn is_message_field(&self, #[allow(unused)] num: i32) -> bool {
+        false
     }
 }
