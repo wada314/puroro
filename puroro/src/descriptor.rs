@@ -153,15 +153,10 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
     type Error = ErrorKind;
     fn try_from(proto: FieldDescriptorProto) -> Result<Self> {
         Ok(Self {
-            name: proto
-                .name()?
-                .ok_or_else(|| {
-                    ErrorKind::DescriptorProtoValidationError("No FieldDescriptor name".to_string())
-                })?
-                .to_string(),
-            number: proto.number()?.ok_or_else(|| {
-                ErrorKind::DescriptorProtoValidationError("No FieldDescriptor number".to_string())
-            })?,
+            name: proto.name()?.try_into_string("No FieldDescriptor name")?,
+            number: proto
+                .number()?
+                .try_into_number("No FieldDescriptor number")?,
             type_: proto
                 .type_()?
                 .ok_or_else(|| {
@@ -189,12 +184,7 @@ impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptor {
     type Error = ErrorKind;
     fn try_from(proto: EnumDescriptorProto) -> Result<Self> {
         Ok(Self {
-            name: proto
-                .name()?
-                .ok_or_else(|| {
-                    ErrorKind::DescriptorProtoValidationError("No EnumDescriptor name".to_string())
-                })?
-                .to_string(),
+            name: proto.name()?.try_into_string("No EnumDescriptor name")?,
             values: proto
                 .value()
                 .into_iter()
@@ -220,28 +210,33 @@ impl<'a> TryFrom<EnumValueDescriptorProto<'a>> for EnumValueDescriptor {
         Ok(Self {
             name: proto
                 .name()?
-                .ok_or_else(|| {
-                    ErrorKind::DescriptorProtoValidationError(
-                        "No EnumValueDescriptor name".to_string(),
-                    )
-                })?
-                .to_string(),
-            number: proto.number()?.ok_or_else(|| {
-                ErrorKind::DescriptorProtoValidationError(
-                    "No EnumValueDescriptor number".to_string(),
-                )
-            })?,
+                .try_into_string("No EnumValueDescriptor name")?,
+            number: proto
+                .number()?
+                .try_into_number("No EnumValueDescriptor number")?,
         })
     }
 }
 
 // endregion:
 
+// region: OneofDescriptor
+
 #[derive(Debug, Clone)]
 pub struct OneofDescriptor {
     name: String,
-    field_indices: Vec<usize>,
 }
+
+impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
+    type Error = ErrorKind;
+    fn try_from(proto: OneofDescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto.name()?.try_into_string("No OneofDescriptor name")?,
+        })
+    }
+}
+
+// endregion:
 
 // endregion:
 
@@ -588,3 +583,25 @@ pub struct OneofDescriptorWithContext<'a> {
 
 #[derive(Default)]
 pub struct OneofDescriptorCache {}
+
+// region: utils
+
+trait TryIntoString {
+    fn try_into_string(self, error_message: &str) -> Result<String>;
+}
+impl TryIntoString for Option<&str> {
+    fn try_into_string(self, error_message: &str) -> Result<String> {
+        self.ok_or_else(|| ErrorKind::DescriptorProtoValidationError(error_message.to_string()))
+            .map(str::to_string)
+    }
+}
+trait TryIntoNumber<T> {
+    fn try_into_number(self, error_message: &str) -> Result<T>;
+}
+impl<T> TryIntoNumber<T> for Option<T> {
+    fn try_into_number(self, error_message: &str) -> Result<T> {
+        self.ok_or_else(|| ErrorKind::DescriptorProtoValidationError(error_message.to_string()))
+    }
+}
+
+// endregion:
