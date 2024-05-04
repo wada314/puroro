@@ -137,7 +137,7 @@ pub struct Descriptor {
     enum_types: Vec<EnumDescriptor>,
 }
 
-// region: FiledDescriptor
+// region: FieldDescriptor
 
 #[derive(Debug, Clone)]
 pub struct FieldDescriptor {
@@ -145,7 +145,8 @@ pub struct FieldDescriptor {
     number: i32,
     type_: FieldType,
     type_name: Option<String>,
-    label: FieldLabel,
+    label: Option<FieldLabel>,
+    oneof_index: Option<i32>,
 }
 
 impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
@@ -168,14 +169,8 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
                 })?
                 .into(),
             type_name: proto.type_name()?.map(str::to_string),
-            label: proto
-                .label()?
-                .ok_or_else(|| {
-                    ErrorKind::DescriptorProtoValidationError(
-                        "No FieldDescriptor label".to_string(),
-                    )
-                })?
-                .into(),
+            label: proto.label()?.map(FieldLabelProto::into),
+            oneof_index: proto.oneof_index()?,
         })
     }
 }
