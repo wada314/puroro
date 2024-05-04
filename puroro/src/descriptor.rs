@@ -15,8 +15,10 @@
 #![allow(unused)]
 
 use crate::descriptor_proto::{
-    DescriptorProto, EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto,
-    FileDescriptorProto, FileDescriptorSet, OneofDescriptorProto,
+    field_descriptor_proto::Label as FieldLabelProto,
+    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, EnumDescriptorProto,
+    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, FileDescriptorSet,
+    OneofDescriptorProto,
 };
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -31,6 +33,8 @@ pub enum Edition {
     Edition2023,
     Edition2024,
 }
+
+// region: FieldType
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldTypeTemplate<E, M> {
@@ -58,6 +62,35 @@ pub type FieldType = FieldTypeTemplate<(), ()>;
 pub type FieldTypeWithConcreteType<'a> =
     FieldTypeTemplate<&'a EnumDescriptorWithContext<'a>, &'a DescriptorWithContext<'a>>;
 
+impl From<FieldTypeProto> for FieldType {
+    fn from(proto: FieldTypeProto) -> Self {
+        match proto {
+            FieldTypeProto::TypeDouble => FieldType::DOUBLE,
+            FieldTypeProto::TypeFloat => FieldType::FLOAT,
+            FieldTypeProto::TypeInt64 => FieldType::INT64,
+            FieldTypeProto::TypeUInt64 => FieldType::UINT64,
+            FieldTypeProto::TypeInt32 => FieldType::INT32,
+            FieldTypeProto::TypeFixed64 => FieldType::FIXED64,
+            FieldTypeProto::TypeFixed32 => FieldType::FIXED32,
+            FieldTypeProto::TypeBool => FieldType::BOOL,
+            FieldTypeProto::TypeString => FieldType::STRING,
+            FieldTypeProto::TypeGroup => FieldType::GROUP,
+            FieldTypeProto::TypeMessage => FieldType::MESSAGE(()),
+            FieldTypeProto::TypeBytes => FieldType::BYTES,
+            FieldTypeProto::TypeUInt32 => FieldType::UINT32,
+            FieldTypeProto::TypeEnum => FieldType::ENUM(()),
+            FieldTypeProto::TypeSFixed32 => FieldType::SFIXED32,
+            FieldTypeProto::TypeSFixed64 => FieldType::SFIXED64,
+            FieldTypeProto::TypeSInt32 => FieldType::SINT32,
+            FieldTypeProto::TypeSInt64 => FieldType::SINT64,
+        }
+    }
+}
+
+// endregion:
+
+// region: FieldLabel
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldLabel {
     #[default]
@@ -65,6 +98,18 @@ pub enum FieldLabel {
     REQUIRED,
     REPEATED,
 }
+
+impl From<FieldLabelProto> for FieldLabel {
+    fn from(proto: FieldLabelProto) -> Self {
+        match proto {
+            FieldLabelProto::LabelOptional => FieldLabel::OPTIONAL,
+            FieldLabelProto::LabelRequired => FieldLabel::REQUIRED,
+            FieldLabelProto::LabelRepeated => FieldLabel::REPEATED,
+        }
+    }
+}
+
+// endregion:
 
 // region: Descriptor raw structs
 
@@ -92,14 +137,50 @@ pub struct Descriptor {
     enum_types: Vec<EnumDescriptor>,
 }
 
+// region: FiledDescriptor
+
 #[derive(Debug, Clone)]
 pub struct FieldDescriptor {
     name: String,
     number: i32,
     type_: FieldType,
-    type_name: String,
+    type_name: Option<String>,
     label: FieldLabel,
 }
+
+impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
+    type Error = ErrorKind;
+    fn try_from(proto: FieldDescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto
+                .name()?
+                .ok_or_else(|| {
+                    ErrorKind::DescriptorProtoValidationError("No FieldDescriptor name".to_string())
+                })?
+                .to_string(),
+            number: proto.number()?.ok_or_else(|| {
+                ErrorKind::DescriptorProtoValidationError("No FieldDescriptor number".to_string())
+            })?,
+            type_: proto
+                .type_()?
+                .ok_or_else(|| {
+                    ErrorKind::DescriptorProtoValidationError("No FieldDescriptor type".to_string())
+                })?
+                .into(),
+            type_name: proto.type_name()?.map(str::to_string),
+            label: proto
+                .label()?
+                .ok_or_else(|| {
+                    ErrorKind::DescriptorProtoValidationError(
+                        "No FieldDescriptor label".to_string(),
+                    )
+                })?
+                .into(),
+        })
+    }
+}
+
+// endregion:
 
 // region: EnumDescriptor
 
