@@ -139,8 +139,8 @@ pub struct FileDescriptor {
     package: String,
     message_types: Vec<Descriptor>,
     enum_types: Vec<EnumDescriptor>,
-    syntax: String,
-    edition: Edition,
+    syntax: Option<String>,
+    edition: Option<Edition>,
 }
 
 impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
@@ -161,16 +161,8 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
                 .into_iter()
                 .map_ok(EnumDescriptor::try_from)
                 .collect::<Result<Result<Vec<_>>>>()??,
-            syntax: proto
-                .syntax()?
-                .try_into_string("No FileDescriptor syntax")?,
-            edition: match proto.syntax()? {
-                "proto2" => Edition::Proto2,
-                "proto3" => Edition::Proto3,
-                "proto3.2023" => Edition::Edition2023,
-                "proto3.2024" => Edition::Edition2024,
-                _ => Edition::Unknown,
-            },
+            syntax: proto.syntax()?.map(str::to_string),
+            edition: proto.edition()?.map(EditionProto::try_into).transpose()?,
         })
     }
 }
