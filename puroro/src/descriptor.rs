@@ -16,13 +16,15 @@
 
 use crate::descriptor_proto::{
     field_descriptor_proto::Label as FieldLabelProto,
-    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, EnumDescriptorProto,
-    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, FileDescriptorSet,
-    OneofDescriptorProto,
+    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, Edition as EditionProto,
+    EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
+    FileDescriptorSet, OneofDescriptorProto,
 };
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::cell::OnceCell;
+
+// region: Edition
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Edition {
@@ -33,6 +35,21 @@ pub enum Edition {
     Edition2023,
     Edition2024,
 }
+
+impl TryFrom<EditionProto> for Edition {
+    type Error = ErrorKind;
+    fn try_from(proto: EditionProto) -> Result<Self> {
+        match proto {
+            EditionProto::EditionProto2 => Ok(Edition::Proto2),
+            EditionProto::EditionProto3 => Ok(Edition::Proto3),
+            EditionProto::Edition2023 => Ok(Edition::Edition2023),
+            EditionProto::Edition2024 => Ok(Edition::Edition2024),
+            _ => Err(ErrorKind::UnknownEdition),
+        }
+    }
+}
+
+// endregion:
 
 // region: FieldType
 
@@ -120,22 +137,85 @@ impl From<FieldLabelProto> for FieldLabel {
 pub struct FileDescriptor {
     name: String,
     package: String,
-    dependency_indices: Vec<usize>,
     message_types: Vec<Descriptor>,
     enum_types: Vec<EnumDescriptor>,
     syntax: String,
     edition: Edition,
 }
 
+impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
+    type Error = ErrorKind;
+    fn try_from(proto: FileDescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto.name()?.try_into_string("No FileDescriptor name")?,
+            package: proto
+                .package()?
+                .try_into_string("No FileDescriptor package")?,
+            message_types: proto
+                .message_type()
+                .into_iter()
+                .map_ok(Descriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+            enum_types: proto
+                .enum_type()
+                .into_iter()
+                .map_ok(EnumDescriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+            syntax: proto
+                .syntax()?
+                .try_into_string("No FileDescriptor syntax")?,
+            edition: match proto.syntax()? {
+                "proto2" => Edition::Proto2,
+                "proto3" => Edition::Proto3,
+                "proto3.2023" => Edition::Edition2023,
+                "proto3.2024" => Edition::Edition2024,
+                _ => Edition::Unknown,
+            },
+        })
+    }
+}
+
+// region: Descriptor
+
 #[derive(Debug, Clone)]
 pub struct Descriptor {
     name: String,
-    full_name: String,
     fields: Vec<FieldDescriptor>,
     oneof_decls: Vec<OneofDescriptor>,
     nested_types: Vec<Descriptor>,
     enum_types: Vec<EnumDescriptor>,
 }
+
+impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
+    type Error = ErrorKind;
+    fn try_from(proto: DescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto.name()?.try_into_string("No Descriptor name")?,
+            fields: proto
+                .field()
+                .into_iter()
+                .map_ok(FieldDescriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+            oneof_decls: proto
+                .oneof_decl()
+                .into_iter()
+                .map_ok(OneofDescriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+            nested_types: proto
+                .nested_type()
+                .into_iter()
+                .map_ok(Descriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+            enum_types: proto
+                .enum_type()
+                .into_iter()
+                .map_ok(EnumDescriptor::try_from)
+                .collect::<Result<Result<Vec<_>>>>()??,
+        })
+    }
+}
+
+// endregion:
 
 // region: FieldDescriptor
 

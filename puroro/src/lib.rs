@@ -51,6 +51,8 @@ pub enum ErrorKind {
     DescriptorProtoValidationError(String),
     #[error("Error while constructing a descriptor tree structure. %s")]
     DescriptorStructureError(String),
+    #[error("Unknown Edition.")]
+    UnknownEdition,
     #[error("Error when matching the GenericMessage type's field type.")]
     GenericMessageFieldTypeError,
     #[error("Error when converting an int32 to an (closed) enum value.")]
