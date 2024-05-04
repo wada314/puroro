@@ -379,7 +379,7 @@ pub struct FileDescriptorWithContext<'a> {
 
 #[derive(Default)]
 pub struct FileDescriptorCache<'a> {
-    dependencies: OnceCell<Vec<FileDescriptorWithContext<'a>>>,
+    dependencies: OnceCell<Vec<&'a FileDescriptorWithContext<'a>>>,
     messages: OnceCell<Vec<DescriptorWithContext<'a>>>,
     enums: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
 }
@@ -391,14 +391,20 @@ impl<'a> FileDescriptorWithContext<'a> {
     fn package(&self) -> Result<&str> {
         Ok(&self.body.package)
     }
-    fn dependencies(&'a self) -> Result<impl 'a + IntoIterator<Item = &FileDescriptorWithContext>> {
-        self.cache.dependencies.get_or_try_init(|| {
-            self.body
-                .dependencies
-                .into_iter()
-                .map(|&name| self.root.file_from_name(name))
-                .collect()
-        })
+    fn dependencies(
+        &'a self,
+    ) -> Result<impl IntoIterator<Item = &'a FileDescriptorWithContext<'a>>> {
+        self.cache
+            .dependencies
+            .get_or_try_init(|| {
+                Ok(self
+                    .body
+                    .dependencies
+                    .iter()
+                    .map(|name| self.root.file_from_name(name))
+                    .collect::<Result<Vec<_>>>()?)
+            })
+            .map(|v| v.into_iter().map(|f| *f))
     }
     fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
         self.cache.messages.get_or_try_init(|| {
