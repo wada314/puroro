@@ -319,41 +319,54 @@ impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
 /// The struct types with the "context".
 /// The context here means the path from the root of the descriptor tree to the current node.
 
-pub struct Context {
-    files: Vec<FileDescriptor>,
+pub struct Context<'a> {
+    files: Vec<(FileDescriptor, OnceCell<FileDescriptorWithContext<'a>>)>,
 }
-impl From<FileDescriptor> for Context {
+impl From<FileDescriptor> for Context<'_> {
     fn from(f: FileDescriptor) -> Self {
-        Self { files: vec![f] }
-    }
-}
-impl From<Vec<FileDescriptor>> for Context {
-    fn from(files: Vec<FileDescriptor>) -> Self {
-        Self { files }
-    }
-}
-impl<const N: usize> From<[FileDescriptor; N]> for Context {
-    fn from(files: [FileDescriptor; N]) -> Self {
         Self {
-            files: files.into(),
+            files: vec![(f, OnceCell::default())],
         }
     }
 }
-impl Context {
-    fn files(&self) -> impl IntoIterator<Item = Result<FileDescriptorWithContext>> {
-        (0..(self.files.len())).map(move |i| self.file_from_index(i))
+impl From<Vec<FileDescriptor>> for Context<'_> {
+    fn from(files: Vec<FileDescriptor>) -> Self {
+        Self {
+            files: files
+                .into_iter()
+                .map(|f| (f, OnceCell::default()))
+                .collect(),
+        }
     }
-    fn file_from_index(&self, index: usize) -> Result<FileDescriptorWithContext> {
-        Ok(FileDescriptorWithContext {
-            root: self,
-            body: &self.files[index],
-            cache: Default::default(),
-        })
+}
+impl<const N: usize> From<[FileDescriptor; N]> for Context<'_> {
+    fn from(files: [FileDescriptor; N]) -> Self {
+        Self {
+            files: files
+                .into_iter()
+                .map(|f| (f, OnceCell::default()))
+                .collect(),
+        }
+    }
+}
+impl<'a> Context<'a> {
+    fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorWithContext<'a>> {
+        self.files
+            .iter()
+            .find(|(f, _)| f.name == name)
+            .map(|(f, c)| {
+                c.get_or_init(|| FileDescriptorWithContext {
+                    root: self,
+                    body: f,
+                    cache: Default::default(),
+                })
+            })
+            .ok_or_else(|| ErrorKind::DescriptorStructureError("No such file".to_string()))
     }
 }
 
 pub struct FileDescriptorWithContext<'a> {
-    root: &'a Context,
+    root: &'a Context<'a>,
     body: &'a FileDescriptor,
     cache: FileDescriptorCache<'a>,
 }
