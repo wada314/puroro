@@ -133,6 +133,8 @@ impl From<FieldLabelProto> for FieldLabel {
 /// Structs for the each descriptor types.
 /// These structs are strictly read-only and only knows about its children, not parent.
 
+// region: FileDescriptor
+
 #[derive(Debug, Clone)]
 pub struct FileDescriptor {
     name: String,
@@ -166,6 +168,8 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
         })
     }
 }
+
+// endregion:
 
 // region: Descriptor
 
