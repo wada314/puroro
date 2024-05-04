@@ -138,6 +138,7 @@ impl From<FieldLabelProto> for FieldLabel {
 #[derive(Debug, Clone)]
 pub struct FileDescriptor {
     name: String,
+    dependencies: Vec<String>,
     package: String,
     message_types: Vec<Descriptor>,
     enum_types: Vec<EnumDescriptor>,
@@ -150,6 +151,11 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
     fn try_from(proto: FileDescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No FileDescriptor name")?,
+            dependencies: proto
+                .dependency()
+                .into_iter()
+                .map_ok(str::to_string)
+                .collect::<Result<_>>()?,
             package: proto
                 .package()?
                 .try_into_string("No FileDescriptor package")?,
@@ -388,9 +394,9 @@ impl<'a> FileDescriptorWithContext<'a> {
     fn dependencies(&'a self) -> Result<impl 'a + IntoIterator<Item = &FileDescriptorWithContext>> {
         self.cache.dependencies.get_or_try_init(|| {
             self.body
-                .dependency_indices
-                .iter()
-                .map(|&i| self.root.file_from_index(i))
+                .dependencies
+                .into_iter()
+                .map(|&name| self.root.file_from_name(name))
                 .collect()
         })
     }
