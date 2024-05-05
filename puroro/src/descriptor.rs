@@ -499,7 +499,7 @@ impl<'a> DescriptorWithContext<'a> {
     fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
     }
-    fn fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    fn all_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         Ok(self
             .non_oneof_fields()?
             .into_iter()
@@ -558,7 +558,7 @@ impl<'a> DescriptorWithContext<'a> {
     )> {
         let (real, synthetic) = self.cache.real_and_synthetic_oneofs.get_or_try_init(|| {
             let mut is_oneof_synthetic = vec![false; self.body.oneof_decls.len()];
-            for f in self.fields()? {
+            for f in self.all_fields()? {
                 if let Some(i) = f.body.oneof_index {
                     is_oneof_synthetic[i] |= f.body.proto3_optional;
                 }
