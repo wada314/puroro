@@ -325,6 +325,8 @@ impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
 /// The struct types with the "context".
 /// The context here means the path from the root of the descriptor tree to the current node.
 
+// region: Context
+
 pub struct Context<'a> {
     files: Vec<(FileDescriptor, OnceCell<FileDescriptorWithContext<'a>>)>,
 }
@@ -370,6 +372,10 @@ impl<'a> Context<'a> {
             .ok_or_else(|| ErrorKind::DescriptorStructureError("No such file".to_string()))
     }
 }
+
+// endregion:
+
+// region: FileDescriptorWithContext
 
 pub struct FileDescriptorWithContext<'a> {
     root: &'a Context<'a>,
@@ -439,6 +445,10 @@ impl<'a> FileDescriptorWithContext<'a> {
         })
     }
 }
+
+// endregion:
+
+// region: DescriptorWithContext
 
 pub struct DescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
@@ -560,6 +570,10 @@ impl<'a> DescriptorWithContext<'a> {
     }
 }
 
+// endregion:
+
+// region: EnumDescriptorWithContext
+
 pub struct EnumDescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
     maybe_containing: Option<&'a DescriptorWithContext<'a>>,
@@ -614,6 +628,10 @@ impl<'a> EnumDescriptorWithContext<'a> {
     }
 }
 
+// endregion:
+
+// region: EnumValueDescriptorWithContext
+
 pub struct EnumValueDescriptorWithContext<'a> {
     enum_: &'a EnumDescriptorWithContext<'a>,
     body: &'a EnumValueDescriptor,
@@ -647,6 +665,10 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
     }
 }
 
+// endregion:
+
+// region: FieldDescriptorWithContext
+
 pub struct FieldDescriptorWithContext<'a> {
     message: &'a DescriptorWithContext<'a>,
     body: &'a FieldDescriptor,
@@ -676,6 +698,10 @@ impl<'a> FieldDescriptorWithContext<'a> {
     }
 }
 
+// endregion:
+
+// region: OneofDescriptorWithContext
+
 pub struct OneofDescriptorWithContext<'a> {
     message: &'a DescriptorWithContext<'a>,
     body: &'a OneofDescriptor,
@@ -684,6 +710,8 @@ pub struct OneofDescriptorWithContext<'a> {
 
 #[derive(Default)]
 pub struct OneofDescriptorCache {}
+
+// endregion:
 
 // region: utils
 
