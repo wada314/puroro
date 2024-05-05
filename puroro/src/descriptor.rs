@@ -544,7 +544,7 @@ impl<'a> DescriptorWithContext<'a> {
             self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional)
         })
     }
-    fn oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+    fn all_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
         Ok(self
             .real_oneofs()?
             .into_iter()
