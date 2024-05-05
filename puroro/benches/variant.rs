@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ::criterion::{black_box, criterion_group, criterion_main, Criterion};
-use ::puroro::internal::variant::{BufReadExtVariant, ReadExtVariant, Variant, WriteExtVariant};
+use ::puroro::variant::{BufReadExtVariant, ReadExtVariant, Variant, WriteExtVariant};
 use ::rand::prelude::*;
 use ::rand_distr::Exp;
 use ::rand_pcg::Pcg32;
