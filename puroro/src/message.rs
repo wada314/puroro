@@ -14,11 +14,12 @@
 
 use crate::Result;
 use ::futures::io::{AsyncRead, AsyncWrite};
-use ::std::io::Read;
+use ::std::io::{Read, Write};
 
 /// Protobuf message, which can be serialized, deserialized, and field accessible.
 pub trait MessageLite {
     fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()>;
+    fn write<W: Write>(&self, write: W) -> Result<usize>;
 }
 
 /// [`MessageLite`] + descriptors and reflections.

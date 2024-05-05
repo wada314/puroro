@@ -17,7 +17,7 @@ pub mod deser;
 use crate::{ErrorKind, Result};
 
 #[derive(Debug)]
-enum WireType {
+pub(crate) enum WireType {
     Variant = 0,
     I64 = 1,
     Len = 2,
@@ -33,5 +33,10 @@ impl TryFrom<u32> for WireType {
             5 => WireType::I32,
             _ => Err(ErrorKind::UnknownWireType)?,
         })
+    }
+}
+impl From<WireType> for u32 {
+    fn from(value: WireType) -> u32 {
+        value as u32
     }
 }

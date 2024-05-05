@@ -145,7 +145,7 @@ impl TryFrom<Variant> for u32 {
 
 // endregion
 
-// Variant readers
+// region: Variant readers
 
 pub trait ReadExtVariant {
     fn read_variant(&mut self) -> Result<Variant>;
@@ -163,7 +163,7 @@ pub trait BufReadExtVariant: ReadExtVariant {
 }
 
 pub trait WriteExtVariant {
-    fn write_variant(&mut self, variant: Variant) -> Result<()>;
+    fn write_variant(&mut self, variant: Variant) -> Result<usize>;
 }
 
 impl<T: Read> ReadExtVariant for T {
@@ -310,8 +310,12 @@ impl<T: BufRead> BufReadExtVariant for T {
     }
 }
 
+// endregion:
+
+// region: Variant writers
+
 impl<T: Write> WriteExtVariant for T {
-    fn write_variant(&mut self, variant: Variant) -> Result<()> {
+    fn write_variant(&mut self, variant: Variant) -> Result<usize> {
         let mut v = u64::from_le_bytes(variant.0);
         let mut buffer = <[u8; 10]>::default();
         let mut byte_len = 0;
@@ -326,9 +330,11 @@ impl<T: Write> WriteExtVariant for T {
         }
         let out_slice = &buffer[0..byte_len];
         self.write_all(out_slice)?;
-        Ok(())
+        Ok(byte_len)
     }
 }
+
+// endregion:
 
 #[cfg(test)]
 mod test {

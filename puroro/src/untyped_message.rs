@@ -14,13 +14,14 @@
 
 use crate::internal::deser::record::{Payload, Record};
 use crate::internal::deser::{deser_from_bufread, DeserMessageHandler};
+use crate::internal::WireType;
 use crate::message::MessageLite;
-use crate::variant::{ReadExtVariant, Variant};
+use crate::variant::{ReadExtVariant, UInt32, Variant, VariantIntegerType, WriteExtVariant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
-use ::std::io::{BufReader, Read};
+use ::std::io::{BufReader, Read, Write};
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
@@ -32,6 +33,32 @@ impl MessageLite for UntypedMessage<'_> {
     fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
         deser_from_bufread(BufReader::new(read), self)
     }
+    fn write<W: Write>(&self, mut write: W) -> Result<usize> {
+        let mut total_bytes = 0;
+        for (number, wire_and_payloads) in &self.fields {
+            for wire_and_payload in wire_and_payloads {
+                let tag = (TryInto::<u32>::try_into(*number)? << 3)
+                    | Into::<u32>::into(wire_and_payload.wire_type());
+                total_bytes += write.write_variant(UInt32::try_into_variant(tag)?)?;
+                total_bytes += match wire_and_payload {
+                    WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
+                    WireTypeAndPayload::Fixed64(buf) => {
+                        write.write_all(buf)?;
+                        4usize
+                    }
+                    WireTypeAndPayload::Fixed32(buf) => {
+                        write.write_all(buf)?;
+                        8usize
+                    }
+                    WireTypeAndPayload::Len(ld) => {
+                        write.write_all(ld)?;
+                        ld.len()
+                    }
+                };
+            }
+        }
+        Ok(total_bytes)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -42,6 +69,16 @@ pub enum WireTypeAndPayload<'a> {
     Len(Cow<'a, [u8]>),
     // StartGroup,
     // EndGroup,
+}
+impl WireTypeAndPayload<'_> {
+    pub(crate) fn wire_type(&self) -> WireType {
+        match self {
+            WireTypeAndPayload::Variant(_) => WireType::Variant,
+            WireTypeAndPayload::Fixed64(_) => WireType::I64,
+            WireTypeAndPayload::Fixed32(_) => WireType::I32,
+            WireTypeAndPayload::Len(_) => WireType::Len,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
