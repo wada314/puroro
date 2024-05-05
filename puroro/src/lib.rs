@@ -59,5 +59,3 @@ pub enum ErrorKind {
     TryFromIntIntoEnumError(i32),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
-
-pub trait Message {}

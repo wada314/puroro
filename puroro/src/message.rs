@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::Result;
 use ::futures::io::{AsyncRead, AsyncWrite};
+use ::std::io::Read;
 
 /// Protobuf message, which can be serialized, deserialized, and field accessible.
-pub trait MessageLite {}
+pub trait MessageLite {
+    fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()>;
+}
+
 /// [`MessageLite`] + descriptors and reflections.
 pub trait Message: MessageLite {}
 pub trait ReadableMessage: MessageLite {}

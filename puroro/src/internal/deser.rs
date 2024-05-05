@@ -114,7 +114,7 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-pub fn deser_from_read<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
+pub fn deser_from_bufread<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
     read: R,
     handler: &mut H,
 ) -> Result<()> {
@@ -371,7 +371,7 @@ mod test {
     fn test_deser_variant_fields() {
         let (input, expected) = test_case_variant_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read(input.as_slice(), &mut handler).unwrap();
+        deser_from_bufread(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
@@ -380,7 +380,7 @@ mod test {
     fn test_deser_fixed_fields() {
         let (input, expected) = test_case_fixed_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read(input.as_slice(), &mut handler).unwrap();
+        deser_from_bufread(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
@@ -389,7 +389,7 @@ mod test {
     fn test_deser_string_fields() {
         let (input, expected) = test_case_string_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read(input.as_slice(), &mut handler).unwrap();
+        deser_from_bufread(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }
@@ -398,7 +398,7 @@ mod test {
     fn test_deser_complex_fields() {
         let (input, expected) = test_case_complex_fields();
         let mut handler = SampleMessageHandler::new();
-        deser_from_read(input.as_slice(), &mut handler).unwrap();
+        deser_from_bufread(input.as_slice(), &mut handler).unwrap();
         let msg = handler.finish();
         assert_eq!(expected, msg);
     }

@@ -13,18 +13,25 @@
 // limitations under the License.
 
 use crate::internal::deser::record::{Payload, Record};
-use crate::internal::deser::{deser_from_read, DeserMessageHandler};
+use crate::internal::deser::{deser_from_bufread, DeserMessageHandler};
+use crate::message::MessageLite;
 use crate::variant::{ReadExtVariant, Variant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
-use ::std::io::Read;
+use ::std::io::{BufReader, Read};
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
 pub struct UntypedMessage<'a> {
     fields: HashMap<i32, Vec<WireTypeAndPayload<'a>>>,
+}
+
+impl MessageLite for UntypedMessage<'_> {
+    fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
+        deser_from_bufread(BufReader::new(read), self)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -55,7 +62,7 @@ impl<'a> UntypedMessage<'a> {
     }
 
     pub fn merge_from_buffer(&mut self, buf: &'a [u8]) -> Result<()> {
-        deser_from_read(buf, self)?;
+        deser_from_bufread(buf, self)?;
         Ok(())
     }
 
