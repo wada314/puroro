@@ -228,7 +228,7 @@ pub struct FieldDescriptor {
     type_: FieldType,
     type_name: Option<String>,
     label: Option<FieldLabel>,
-    oneof_index: Option<i32>,
+    oneof_index: Option<usize>,
     proto3_optional: bool,
 }
 
@@ -248,7 +248,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
                 .into(),
             type_name: proto.type_name()?.map(str::to_string),
             label: proto.label()?.map(FieldLabelProto::into),
-            oneof_index: proto.oneof_index()?,
+            oneof_index: proto.oneof_index()?.map(|i| i.try_into()).transpose()?,
             proto3_optional: proto.proto3_optional()?.unwrap_or(false),
         })
     }
@@ -462,12 +462,11 @@ pub struct DescriptorWithContext<'a> {
 #[derive(Default)]
 pub struct DescriptorCache<'a> {
     full_name: OnceCell<String>,
-    fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     real_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     synthetic_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
-    oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
     real_oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
+    synthetic_oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
     nested_types: OnceCell<Vec<DescriptorWithContext<'a>>>,
     enum_types: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
 }
@@ -497,19 +496,11 @@ impl<'a> DescriptorWithContext<'a> {
         Ok(self.file)
     }
     fn fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
-        self.cache.fields.get_or_try_init(|| {
-            self.body
-                .fields
-                .iter()
-                .map(|f| {
-                    Ok(FieldDescriptorWithContext {
-                        message: self,
-                        body: f,
-                        cache: Default::default(),
-                    })
-                })
-                .collect()
-        })
+        Ok(self
+            .non_oneof_fields()?
+            .into_iter()
+            .chain(self.real_oneof_fields()?.into_iter())
+            .chain(self.synthetic_oneof_fields()?.into_iter()))
     }
     fn filtered_fields(
         &'a self,
@@ -538,38 +529,71 @@ impl<'a> DescriptorWithContext<'a> {
     fn real_oneof_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
-        self.cache
-            .real_oneof_fields
-            .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional))
+        self.cache.real_oneof_fields.get_or_try_init(|| {
+            self.filtered_fields(|f| f.oneof_index.is_some() && !f.proto3_optional)
+        })
+    }
+    fn synthetic_oneof_fields(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+        self.cache.synthetic_oneof_fields.get_or_try_init(|| {
+            self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional)
+        })
     }
     fn oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
-        self.cache.oneofs.get_or_try_init(|| {
-            self.body
-                .oneof_decls
-                .iter()
-                .map(|o| {
-                    Ok(OneofDescriptorWithContext {
-                        message: self,
-                        body: o,
-                        cache: Default::default(),
-                    })
-                })
-                .collect()
-        })
+        Ok(self
+            .real_oneofs()?
+            .into_iter()
+            .chain(self.synthetic_oneofs()?.into_iter()))
     }
     fn real_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
         self.cache.real_oneofs.get_or_try_init(|| {
+            let mut is_oneof_synthetic = vec![false; self.body.oneof_decls.len()];
+            for f in self.fields()? {
+                if let Some(i) = f.body.oneof_index {
+                    is_oneof_synthetic[i] |= f.body.proto3_optional;
+                }
+            }
             self.body
                 .oneof_decls
                 .iter()
-                .map(|o| {
-                    Ok(OneofDescriptorWithContext {
-                        message: self,
-                        body: o,
-                        cache: Default::default(),
+                .enumerate()
+                .filter_map(|(i, o)| {
+                    (!is_oneof_synthetic[i]).then(|| {
+                        Ok(OneofDescriptorWithContext {
+                            message: self,
+                            body: o,
+                            cache: Default::default(),
+                        })
                     })
                 })
-                .collect()
+                .collect::<Result<_>>()
+        })
+    }
+    fn synthetic_oneofs(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+        self.cache.synthetic_oneofs.get_or_try_init(|| {
+            let mut is_oneof_synthetic = vec![false; self.body.oneof_decls.len()];
+            for f in self.fields()? {
+                if let Some(i) = f.body.oneof_index {
+                    is_oneof_synthetic[i] |= f.body.proto3_optional;
+                }
+            }
+            self.body
+                .oneof_decls
+                .iter()
+                .enumerate()
+                .filter_map(|(i, o)| {
+                    is_oneof_synthetic[i].then(|| {
+                        Ok(OneofDescriptorWithContext {
+                            message: self,
+                            body: o,
+                            cache: Default::default(),
+                        })
+                    })
+                })
+                .collect::<Result<_>>()
         })
     }
     fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
