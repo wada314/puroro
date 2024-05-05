@@ -229,6 +229,7 @@ pub struct FieldDescriptor {
     type_name: Option<String>,
     label: Option<FieldLabel>,
     oneof_index: Option<i32>,
+    proto3_optional: bool,
 }
 
 impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
@@ -248,6 +249,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
             type_name: proto.type_name()?.map(str::to_string),
             label: proto.label()?.map(FieldLabelProto::into),
             oneof_index: proto.oneof_index()?,
+            proto3_optional: proto.proto3_optional()?.unwrap_or(false),
         })
     }
 }
@@ -461,6 +463,9 @@ pub struct DescriptorWithContext<'a> {
 pub struct DescriptorCache<'a> {
     full_name: OnceCell<String>,
     fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
+    non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
+    real_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
+    synthetic_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
     real_oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
     nested_types: OnceCell<Vec<DescriptorWithContext<'a>>>,
@@ -505,6 +510,37 @@ impl<'a> DescriptorWithContext<'a> {
                 })
                 .collect()
         })
+    }
+    fn filtered_fields(
+        &'a self,
+        f: impl Fn(&&FieldDescriptor) -> bool,
+    ) -> Result<Vec<FieldDescriptorWithContext<'a>>> {
+        self.body
+            .fields
+            .iter()
+            .filter(f)
+            .map(|f| {
+                Ok(FieldDescriptorWithContext {
+                    message: self,
+                    body: f,
+                    cache: Default::default(),
+                })
+            })
+            .collect()
+    }
+    fn non_oneof_fields(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+        self.cache
+            .non_oneof_fields
+            .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index.is_none()))
+    }
+    fn real_oneof_fields(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+        self.cache
+            .real_oneof_fields
+            .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional))
     }
     fn oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
         self.cache.oneofs.get_or_try_init(|| {
