@@ -1,8 +1,10 @@
 [workspace]
-members = [
+members = [ 
+    "codegen",
     "puroro",
 ]
 default-members = [
+    "codegen",
     "puroro",
 ]
 resolver = "2"
