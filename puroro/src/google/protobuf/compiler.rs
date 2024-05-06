@@ -56,7 +56,9 @@ impl<'a> CodeGeneratorRequest<'a> {
 }
 
 pub mod code_generator_response {
+    use crate::untyped_message::UntypedMessage;
     use crate::{ErrorKind, Result};
+
     pub enum Feature {
         FeatureNone = 0,
         FeatureProto3Optional = 1,
@@ -80,6 +82,22 @@ pub mod code_generator_response {
                 Feature::FeatureProto3Optional => 1,
                 Feature::FeatureSupportsEditions => 2,
             }
+        }
+    }
+
+    pub struct File<'a>(UntypedMessage<'a>);
+    impl<'a> File<'a> {
+        pub fn name(&self) -> Result<Option<&str>> {
+            self.0.field(1).as_scalar_string()
+        }
+        pub fn insertion_point(&self) -> Result<Option<&str>> {
+            self.0.field(2).as_scalar_string()
+        }
+        pub fn content(&self) -> Result<&str> {
+            self.0
+                .field(15)
+                .as_scalar_string()
+                .map(|opt| opt.unwrap_or(""))
         }
     }
 }
