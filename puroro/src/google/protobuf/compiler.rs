@@ -14,8 +14,8 @@
 
 use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
-use crate::variant::{Bool, Int32, UInt64};
-use crate::{ErrorKind, Result};
+use crate::variant::{Int32, UInt64};
+use crate::Result;
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
 #[derive(DDeref, DFrom)]

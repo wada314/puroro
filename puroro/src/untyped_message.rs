@@ -88,8 +88,8 @@ pub struct Field<'a> {
 }
 
 #[derive(Debug)]
-pub struct FieldMut<'a> {
-    entry: hash_map::Entry<'a, i32, Vec<WireTypeAndPayload<'a>>>,
+pub struct FieldMut<'msg, 'a> {
+    entry: hash_map::Entry<'msg, i32, Vec<WireTypeAndPayload<'a>>>,
 }
 
 impl<'a> UntypedMessage<'a> {
@@ -119,6 +119,12 @@ impl<'a> UntypedMessage<'a> {
                 wire_and_payloads,
             },
         )
+    }
+
+    pub fn field_mut(&mut self, number: i32) -> FieldMut<'_, 'a> {
+        FieldMut {
+            entry: self.fields.entry(number),
+        }
     }
 
     pub fn fields(&self) -> impl '_ + Iterator<Item = Field> {
@@ -199,6 +205,29 @@ impl<'a> Field<'a> {
             };
             UntypedMessage::from_buffer(buf)
         })
+    }
+}
+
+impl<'msg, 'a> FieldMut<'msg, 'a> {
+    pub fn number(&self) -> i32 {
+        *self.entry.key()
+    }
+    pub fn push_variant(&mut self, variant: Variant) {
+        self.entry
+            .or_default()
+            .push(WireTypeAndPayload::Variant(variant));
+    }
+    pub fn push_string(&mut self, val: &str) {
+        self.entry
+            .or_default()
+            .push(WireTypeAndPayload::Len(val.to_string().into_bytes().into()));
+    }
+    pub fn push_message(&mut self, message: UntypedMessage<'a>) {
+        let mut buf = Vec::new();
+        message.write(&mut buf).unwrap();
+        self.entry
+            .or_default()
+            .push(WireTypeAndPayload::Len(buf.into()));
     }
 }
 
