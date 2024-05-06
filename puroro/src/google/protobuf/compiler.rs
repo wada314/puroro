@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
 use crate::variant::{Bool, Int32};
 use crate::{ErrorKind, Result};
@@ -31,5 +32,25 @@ impl<'a> Version<'a> {
     }
     pub fn suffix(&self) -> Result<&str> {
         Ok(self.0.field(4).as_scalar_string()?.unwrap_or(""))
+    }
+}
+
+#[derive(DDeref, DFrom)]
+pub struct CodeGeneratorRequest<'a>(UntypedMessage<'a>);
+impl<'a> CodeGeneratorRequest<'a> {
+    pub fn file_to_generate(&self) -> impl IntoIterator<Item = Result<&str>> {
+        self.0.field(1).as_repeated_string()
+    }
+    pub fn parameter(&self) -> Result<Option<&str>> {
+        self.0.field(2).as_scalar_string()
+    }
+    pub fn proto_file(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
+        self.0.repeated_message_field(15, FileDescriptorProto)
+    }
+    pub fn source_file_descriptors(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
+        self.0.repeated_message_field(17, FileDescriptorProto)
+    }
+    pub fn compiler_version(&self) -> Result<Option<Version>> {
+        self.0.scalar_message_field(3, Version)
     }
 }

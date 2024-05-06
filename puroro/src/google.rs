@@ -50,6 +50,13 @@ impl UntypedMessage<'_> {
             .map(|i| i.try_into())
             .transpose()
     }
+    fn scalar_message_field<'a, T, F: Fn(UntypedMessage<'a>) -> T>(
+        &'a self,
+        number: i32,
+        constructor: F,
+    ) -> Result<Option<T>> {
+        Ok(self.field(number).as_scalar_message()?.map(constructor))
+    }
     fn repeated_message_field<'a, T, F: 'a + Fn(UntypedMessage<'a>) -> T>(
         &'a self,
         number: i32,
