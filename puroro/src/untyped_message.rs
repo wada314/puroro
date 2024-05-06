@@ -20,7 +20,7 @@ use crate::variant::{ReadExtVariant, UInt32, Variant, VariantIntegerType, WriteE
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
-use ::std::collections::HashMap;
+use ::std::collections::{hash_map, HashMap};
 use ::std::io::{BufReader, Read, Write};
 
 /// Assuming proto2 syntax.
@@ -85,6 +85,11 @@ impl WireTypeAndPayload<'_> {
 pub struct Field<'a> {
     number: i32,
     wire_and_payloads: &'a [WireTypeAndPayload<'a>],
+}
+
+#[derive(Debug)]
+pub struct FieldMut<'a> {
+    entry: hash_map::Entry<'a, i32, Vec<WireTypeAndPayload<'a>>>,
 }
 
 impl<'a> UntypedMessage<'a> {
