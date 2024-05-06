@@ -12,54 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod compiler;
+
 use crate::untyped_message::UntypedMessage;
-use crate::variant::{Bool, Int32, VariantIntegerType};
+use crate::variant::{Bool, Int32};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
-use ::itertools::Itertools;
-
-/// Some utility impls for `UntypedMessage`.
-impl UntypedMessage<'_> {
-    fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T::RustType>>
-    where
-        T: VariantIntegerType,
-    {
-        self.field(number)
-            .as_scalar_variant(false)?
-            .map(|v| T::try_from_variant(v))
-            .transpose()
-    }
-    fn repeated_variant_field<'a, T>(
-        &'a self,
-        number: i32,
-    ) -> impl 'a + Iterator<Item = Result<T::RustType>>
-    where
-        T: VariantIntegerType,
-    {
-        self.field(number)
-            .as_repeated_variant(false)
-            .into_iter()
-            .map(|var| T::try_from_variant(var?))
-    }
-    fn scalar_enum2_field<T>(&self, number: i32) -> Result<Option<T>>
-    where
-        T: TryFrom<i32, Error = ErrorKind>,
-    {
-        self.scalar_variant_field::<Int32>(number)?
-            .map(|i| i.try_into())
-            .transpose()
-    }
-    fn repeated_message_field<'a, T, F: 'a + Fn(UntypedMessage<'a>) -> T>(
-        &'a self,
-        number: i32,
-        constructor: F,
-    ) -> impl 'a + Iterator<Item = Result<T>> {
-        self.field(number)
-            .as_repeated_message()
-            .into_iter()
-            .map_ok(constructor)
-    }
-}
 
 #[derive(DDeref, DFrom)]
 pub struct FileDescriptorSet<'a>(UntypedMessage<'a>);

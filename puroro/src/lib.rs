@@ -19,8 +19,8 @@
 #![feature(once_cell_try)]
 
 pub mod descriptor;
-pub mod descriptor_proto;
 pub mod editions;
+pub mod google;
 pub mod internal;
 pub mod message;
 pub mod string;

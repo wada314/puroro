@@ -14,7 +14,7 @@
 
 #![allow(unused)]
 
-use crate::descriptor_proto::{
+use crate::google::protobuf::{
     field_descriptor_proto::Label as FieldLabelProto,
     field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, Edition as EditionProto,
     EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
