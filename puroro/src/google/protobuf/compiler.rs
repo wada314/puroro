@@ -14,7 +14,7 @@
 
 use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
-use crate::variant::{Bool, Int32};
+use crate::variant::{Bool, Int32, UInt64};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
@@ -52,5 +52,51 @@ impl<'a> CodeGeneratorRequest<'a> {
     }
     pub fn compiler_version(&self) -> Result<Option<Version>> {
         self.0.scalar_message_field(3, Version)
+    }
+}
+
+pub mod code_generator_response {
+    use crate::{ErrorKind, Result};
+    pub enum Feature {
+        FeatureNone = 0,
+        FeatureProto3Optional = 1,
+        FeatureSupportsEditions = 2,
+    }
+    impl TryFrom<i32> for Feature {
+        type Error = ErrorKind;
+        fn try_from(value: i32) -> Result<Self> {
+            match value {
+                0 => Ok(Self::FeatureNone),
+                1 => Ok(Self::FeatureProto3Optional),
+                2 => Ok(Self::FeatureSupportsEditions),
+                _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+            }
+        }
+    }
+    impl From<Feature> for i32 {
+        fn from(value: Feature) -> i32 {
+            match value {
+                Feature::FeatureNone => 0,
+                Feature::FeatureProto3Optional => 1,
+                Feature::FeatureSupportsEditions => 2,
+            }
+        }
+    }
+}
+
+#[derive(DDeref, DFrom)]
+pub struct CodeGeneratorResponse<'a>(UntypedMessage<'a>);
+impl<'a> CodeGeneratorResponse<'a> {
+    pub fn error(&self) -> Result<Option<&str>> {
+        self.0.field(1).as_scalar_string()
+    }
+    pub fn supported_features(&self) -> Result<Option<u64>> {
+        self.0.scalar_variant_field::<UInt64>(2)
+    }
+    pub fn minimum_edition(&self) -> Result<Option<i32>> {
+        self.0.scalar_variant_field::<Int32>(3)
+    }
+    pub fn maximum_edition(&self) -> Result<Option<i32>> {
+        self.0.scalar_variant_field::<Int32>(4)
     }
 }
