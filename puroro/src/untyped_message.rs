@@ -212,22 +212,25 @@ impl<'msg, 'a> FieldMut<'msg, 'a> {
     pub fn number(&self) -> i32 {
         *self.entry.key()
     }
-    pub fn push_variant(&mut self, variant: Variant) {
+    pub fn push_variant(&mut self, variant: Variant) -> Result<()> {
         self.entry
             .or_default()
             .push(WireTypeAndPayload::Variant(variant));
+        Ok(())
     }
-    pub fn push_string(&mut self, val: &str) {
+    pub fn push_string(&mut self, val: &str) -> Result<()> {
         self.entry
             .or_default()
             .push(WireTypeAndPayload::Len(val.to_string().into_bytes().into()));
+        Ok(())
     }
-    pub fn push_message(&mut self, message: UntypedMessage<'a>) {
+    pub fn push_message(&mut self, message: UntypedMessage<'a>) -> Result<()> {
         let mut buf = Vec::new();
-        message.write(&mut buf).unwrap();
+        message.write(&mut buf)?;
         self.entry
             .or_default()
             .push(WireTypeAndPayload::Len(buf.into()));
+        Ok(())
     }
 }
 
