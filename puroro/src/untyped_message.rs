@@ -19,6 +19,7 @@ use crate::message::MessageLite;
 use crate::variant::{ReadExtVariant, UInt32, Variant, VariantIntegerType, WriteExtVariant};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
+use ::once_cell::unsync::Lazy;
 use ::std::borrow::Cow;
 use ::std::collections::{hash_map, HashMap};
 use ::std::io::{BufReader, Read, Write};
@@ -89,7 +90,11 @@ pub struct Field<'a> {
 
 #[derive(Debug)]
 pub struct FieldMut<'msg, 'a> {
-    entry: hash_map::Entry<'msg, i32, Vec<WireTypeAndPayload<'a>>>,
+    number: i32,
+    mut_ref: Lazy<
+        &'msg mut Vec<WireTypeAndPayload<'a>>,
+        Box<dyn 'msg + FnOnce() -> &'msg mut Vec<WireTypeAndPayload<'a>>>,
+    >,
 }
 
 impl<'a> UntypedMessage<'a> {
@@ -122,8 +127,10 @@ impl<'a> UntypedMessage<'a> {
     }
 
     pub fn field_mut(&mut self, number: i32) -> FieldMut<'_, 'a> {
+        let entry = self.fields.entry(number);
         FieldMut {
-            entry: self.fields.entry(number),
+            number,
+            mut_ref: Lazy::new(Box::new(move || entry.or_default())),
         }
     }
 
@@ -210,26 +217,21 @@ impl<'a> Field<'a> {
 
 impl<'msg, 'a> FieldMut<'msg, 'a> {
     pub fn number(&self) -> i32 {
-        *self.entry.key()
+        self.number
     }
     pub fn push_variant(&mut self, variant: Variant) -> Result<()> {
-        self.entry
-            .or_default()
-            .push(WireTypeAndPayload::Variant(variant));
+        self.mut_ref.push(WireTypeAndPayload::Variant(variant));
         Ok(())
     }
     pub fn push_string(&mut self, val: &str) -> Result<()> {
-        self.entry
-            .or_default()
+        self.mut_ref
             .push(WireTypeAndPayload::Len(val.to_string().into_bytes().into()));
         Ok(())
     }
     pub fn push_message(&mut self, message: UntypedMessage<'a>) -> Result<()> {
         let mut buf = Vec::new();
         message.write(&mut buf)?;
-        self.entry
-            .or_default()
-            .push(WireTypeAndPayload::Len(buf.into()));
+        self.mut_ref.push(WireTypeAndPayload::Len(buf.into()));
         Ok(())
     }
 }
