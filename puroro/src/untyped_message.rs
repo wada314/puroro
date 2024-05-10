@@ -21,7 +21,7 @@ use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::once_cell::unsync::Lazy;
 use ::std::borrow::Cow;
-use ::std::collections::{hash_map, HashMap};
+use ::std::collections::HashMap;
 use ::std::io::{BufReader, Read, Write};
 
 /// Assuming proto2 syntax.
