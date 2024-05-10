@@ -85,7 +85,7 @@ pub mod code_generator_response {
         }
     }
 
-    pub struct File<'a>(UntypedMessage<'a>);
+    pub struct File<'a>(pub(crate) UntypedMessage<'a>);
     impl<'a> File<'a> {
         pub fn name(&self) -> Result<Option<&str>> {
             self.0.field(1).as_scalar_string()
@@ -116,5 +116,9 @@ impl<'a> CodeGeneratorResponse<'a> {
     }
     pub fn maximum_edition(&self) -> Result<Option<i32>> {
         self.0.scalar_variant_field::<Int32>(4)
+    }
+    pub fn file(&self) -> impl Iterator<Item = Result<code_generator_response::File>> {
+        self.0
+            .repeated_message_field(15, code_generator_response::File)
     }
 }
