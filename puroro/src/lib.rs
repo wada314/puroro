@@ -18,7 +18,6 @@
 #![feature(lazy_cell)]
 #![feature(once_cell_try)]
 
-pub mod descriptor;
 pub mod editions;
 pub mod google;
 pub mod internal;

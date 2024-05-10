@@ -4,6 +4,8 @@ version = "0.15.0"
 edition = "2021"
 
 [dependencies]
+ipc-channel = "0.18.0"
+itertools = "0.12.1"
 prettyplease = "0.2.19"
 proc-macro2 = "1.0.81"
 puroro = { path = "../puroro" }
@@ -13,3 +15,5 @@ syn = "2.0.60"
 [[bin]]
 name = "puroro-plugin"
 path = "src/main.rs"
+
+[lib]
