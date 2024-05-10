@@ -14,7 +14,7 @@
 
 use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
-use crate::variant::{Int32, UInt64};
+use crate::variant::{Int32, UInt64, VariantIntegerType};
 use crate::Result;
 use ::derive_more::{Deref as DDeref, From as DFrom};
 
@@ -99,6 +99,16 @@ pub mod code_generator_response {
                 .as_scalar_string()
                 .map(|opt| opt.unwrap_or(""))
         }
+
+        pub fn set_name(&mut self, name: &str) -> Result<()> {
+            self.0.field_mut(1).push_string(name)
+        }
+        pub fn set_insertion_point(&mut self, insertion_point: &str) -> Result<()> {
+            self.0.field_mut(2).push_string(insertion_point)
+        }
+        pub fn set_content(&mut self, content: &str) -> Result<()> {
+            self.0.field_mut(15).push_string(content)
+        }
     }
 }
 
@@ -120,5 +130,25 @@ impl<'a> CodeGeneratorResponse<'a> {
     pub fn file(&self) -> impl Iterator<Item = Result<code_generator_response::File>> {
         self.0
             .repeated_message_field(15, code_generator_response::File)
+    }
+
+    pub fn set_error(&mut self, error: &str) -> Result<()> {
+        self.0.field_mut(1).push_string(error)
+    }
+    pub fn set_supported_features(&mut self, features: u64) -> Result<()> {
+        self.0.field_mut(2).push_variant(features.into())
+    }
+    pub fn set_minimum_edition(&mut self, edition: i32) -> Result<()> {
+        self.0
+            .field_mut(3)
+            .push_variant(Int32::try_into_variant(edition)?)
+    }
+    pub fn set_maximum_edition(&mut self, edition: i32) -> Result<()> {
+        self.0
+            .field_mut(4)
+            .push_variant(Int32::try_into_variant(edition)?)
+    }
+    pub fn push_file(&mut self, file: code_generator_response::File<'a>) -> Result<()> {
+        self.0.field_mut(15).push_message(file.0)
     }
 }
