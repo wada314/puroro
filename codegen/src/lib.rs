@@ -15,12 +15,3 @@
 #![feature(once_cell_try)]
 
 pub mod descriptor;
-
-use crate::descriptor::FileDescriptor;
-
-pub struct Request {
-    pub file_to_generate: Vec<String>,
-    pub parameter: Option<String>,
-    pub proto_files: Vec<FileDescriptor>,
-    pub compiler_version: (i32, i32, i32, String),
-}
