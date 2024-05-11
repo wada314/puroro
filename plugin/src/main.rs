@@ -12,25 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.<
 
-use ::std::env::args;
+use ::std::io::{stdin, stdout, Read, Write};
+use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 
 fn main() {
-    let mut out_dir = String::new();
-    let mut params = Vec::new();
-    let mut proto_files = Vec::new();
-
-    for arg in args().skip(1) {
-        if arg.starts_with("--out_dir=") {
-            out_dir = arg.split_at("--out_dir=".len()).1.to_string();
-        } else if arg.starts_with("--parameter=") {
-            let comma_separated_params = arg.split_at("--parameter=".len()).1;
-            for param in comma_separated_params.split(',') {
-                params.push(param.to_string());
-            }
-        } else {
-            proto_files.push(arg.to_string());
-        }
-    }
-
-    println!("Hello, world!");
+    let mut input_buffer = Vec::new();
+    stdin().read_to_end(&mut input_buffer).unwrap();
+    let request = CodeGeneratorRequest::decode(&input_buffer).unwrap();
 }
