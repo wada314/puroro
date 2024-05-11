@@ -1,10 +1,4 @@
 [workspace]
-members = [ 
-    "codegen",
-    "puroro",
-]
-default-members = [
-    "codegen",
-    "puroro",
-]
+members = ["codegen", "plugin", "puroro"]
+default-members = ["codegen", "plugin", "puroro"]
 resolver = "2"
