@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.<
 
-use ::std::io::{stdin, stdout, Read, Write};
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
+use ::puroro::message::MessageLite;
+use ::std::io::{stdin, stdout, Read, Write};
 
 fn main() {
     let mut input_buffer = Vec::new();
     stdin().read_to_end(&mut input_buffer).unwrap();
-    let request = CodeGeneratorRequest::decode(&input_buffer).unwrap();
+    let request = CodeGeneratorRequest::deser_from_read(input_buffer.as_slice()).unwrap();
 }
