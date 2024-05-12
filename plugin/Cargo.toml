@@ -7,3 +7,9 @@ edition = "2021"
 anyhow = "1.0.83"
 ipc-channel = "0.18.0"
 puroro = { path = "../puroro" }
+
+[[bin]]
+name = "puroro-plugin"
+path = "src/main.rs"
+
+[lib]
