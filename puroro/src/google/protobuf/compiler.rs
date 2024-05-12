@@ -16,9 +16,9 @@ use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
 use crate::variant::{Int32, UInt64, VariantIntegerType};
 use crate::Result;
-use ::derive_more::{Deref as DDeref, From as DFrom};
+use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom};
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct Version<'a>(UntypedMessage<'a>);
 impl<'a> Version<'a> {
     pub fn major(&self) -> Result<i32> {
@@ -35,7 +35,7 @@ impl<'a> Version<'a> {
     }
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct CodeGeneratorRequest<'a>(UntypedMessage<'a>);
 impl<'a> CodeGeneratorRequest<'a> {
     pub fn file_to_generate(&self) -> impl IntoIterator<Item = Result<&str>> {
@@ -112,7 +112,7 @@ pub mod code_generator_response {
     }
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct CodeGeneratorResponse<'a>(UntypedMessage<'a>);
 impl<'a> CodeGeneratorResponse<'a> {
     pub fn error(&self) -> Result<Option<&str>> {

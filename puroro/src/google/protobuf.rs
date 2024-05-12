@@ -17,9 +17,9 @@ pub mod compiler;
 use crate::untyped_message::UntypedMessage;
 use crate::variant::{Bool, Int32};
 use crate::{ErrorKind, Result};
-use ::derive_more::{Deref as DDeref, From as DFrom};
+use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom};
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct FileDescriptorSet<'a>(UntypedMessage<'a>);
 impl<'a> FileDescriptorSet<'a> {
     pub fn file(&self) -> impl IntoIterator<Item = Result<FileDescriptorProto>> {
@@ -58,7 +58,7 @@ impl TryFrom<i32> for Edition {
     }
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct FileDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> FileDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
@@ -94,7 +94,7 @@ impl<'a> FileDescriptorProto<'a> {
     }
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct DescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> DescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
@@ -121,7 +121,7 @@ impl<'a> DescriptorProto<'a> {
     // pub fn reserved_name(&self) -> impl IntoIterator<Item = Result<&'a str>>
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct FieldDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> FieldDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
@@ -226,7 +226,7 @@ pub mod field_descriptor_proto {
     }
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct OneofDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> OneofDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
@@ -235,7 +235,7 @@ impl<'a> OneofDescriptorProto<'a> {
     // pub fn options(&self) -> Result<Option<OneofOptions>>
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct EnumDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> EnumDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
@@ -249,7 +249,7 @@ impl<'a> EnumDescriptorProto<'a> {
     // pub fn reserved_name(&self) -> impl IntoIterator<Item = Result<&'a str>>
 }
 
-#[derive(DDeref, DFrom)]
+#[derive(DDeref, DDerefMut, DFrom)]
 pub struct EnumValueDescriptorProto<'a>(UntypedMessage<'a>);
 impl<'a> EnumValueDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {

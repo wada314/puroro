@@ -15,11 +15,34 @@
 use crate::Result;
 use ::futures::io::{AsyncRead, AsyncWrite};
 use ::std::io::{Read, Write};
+use ::std::ops::{Deref, DerefMut};
 
 /// Protobuf message, which can be serialized, deserialized, and field accessible.
 pub trait MessageLite {
     fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()>;
+    fn deser_from_read<R: Read>(read: R) -> Result<Self>
+    where
+        Self: Sized + Default,
+    {
+        let mut msg = Self::default();
+        msg.merge_from_read(read)?;
+        Ok(msg)
+    }
     fn write<W: Write>(&self, write: W) -> Result<usize>;
+}
+
+impl<T> MessageLite for T
+where
+    T: Deref + DerefMut,
+    <T as Deref>::Target: MessageLite,
+{
+    fn merge_from_read<R: Read>(&mut self, mut read: R) -> Result<()> {
+        DerefMut::deref_mut(self).merge_from_read(&mut read)?;
+        Ok(())
+    }
+    fn write<W: Write>(&self, mut write: W) -> Result<usize> {
+        Deref::deref(self).write(&mut write)
+    }
 }
 
 /// [`MessageLite`] + descriptors and reflections.
