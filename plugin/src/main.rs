@@ -12,12 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.<
 
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
+use ::anyhow::Result;
+use ::ipc_channel::ipc::{bytes_channel, IpcSender};
+use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::MessageLite;
 use ::std::io::{stdin, stdout, Read, Write};
 
-fn main() {
+fn main() -> Result<()> {
     let mut input_buffer = Vec::new();
-    stdin().read_to_end(&mut input_buffer).unwrap();
+    stdin().read_to_end(&mut input_buffer)?;
     let request = CodeGeneratorRequest::deser_from_read(input_buffer.as_slice()).unwrap();
+
+    let ipc_init_key = request.parameter()?.unwrap_or_default();
+    let ipc_init_send = IpcSender::connect(ipc_init_key.to_string())?;
+    let (req_send, req_recv) = bytes_channel()?;
+    let (res_send, res_recv) = bytes_channel()?;
+    ipc_init_send.send((req_recv, res_send))?;
+
+    req_send.send(&input_buffer)?;
+    let response = res_recv.recv()?;
+
+    stdout().write_all(&response)?;
+
+    Ok(())
 }
