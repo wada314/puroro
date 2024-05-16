@@ -62,7 +62,8 @@ fn test_call_wrapper_inner(
     out_file_name: &str,
     out_file_content: &str,
 ) -> CodeGeneratorResponse<'static> {
-    assert_eq!(req.proto_file().count(), 1);
+    let input_files = req.proto_file().collect::<Result<Vec<_>, _>>().unwrap();
+    assert_eq!(input_files.len(), 1);
     let mut res = CodeGeneratorResponse::default();
     let mut file = ResFile::default();
     file.set_name(out_file_name).unwrap();
