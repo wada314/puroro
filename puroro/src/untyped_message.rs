@@ -52,8 +52,10 @@ impl MessageLite for UntypedMessage<'_> {
                         8usize
                     }
                     WireTypeAndPayload::Len(ld) => {
+                        let len_len =
+                            write.write_variant(UInt32::try_into_variant(ld.len().try_into()?)?)?;
                         write.write_all(ld)?;
-                        ld.len()
+                        len_len + ld.len()
                     }
                 };
             }
