@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro_protoc_wrapper::Protoc;
+use ::tempfile::tempdir;
 
 #[test]
-fn test_call_wrapper() {}
+fn test_call_wrapper() {
+    let out_dir = tempdir().unwrap();
+    let protoc = Protoc::new()
+        .protoc_path("protoc")
+        .out_dir(out_dir.path().to_str().unwrap())
+        .proto_file("tests/test.proto")
+        .run(|req| todo!())
+        .unwrap();
+}

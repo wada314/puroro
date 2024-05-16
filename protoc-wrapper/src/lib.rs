@@ -46,6 +46,14 @@ pub struct Protoc {
 }
 
 impl Protoc {
+    pub fn new() -> Self {
+        Self {
+            protoc_path: "protoc".to_string(),
+            out_dir: ".".to_string(),
+            proto_files: Vec::new(),
+            proto_paths: Vec::new(),
+        }
+    }
     pub fn protoc_path(mut self, path: &str) -> Self {
         self.protoc_path = path.to_string();
         self
