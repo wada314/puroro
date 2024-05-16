@@ -1,0 +1,16 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "*.inc": "cpp"
+        },
+        "rust-analyzer.cargo.extraArgs": [
+            "-Z",
+            "bindeps"
+        ]
+    }
+}

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
-use ::puroro::google::protobuf::compiler::plugin::{CodeGeneratorRequest, CodeGeneratorResponse};
+use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::message::MessageLite;
 use ::std::env;
 use ::std::process::Command;
@@ -24,9 +24,11 @@ const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PURORO_PLUGIN");
 #[derive(Error, Debug)]
 pub enum ErrorKind {
     #[error("IpcError: {0}")]
-    IpcError(#[from] ::ipc_channel::Error),
+    IpcError(#[from] ::ipc_channel::ipc::IpcError),
     #[error("IoError: {0}")]
     IoError(#[from] ::std::io::Error),
+    #[error("PuroroError: {0}")]
+    PuroroError(#[from] ::puroro::ErrorKind),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
@@ -75,7 +77,7 @@ impl Protoc {
         // revieve the ipc channels from the plugin exe.
         let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) = ipc_init_server.accept()?.1;
 
-        let req = CodeGeneratorRequest::deser_from_read(&req_recv.recv()?)?;
+        let req = CodeGeneratorRequest::deser_from_read(req_recv.recv()?.as_slice())?;
 
         todo!();
         Ok(())
