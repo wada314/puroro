@@ -15,7 +15,7 @@
 use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
 use crate::variant::{Int32, UInt64, VariantIntegerType};
-use crate::Result;
+use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom};
 
 #[derive(DDeref, DDerefMut, DFrom, Default, Debug)]
@@ -56,10 +56,11 @@ impl<'a> CodeGeneratorRequest<'a> {
 }
 
 pub mod code_generator_response {
-    use crate::untyped_message::UntypedMessage;
-    use crate::{ErrorKind, Result};
+    use super::*;
 
+    #[derive(Default, Debug)]
     pub enum Feature {
+        #[default]
         FeatureNone = 0,
         FeatureProto3Optional = 1,
         FeatureSupportsEditions = 2,
@@ -85,6 +86,7 @@ pub mod code_generator_response {
         }
     }
 
+    #[derive(DDeref, DDerefMut, DFrom, Default, Debug)]
     pub struct File<'a>(pub(crate) UntypedMessage<'a>);
     impl<'a> File<'a> {
         pub fn name(&self) -> Result<Option<&str>> {

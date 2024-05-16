@@ -12,17 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::puroro::google::protobuf::compiler::code_generator_response::File as ResFile;
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro_protoc_wrapper::Protoc;
-use ::tempfile::tempdir;
+use ::std::io::Write;
+use ::tempfile::{tempdir, NamedTempFile};
+
+const EMPTY_PROTO_FILE: &'static str = r#"
+syntax = "proto3";
+package empty;
+"#;
 
 #[test]
 fn test_call_wrapper() {
     let out_dir = tempdir().unwrap();
-    let protoc = Protoc::new()
+    let out_file_name = "empty_test.rs";
+    let proto_file = NamedTempFile::new().unwrap();
+    proto_file
+        .as_file()
+        .write_all(EMPTY_PROTO_FILE.as_bytes())
+        .unwrap();
+    Protoc::new()
         .protoc_path("protoc")
         .out_dir(out_dir.path().to_str().unwrap())
-        .proto_file("tests/test.proto")
-        .run(|req| todo!())
+        .proto_file(proto_file.path().to_str().unwrap())
+        .run(|req| Ok(test_call_wrapper_inner(req, &out_file_name)))
         .unwrap();
+}
+
+fn test_call_wrapper_inner(
+    req: CodeGeneratorRequest,
+    out_file_name: &str,
+) -> CodeGeneratorResponse<'static> {
+    assert_eq!(req.proto_file().count(), 1);
+    let mut res = CodeGeneratorResponse::default();
+    let mut file = ResFile::default();
+    file.set_name(out_file_name).unwrap();
+    // empty content
+    res.push_file(file).unwrap();
+    res
 }
