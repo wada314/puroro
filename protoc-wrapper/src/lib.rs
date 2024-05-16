@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
+use ::std::env;
 use ::thiserror::Error;
+
+const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PURORO_PLUGIN");
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {

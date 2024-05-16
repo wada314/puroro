@@ -4,6 +4,10 @@
         {
             "type": "cargo",
             "command": "build",
+            "args": [
+                "-Z",
+                "bindeps"
+            ],
             "problemMatcher": [
                 "$rustc"
             ],
