@@ -1,0 +1,8 @@
+[package]
+name = "puroro-protoc-wrapper"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ipc-channel = "0.18.0"
+thiserror = "1.0.60"
