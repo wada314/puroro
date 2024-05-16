@@ -8,3 +8,6 @@ ipc-channel = "0.18.0"
 thiserror = "1.0.60"
 puroro-plugin = { path = "../plugin", artifact = "bin:puroro-plugin" }
 puroro = { path = "../puroro" }
+
+[dev-dependencies]
+tempfile = "3.10.1"
