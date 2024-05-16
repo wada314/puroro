@@ -83,7 +83,7 @@ impl Protoc {
 
         let mut process = Command::new(&self.protoc_path)
             .args(&[
-                format!("--plugin=puroro={}", PLUGIN_PATH),
+                format!("--plugin=protoc-gen-puroro={}", PLUGIN_PATH),
                 format!("--puroro_out={}", self.out_dir),
                 format!("--puroro_opt={}", ipc_init_name),
             ])
