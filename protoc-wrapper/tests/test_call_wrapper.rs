@@ -27,7 +27,8 @@ package empty;
 fn test_call_wrapper() {
     let out_dir = tempdir().unwrap();
     let out_file_name = "empty_test.rs";
-    let proto_file = NamedTempFile::new().unwrap();
+    let proto_dir = tempdir().unwrap();
+    let proto_file = NamedTempFile::new_in(proto_dir.path()).unwrap();
     proto_file
         .as_file()
         .write_all(EMPTY_PROTO_FILE.as_bytes())
@@ -36,6 +37,7 @@ fn test_call_wrapper() {
         .protoc_path("protoc")
         .out_dir(out_dir.path().to_str().unwrap())
         .proto_file(proto_file.path().to_str().unwrap())
+        .proto_path(proto_dir.path().to_str().unwrap())
         .run(|req| Ok(test_call_wrapper_inner(req, &out_file_name)))
         .unwrap();
 }

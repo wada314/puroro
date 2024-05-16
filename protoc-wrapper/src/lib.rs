@@ -17,7 +17,9 @@ use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorRe
 use ::puroro::message::MessageLite;
 use ::std::env;
 use ::std::process::{Command, ExitStatus};
+use ::std::time::Duration;
 use ::thiserror::Error;
+use ::wait_timeout::ChildExt;
 
 const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PURORO_PLUGIN");
 
@@ -33,6 +35,8 @@ pub enum ErrorKind {
     PuroroError(#[from] ::puroro::ErrorKind),
     #[error("CallbackError: {0}")]
     CallbackError(String),
+    #[error("ProtocTimeoutError")]
+    ProtocTimeoutError,
     #[error("ProtocProcessError: {0}")]
     ProtocProcessError(ExitStatus),
 }
@@ -91,17 +95,22 @@ impl Protoc {
             .args(&self.proto_files)
             .spawn()?;
 
-        // revieve the ipc channels from the plugin exe.
-        let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) = ipc_init_server.accept()?.1;
+        {
+            // revieve the ipc channels from the plugin exe.
+            let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) =
+                ipc_init_server.accept()?.1;
 
-        let req = CodeGeneratorRequest::deser_from_read(req_recv.recv()?.as_slice())?;
-        let res = (body)(req).map_err(|x| ErrorKind::CallbackError(x))?;
+            let req = CodeGeneratorRequest::deser_from_read(req_recv.recv()?.as_slice())?;
+            let res = (body)(req).map_err(|x| ErrorKind::CallbackError(x))?;
 
-        let mut res_bytes = Vec::new();
-        res.write(&mut res_bytes)?;
-        res_send.send(&res_bytes)?;
+            let mut res_bytes = Vec::new();
+            res.write(&mut res_bytes)?;
+            res_send.send(&res_bytes)?;
+        }
 
-        let exit_code = process.wait()?;
+        let Some(exit_code) = process.wait_timeout(Duration::from_secs(1))? else {
+            return Err(ErrorKind::ProtocTimeoutError);
+        };
         if !exit_code.success() {
             return Err(ErrorKind::ProtocProcessError(exit_code));
         }
