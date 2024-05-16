@@ -16,19 +16,25 @@ use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::message::MessageLite;
 use ::std::env;
-use ::std::process::Command;
+use ::std::process::{Command, ExitStatus};
 use ::thiserror::Error;
 
 const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PURORO_PLUGIN");
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
+    #[error("IpcIpcError: {0}")]
+    IpcIpcError(#[from] ::ipc_channel::ipc::IpcError),
     #[error("IpcError: {0}")]
-    IpcError(#[from] ::ipc_channel::ipc::IpcError),
+    IpcError(#[from] ::ipc_channel::Error),
     #[error("IoError: {0}")]
     IoError(#[from] ::std::io::Error),
     #[error("PuroroError: {0}")]
     PuroroError(#[from] ::puroro::ErrorKind),
+    #[error("CallbackError: {0}")]
+    CallbackError(String),
+    #[error("ProtocProcessError: {0}")]
+    ProtocProcessError(ExitStatus),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
@@ -57,10 +63,13 @@ impl Protoc {
         self
     }
 
-    pub fn run(self) -> Result<()> {
+    pub fn run<F>(self, body: F) -> Result<()>
+    where
+        F: FnOnce(CodeGeneratorRequest) -> ::std::result::Result<CodeGeneratorResponse, String>,
+    {
         let (ipc_init_server, ipc_init_name) = IpcOneShotServer::new()?;
 
-        let process = Command::new(&self.protoc_path)
+        let mut process = Command::new(&self.protoc_path)
             .args(&[
                 format!("--plugin=puroro={}", PLUGIN_PATH),
                 format!("--puroro_out={}", self.out_dir),
@@ -78,8 +87,17 @@ impl Protoc {
         let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) = ipc_init_server.accept()?.1;
 
         let req = CodeGeneratorRequest::deser_from_read(req_recv.recv()?.as_slice())?;
+        let res = (body)(req).map_err(|x| ErrorKind::CallbackError(x))?;
 
-        todo!();
+        let mut res_bytes = Vec::new();
+        res.write(&mut res_bytes)?;
+        res_send.send(&res_bytes)?;
+
+        let exit_code = process.wait()?;
+        if !exit_code.success() {
+            return Err(ErrorKind::ProtocProcessError(exit_code));
+        }
+
         Ok(())
     }
 }
