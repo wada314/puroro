@@ -9,6 +9,11 @@ thiserror = "1.0.60"
 puroro-plugin = { path = "../plugin", artifact = "bin:puroro-plugin" }
 puroro = { path = "../puroro" }
 wait-timeout = "0.2.0"
+tempfile = { version = "3.10.1", optional = true }
 
 [dev-dependencies]
 tempfile = "3.10.1"
+
+[features]
+default = ["on-memory"]
+on-memory = ["tempfile"]
