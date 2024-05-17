@@ -44,7 +44,7 @@ pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub struct Protoc {
     protoc_path: String,
-    out_dir: String,
+    out_dir: Option<String>,
     proto_files: Vec<String>,
     proto_paths: Vec<String>,
 }
@@ -53,7 +53,7 @@ impl Protoc {
     pub fn new() -> Self {
         Self {
             protoc_path: "protoc".to_string(),
-            out_dir: ".".to_string(),
+            out_dir: None,
             proto_files: Vec::new(),
             proto_paths: Vec::new(),
         }
@@ -63,7 +63,7 @@ impl Protoc {
         self
     }
     pub fn out_dir(mut self, path: &str) -> Self {
-        self.out_dir = path.to_string();
+        self.out_dir = Some(path.to_string());
         self
     }
     pub fn proto_file(mut self, path: &str) -> Self {
@@ -84,7 +84,7 @@ impl Protoc {
         let mut process = Command::new(&self.protoc_path)
             .args(&[
                 format!("--plugin=protoc-gen-puroro={}", PLUGIN_PATH),
-                format!("--puroro_out={}", self.out_dir),
+                format!("--puroro_out={}", self.out_dir.unwrap_or(".".to_string())),
                 format!("--puroro_opt={}", ipc_init_name),
             ])
             .args(
