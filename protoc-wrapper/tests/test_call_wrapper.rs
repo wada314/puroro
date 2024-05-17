@@ -15,14 +15,8 @@
 use ::puroro::google::protobuf::compiler::code_generator_response::File as ResFile;
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro_protoc_wrapper::Protoc;
-use ::std::fs::File;
-use ::std::io::{Read, Write};
+use ::std::io::Write;
 use ::tempfile::{tempdir, NamedTempFile};
-
-const EMPTY_PROTO_FILE: &'static str = r#"
-syntax = "proto3";
-package empty;
-"#;
 
 #[test]
 fn test_call_wrapper() {
@@ -31,10 +25,14 @@ fn test_call_wrapper() {
     let out_file_content = "This\nis\na\ntest";
     let proto_dir = tempdir().unwrap();
     let proto_file = NamedTempFile::new_in(proto_dir.path()).unwrap();
+    let proto_file_content = r#"
+syntax = "proto3";
+package empty;
+"#;
 
     proto_file
         .as_file()
-        .write_all(EMPTY_PROTO_FILE.as_bytes())
+        .write_all(proto_file_content.as_bytes())
         .unwrap();
 
     Protoc::new()
@@ -51,9 +49,7 @@ fn test_call_wrapper() {
         })
         .unwrap();
 
-    let mut out_file = File::open(out_dir.path().join(out_file_name)).unwrap();
-    let mut actual_out = String::new();
-    out_file.read_to_string(&mut actual_out).unwrap();
+    let actual_out = ::std::fs::read_to_string(out_dir.path().join(out_file_name)).unwrap();
     assert_eq!(actual_out, out_file_content);
 }
 
