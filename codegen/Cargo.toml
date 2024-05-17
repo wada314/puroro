@@ -11,5 +11,6 @@ proc-macro2 = "1.0.81"
 puroro = { path = "../puroro" }
 quote = "1.0.36"
 syn = "2.0.60"
+thiserror = "1.0.60"
 
 [lib]
