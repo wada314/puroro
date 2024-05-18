@@ -45,10 +45,10 @@ impl<'a> CodeGeneratorRequest<'a> {
         self.0.field(2).as_scalar_string()
     }
     pub fn proto_file(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
-        self.0.repeated_message_field(15, FileDescriptorProto)
+        self.0.repeated_message_field(15, Into::into)
     }
     pub fn source_file_descriptors(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
-        self.0.repeated_message_field(17, FileDescriptorProto)
+        self.0.repeated_message_field(17, Into::into)
     }
     pub fn compiler_version(&self) -> Result<Option<Version>> {
         self.0.scalar_message_field(3, Version)
